@@ -2,6 +2,7 @@
 	"extends": "@trymatcha/typescript-config/base.json",
 	"compilerOptions": {
 		"types": ["bun"],
+		"target": "ESNext",
 		"noEmit": true,
 		"strictNullChecks": true
 	},
