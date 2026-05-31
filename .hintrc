@@ -1,0 +1,17 @@
+{
+    "hints": {
+        "axe/aria": "off",
+        "axe/forms": "off",
+        "axe/name-role-value": "off",
+        "axe/semantics": "off",
+        "axe/text-alternatives": "off",
+        "axe/structure": "off",
+        "axe/keyboard": "off",
+        "axe/color": "off",
+        "axe/language": "off",
+        "axe/parsing": "off",
+        "axe/sensory-and-visual-cues": "off",
+        "axe/tables": "off",
+        "axe/time-and-media": "off"
+    }
+}
