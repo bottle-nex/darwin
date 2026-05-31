@@ -71,7 +71,7 @@ export function Button({
 				className={cn(
 					buttonVariants({ variant, size, className }),
 					azeretMono.className,
-					"font-light duration-150 ease-out active:scale-[0.99]",
+					"font-light duration-150 ease-out active:scale-[0.99] cursor-pointer",
 				)}
 				{...props}
 			>
@@ -91,7 +91,7 @@ export function Button({
 			className={cn(
 				buttonVariants({ variant, size, className }),
 				azeretMono.className,
-				"font-light duration-150 ease-out active:scale-[0.99] uppercase",
+				"font-light duration-150 ease-out active:scale-[0.99] uppercase cursor-pointer",
 			)}
 			{...props}
 		>
