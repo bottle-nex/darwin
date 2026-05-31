@@ -15,6 +15,9 @@ const envSchema = z.object({
         .string()
         .min(32, "JWT refresh secret must be at least 32 characters"),
     SERVER_REDIS_URL: z.url("Invalid Redis URL"),
+    SERVER_OTP_TTL_SECONDS: z.coerce.number().default(600),
+    SERVER_OTP_COOLDOWN_SECONDS: z.coerce.number().default(60),
+    SERVER_OTP_MAX_ATTEMPTS: z.coerce.number().default(5),
     SERVER_RESEND_API_KEY: z.string().min(1, "Resend api key is required"),
     SERVER_WEB_URL: z.string().min(1, "Web URL is required"),
     DATABASE_URL: z.string().min(1, "Database URL is required"),
