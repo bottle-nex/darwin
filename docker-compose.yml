@@ -1,19 +1,18 @@
 version: "3"
 
+services:
+  db:
+    image: postgres:16
+    container_name: nanbe-postgres
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=nanbe
+    ports:
+      - '5435:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
 volumes:
   postgres_data:
     driver: local
-
-services:
-  db:
-    platform: linux/amd64
-    image: postgres:15 # Use a specific version of Postgres
-    restart: always
-    environment:
-      - POSTGRES_USER=sebi
-      - POSTGRES_PASSWORD=sebi_test_4444
-      - POSTGRES_DB=turborepo
-    ports:
-      - '5432:5432' # Expose the Postgres port to your local machine
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
