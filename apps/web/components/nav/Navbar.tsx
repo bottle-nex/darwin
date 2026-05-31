@@ -1,5 +1,5 @@
 "use client";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { HiBars3, HiChevronRight, HiXMark } from "react-icons/hi2";
 import { cn } from "@/lib/utils";
@@ -17,42 +17,47 @@ export function NavBar() {
     const [menuOpen, setMenuOpen] = useState(false);
     const headerRef = useRef<HTMLElement>(null);
 
+
+    useEffect(() => {
+        function onScroll() {
+            const scrollY = window.scrollY;
+            setScrolled(scrollY > 10);
+        }
+
+        document.addEventListener('scroll', onScroll)
+        return () => document.removeEventListener('scroll', onScroll)
+    }, [])
+
     return (
         <header
             ref={headerRef}
             className={cn(
-                "fixed top-0 left-0 right-0 z-50 h-14",
-                "border-b",
-                "transition-colors duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]",
-                scrolled ? "border-b-transparent bg-transparent" : "border-b-border bg-snow",
+                "fixed top-0 left-0 right-0 z-50",
+                "transition-[height,border-color] duration-300 ease-out",
+                scrolled ? "border-b border-neutral-200 h-15" : "border-b border-transparent h-17"
             )}
         >
             <div
-                className={cn(
-                    "mx-auto flex items-center justify-between px-4 border",
-                    "transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]",
-                    scrolled
-                        ? "mt-1.5 h-14 max-w-270 rounded-lg border-border bg-card shadow-[0_4px_16px_-4px_rgba(15,23,42,0.12)]"
-                        : "h-full max-w-6xl rounded-none border-transparent bg-transparent shadow-none",
-                )}
+                className="mx-auto max-w-7xl flex h-full items-center justify-between px-4"
             >
                 <div className="flex items-center gap-8 justify-between">
                     <Link href="/" aria-label="try matcha home">
                         <AppLogo />
                     </Link>
                 </div>
-                <nav className={cn("hidden md:flex items-center gap-7 uppercase", azeretMono.className)}>
-                    {NAV_ITEMS.map((item) => (
-                        <Link
-                            key={item.label}
-                            href={item.href}
-                            className="text-[13px] font-medium text-foreground hover:text-foreground transition-colors duration-200"
-                        >
-                            {item.label}
-                        </Link>
+                <nav className={cn("hidden md:flex items-center uppercase", azeretMono.className)}>
+                    {NAV_ITEMS.map((item, i) => (
+                        <div key={item.label} className="flex items-center">
+                            {i > 0 && <span className="h-2.5 w-px bg-neutral-700" />}
+                            <Link
+                                href={item.href}
+                                className="flex items-center px-4 text-[13px] font-medium text-foreground transition-colors duration-200 hover:text-foreground/70"
+                            >
+                                {item.label}
+                            </Link>
+                        </div>
                     ))}
-                </nav>
-                <div className="flex items-center gap-2">
+                </nav>                <div className="flex items-center gap-2">
                     <Button variant={"secondary"} className="flex items-center justify-center">
                         Sign in
                         <HiChevronRight className="h-3 w-3" />
