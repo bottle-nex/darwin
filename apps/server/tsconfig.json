@@ -1,0 +1,10 @@
+{
+	"extends": "@trymatcha/typescript-config/base.json",
+	"compilerOptions": {
+		"types": ["bun"],
+		"noEmit": true,
+		"strictNullChecks": true
+	},
+	"include": ["src/**/*.ts"],
+	"exclude": ["node_modules"]
+}

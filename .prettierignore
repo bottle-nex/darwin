@@ -1,0 +1,13 @@
+node_modules
+dist
+build
+.next
+.turbo
+coverage
+bun.lock
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+packages/database/generated
+**/generated
+*.pem

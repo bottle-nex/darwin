@@ -1,0 +1,21 @@
+echo "🍵 running pre-push checks..."
+
+echo "→ prettier (format check)"
+bun run format:check || {
+	echo "✗ formatting issues found. run \`bun run format\` to fix."
+	exit 1
+}
+
+echo "→ eslint"
+bun run lint || {
+	echo "✗ lint failed."
+	exit 1
+}
+
+echo "→ typescript"
+bun run typecheck || {
+	echo "✗ typecheck failed."
+	exit 1
+}
+
+echo "✓ all checks passed — pushing."
