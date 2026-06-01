@@ -7,6 +7,8 @@ import { azeretMono, Button } from "@/components/ui/button";
 import AppLogo from "@/components/app/Applogo";
 import { FaDiscord } from "react-icons/fa";
 import { TiArrowDown } from "react-icons/ti";
+import { useUserSessionStore } from "@/store/user/useUserSessionStore";
+import SigninModal from "../utility/modal/SigninModal";
 
 const NAV_ITEMS = [
     { label: "Features", href: "/#features" },
@@ -17,6 +19,7 @@ export function NavBar() {
     const [scrolled, setScrolled] = useState(false);
     const [menuOpen, setMenuOpen] = useState(false);
     const headerRef = useRef<HTMLElement>(null);
+    const { setOpenSigninModal } = useUserSessionStore();
 
     useEffect(() => {
         function onScroll() {
@@ -27,6 +30,10 @@ export function NavBar() {
         document.addEventListener("scroll", onScroll);
         return () => document.removeEventListener("scroll", onScroll);
     }, []);
+
+    function handleSignin() {
+        setOpenSigninModal(true);
+    }
 
     return (
         <header
@@ -64,7 +71,11 @@ export function NavBar() {
                 </nav>
 
                 <div className="flex items-center gap-2">
-                    <Button variant={"secondary"} className="flex items-center justify-center">
+                    <Button
+                        variant={"secondary"}
+                        className="flex items-center justify-center"
+                        onClick={handleSignin}
+                    >
                         Sign in
                         <HiChevronRight className="h-3 w-3" />
                     </Button>
@@ -84,6 +95,7 @@ export function NavBar() {
                     </Button>
                 </div>
             </div>
+            <SigninModal />
         </header>
     );
 }
