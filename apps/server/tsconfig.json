@@ -1,11 +1,11 @@
 {
-	"extends": "@trymatcha/typescript-config/base.json",
-	"compilerOptions": {
-		"types": ["bun"],
-		"target": "ESNext",
-		"noEmit": true,
-		"strictNullChecks": true
-	},
-	"include": ["src/**/*.ts"],
-	"exclude": ["node_modules"]
+    "extends": "@trymatcha/typescript-config/base.json",
+    "compilerOptions": {
+        "types": ["bun"],
+        "target": "ESNext",
+        "noEmit": true,
+        "strictNullChecks": true
+    },
+    "include": ["src/**/*.ts"],
+    "exclude": ["node_modules"]
 }
