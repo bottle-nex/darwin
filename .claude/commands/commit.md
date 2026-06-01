@@ -16,7 +16,7 @@ git diff --cached
 - If there **are** staged changes, commit the **staged** diff only.
 - If **nothing is staged**, run `git add -A` first, then commit everything.
 
-Read the actual diff to understand *what changed* — never write the message from filenames alone.
+Read the actual diff to understand _what changed_ — never write the message from filenames alone.
 
 ## 2. Message — Conventional Commits with body
 
@@ -27,13 +27,13 @@ Read the actual diff to understand *what changed* — never write the message fr
 ```
 
 - **subject** (line 1):
-  - **type**: `feat` | `fix` | `refactor` | `chore` | `docs` | `style` | `test` | `perf` | `build` | `ci`
-  - **scope** (optional): area touched — `auth`, `otp`, `server`, `web`, `db`, `config`, etc. Infer from paths.
-  - imperative mood, lowercase, no trailing period, ≤ 50 chars.
+    - **type**: `feat` | `fix` | `refactor` | `chore` | `docs` | `style` | `test` | `perf` | `build` | `ci`
+    - **scope** (optional): area touched — `auth`, `otp`, `server`, `web`, `db`, `config`, etc. Infer from paths.
+    - imperative mood, lowercase, no trailing period, ≤ 50 chars.
 - **blank line**, then the **body**:
-  - Explain *what changed and why* — not a file-by-file restatement of the diff.
-  - Wrap lines at ~72 cols. A few sentences or short bullets is plenty.
-  - For a truly trivial change (typo, formatting) the body may be a single line.
+    - Explain _what changed and why_ — not a file-by-file restatement of the diff.
+    - Wrap lines at ~72 cols. A few sentences or short bullets is plenty.
+    - For a truly trivial change (typo, formatting) the body may be a single line.
 - If the diff spans unrelated concerns, pick the dominant change for the subject and cover the rest in the body.
 
 If I passed a hint after the command (`$ARGUMENTS`), use it to steer intent/scope.
