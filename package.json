@@ -29,7 +29,8 @@
     },
     "dependencies": {
         "@prisma/adapter-pg": "^7.2.0",
-        "@prisma/client": "latest"
+        "@prisma/client": "latest",
+        "lucide-react": "^1.17.0"
     },
     "devDependencies": {
         "husky": "^9.1.7",
