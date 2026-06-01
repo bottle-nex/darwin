@@ -4,8 +4,8 @@ import { AnimatePresence } from "motion/react";
 import {
     RiLayoutColumnFill,
     RiCodeSSlashFill,
-    RiListSettingsFill,
-    RiFlashlightFill,
+    RiEqualizer2Fill,
+    RiPulseFill,
     RiSettingsFill,
     RiInformationFill,
     RiPaletteFill,
@@ -19,6 +19,7 @@ import {
     usePlaygroundRenderer,
 } from "@/store/playground/usePlaygroundRenderer";
 import { cn } from "@/lib/utils";
+import IconWrapper from "@/components/ui/IconWrapper";
 import PlaygroundSidebarPanel, {
     type SidebarChild,
 } from "@/components/playground/PlaygroundSidebarPanel";
@@ -26,17 +27,41 @@ import PlaygroundSidebarPanel, {
 type RendererMeta = {
     icon: React.ElementType;
     label: string;
+    bgColor: string;
+    strokeColor: string;
     children?: SidebarChild[];
 };
 
 const RENDERER_META: Record<PlayGroundSidebarProps, RendererMeta> = {
-    [PlayGroundSidebarProps.KANBAN]: { icon: RiLayoutColumnFill, label: "Kanban" },
-    [PlayGroundSidebarProps.CODE]: { icon: RiCodeSSlashFill, label: "Code" },
-    [PlayGroundSidebarProps.PROPS]: { icon: RiListSettingsFill, label: "Props" },
-    [PlayGroundSidebarProps.EVENTS]: { icon: RiFlashlightFill, label: "Events" },
+    [PlayGroundSidebarProps.KANBAN]: {
+        icon: RiLayoutColumnFill,
+        label: "Kanban",
+        bgColor: "bg-indigo-500",
+        strokeColor: "text-white",
+    },
+    [PlayGroundSidebarProps.CODE]: {
+        icon: RiCodeSSlashFill,
+        label: "Code",
+        bgColor: "bg-emerald-500",
+        strokeColor: "text-white",
+    },
+    [PlayGroundSidebarProps.PROPS]: {
+        icon: RiEqualizer2Fill,
+        label: "Props",
+        bgColor: "bg-amber-500",
+        strokeColor: "text-white",
+    },
+    [PlayGroundSidebarProps.EVENTS]: {
+        icon: RiPulseFill,
+        label: "Events",
+        bgColor: "bg-sky-500",
+        strokeColor: "text-white",
+    },
     [PlayGroundSidebarProps.MANAGE]: {
         icon: RiSettingsFill,
         label: "Manage",
+        bgColor: "bg-rose-500",
+        strokeColor: "text-white",
         children: [
             {
                 key: "general",
@@ -88,7 +113,13 @@ export default function PlaygroundSidebar() {
             <aside className="flex h-full w-14 shrink-0 flex-col items-center gap-1 py-3">
                 <nav className="flex flex-col items-center gap-1" aria-label="Playground views">
                     {RENDERERS.map((key) => {
-                        const { icon: Icon, label, children } = RENDERER_META[key];
+                        const {
+                            icon: Icon,
+                            label,
+                            children,
+                            bgColor,
+                            strokeColor,
+                        } = RENDERER_META[key];
                         const isActive = renderer === key;
 
                         return (
@@ -110,25 +141,24 @@ export default function PlaygroundSidebar() {
                                             "group relative flex size-10 cursor-pointer items-center justify-center rounded-md outline-none transition-all duration-200 ease-out",
                                             "focus-visible:ring-2 focus-visible:ring-[#9bc24f]/40",
                                             isActive
-                                                ? "bg-[#9bc24f]/10 text-[#bcdb6f]"
-                                                : "text-neutral-500 hover:bg-neutral-800/60 hover:text-neutral-200",
+                                                ? "bg-neutral-800/80"
+                                                : "hover:bg-neutral-800/60",
                                         )}
                                     >
                                         <span
                                             className={cn(
-                                                "absolute -left-2 h-8 w-0.75 rounded-r-full bg-[#9bc24f] transition-all duration-200 ease-out",
+                                                bgColor,
+                                                "absolute -left-2 h-8 w-0.75 rounded-r-full transition-all duration-200 ease-out",
                                                 isActive
                                                     ? "opacity-100"
                                                     : "-translate-x-1 opacity-0",
                                             )}
                                             aria-hidden
                                         />
-                                        <Icon
-                                            className={cn(
-                                                "size-4.5 transition-transform duration-200 ease-out",
-                                                !isActive && "group-hover:scale-110",
-                                            )}
-                                            aria-hidden
+                                        <IconWrapper
+                                            icon={<Icon className="size-3.5" aria-hidden />}
+                                            stroke_color={strokeColor}
+                                            bg_color={bgColor}
                                         />
                                     </button>
                                 </TooltipTrigger>
