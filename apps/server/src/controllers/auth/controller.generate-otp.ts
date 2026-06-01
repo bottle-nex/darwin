@@ -23,7 +23,7 @@ export default class GenerateOtpController {
      *
      * Responses: `200` sent · `429` `OTP_COOLDOWN` · `400` invalid email · `500` on error.
      */
-    static async generate(req: Request, res: Response) {
+    static async process(req: Request, res: Response) {
         const parsed = body_schema.safeParse(req.body);
         if (!parsed.success) {
             return ResponseWriter.invalid_data(res, "Valid email required");

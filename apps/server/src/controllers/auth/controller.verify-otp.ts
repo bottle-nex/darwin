@@ -25,7 +25,7 @@ export default class OtpVerifyController {
      * Responses: `200` `{ user, token }` · `429` `OTP_LOCKED` · `400` `OTP_EXPIRED` /
      * `OTP_INVALID` / invalid body · `500` on error.
      */
-    static async verify(req: Request, res: Response) {
+    static async process(req: Request, res: Response) {
         const parsed = body_schema.safeParse(req.body);
         if (!parsed.success) {
             return ResponseWriter.invalid_data(res, "Email and 6-digit code required");
