@@ -10,10 +10,8 @@ const envSchema = z.object({
         .default("8080")
         .transform((val) => parseInt(val, 10)),
     SERVER_NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
-    SERVER_JWT_SECRET: z.string().min(32, "JWT secret must be at least 32 characters"),
-    SERVER_JWT_REFRESH_SECRET: z
-        .string()
-        .min(32, "JWT refresh secret must be at least 32 characters"),
+    SERVER_JWT_SECRET: z.string().min(32),
+    SERVER_JWT_TOKEN_TTL: z.string().default("7d"),
     SERVER_REDIS_URL: z.url("Invalid Redis URL"),
     SERVER_OTP_TTL_SECONDS: z.coerce.number().default(600),
     SERVER_OTP_COOLDOWN_SECONDS: z.coerce.number().default(60),
@@ -57,6 +55,6 @@ function parseEnv() {
     }
 }
 
-export const env = parseEnv();
-export const isDevelopment = () => env.SERVER_NODE_ENV === "development";
-export const isProduction = () => env.SERVER_NODE_ENV === "production";
+export const ENV = parseEnv();
+export const isDevelopment = () => ENV.SERVER_NODE_ENV === "development";
+export const isProduction = () => ENV.SERVER_NODE_ENV === "production";

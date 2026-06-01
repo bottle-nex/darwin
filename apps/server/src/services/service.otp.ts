@@ -1,13 +1,83 @@
+import { randomInt } from "node:crypto";
+import bcrypt from "bcryptjs";
+import { redis } from "./service.redis";
+import { ENV } from "../configs/env";
+
+export type OtpVerifyResult =
+    | { ok: true }
+    | { ok: false; reason: "expired" | "invalid" | "locked" };
+
 export default class OtpService {
 
-    static async store_otp(email: string, otp: string): Promise<void> {
+    static async store_otp(email: string, code: string): Promise<void> {
+        const hash = await bcrypt.hash(code, 10);
+        await redis
+            .multi()
+            .set(this.code_key(email), hash, "EX", ENV.SERVER_OTP_TTL_SECONDS)
+            .del(this.attempts_key(email))
+            .set(this.cool_down_key(email), "1", "EX", ENV.SERVER_OTP_COOLDOWN_SECONDS)
+            .exec();
+    }
 
+    static async verify_otp(email: string, code: string): Promise<OtpVerifyResult> {
+        const hash = await redis.get(this.code_key(email));
+        if (!hash) {
+            return { ok: false, reason: "expired" };
+        }
+
+        const attempts = await redis.incr(this.attempts_key(email));
+        if (attempts === 1) {
+            await redis.expire(this.attempts_key(email), ENV.SERVER_OTP_TTL_SECONDS);
+        }
+
+        if (attempts > ENV.SERVER_OTP_MAX_ATTEMPTS) {
+            await redis
+                .pipeline()
+                .del(this.code_key(email))
+                .del(this.attempts_key(email))
+                .exec();
+            return { ok: false, reason: "locked" };
+        }
+
+        const matches = await bcrypt.compare(code, hash);
+        if (!matches) {
+            return { ok: false, reason: "invalid" };
+        }
+
+        await redis
+            .pipeline()
+            .del(this.code_key(email))
+            .del(this.attempts_key(email))
+            .exec();
+        return { ok: true };
+    }
+
+    static async clear_otp(email: string): Promise<void> {
+        await redis
+            .pipeline()
+            .del(this.code_key(email))
+            .del(this.attempts_key(email))
+            .del(this.cool_down_key(email))
+            .exec();
+    }
+
+    static async is_cooldown(email: string): Promise<boolean> {
+        return (await redis.exists(this.cool_down_key(email))) === 1;
+    }
+
+    static generate_otp(): string {
+        return randomInt(0, 1_000_000).toString().padStart(6, "0");
     }
 
     static code_key(email: string) {
-        return `otp:${email.toLocaleLowerCase()}`;
+        return `otp:${email.toLowerCase()}`;
     }
-    static attempt_key(email: string) {
-        return `otp:${email.toLocaleLowerCase()}:attempts`;
+
+    static attempts_key(email: string) {
+        return `otp:${email.toLowerCase()}:attempts`;
+    }
+
+    static cool_down_key(email: string) {
+        return `otp:${email.toLowerCase()}:cooldown`;
     }
 }
