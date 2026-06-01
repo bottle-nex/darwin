@@ -49,8 +49,9 @@ export default class OtpService {
      *
      * Increments the failed-attempt counter on every call. Once it exceeds
      * `SERVER_OTP_MAX_ATTEMPTS` the code and counter are destroyed and `"locked"` is
-     * returned. On a correct match the code and counter are destroyed and `{ ok: true }`
-     * is returned, so a code is single-use. The bcrypt comparison runs only after the
+     * returned. On a correct match the code, counter, and cooldown are all cleared and
+     * `{ ok: true }` is returned, so a code is single-use and the just-verified user is
+     * not throttled if they need a new one. The bcrypt comparison runs only after the
      * lock check, meaning the lock takes precedence even if the final guess is correct.
      *
      * @param email - Address the code was issued to; pass it already lowercased.
@@ -86,6 +87,7 @@ export default class OtpService {
             .pipeline()
             .del(this.code_key(email))
             .del(this.attempts_key(email))
+            .del(this.cool_down_key(email))
             .exec();
         return { ok: true };
     }
