@@ -1,53 +1,53 @@
-'use client';
-import OpacityBackground from '../OpacityBackground';
-import Image from 'next/image';
-import { motion } from 'framer-motion';
-import { signIn } from 'next-auth/react';
-import { useUserSessionStore } from '@/store/user/useUserSessionStore';
-import { RxCross2 } from 'react-icons/rx';
-import { Input } from '../../ui/input';
-import { Label } from '../../ui/label';
-import { Button } from '../../ui/button';
-import { InputOTP, InputOTPGroup, InputOTPSlot } from '../../ui/input-otp';
-import { useState } from 'react';
-import axios from 'axios';
-import { useRouter } from 'next/navigation';
-import { REQUEST_OTP_URL } from '@/routes/api_routes';
+"use client";
+import OpacityBackground from "../OpacityBackground";
+import Image from "next/image";
+import { motion } from "framer-motion";
+import { signIn } from "next-auth/react";
+import { useUserSessionStore } from "@/store/user/useUserSessionStore";
+import { RxCross2 } from "react-icons/rx";
+import { Input } from "../../ui/input";
+import { Label } from "../../ui/label";
+import { Button } from "../../ui/button";
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "../../ui/input-otp";
+import { useState } from "react";
+import axios from "axios";
+import { useRouter } from "next/navigation";
+import { REQUEST_OTP_URL } from "@/routes/api_routes";
 
 interface SigninOptions {
-    type: 'github' | 'google' | 'facebook';
+    type: "github" | "google" | "facebook";
     image: string;
 }
 
 const signin_options: SigninOptions[] = [
-    { type: 'google', image: '/images/google.png' },
-    { type: 'github', image: '/images/github.png' },
+    { type: "google", image: "/images/google.png" },
+    { type: "github", image: "/images/github.png" },
 ];
 
 export default function SigninModal() {
     const { openSigninModal, setOpenSigninModal } = useUserSessionStore();
-    const [email, setEmail] = useState('');
-    const [otp, setOtp] = useState('');
-    const [step, setStep] = useState<'email' | 'otp'>('email');
+    const [email, setEmail] = useState("");
+    const [otp, setOtp] = useState("");
+    const [step, setStep] = useState<"email" | "otp">("email");
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState('');
+    const [error, setError] = useState("");
     const router = useRouter();
 
     if (!openSigninModal) return null;
 
-    function singinHandler(type: 'github' | 'google' | 'facebook') {
-        signIn(type, { callbackUrl: '/' });
+    function singinHandler(type: "github" | "google" | "facebook") {
+        signIn(type, { callbackUrl: "/" });
     }
 
     async function handleSendOtp() {
         if (!email) return;
         setLoading(true);
-        setError('');
+        setError("");
         try {
             await axios.post(REQUEST_OTP_URL, { email });
-            setStep('otp');
+            setStep("otp");
         } catch {
-            setError('Failed to send OTP. Please try again.');
+            setError("Failed to send OTP. Please try again.");
         } finally {
             setLoading(false);
         }
@@ -56,8 +56,8 @@ export default function SigninModal() {
     async function handleVerifyOtp() {
         if (!otp) return;
         setLoading(true);
-        setError('');
-        const result = await signIn('email-otp', {
+        setError("");
+        const result = await signIn("email-otp", {
             email,
             otp,
             redirect: false,
@@ -67,7 +67,7 @@ export default function SigninModal() {
             setOpenSigninModal(false);
             router.refresh();
         } else {
-            setError('Invalid or expired OTP. Please try again.');
+            setError("Invalid or expired OTP. Please try again.");
         }
     }
 
@@ -77,16 +77,16 @@ export default function SigninModal() {
             onBackgroundClick={() => setOpenSigninModal(false)}
         >
             <motion.section
-                initial={{ opacity: 0, scale: 0.98, filter: 'blur(10px)' }}
-                animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
-                exit={{ opacity: 0, scale: 0.98, filter: 'blur(10px)' }}
-                transition={{ duration: 0.3, ease: 'easeInOut' }}
+                initial={{ opacity: 0, scale: 0.98, filter: "blur(10px)" }}
+                animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+                exit={{ opacity: 0, scale: 0.98, filter: "blur(10px)" }}
+                transition={{ duration: 0.3, ease: "easeInOut" }}
                 className="relative bg-card border-2 border-black w-100 max-w-[90vw] rounded-md overflow-hidden shadow-sm"
             >
                 <div className="bg-ndarkest border-b-2 border-black flex items-center justify-between h-full w-full">
                     <div className="relative h-40 w-full">
                         <Image
-                            src={'/images/landing/buttonPress.jpg'}
+                            src={"/images/landing/buttonPress.jpg"}
                             alt="sign-in image"
                             className="object-cover"
                             fill
@@ -120,7 +120,7 @@ export default function SigninModal() {
                                 key={option.type}
                                 whileTap={{ scale: 0.98 }}
                                 transition={{
-                                    type: 'spring',
+                                    type: "spring",
                                     stiffness: 300,
                                     damping: 18,
                                 }}
@@ -141,7 +141,7 @@ export default function SigninModal() {
 
                     <span className="block text-neutral-500 text-xs mt-4">or sign in with</span>
 
-                    {step === 'email' ? (
+                    {step === "email" ? (
                         <>
                             <div className="w-full flex flex-col gap-y-1 mt-4">
                                 <Label className="font-semibold ml-0.5 text-sm" htmlFor="email">
@@ -154,7 +154,7 @@ export default function SigninModal() {
                                     className="bg-light-base border-none p-5 mt-1.5"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
-                                    onKeyDown={(e) => e.key === 'Enter' && handleSendOtp()}
+                                    onKeyDown={(e) => e.key === "Enter" && handleSendOtp()}
                                 />
                             </div>
                             <Button
@@ -162,21 +162,21 @@ export default function SigninModal() {
                                 onClick={handleSendOtp}
                                 disabled={loading || !email}
                             >
-                                {loading ? 'Sending...' : 'Get OTP'}
+                                {loading ? "Sending..." : "Get OTP"}
                             </Button>
                         </>
                     ) : (
                         <>
                             <p className="text-neutral-500 text-xs mt-4 text-center">
-                                OTP sent to{' '}
-                                <span className="font-semibold text-neutral-700">{email}</span>.{' '}
+                                OTP sent to{" "}
+                                <span className="font-semibold text-neutral-700">{email}</span>.{" "}
                                 <button
                                     type="button"
                                     className="underline cursor-pointer"
                                     onClick={() => {
-                                        setStep('email');
-                                        setOtp('');
-                                        setError('');
+                                        setStep("email");
+                                        setOtp("");
+                                        setError("");
                                     }}
                                 >
                                     Change
@@ -191,7 +191,7 @@ export default function SigninModal() {
                                     containerClassName="w-full"
                                     value={otp}
                                     onChange={setOtp}
-                                    onKeyDown={(e) => e.key === 'Enter' && handleVerifyOtp()}
+                                    onKeyDown={(e) => e.key === "Enter" && handleVerifyOtp()}
                                 >
                                     <InputOTPGroup className="w-full justify-between gap-x-2">
                                         <InputOTPSlot
@@ -226,7 +226,7 @@ export default function SigninModal() {
                                 onClick={handleVerifyOtp}
                                 disabled={loading || otp.length !== 6}
                             >
-                                {loading ? 'Verifying...' : 'Sign In'}
+                                {loading ? "Verifying..." : "Sign In"}
                             </Button>
                         </>
                     )}

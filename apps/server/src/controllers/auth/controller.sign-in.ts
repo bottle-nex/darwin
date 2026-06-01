@@ -55,7 +55,11 @@ export default class SignInController {
                 select: { id: true, email: true, name: true, image: true },
             });
 
-            const token = signSessionJwt({ id: user.id, name: user.name ?? "", email: normalizedEmail });
+            const token = signSessionJwt({
+                id: user.id,
+                name: user.name ?? "",
+                email: normalizedEmail,
+            });
 
             return ResponseWriter.success(res, { user, token }, "Signed in");
         } catch (err) {

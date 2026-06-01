@@ -1,5 +1,5 @@
-import { Session } from 'next-auth';
-import { create } from 'zustand';
+import { Session } from "next-auth";
+import { create } from "zustand";
 
 interface UserSessionStoreType {
     session: Session | null;

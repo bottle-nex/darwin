@@ -1,10 +1,10 @@
-import { Account, AuthOptions, ISODateString } from 'next-auth';
-import GoogleProvider from 'next-auth/providers/google';
-import GitHubProvider from 'next-auth/providers/github';
-import CredentialsProvider from 'next-auth/providers/credentials';
-import { JWT } from 'next-auth/jwt';
-import axios from 'axios';
-import { SIGNIN_URL, VERIFY_OTP_URL } from '@/routes/api_routes';
+import { Account, AuthOptions, ISODateString } from "next-auth";
+import GoogleProvider from "next-auth/providers/google";
+import GitHubProvider from "next-auth/providers/github";
+import CredentialsProvider from "next-auth/providers/credentials";
+import { JWT } from "next-auth/jwt";
+import axios from "axios";
+import { SIGNIN_URL, VERIFY_OTP_URL } from "@/routes/api_routes";
 
 export interface UserType {
     id?: string | null;
@@ -22,15 +22,12 @@ export interface CustomSession {
 
 export const authOption: AuthOptions = {
     pages: {
-        signIn: '/',
+        signIn: "/",
     },
     callbacks: {
         async signIn({ user, account }: { user: UserType; account: Account | null }) {
             try {
-                if (
-                    account?.provider === 'google' ||
-                    account?.provider === 'github'
-                ) {
+                if (account?.provider === "google" || account?.provider === "github") {
                     const response = await axios.post(`${SIGNIN_URL}`, {
                         user,
                         account,
@@ -45,7 +42,7 @@ export const authOption: AuthOptions = {
                     }
                 }
 
-                if (account?.provider === 'email-otp') {
+                if (account?.provider === "email-otp") {
                     return !!user;
                 }
 
@@ -68,26 +65,26 @@ export const authOption: AuthOptions = {
     },
     providers: [
         GoogleProvider({
-            clientId: process.env.GOOGLE_CLIENT_ID || '',
-            clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
+            clientId: process.env.GOOGLE_CLIENT_ID || "",
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
             authorization: {
                 params: {
-                    prompt: 'consent',
-                    access_type: 'offline',
-                    response_type: 'code',
+                    prompt: "consent",
+                    access_type: "offline",
+                    response_type: "code",
                 },
             },
         }),
         GitHubProvider({
-            clientId: process.env.GITHUB_CLIENT_ID || '',
-            clientSecret: process.env.GITHUB_CLIENT_SECRET || '',
+            clientId: process.env.GITHUB_CLIENT_ID || "",
+            clientSecret: process.env.GITHUB_CLIENT_SECRET || "",
         }),
         CredentialsProvider({
-            id: 'email-otp',
-            name: 'Email OTP',
+            id: "email-otp",
+            name: "Email OTP",
             credentials: {
-                email: { label: 'Email', type: 'email' },
-                otp: { label: 'OTP', type: 'text' },
+                email: { label: "Email", type: "email" },
+                otp: { label: "OTP", type: "text" },
             },
             async authorize(credentials) {
                 if (!credentials?.email || !credentials?.otp) return null;

@@ -19,7 +19,7 @@ export function NavBar() {
     const [scrolled, setScrolled] = useState(false);
     const [menuOpen, setMenuOpen] = useState(false);
     const headerRef = useRef<HTMLElement>(null);
-	const { setOpenSigninModal }  = useUserSessionStore();
+    const { setOpenSigninModal } = useUserSessionStore();
 
     useEffect(() => {
         function onScroll() {
@@ -31,9 +31,9 @@ export function NavBar() {
         return () => document.removeEventListener("scroll", onScroll);
     }, []);
 
-	function handleSignin() {
-		setOpenSigninModal(true);
-	}
+    function handleSignin() {
+        setOpenSigninModal(true);
+    }
 
     return (
         <header
@@ -72,9 +72,10 @@ export function NavBar() {
 
                 <div className="flex items-center gap-2">
                     <Button
-					variant={"secondary"} className="flex items-center justify-center"
-					onClick={handleSignin}
-					>
+                        variant={"secondary"}
+                        className="flex items-center justify-center"
+                        onClick={handleSignin}
+                    >
                         Sign in
                         <HiChevronRight className="h-3 w-3" />
                     </Button>
@@ -94,7 +95,7 @@ export function NavBar() {
                     </Button>
                 </div>
             </div>
-			<SigninModal />
+            <SigninModal />
         </header>
     );
 }
