@@ -16,10 +16,10 @@ const NAV_ITEMS = [
     { label: "About", href: "/#about" },
 ];
 export function NavBar() {
+    const setOpenSigninModal = useUserSessionStore((s) => s.setOpenSigninModal);
     const [scrolled, setScrolled] = useState(false);
     const [menuOpen, setMenuOpen] = useState(false);
     const headerRef = useRef<HTMLElement>(null);
-    const { setOpenSigninModal } = useUserSessionStore();
 
     useEffect(() => {
         function onScroll() {

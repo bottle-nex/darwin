@@ -1,18 +1,26 @@
 "use client";
-import OpacityBackground from "../OpacityBackground";
 import Image from "next/image";
-import { motion } from "framer-motion";
 import { signIn } from "next-auth/react";
 import { useUserSessionStore } from "@/store/user/useUserSessionStore";
-import { RxCross2 } from "react-icons/rx";
 import { Input } from "../../ui/input";
 import { Label } from "../../ui/label";
 import { Button } from "../../ui/button";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "../../ui/input-otp";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+} from "../../ui/dialog";
 import { useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { REQUEST_OTP_URL } from "@/routes/api_routes";
+import { cn } from "@/lib/utils";
+
+// Matcha brand accent — matches the playground sidebar focus ring (#9bc24f).
+const ACCENT = "#9bc24f";
 
 interface SigninOptions {
     type: "github" | "google" | "facebook";
@@ -33,7 +41,15 @@ export default function SigninModal() {
     const [error, setError] = useState("");
     const router = useRouter();
 
-    if (!openSigninModal) return null;
+    function handleOpenChange(open: boolean) {
+        setOpenSigninModal(open);
+        // Reset transient state on close so reopening always starts clean.
+        if (!open) {
+            setStep("email");
+            setOtp("");
+            setError("");
+        }
+    }
 
     function singinHandler(type: "github" | "google" | "facebook") {
         signIn(type, { callbackUrl: "/" });
@@ -64,115 +80,111 @@ export default function SigninModal() {
         });
         setLoading(false);
         if (result?.ok) {
-            setOpenSigninModal(false);
+            handleOpenChange(false);
             router.refresh();
         } else {
             setError("Invalid or expired OTP. Please try again.");
         }
     }
 
+    const otpSlotClass = cn(
+        "h-12 flex-1 rounded-md border border-input bg-surface text-base shadow-none",
+        "data-[active=true]:border-[#9bc24f] data-[active=true]:ring-2 data-[active=true]:ring-[#9bc24f]/30",
+    );
+
     return (
-        <OpacityBackground
-            className="bg-neutral-900/20"
-            onBackgroundClick={() => setOpenSigninModal(false)}
-        >
-            <motion.section
-                initial={{ opacity: 0, scale: 0.98, filter: "blur(10px)" }}
-                animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-                exit={{ opacity: 0, scale: 0.98, filter: "blur(10px)" }}
-                transition={{ duration: 0.3, ease: "easeInOut" }}
-                className="relative bg-card border-2 border-black w-100 max-w-[90vw] rounded-md overflow-hidden shadow-sm"
-            >
-                <div className="bg-ndarkest border-b-2 border-black flex items-center justify-between h-full w-full">
-                    <div className="relative h-40 w-full">
-                        <Image
-                            src={"/images/landing/buttonPress.jpg"}
-                            alt="sign-in image"
-                            className="object-cover"
-                            fill
-                            unoptimized
-                        />
-                    </div>
-                    <motion.button
-                        type="button"
-                        aria-label="Close modal"
-                        onClick={() => setOpenSigninModal(false)}
-                        className="text-ndarkest cursor-pointer absolute right-3 top-3 bg-nlighter rounded-full p-1 hover:bg-ndarkest hover:text-nlighter shadow-xs transition-colors duration-250"
-                    >
-                        <RxCross2 size={15} strokeWidth={0.8} />
-                    </motion.button>
-                </div>
-
-                <section className="p-6 flex flex-col items-center tracking-wide rounded-t-xl text-dark-alpha dark:text-light-base">
-                    <div className="font-semibold  px-2 py-px text-sm rounded-alpha mb-1">
-                        NOCTURN
-                    </div>
-                    <div className="text-2xl font-bold mb-1 text-dark-alpha/80 dark:text-light-base/80">
-                        Your next question awaits
-                    </div>
-                    <p className="text-[14px] mb-5 text-center text-dark-alpha/80 dark:text-light-base/80">
-                        Choose your preferred sign in method
-                    </p>
-
-                    <section className="flex items-center justify-center gap-x-2 tracking-wider">
-                        {signin_options.map((option) => (
-                            <motion.button
-                                key={option.type}
-                                whileTap={{ scale: 0.98 }}
-                                transition={{
-                                    type: "spring",
-                                    stiffness: 300,
-                                    damping: 18,
+        <Dialog open={openSigninModal} onOpenChange={handleOpenChange}>
+            <DialogContent className="gap-0 overflow-hidden rounded-xl border-border bg-card p-0 sm:max-w-100">
+                <div className="flex flex-col p-6">
+                    <DialogHeader className="space-y-0">
+                        {/* Brand wordmark */}
+                        <div className="mb-4 flex items-center gap-x-2">
+                            <span
+                                className="flex size-6 items-center justify-center rounded-md shadow-sm"
+                                style={{
+                                    background: `linear-gradient(135deg, ${ACCENT}, #bcdb6f)`,
                                 }}
-                                className="h-8 px-2 rounded-sm bg-neutral-200 dark:bg-neutral-800 text-dark-base dark:text-neutral-200 font-normal text-base flex items-center justify-center gap-x-2 cursor-pointer capitalize ring-1 ring-dark-base/20 dark:ring-light-base/10"
-                                onClick={() => singinHandler(option.type)}
+                                aria-hidden
                             >
-                                <Image
-                                    src={option.image}
-                                    alt={option.type}
-                                    width={20}
-                                    height={20}
-                                    className="shrink-0"
-                                />
-                                <span className="text-sm">{option.type}</span>
-                            </motion.button>
-                        ))}
-                    </section>
+                                <span className="size-2 rounded-full bg-[#1a2e05]/80" />
+                            </span>
+                            <span className="text-sm font-semibold tracking-tight text-foreground">
+                                matcha
+                            </span>
+                        </div>
 
-                    <span className="block text-neutral-500 text-xs mt-4">or sign in with</span>
+                        <DialogTitle className="text-xl font-semibold tracking-tight text-foreground">
+                            Your next question awaits
+                        </DialogTitle>
+                        <DialogDescription className="text-sm text-muted-foreground">
+                            Sign in to continue
+                        </DialogDescription>
+                    </DialogHeader>
 
                     {step === "email" ? (
-                        <>
-                            <div className="w-full flex flex-col gap-y-1 mt-4">
-                                <Label className="font-semibold ml-0.5 text-sm" htmlFor="email">
-                                    Work email
-                                </Label>
-                                <Input
-                                    id="email"
-                                    type="email"
-                                    placeholder="youremail@example.com"
-                                    className="bg-light-base border-none p-5 mt-1.5"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    onKeyDown={(e) => e.key === "Enter" && handleSendOtp()}
-                                />
-                            </div>
+                        <div className="mt-6 flex flex-col">
+                            <Label
+                                className="ml-0.5 text-sm font-medium text-foreground"
+                                htmlFor="email"
+                            >
+                                Work email
+                            </Label>
+                            <Input
+                                id="email"
+                                type="email"
+                                placeholder="youremail@example.com"
+                                className="mt-2 h-11 bg-surface focus-visible:border-[#9bc24f] focus-visible:ring-[3px] focus-visible:ring-[#9bc24f]/30"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                onKeyDown={(e) => e.key === "Enter" && handleSendOtp()}
+                            />
                             <Button
-                                className="bg-dark-alpha dark:bg-light-alpha dark:inset-shadow-neutral-500/80 inset-shadow-xs text-light-alpha dark:text-dark-alpha hover:bg-dark-base w-full mt-6 p-5 disabled:bg-neutral-700 dark:disabled:bg-light-base disabled:opacity-100! cursor-pointer"
+                                className="mt-4 h-10 w-full"
                                 onClick={handleSendOtp}
+                                loading={loading}
                                 disabled={loading || !email}
                             >
                                 {loading ? "Sending..." : "Get OTP"}
                             </Button>
-                        </>
+
+                            {/* Divider */}
+                            <div className="my-5 flex items-center gap-x-3">
+                                <span className="h-px flex-1 bg-border" />
+                                <span className="text-xs text-muted-foreground">
+                                    or continue with
+                                </span>
+                                <span className="h-px flex-1 bg-border" />
+                            </div>
+
+                            {/* Social providers */}
+                            <div className="grid grid-cols-2 gap-x-3">
+                                {signin_options.map((option) => (
+                                    <button
+                                        key={option.type}
+                                        type="button"
+                                        className="flex h-11 cursor-pointer items-center justify-center gap-x-2 rounded-md border border-border bg-secondary text-sm font-medium text-secondary-foreground capitalize transition-[transform,background-color] hover:bg-secondary/70 active:scale-[.98]"
+                                        onClick={() => singinHandler(option.type)}
+                                    >
+                                        <Image
+                                            src={option.image}
+                                            alt={option.type}
+                                            width={18}
+                                            height={18}
+                                            className="shrink-0"
+                                        />
+                                        {option.type}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
                     ) : (
-                        <>
-                            <p className="text-neutral-500 text-xs mt-4 text-center">
+                        <div className="mt-6 flex flex-col">
+                            <p className="text-xs text-muted-foreground">
                                 OTP sent to{" "}
-                                <span className="font-semibold text-neutral-700">{email}</span>.{" "}
+                                <span className="font-semibold text-foreground">{email}</span>.{" "}
                                 <button
                                     type="button"
-                                    className="underline cursor-pointer"
+                                    className="cursor-pointer font-medium text-[#7a9c34] underline-offset-2 hover:underline"
                                     onClick={() => {
                                         setStep("email");
                                         setOtp("");
@@ -182,58 +194,40 @@ export default function SigninModal() {
                                     Change
                                 </button>
                             </p>
-                            <div className="w-full flex flex-col items-center gap-y-3 mt-4">
-                                <Label className="font-semibold ml-0.5 text-sm self-start">
-                                    Enter OTP
-                                </Label>
-                                <InputOTP
-                                    maxLength={6}
-                                    containerClassName="w-full"
-                                    value={otp}
-                                    onChange={setOtp}
-                                    onKeyDown={(e) => e.key === "Enter" && handleVerifyOtp()}
-                                >
-                                    <InputOTPGroup className="w-full justify-between gap-x-2">
-                                        <InputOTPSlot
-                                            index={0}
-                                            className="flex-1 h-13 aspect-square text-base rounded-sm shadow-none border dark:border-neutral-700 border-neutral-200"
-                                        />
-                                        <InputOTPSlot
-                                            index={1}
-                                            className="flex-1 h-13 aspect-square text-base rounded-sm shadow-none border dark:border-neutral-700 border-neutral-200"
-                                        />
-                                        <InputOTPSlot
-                                            index={2}
-                                            className="flex-1 h-13 aspect-square text-base rounded-sm shadow-none border dark:border-neutral-700 border-neutral-200"
-                                        />
-                                        <InputOTPSlot
-                                            index={3}
-                                            className="flex-1 h-13 aspect-square text-base rounded-sm shadow-none border dark:border-neutral-700 border-neutral-200"
-                                        />
-                                        <InputOTPSlot
-                                            index={4}
-                                            className="flex-1 h-13 aspect-square text-base rounded-sm shadow-none border dark:border-neutral-700 border-neutral-200"
-                                        />
-                                        <InputOTPSlot
-                                            index={5}
-                                            className="flex-1 h-13 aspect-square text-base rounded-sm shadow-none border dark:border-neutral-700 border-neutral-200"
-                                        />
-                                    </InputOTPGroup>
-                                </InputOTP>
-                            </div>
+
+                            <Label className="mt-5 ml-0.5 text-sm font-medium text-foreground">
+                                Enter OTP
+                            </Label>
+                            <InputOTP
+                                maxLength={6}
+                                containerClassName="w-full mt-2"
+                                value={otp}
+                                onChange={setOtp}
+                                onKeyDown={(e) => e.key === "Enter" && handleVerifyOtp()}
+                            >
+                                <InputOTPGroup className="w-full justify-between gap-x-2">
+                                    {Array.from({ length: 6 }).map((_, i) => (
+                                        <InputOTPSlot key={i} index={i} className={otpSlotClass} />
+                                    ))}
+                                </InputOTPGroup>
+                            </InputOTP>
+
                             <Button
-                                className="dark:bg-light-alpha! hover:bg-light-base dark:text-dark-base w-full mt-6 p-5 disabled:bg-neutral-700! disabled:opacity-100! inset-shadow-2xs inset-shadow-dark-alpha/10"
+                                className="mt-6 h-11 w-full font-semibold text-[#14210a] transition-[filter] hover:brightness-95 disabled:bg-muted disabled:text-muted-foreground disabled:opacity-100"
+                                style={{ backgroundColor: ACCENT }}
                                 onClick={handleVerifyOtp}
                                 disabled={loading || otp.length !== 6}
                             >
                                 {loading ? "Verifying..." : "Sign In"}
                             </Button>
-                        </>
+                        </div>
                     )}
 
-                    {error && <p className="text-red-500 text-xs mt-3 text-center">{error}</p>}
-                </section>
-            </motion.section>
-        </OpacityBackground>
+                    {error && (
+                        <p className="mt-3 text-center text-xs text-destructive">{error}</p>
+                    )}
+                </div>
+            </DialogContent>
+        </Dialog>
     );
 }
