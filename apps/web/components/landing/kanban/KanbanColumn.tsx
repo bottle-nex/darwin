@@ -15,9 +15,10 @@ export function KanbanColumn({
     total: number;
     column: Column;
 }) {
-    const start = (index / total) * 0.75;
+    const start = ((index - 1) / total) * 0.75;
     const end = start + 0.4;
-    const y = useTransform(progress, [start, end], ["100%", "0%"]);
+    const yMotion = useTransform(progress, [start, end], ["100%", "0%"]);
+    const y = index === 0 ? "0%" : yMotion;
 
     const { theme, icon: Icon } = column;
 

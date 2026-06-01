@@ -37,7 +37,7 @@ export default function PlaygroundSidebarPanel({ label, items }: PlaygroundSideb
             animate={{ width: PANEL_WIDTH, opacity: 1 }}
             exit={{ width: 0, opacity: 0 }}
             transition={{ duration: 0.28, ease: [0.215, 0.61, 0.355, 1] }}
-            className="h-full shrink-0 overflow-hidden bg-[#141414]"
+            className="h-full shrink-0 overflow-hidden"
         >
             <div className="flex h-full w-56 flex-col border-l border-neutral-800/80">
                 <motion.nav

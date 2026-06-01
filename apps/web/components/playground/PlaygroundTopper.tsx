@@ -3,7 +3,7 @@ import { RiExpandLeftRightFill } from "react-icons/ri";
 
 export default function PlaygroundTopper() {
     return (
-        <main className="w-full h-12 bg-[#141414] flex items-center">
+        <main className="w-full h-12 flex items-center">
             <Button
                 variant="ghost"
                 size="sm"

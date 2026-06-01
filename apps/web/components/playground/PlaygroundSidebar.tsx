@@ -85,7 +85,7 @@ export default function PlaygroundSidebar() {
 
     return (
         <div className="flex h-full shrink-0">
-            <aside className="flex h-full w-14 shrink-0 flex-col items-center gap-1 bg-[#141414] py-3">
+            <aside className="flex h-full w-14 shrink-0 flex-col items-center gap-1 py-3">
                 <nav className="flex flex-col items-center gap-1" aria-label="Playground views">
                     {RENDERERS.map((key) => {
                         const { icon: Icon, label, children } = RENDERER_META[key];
