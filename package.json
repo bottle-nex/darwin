@@ -28,14 +28,14 @@
         "prepare": "husky"
     },
     "dependencies": {
-        "@prisma/adapter-pg": "^7.2.0",
-        "@prisma/client": "latest",
+        "@prisma/adapter-pg": "7.8.0",
+        "@prisma/client": "7.8.0",
         "lucide-react": "^1.17.0"
     },
     "devDependencies": {
         "husky": "^9.1.7",
         "prettier": "^3.2.5",
-        "prisma": "latest",
+        "prisma": "7.8.0",
         "tsx": "4.21.0",
         "turbo": "^2.9.16"
     }

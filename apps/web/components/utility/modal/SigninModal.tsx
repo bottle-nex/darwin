@@ -22,7 +22,6 @@ interface SigninOptions {
 const signin_options: SigninOptions[] = [
     { type: 'google', image: '/images/google.png' },
     { type: 'github', image: '/images/github.png' },
-    { type: 'facebook', image: '/images/facebook.png' },
 ];
 
 export default function SigninModal() {
@@ -82,7 +81,7 @@ export default function SigninModal() {
                 animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
                 exit={{ opacity: 0, scale: 0.98, filter: 'blur(10px)' }}
                 transition={{ duration: 0.3, ease: 'easeInOut' }}
-                className="relative bg-light-alpha dark:bg-dark-base border-2 border-black w-100 max-w-[90vw] rounded-md overflow-hidden shadow-sm"
+                className="relative bg-card border-2 border-black w-100 max-w-[90vw] rounded-md overflow-hidden shadow-sm"
             >
                 <div className="bg-ndarkest border-b-2 border-black flex items-center justify-between h-full w-full">
                     <div className="relative h-40 w-full">
