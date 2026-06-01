@@ -64,7 +64,7 @@ export default class OtpVerifyController {
                 select: { id: true, email: true, name: true },
             });
 
-            const token = signSessionJwt({ sub: user.id, email: user.email });
+            const token = signSessionJwt({ id: user.id, name: user.name ?? "", email: user.email });
 
             return ResponseWriter.success(res, { user, token }, "OTP verified");
         } catch (err) {

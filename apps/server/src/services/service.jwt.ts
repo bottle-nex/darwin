@@ -1,16 +1,7 @@
 import jwt, { type SignOptions } from "jsonwebtoken";
 import { ENV } from "../configs/env";
+import { AuthUser } from "../types/express";
 
-/**
- * Claims embedded in a session token.
- *
- * @property sub - The authenticated user's id (standard JWT subject claim).
- * @property email - The user's verified email address.
- */
-export interface SessionClaims {
-    sub: string;
-    email: string;
-}
 
 /**
  * Sign a session JWT for an authenticated user.
@@ -20,7 +11,7 @@ export interface SessionClaims {
  * @param claims - The {@link SessionClaims} to encode into the token.
  * @returns The signed, compact-serialized JWT string.
  */
-export function signSessionJwt(claims: SessionClaims): string {
+export function signSessionJwt(claims: AuthUser): string {
     return jwt.sign(claims, ENV.SERVER_JWT_SECRET, {
         algorithm: "HS256",
         expiresIn: ENV.SERVER_JWT_TOKEN_TTL as SignOptions["expiresIn"],
@@ -37,7 +28,7 @@ export function signSessionJwt(claims: SessionClaims): string {
  * @returns The decoded {@link SessionClaims}.
  * @throws If the signature/expiry is invalid, or the payload is missing `sub`/`email`.
  */
-export function verifySessionJwt(token: string): SessionClaims {
+export function verifySessionJwt(token: string): AuthUser {
     const payload = jwt.verify(token, ENV.SERVER_JWT_SECRET, {
         algorithms: ["HS256"],
     });
@@ -46,10 +37,10 @@ export function verifySessionJwt(token: string): SessionClaims {
         throw new Error("invalid token payload");
     }
 
-    const { sub, email } = payload as Record<string, unknown>;
-    if (typeof sub !== "string" || typeof email !== "string") {
-        throw new Error("missing sub or email claim");
+    const { id, name, email } = payload as Record<string, unknown>;
+    if (typeof id !== "string" || typeof email !== "string") {
+        throw new Error("missing id or email claim");
     }
 
-    return { sub, email };
+    return { id, name: typeof name === "string" ? name : "", email };
 }
