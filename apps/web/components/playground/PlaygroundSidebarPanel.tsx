@@ -44,7 +44,7 @@ export default function PlaygroundSidebarPanel({ label, items }: PlaygroundSideb
                     variants={listVariants}
                     initial="hidden"
                     animate="visible"
-                    className="flex flex-1 flex-col gap-0.5 overflow-y-auto px-2 pb-3 mt-2.5"
+                    className="flex flex-1 flex-col gap-0.5 gap-y-2 overflow-y-auto px-2 pb-3 mt-2.5"
                     aria-label={`${label} sections`}
                 >
                     {items.map((item) => {
@@ -69,7 +69,7 @@ export default function PlaygroundSidebarPanel({ label, items }: PlaygroundSideb
                                         "size-4 shrink-0 transition-colors duration-150",
                                         isActive
                                             ? "text-[#bcdb6f]"
-                                            : "text-neutral-500 group-hover:text-neutral-300",
+                                            : "text-neutral-300 group-hover:text-neutral-300",
                                     )}
                                     aria-hidden
                                 />
