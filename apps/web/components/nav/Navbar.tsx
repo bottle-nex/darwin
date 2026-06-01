@@ -5,6 +5,8 @@ import { HiBars3, HiChevronRight, HiXMark } from "react-icons/hi2";
 import { cn } from "@/lib/utils";
 import { azeretMono, Button } from "@/components/ui/button";
 import AppLogo from "@/components/app/Applogo";
+import { FaDiscord } from "react-icons/fa";
+import { TiArrowDown } from "react-icons/ti";
 
 const NAV_ITEMS = [
     { label: "Features", href: "/#features" },
@@ -41,19 +43,26 @@ export function NavBar() {
                         <AppLogo />
                     </Link>
                 </div>
-                <nav className={cn("hidden md:flex items-center uppercase", azeretMono.className)}>
-                    {NAV_ITEMS.map((item, i) => (
-                        <div key={item.label} className="flex items-center">
-                            {i > 0 && <span className="h-2.5 w-px bg-neutral-400" />}
-                            <Link
-                                href={item.href}
-                                className="flex items-center px-4 text-[13px] font-medium text-foreground transition-colors duration-200 hover:text-foreground/70"
-                            >
-                                {item.label}
-                            </Link>
-                        </div>
-                    ))}
-                </nav>{" "}
+                <nav className={cn("flex items-center gap-x-24 ml-12", azeretMono.className)}>
+                    <section className="hidden md:flex items-center gap-x-8 uppercase">
+                        {NAV_ITEMS.map((item, i) => (
+                            <div key={item.label} className="flex items-center gap-x-8">
+                                {i > 0 && <span className="h-2.5 w-px bg-neutral-400" />}
+                                <Link
+                                    href={item.href}
+                                    className="flex items-center text-[13px] font-medium text-foreground transition-colors duration-200 hover:text-foreground/70"
+                                >
+                                    {item.label}
+                                </Link>
+                            </div>
+                        ))}
+                    </section>
+                    <section className="flex items-center">
+                        <FaDiscord className="" />
+                        <TiArrowDown className="-rotate-135 size-5 text-indigo-600" />
+                    </section>
+                </nav>
+
                 <div className="flex items-center gap-2">
                     <Button variant={"secondary"} className="flex items-center justify-center">
                         Sign in
