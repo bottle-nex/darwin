@@ -17,7 +17,7 @@ const buttonVariants = cva(
 		variants: {
 			variant: {
 				default:
-					"bg-linear-to-b from-neutral-700 to-neutral-900 text-white shadow-[inset_0_2px_0_0_rgba(255,255,255,0.20),inset_0_-2.5px_0_0_rgba(0,0,0,0.7),0_1px_2px_0_rgba(15,23,42,0.20),0_2px_6px_1px_rgba(15,23,42,0.26)] hover:from-neutral-500 hover:to-neutral-800 focus-visible:border-ring dark:from-neutral-200 dark:to-neutral-200 dark:text-neutral-950 dark:shadow-[inset_0_1.5px_0_0_rgba(255,255,255,0.9),inset_0_-2px_0_0_rgba(0,0,0,0.35),0_1px_3px_0_rgba(0,0,0,0.4)] dark:hover:from-neutral-200 dark:hover:to-neutral-300",
+					"bg-linear-to-b from-neutral-700 to-neutral-900 text-white shadow-[inset_0_2px_0_0_rgba(255,255,255,0.20),inset_0_-2.5px_0_0_rgba(0,0,0,0.7),0_1px_2px_0_rgba(15,23,42,0.20),0_2px_6px_1px_rgba(15,23,42,0.26)] hover:from-neutral-600 hover:to-neutral-800 focus-visible:border-ring dark:from-neutral-200 dark:to-neutral-200 dark:text-neutral-950 dark:shadow-[inset_0_1.5px_0_0_rgba(255,255,255,0.9),inset_0_-2px_0_0_rgba(0,0,0,0.35),0_1px_3px_0_rgba(0,0,0,0.4)] dark:hover:from-neutral-200 dark:hover:to-neutral-300",
 				secondary:
 					"bg-linear-to-b from-neutral-100 to-neutral-200 text-neutral-900 shadow-[inset_0_2px_0_0_rgba(255,255,255,1),inset_0_-2.5px_0_0_rgba(15,23,42,0.08),0_1px_3px_0_rgba(15,23,42,0.08)] hover:bg-neutral-50 focus-visible:border-ring [&_svg]:text-neutral-400 hover:[&_svg]:text-neutral-600 dark:from-neutral-700 dark:to-neutral-800 dark:text-neutral-100 dark:border-neutral-600 dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08),inset_0_-1px_0_0_rgba(0,0,0,0.3),0_1px_3px_0_rgba(0,0,0,0.3)] dark:hover:from-neutral-600 dark:hover:to-neutral-700 dark:[&_svg]:text-neutral-400",
 				outline:

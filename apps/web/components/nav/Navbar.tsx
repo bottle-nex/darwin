@@ -30,7 +30,7 @@ export function NavBar() {
 		<header
 			ref={headerRef}
 			className={cn(
-				"fixed top-0 left-0 right-0 z-50",
+				"fixed top-0 left-0 right-0 z-50 bg-snow",
 				"transition-[height,border-color] duration-300 ease-out",
 				scrolled ? "border-b border-neutral-200 h-15" : "border-b border-transparent h-17",
 			)}
@@ -44,7 +44,7 @@ export function NavBar() {
 				<nav className={cn("hidden md:flex items-center uppercase", azeretMono.className)}>
 					{NAV_ITEMS.map((item, i) => (
 						<div key={item.label} className="flex items-center">
-							{i > 0 && <span className="h-2.5 w-px bg-neutral-700" />}
+							{i > 0 && <span className="h-2.5 w-px bg-neutral-400" />}
 							<Link
 								href={item.href}
 								className="flex items-center px-4 text-[13px] font-medium text-foreground transition-colors duration-200 hover:text-foreground/70"
