@@ -223,9 +223,7 @@ export default function SigninModal() {
                         </div>
                     )}
 
-                    {error && (
-                        <p className="mt-3 text-center text-xs text-destructive">{error}</p>
-                    )}
+                    {error && <p className="mt-3 text-center text-xs text-destructive">{error}</p>}
                 </div>
             </DialogContent>
         </Dialog>

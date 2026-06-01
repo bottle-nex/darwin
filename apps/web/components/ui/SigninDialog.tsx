@@ -13,9 +13,5 @@ import { useUserSessionStore } from "@/store/user/useUserSessionStore";
 export default function SigninDialog(): JSX.Element {
     const setOpen = useUserSessionStore((s) => s.setOpenSigninModal);
     const open = useUserSessionStore((s) => s.openSigninModal);
-    return (
-        <Dialog open={open} onOpenChange={() => setOpen(!open)}  >
-
-        </Dialog>
-    )
+    return <Dialog open={open} onOpenChange={() => setOpen(!open)}></Dialog>;
 }
