@@ -19,7 +19,6 @@ import { useRouter } from "next/navigation";
 import { REQUEST_OTP_URL } from "@/routes/api_routes";
 import { cn } from "@/lib/utils";
 
-// Matcha brand accent — matches the playground sidebar focus ring (#9bc24f).
 const ACCENT = "#9bc24f";
 
 interface SigninOptions {
@@ -147,7 +146,6 @@ export default function SigninModal() {
                                 {loading ? "Sending..." : "Get OTP"}
                             </Button>
 
-                            {/* Divider */}
                             <div className="my-5 flex items-center gap-x-3">
                                 <span className="h-px flex-1 bg-border" />
                                 <span className="text-xs text-muted-foreground">
@@ -156,7 +154,6 @@ export default function SigninModal() {
                                 <span className="h-px flex-1 bg-border" />
                             </div>
 
-                            {/* Social providers */}
                             <div className="grid grid-cols-2 gap-x-3">
                                 {signin_options.map((option) => (
                                     <button
@@ -213,9 +210,9 @@ export default function SigninModal() {
                             </InputOTP>
 
                             <Button
-                                className="mt-6 h-11 w-full font-semibold text-[#14210a] transition-[filter] hover:brightness-95 disabled:bg-muted disabled:text-muted-foreground disabled:opacity-100"
-                                style={{ backgroundColor: ACCENT }}
+                                className="mt-6 h-10 w-full"
                                 onClick={handleVerifyOtp}
+                                loading={loading}
                                 disabled={loading || otp.length !== 6}
                             >
                                 {loading ? "Verifying..." : "Sign In"}

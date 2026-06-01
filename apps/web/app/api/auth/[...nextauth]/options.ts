@@ -92,7 +92,8 @@ export const authOption: AuthOptions = {
                 try {
                     const response = await axios.post(VERIFY_OTP_URL, {
                         email: credentials.email,
-                        otp: credentials.otp,
+                        // Server's verify schema expects `code`.
+                        code: credentials.otp,
                     });
 
                     const result = response.data;
