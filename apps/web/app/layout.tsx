@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { Poppins, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import LenisProvider from "@/providers/LenisProvider";
+import SessionSetter from "@/components/utility/SessionSetter";
+import { getServerSession } from "next-auth";
+import { authOption } from "./api/auth/[...nextauth]/options";
 
 const poppins = Poppins({
     variable: "--font-poppins",
@@ -19,11 +22,14 @@ export const metadata: Metadata = {
     description: "The modern WhatsApp marketing platform for teams that want to grow.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
     children,
 }: Readonly<{
     children: React.ReactNode;
 }>) {
+
+    const session = await getServerSession(authOption);
+
     return (
         <html
             lang="en"
@@ -32,6 +38,7 @@ export default function RootLayout({
         >
             <LenisProvider>
                 <body className="min-h-full flex flex-col">{children}</body>
+                <SessionSetter session={session} />
             </LenisProvider>
         </html>
     );

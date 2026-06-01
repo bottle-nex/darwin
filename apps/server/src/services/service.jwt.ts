@@ -8,7 +8,7 @@ import { AuthUser } from "../types/express";
  *
  * Uses HS256 with `SERVER_JWT_SECRET` and expires after `SERVER_JWT_TOKEN_TTL`.
  *
- * @param claims - The {@link SessionClaims} to encode into the token.
+ * @param claims - The {@link AuthUser} to encode into the token.
  * @returns The signed, compact-serialized JWT string.
  */
 export function signSessionJwt(claims: AuthUser): string {
