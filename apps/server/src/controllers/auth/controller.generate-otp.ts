@@ -17,8 +17,9 @@ export default class GenerateOtpController {
      * cooldown, generate and store a fresh code, then dispatch it by email.
      *
      * Delivery is fire-and-forget so the response is not blocked on the mail provider;
-     * if sending fails the stored OTP is rolled back via `clear_otp`. Always responds
-     * success once the code is stored (it does not leak whether mail delivery succeeded).
+     * a send failure is logged and the stored code is left to expire on its own TTL.
+     * Always responds success once the code is stored (it does not leak whether mail
+     * delivery succeeded).
      *
      * Responses: `200` sent · `429` `OTP_COOLDOWN` · `400` invalid email · `500` on error.
      */
@@ -43,11 +44,8 @@ export default class GenerateOtpController {
             const code = OtpService.generate_otp();
             await OtpService.store_otp(email, code);
 
-            void sendOtpEmail(email, code).catch(async (err) => {
+            void sendOtpEmail(email, code).catch((err) => {
                 console.error("[otp-request] delivery failed", err);
-                await OtpService.clear_otp(email).catch((e) =>
-                    console.error("[otp-request] clear_otp failed", e),
-                );
             });
 
             return ResponseWriter.success(res, { ok: true }, "OTP sent");

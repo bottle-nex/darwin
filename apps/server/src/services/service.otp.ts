@@ -47,8 +47,10 @@ export default class OtpService {
      * Check `code` against the stored OTP for `email`, enforcing the attempt ceiling.
      *
      * Increments the failed-attempt counter on every call. Once it exceeds
-     * `SERVER_OTP_MAX_ATTEMPTS` the code and counter are destroyed and `"locked"` is
-     * returned. On a correct match the code, counter, and cooldown are all cleared and
+     * `SERVER_OTP_MAX_ATTEMPTS` the code, counter, and cooldown are destroyed and
+     * `"locked"` is returned — clearing the cooldown so the user can immediately
+     * request a fresh code as the response instructs. On a correct match the code,
+     * counter, and cooldown are all cleared and
      * `{ ok: true }` is returned, so a code is single-use and the just-verified user is
      * not throttled if they need a new one. The bcrypt comparison runs only after the
      * lock check, meaning the lock takes precedence even if the final guess is correct.
@@ -69,7 +71,12 @@ export default class OtpService {
         }
 
         if (attempts > ENV.SERVER_OTP_MAX_ATTEMPTS) {
-            await redis.pipeline().del(this.code_key(email)).del(this.attempts_key(email)).exec();
+            await redis
+                .pipeline()
+                .del(this.code_key(email))
+                .del(this.attempts_key(email))
+                .del(this.cool_down_key(email))
+                .exec();
             return { ok: false, reason: "locked" };
         }
 
@@ -85,23 +92,6 @@ export default class OtpService {
             .del(this.cool_down_key(email))
             .exec();
         return { ok: true };
-    }
-
-    /**
-     * Remove every OTP-related key for `email` — code, attempt counter, and cooldown.
-     *
-     * Used to roll back state when downstream work fails (e.g. the delivery email
-     * could not be sent) so the user is not left throttled by a code they never got.
-     *
-     * @param email - Address whose OTP state should be wiped; pass it already lowercased.
-     */
-    static async clear_otp(email: string): Promise<void> {
-        await redis
-            .pipeline()
-            .del(this.code_key(email))
-            .del(this.attempts_key(email))
-            .del(this.cool_down_key(email))
-            .exec();
     }
 
     /**
