@@ -14,5 +14,117 @@ model User {
     id            String    @id @default(cuid())
     name          String?
     email         String    @unique
+    image         String?
     emailVerified DateTime?
+
+    orgMemberships  OrgMember[]
+    teamMemberships TeamMember[]
+    ownedProjects   Project[]    @relation("ProjectOwner")
+    createdProjects Project[]    @relation("ProjectCreator")
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model Organization {
+    id          String  @id @default(cuid())
+    name        String
+    slug        String  @unique
+    description String?
+
+    members  OrgMember[]
+    projects Project[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model OrgMember {
+    id     String  @id @default(cuid())
+    orgId  String
+    userId String
+    role   OrgRole
+
+    organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+    user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@unique([orgId, userId])
+    @@index([userId])
+}
+
+model Project {
+    id          String  @id @default(cuid())
+    orgId       String
+    name        String
+    slug        String
+    description String?
+    ownerId     String
+    createdById String?
+
+    organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+    owner        User         @relation("ProjectOwner", fields: [ownerId], references: [id], onDelete: Restrict)
+    createdBy    User?        @relation("ProjectCreator", fields: [createdById], references: [id], onDelete: SetNull)
+    teams        Team[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@unique([orgId, slug])
+    @@index([ownerId])
+}
+
+model Team {
+    id          String      @id @default(cuid())
+    projectId   String
+    name        String
+    slug        String
+    description String?
+    projectRole ProjectRole
+
+    project Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+    members TeamMember[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@unique([projectId, slug])
+}
+
+model TeamMember {
+    id     String   @id @default(cuid())
+    teamId String
+    userId String
+    role   TeamRole
+
+    team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@unique([teamId, userId])
+    @@index([userId])
+}
+
+enum OrgRole {
+    Owner
+    Admin
+    Member
+    Billing
+}
+
+enum ProjectRole {
+    Admin
+    Maintain
+    Write
+    Triage
+    Read
+}
+
+enum TeamRole {
+    Maintainer
+    Member
 }
