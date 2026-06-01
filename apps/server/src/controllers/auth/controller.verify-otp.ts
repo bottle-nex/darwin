@@ -10,7 +10,21 @@ const body_schema = z.object({
     code: z.string().regex(/^\d{6}$/, "Code must be 6 digits"),
 });
 
+/**
+ * HTTP controller for verifying OTP codes and establishing a session.
+ */
 export default class OtpVerifyController {
+    /**
+     * Handle `POST /auth/otp/verify`: validate the email + 6-digit code, check it
+     * against the stored OTP, and on success upsert the user (marking their email
+     * verified) and return a signed session JWT.
+     *
+     * The upsert makes first verification double as account creation, so no separate
+     * sign-up step is needed.
+     *
+     * Responses: `200` `{ user, token }` · `429` `OTP_LOCKED` · `400` `OTP_EXPIRED` /
+     * `OTP_INVALID` / invalid body · `500` on error.
+     */
     static async verify(req: Request, res: Response) {
         const parsed = body_schema.safeParse(req.body);
         if (!parsed.success) {

@@ -8,7 +8,20 @@ const body_schema = z.object({
     email: z.email(),
 })
 
+/**
+ * HTTP controller for issuing sign-in OTP codes.
+ */
 export default class GenerateOtpController {
+    /**
+     * Handle `POST /auth/otp/request`: validate the email, enforce the per-email
+     * cooldown, generate and store a fresh code, then dispatch it by email.
+     *
+     * Delivery is fire-and-forget so the response is not blocked on the mail provider;
+     * if sending fails the stored OTP is rolled back via `clear_otp`. Always responds
+     * success once the code is stored (it does not leak whether mail delivery succeeded).
+     *
+     * Responses: `200` sent · `429` `OTP_COOLDOWN` · `400` invalid email · `500` on error.
+     */
     static async generate(req: Request, res: Response) {
 
         const parsed = body_schema.safeParse(req.body);
