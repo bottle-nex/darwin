@@ -2,6 +2,7 @@
 module.exports = {
     root: true,
     extends: ["@trymatcha/eslint-config/library.js"],
+    ignorePatterns: ["*.d.ts"],
     parser: "@typescript-eslint/parser",
     parserOptions: {
         project: true,
