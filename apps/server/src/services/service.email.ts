@@ -31,7 +31,7 @@ function client(): Resend {
  */
 export async function sendOtpEmail(to: string, code: string) {
     const { error } = await client().emails.send({
-        from: "trymatcha <noreply@trymatcha.app>",
+        from: "trymatcha <onboarding@resend.dev>",
         to,
         subject: "Your trymatcha sign-in code",
         text: `Your trymatcha signin code is ${code}.\n\nIt expires in ${Math.floor(

@@ -9,12 +9,12 @@ Write a Conventional Commit message for the current changes and commit it **imme
 
 ```bash
 git status --short
-git diff --cached --stat
-git diff --cached
+git diff HEAD
 ```
 
-- If there **are** staged changes, commit the **staged** diff only.
-- If **nothing is staged**, run `git add -A` first, then commit everything.
+- Always stage **everything** first with `git add -A`, then commit all changed files
+  in a **single** commit. Do not split changes across multiple commits, and do not
+  commit only the already-staged subset.
 
 Read the actual diff to understand _what changed_ — never write the message from filenames alone.
 
