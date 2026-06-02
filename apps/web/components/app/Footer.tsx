@@ -32,7 +32,7 @@ const LEGAL_LINKS: { label: string; href: string }[] = [
 const TOP_EDGE =
     "M0 4a4 4 0 0 1 4-4h344.32c4.197 0 8.369.66 12.361 1.958l49.5 16.084A40 40 0 0 0 422.542 20h517.7c4.293 0 8.559-.691 12.633-2.047l47.785-15.906A40 40 0 0 1 1013.29 0H1356a4 4 0 0 1 4 4";
 
-function FooterTopEdge() {
+function FooterTopEdge({ isMarkettingPage = false }: { isMarkettingPage?: boolean }) {
     return (
         <div aria-hidden className="relative">
             <svg
@@ -43,31 +43,45 @@ function FooterTopEdge() {
                 preserveAspectRatio="none"
                 className="block w-full"
             >
-                <path d={`${TOP_EDGE}v16H0z`} className="fill-neutral-900" />
+                <path
+                    d={`${TOP_EDGE}v16H0z`}
+                    className={isMarkettingPage ? "fill-snow" : "fill-neutral-900"}
+                />
             </svg>
         </div>
     );
 }
 
-export function Footer() {
+export function Footer({ isMarkettingPage = false }: { isMarkettingPage?: boolean }) {
     return (
         <footer className="relative">
-            <FooterTopEdge />
-            <div className="relative bg-neutral-900 pb-6">
+            <FooterTopEdge isMarkettingPage={isMarkettingPage} />
+            <div className={cn("relative pb-6", isMarkettingPage ? "bg-snow" : "bg-neutral-900")}>
                 <div className="relative mx-auto max-w-7xl px-6 pt-10 sm:pt-14">
-                    {" "}
                     <div className="grid grid-cols-2 md:grid-cols-6 gap-x-6 gap-y-8">
                         <div className="col-span-2 md:col-span-2">
                             <div className="flex items-center gap-2">
-                                <AppLogo className="text-white" />
+                                <AppLogo
+                                    className={isMarkettingPage ? "text-neutral-900" : "text-white"}
+                                />
                             </div>
-                            <p className="mt-3 text-sm text-pretty text-neutral-400 max-w-xs">
+                            <p
+                                className={cn(
+                                    "mt-3 text-sm text-pretty max-w-xs",
+                                    isMarkettingPage ? "text-neutral-600" : "text-neutral-400",
+                                )}
+                            >
                                 The modern WhatsApp marketing platform for teams that want to grow.
                             </p>
                         </div>
                         {Object.entries(FOOTER_LINKS).map(([heading, links]) => (
                             <div key={heading}>
-                                <div className="text-xs font-medium text-neutral-100 mb-3">
+                                <div
+                                    className={cn(
+                                        "text-xs font-medium mb-3",
+                                        isMarkettingPage ? "text-neutral-700" : "text-neutral-100",
+                                    )}
+                                >
                                     {heading}
                                 </div>
                                 <ul className="space-y-2">
@@ -75,7 +89,12 @@ export function Footer() {
                                         <li key={link.label}>
                                             <Link
                                                 href={link.href}
-                                                className="group inline-flex items-center gap-0.5 text-sm text-neutral-400 hover:text-white transition-colors"
+                                                className={cn(
+                                                    "group inline-flex items-center gap-0.5 text-sm transition-colors",
+                                                    isMarkettingPage
+                                                        ? "text-neutral-500 hover:text-neutral-900"
+                                                        : "text-neutral-400 hover:text-white",
+                                                )}
                                             >
                                                 {link.label}
                                                 <FiArrowUpRight className="size-3.5 -translate-y-px -translate-x-0.5 opacity-0 transition-[opacity,transform] duration-200 ease-out group-hover:translate-x-0 group-hover:opacity-100" />
@@ -90,7 +109,8 @@ export function Footer() {
                         className={cn(
                             "mt-12 flex flex-col sm:flex-row items-center justify-between -mx-6 px-6",
                             "pt-6",
-                            "text-xs text-neutral-400",
+                            "text-xs",
+                            isMarkettingPage ? "text-neutral-500" : "text-neutral-400",
                         )}
                     >
                         <div>© {new Date().getFullYear()} AIDM</div>
@@ -99,7 +119,11 @@ export function Footer() {
                                 <Link
                                     key={link.label}
                                     href={link.href}
-                                    className="hover:text-white"
+                                    className={
+                                        isMarkettingPage
+                                            ? "hover:text-neutral-900"
+                                            : "hover:text-white"
+                                    }
                                 >
                                     {link.label}
                                 </Link>

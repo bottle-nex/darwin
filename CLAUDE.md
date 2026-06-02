@@ -2,6 +2,21 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Product
+
+**matcha** (trymatcha) is an autonomous, agentic engineering platform built around a **canvas/board** where teams file issues — and an LLM agent picks them up, implements the fix, and raises a PR end-to-end.
+
+The flow we're building toward:
+
+1. **Board (canvas)** — organizations and their teams drop issues onto a shared board (Kanban-style; see `LandingKanbanBoard`). Each issue belongs to a project.
+2. **Agent pickup** — an LLM agent claims issues from the board and works them autonomously: understand the issue, change the code, verify it.
+3. **Code runners** — sandboxed, ephemeral compute ("DevOps" runners) that clone and actually **run the target project's codebase** so the agent can build, test, and validate its changes against the real project before shipping.
+4. **PR** — the agent opens a pull request from the runner with the implemented fix, back to the company's repo for human review.
+
+The org → project → team → member hierarchy (with GitHub-style roles) in the Prisma schema exists to scope who can file issues and who owns which projects/repos the runners operate on. The work-item (issue/card) domain that lives on the board is not yet modeled — when building it, treat the board issue as the unit the agent consumes and the PR as its output.
+
+This vision is **directional** — much of it (runners, agent orchestration, the issue domain) is not built yet. What's shipped today is auth (email-OTP + OAuth) and the org/team scaffolding. Don't assume a feature exists; verify in code.
+
 ## Stack & layout
 
 Bun-managed Turborepo monorepo. `bun@1.3.2` is pinned via `packageManager`; use `bun` (not npm/yarn/pnpm) for installs and scripts.
