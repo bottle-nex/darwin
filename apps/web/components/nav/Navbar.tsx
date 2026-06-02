@@ -43,8 +43,14 @@ export function NavBar({ isMarkettingPage = false }: { isMarkettingPage?: boolea
             className={cn(
                 "fixed top-0 left-0 right-0 z-50",
                 "transition-[height,border-color] duration-300 ease-out",
-                scrolled ? cn("border-b h-15", isMarkettingPage ? "border-neutral-700 bg-neutral-900" : "border-neutral-200 bg-snow") : "border-b border-transparent h-17",
-
+                scrolled
+                    ? cn(
+                          "border-b h-15",
+                          isMarkettingPage
+                              ? "border-neutral-700 bg-neutral-900"
+                              : "border-neutral-200 bg-snow",
+                      )
+                    : "border-b border-transparent h-17",
             )}
         >
             <div className="mx-auto max-w-7xl flex h-full items-center justify-between px-4">
@@ -60,7 +66,12 @@ export function NavBar({ isMarkettingPage = false }: { isMarkettingPage?: boolea
                                 {i > 0 && <span className="h-2.5 w-px bg-neutral-400" />}
                                 <Link
                                     href={item.href}
-                                    className={cn("flex items-center text-[13px] font-medium transition-colors duration-200", isMarkettingPage ? "text-neutral-100 hover:text-neutral-100/70" : "text-foreground hover:text-foreground/70")}
+                                    className={cn(
+                                        "flex items-center text-[13px] font-medium transition-colors duration-200",
+                                        isMarkettingPage
+                                            ? "text-neutral-100 hover:text-neutral-100/70"
+                                            : "text-foreground hover:text-foreground/70",
+                                    )}
                                 >
                                     {item.label}
                                 </Link>
@@ -99,6 +110,6 @@ export function NavBar({ isMarkettingPage = false }: { isMarkettingPage?: boolea
                 </div>
             </div>
             <SigninModal />
-        </header >
+        </header>
     );
 }

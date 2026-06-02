@@ -49,9 +49,9 @@ export default function WhyPage() {
                     Your backlog should clear itself
                 </div>
                 <div className="text-neutral-100 w-xl text-center pt-8 text-xl">
-                    Issues used to wait for an engineer with a free afternoon. Now you assign them to
-                    an agent that reads the repo, writes the patch, and opens a PR. You review the
-                    diff instead of writing it.
+                    Issues used to wait for an engineer with a free afternoon. Now you assign them
+                    to an agent that reads the repo, writes the patch, and opens a PR. You review
+                    the diff instead of writing it.
                 </div>
                 <div className="flex-1 w-full flex flex-col items-center justify-center">
                     <div className="h-40 w-40 rounded-xl bg-amber-50"></div>
@@ -66,10 +66,10 @@ export default function WhyPage() {
                     </div>
                     <div className="flex gap-10 w-9/12">
                         <div>
-                            For years, the issue tracker was a holding pen. Tickets went in, and they
-                            sat there until someone had the time, the context, and the energy to pick
-                            one up. The board kept score. The work still waited on a human with a free
-                            afternoon.
+                            For years, the issue tracker was a holding pen. Tickets went in, and
+                            they sat there until someone had the time, the context, and the energy
+                            to pick one up. The board kept score. The work still waited on a human
+                            with a free afternoon.
                         </div>
                         <div>
                             Now agents pull from that same board. They analyze the repo, write the
@@ -90,21 +90,20 @@ export default function WhyPage() {
                     </div>
                     <div className="flex gap-10 w-9/12">
                         <div>
-                            The scarce thing was never ideas for what to fix. It was the hours to sit
-                            down and do it. When an agent can take a well-scoped issue to a working
-                            PR, the bottleneck moves off the keyboard and onto the decision of what's
-                            worth doing.
+                            The scarce thing was never ideas for what to fix. It was the hours to
+                            sit down and do it. When an agent can take a well-scoped issue to a
+                            working PR, the bottleneck moves off the keyboard and onto the decision
+                            of what's worth doing.
                         </div>
                         <div>
                             Your team's job becomes scoping the work and reviewing the result. Read
-                            the diff, read the reasoning, approve or send it back. The judgment stays
-                            human. The typing doesn't. That's a different shape of engineering, and
-                            it's already here.
+                            the diff, read the reasoning, approve or send it back. The judgment
+                            stays human. The typing doesn't. That's a different shape of
+                            engineering, and it's already here.
                         </div>
                     </div>
                 </div>
-                <div className="flex-1 flex border-t border-neutral-800 relative">
-                </div>
+                <div className="flex-1 flex border-t border-neutral-800 relative"></div>
             </div>
             {/* section 4 */}
             <div className="h-max-content w-screen flex">
@@ -122,9 +121,9 @@ export default function WhyPage() {
                         </div>
                         <div>
                             File the issue, and an agent spins up a runner, clones your repo, makes
-                            the change, and validates it against your real project before opening the
-                            PR. Minutes, not sprints. The bottleneck isn't the work anymore. It's
-                            deciding what to point it at.
+                            the change, and validates it against your real project before opening
+                            the PR. Minutes, not sprints. The bottleneck isn't the work anymore.
+                            It's deciding what to point it at.
                         </div>
                     </div>
                 </div>
@@ -143,13 +142,18 @@ export default function WhyPage() {
                 </div>
                 <div className="flex gap-4 py-10">
                     {cards.map((card) => (
-                        <div key={card.title} className="flex-1 flex flex-col gap-4 border border-neutral-800 p-4 rounded-sm">
+                        <div
+                            key={card.title}
+                            className="flex-1 flex flex-col gap-4 border border-neutral-800 p-4 rounded-sm"
+                        >
                             <div className="text-xl"> {card.title} </div>
                             <div className="border-t border-b border-neutral-800 border-dotted h-65 w-full"></div>
                             <div className="text-neutral-400 min-h-30"> {card.description} </div>
                             <div className="flex items-center justify-between">
                                 <div className="flex text-sm gap-4">
-                                    <div className="border-r border-neutral-800 pr-4">{card.role}</div>
+                                    <div className="border-r border-neutral-800 pr-4">
+                                        {card.role}
+                                    </div>
                                     <div className="text-neutral-500">{card.company}</div>
                                 </div>
                                 <Button size={"icon"} variant={"secondary"}>
