@@ -75,7 +75,6 @@ export default function LandingHero() {
                     <rect x={610} y={140} width={180} height={180} rx={28} fill="#ffffff" />
                     <foreignObject x={640} y={170} width={120} height={120}>
                         <div
-                            xmlns="http://www.w3.org/1999/xhtml"
                             style={{
                                 width: "100%",
                                 height: "100%",
