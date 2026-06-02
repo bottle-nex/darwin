@@ -44,7 +44,9 @@ export function NavBar({ isMarkettingPage = false }: { isMarkettingPage?: boolea
                 "fixed top-0 left-0 right-0 z-50",
                 "transition-[height,border-color] duration-300 ease-out",
                 scrolled
-                    ? "border-b border-neutral-200 h-15 bg-snow"
+                    ? isMarkettingPage
+                        ? "border-b border-neutral-800 h-15 bg-secondary-foreground"
+                        : "border-b border-neutral-200 h-15 bg-snow"
                     : "border-b border-transparent h-17",
             )}
         >

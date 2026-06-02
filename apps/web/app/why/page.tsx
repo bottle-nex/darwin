@@ -1,8 +1,9 @@
 "use client";
+import Image from "next/image";
 import { NavBar } from "@/components/nav/Navbar";
 import { PiArrowRight } from "react-icons/pi";
 import { ArrowRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { azeretMono, Button } from "@/components/ui/button";
 import { Footer } from "@/components/app/Footer";
 import { cn } from "@/lib/utils";
 import { cards, sections } from "@/components/why/data";
@@ -23,18 +24,53 @@ export default function WhyPage() {
     return (
         <main className="flex min-h-screen flex-col pt-17 bg-secondary-foreground select-none">
             <NavBar isMarkettingPage={true} />
-            <div className="h-screen w-screen flex flex-col items-center bg-secondary-foreground p-12">
-                <div className="text-7xl w-2xl text-center text-secondary font-light">
-                    Your backlog should clear itself
+            <div className="relative h-screen w-screen flex flex-col items-center overflow-hidden bg-secondary-foreground p-12">
+                <div className="relative z-10 w-full max-w-7xl mx-auto flex flex-col items-start justify-center flex-1 gap-7">
+                    <HeadingText text="Why matcha" />
+                    <div className="text-8xl w-3xl text-left text-secondary font-light leading-[0.95]">
+                        Ship the backlog, not the burnout
+                    </div>
+                    <div className="text-neutral-300 max-w-xl text-left text-lg leading-relaxed">
+                        Issues used to wait for an engineer with a free afternoon. Now you assign
+                        them to an agent that reads the repo, writes the patch, and opens a PR, you
+                        review the diff instead of writing it.
+                    </div>
+                    <div className="flex items-center gap-3 pt-1">
+                        <Button size="lg" variant="secondary">
+                            Get started
+                            <PiArrowRight className="h-3 w-3" />
+                        </Button>
+                        <Button
+                            size="lg"
+                            variant="ghost"
+                            className="text-secondary hover:bg-transparent hover:text-secondary/70"
+                        >
+                            See how it works
+                            <ArrowRight />
+                        </Button>
+                    </div>
+                    <div
+                        className={cn(
+                            "flex items-center gap-4 pt-4 text-[12px] uppercase tracking-wide text-neutral-400",
+                            azeretMono.className,
+                        )}
+                    >
+                        <span>Reads the repo</span>
+                        <span className="h-2.5 w-px bg-neutral-700" />
+                        <span>Writes the patch</span>
+                        <span className="h-2.5 w-px bg-neutral-700" />
+                        <span>Opens the PR</span>
+                    </div>
                 </div>
-                <div className="text-neutral-100 w-xl text-center pt-8 text-xl">
-                    Issues used to wait for an engineer with a free afternoon. Now you assign them
-                    to an agent that reads the repo, writes the patch, and opens a PR. You review
-                    the diff instead of writing it.
-                </div>
-                <div className="flex-1 w-full flex flex-col items-center justify-center">
-                    <div className="h-40 w-40 rounded-xl bg-amber-50"></div>
-                </div>
+                <Image
+                    src="/anim/traffic.gif"
+                    alt="Agents clearing the backlog"
+                    width={1080}
+                    height={1439}
+                    unoptimized
+                    priority
+                    className="absolute -top-12 -right-12 h-[145%] w-auto max-w-none object-contain mix-blend-screen"
+                />
             </div>
             {sections.map((section) => {
                 const isRight = section.align === "right";
