@@ -15,7 +15,7 @@ export function IssueCard({ issue, dark = false }: { issue: Issue; dark?: boolea
         <motion.div
             whileHover={{ y: -2 }}
             transition={{ type: "spring", stiffness: 400, damping: 30 }}
-            className={`rounded-xl border p-3.5 shadow-sm transition-shadow hover:shadow-md ${
+            className={`rounded-md border p-3.5 shadow-sm transition-shadow hover:shadow-md ${
                 dark ? "border-neutral-700/40 bg-neutral-800" : "border-black/5 bg-white"
             } ${isDone ? "opacity-90" : ""}`}
         >

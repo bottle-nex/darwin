@@ -23,10 +23,10 @@ export function KanbanColumn({
     const { theme, icon: Icon } = column;
 
     return (
-        <div className="flex-1 overflow-hidden rounded-2xl">
+        <div className="flex-1 overflow-hidden rounded-md">
             <motion.div
                 style={{ y }}
-                className={`flex h-full w-full flex-col rounded-2xl p-3 ${theme.surface} ${theme.headerText}`}
+                className={`flex h-full w-full flex-col rounded-md p-3 ${theme.surface} ${theme.headerText}`}
             >
                 <div className="mb-3 flex items-center justify-between px-1">
                     <div className="flex items-center gap-2">
