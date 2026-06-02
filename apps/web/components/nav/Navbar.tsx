@@ -1,21 +1,23 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { HiBars3, HiChevronRight, HiXMark } from "react-icons/hi2";
+import { HiBars3, HiXMark } from "react-icons/hi2";
 import { cn } from "@/lib/utils";
 import { azeretMono, Button } from "@/components/ui/button";
 import AppLogo from "@/components/app/Applogo";
 import { FaDiscord } from "react-icons/fa";
-import { TiArrowDown } from "react-icons/ti";
 import { useUserSessionStore } from "@/store/user/useUserSessionStore";
 import SigninModal from "../utility/modal/SigninModal";
+import { PiArrowRight } from "react-icons/pi";
 
 const NAV_ITEMS = [
+    { label: "Why", href: "/why" },
     { label: "Features", href: "/#features" },
     { label: "Pricing", href: "/#pricing" },
     { label: "About", href: "/#about" },
 ];
-export function NavBar() {
+
+export function NavBar({ isMarkettingPage = false }: { isMarkettingPage?: boolean }) {
     const setOpenSigninModal = useUserSessionStore((s) => s.setOpenSigninModal);
     const [scrolled, setScrolled] = useState(false);
     const [menuOpen, setMenuOpen] = useState(false);
@@ -39,15 +41,22 @@ export function NavBar() {
         <header
             ref={headerRef}
             className={cn(
-                "fixed top-0 left-0 right-0 z-50 bg-snow",
+                "fixed top-0 left-0 right-0 z-50",
                 "transition-[height,border-color] duration-300 ease-out",
-                scrolled ? "border-b border-neutral-200 h-15" : "border-b border-transparent h-17",
+                scrolled
+                    ? cn(
+                          "border-b h-15",
+                          isMarkettingPage
+                              ? "border-neutral-700 bg-neutral-900"
+                              : "border-neutral-200 bg-snow",
+                      )
+                    : "border-b border-transparent h-17",
             )}
         >
             <div className="mx-auto max-w-7xl flex h-full items-center justify-between px-4">
                 <div className="flex items-center gap-8 justify-between">
                     <Link href="/" aria-label="try matcha home">
-                        <AppLogo />
+                        <AppLogo className={isMarkettingPage ? "text-neutral-100" : ""} />
                     </Link>
                 </div>
                 <nav className={cn("flex items-center gap-x-24 ml-12", azeretMono.className)}>
@@ -57,16 +66,21 @@ export function NavBar() {
                                 {i > 0 && <span className="h-2.5 w-px bg-neutral-400" />}
                                 <Link
                                     href={item.href}
-                                    className="flex items-center text-[13px] font-medium text-foreground transition-colors duration-200 hover:text-foreground/70"
+                                    className={cn(
+                                        "flex items-center text-[13px] font-medium transition-colors duration-200",
+                                        isMarkettingPage
+                                            ? "text-neutral-100 hover:text-neutral-100/70"
+                                            : "text-foreground hover:text-foreground/70",
+                                    )}
                                 >
                                     {item.label}
                                 </Link>
                             </div>
                         ))}
                     </section>
-                    <section className="flex items-center">
-                        <FaDiscord className="" />
-                        <TiArrowDown className="-rotate-135 size-5 text-indigo-600" />
+                    <section className="flex">
+                        <FaDiscord className={cn(isMarkettingPage ? "text-neutral-200" : "")} />
+                        <PiArrowRight className="-rotate-45 ml-1 size-4 text-indigo-600" />
                     </section>
                 </nav>
 
@@ -77,11 +91,11 @@ export function NavBar() {
                         onClick={handleSignin}
                     >
                         Sign in
-                        <HiChevronRight className="h-3 w-3" />
+                        <PiArrowRight className="h-3 w-3" />
                     </Button>
                     <Button className="flex items-center justify-center">
                         Get Started
-                        <HiChevronRight className="h-3 w-3" />
+                        <PiArrowRight className="h-3 w-3" />
                     </Button>
                     <Button
                         variant="ghost"
