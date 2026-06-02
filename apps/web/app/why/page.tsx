@@ -74,9 +74,8 @@ export default function WhyPage() {
                         <div>
                             Now agents pull from that same board. They analyze the repo, write the
                             patch, run the tests, and open a PR while you&apos;re doing something
-                            else.
-                            Queued, resolving, in review, resolved. The column you used to drain by
-                            hand drains itself.
+                            else. Queued, resolving, in review, resolved. The column you used to
+                            drain by hand drains itself.
                         </div>
                     </div>
                 </div>
