@@ -1,14 +1,14 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { HiBars3, HiChevronRight, HiXMark } from "react-icons/hi2";
+import { HiBars3, HiXMark } from "react-icons/hi2";
 import { cn } from "@/lib/utils";
 import { azeretMono, Button } from "@/components/ui/button";
 import AppLogo from "@/components/app/Applogo";
 import { FaDiscord } from "react-icons/fa";
-import { TiArrowDown } from "react-icons/ti";
 import { useUserSessionStore } from "@/store/user/useUserSessionStore";
 import SigninModal from "../utility/modal/SigninModal";
+import { PiArrowRight } from "react-icons/pi";
 
 const NAV_ITEMS = [
     { label: "Why", href: "/why" },
@@ -45,11 +45,11 @@ export function NavBar({ isMarkettingPage = false }: { isMarkettingPage?: boolea
                 "transition-[height,border-color] duration-300 ease-out",
                 scrolled
                     ? cn(
-                          "border-b h-15",
-                          isMarkettingPage
-                              ? "border-neutral-700 bg-neutral-900"
-                              : "border-neutral-200 bg-snow",
-                      )
+                        "border-b h-15",
+                        isMarkettingPage
+                            ? "border-neutral-700 bg-neutral-900"
+                            : "border-neutral-200 bg-snow",
+                    )
                     : "border-b border-transparent h-17",
             )}
         >
@@ -78,9 +78,9 @@ export function NavBar({ isMarkettingPage = false }: { isMarkettingPage?: boolea
                             </div>
                         ))}
                     </section>
-                    <section className="flex items-center">
+                    <section className="flex">
                         <FaDiscord className={cn(isMarkettingPage ? "text-neutral-200" : "")} />
-                        <TiArrowDown className="-rotate-135 size-5 text-indigo-600" />
+                        <PiArrowRight className="-rotate-45 ml-1 size-4 text-indigo-600" />
                     </section>
                 </nav>
 
@@ -91,11 +91,11 @@ export function NavBar({ isMarkettingPage = false }: { isMarkettingPage?: boolea
                         onClick={handleSignin}
                     >
                         Sign in
-                        <HiChevronRight className="h-3 w-3" />
+                        <PiArrowRight className="h-3 w-3" />
                     </Button>
                     <Button className="flex items-center justify-center">
                         Get Started
-                        <HiChevronRight className="h-3 w-3" />
+                        <PiArrowRight className="h-3 w-3" />
                     </Button>
                     <Button
                         variant="ghost"
