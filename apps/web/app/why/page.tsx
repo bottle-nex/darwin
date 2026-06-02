@@ -4,30 +4,8 @@ import { PiArrowRight } from "react-icons/pi";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Footer } from "@/components/app/Footer";
-
-const cards = [
-    {
-        title: "The backlog clears itself",
-        description:
-            "Assign an issue to an agent and it reads the repo, writes the patch, and opens a PR. The long tail of chores and small fixes stops piling up while you sleep.",
-        role: "Engineering Lead",
-        company: "Seed-stage startup",
-    },
-    {
-        title: "You review, you don't type",
-        description:
-            "Every change lands as a PR with a diff and the agent's reasoning. Your team moves from writing code to directing it, keeping the judgment where it matters.",
-        role: "Staff Engineer",
-        company: "Platform team",
-    },
-    {
-        title: "Runs on your repo, your rules",
-        description:
-            "Matcha works against your codebase with your conventions, your tests, and your review gates. No black box, no lock-in, just agents inside the loop you already trust.",
-        role: "Founding Engineer",
-        company: "Developer tools",
-    },
-];
+import { cn } from "@/lib/utils";
+import { cards, sections } from "@/components/why/data";
 
 function HeadingText({ text }: { text: string }) {
     return (
@@ -57,78 +35,32 @@ export default function WhyPage() {
                     <div className="h-40 w-40 rounded-xl bg-amber-50"></div>
                 </div>
             </div>
-            {/* section 2 */}
-            <div className="h-max-content w-screen flex">
-                <div className="w-11/12 flex flex-col gap-8 border-t border-r border-neutral-800 py-16 px-10 text-secondary">
-                    <HeadingText text="The shift" />
-                    <div className="text-6xl font-extralight">
-                        The backlog was a queue. <br /> Agents drain it for you.
-                    </div>
-                    <div className="flex gap-10 w-9/12">
-                        <div>
-                            For years, the issue tracker was a holding pen. Tickets went in, and
-                            they sat there until someone had the time, the context, and the energy
-                            to pick one up. The board kept score. The work still waited on a human
-                            with a free afternoon.
+            {sections.map((section) => {
+                const isRight = section.align === "right";
+                return (
+                    <div
+                        key={section.label}
+                        className={cn("h-max-content w-screen flex", isRight && "flex-row-reverse")}
+                    >
+                        <div
+                            className={cn(
+                                "w-11/12 flex flex-col gap-8 border-t border-neutral-800 py-16 px-10 text-secondary",
+                                isRight ? "items-end border-l" : "border-r",
+                            )}
+                        >
+                            <HeadingText text={section.label} />
+                            <div className={cn("text-6xl font-extralight", isRight && "text-end")}>
+                                {section.headingLines[0]} <br /> {section.headingLines[1]}
+                            </div>
+                            <div className="flex gap-10 w-9/12">
+                                <div>{section.paragraphs[0]}</div>
+                                <div>{section.paragraphs[1]}</div>
+                            </div>
                         </div>
-                        <div>
-                            Now agents pull from that same board. They analyze the repo, write the
-                            patch, run the tests, and open a PR while you&apos;re doing something
-                            else. Queued, resolving, in review, resolved. The column you used to
-                            drain by hand drains itself.
-                        </div>
+                        <div className="flex-1 border-t border-neutral-800 relative"></div>
                     </div>
-                </div>
-                <div className="flex-1 border-t border-neutral-800 relative"></div>
-            </div>
-            {/* section 3 */}
-            <div className="h-max-content w-screen flex flex-row-reverse">
-                <div className="w-11/12 flex flex-col items-end gap-8 border-t border-l border-neutral-800 py-16 px-10 text-secondary">
-                    <HeadingText text="What this means" />
-                    <div className="text-6xl text-end font-extralight">
-                        Engineers stopped typing. <br /> They started directing.
-                    </div>
-                    <div className="flex gap-10 w-9/12">
-                        <div>
-                            The scarce thing was never ideas for what to fix. It was the hours to
-                            sit down and do it. When an agent can take a well-scoped issue to a
-                            working PR, the bottleneck moves off the keyboard and onto the decision
-                            of what&apos;s worth doing.
-                        </div>
-                        <div>
-                            Your team&apos;s job becomes scoping the work and reviewing the result.
-                            Read the diff, read the reasoning, approve or send it back. The judgment
-                            stays human. The typing doesn&apos;t. That&apos;s a different shape of
-                            engineering, and it&apos;s already here.
-                        </div>
-                    </div>
-                </div>
-                <div className="flex-1 flex border-t border-neutral-800 relative"></div>
-            </div>
-            {/* section 4 */}
-            <div className="h-max-content w-screen flex">
-                <div className="w-11/12 flex flex-col gap-8 border-t border-r border-neutral-800 py-16 px-10 text-secondary">
-                    <HeadingText text="The opportunity" />
-                    <div className="text-6xl font-extralight">
-                        From &quot;someone should fix <br /> this&quot; to a PR in minutes.
-                    </div>
-                    <div className="flex gap-10 w-9/12">
-                        <div>
-                            Every team has the list it never gets to. Flaky tests, stale docs, the
-                            refactor everyone agrees on but nobody starts. The gap between noticing
-                            and shipping was measured in sprints, so the list just grew. People
-                            learned to live with it.
-                        </div>
-                        <div>
-                            File the issue, and an agent spins up a runner, clones your repo, makes
-                            the change, and validates it against your real project before opening
-                            the PR. Minutes, not sprints. The bottleneck isn&apos;t the work
-                            anymore. It&apos;s deciding what to point it at.
-                        </div>
-                    </div>
-                </div>
-                <div className="flex-1 border-t border-neutral-800 relative"></div>
-            </div>
+                );
+            })}
 
             {/* cards section */}
 
