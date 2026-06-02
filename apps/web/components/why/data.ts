@@ -26,7 +26,7 @@ export const sections: WhySection[] = [
     },
     {
         label: "The opportunity",
-        headingLines: ['From "someone should fix', 'this" to a PR in minutes.'],
+        headingLines: ['From someone should fix', 'this to a PR in minutes.'],
         paragraphs: [
             "Every team has the list it never gets to. Flaky tests, stale docs, the refactor everyone agrees on but nobody starts. The gap between noticing and shipping was measured in sprints, so the list just grew. People learned to live with it.",
             "File the issue, and an agent spins up a runner, clones your repo, makes the change, and validates it against your real project before opening the PR. Minutes, not sprints. The bottleneck isn't the work anymore. It's deciding what to point it at.",
@@ -40,6 +40,7 @@ export type WhyCard = {
     description: string;
     role: string;
     company: string;
+    image: string;
 };
 
 export const cards: WhyCard[] = [
@@ -49,6 +50,7 @@ export const cards: WhyCard[] = [
             "Assign an issue to an agent and it reads the repo, writes the patch, and opens a PR. The long tail of chores and small fixes stops piling up while you sleep.",
         role: "Engineering Lead",
         company: "Seed-stage startup",
+        image: "/images/why/card1.svg",
     },
     {
         title: "You review, you don't type",
@@ -56,6 +58,7 @@ export const cards: WhyCard[] = [
             "Every change lands as a PR with a diff and the agent's reasoning. Your team moves from writing code to directing it, keeping the judgment where it matters.",
         role: "Staff Engineer",
         company: "Platform team",
+        image: "/images/why/card2.svg",
     },
     {
         title: "Runs on your repo, your rules",
@@ -63,5 +66,6 @@ export const cards: WhyCard[] = [
             "Matcha works against your codebase with your conventions, your tests, and your review gates. No black box, no lock-in, just agents inside the loop you already trust.",
         role: "Founding Engineer",
         company: "Developer tools",
+        image: "/images/why/card3.svg",
     },
 ];

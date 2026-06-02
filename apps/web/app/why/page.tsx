@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Footer } from "@/components/app/Footer";
 import { cn } from "@/lib/utils";
 import { cards, sections } from "@/components/why/data";
+import { HalftoneShape } from "@/lib/halftone/shape";
 
 function HeadingText({ text }: { text: string }) {
     return (
@@ -20,7 +21,7 @@ function HeadingText({ text }: { text: string }) {
 
 export default function WhyPage() {
     return (
-        <main className="flex min-h-screen flex-col pt-17 bg-secondary-foreground">
+        <main className="flex min-h-screen flex-col pt-17 bg-secondary-foreground select-none">
             <NavBar isMarkettingPage={true} />
             <div className="h-screen w-screen flex flex-col items-center bg-secondary-foreground p-12">
                 <div className="text-7xl w-2xl text-center text-secondary font-light">
@@ -79,7 +80,9 @@ export default function WhyPage() {
                             className="flex-1 flex flex-col gap-4 border border-neutral-800 p-4 rounded-sm"
                         >
                             <div className="text-xl"> {card.title} </div>
-                            <div className="border-t border-b border-neutral-800 border-dotted h-65 w-full"></div>
+                            <div className="border-t border-b border-neutral-800 border-dotted h-65 w-full overflow-hidden">
+                                <HalftoneShape src={card.image} ink="#4A38F5" />
+                            </div>
                             <div className="text-neutral-400 min-h-30"> {card.description} </div>
                             <div className="flex items-center justify-between">
                                 <div className="flex text-sm gap-4">
