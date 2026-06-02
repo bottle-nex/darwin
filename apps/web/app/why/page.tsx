@@ -1,6 +1,6 @@
 "use client";
 import { NavBar } from "@/components/nav/Navbar";
-import { PiArrowRight, PiPlus } from "react-icons/pi";
+import { PiArrowRight } from "react-icons/pi";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Footer } from "@/components/app/Footer";
@@ -73,7 +73,8 @@ export default function WhyPage() {
                         </div>
                         <div>
                             Now agents pull from that same board. They analyze the repo, write the
-                            patch, run the tests, and open a PR while you're doing something else.
+                            patch, run the tests, and open a PR while you&apos;re doing something
+                            else.
                             Queued, resolving, in review, resolved. The column you used to drain by
                             hand drains itself.
                         </div>
@@ -93,13 +94,13 @@ export default function WhyPage() {
                             The scarce thing was never ideas for what to fix. It was the hours to
                             sit down and do it. When an agent can take a well-scoped issue to a
                             working PR, the bottleneck moves off the keyboard and onto the decision
-                            of what's worth doing.
+                            of what&apos;s worth doing.
                         </div>
                         <div>
-                            Your team's job becomes scoping the work and reviewing the result. Read
-                            the diff, read the reasoning, approve or send it back. The judgment
-                            stays human. The typing doesn't. That's a different shape of
-                            engineering, and it's already here.
+                            Your team&apos;s job becomes scoping the work and reviewing the result.
+                            Read the diff, read the reasoning, approve or send it back. The judgment
+                            stays human. The typing doesn&apos;t. That&apos;s a different shape of
+                            engineering, and it&apos;s already here.
                         </div>
                     </div>
                 </div>
@@ -110,7 +111,7 @@ export default function WhyPage() {
                 <div className="w-11/12 flex flex-col gap-8 border-t border-r border-neutral-800 py-16 px-10 text-secondary">
                     <HeadingText text="The opportunity" />
                     <div className="text-6xl font-extralight">
-                        From "someone should fix <br /> this" to a PR in minutes.
+                        From &quot;someone should fix <br /> this&quot; to a PR in minutes.
                     </div>
                     <div className="flex gap-10 w-9/12">
                         <div>
@@ -122,8 +123,8 @@ export default function WhyPage() {
                         <div>
                             File the issue, and an agent spins up a runner, clones your repo, makes
                             the change, and validates it against your real project before opening
-                            the PR. Minutes, not sprints. The bottleneck isn't the work anymore.
-                            It's deciding what to point it at.
+                            the PR. Minutes, not sprints. The bottleneck isn&apos;t the work
+                            anymore. It&apos;s deciding what to point it at.
                         </div>
                     </div>
                 </div>
