@@ -67,24 +67,24 @@ h.destroy();
 
 ## Options
 
-| option               | default     | meaning                                                     |
-| -------------------- | ----------- | ----------------------------------------------------------- |
-| `src` (required)     | —           | image URL / dataURL / public path                           |
-| `ink`                | `#4A38F5`   | line color                                                  |
-| `hoverColor`         | `#4A38F5`   | line color under the cursor                                 |
-| `tile`               | `12`        | cell size px (smaller = finer/denser, heavier)              |
-| `power`              | `-0.07`     | tone bias (`s_3`)                                           |
-| `width`              | `0.34`      | line thickness (`s_4`)                                      |
-| `contrast`           | `1`         | contrast applied to the source                              |
-| `invert`             | `true`      | `applyToDarkAreas` — dark image areas become lines          |
-| `cropToBounds`       | `true`      | only draw where the image is present                        |
-| `hover`              | `true`      | cursor hover light (lines lengthen near the pointer)        |
-| `hoverRadius`        | `0.14`      | glow radius as a fraction of canvas height                  |
-| `hoverIntensity`     | `0.8`       | hover light intensity                                       |
-| `previewDistance`    | `4`         | zoom = `4 / previewDistance` (Twenty's hero uses `3.2`)     |
-| `verticalAnchor`     | `0.5`       | 0 bottom · 0.5 center · 1 top (for letterboxing)            |
-| `horizontalOffsetPx` | `0`         | shift the sampled image horizontally                        |
-| `verticalOffsetPx`   | `0`         | shift the sampled image vertically                          |
+| option               | default   | meaning                                                 |
+| -------------------- | --------- | ------------------------------------------------------- |
+| `src` (required)     | —         | image URL / dataURL / public path                       |
+| `ink`                | `#4A38F5` | line color                                              |
+| `hoverColor`         | `#4A38F5` | line color under the cursor                             |
+| `tile`               | `12`      | cell size px (smaller = finer/denser, heavier)          |
+| `power`              | `-0.07`   | tone bias (`s_3`)                                       |
+| `width`              | `0.34`    | line thickness (`s_4`)                                  |
+| `contrast`           | `1`       | contrast applied to the source                          |
+| `invert`             | `true`    | `applyToDarkAreas` — dark image areas become lines      |
+| `cropToBounds`       | `true`    | only draw where the image is present                    |
+| `hover`              | `true`    | cursor hover light (lines lengthen near the pointer)    |
+| `hoverRadius`        | `0.14`    | glow radius as a fraction of canvas height              |
+| `hoverIntensity`     | `0.8`     | hover light intensity                                   |
+| `previewDistance`    | `4`       | zoom = `4 / previewDistance` (Twenty's hero uses `3.2`) |
+| `verticalAnchor`     | `0.5`     | 0 bottom · 0.5 center · 1 top (for letterboxing)        |
+| `horizontalOffsetPx` | `0`       | shift the sampled image horizontally                    |
+| `verticalOffsetPx`   | `0`       | shift the sampled image vertically                      |
 
 ## Notes
 
@@ -98,4 +98,7 @@ h.destroy();
 - **Cross-origin images** need CORS headers to be exportable (canvas taint).
 - Mirrors Twenty's `use-home-background-halftone.ts` (shaders, `footprintScale`,
   hover easing) verbatim.
+
+```
+
 ```

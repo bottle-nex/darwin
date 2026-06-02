@@ -1,11 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import {
-    createHalftoneShape,
-    HalftoneShapeInstance,
-    HalftoneShapeOptions,
-} from "./shape-engine";
+import { createHalftoneShape, HalftoneShapeInstance, HalftoneShapeOptions } from "./shape-engine";
 
 export type HalftoneShapeProps = HalftoneShapeOptions & {
     className?: string;

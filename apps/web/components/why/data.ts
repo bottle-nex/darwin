@@ -26,7 +26,7 @@ export const sections: WhySection[] = [
     },
     {
         label: "The opportunity",
-        headingLines: ['From someone should fix', 'this to a PR in minutes.'],
+        headingLines: ["From someone should fix", "this to a PR in minutes."],
         paragraphs: [
             "Every team has the list it never gets to. Flaky tests, stale docs, the refactor everyone agrees on but nobody starts. The gap between noticing and shipping was measured in sprints, so the list just grew. People learned to live with it.",
             "File the issue, and an agent spins up a runner, clones your repo, makes the change, and validates it against your real project before opening the PR. Minutes, not sprints. The bottleneck isn't the work anymore. It's deciding what to point it at.",
