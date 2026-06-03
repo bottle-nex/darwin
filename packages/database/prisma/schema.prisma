@@ -16,6 +16,7 @@ model User {
     email         String    @unique
     image         String?
     emailVerified DateTime?
+    setupComplete Boolean @default(false)
 
     orgMemberships  OrgMember[]
     teamMemberships TeamMember[]

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import "./globals.css";
 import LenisProvider from "@/providers/LenisProvider";
+import QueryProvider from "@/providers/QueryProvider";
 import SessionSetter from "@/components/utility/SessionSetter";
 import { getServerSession } from "next-auth";
 import { authOption } from "./api/auth/[...nextauth]/options";
@@ -31,7 +32,9 @@ export default async function RootLayout({
             className={`${poppins.variable} h-full antialiased`}
         >
             <LenisProvider>
-                <body className="min-h-full flex flex-col">{children}</body>
+                <body className="min-h-full flex flex-col">
+                    <QueryProvider>{children}</QueryProvider>
+                </body>
                 <SessionSetter session={session} />
             </LenisProvider>
         </html>

@@ -1,31 +1,27 @@
 "use client";
 
-import { motion, useTransform, type MotionValue } from "motion/react";
+import { type MotionValue } from "motion/react";
 import type { Column } from "./types";
-import { IssueCard } from "./IssueCard";
+import IssueCard from "./IssueCard";
 
 export function KanbanColumn({
     progress,
-    index,
-    total,
+    cardOffset,
+    prefilledCount,
+    animatedTotal,
     column,
 }: {
     progress: MotionValue<number>;
-    index: number;
-    total: number;
+    cardOffset: number;
+    prefilledCount: number;
+    animatedTotal: number;
     column: Column;
 }) {
-    const start = ((index - 1) / total) * 0.75;
-    const end = start + 0.4;
-    const yMotion = useTransform(progress, [start, end], ["100%", "0%"]);
-    const y = index === 0 ? "0%" : yMotion;
-
     const { theme, icon: Icon } = column;
 
     return (
         <div className="flex-1 overflow-hidden rounded-md">
-            <motion.div
-                style={{ y }}
+            <div
                 className={`flex h-full w-full flex-col rounded-md p-3 ${theme.surface} ${theme.headerText}`}
             >
                 <div className="mb-3 flex items-center justify-between px-1">
@@ -43,11 +39,23 @@ export function KanbanColumn({
                     <span className={`text-lg leading-none ${theme.menu}`}>⋯</span>
                 </div>
                 <div className="flex flex-1 flex-col gap-2.5 overflow-y-auto pr-0.5">
-                    {column.issues.map((issue) => (
-                        <IssueCard key={issue.number} issue={issue} dark={column.dark} />
-                    ))}
+                    {column.issues.map((issue, i) => {
+                        const globalIndex = cardOffset + i;
+                        const animate = globalIndex >= prefilledCount;
+                        return (
+                            <IssueCard
+                                key={issue.number}
+                                issue={issue}
+                                dark={column.dark}
+                                progress={progress}
+                                animate={animate}
+                                animatedIndex={globalIndex - prefilledCount}
+                                animatedTotal={animatedTotal}
+                            />
+                        );
+                    })}
                 </div>
-            </motion.div>
+            </div>
         </div>
     );
 }
