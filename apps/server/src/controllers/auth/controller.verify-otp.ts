@@ -10,9 +10,6 @@ const body_schema = z.object({
     code: z.string().regex(/^\d{6}$/, "Code must be 6 digits"),
 });
 
-/**
- * HTTP controller for verifying OTP codes and establishing a session.
- */
 export default class OtpVerifyController {
     /**
      * Handle `POST /auth/otp/verify`: validate the email + 6-digit code, check it

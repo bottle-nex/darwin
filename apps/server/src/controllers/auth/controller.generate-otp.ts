@@ -8,9 +8,6 @@ const body_schema = z.object({
     email: z.email(),
 });
 
-/**
- * HTTP controller for issuing sign-in OTP codes.
- */
 export default class GenerateOtpController {
     /**
      * Handle `POST /auth/otp/request`: validate the email, enforce the per-email
