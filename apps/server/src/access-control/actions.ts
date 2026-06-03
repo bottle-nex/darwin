@@ -1,0 +1,36 @@
+const Action = {
+    org: {
+        read: "read",
+        update: "update",
+        delete: "delete",
+        invite_member: "invite_member",
+        remove_member: "remove_member",
+        change_member_role: "change_member_role",
+        manage_billing: "manage_billing",
+        create_project: "create_project",
+    },
+    project: {
+        read: "read",
+        update: "update",
+        delete: "delete",
+        create_team: "create_team",
+        manage_team: "manage_team",
+        create_issue: "create_issue",
+        triage_issue: "triage_issue",
+        close_issue: "close_issue",
+        assign_issue: "assign_issue",
+        trigger_runner: "trigger_runner",
+        cancel_runner: "cancel_runner",
+        view_runner_logs: "view_runner_logs",
+        manage_connectors: "manage_connectors",
+    },
+    team: {
+        read: "read",
+        update: "update",
+        add_member: "add_member",
+        remove_member: "remove_member",
+        change_member_role: "change_member_role",
+    },
+} as const;
+
+export default Action;
