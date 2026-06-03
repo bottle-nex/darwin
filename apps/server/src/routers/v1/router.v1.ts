@@ -1,6 +1,7 @@
 import { Router } from "express";
 import auth_router from "../auth/router.auth";
 import playground_router from "../playground/router.playground";
+import org_router from "../org/router.org";
 
 const v1_router: Router = Router();
 
@@ -9,6 +10,7 @@ v1_router.get("/health", (_req, res) => {
 });
 
 v1_router.use("/auth", auth_router);
+v1_router.use("/org", org_router);
 v1_router.use("/playground", playground_router);
 
 export default v1_router;

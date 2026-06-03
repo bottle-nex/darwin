@@ -8,8 +8,6 @@ let _resend: Resend | null = null;
  *
  * Deferring construction until first use keeps module import side-effect free and
  * avoids instantiating the client in code paths (e.g. tests) that never send mail.
- *
- * @returns The shared {@link Resend} instance.
  */
 function client(): Resend {
     if (!_resend) {
@@ -24,10 +22,6 @@ function client(): Resend {
  * The message states the expiry derived from `SERVER_OTP_TTL_SECONDS`. Resend reports
  * failures in the response body rather than throwing, so this normalizes that into a
  * thrown error for callers to catch.
- *
- * @param to - Recipient email address.
- * @param code - The plaintext 6-digit code to deliver.
- * @throws If Resend returns a delivery error.
  */
 export async function sendOtpEmail(to: string, code: string) {
     const { error } = await client().emails.send({

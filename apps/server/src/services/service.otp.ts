@@ -29,9 +29,7 @@ export default class OtpService {
      *
      * Runs as a single `MULTI` so the three keys never drift out of sync. The code is
      * stored as a bcrypt hash (never plaintext) and expires after `SERVER_OTP_TTL_SECONDS`.
-     *
-     * @param email - Recipient address; callers should pass it already lowercased.
-     * @param code - The plaintext 6-digit code to hash and store.
+     * Pass `email` already lowercased.
      */
     static async store_otp(email: string, code: string): Promise<void> {
         const hash = await bcrypt.hash(code, 10);
@@ -54,10 +52,7 @@ export default class OtpService {
      * `{ ok: true }` is returned, so a code is single-use and the just-verified user is
      * not throttled if they need a new one. The bcrypt comparison runs only after the
      * lock check, meaning the lock takes precedence even if the final guess is correct.
-     *
-     * @param email - Address the code was issued to; pass it already lowercased.
-     * @param code - The plaintext code supplied by the user.
-     * @returns An {@link OtpVerifyResult} describing success or the failure reason.
+     * Pass `email` already lowercased.
      */
     static async verify_otp(email: string, code: string): Promise<OtpVerifyResult> {
         const hash = await redis.get(this.code_key(email));
@@ -97,9 +92,7 @@ export default class OtpService {
     /**
      * Whether `email` is still within the post-request cooldown window and should be
      * refused a new code. Set by {@link store_otp}, expires after `SERVER_OTP_COOLDOWN_SECONDS`.
-     *
-     * @param email - Address to check; pass it already lowercased.
-     * @returns `true` while the cooldown key exists, `false` once it has expired.
+     * Pass `email` already lowercased.
      */
     static async is_cooldown(email: string): Promise<boolean> {
         return (await redis.exists(this.cool_down_key(email))) === 1;
@@ -110,8 +103,6 @@ export default class OtpService {
      *
      * Uses `crypto.randomInt` (not `Math.random`) and pads so values below 100000
      * keep their leading zeros — the full `"000000"`–`"999999"` range is valid.
-     *
-     * @returns A 6-character numeric string.
      */
     static generate_otp(): string {
         return randomInt(0, 1_000_000).toString().padStart(6, "0");

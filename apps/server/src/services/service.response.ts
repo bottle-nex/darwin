@@ -6,28 +6,17 @@ import { type Response } from "express";
  * Keeping a single shape means clients can branch on `success` and read
  * `error.code` without knowing which route they hit. `meta.timestamp` is
  * always present; `data`, `error`, and `url` are populated per-helper.
- *
- * @typeParam T - Shape of the `data` payload for success responses.
  */
 export interface CustomResponse<T = unknown> {
-    /** `true` for success helpers, `false` for error helpers. */
     success?: boolean;
-    /** Payload returned on success. Omitted on errors. */
     data?: T;
-    /** Human-readable summary, safe to surface in the UI. */
     message?: string;
-    /** Machine-readable failure detail. Present only on error responses. */
     error?: {
-        /** Stable, uppercase identifier clients can switch on (e.g. `NOT_FOUND`). */
         code: string;
-        /** Optional extra context for debugging; not guaranteed to be user-safe. */
         details?: string;
     };
-    /** Target location for redirect responses. */
     url?: string;
-    /** Envelope metadata. `timestamp` is always set; extra keys are allowed. */
     meta: {
-        /** ISO-8601 time the response was built. */
         timestamp: string;
         [key: string]: unknown;
     };
@@ -45,11 +34,6 @@ export default class ResponseWriter {
      *
      * Use when the caller already holds a `{ data: T }` object; prefer
      * {@link ResponseWriter.success} when you have the bare value.
-     *
-     * @param res - Express response object.
-     * @param payload - Object holding the payload under `data`.
-     * @param message - Human-readable summary.
-     * @param status_code - HTTP status (default `200`).
      */
     static secure_success<T>(
         res: Response,
@@ -67,14 +51,6 @@ export default class ResponseWriter {
         this.send_response(res, response, status_code);
     }
 
-    /**
-     * Standard success response carrying a bare payload.
-     *
-     * @param res - Express response object.
-     * @param data - Payload to return under `data`.
-     * @param message - Human-readable summary.
-     * @param status_code - HTTP status (default `200`).
-     */
     static success<T>(
         res: Response,
         data: T,
@@ -95,12 +71,6 @@ export default class ResponseWriter {
      * Generic error response. Reach for a specific helper
      * ({@link ResponseWriter.not_found}, {@link ResponseWriter.invalid_data},
      * etc.) when one fits; use this for ad-hoc codes.
-     *
-     * @param res - Express response object.
-     * @param code - Stable error code for clients to branch on.
-     * @param message - Human-readable summary.
-     * @param details - Optional debugging context.
-     * @param status_code - HTTP status (default `500`).
      */
     static error(
         res: Response,
@@ -124,11 +94,6 @@ export default class ResponseWriter {
     /**
      * Redirect envelope. Returns the target in `url` rather than issuing an
      * HTTP `Location` redirect, so SPA clients can decide how to navigate.
-     *
-     * @param res - Express response object.
-     * @param url - Destination URL.
-     * @param message - Human-readable summary.
-     * @param status_code - HTTP status (default `302`).
      */
     static redirect(
         res: Response,
@@ -147,14 +112,7 @@ export default class ResponseWriter {
         this.send_response(res, response, status_code);
     }
 
-    /**
-     * `401 Unauthorized` with code `NOT_AUTHORIZED`. Use for missing or
-     * invalid credentials.
-     *
-     * @param res - Express response object.
-     * @param message - Human-readable summary.
-     * @param status_code - HTTP status (default `401`).
-     */
+    /** `401 Unauthorized` with code `NOT_AUTHORIZED`. Use for missing or invalid credentials. */
     static not_authorized(
         res: Response,
         message: string = "Not authorized",
@@ -171,14 +129,7 @@ export default class ResponseWriter {
         this.send_response(res, response, status_code);
     }
 
-    /**
-     * `201 Created` success response for newly created resources.
-     *
-     * @param res - Express response object.
-     * @param data - The created resource.
-     * @param message - Human-readable summary.
-     * @param status_code - HTTP status (default `201`).
-     */
+    /** `201 Created` success response for newly created resources. */
     static created<T>(
         res: Response,
         data: T,
@@ -196,12 +147,7 @@ export default class ResponseWriter {
 
     /**
      * `429 Too Many Requests` with code `RATE_LIMIT_EXCEEDED`. Sets the
-     * `Retry-After` header when a finite retry window is supplied.
-     *
-     * @param res - Express response object.
-     * @param message - Human-readable summary.
-     * @param retry_after_seconds - Seconds until the caller may retry; written
-     * to the `Retry-After` header (rounded up) when finite.
+     * `Retry-After` header (rounded up) when a finite `retry_after_seconds` is supplied.
      */
     static too_many_requests(
         res: Response,
@@ -222,12 +168,7 @@ export default class ResponseWriter {
         this.send_response(res, response, 429);
     }
 
-    /**
-     * `404 Not Found` with code `NOT_FOUND`.
-     *
-     * @param res - Express response object.
-     * @param messaage - Human-readable summary.
-     */
+    /** `404 Not Found` with code `NOT_FOUND`. */
     static not_found(res: Response, messaage: string = "Resource not found") {
         const response: CustomResponse = {
             success: false,
@@ -241,11 +182,8 @@ export default class ResponseWriter {
     }
 
     /**
-     * `500 Internal Server Error` with code `INTERNAL_SERVER_ERROR`. The
-     * fixed catch-all for unexpected failures — no caller-supplied detail is
-     * leaked to the client.
-     *
-     * @param res - Express response object.
+     * `500 Internal Server Error` with code `INTERNAL_SERVER_ERROR`. The fixed
+     * catch-all for unexpected failures — no caller-supplied detail is leaked to the client.
      */
     static system_error(res: Response) {
         const response: CustomResponse = {
@@ -262,10 +200,6 @@ export default class ResponseWriter {
     /**
      * `400`-class validation failure with code `INVALID_DATA`. Use after a
      * failed schema parse on the request body/params.
-     *
-     * @param res - Express response object.
-     * @param message - Human-readable summary.
-     * @param status_code - HTTP status (default `400`).
      */
     static invalid_data(
         res: Response,
@@ -288,14 +222,6 @@ export default class ResponseWriter {
      * status, and optional `data`/`details` explicitly. Use for domain
      * outcomes that don't map onto the named helpers (e.g. `OTP_COOLDOWN`,
      * `OTP_EXPIRED`).
-     *
-     * @param res - Express response object.
-     * @param success - Whether this represents a success or failure.
-     * @param code - Stable error/outcome code.
-     * @param message - Human-readable summary.
-     * @param status_code - HTTP status.
-     * @param data - Optional payload.
-     * @param details - Optional debugging context.
      */
     static custom<T>(
         res: Response,
@@ -323,10 +249,6 @@ export default class ResponseWriter {
      * Low-level writer that serializes the envelope and sets the status.
      * Every other helper funnels through here; call directly only if you've
      * already built a {@link CustomResponse}.
-     *
-     * @param res - Express response object.
-     * @param response - Pre-built response envelope.
-     * @param status_code - HTTP status to send.
      */
     static send_response<T>(res: Response, response: CustomResponse<T>, status_code: number) {
         res.status(status_code).json(response);

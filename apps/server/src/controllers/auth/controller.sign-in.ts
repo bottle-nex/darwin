@@ -15,9 +15,6 @@ const body_schema = z.object({
     }),
 });
 
-/**
- * HTTP controller for OAuth sign-in (Google / GitHub).
- */
 export default class SignInController {
     /**
      * Handle `POST /auth/sign-in`: validate the OAuth provider payload, then upsert the

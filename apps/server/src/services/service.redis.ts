@@ -8,9 +8,6 @@ import { ENV } from "../configs/env";
  */
 export let redis: Redis;
 
-/**
- * Lifecycle manager for the process-wide Redis connection.
- */
 export default class RedisService {
     /**
      * Establish the shared Redis connection and attach lifecycle logging.
