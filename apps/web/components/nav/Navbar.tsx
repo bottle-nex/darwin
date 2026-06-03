@@ -8,6 +8,7 @@ import { FaDiscord, FaPhoneAlt } from "react-icons/fa";
 import { useUserSessionStore } from "@/store/user/useUserSessionStore";
 import SigninModal from "../utility/modal/SigninModal";
 import { PiArrowRight } from "react-icons/pi";
+import { useRouter } from "next/navigation";
 
 const NAV_ITEMS = [
     { label: "Why", href: "/why" },
@@ -18,6 +19,7 @@ const NAV_ITEMS = [
 
 export function NavBar({ isMarkettingPage = false }: { isMarkettingPage?: boolean }) {
     const setOpenSigninModal = useUserSessionStore((s) => s.setOpenSigninModal);
+    const router = useRouter()
     const session = useUserSessionStore((s) => s.session);
     const [scrolled, setScrolled] = useState(false);
     const headerRef = useRef<HTMLElement>(null);
@@ -34,6 +36,10 @@ export function NavBar({ isMarkettingPage = false }: { isMarkettingPage?: boolea
 
     function handleSignin() {
         setOpenSigninModal(true);
+    }
+
+    function handleRedirect() {
+        router.push("/playground")
     }
 
     return (
@@ -84,14 +90,14 @@ export function NavBar({ isMarkettingPage = false }: { isMarkettingPage?: boolea
                     <Button
                         variant="secondary"
                         className="flex items-center justify-center"
-                        onClick={session ? undefined : handleSignin}
+                        onClick={session ? handleRedirect : handleSignin}
                     >
                         Connect with us
                         <FaPhoneAlt className="size-3" />
                     </Button>
                     <Button
                         className="flex items-center justify-center"
-                        onClick={session ? undefined : handleSignin}
+                        onClick={session ? handleRedirect : handleSignin}
                     >
                         {session ? "Get Started" : "Sign in"}
                         <PiArrowRight className="h-3 w-3" />
