@@ -6,104 +6,111 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-  --color-ink: #0A0A0A; /* deepest dark — page base in dark mode */
-  --color-charcoal: #242424; /* lighter dark — cards/surfaces in dark mode */
-  --color-snow: #fafafa; /* lightest — page base in light mode */
-  --color-mist: #f4f4f4; /* off-white — cards/surfaces in light mode */
+    --color-ink: #0A0A0A;
+    /* deepest dark — page base in dark mode */
+    --color-charcoal: #121212;
+    /* lighter dark — cards/surfaces in dark mode */
+    --color-snow: #fafafa;
+    /* lightest — page base in light mode */
+    --color-mist: #f4f4f4;
+    /* off-white — cards/surfaces in light mode */
 }
 
 :root {
-  --radius: 0.625rem;
+    --radius: 0.625rem;
 
-  --background: var(--color-snow);
-  --foreground: #171717;
-  --surface: var(--color-mist);
-  --card: #ffffff;
-  --card-foreground: #171717;
-  --popover: #ffffff;
-  --popover-foreground: #171717;
+    --background: var(--color-snow);
+    --foreground: #171717;
+    --surface: var(--color-mist);
+    --card: #ffffff;
+    --card-foreground: #171717;
+    --popover: #ffffff;
+    --popover-foreground: #171717;
 
-  --primary: #171717;
-  --primary-foreground: var(--color-snow);
-  --secondary: var(--color-mist);
-  --secondary-foreground: #171717;
-  --muted: var(--color-mist);
-  --muted-foreground: #737373;
-  --accent: var(--color-mist);
-  --accent-foreground: #171717;
-  --destructive: #e7000b;
+    --primary: #171717;
+    --primary-foreground: var(--color-snow);
+    --secondary: var(--color-mist);
+    --secondary-foreground: #171717;
+    --muted: var(--color-mist);
+    --muted-foreground: #737373;
+    --accent: var(--color-mist);
+    --accent-foreground: #171717;
+    --destructive: #e7000b;
 
-  --border: #e5e5e5;
-  --input: #e5e5e5;
-  --ring: #a3a3a3;
+    --border: #e5e5e5;
+    --input: #e5e5e5;
+    --ring: #a3a3a3;
 }
 
 .dark {
-  --background: var(--color-ink);
-  --foreground: #ededed;
-  --surface: var(--color-charcoal);
-  --card: var(--color-charcoal);
-  --card-foreground: #ededed;
-  --popover: var(--color-charcoal);
-  --popover-foreground: #ededed;
+    --background: var(--color-ink);
+    --foreground: #ededed;
+    --surface: var(--color-charcoal);
+    --card: var(--color-charcoal);
+    --card-foreground: #ededed;
+    --popover: var(--color-charcoal);
+    --popover-foreground: #ededed;
 
-  --primary: #ededed;
-  --primary-foreground: #171717;
-  --secondary: var(--color-charcoal);
-  --secondary-foreground: #ededed;
-  --muted: var(--color-charcoal);
-  --muted-foreground: #a1a1a1;
-  --accent: #2e2e2e;
-  --accent-foreground: #ededed;
-  --destructive: #ff6467;
+    --primary: #ededed;
+    --primary-foreground: #171717;
+    --secondary: var(--color-charcoal);
+    --secondary-foreground: #ededed;
+    --muted: var(--color-charcoal);
+    --muted-foreground: #a1a1a1;
+    --accent: #2e2e2e;
+    --accent-foreground: #ededed;
+    --destructive: #ff6467;
 
-  --border: #ffffff1a; /* white 10% */
-  --input: #ffffff26; /* white 15% */
-  --ring: #525252;
+    --border: #ffffff1a;
+    /* white 10% */
+    --input: #ffffff26;
+    /* white 15% */
+    --ring: #525252;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-surface: var(--surface);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-popover: var(--popover);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-destructive: var(--destructive);
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
+    --color-background: var(--background);
+    --color-foreground: var(--foreground);
+    --color-surface: var(--surface);
+    --color-card: var(--card);
+    --color-card-foreground: var(--card-foreground);
+    --color-popover: var(--popover);
+    --color-popover-foreground: var(--popover-foreground);
+    --color-primary: var(--primary);
+    --color-primary-foreground: var(--primary-foreground);
+    --color-secondary: var(--secondary);
+    --color-secondary-foreground: var(--secondary-foreground);
+    --color-muted: var(--muted);
+    --color-muted-foreground: var(--muted-foreground);
+    --color-accent: var(--accent);
+    --color-accent-foreground: var(--accent-foreground);
+    --color-destructive: var(--destructive);
+    --color-border: var(--border);
+    --color-input: var(--input);
+    --color-ring: var(--ring);
 
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
+    --radius-sm: calc(var(--radius) - 4px);
+    --radius-md: calc(var(--radius) - 2px);
+    --radius-lg: var(--radius);
+    --radius-xl: calc(var(--radius) + 4px);
 
-  --font-sans: var(--font-poppins);
-  --font-mono: var(--font-geist-mono);
+    --font-sans: var(--font-poppins);
+    --font-mono: var(--font-geist-mono);
 }
 
 @layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
-  body {
-    @apply bg-snow text-foreground;
-  }
+    * {
+        @apply border-border outline-ring/50;
+    }
+
+    body {
+        @apply bg-snow text-foreground;
+    }
 }
 
 @layer utilities {
-  .grain {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='linear' slope='0.12'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
-    background-repeat: repeat;
-  }
+    .grain {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='linear' slope='0.12'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+        background-repeat: repeat;
+    }
 }

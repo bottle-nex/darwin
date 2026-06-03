@@ -1,14 +1,14 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { HiBars3, HiXMark } from "react-icons/hi2";
 import { cn } from "@/lib/utils";
 import { azeretMono, Button } from "@/components/ui/button";
 import AppLogo from "@/components/app/Applogo";
-import { FaDiscord } from "react-icons/fa";
+import { FaDiscord, FaPhoneAlt } from "react-icons/fa";
 import { useUserSessionStore } from "@/store/user/useUserSessionStore";
 import SigninModal from "../utility/modal/SigninModal";
 import { PiArrowRight } from "react-icons/pi";
+import { useRouter } from "next/navigation";
 
 const NAV_ITEMS = [
     { label: "Why", href: "/why" },
@@ -19,8 +19,9 @@ const NAV_ITEMS = [
 
 export function NavBar({ isMarkettingPage = false }: { isMarkettingPage?: boolean }) {
     const setOpenSigninModal = useUserSessionStore((s) => s.setOpenSigninModal);
+    const router = useRouter();
+    const session = useUserSessionStore((s) => s.session);
     const [scrolled, setScrolled] = useState(false);
-    const [menuOpen, setMenuOpen] = useState(false);
     const headerRef = useRef<HTMLElement>(null);
 
     useEffect(() => {
@@ -37,6 +38,10 @@ export function NavBar({ isMarkettingPage = false }: { isMarkettingPage?: boolea
         setOpenSigninModal(true);
     }
 
+    function handleRedirect() {
+        router.push("/playground");
+    }
+
     return (
         <header
             ref={headerRef}
@@ -45,7 +50,7 @@ export function NavBar({ isMarkettingPage = false }: { isMarkettingPage?: boolea
                 "transition-[height,border-color] duration-300 ease-out",
                 scrolled
                     ? isMarkettingPage
-                        ? "border-b border-neutral-800 h-15 bg-secondary-foreground"
+                        ? "border-b border-neutral-800 h-15 bg-charcoal"
                         : "border-b border-neutral-200 h-15 bg-snow"
                     : "border-b border-transparent h-17",
             )}
@@ -83,26 +88,19 @@ export function NavBar({ isMarkettingPage = false }: { isMarkettingPage?: boolea
 
                 <div className="flex items-center gap-2">
                     <Button
-                        variant={"secondary"}
+                        variant="secondary"
                         className="flex items-center justify-center"
-                        onClick={handleSignin}
+                        onClick={session ? handleRedirect : handleSignin}
                     >
-                        Sign in
-                        <PiArrowRight className="h-3 w-3" />
-                    </Button>
-                    <Button className="flex items-center justify-center">
-                        Get Started
-                        <PiArrowRight className="h-3 w-3" />
+                        Connect with us
+                        <FaPhoneAlt className="size-3" />
                     </Button>
                     <Button
-                        variant="ghost"
-                        size="icon-sm"
-                        aria-label={menuOpen ? "Close menu" : "Open menu"}
-                        aria-expanded={menuOpen}
-                        onClick={() => setMenuOpen((open) => !open)}
-                        className="md:hidden text-foreground/70"
+                        className="flex items-center justify-center"
+                        onClick={session ? handleRedirect : handleSignin}
                     >
-                        {menuOpen ? <HiXMark className="size-5" /> : <HiBars3 className="size-5" />}
+                        {session ? "Get Started" : "Sign in"}
+                        <PiArrowRight className="h-3 w-3" />
                     </Button>
                 </div>
             </div>

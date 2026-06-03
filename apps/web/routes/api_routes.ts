@@ -6,3 +6,6 @@ export const AUTH_URL = API_URL + "/auth";
 export const SIGNIN_URL = AUTH_URL + "/sign-in";
 export const REQUEST_OTP_URL = AUTH_URL + "/otp/request";
 export const VERIFY_OTP_URL = AUTH_URL + "/otp/verify";
+
+export const PLAYGROUND_URL = API_URL + "/playground";
+export const PRELOAD_URL = PLAYGROUND_URL + "/preload";

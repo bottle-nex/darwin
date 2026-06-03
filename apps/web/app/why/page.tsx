@@ -22,9 +22,9 @@ function HeadingText({ text }: { text: string }) {
 
 export default function WhyPage() {
     return (
-        <main className="flex min-h-screen flex-col pt-17 bg-secondary-foreground select-none">
+        <main className="flex min-h-screen flex-col pt-17 bg-charcoal select-none">
             <NavBar isMarkettingPage={true} />
-            <div className="relative h-screen w-screen flex flex-col items-center overflow-hidden bg-secondary-foreground p-12">
+            <div className="relative h-screen w-screen flex flex-col items-center overflow-hidden bg-charcoal p-12">
                 <div className="relative z-10 w-full max-w-7xl mx-auto flex flex-col items-start justify-center flex-1 gap-7">
                     <HeadingText text="Why matcha" />
                     <div className="text-8xl w-3xl text-left text-secondary font-light leading-[0.95]">
