@@ -60,15 +60,15 @@ export default function PlaygroundSidebarPanel({ label, items }: PlaygroundSideb
                                 aria-current={isActive ? "true" : undefined}
                                 className={cn(
                                     "group flex cursor-pointer items-center gap-3 rounded-md px-2.5 py-2 text-left outline-none transition-colors duration-150",
-                                    "focus-visible:ring-2 focus-visible:ring-[#9bc24f]/40",
-                                    isActive ? "bg-[#9bc24f]/10" : "hover:bg-neutral-800/60",
+                                    "focus-visible:ring-2 focus-visible:ring-neutral-500/40",
+                                    isActive ? "bg-neutral-800/80" : "hover:bg-neutral-800/60",
                                 )}
                             >
                                 <Icon
                                     className={cn(
                                         "size-4 shrink-0 transition-colors duration-150",
                                         isActive
-                                            ? "text-[#bcdb6f]"
+                                            ? "text-neutral-100"
                                             : "text-neutral-300 group-hover:text-neutral-300",
                                     )}
                                     aria-hidden

@@ -1,153 +1,134 @@
 "use client";
+
 import { useState } from "react";
-import { AnimatePresence } from "motion/react";
 import {
-    RiLayoutColumnFill,
-    RiCodeSSlashFill,
-    RiListSettingsFill,
-    RiFlashlightFill,
-    RiSettingsFill,
+    RiNotification3Fill,
+    RiDashboardFill,
+    RiInboxFill,
+    RiCalendarFill,
+    RiClipboardFill,
     RiInformationFill,
-    RiPaletteFill,
-    RiTeamFill,
-    RiBankCardFill,
-    RiShieldKeyholeFill,
+    RiSettings4Fill,
 } from "react-icons/ri";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import {
-    PlayGroundSidebarProps,
-    usePlaygroundRenderer,
-} from "@/store/playground/usePlaygroundRenderer";
+import { BsFillKanbanFill } from "react-icons/bs";
 import { cn } from "@/lib/utils";
-import PlaygroundSidebarPanel, {
-    type SidebarChild,
-} from "@/components/playground/PlaygroundSidebarPanel";
+import IconWrapper from "../ui/IconWrapper";
+import { PiBuildingOfficeFill } from "react-icons/pi";
+import {
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectLabel,
+    SelectTrigger,
+} from "@/components/ui/select";
 
-type RendererMeta = {
-    icon: React.ElementType;
+type NavItem = {
     label: string;
-    children?: SidebarChild[];
+    icon: React.ElementType;
 };
 
-const RENDERER_META: Record<PlayGroundSidebarProps, RendererMeta> = {
-    [PlayGroundSidebarProps.KANBAN]: { icon: RiLayoutColumnFill, label: "Kanban" },
-    [PlayGroundSidebarProps.CODE]: { icon: RiCodeSSlashFill, label: "Code" },
-    [PlayGroundSidebarProps.PROPS]: { icon: RiListSettingsFill, label: "Props" },
-    [PlayGroundSidebarProps.EVENTS]: { icon: RiFlashlightFill, label: "Events" },
-    [PlayGroundSidebarProps.MANAGE]: {
-        icon: RiSettingsFill,
-        label: "Manage",
-        children: [
-            {
-                key: "general",
-                label: "General",
-                description: "Name & metadata",
-                icon: RiInformationFill,
-            },
-            {
-                key: "appearance",
-                label: "Appearance",
-                description: "Theme & layout",
-                icon: RiPaletteFill,
-            },
-            { key: "members", label: "Members", description: "People & roles", icon: RiTeamFill },
-            {
-                key: "access",
-                label: "Access",
-                description: "Keys & tokens",
-                icon: RiShieldKeyholeFill,
-            },
-            {
-                key: "billing",
-                label: "Billing",
-                description: "Plan & invoices",
-                icon: RiBankCardFill,
-            },
-        ],
-    },
+type Org = {
+    id: string;
+    name: string;
 };
 
-const RENDERERS = Object.values(PlayGroundSidebarProps);
+const ORGS: Org[] = [
+    { id: "appx", name: "AppX" },
+    { id: "northwind", name: "Northwind Labs" },
+    { id: "acme", name: "Acme Corp" },
+    { id: "globex", name: "Globex" },
+    { id: "umbrella", name: "Umbrella Inc" },
+];
+
+const PRIMARY_ITEMS: NavItem[] = [
+    { label: "Kanban", icon: BsFillKanbanFill },
+    { label: "Notification", icon: RiNotification3Fill },
+    { label: "Dashboard", icon: RiDashboardFill },
+];
+
+const WORKSPACE_ITEMS: NavItem[] = [
+    { label: "Inbox", icon: RiInboxFill },
+    { label: "Calendar", icon: RiCalendarFill },
+    { label: "Reports", icon: RiClipboardFill },
+    { label: "Help & Center", icon: RiInformationFill },
+    { label: "Settings", icon: RiSettings4Fill },
+];
 
 export default function PlaygroundSidebar() {
-    const renderer = usePlaygroundRenderer((s) => s.renderer);
-    const setRenderer = usePlaygroundRenderer((s) => s.setRenderer);
-    const [openPanelKey, setOpenPanelKey] = useState<PlayGroundSidebarProps | null>(null);
+    const [active, setActive] = useState("Project");
+    const [orgId, setOrgId] = useState("appx");
+    const activeOrg = ORGS.find((o) => o.id === orgId) ?? ORGS[0];
 
-    const selectRenderer = (key: PlayGroundSidebarProps) => {
-        setRenderer(key);
-        // Items with children toggle their panel (tapping the open one closes it);
-        // items without children switch views and dismiss any open panel.
-        setOpenPanelKey((prev) => (RENDERER_META[key].children && prev !== key ? key : null));
+    const renderItem = ({ label, icon: Icon }: NavItem) => {
+        const isActive = active === label;
+
+        return (
+            <button
+                key={label}
+                type="button"
+                onClick={() => setActive(label)}
+                aria-current={isActive ? "true" : undefined}
+                className={cn(
+                    "flex cursor-pointer items-center gap-3 rounded-md px-3 py-2.5 text-left text-[12px] outline-none transition-colors",
+                    "focus-visible:ring-2 focus-visible:ring-neutral-500/40",
+                    isActive
+                        ? "bg-[#1a1a1a] text-white shadow-[inset_0_1.5px_0_0_rgba(255,255,255,0.06)] outline! outline-black!"
+                        : "text-neutral-500 hover:bg-neutral-800/50 hover:text-neutral-200",
+                )}
+            >
+                <Icon className="size-4 shrink-0" aria-hidden />
+                <span className="min-w-0 truncate">{label}</span>
+            </button>
+        );
     };
 
-    const openPanel = openPanelKey ? RENDERER_META[openPanelKey] : null;
-
     return (
-        <div className="flex h-full shrink-0">
-            <aside className="flex h-full w-14 shrink-0 flex-col items-center gap-1 py-3">
-                <nav className="flex flex-col items-center gap-1" aria-label="Playground views">
-                    {RENDERERS.map((key) => {
-                        const { icon: Icon, label, children } = RENDERER_META[key];
-                        const isActive = renderer === key;
+        <aside className="flex h-full w-64 shrink-0 flex-col px-3">
+            <Select value={orgId} onValueChange={setOrgId}>
+                <SelectTrigger
+                    aria-label="Switch organization"
+                    className="h-auto w-full justify-between gap-x-3 border-0 bg-transparent px-2 py-4 text-[12px] text-neutral-300 shadow-none hover:bg-neutral-800/50 focus-visible:ring-0 data-[size=default]:h-auto"
+                >
+                    <span className="flex min-w-0 items-center gap-x-3">
+                        <IconWrapper
+                            icon={<PiBuildingOfficeFill />}
+                            stroke_color="text-indigo-200"
+                            bg_color="bg-indigo-700"
+                        />
+                        <span className="truncate">{activeOrg.name}</span>
+                    </span>
+                </SelectTrigger>
+                <SelectContent>
+                    <SelectGroup>
+                        <SelectLabel>Organizations</SelectLabel>
+                        {ORGS.map((org) => (
+                            <SelectItem key={org.id} value={org.id} className="py-2 pl-2">
+                                <span className="flex items-center gap-x-3">
+                                    <IconWrapper
+                                        icon={<PiBuildingOfficeFill />}
+                                        stroke_color="text-indigo-200"
+                                        bg_color="bg-indigo-700"
+                                    />
+                                    <span className="truncate">{org.name}</span>
+                                </span>
+                            </SelectItem>
+                        ))}
+                    </SelectGroup>
+                </SelectContent>
+            </Select>
 
-                        return (
-                            <Tooltip key={key}>
-                                <TooltipTrigger asChild>
-                                    <button
-                                        type="button"
-                                        onClick={() => selectRenderer(key)}
-                                        aria-label={label}
-                                        aria-current={isActive ? "true" : undefined}
-                                        aria-expanded={
-                                            children?.length
-                                                ? openPanelKey === key
-                                                    ? "true"
-                                                    : "false"
-                                                : undefined
-                                        }
-                                        className={cn(
-                                            "group relative flex size-10 cursor-pointer items-center justify-center rounded-md outline-none transition-all duration-200 ease-out",
-                                            "focus-visible:ring-2 focus-visible:ring-[#9bc24f]/40",
-                                            isActive
-                                                ? "bg-[#9bc24f]/10 text-[#bcdb6f]"
-                                                : "text-neutral-300 hover:bg-neutral-800/60 hover:text-neutral-200",
-                                        )}
-                                    >
-                                        <span
-                                            className={cn(
-                                                "absolute -left-2 h-8 w-0.75 rounded-r-full bg-[#9bc24f] transition-all duration-200 ease-out",
-                                                isActive
-                                                    ? "opacity-100"
-                                                    : "-translate-x-1 opacity-0",
-                                            )}
-                                            aria-hidden
-                                        />
-                                        <Icon
-                                            className={cn(
-                                                "size-4.5 transition-transform duration-200 ease-out",
-                                                !isActive && "group-hover:scale-110",
-                                            )}
-                                            aria-hidden
-                                        />
-                                    </button>
-                                </TooltipTrigger>
-                                <TooltipContent side="right">{label}</TooltipContent>
-                            </Tooltip>
-                        );
-                    })}
-                </nav>
-            </aside>
+            <div className="mx-2 h-px bg-neutral-800" />
 
-            <AnimatePresence initial={false}>
-                {openPanel?.children && (
-                    <PlaygroundSidebarPanel
-                        key={openPanelKey}
-                        label={openPanel.label}
-                        items={openPanel.children}
-                    />
-                )}
-            </AnimatePresence>
-        </div>
+            <nav className="flex flex-col gap-1 py-3" aria-label="Primary">
+                {PRIMARY_ITEMS.map(renderItem)}
+            </nav>
+
+            <div className="mx-2 h-px bg-neutral-800" />
+
+            <nav className="flex flex-col gap-1 py-3" aria-label="Workspace">
+                {WORKSPACE_ITEMS.map(renderItem)}
+            </nav>
+        </aside>
     );
 }
