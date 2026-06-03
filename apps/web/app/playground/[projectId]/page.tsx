@@ -1,6 +1,5 @@
 import PlaygroundPill from "@/components/playground/PlaygroundPill";
 import PlaygroundSidebar from "@/components/playground/PlaygroundSidebar";
-import PlaygroundTopper from "@/components/playground/PlaygroundTopper";
 
 export default function ProjectPage() {
     return (

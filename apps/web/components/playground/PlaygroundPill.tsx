@@ -18,7 +18,7 @@ export default function PlaygroundPill() {
                 </div>
                 <Button>
                     <IoAddSharp />
-                    Create Org
+                    New Project
                 </Button>
             </section>
         </main>

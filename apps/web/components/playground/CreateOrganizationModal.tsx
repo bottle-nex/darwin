@@ -10,6 +10,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog";
+import { IoIosCheckmark } from "react-icons/io";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { slugify } from "@/lib/format";
@@ -178,7 +179,8 @@ export default function CreateOrganizationModal({
                             Cancel
                         </Button>
                         <Button type="submit" loading={isPending} disabled={!name?.trim()}>
-                            Create organization
+                            Create Org
+                            {!isPending && name?.trim() && <IoIosCheckmark />}
                         </Button>
                     </DialogFooter>
                 </form>

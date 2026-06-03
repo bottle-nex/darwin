@@ -1,6 +1,7 @@
 "use client";
 import { useMemo, useState } from "react";
-import { FaMagnifyingGlass, FaPlus } from "react-icons/fa6";
+import { FaMagnifyingGlass } from "react-icons/fa6";
+import { IoAddSharp } from "react-icons/io5";
 import { Button } from "@/components/ui/button";
 import OrganizationCard from "@/components/playground/OrganizationCard";
 import OrganizationCardSkeleton from "@/components/playground/OrganizationCardSkeleton";
@@ -65,7 +66,7 @@ export default function Playground() {
                 ) : isEmpty ? (
                     <div className="flex h-[90vh] flex-col items-center justify-center gap-4 text-center">
                         <span className="flex size-12 items-center justify-center rounded-xl border border-white/10 bg-white/5">
-                            <FaPlus className="size-5 text-neutral-500" />
+                            <IoAddSharp className="size-5 text-neutral-500" />
                         </span>
                         <div>
                             <p className="text-sm font-medium text-neutral-200">
@@ -75,9 +76,9 @@ export default function Playground() {
                                 Create one to start filing issues for your agents.
                             </p>
                         </div>
-                        <Button variant="secondary" onClick={() => setIsCreateOpen(true)}>
-                            <FaPlus className="size-3" />
-                            Create organization
+                        <Button onClick={() => setIsCreateOpen(true)}>
+                            <IoAddSharp className="size-3" />
+                            Create Org
                         </Button>
                     </div>
                 ) : visible.length === 0 ? (

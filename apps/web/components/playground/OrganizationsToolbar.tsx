@@ -58,22 +58,6 @@ export default function OrganizationsToolbar({
                     </SelectContent>
                 </Select>
 
-                <Select value={sort} onValueChange={(v) => onSort(v as SortKey)}>
-                    <SelectTrigger
-                        aria-label="Sort organizations"
-                        className={`min-w-37.5 ${FIELD}`}
-                    >
-                        <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="dark">
-                        {SORT_OPTIONS.map((option) => (
-                            <SelectItem key={option.value} value={option.value}>
-                                {option.label}
-                            </SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
-
                 <Button onClick={onCreate}>
                     <IoAddSharp className="size-3" />
                     Create Org
