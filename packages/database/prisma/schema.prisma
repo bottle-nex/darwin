@@ -2,133 +2,166 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 datasource db {
-    provider = "postgresql"
+  provider = "postgresql"
 }
 
 generator client {
-    provider = "prisma-client-js"
-    output   = "../generated/client"
+  provider = "prisma-client-js"
+  output   = "../generated/client"
 }
 
 model User {
-    id            String    @id @default(cuid())
-    name          String?
-    email         String    @unique
-    image         String?
-    emailVerified DateTime?
-    setupComplete Boolean   @default(false)
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  image         String?
+  emailVerified DateTime?
+  setupComplete Boolean   @default(false)
 
-    orgMemberships       OrgMember[]
-    teamMemberships      TeamMember[]
-    ownedProjects        Project[]      @relation("ProjectOwner")
-    createdProjects      Project[]      @relation("ProjectCreator")
-    createdOrganizations Organization[] @relation("OrgCreator")
+  orgMemberships       OrgMember[]
+  teamMemberships      TeamMember[]
+  ownedProjects        Project[]      @relation("ProjectOwner")
+  createdProjects      Project[]      @relation("ProjectCreator")
+  createdOrganizations Organization[] @relation("OrgCreator")
+  invitations          Invitation[]   @relation("InviteRecipient")
+  sentInvitations      Invitation[]   @relation("InviteSender")
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Organization {
-    id          String  @id @default(cuid())
-    createdById String
-    name        String
-    slug        String  @unique
-    description String?
+  id          String  @id @default(cuid())
+  createdById String
+  name        String
+  slug        String  @unique
+  description String?
 
-    members   OrgMember[]
-    projects  Project[]
-    createdBy User        @relation("OrgCreator", fields: [createdById], references: [id])
+  members     OrgMember[]
+  projects    Project[]
+  invitations Invitation[]
+  createdBy   User         @relation("OrgCreator", fields: [createdById], references: [id])
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model OrgMember {
-    id     String  @id @default(cuid())
-    orgId  String
-    userId String
-    role   OrgRole
+  id     String  @id @default(cuid())
+  orgId  String
+  userId String
+  role   OrgRole
 
-    organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
-    user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-    @@unique([orgId, userId])
-    @@index([userId])
+  @@unique([orgId, userId])
+  @@index([userId])
 }
 
 model Project {
-    id          String  @id @default(cuid())
-    orgId       String
-    name        String
-    slug        String
-    description String?
-    ownerId     String
-    createdById String?
+  id          String  @id @default(cuid())
+  orgId       String
+  name        String
+  slug        String
+  description String?
+  ownerId     String
+  createdById String?
 
-    organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
-    owner        User         @relation("ProjectOwner", fields: [ownerId], references: [id], onDelete: Restrict)
-    createdBy    User?        @relation("ProjectCreator", fields: [createdById], references: [id], onDelete: SetNull)
-    teams        Team[]
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  owner        User         @relation("ProjectOwner", fields: [ownerId], references: [id], onDelete: Restrict)
+  createdBy    User?        @relation("ProjectCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  teams        Team[]
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-    @@unique([orgId, slug])
-    @@index([ownerId])
+  @@unique([orgId, slug])
+  @@index([ownerId])
 }
 
 model Team {
-    id          String      @id @default(cuid())
-    projectId   String
-    name        String
-    slug        String
-    description String?
-    projectRole ProjectRole
+  id          String      @id @default(cuid())
+  projectId   String
+  name        String
+  slug        String
+  description String?
+  projectRole ProjectRole
 
-    project Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
-    members TeamMember[]
+  project     Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  members     TeamMember[]
+  invitations Invitation[]
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-    @@unique([projectId, slug])
+  @@unique([projectId, slug])
 }
 
 model TeamMember {
-    id     String   @id @default(cuid())
-    teamId String
-    userId String
-    role   TeamRole
+  id     String   @id @default(cuid())
+  teamId String
+  userId String
+  role   TeamRole
 
-    team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
-    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-    @@unique([teamId, userId])
-    @@index([userId])
+  @@unique([teamId, userId])
+  @@index([userId])
+}
+
+model Invitation {
+  id          String           @id @default(cuid())
+  email       String
+  userId      String
+  token       String           @unique @default(cuid())
+  orgId       String
+  teamId      String? // null = org invite, set = team invite
+  status      InvitationStatus @default(Pending)
+  invitedById String
+  expiresAt   DateTime
+
+  user         User         @relation("InviteRecipient", fields: [userId], references: [id], onDelete: Cascade)
+  invitedBy    User         @relation("InviteSender", fields: [invitedById], references: [id], onDelete: Cascade)
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  team         Team?        @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, orgId, teamId])
+  @@index([userId, status])
+}
+
+enum InvitationStatus {
+  Pending
+  Accepted
+  Rejected
 }
 
 enum OrgRole {
-    Owner
-    Admin
-    Member
-    Billing
+  Owner
+  Admin
+  Member
+  Billing
 }
 
 enum ProjectRole {
-    Admin
-    Maintain
-    Write
-    Triage
-    Read
+  Admin
+  Maintain
+  Write
+  Triage
+  Read
 }
 
 enum TeamRole {
-    Maintainer
-    Member
+  Maintainer
+  Member
 }
