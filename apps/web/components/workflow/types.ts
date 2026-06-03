@@ -4,7 +4,7 @@
 
 export interface ResponsePeriod {
     id: string;
-    label: string;     // e.g. "Clarification", "Suggestion"
+    label: string; // e.g. "Clarification", "Suggestion"
     startOffset: number; // ticks from node.startAbs
     endOffset: number;
     color: string;

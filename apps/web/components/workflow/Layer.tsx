@@ -1,6 +1,12 @@
 "use client";
 
-import { animate, motion, useAnimationFrame, useMotionValue, type MotionValue } from "framer-motion";
+import {
+    animate,
+    motion,
+    useAnimationFrame,
+    useMotionValue,
+    type MotionValue,
+} from "framer-motion";
 import { Star } from "lucide-react";
 import { useEffect, useRef } from "react";
 import Node from "./Node";
@@ -22,7 +28,14 @@ interface NodeItemProps {
     onNodeLeave?: () => void;
 }
 
-function NodeItem({ node, originMinute, color, nowSecMv, onNodeHover, onNodeLeave }: NodeItemProps) {
+function NodeItem({
+    node,
+    originMinute,
+    color,
+    nowSecMv,
+    onNodeHover,
+    onNodeLeave,
+}: NodeItemProps) {
     const targetWidth = (node.endAbs - node.startAbs) * TICK_WIDTH;
     const targetLeft = (node.startAbs - originMinute) * TICK_WIDTH;
 
@@ -45,7 +58,10 @@ function NodeItem({ node, originMinute, color, nowSecMv, onNodeHover, onNodeLeav
     useEffect(() => {
         widthAnimRef.current?.stop();
         if (node.status === "done") {
-            widthAnimRef.current = animate(widthMv, targetWidth, { duration: 0.35, ease: "easeOut" });
+            widthAnimRef.current = animate(widthMv, targetWidth, {
+                duration: 0.35,
+                ease: "easeOut",
+            });
         } else if (node.status === "pending") {
             widthMv.set(targetWidth);
         }

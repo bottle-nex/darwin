@@ -75,7 +75,6 @@ export default function Timeline({
             el.removeEventListener("scroll", updateFade);
             observer.disconnect();
         };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [span]);
 
     const markerMap = new Map(markers.map((m) => [Math.round(m.minute), m]));
@@ -86,7 +85,9 @@ export default function Timeline({
     const isSec = originMinute > 1440;
     function fmtDur(ticks: number): string {
         if (isSec) return Math.round(ticks) + "s";
-        return ticks < 60 ? Math.round(ticks) + "m" : Math.floor(ticks / 60) + "h " + (ticks % 60 | 0) + "m";
+        return ticks < 60
+            ? Math.round(ticks) + "m"
+            : Math.floor(ticks / 60) + "h " + ((ticks % 60) | 0) + "m";
     }
 
     return (
@@ -116,7 +117,12 @@ export default function Timeline({
                         const startPx = nodeLeft + period.startOffset * TICK_WIDTH;
                         const endPx = nodeLeft + period.endOffset * TICK_WIDTH;
                         const midPx = (startPx + endPx) / 2;
-                        const DASH = "repeating-linear-gradient(to bottom, " + period.color + " 0px, " + period.color + " 4px, transparent 4px, transparent 8px)";
+                        const DASH =
+                            "repeating-linear-gradient(to bottom, " +
+                            period.color +
+                            " 0px, " +
+                            period.color +
+                            " 4px, transparent 4px, transparent 8px)";
                         // Lines go from top of padding down to the hovered row only (not below)
                         const lineHeight = hoveredRowBottom ?? 9999;
                         const shadeHeight = Math.max(0, (hoveredRowBottom ?? 9999) - RULER_HEIGHT);
@@ -193,7 +199,11 @@ export default function Timeline({
                                     </div>
                                     <div
                                         className="text-white/50 font-mono whitespace-nowrap"
-                                        style={{ fontSize: 8, marginTop: 2, letterSpacing: "0.04em" }}
+                                        style={{
+                                            fontSize: 8,
+                                            marginTop: 2,
+                                            letterSpacing: "0.04em",
+                                        }}
                                     >
                                         {period.label}
                                     </div>

@@ -12,7 +12,10 @@ interface SidebarProps {
 
 export default function Sidebar({ workers }: SidebarProps) {
     return (
-        <div className="relative shrink-0 flex flex-col z-20" style={{ width: 140, background: "#0a0a0a" }}>
+        <div
+            className="relative shrink-0 flex flex-col z-20"
+            style={{ width: 140, background: "#0a0a0a" }}
+        >
             {/* Spacer aligning the first capsule with the first layer row */}
             <div style={{ height: RULER_HEIGHT + CHILDREN_PT }} />
 

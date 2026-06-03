@@ -15,16 +15,106 @@ const WORKERS: WorkerDef[] = [
 ];
 
 const INITIAL_NODES: IssueNode[] = [
-    { id: "n1", workerId: "w1", sequence: 1, issueName: "Auth bug", description: "", issuer: "u1", engineer: "e1", estimatedMinutes: 40 },
-    { id: "n2", workerId: "w1", sequence: 2, issueName: "Session refresh", description: "", issuer: "u1", engineer: "e1", estimatedMinutes: 25 },
-    { id: "n3", workerId: "w1", sequence: 3, issueName: "Logout race", description: "", issuer: "u1", engineer: "e1", estimatedMinutes: 60 },
-    { id: "n4", workerId: "w2", sequence: 1, issueName: "Migrate schema", description: "", issuer: "u1", engineer: "e2", estimatedMinutes: 20 },
-    { id: "n5", workerId: "w2", sequence: 2, issueName: "Fix lint", description: "", issuer: "u1", engineer: "e2", estimatedMinutes: 15 },
-    { id: "n6", workerId: "w2", sequence: 3, issueName: "Backfill rows", description: "", issuer: "u1", engineer: "e2", estimatedMinutes: 55 },
-    { id: "n7", workerId: "w2", sequence: 4, issueName: "Add tests", description: "", issuer: "u1", engineer: "e2", estimatedMinutes: 25 },
-    { id: "n8", workerId: "w3", sequence: 1, issueName: "Refactor API", description: "", issuer: "u1", engineer: "e3", estimatedMinutes: 45 },
-    { id: "n9", workerId: "w3", sequence: 2, issueName: "Build pipeline", description: "", issuer: "u1", engineer: "e3", estimatedMinutes: 35 },
-    { id: "n10", workerId: "w4", sequence: 1, issueName: "Cache layer", description: "", issuer: "u1", engineer: "e4", estimatedMinutes: 50 },
+    {
+        id: "n1",
+        workerId: "w1",
+        sequence: 1,
+        issueName: "Auth bug",
+        description: "",
+        issuer: "u1",
+        engineer: "e1",
+        estimatedMinutes: 40,
+    },
+    {
+        id: "n2",
+        workerId: "w1",
+        sequence: 2,
+        issueName: "Session refresh",
+        description: "",
+        issuer: "u1",
+        engineer: "e1",
+        estimatedMinutes: 25,
+    },
+    {
+        id: "n3",
+        workerId: "w1",
+        sequence: 3,
+        issueName: "Logout race",
+        description: "",
+        issuer: "u1",
+        engineer: "e1",
+        estimatedMinutes: 60,
+    },
+    {
+        id: "n4",
+        workerId: "w2",
+        sequence: 1,
+        issueName: "Migrate schema",
+        description: "",
+        issuer: "u1",
+        engineer: "e2",
+        estimatedMinutes: 20,
+    },
+    {
+        id: "n5",
+        workerId: "w2",
+        sequence: 2,
+        issueName: "Fix lint",
+        description: "",
+        issuer: "u1",
+        engineer: "e2",
+        estimatedMinutes: 15,
+    },
+    {
+        id: "n6",
+        workerId: "w2",
+        sequence: 3,
+        issueName: "Backfill rows",
+        description: "",
+        issuer: "u1",
+        engineer: "e2",
+        estimatedMinutes: 55,
+    },
+    {
+        id: "n7",
+        workerId: "w2",
+        sequence: 4,
+        issueName: "Add tests",
+        description: "",
+        issuer: "u1",
+        engineer: "e2",
+        estimatedMinutes: 25,
+    },
+    {
+        id: "n8",
+        workerId: "w3",
+        sequence: 1,
+        issueName: "Refactor API",
+        description: "",
+        issuer: "u1",
+        engineer: "e3",
+        estimatedMinutes: 45,
+    },
+    {
+        id: "n9",
+        workerId: "w3",
+        sequence: 2,
+        issueName: "Build pipeline",
+        description: "",
+        issuer: "u1",
+        engineer: "e3",
+        estimatedMinutes: 35,
+    },
+    {
+        id: "n10",
+        workerId: "w4",
+        sequence: 1,
+        issueName: "Cache layer",
+        description: "",
+        issuer: "u1",
+        engineer: "e4",
+        estimatedMinutes: 50,
+    },
 ];
 
 const LEAD = 5;
@@ -40,6 +130,7 @@ export default function GanttPage() {
     const [startMinute, setStartMinute] = useState<number | null>(null);
     const [frozenNow] = useState(() => Math.floor(getNowMinute()));
     const [nowMinute, setNowMinute] = useState(getNowMinute);
+    const [activeResponseWorkers, setActiveResponseWorkers] = useState<string[]>([]);
 
     useEffect(() => {
         const id = setInterval(() => setNowMinute(getNowMinute()), 1000);
@@ -62,6 +153,12 @@ export default function GanttPage() {
         const now = Math.floor(getNowMinute());
         setStartMinute(now);
         setNodes((prev) => prev.map((n) => (n.sequence === 1 ? { ...n, startedAt: now } : n)));
+    }, []);
+
+    const handleActionToggle = useCallback((workerId: string) => {
+        setActiveResponseWorkers((prev) =>
+            prev.includes(workerId) ? prev.filter((id) => id !== workerId) : [...prev, workerId],
+        );
     }, []);
 
     const handleEndNode = useCallback((workerId: string) => {
@@ -118,6 +215,8 @@ export default function GanttPage() {
                 isStarted={startMinute != null}
                 onStart={handleStart}
                 onEndNode={handleEndNode}
+                activeResponseWorkers={activeResponseWorkers}
+                onActionToggle={handleActionToggle}
             />
         </div>
     );

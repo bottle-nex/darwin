@@ -21,16 +21,106 @@ const WORKERS: WorkerDef[] = [
 ];
 
 const INITIAL_NODES: IssueNode[] = [
-    { id: "n1", workerId: "w1", sequence: 1, issueName: "Auth bug", description: "", issuer: "u1", engineer: "e1", estimatedMinutes: 40 },
-    { id: "n2", workerId: "w1", sequence: 2, issueName: "Session refresh", description: "", issuer: "u1", engineer: "e1", estimatedMinutes: 25 },
-    { id: "n3", workerId: "w1", sequence: 3, issueName: "Logout race", description: "", issuer: "u1", engineer: "e1", estimatedMinutes: 60 },
-    { id: "n4", workerId: "w2", sequence: 1, issueName: "Migrate schema", description: "", issuer: "u1", engineer: "e2", estimatedMinutes: 20 },
-    { id: "n5", workerId: "w2", sequence: 2, issueName: "Fix lint", description: "", issuer: "u1", engineer: "e2", estimatedMinutes: 15 },
-    { id: "n6", workerId: "w2", sequence: 3, issueName: "Backfill rows", description: "", issuer: "u1", engineer: "e2", estimatedMinutes: 55 },
-    { id: "n7", workerId: "w2", sequence: 4, issueName: "Add tests", description: "", issuer: "u1", engineer: "e2", estimatedMinutes: 25 },
-    { id: "n8", workerId: "w3", sequence: 1, issueName: "Refactor API", description: "", issuer: "u1", engineer: "e3", estimatedMinutes: 45 },
-    { id: "n9", workerId: "w3", sequence: 2, issueName: "Build pipeline", description: "", issuer: "u1", engineer: "e3", estimatedMinutes: 35 },
-    { id: "n10", workerId: "w4", sequence: 1, issueName: "Cache layer", description: "", issuer: "u1", engineer: "e4", estimatedMinutes: 50 },
+    {
+        id: "n1",
+        workerId: "w1",
+        sequence: 1,
+        issueName: "Auth bug",
+        description: "",
+        issuer: "u1",
+        engineer: "e1",
+        estimatedMinutes: 40,
+    },
+    {
+        id: "n2",
+        workerId: "w1",
+        sequence: 2,
+        issueName: "Session refresh",
+        description: "",
+        issuer: "u1",
+        engineer: "e1",
+        estimatedMinutes: 25,
+    },
+    {
+        id: "n3",
+        workerId: "w1",
+        sequence: 3,
+        issueName: "Logout race",
+        description: "",
+        issuer: "u1",
+        engineer: "e1",
+        estimatedMinutes: 60,
+    },
+    {
+        id: "n4",
+        workerId: "w2",
+        sequence: 1,
+        issueName: "Migrate schema",
+        description: "",
+        issuer: "u1",
+        engineer: "e2",
+        estimatedMinutes: 20,
+    },
+    {
+        id: "n5",
+        workerId: "w2",
+        sequence: 2,
+        issueName: "Fix lint",
+        description: "",
+        issuer: "u1",
+        engineer: "e2",
+        estimatedMinutes: 15,
+    },
+    {
+        id: "n6",
+        workerId: "w2",
+        sequence: 3,
+        issueName: "Backfill rows",
+        description: "",
+        issuer: "u1",
+        engineer: "e2",
+        estimatedMinutes: 55,
+    },
+    {
+        id: "n7",
+        workerId: "w2",
+        sequence: 4,
+        issueName: "Add tests",
+        description: "",
+        issuer: "u1",
+        engineer: "e2",
+        estimatedMinutes: 25,
+    },
+    {
+        id: "n8",
+        workerId: "w3",
+        sequence: 1,
+        issueName: "Refactor API",
+        description: "",
+        issuer: "u1",
+        engineer: "e3",
+        estimatedMinutes: 45,
+    },
+    {
+        id: "n9",
+        workerId: "w3",
+        sequence: 2,
+        issueName: "Build pipeline",
+        description: "",
+        issuer: "u1",
+        engineer: "e3",
+        estimatedMinutes: 35,
+    },
+    {
+        id: "n10",
+        workerId: "w4",
+        sequence: 1,
+        issueName: "Cache layer",
+        description: "",
+        issuer: "u1",
+        engineer: "e4",
+        estimatedMinutes: 50,
+    },
 ];
 
 const LEAD = 5;
@@ -88,7 +178,14 @@ export default function WorkflowPage() {
             })),
         // Start boundary — shown once simulation begins
         ...(startMinute != null
-            ? [{ minute: effectiveStart, color: BOUNDARY, label: fmtTick(effectiveStart), dashed: true }]
+            ? [
+                  {
+                      minute: effectiveStart,
+                      color: BOUNDARY,
+                      label: fmtTick(effectiveStart),
+                      dashed: true,
+                  },
+              ]
             : []),
         // End boundary — shown only when everything is done
         ...(allDone
@@ -98,7 +195,10 @@ export default function WorkflowPage() {
 
     // Row-bottom pixel offset (within .wf-ruler) for the hovered node's row.
     // Used by Timeline to clip the response-period overlay above the row.
-    const RULER_H = 80, CHILDREN_PAD = 24, LAYER_H = 52, LAYER_GAP = 10;
+    const RULER_H = 80,
+        CHILDREN_PAD = 24,
+        LAYER_H = 52,
+        LAYER_GAP = 10;
     const hoveredWorkerIdx = hoveredDoneNode
         ? WORKERS.findIndex((w) => w.id === hoveredDoneNode.workerId)
         : -1;
@@ -125,8 +225,7 @@ export default function WorkflowPage() {
                     prev.map((n) => {
                         if (n.workerId !== workerId || n.startedAt == null || n.endedAt != null)
                             return n;
-                        const color =
-                            WORKERS.find((w) => w.id === workerId)?.color ?? "#60a5fa";
+                        const color = WORKERS.find((w) => w.id === workerId)?.color ?? "#60a5fa";
                         const newPeriod: ResponsePeriod = {
                             id: "rp-" + workerId + "-" + startAbsTime,
                             label: "Action",
