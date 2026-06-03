@@ -5,6 +5,9 @@ import { InvitationStatus, Prisma, prisma } from "@trymatcha/database";
 import ResponseWriter from "../../services/service.response";
 import { ENV } from "../../configs/env";
 import { inviteMember } from "../../services/service.email";
+import Access from "../../access-control/access";
+import Permissions from "../../access-control/permissions";
+import Action from "../../access-control/actions";
 
 const body_schema = z
     .object({
@@ -31,6 +34,19 @@ export default class InviteMembersController {
             const { emails, orgId, projectId, teamId } = parsed.data;
             const invitedById = req.user.id;
             const is_team_invite = Boolean(teamId);
+
+            // Team invites need team add_member; org invites need org invite_member.
+            if (teamId) {
+                const role = await Access.team(invitedById, teamId);
+                if (!role || !Permissions.team(role, Action.team.add_member)) {
+                    return ResponseWriter.not_authorized(res, "insufficient permissions", 403);
+                }
+            } else {
+                const role = await Access.org(invitedById, orgId);
+                if (!role || !Permissions.org(role, Action.org.invite_member)) {
+                    return ResponseWriter.not_authorized(res, "insufficient permissions", 403);
+                }
+            }
 
             const organization = await prisma.organization.findUnique({
                 where: { id: orgId },
@@ -66,13 +82,13 @@ export default class InviteMembersController {
             const [members, pending_invites] = await Promise.all([
                 is_team_invite
                     ? prisma.teamMember.findMany({
-                          where: { teamId: team!.id, userId: { in: user_ids } },
-                          select: { userId: true },
-                      })
+                        where: { teamId: team!.id, userId: { in: user_ids } },
+                        select: { userId: true },
+                    })
                     : prisma.orgMember.findMany({
-                          where: { orgId, userId: { in: user_ids } },
-                          select: { userId: true },
-                      }),
+                        where: { orgId, userId: { in: user_ids } },
+                        select: { userId: true },
+                    }),
                 prisma.invitation.findMany({
                     where: {
                         orgId,
@@ -132,9 +148,10 @@ export default class InviteMembersController {
             if (to_create.length > 0) {
                 await prisma.invitation.createMany({ data: to_create });
 
-                // Email failures don't fail the request — the invite row already exists
-                // and can be resent. Log so a failed delivery is visible.
-                const results = await Promise.allSettled(
+                // Fire-and-forget: the invite rows are committed, so don't block the
+                // response on email delivery. Failures only get logged (and can be
+                // resent later) — they were never part of the response anyway.
+                void Promise.allSettled(
                     to_email.map(({ email, token }) =>
                         inviteMember(
                             email,
@@ -144,11 +161,12 @@ export default class InviteMembersController {
                                 : { type: "org", orgName: organization.name },
                         ),
                     ),
-                );
-                results.forEach((r, i) => {
-                    if (r.status === "rejected") {
-                        console.error(`invite email failed for ${to_email[i].email}`, r.reason);
-                    }
+                ).then((results) => {
+                    results.forEach((r, i) => {
+                        if (r.status === "rejected") {
+                            console.error(`invite email failed for ${to_email[i].email}`, r.reason);
+                        }
+                    });
                 });
             }
 

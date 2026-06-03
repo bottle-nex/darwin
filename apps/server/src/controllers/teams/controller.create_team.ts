@@ -2,6 +2,9 @@ import { Request, Response } from "express";
 import { z } from "zod";
 import { Prisma, prisma, ProjectRole, TeamRole } from "@trymatcha/database";
 import ResponseWriter from "../../services/service.response";
+import Access from "../../access-control/access";
+import Permissions from "../../access-control/permissions";
+import Action from "../../access-control/actions";
 
 const body_schema = z.object({
     projectId: z.string(),
@@ -24,6 +27,12 @@ export default class CreateTeamController {
         try {
             const data = parsed.data;
             const userId = req.user.id;
+
+            // Creating a team is a project-level action.
+            const role = await Access.project(userId, data.projectId);
+            if (!role || !Permissions.project(role, Action.project.create_team)) {
+                return ResponseWriter.not_authorized(res, "insufficient permissions", 403);
+            }
 
             const project = await prisma.project.findUnique({
                 where: { id: data.projectId },

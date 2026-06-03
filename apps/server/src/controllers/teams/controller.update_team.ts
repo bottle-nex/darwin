@@ -2,6 +2,9 @@ import { Request, Response } from "express";
 import { z } from "zod";
 import { Prisma, prisma, ProjectRole } from "@trymatcha/database";
 import ResponseWriter from "../../services/service.response";
+import Access from "../../access-control/access";
+import Permissions from "../../access-control/permissions";
+import Action from "../../access-control/actions";
 
 const body_schema = z.object({
     teamId: z.string(),
@@ -24,6 +27,12 @@ export default class UpdateTeamController {
 
         try {
             const { teamId, name, slug, description, projectRole } = parsed.data;
+
+            const role = await Access.team(req.user.id, teamId);
+            if (!role || !Permissions.team(role, Action.team.update)) {
+                return ResponseWriter.not_authorized(res, "insufficient permissions", 403);
+            }
+
             await prisma.team.update({
                 where: { id: teamId },
                 data: {

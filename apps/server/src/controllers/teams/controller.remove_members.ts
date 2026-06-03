@@ -2,6 +2,9 @@ import { Request, Response } from "express";
 import { z } from "zod";
 import { prisma } from "@trymatcha/database";
 import ResponseWriter from "../../services/service.response";
+import Access from "../../access-control/access";
+import Permissions from "../../access-control/permissions";
+import Action from "../../access-control/actions";
 
 const body_schema = z.object({
     orgId: z.string(),
@@ -21,8 +24,14 @@ export default class RemoveMembersController {
             const requested_ids = [...new Set(userIds)];
 
             if (teamId) {
-                // Team-level removal: drop only this team's membership. Validate the
-                // team belongs to the org so a team from another org can't be targeted.
+                // Team-level removal needs the team remove_member permission.
+                const role = await Access.team(req.user.id, teamId);
+                if (!role || !Permissions.team(role, Action.team.remove_member)) {
+                    return ResponseWriter.not_authorized(res, "insufficient permissions", 403);
+                }
+
+                // Validate the team belongs to the org so a team from another org
+                // can't be targeted, then drop only this team's membership.
                 const team = await prisma.team.findFirst({
                     where: { id: teamId, project: { orgId } },
                     select: { id: true },
@@ -35,8 +44,14 @@ export default class RemoveMembersController {
                     where: { teamId, userId: { in: requested_ids } },
                 });
             } else {
-                // Org-level removal: drop org membership AND every team membership in
-                // this org (no FK cascade exists between OrgMember and TeamMember).
+                // Org-level removal needs the org remove_member permission.
+                const role = await Access.org(req.user.id, orgId);
+                if (!role || !Permissions.org(role, Action.org.remove_member)) {
+                    return ResponseWriter.not_authorized(res, "insufficient permissions", 403);
+                }
+
+                // Drop org membership AND every team membership in this org (no FK
+                // cascade exists between OrgMember and TeamMember).
                 await prisma.$transaction([
                     prisma.teamMember.deleteMany({
                         where: { userId: { in: requested_ids }, team: { project: { orgId } } },
