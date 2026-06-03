@@ -33,7 +33,7 @@ export default function OrganizationCard({
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: index * 0.05, ease: "easeOut" }}
-            whileHover={{ y: -4 }}
+            whileHover={{ y: -1 }}
             whileTap={{ scale: 0.99 }}
             className="flex w-full cursor-pointer flex-col gap-4 rounded-sm border border-neutral-800 bg-neutral-900 p-5 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/20"
         >

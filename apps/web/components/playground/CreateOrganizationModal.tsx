@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { useForm, useWatch } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import {
     Dialog,
@@ -12,59 +13,89 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { slugify } from "@/lib/format";
+import { useQueryClient } from "@tanstack/react-query";
+import { useCreateOrganization } from "@/hooks/playground/useCreateOrganization";
+import { ORGANIZATIONS_QUERY_KEY } from "@/hooks/playground/useFetchOrganizations";
 import type { Organization } from "@/types/organization";
 
 const FIELD =
     "mt-1.5 border-white/10 bg-white/5 text-neutral-200 placeholder:text-neutral-500 focus-visible:border-[#9bc24f] focus-visible:ring-[#9bc24f]/30";
 
+type FormValues = {
+    name: string;
+    slug: string;
+    description: string;
+};
+
 export default function CreateOrganizationModal({
     open,
     onOpenChange,
-    onCreate,
 }: {
     open: boolean;
     onOpenChange: (open: boolean) => void;
-    onCreate: (organization: Organization) => void;
 }) {
-    const [name, setName] = useState("");
-    const [slug, setSlug] = useState("");
-    const [slugEdited, setSlugEdited] = useState(false);
-    const [description, setDescription] = useState("");
+    const {
+        register,
+        handleSubmit,
+        setValue,
+        control,
+        reset,
+        formState: { errors },
+    } = useForm<FormValues>({
+        defaultValues: { name: "", slug: "", description: "" },
+    });
 
-    function reset() {
-        setName("");
-        setSlug("");
-        setSlugEdited(false);
-        setDescription("");
-    }
+    const queryClient = useQueryClient();
+    const { mutate, isPending } = useCreateOrganization();
+    const [slugEdited, setSlugEdited] = useState(false);
+    const name = useWatch({ control, name: "name" });
+    const description = useWatch({ control, name: "description" });
+
+    const nameField = register("name", {
+        required: "Name is required",
+        validate: (value) => value.trim().length > 0 || "Name is required",
+    });
+    const slugField = register("slug");
 
     function handleOpenChange(next: boolean) {
         onOpenChange(next);
-        if (!next) reset();
+        if (!next) {
+            reset();
+            setSlugEdited(false);
+        }
     }
 
-    function handleNameChange(value: string) {
-        setName(value);
-        if (!slugEdited) setSlug(slugify(value));
-    }
+    const onSubmit = handleSubmit((values) => {
+        const trimmed = values.name.trim();
 
-    function handleCreate() {
-        const trimmed = name.trim();
-        if (!trimmed) return;
+        const slug = values.slug.trim() || slugify(trimmed);
+        const description = values.description.trim() || null;
 
-        onCreate({
-            id: crypto.randomUUID(),
-            name: trimmed,
-            slug: slug.trim() || slugify(trimmed),
-            description: description.trim() || null,
-            createdAt: new Date().toISOString(),
-            memberCount: 1,
-            projectCount: 0,
-            role: "Owner",
-        });
+        mutate(
+            { name: trimmed, slug, description: description ?? undefined },
+            {
+                onSuccess: ({ id }) => {
+                    const newOrg: Organization = {
+                        id,
+                        name: trimmed,
+                        slug,
+                        description,
+                        createdAt: new Date().toISOString(),
+                        memberCount: 1,
+                        projectCount: 0,
+                        role: "Owner",
+                    };
 
-        handleOpenChange(false);
-    }
+                    queryClient.setQueryData<Organization[]>(ORGANIZATIONS_QUERY_KEY, (old) => [
+                        newOrg,
+                        ...(old ?? []),
+                    ]);
+
+                    handleOpenChange(false);
+                },
+            },
+        );
+    });
 
     return (
         <Dialog open={open} onOpenChange={handleOpenChange}>
@@ -77,19 +108,25 @@ export default function CreateOrganizationModal({
                     </DialogDescription>
                 </DialogHeader>
 
-                <div className="flex flex-col gap-4 py-2">
+                <form onSubmit={onSubmit} className="flex flex-col gap-4 py-2">
                     <div>
                         <Label htmlFor="org-name" className="text-neutral-300">
                             Name
                         </Label>
                         <Input
                             id="org-name"
-                            value={name}
-                            onChange={(e) => handleNameChange(e.target.value)}
+                            {...nameField}
+                            onChange={(e) => {
+                                nameField.onChange(e);
+                                if (!slugEdited) setValue("slug", slugify(e.target.value));
+                            }}
                             placeholder="Acme Labs"
                             autoFocus
                             className={FIELD}
                         />
+                        {errors.name && (
+                            <p className="mt-1.5 text-xs text-red-400">{errors.name.message}</p>
+                        )}
                     </div>
 
                     <div>
@@ -102,10 +139,10 @@ export default function CreateOrganizationModal({
                             </span>
                             <Input
                                 id="org-slug"
-                                value={slug}
+                                {...slugField}
                                 onChange={(e) => {
                                     setSlugEdited(true);
-                                    setSlug(slugify(e.target.value));
+                                    setValue("slug", slugify(e.target.value));
                                 }}
                                 placeholder="acme-labs"
                                 className={`${FIELD} pl-7 font-mono`}
@@ -120,23 +157,31 @@ export default function CreateOrganizationModal({
                         </Label>
                         <textarea
                             id="org-description"
-                            value={description}
-                            onChange={(e) => setDescription(e.target.value)}
+                            {...register("description")}
+                            maxLength={150}
                             placeholder="What does this organization work on?"
-                            rows={3}
+                            rows={4}
                             className="mt-1.5 w-full resize-none rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm text-neutral-200 placeholder:text-neutral-500 outline-none focus-visible:border-[#9bc24f] focus-visible:ring-[3px] focus-visible:ring-[#9bc24f]/30"
                         />
+                        <p className="mt-1 text-right text-xs text-neutral-500">
+                            {description?.length ?? 0}/150
+                        </p>
                     </div>
-                </div>
 
-                <DialogFooter>
-                    <Button variant="outline" onClick={() => handleOpenChange(false)}>
-                        Cancel
-                    </Button>
-                    <Button onClick={handleCreate} disabled={!name.trim()}>
-                        Create organization
-                    </Button>
-                </DialogFooter>
+                    <DialogFooter>
+                        <Button
+                            type="button"
+                            variant={"secondary"}
+                            onClick={() => handleOpenChange(false)}
+                            disabled={isPending}
+                        >
+                            Cancel
+                        </Button>
+                        <Button type="submit" loading={isPending} disabled={!name?.trim()}>
+                            Create organization
+                        </Button>
+                    </DialogFooter>
+                </form>
             </DialogContent>
         </Dialog>
     );
