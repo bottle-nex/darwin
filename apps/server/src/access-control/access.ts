@@ -2,7 +2,6 @@ import { OrgRole, prisma, ProjectRole, TeamRole } from "@trymatcha/database";
 import Permissions from "./permissions";
 
 export default class Access {
-
     static async org(userId: string, orgId: string): Promise<OrgRole | null> {
         const member = await prisma.orgMember.findUnique({
             where: {
@@ -16,8 +15,11 @@ export default class Access {
         return member?.role ?? null;
     }
 
-    static async project(userId: string, projectId: string, orgId: string): Promise<ProjectRole | null> {
-
+    static async project(
+        userId: string,
+        projectId: string,
+        // orgId: string,
+    ): Promise<ProjectRole | null> {
         // const (team_member, project, org_member) = await Promise.all([
         //     prisma.teamMember.findFirst({
         //         where: {
@@ -69,7 +71,6 @@ export default class Access {
     }
 
     static async team(userId: string, teamId: string): Promise<TeamRole | null> {
-
         const member = await prisma.teamMember.findUnique({
             where: {
                 teamId_userId: { teamId, userId },
