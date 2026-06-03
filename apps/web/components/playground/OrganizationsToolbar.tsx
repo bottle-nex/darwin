@@ -12,15 +12,8 @@ import {
 import type { OrgRole } from "@/types/organization";
 
 export type RoleFilter = "All" | OrgRole;
-export type SortKey = "recent" | "name" | "members";
 
 const ROLE_OPTIONS: RoleFilter[] = ["All", "Owner", "Admin", "Member", "Billing"];
-
-const SORT_OPTIONS: { value: SortKey; label: string }[] = [
-    { value: "recent", label: "Recently created" },
-    { value: "name", label: "Name" },
-    { value: "members", label: "Members" },
-];
 
 const FIELD =
     "border-white/10 bg-white/5 text-[13px] text-neutral-300 hover:bg-white/7 focus-visible:border-[#9bc24f] focus-visible:ring-[#9bc24f]/30";
@@ -30,16 +23,12 @@ export default function OrganizationsToolbar({
     onSearch,
     role,
     onRole,
-    sort,
-    onSort,
     onCreate,
 }: {
     search: string;
     onSearch: (value: string) => void;
     role: RoleFilter;
     onRole: (value: RoleFilter) => void;
-    sort: SortKey;
-    onSort: (value: SortKey) => void;
     onCreate: () => void;
 }) {
     return (
@@ -67,23 +56,6 @@ export default function OrganizationsToolbar({
                         {ROLE_OPTIONS.map((option) => (
                             <SelectItem key={option} value={option}>
                                 {option === "All" ? "All roles" : option}
-                            </SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
-
-                <Select value={sort} onValueChange={(v) => onSort(v as SortKey)}>
-                    <SelectTrigger
-                        size="sm"
-                        aria-label="Sort organizations"
-                        className={`min-w-37.5 ${FIELD}`}
-                    >
-                        <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="dark">
-                        {SORT_OPTIONS.map((option) => (
-                            <SelectItem key={option.value} value={option.value}>
-                                {option.label}
                             </SelectItem>
                         ))}
                     </SelectContent>

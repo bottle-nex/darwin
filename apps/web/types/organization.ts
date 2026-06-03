@@ -10,8 +10,3 @@ export interface Organization {
     projectCount: number;
     role: OrgRole;
 }
-
-export interface PreloadData {
-    hasOrganization: boolean;
-    organizations: Organization[];
-}
