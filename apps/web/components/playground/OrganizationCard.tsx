@@ -1,4 +1,5 @@
 "use client";
+import { useRouter } from "next/navigation";
 import { motion } from "motion/react";
 import { FaClock, FaFolder, FaUsers } from "react-icons/fa6";
 import { cn } from "@/lib/utils";
@@ -25,11 +26,14 @@ export default function OrganizationCard({
     organization: Organization;
     index?: number;
 }) {
-    const { name, slug, description, role, memberCount, projectCount, createdAt } = organization;
+    const router = useRouter();
+    const { id, name, slug, description, role, memberCount, projectCount, createdAt } =
+        organization;
 
     return (
         <motion.button
             type="button"
+            onClick={() => router.push(`/playground/${id}`)}
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: index * 0.05, ease: "easeOut" }}
