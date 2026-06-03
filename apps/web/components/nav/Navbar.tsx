@@ -19,7 +19,7 @@ const NAV_ITEMS = [
 
 export function NavBar({ isMarkettingPage = false }: { isMarkettingPage?: boolean }) {
     const setOpenSigninModal = useUserSessionStore((s) => s.setOpenSigninModal);
-    const router = useRouter()
+    const router = useRouter();
     const session = useUserSessionStore((s) => s.session);
     const [scrolled, setScrolled] = useState(false);
     const headerRef = useRef<HTMLElement>(null);
@@ -39,7 +39,7 @@ export function NavBar({ isMarkettingPage = false }: { isMarkettingPage?: boolea
     }
 
     function handleRedirect() {
-        router.push("/playground")
+        router.push("/playground");
     }
 
     return (
