@@ -43,15 +43,13 @@ const ORGS: Org[] = [
 
 const PRIMARY_ITEMS: NavItem[] = [
     { label: "Kanban", icon: BsFillKanbanFill },
-    { label: "Notification", icon: RiNotification3Fill },
-    { label: "Dashboard", icon: RiDashboardFill },
+    { label: "Chat", icon: RiNotification3Fill },
 ];
 
 const WORKSPACE_ITEMS: NavItem[] = [
-    { label: "Inbox", icon: RiInboxFill },
-    { label: "Calendar", icon: RiCalendarFill },
+    { label: "Projects", icon: RiInboxFill },
+    { label: "My Teams", icon: RiCalendarFill },
     { label: "Reports", icon: RiClipboardFill },
-    { label: "Help & Center", icon: RiInformationFill },
     { label: "Settings", icon: RiSettings4Fill },
 ];
 

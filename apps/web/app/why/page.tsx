@@ -35,7 +35,7 @@ export default function WhyPage() {
                         them to an agent that reads the repo, writes the patch, and opens a PR, you
                         review the diff instead of writing it.
                     </div>
-                    <div className="flex items-center gap-3 pt-1">
+                    <div className="flex items-center gap-x-4 pt-1">
                         <Button size="lg" variant="secondary">
                             Get started
                             <PiArrowRight className="h-3 w-3" />

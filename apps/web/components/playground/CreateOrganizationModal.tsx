@@ -162,7 +162,7 @@ export default function CreateOrganizationModal({
                             maxLength={150}
                             placeholder="What does this organization work on?"
                             rows={4}
-                            className="mt-1.5 w-full resize-none rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm text-neutral-200 placeholder:text-neutral-500 outline-none focus-visible:border-[#9bc24f] focus-visible:ring-[3px] focus-visible:ring-[#9bc24f]/30"
+                            className="mt-1.5 w-full resize-none rounded-md bg-white/5 px-3 py-2 text-sm text-neutral-200 placeholder:text-neutral-500 outline-none focus-visible:border-[#9bc24f] focus-visible:ring-[3px] focus-visible:ring-[#9bc24f]/30 shadow-[inset_0_1px_0_0_#262626]"
                         />
                         <p className="mt-1 text-right text-xs text-neutral-500">
                             {description?.length ?? 0}/150
@@ -172,7 +172,7 @@ export default function CreateOrganizationModal({
                     <DialogFooter>
                         <Button
                             type="button"
-                            variant={"secondary"}
+                            variant={"tertiary"}
                             onClick={() => handleOpenChange(false)}
                             disabled={isPending}
                         >

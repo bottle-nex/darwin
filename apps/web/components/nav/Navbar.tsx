@@ -88,7 +88,7 @@ export function NavBar({ isMarkettingPage = false }: { isMarkettingPage?: boolea
 
                 <div className="flex items-center gap-2">
                     <Button
-                        variant="secondary"
+                        variant={isMarkettingPage ? "tertiary" : "secondary"}
                         className="flex items-center justify-center"
                         onClick={session ? handleRedirect : handleSignin}
                     >

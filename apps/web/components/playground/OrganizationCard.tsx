@@ -38,8 +38,8 @@ export default function OrganizationCard({
             whileHover={{ y: -1 }}
             whileTap={{ scale: 0.99 }}
             onClick={() => router.push(`/playground/${slug}`)}
-            className = "flex w-full cursor-pointer flex-col gap-4 rounded-[14px] bg-linear-to-b from-[#1a1a1a] to-neutral-900 p-5 text-left shadow-[inset_0_2px_0_0_#262626] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/20"
-                >
+            className="flex w-full cursor-pointer flex-col gap-4 rounded-[14px] bg-linear-to-b from-[#1a1a1a] to-neutral-900 p-5 text-left shadow-[inset_0_2px_0_0_#262626] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/20"
+        >
             <div className="flex items-start justify-between gap-3">
                 <div className="flex min-w-0 items-center gap-3">
                     <IconWrapper
@@ -80,6 +80,6 @@ export default function OrganizationCard({
                     {formatRelativeTime(createdAt)}
                 </span>
             </div>
-        </motion.button >
+        </motion.button>
     );
 }
