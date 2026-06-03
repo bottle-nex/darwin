@@ -8,11 +8,11 @@ import type { Organization, OrgRole } from "@/types/organization";
 import { FaIndustry } from "react-icons/fa";
 import IconWrapper from "../ui/IconWrapper";
 
-const ROLE_STYLES: Record<OrgRole, string> = {
-    Owner: "bg-purple-500/10 text-emerald-300 ring-emerald-400/20",
-    Admin: "bg-amber-500/10 text-amber-300 ring-amber-400/20",
-    Member: "bg-white/5 text-neutral-300 ring-white/10",
-    Billing: "bg-sky-500/10 text-sky-300 ring-sky-400/20",
+const ROLE_DOT: Record<OrgRole, string> = {
+    Owner: "bg-emerald-400 shadow-[0_0_6px_0] shadow-emerald-400/60",
+    Admin: "bg-amber-400 shadow-[0_0_6px_0] shadow-amber-400/60",
+    Member: "bg-neutral-400 shadow-[0_0_6px_0] shadow-neutral-400/50",
+    Billing: "bg-sky-400 shadow-[0_0_6px_0] shadow-sky-400/60",
 };
 
 function pluralize(count: number, noun: string): string {
@@ -39,7 +39,7 @@ export default function OrganizationCard({
             transition={{ duration: 0.3, delay: index * 0.05, ease: "easeOut" }}
             whileHover={{ y: -1 }}
             whileTap={{ scale: 0.99 }}
-            className="flex w-full cursor-pointer flex-col gap-4 rounded-sm border border-neutral-800 bg-linear-to-b from-[#1a1a1a] to-neutral-900 p-5 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/20"
+            className="flex w-full cursor-pointer flex-col gap-4 rounded-[14px] bg-linear-to-b from-[#1a1a1a] to-neutral-900 p-5 text-left shadow-[inset_0_2px_0_0_#262626] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/20"
         >
             <div className="flex items-start justify-between gap-3">
                 <div className="flex min-w-0 items-center gap-3">
@@ -49,25 +49,25 @@ export default function OrganizationCard({
                         bg_color="bg-indigo-600"
                     />
                     <div className="min-w-0">
-                        <h3 className="truncate text-sm font-medium text-neutral-100">{name}</h3>
-                        <p className="truncate font-mono text-xs text-neutral-500">@{slug}</p>
+                        <h3 className="truncate text-[15px] font-semibold tracking-tight text-neutral-50">
+                            {name}
+                        </h3>
+                        <p className="truncate font-mono text-[11px] tracking-tight text-neutral-500">
+                            @{slug}
+                        </p>
                     </div>
                 </div>
-                <span
-                    className={cn(
-                        "shrink-0 rounded-full px-2 py-0.5 text-[11px] font-medium ring-1 ring-inset",
-                        ROLE_STYLES[role],
-                    )}
-                >
+                <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-white/5 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-neutral-300 ring-1 ring-inset ring-white/10">
+                    <span className={cn("size-1.5 rounded-full", ROLE_DOT[role])} aria-hidden />
                     {role}
                 </span>
             </div>
 
-            <p className="line-clamp-2 min-h-10 text-xs leading-relaxed text-neutral-400">
+            <p className="line-clamp-2 min-h-10 text-[13px] leading-relaxed text-neutral-400">
                 {description?.trim() || "No description provided."}
             </p>
 
-            <div className="flex items-center gap-4 border-t border-white/6 pt-3 text-[11px] text-neutral-500 [&_svg]:text-neutral-600">
+            <div className="flex items-center gap-4 border-t border-white/10 pt-3 text-[11px] tracking-tight text-neutral-500 tabular-nums [&_svg]:text-neutral-600">
                 <span className="flex items-center gap-1.5">
                     <FaUsers className="size-3" />
                     {pluralize(memberCount, "member")}

@@ -1,5 +1,6 @@
 "use client";
-import { FaMagnifyingGlass, FaPlus } from "react-icons/fa6";
+import { FaMagnifyingGlass } from "react-icons/fa6";
+import { IoAddSharp } from "react-icons/io5";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -39,17 +40,13 @@ export default function OrganizationsToolbar({
                     value={search}
                     onChange={(e) => onSearch(e.target.value)}
                     placeholder="Search organizations…"
-                    className={`h-8 pl-9 placeholder:text-neutral-500 ${FIELD}`}
+                    className={`pl-9 placeholder:text-neutral-500 ${FIELD}`}
                 />
             </div>
 
             <div className="flex items-center gap-2">
                 <Select value={role} onValueChange={(v) => onRole(v as RoleFilter)}>
-                    <SelectTrigger
-                        size="sm"
-                        aria-label="Filter by role"
-                        className={`min-w-32.5 ${FIELD}`}
-                    >
+                    <SelectTrigger aria-label="Filter by role" className={`min-w-32.5 ${FIELD}`}>
                         <SelectValue />
                     </SelectTrigger>
                     <SelectContent className="dark">
@@ -61,9 +58,25 @@ export default function OrganizationsToolbar({
                     </SelectContent>
                 </Select>
 
-                <Button variant="secondary" onClick={onCreate}>
-                    <FaPlus className="size-3" />
-                    Create organization
+                <Select value={sort} onValueChange={(v) => onSort(v as SortKey)}>
+                    <SelectTrigger
+                        aria-label="Sort organizations"
+                        className={`min-w-37.5 ${FIELD}`}
+                    >
+                        <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="dark">
+                        {SORT_OPTIONS.map((option) => (
+                            <SelectItem key={option.value} value={option.value}>
+                                {option.label}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+
+                <Button onClick={onCreate}>
+                    <IoAddSharp className="size-3" />
+                    Create Org
                 </Button>
             </div>
         </div>

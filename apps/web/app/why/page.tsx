@@ -143,7 +143,7 @@ export default function WhyPage() {
                 <div className="text-neutral-300">
                     Board in, PRs out. Agent-native, repo-aware, and built to ship.
                 </div>
-                <Button size={"lg"} variant={"secondary"}>
+                <Button size={"lg"}>
                     Get Started
                     <ArrowRight className="text-neutral-800!" />
                 </Button>

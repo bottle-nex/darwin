@@ -4,7 +4,7 @@ import PlaygroundTopper from "@/components/playground/PlaygroundTopper";
 
 export default function ProjectPage() {
     return (
-        <main className="flex flex-col h-full overflow-hidden bg-[#0c0c0c]">
+        <main className="flex flex-col h-full overflow-hidden bg-[#0E0E0E]">
             <section className="flex flex-1 min-h-0">
                 <PlaygroundSidebar />
                 <div className="flex-1 min-w-0">

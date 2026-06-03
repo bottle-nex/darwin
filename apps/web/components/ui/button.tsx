@@ -12,14 +12,14 @@ export const azeretMono = Azeret_Mono({
 });
 
 const buttonVariants = cva(
-    "group/button inline-flex shrink-0 items-center justify-center rounded-sm border-transparent bg-clip-padding text-[12px] font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-70 aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+    "group/button inline-flex shrink-0 items-center justify-center rounded-[10px] border-transparent bg-clip-padding text-[12px] font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-70 aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
     {
         variants: {
             variant: {
                 default:
-                    "bg-linear-to-b from-[#171717] to-neutral-900 text-white shadow-[inset_0_2px_0_0_#262626,inset_0_-2.5px_0_0_rgba(0,0,0,0.7),0_1px_2px_0_rgba(15,23,42,0.20),0_2px_6px_1px_rgba(15,23,42,0.26)] hover:from-neutral-600 hover:to-neutral-800 focus-visible:border-ring dark:from-neutral-200 dark:to-neutral-200 dark:text-neutral-950 dark:shadow-[inset_0_1.5px_0_0_rgba(255,255,255,0.9),inset_0_-2px_0_0_rgba(0,0,0,0.35),0_1px_3px_0_rgba(0,0,0,0.4)] dark:hover:from-neutral-200 dark:hover:to-neutral-300",
+                    "bg-linear-to-b from-[#CFC6FF] to-[#BCAFFF] text-neutral-900 shadow-[inset_0_2px_0_0_rgba(255,255,255,0.55),inset_0_-2.5px_0_0_rgba(124,108,196,0.45),0_1px_2px_0_rgba(15,23,42,0.20),0_2px_6px_1px_rgba(15,23,42,0.20)] hover:from-[#C4BAFF] hover:to-[#B0A2FF] focus-visible:border-ring",
                 secondary:
-                    "bg-linear-to-b from-[#E3E3E3] to-neutral-200 text-neutral-900 shadow-[inset_0_2px_0_0_#ffffff,inset_0_-2.5px_0_0_#8F8F8F,0_1px_3px_0_rgba(15,23,42,0.08)] hover:bg-neutral-50 focus-visible:border-ring [&_svg]:text-neutral-400 hover:[&_svg]:text-neutral-600 dark:from-neutral-700 dark:to-neutral-800 dark:text-neutral-100 dark:border-neutral-600 dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08),inset_0_-1px_0_0_rgba(0,0,0,0.3),0_1px_3px_0_rgba(0,0,0,0.3)] dark:hover:from-neutral-600 dark:hover:to-neutral-700 dark:[&_svg]:text-neutral-400",
+                    "bg-linear-to-b from-[#171717] to-neutral-900 text-white shadow-[inset_0_2px_0_0_#262626,inset_0_-2.5px_0_0_rgba(0,0,0,0.7),0_1px_2px_0_rgba(15,23,42,0.20),0_2px_6px_1px_rgba(15,23,42,0.26)] hover:from-neutral-600 hover:to-neutral-800 focus-visible:border-ring dark:from-neutral-200 dark:to-neutral-200 dark:text-neutral-950 dark:shadow-[inset_0_1.5px_0_0_rgba(255,255,255,0.9),inset_0_-2px_0_0_rgba(0,0,0,0.35),0_1px_3px_0_rgba(0,0,0,0.4)] dark:hover:from-neutral-200 dark:hover:to-neutral-300",
                 outline:
                     "bg-linear-to-b from-white to-neutral-50 text-foreground border border-neutral-200 shadow-[inset_0_1px_0_0_rgba(255,255,255,1),inset_0_-1px_0_0_rgba(15,23,42,0.06),0_1px_3px_0_rgba(15,23,42,0.06)] hover:bg-neutral-50 focus-visible:border-ring aria-expanded:bg-neutral-50 dark:from-neutral-800 dark:to-neutral-800 dark:border-neutral-600 dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05),inset_0_-1px_0_0_rgba(0,0,0,0.2)] dark:hover:from-neutral-700 dark:hover:to-neutral-700 dark:aria-expanded:from-neutral-700",
                 destructive:
@@ -71,7 +71,7 @@ export function Button({
                 className={cn(
                     buttonVariants({ variant, size, className }),
                     azeretMono.className,
-                    "font-light duration-150 ease-out active:scale-[0.99] cursor-pointer",
+                    "font-medium duration-150 ease-out active:scale-[0.99] cursor-pointer",
                 )}
                 {...props}
             >
@@ -91,7 +91,7 @@ export function Button({
             className={cn(
                 buttonVariants({ variant, size, className }),
                 azeretMono.className,
-                "font-light duration-150 ease-out active:scale-[0.99] uppercase cursor-pointer",
+                "font-medium duration-150 ease-out active:scale-[0.99] uppercase cursor-pointer",
             )}
             {...props}
         >
