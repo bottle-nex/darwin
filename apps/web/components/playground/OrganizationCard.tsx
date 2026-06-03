@@ -35,7 +35,7 @@ export default function OrganizationCard({
             transition={{ duration: 0.3, delay: index * 0.05, ease: "easeOut" }}
             whileHover={{ y: -4 }}
             whileTap={{ scale: 0.99 }}
-            className="flex w-full cursor-pointer flex-col gap-4 rounded-sm border border-neutral-800 bg-neutral-900 p-5 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/20"
+            className="flex w-full cursor-pointer flex-col gap-4 rounded-sm border border-neutral-800 bg-linear-to-b from-[#1a1a1a] to-neutral-900 p-5 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/20"
         >
             <div className="flex items-start justify-between gap-3">
                 <div className="flex min-w-0 items-center gap-3">

@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { requireAuth } from "../../middlewares/middleware.auth";
-import CreateOrgController from "../../controllers/org/controller.create-org";
-import ListOrgsController from "../../controllers/org/controller.list-orgs";
+import CreateOrgController from "../../controllers/org/controller.create_org";
+import ListOrgsController from "../../controllers/org/controller.list_orgs";
 
 const org_router: Router = Router();
 
