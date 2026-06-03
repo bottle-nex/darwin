@@ -16,12 +16,13 @@ model User {
     email         String    @unique
     image         String?
     emailVerified DateTime?
-    setupComplete Boolean @default(false)
+    setupComplete Boolean   @default(false)
 
-    orgMemberships  OrgMember[]
-    teamMemberships TeamMember[]
-    ownedProjects   Project[]    @relation("ProjectOwner")
-    createdProjects Project[]    @relation("ProjectCreator")
+    orgMemberships       OrgMember[]
+    teamMemberships      TeamMember[]
+    ownedProjects        Project[]      @relation("ProjectOwner")
+    createdProjects      Project[]      @relation("ProjectCreator")
+    createdOrganizations Organization[] @relation("OrgCreator")
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -29,12 +30,14 @@ model User {
 
 model Organization {
     id          String  @id @default(cuid())
+    createdById String
     name        String
     slug        String  @unique
     description String?
 
-    members  OrgMember[]
-    projects Project[]
+    members   OrgMember[]
+    projects  Project[]
+    createdBy User        @relation("OrgCreator", fields: [createdById], references: [id])
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt

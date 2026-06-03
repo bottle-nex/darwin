@@ -28,6 +28,7 @@ export default class CreateOrgController {
                     name: data.name,
                     slug: data.slug,
                     description: data.description,
+                    createdById: userId,
                     members: {
                         create: {
                             userId: userId,
