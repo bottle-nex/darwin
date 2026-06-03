@@ -72,7 +72,8 @@ export default function CreateOrganizationModal({
                 <DialogHeader>
                     <DialogTitle className="text-neutral-100">Create organization</DialogTitle>
                     <DialogDescription className="text-neutral-500">
-                        Organizations group your projects, teams, and the issues your agents pick up.
+                        Organizations group your projects, teams, and the issues your agents pick
+                        up.
                     </DialogDescription>
                 </DialogHeader>
 
