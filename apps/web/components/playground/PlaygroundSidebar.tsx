@@ -66,10 +66,10 @@ export default function PlaygroundSidebar() {
                 onClick={() => setActive(label)}
                 aria-current={isActive ? "true" : undefined}
                 className={cn(
-                    "flex cursor-pointer items-center gap-3 rounded-md px-3 py-2.5 text-left text-[12px] outline-none transition-colors",
+                    "flex cursor-pointer items-center gap-3 rounded-md px-3 py-2 text-left text-[12px] outline-none transition-colors",
                     "focus-visible:ring-2 focus-visible:ring-neutral-500/40",
                     isActive
-                        ? "bg-[#1a1a1a] text-white shadow-[inset_0_1.5px_0_0_rgba(255,255,255,0.06)]"
+                        ? "bg-[#1a1a1a] ring-1 ring-white/5 text-white shadow-[inset_0_1.5px_0_0_rgba(255,255,255,0.06)]"
                         : "text-neutral-500 hover:bg-neutral-800/50 hover:text-neutral-200",
                 )}
             >

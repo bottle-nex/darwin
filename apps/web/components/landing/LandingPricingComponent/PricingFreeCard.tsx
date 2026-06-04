@@ -35,7 +35,7 @@ const NAV_ICONS = [
 ];
 
 export default function PricingFreeCard() {
-    const [hovered, setHovered] = useState(false);
+    const [hovered, setHovered] = useState<boolean>(false);
 
     return (
         <div
@@ -142,15 +142,15 @@ export default function PricingFreeCard() {
                     pr and let our matcha agent handle the bug with minor approvals.
                 </div>
 
-                <div className="h-12 w-full flex gap-x-4 items-center justify-center mt-5">
-                    <div className="h-full w-40 text-neutral-100 px-4 flex items-center justify-center gap-x-2 bg-neutral-600/90 rounded-md shadow-sm shadow-black/5 group hover:bg-[#D35837] transition-all transform duration-300 cursor-pointer">
+                <div className="h-11 w-full flex gap-x-4 items-center justify-center mt-5">
+                    <div className="h-full w-40 text-neutral-100 px-4 flex items-center justify-center gap-x-2 bg-neutral-600/90 rounded-md shadow-sm shadow-black/5 group hover:bg-primary hover:text-neutral-800 transition-all transform duration-300 cursor-pointer">
                         <span className="flex gap-x-2 items-center group-hover:scale-[0.94] transition-all transform duration-300">
                             Get Started
                             <HiMiniChevronRight className="size-5.5" />
                         </span>
                     </div>
 
-                    <div className="h-full w-40 text-neutral-100 px-4 flex items-center justify-center gap-x-2 bg-neutral-600/90 rounded-md shadow-sm shadow-black/5 group hover:bg-[#D35837] transition-all transform duration-300 cursor-pointer">
+                    <div className="h-full w-40 text-neutral-100 px-4 flex items-center justify-center gap-x-2 bg-neutral-600/90 rounded-md shadow-sm shadow-black/5 group hover:bg-primary hover:text-neutral-800 transition-all transform duration-300 cursor-pointer">
                         <span className="flex gap-x-2 items-center group-hover:scale-[0.94] transition-all transform duration-250">
                             Know more
                             <MdOutlineReadMore className="size-5" />

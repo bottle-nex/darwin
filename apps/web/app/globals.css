@@ -14,6 +14,7 @@
     /* lightest — page base in light mode */
     --color-mist: #f4f4f4;
     /* off-white — cards/surfaces in light mode */
+    --color-primary: #AB9FF2;
 }
 
 :root {

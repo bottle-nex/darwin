@@ -92,7 +92,7 @@ function AnimatedNumber({
 }
 
 export default function PricingProCard() {
-    const [isYearly, setIsYearly] = useState(true);
+    const [isYearly, setIsYearly] = useState<boolean>(true);
 
     const togglePlan = () => setIsYearly((prev) => !prev);
 
@@ -100,10 +100,10 @@ export default function PricingProCard() {
     const subtitle = isYearly ? "$119.99 billed yearly" : "billed monthly";
 
     return (
-        <div className="h-full w-1/2 bg-[#E8613C] rounded-4xl flex flex-col items-center justify-center px-12 gap-9 text-white">
+        <div className="h-full w-1/2 bg-[#AB9FF2] rounded-4xl flex flex-col items-center justify-center px-12 gap-9 text-white">
             {/* Price block */}
             <div className="flex flex-col items-center gap-2 scale-105">
-                <div className="font-serif text-7xl text-[#FFEDE8] tracking-tight leading-none tabular-nums">
+                <div className="font-serif text-7xl text-[#FAFAFE] tracking-tight leading-none tabular-nums">
                     $<AnimatedNumber value={priceValue} />
                     /mo
                 </div>
@@ -129,7 +129,7 @@ export default function PricingProCard() {
                 <button
                     type="button"
                     onClick={togglePlan}
-                    className="relative w-14 h-7 rounded-full bg-[#0a0a0a]"
+                    className="relative w-14 h-7 rounded-full bg-[#0a0a0a]  cursor-pointer"
                     style={{
                         boxShadow:
                             "inset 0 3px 6px rgba(0,0,0,0.85), inset 0 1px 2px rgba(0,0,0,0.6), inset 0 -1px 1px rgba(255,255,255,0.08), 0 1px 1px rgba(255,255,255,0.12)",

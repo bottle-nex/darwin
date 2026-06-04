@@ -8,6 +8,7 @@ import { FaDiscord, FaPhoneAlt } from "react-icons/fa";
 import { useUserSessionStore } from "@/store/user/useUserSessionStore";
 import SigninModal from "../utility/modal/SigninModal";
 import { PiArrowRight } from "react-icons/pi";
+import { ChevronRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 const NAV_ITEMS = [
@@ -61,7 +62,7 @@ export function NavBar({ isMarkettingPage = false }: { isMarkettingPage?: boolea
                         <AppLogo className={isMarkettingPage ? "text-neutral-100" : ""} />
                     </Link>
                 </div>
-                <nav className={cn("flex items-center gap-x-24 ml-12", azeretMono.className)}>
+                <nav className={cn("flex items-center gap-x-24 ml-12")}>
                     <section className="hidden md:flex items-center gap-x-8 uppercase">
                         {NAV_ITEMS.map((item, i) => (
                             <div key={item.label} className="flex items-center gap-x-8">
