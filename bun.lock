@@ -21,7 +21,9 @@
       "name": "@trymatcha/server",
       "version": "1.0.0",
       "dependencies": {
+        "@trymatcha/access-control": "*",
         "@trymatcha/database": "*",
+        "@trymatcha/types": "*",
         "@types/cors": "^2.8.19",
         "@types/dotenv": "^8.2.3",
         "@types/express": "^5.0.6",
@@ -58,6 +60,7 @@
         "@radix-ui/react-label": "^2.1.8",
         "@radix-ui/react-select": "^2.2.6",
         "@tanstack/react-query": "^5.101.0",
+        "@trymatcha/access-control": "*",
         "axios": "^1.16.1",
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
@@ -80,6 +83,7 @@
       "devDependencies": {
         "@tailwindcss/postcss": "^4",
         "@tanstack/react-query-devtools": "^5.101.0",
+        "@trymatcha/types": "*",
         "@types/node": "^20",
         "@types/react": "^19",
         "@types/react-dom": "^19",
@@ -88,6 +92,18 @@
         "eslint-config-next": "16.2.6",
         "tailwindcss": "^4",
         "tw-animate-css": "^1.4.0",
+        "typescript": "^5",
+      },
+    },
+    "packages/access-control": {
+      "name": "@trymatcha/access-control",
+      "dependencies": {
+        "@trymatcha/types": "*",
+      },
+      "devDependencies": {
+        "@types/bun": "latest",
+      },
+      "peerDependencies": {
         "typescript": "^5",
       },
     },
@@ -133,6 +149,15 @@
         "tsup": "^8.0.2",
         "tsx": "4.21.0",
         "typescript": "5.5.4",
+      },
+    },
+    "packages/types": {
+      "name": "@trymatcha/types",
+      "devDependencies": {
+        "@types/bun": "latest",
+      },
+      "peerDependencies": {
+        "typescript": "^5",
       },
     },
   },
@@ -635,11 +660,15 @@
 
     "@tanstack/react-query-devtools": ["@tanstack/react-query-devtools@5.101.0", "", { "dependencies": { "@tanstack/query-devtools": "5.101.0" }, "peerDependencies": { "@tanstack/react-query": "^5.101.0", "react": "^18 || ^19" } }, "sha512-cpZA0+WqKXwrwMfiWZEGGF6QrIWVQFbhBtxqDF5sQsAfrFf47HIE6fiPbQU3wyAUEN2+7UNqLCQe7oG6m3f93w=="],
 
+    "@trymatcha/access-control": ["@trymatcha/access-control@workspace:packages/access-control"],
+
     "@trymatcha/database": ["@trymatcha/database@workspace:packages/database"],
 
     "@trymatcha/eslint-config": ["@trymatcha/eslint-config@workspace:packages/config-eslint"],
 
     "@trymatcha/server": ["@trymatcha/server@workspace:apps/server"],
+
+    "@trymatcha/types": ["@trymatcha/types@workspace:packages/types"],
 
     "@trymatcha/typescript-config": ["@trymatcha/typescript-config@workspace:packages/config-typescript"],
 

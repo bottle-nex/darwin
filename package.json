@@ -25,6 +25,7 @@
         "db:migrate:dev": "turbo run db:migrate:dev",
         "db:push": "turbo run db:push",
         "db:seed": "turbo run db:seed",
+        "pre-push": "bun run lint && bun run format:check && bun run typecheck",
         "prepare": "husky"
     },
     "dependencies": {
