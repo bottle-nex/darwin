@@ -3,8 +3,7 @@ import { z } from "zod";
 import { Prisma, prisma, ProjectRole, TeamRole } from "@trymatcha/database";
 import ResponseWriter from "../../services/service.response";
 import Access from "../../access-control/access";
-import Permissions from "../../access-control/permissions";
-import Action from "../../access-control/actions";
+import { Action, Permissions } from "@trymatcha/access-control";
 
 const body_schema = z.object({
     projectId: z.string(),

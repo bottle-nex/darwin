@@ -6,8 +6,7 @@ import ResponseWriter from "../../services/service.response";
 import { ENV } from "../../configs/env";
 import { inviteMember } from "../../services/service.email";
 import Access from "../../access-control/access";
-import Permissions from "../../access-control/permissions";
-import Action from "../../access-control/actions";
+import { Action, Permissions } from "@trymatcha/access-control";
 
 const body_schema = z
     .object({
