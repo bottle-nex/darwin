@@ -13,6 +13,7 @@ const envSchema = z.object({
     SERVER_JWT_SECRET: z.string().min(32),
     SERVER_JWT_TOKEN_TTL: z.string().default("7d"),
     SERVER_REDIS_URL: z.url("Invalid Redis URL"),
+    INVITATION_URL_TTL_DAYS: z.coerce.number().default(7),
     SERVER_OTP_TTL_SECONDS: z.coerce.number().default(600),
     SERVER_OTP_COOLDOWN_SECONDS: z.coerce.number().default(60),
     SERVER_OTP_MAX_ATTEMPTS: z.coerce.number().default(5),
