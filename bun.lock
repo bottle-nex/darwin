@@ -21,6 +21,7 @@
       "name": "@trymatcha/server",
       "version": "1.0.0",
       "dependencies": {
+        "@trymatcha/access-control": "*",
         "@trymatcha/database": "*",
         "@types/cors": "^2.8.19",
         "@types/dotenv": "^8.2.3",
@@ -39,7 +40,6 @@
         "zod": "^4.4.3",
       },
       "devDependencies": {
-        "@trymatcha/access-control": "*",
         "@trymatcha/eslint-config": "*",
         "@trymatcha/typescript-config": "*",
         "@types/bun": "latest",
@@ -59,6 +59,7 @@
         "@radix-ui/react-label": "^2.1.8",
         "@radix-ui/react-select": "^2.2.6",
         "@tanstack/react-query": "^5.101.0",
+        "@trymatcha/access-control": "*",
         "axios": "^1.16.1",
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
