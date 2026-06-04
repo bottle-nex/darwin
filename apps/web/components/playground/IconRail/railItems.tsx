@@ -18,7 +18,6 @@ export type RailItem = {
     /** Accent treatment for the active item — currently only "green" for Home. */
     accent?: "green";
 };
-
 /**
  * The icon rail surfaces the top-level stages of the matcha flow: file issues
  * on a project board, agents pick them up, runners build/test, PRs ship.
