@@ -2,9 +2,8 @@ import { Request, Response } from "express";
 import z from "zod";
 import ResponseWriter from "../../services/service.response";
 import { Prisma, prisma } from "@trymatcha/database";
+import { Action, Permissions } from "@trymatcha/access-control";
 import Access from "../../access-control/access";
-import Permissions from "../../access-control/permissions";
-import Action from "../../access-control/actions";
 
 const body_schema = z.object({
     id: z.string(),
@@ -24,23 +23,17 @@ export default class UpdateOrgController {
             return ResponseWriter.invalid_data(res, "invalid_data");
         }
 
+        const { id, name, slug, description } = parsed.data;
+
+        const role = await Access.org(req.user.id, id);
+        if (!role || !Permissions.org(role, Action.org.update)) {
+            return ResponseWriter.not_authorized(res);
+        }
+
         try {
-            const { id, name, slug, description } = parsed.data;
-
-            const role = await Access.org(req.user.id, id);
-            if (!role || !Permissions.org(role, Action.org.update)) {
-                return ResponseWriter.not_authorized(res, "insufficient permissions", 403);
-            }
-
             await prisma.organization.update({
-                where: {
-                    id,
-                },
-                data: {
-                    name,
-                    slug,
-                    description,
-                },
+                where: { id },
+                data: { name, slug, description },
             });
 
             ResponseWriter.success(res, {}, "Organization updated successfully!");

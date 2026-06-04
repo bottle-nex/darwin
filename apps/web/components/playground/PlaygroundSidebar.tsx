@@ -3,11 +3,9 @@
 import { useState } from "react";
 import {
     RiNotification3Fill,
-    RiDashboardFill,
     RiInboxFill,
     RiCalendarFill,
     RiClipboardFill,
-    RiInformationFill,
     RiSettings4Fill,
 } from "react-icons/ri";
 import { BsFillKanbanFill } from "react-icons/bs";
