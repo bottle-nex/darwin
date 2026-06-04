@@ -82,13 +82,13 @@ export default class InviteMembersController {
             const [members, pending_invites] = await Promise.all([
                 is_team_invite
                     ? prisma.teamMember.findMany({
-                        where: { teamId: team!.id, userId: { in: user_ids } },
-                        select: { userId: true },
-                    })
+                          where: { teamId: team!.id, userId: { in: user_ids } },
+                          select: { userId: true },
+                      })
                     : prisma.orgMember.findMany({
-                        where: { orgId, userId: { in: user_ids } },
-                        select: { userId: true },
-                    }),
+                          where: { orgId, userId: { in: user_ids } },
+                          select: { userId: true },
+                      }),
                 prisma.invitation.findMany({
                     where: {
                         orgId,
