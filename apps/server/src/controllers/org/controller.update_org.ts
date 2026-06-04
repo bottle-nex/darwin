@@ -2,7 +2,8 @@ import { Request, Response } from "express";
 import z from "zod";
 import ResponseWriter from "../../services/service.response";
 import { Prisma, prisma } from "@trymatcha/database";
-import { Access, Action, Permissions } from "@trymatcha/access-control";
+import { Action, Permissions } from "@trymatcha/access-control";
+import Access from "../../access-control/access";
 
 const body_schema = z.object({
     id: z.string(),
