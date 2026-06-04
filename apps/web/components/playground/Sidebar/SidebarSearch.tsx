@@ -1,0 +1,76 @@
+"use client";
+import { useEffect, useRef } from "react";
+import { Search, X } from "lucide-react";
+
+type SidebarSearchProps = {
+    value: string;
+    onChange: (value: string) => void;
+    /** Collapse the search back into the header. */
+    onClose: () => void;
+    /** Move the highlighted result down/up through the filtered list. */
+    onArrowDown?: () => void;
+    onArrowUp?: () => void;
+    /** Open the highlighted result. */
+    onEnter?: () => void;
+};
+
+/** Full-width sidebar search field that the header expands into. */
+export default function SidebarSearch({
+    value,
+    onChange,
+    onClose,
+    onArrowDown,
+    onArrowUp,
+    onEnter,
+}: SidebarSearchProps) {
+    const inputRef = useRef<HTMLInputElement>(null);
+
+    useEffect(() => {
+        inputRef.current?.focus();
+    }, []);
+
+    function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+        switch (e.key) {
+            case "Escape":
+                onClose();
+                break;
+            case "ArrowDown":
+                e.preventDefault();
+                onArrowDown?.();
+                break;
+            case "ArrowUp":
+                e.preventDefault();
+                onArrowUp?.();
+                break;
+            case "Enter":
+                e.preventDefault();
+                onEnter?.();
+                break;
+        }
+    }
+
+    return (
+        <div className="relative flex w-full items-center">
+            <Search
+                className="pointer-events-none absolute left-3 size-3.5 text-neutral-400"
+                aria-hidden
+            />
+            <input
+                ref={inputRef}
+                value={value}
+                onChange={(e) => onChange(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder="Search sidebar..."
+                className="h-7 w-full rounded-md border border-white/8 bg-white/5 pr-9 pl-8 text-[12px] text-neutral-100 placeholder:text-neutral-500 focus:border-white/25 focus:outline-none"
+            />
+            <button
+                type="button"
+                onClick={onClose}
+                aria-label="Close search"
+                className="absolute right-2 flex size-3.5 cursor-pointer items-center justify-center rounded-full bg-white/10 text-neutral-400 transition-colors hover:bg-white/20 hover:text-neutral-100"
+            >
+                <X className="size-2.25" aria-hidden />
+            </button>
+        </div>
+    );
+}

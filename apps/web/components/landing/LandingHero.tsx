@@ -186,6 +186,9 @@ const LogoProcessor = forwardRef<LogoProcessorHandle>((_, ref) => {
         );
         const blob = new Blob([markup], { type: "image/svg+xml;charset=utf-8" });
         const url = URL.createObjectURL(blob);
+        // Browser-only API; can't compute during render or with useMemo
+        // without an SSR hydration mismatch. One-shot mount-time set is fine.
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setMaskUrl(url);
         return () => URL.revokeObjectURL(url);
     }, []);
@@ -434,8 +437,9 @@ function FlowingLine({
             for (let i = 0; i < hops.length; i++) {
                 const hop = hops[i];
                 const { start, end, duration } = schedule[i];
-                const group = groups[i]!;
-                const path = paths[i]!;
+                const group = groups[i];
+                const path = paths[i];
+                if (!group || !path) continue;
                 const length = pathLengths[i];
 
                 if (t < start || t >= end) {
