@@ -40,7 +40,13 @@ export default class UpdateOrgController {
         } catch (error) {
             if (error instanceof Prisma.PrismaClientKnownRequestError) {
                 if (error.code === "P2002") {
-                    return ResponseWriter.custom(res, false, "SLUG_TAKEN", "That slug is already taken.", 409);
+                    return ResponseWriter.custom(
+                        res,
+                        false,
+                        "SLUG_TAKEN",
+                        "That slug is already taken.",
+                        409,
+                    );
                 }
                 if (error.code === "P2025") {
                     return ResponseWriter.not_found(res, "org not found");

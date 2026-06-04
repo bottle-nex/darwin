@@ -30,7 +30,10 @@ export default async function add_team_controller(req: Request, res: Response) {
 
         const role = await Access.project(user_id, project_id);
         if (!role || !Permissions.project(role, Action.project.create_team)) {
-            ResponseWriter.not_authorized(res, "You don't have permission to create teams in this project");
+            ResponseWriter.not_authorized(
+                res,
+                "You don't have permission to create teams in this project",
+            );
             return;
         }
 

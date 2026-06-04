@@ -29,18 +29,34 @@ export function AccessControlProvider({ children }: { children: React.ReactNode 
     const [teamRole, setTeamRole] = useState<TeamRole | null>(null);
 
     const org = (action: OrgAction) =>
-        orgRole !== null && Permissions.org(orgRole as Parameters<typeof Permissions.org>[0], action);
+        orgRole !== null &&
+        Permissions.org(orgRole as Parameters<typeof Permissions.org>[0], action);
 
     const project = (action: ProjectAction) =>
-        projectRole !== null && Permissions.project(projectRole as Parameters<typeof Permissions.project>[0], action);
+        projectRole !== null &&
+        Permissions.project(projectRole as Parameters<typeof Permissions.project>[0], action);
 
     const team = (action: TeamAction) =>
-        teamRole !== null && Permissions.team(teamRole as Parameters<typeof Permissions.team>[0], action);
+        teamRole !== null &&
+        Permissions.team(teamRole as Parameters<typeof Permissions.team>[0], action);
 
-    return React.createElement(AccessControlContext.Provider, {
-        value: { orgRole, projectRole, teamRole, setOrgRole, setProjectRole, setTeamRole, org, project, team },
+    return React.createElement(
+        AccessControlContext.Provider,
+        {
+            value: {
+                orgRole,
+                projectRole,
+                teamRole,
+                setOrgRole,
+                setProjectRole,
+                setTeamRole,
+                org,
+                project,
+                team,
+            },
+        },
         children,
-    });
+    );
 }
 
 export function useAccessControl() {

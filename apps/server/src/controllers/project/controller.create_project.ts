@@ -29,7 +29,10 @@ export default async function create_project_controller(req: Request, res: Respo
 
         const org_role = await Access.org(user_id, org_id);
         if (!org_role || !Permissions.org(org_role, Action.org.create_project)) {
-            ResponseWriter.not_authorized(res, "You don't have permission to create projects in this org");
+            ResponseWriter.not_authorized(
+                res,
+                "You don't have permission to create projects in this org",
+            );
             return;
         }
 

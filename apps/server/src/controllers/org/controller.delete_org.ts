@@ -20,7 +20,9 @@ export default class DeleteOrgController {
             const requested_ids = [...new Set(parsed.data.ids)];
 
             const roles = await Promise.all(
-                requested_ids.map((orgId) => Access.org(req.user.id, orgId).then((role) => ({ orgId, role }))),
+                requested_ids.map((orgId) =>
+                    Access.org(req.user.id, orgId).then((role) => ({ orgId, role })),
+                ),
             );
 
             const authorized_ids = roles
