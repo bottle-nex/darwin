@@ -15,55 +15,29 @@ export default class Access {
         return member?.role ?? null;
     }
 
-    static async project(
-        userId: string,
-        projectId: string,
-        // orgId: string,
-    ): Promise<ProjectRole | null> {
-        // const (team_member, project, org_member) = await Promise.all([
-        //     prisma.teamMember.findFirst({
-        //         where: {
-        //             userId, team: { projectId },
-        //         },
-        //         select: {
-        //             team: { select: { projectRole: true } },
-        //         },
-        //     }),
-        //     prisma.project.findUnique({
-        //         where: { id: projectId },
-        //         select: { ownerId: true },
-        //     }),
-        //     prisma.orgMember.findUnique({
-        //         where: {
-        //             orgId_userId: { orgId, userId },
-        //         },
-        //         select: {
-        //             role: true,
-        //         },
-        //     }),
-        // ]);
+    static async project(userId: string, projectId: string): Promise<ProjectRole | null> {
+        const [team_member, project] = await Promise.all([
+            prisma.teamMember.findFirst({
+                where: { userId, team: { projectId } },
+                select: { team: { select: { projectRole: true } } },
+            }),
+            prisma.project.findUnique({
+                where: { id: projectId },
+                select: { ownerId: true, orgId: true },
+            }),
+        ]);
 
-        const teamMember = await prisma.teamMember.findFirst({
-            where: { userId, team: { projectId } },
-            select: { team: { select: { projectRole: true } } },
-        });
-
-        if (teamMember) return teamMember.team.projectRole;
-
-        const project = await prisma.project.findUnique({
-            where: { id: projectId },
-            select: { ownerId: true, orgId: true },
-        });
+        if (team_member) return team_member.team.projectRole;
 
         if (!project) return null;
         if (project.ownerId === userId) return ProjectRole.Admin;
 
-        const orgMember = await prisma.orgMember.findUnique({
+        const org_member = await prisma.orgMember.findUnique({
             where: { orgId_userId: { orgId: project.orgId, userId } },
             select: { role: true },
         });
 
-        if (orgMember && Permissions.has_implicit_project_access(orgMember.role)) {
+        if (org_member && Permissions.has_implicit_project_access(org_member.role)) {
             return ProjectRole.Admin;
         }
 
