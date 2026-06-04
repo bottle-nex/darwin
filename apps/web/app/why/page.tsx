@@ -36,7 +36,7 @@ export default function WhyPage() {
                         review the diff instead of writing it.
                     </div>
                     <div className="flex items-center gap-x-4 pt-1">
-                        <Button size="lg" variant="secondary">
+                        <Button size="lg" variant={"tertiary"}>
                             Get started
                             <PiArrowRight className="h-3 w-3" />
                         </Button>

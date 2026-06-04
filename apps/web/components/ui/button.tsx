@@ -2,8 +2,8 @@ import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 import { Slot } from "radix-ui";
 import { Azeret_Mono } from "next/font/google";
-import { TbLoader2 } from "react-icons/tb";
 import { cn } from "@/lib/utils";
+import { RiLoader4Line } from "react-icons/ri";
 
 export const azeretMono = Azeret_Mono({
     subsets: ["latin"],
@@ -12,7 +12,7 @@ export const azeretMono = Azeret_Mono({
 });
 
 const buttonVariants = cva(
-    "group/button inline-flex shrink-0 items-center justify-center rounded-[10px] border-transparent bg-clip-padding text-[12px] font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-70 aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+    "group/button inline-flex shrink-0 items-center justify-center rounded-[10px] border-transparent bg-clip-padding text-[12px] font-500 whitespace-nowrap transition-all outline-none select-none focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-70 aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
     {
         variants: {
             variant: {
@@ -73,7 +73,7 @@ export function Button({
                 className={cn(
                     buttonVariants({ variant, size, className }),
                     azeretMono.className,
-                    "font-medium duration-150 ease-out active:scale-[0.99] cursor-pointer",
+                    "font-500 duration-150 ease-out active:scale-[0.99] cursor-pointer",
                 )}
                 {...props}
             >
@@ -93,11 +93,11 @@ export function Button({
             className={cn(
                 buttonVariants({ variant, size, className }),
                 azeretMono.className,
-                "font-light duration-150 ease-out active:scale-[0.99] uppercase cursor-pointer",
+                "font-500 duration-150 ease-out active:scale-[0.99] uppercase cursor-pointer",
             )}
             {...props}
         >
-            {loading && <TbLoader2 className="animate-spin" />}
+            {loading && <RiLoader4Line className="animate-spin" />}
             {children}
         </button>
     );

@@ -170,7 +170,6 @@ export default function SigninModal() {
                                 id="email"
                                 type="email"
                                 placeholder="youremail@example.com"
-                                className="mt-2 h-11 bg-surface focus-visible:border-[#9bc24f] focus-visible:ring-[3px] focus-visible:ring-[#9bc24f]/30"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 onKeyDown={(e) => e.key === "Enter" && handleSendOtp()}
