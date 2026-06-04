@@ -12,6 +12,7 @@
     },
     "dependencies": {
         "@trymatcha/database": "*",
+        "@trymatcha/access-control": "*",
         "@types/cors": "^2.8.19",
         "@types/dotenv": "^8.2.3",
         "@types/express": "^5.0.6",
