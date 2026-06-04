@@ -44,6 +44,9 @@ const NODES = [
     { x: TOP_RIGHT_DOT_X, y: TOP_Y },
     { x: INNER_LEFT_DOT_X, y: BOTTOM_Y },
     { x: INNER_RIGHT_DOT_X, y: BOTTOM_Y },
+    // Far-right bottom dot — the new endpoint for the top badge's exit
+    // (top-left enters card → bottom-right exits → travels along bottom row).
+    { x: TOP_RIGHT_DOT_X, y: BOTTOM_Y },
 ];
 
 type Hop = {
