@@ -7,7 +7,7 @@
     ".": "./index.ts"
   },
   "dependencies": {
-    "@trymatcha/database": "*"
+    "@trymatcha/types": "*"
   },
   "devDependencies": {
     "@types/bun": "latest"

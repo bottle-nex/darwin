@@ -9,8 +9,6 @@ export type TeamRole = "Maintainer" | "Member";
 
 export type { OrgAction, ProjectAction, TeamAction };
 
-// ── Context ───────────────────────────────────────────────────────────────────
-
 interface AccessControlContext {
     orgRole: OrgRole | null;
     projectRole: ProjectRole | null;
@@ -18,36 +16,32 @@ interface AccessControlContext {
     setOrgRole: (role: OrgRole | null) => void;
     setProjectRole: (role: ProjectRole | null) => void;
     setTeamRole: (role: TeamRole | null) => void;
-    can_org: (action: OrgAction) => boolean;
-    can_project: (action: ProjectAction) => boolean;
-    can_team: (action: TeamAction) => boolean;
+    org: (action: OrgAction) => boolean;
+    project: (action: ProjectAction) => boolean;
+    team: (action: TeamAction) => boolean;
 }
 
 const AccessControlContext = createContext<AccessControlContext | null>(null);
-
-// ── Provider ──────────────────────────────────────────────────────────────────
 
 export function AccessControlProvider({ children }: { children: React.ReactNode }) {
     const [orgRole, setOrgRole] = useState<OrgRole | null>(null);
     const [projectRole, setProjectRole] = useState<ProjectRole | null>(null);
     const [teamRole, setTeamRole] = useState<TeamRole | null>(null);
 
-    const can_org = (action: OrgAction) =>
+    const org = (action: OrgAction) =>
         orgRole !== null && Permissions.org(orgRole as Parameters<typeof Permissions.org>[0], action);
 
-    const can_project = (action: ProjectAction) =>
+    const project = (action: ProjectAction) =>
         projectRole !== null && Permissions.project(projectRole as Parameters<typeof Permissions.project>[0], action);
 
-    const can_team = (action: TeamAction) =>
+    const team = (action: TeamAction) =>
         teamRole !== null && Permissions.team(teamRole as Parameters<typeof Permissions.team>[0], action);
 
     return React.createElement(AccessControlContext.Provider, {
-        value: { orgRole, projectRole, teamRole, setOrgRole, setProjectRole, setTeamRole, can_org, can_project, can_team },
+        value: { orgRole, projectRole, teamRole, setOrgRole, setProjectRole, setTeamRole, org, project, team },
         children,
     });
 }
-
-// ── Hook ──────────────────────────────────────────────────────────────────────
 
 export function useAccessControl() {
     const ctx = useContext(AccessControlContext);

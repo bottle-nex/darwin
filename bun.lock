@@ -23,6 +23,7 @@
       "dependencies": {
         "@trymatcha/access-control": "*",
         "@trymatcha/database": "*",
+        "@trymatcha/types": "*",
         "@types/cors": "^2.8.19",
         "@types/dotenv": "^8.2.3",
         "@types/express": "^5.0.6",
@@ -82,6 +83,7 @@
       "devDependencies": {
         "@tailwindcss/postcss": "^4",
         "@tanstack/react-query-devtools": "^5.101.0",
+        "@trymatcha/types": "*",
         "@types/node": "^20",
         "@types/react": "^19",
         "@types/react-dom": "^19",
@@ -96,7 +98,7 @@
     "packages/access-control": {
       "name": "@trymatcha/access-control",
       "dependencies": {
-        "@trymatcha/database": "*",
+        "@trymatcha/types": "*",
       },
       "devDependencies": {
         "@types/bun": "latest",
@@ -147,6 +149,15 @@
         "tsup": "^8.0.2",
         "tsx": "4.21.0",
         "typescript": "5.5.4",
+      },
+    },
+    "packages/types": {
+      "name": "@trymatcha/types",
+      "devDependencies": {
+        "@types/bun": "latest",
+      },
+      "peerDependencies": {
+        "typescript": "^5",
       },
     },
   },
@@ -656,6 +667,8 @@
     "@trymatcha/eslint-config": ["@trymatcha/eslint-config@workspace:packages/config-eslint"],
 
     "@trymatcha/server": ["@trymatcha/server@workspace:apps/server"],
+
+    "@trymatcha/types": ["@trymatcha/types@workspace:packages/types"],
 
     "@trymatcha/typescript-config": ["@trymatcha/typescript-config@workspace:packages/config-typescript"],
 
