@@ -20,6 +20,14 @@ const envSchema = z.object({
     SERVER_RESEND_API_KEY: z.string().min(1, "Resend api key is required"),
     SERVER_WEB_URL: z.string().min(1, "Web URL is required"),
     DATABASE_URL: z.string().min(1, "Database URL is required"),
+    SERVER_GITHUB_APP_ID: z.string().min(1, "GitHub App ID is required"),
+    SERVER_GITHUB_APP_SLUG: z.string().min(1, "GitHub App slug is required"),
+    SERVER_GITHUB_APP_CLIENT_ID: z.string().min(1, "GitHub App client id is required"),
+    SERVER_GITHUB_APP_CLIENT_SECRET: z.string().min(1, "GitHub App client secret is required"),
+    SERVER_GITHUB_APP_PRIVATE_KEY: z
+        .string()
+        .min(1, "GitHub App private key (base64-encoded PEM) is required"),
+    SERVER_GITHUB_APP_WEBHOOK_SECRET: z.string().optional(),
 });
 
 function parseEnv() {

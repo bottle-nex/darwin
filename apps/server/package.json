@@ -11,8 +11,10 @@
         "typecheck": "tsc --noEmit"
     },
     "dependencies": {
-        "@trymatcha/database": "*",
+        "@octokit/auth-app": "^8.2.0",
+        "@octokit/rest": "^22.0.1",
         "@trymatcha/access-control": "*",
+        "@trymatcha/database": "*",
         "@trymatcha/types": "*",
         "@types/cors": "^2.8.19",
         "@types/dotenv": "^8.2.3",

@@ -1,6 +1,6 @@
 import { Input } from "@/components/ui/input";
 import { PiMagnifyingGlass } from "react-icons/pi";
-import { Button } from "../ui/button"
+import { Button } from "../ui/button";
 import { IoAddSharp } from "react-icons/io5";
 
 export default function PlaygroundPill() {

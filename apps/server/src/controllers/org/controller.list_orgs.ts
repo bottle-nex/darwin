@@ -23,6 +23,7 @@ export default class ListOrgsController {
                             description: true,
                             createdAt: true,
                             _count: { select: { members: true, projects: true } },
+                            githubInstallation: { select: { id: true } },
                         },
                     },
                 },
@@ -37,6 +38,7 @@ export default class ListOrgsController {
                 createdAt: m.organization.createdAt.toISOString(),
                 memberCount: m.organization._count.members,
                 projectCount: m.organization._count.projects,
+                githubConnected: m.organization.githubInstallation !== null,
                 role: m.role,
             }));
 

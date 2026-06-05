@@ -14,6 +14,7 @@ export const dummyOrganizations: Organization[] = [
         createdAt: "2025-09-12T10:00:00.000Z",
         memberCount: 24,
         projectCount: 7,
+        githubConnected: false,
         role: "Owner",
     },
     {
@@ -24,6 +25,7 @@ export const dummyOrganizations: Organization[] = [
         createdAt: "2026-04-21T08:30:00.000Z",
         memberCount: 9,
         projectCount: 3,
+        githubConnected: false,
         role: "Admin",
     },
     {
@@ -34,6 +36,7 @@ export const dummyOrganizations: Organization[] = [
         createdAt: "2026-05-28T14:15:00.000Z",
         memberCount: 1,
         projectCount: 1,
+        githubConnected: false,
         role: "Member",
     },
     {
@@ -44,6 +47,7 @@ export const dummyOrganizations: Organization[] = [
         createdAt: "2025-12-02T09:45:00.000Z",
         memberCount: 5,
         projectCount: 2,
+        githubConnected: false,
         role: "Billing",
     },
     {
@@ -55,6 +59,7 @@ export const dummyOrganizations: Organization[] = [
         createdAt: "2025-06-30T16:20:00.000Z",
         memberCount: 42,
         projectCount: 12,
+        githubConnected: false,
         role: "Member",
     },
     {
@@ -65,6 +70,7 @@ export const dummyOrganizations: Organization[] = [
         createdAt: "2026-05-31T11:05:00.000Z",
         memberCount: 16,
         projectCount: 5,
+        githubConnected: false,
         role: "Admin",
     },
 ];

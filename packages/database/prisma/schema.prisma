@@ -20,11 +20,13 @@ model User {
 
   orgMemberships       OrgMember[]
   teamMemberships      TeamMember[]
-  ownedProjects        Project[]      @relation("ProjectOwner")
-  createdProjects      Project[]      @relation("ProjectCreator")
-  createdOrganizations Organization[] @relation("OrgCreator")
-  invitations          Invitation[]   @relation("InviteRecipient")
-  sentInvitations      Invitation[]   @relation("InviteSender")
+  ownedProjects        Project[]            @relation("ProjectOwner")
+  createdProjects      Project[]            @relation("ProjectCreator")
+  createdOrganizations Organization[]       @relation("OrgCreator")
+  invitations          Invitation[]         @relation("InviteRecipient")
+  sentInvitations      Invitation[]         @relation("InviteSender")
+  githubAccount        GithubAccount?
+  githubInstallations  GithubInstallation[] @relation("GithubInstallationConnector")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -37,10 +39,11 @@ model Organization {
   slug        String  @unique
   description String?
 
-  members     OrgMember[]
-  projects    Project[]
-  invitations Invitation[]
-  createdBy   User         @relation("OrgCreator", fields: [createdById], references: [id])
+  members            OrgMember[]
+  projects           Project[]
+  invitations        Invitation[]
+  createdBy          User                @relation("OrgCreator", fields: [createdById], references: [id])
+  githubInstallation GithubInstallation?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -71,16 +74,24 @@ model Project {
   ownerId     String
   createdById String?
 
-  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
-  owner        User         @relation("ProjectOwner", fields: [ownerId], references: [id], onDelete: Restrict)
-  createdBy    User?        @relation("ProjectCreator", fields: [createdById], references: [id], onDelete: SetNull)
-  teams        Team[]
+  githubInstallationId String?
+  githubRepoId         BigInt?
+  githubRepoFullName   String?
+  githubRepoUrl        String?
+  githubDefaultBranch  String?
+
+  organization       Organization        @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  owner              User                @relation("ProjectOwner", fields: [ownerId], references: [id], onDelete: Restrict)
+  createdBy          User?               @relation("ProjectCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  teams              Team[]
+  githubInstallation GithubInstallation? @relation(fields: [githubInstallationId], references: [id], onDelete: SetNull)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@unique([orgId, slug])
   @@index([ownerId])
+  @@index([githubInstallationId])
 }
 
 model Team {
@@ -138,6 +149,41 @@ model Invitation {
 
   @@unique([userId, orgId, teamId])
   @@index([userId, status])
+}
+
+model GithubInstallation {
+  id             String @id @default(cuid())
+  orgId          String @unique
+  installationId BigInt @unique
+  accountLogin   String
+  accountType    String
+  accountId      BigInt
+  connectedById  String
+
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  connectedBy  User         @relation("GithubInstallationConnector", fields: [connectedById], references: [id], onDelete: Restrict)
+  projects     Project[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([connectedById])
+}
+
+model GithubAccount {
+  id           String    @id @default(cuid())
+  userId       String    @unique
+  githubUserId BigInt    @unique
+  githubLogin  String
+  accessToken  String
+  refreshToken String?
+  expiresAt    DateTime?
+  scope        String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 enum InvitationStatus {

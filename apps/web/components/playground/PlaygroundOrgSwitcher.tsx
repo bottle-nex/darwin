@@ -36,7 +36,7 @@ export default function PlaygroundOrgSwitcher() {
                 <DropdownMenu.Content
                     align="start"
                     sideOffset={6}
-                    className="z-50 max-h-80 w-64 origin-(--radix-dropdown-menu-content-transform-origin) overflow-y-auto rounded-lg border border-white/10 bg-charcoal p-1 shadow-xl animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95"
+                    className="z-50 max-h-80 w-64 origin-(--radix-dropdown-menu-content-transform-origin) overflow-y-auto rounded-lg border border-neutral-800 bg-charcoal p-1 shadow-xl animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95"
                 >
                     <DropdownMenu.Label className="px-2 py-1.5 text-[11px] font-medium tracking-wide text-neutral-500 uppercase">
                         Organizations

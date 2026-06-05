@@ -8,6 +8,5 @@ export default function PlaygroundLayout({ children }: { children: React.ReactNo
                 <div className="h-dvh overflow-hidden overscroll-none bg-[#141414]">{children}</div>
             </TooltipProvider>
         </AccessControlProvider>
-
     );
 }

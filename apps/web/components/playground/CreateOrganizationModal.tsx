@@ -84,6 +84,7 @@ export default function CreateOrganizationModal({
                         createdAt: new Date().toISOString(),
                         memberCount: 1,
                         projectCount: 0,
+                        githubConnected: false,
                         role: "Owner",
                     };
 

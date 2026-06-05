@@ -5,9 +5,13 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useUserSessionStore } from "@/store/user/useUserSessionStore";
 import PlaygroundOrgSwitcher from "./PlaygroundOrgSwitcher";
+import GithubConnectButton from "./GithubConnectButton";
+import { useNewProjectStore } from "@/store/project/useNewProjectStore";
+import CreateProjectDialog from "@/components/project/CreateProjectDialog";
 
 export default function PlaygroundTopBar() {
     const session = useUserSessionStore((s) => s.session);
+    const { setOpen } = useNewProjectStore();
 
     return (
         <header className="relative flex h-11 shrink-0 items-center justify-between gap-4 px-2">
@@ -32,12 +36,14 @@ export default function PlaygroundTopBar() {
 
             {/* right side icons */}
             <div className="flex items-center gap-2.5">
+                <GithubConnectButton />
                 <Button
+                    onClick={() => setOpen(true)}
                     size="sm"
                     className="h-6.75 cursor-pointer gap-1 rounded-sm bg-neutral-100 px-2.5 text-[11px] font-medium text-neutral-900 hover:bg-white"
                 >
                     <Plus className="size-3.5" aria-hidden />
-                    Create
+                    Create Project
                 </Button>
                 <div className="relative h-7 w-7 overflow-hidden rounded-full">
                     {session?.user?.image && (
@@ -51,6 +57,8 @@ export default function PlaygroundTopBar() {
                     )}
                 </div>
             </div>
+
+            <CreateProjectDialog />
         </header>
     );
 }

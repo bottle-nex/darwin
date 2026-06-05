@@ -94,12 +94,18 @@ export default class ResponseWriter {
     /**
      * Redirect envelope. Returns the target in `url` rather than issuing an
      * HTTP `Location` redirect, so SPA clients can decide how to navigate.
+     *
+     * Responds `200`, NOT a 3xx: the body is meant to be read by JS (e.g. axios
+     * `fetch`), and 3xx statuses are rejected by axios's default `validateStatus`
+     * (resolve only 2xx), which would surface as an error and skip the client's
+     * success handler. A real HTTP redirect would need a `Location` header, which
+     * this helper intentionally does not set.
      */
     static redirect(
         res: Response,
         url: string,
         message: string = "redirecting",
-        status_code: number = 302,
+        status_code: number = 200,
     ) {
         const response: CustomResponse = {
             success: true,

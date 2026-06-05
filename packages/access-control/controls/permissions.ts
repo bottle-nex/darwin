@@ -15,6 +15,7 @@ const ORG_PERMISSIONS: Record<OrgRole, Set<OrgAction>> = {
         Action.org.change_member_role,
         Action.org.manage_billing,
         Action.org.create_project,
+        Action.org.manage_connectors,
     ]),
     [OrgRole.Admin]: new Set([
         Action.org.read,
@@ -23,6 +24,7 @@ const ORG_PERMISSIONS: Record<OrgRole, Set<OrgAction>> = {
         Action.org.remove_member,
         Action.org.change_member_role,
         Action.org.create_project,
+        Action.org.manage_connectors,
     ]),
     [OrgRole.Member]: new Set([Action.org.read]),
     [OrgRole.Billing]: new Set([Action.org.read, Action.org.manage_billing]),

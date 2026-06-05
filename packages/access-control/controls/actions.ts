@@ -8,6 +8,7 @@ const Action = {
         change_member_role: "change_member_role",
         manage_billing: "manage_billing",
         create_project: "create_project",
+        manage_connectors: "manage_connectors",
     },
     project: {
         read: "read",

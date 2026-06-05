@@ -14,6 +14,14 @@ const body_schema = z.object({
         .max(50)
         .regex(/^[a-z0-9-]+$/, "Slug must be lowercase letters, numbers, and hyphens only"),
     description: z.string().optional(),
+    repo: z
+        .object({
+            githubRepoId: z.union([z.string(), z.number()]),
+            fullName: z.string().min(1),
+            htmlUrl: z.string().url(),
+            defaultBranch: z.string().min(1),
+        })
+        .optional(),
 });
 
 export default async function create_project_controller(req: Request, res: Response) {
@@ -24,7 +32,7 @@ export default async function create_project_controller(req: Request, res: Respo
             return;
         }
 
-        const { org_id, name, slug, description } = parsed.data;
+        const { org_id, name, slug, description, repo } = parsed.data;
         const user_id = req.user.id;
 
         const org_role = await Access.org(user_id, org_id);
@@ -36,6 +44,31 @@ export default async function create_project_controller(req: Request, res: Respo
             return;
         }
 
+        let repo_fields = {};
+        if (repo) {
+            const installation = await prisma.githubInstallation.findUnique({
+                where: { orgId: org_id },
+                select: { id: true },
+            });
+            if (!installation) {
+                ResponseWriter.custom(
+                    res,
+                    false,
+                    "NOT_CONNECTED",
+                    "Connect GitHub before attaching a repository to a project.",
+                    400,
+                );
+                return;
+            }
+            repo_fields = {
+                githubInstallationId: installation.id,
+                githubRepoId: BigInt(repo.githubRepoId),
+                githubRepoFullName: repo.fullName,
+                githubRepoUrl: repo.htmlUrl,
+                githubDefaultBranch: repo.defaultBranch,
+            };
+        }
+
         const project = await prisma.project.create({
             data: {
                 orgId: org_id,
@@ -44,6 +77,7 @@ export default async function create_project_controller(req: Request, res: Respo
                 description,
                 ownerId: user_id,
                 createdById: user_id,
+                ...repo_fields,
             },
             select: { id: true, name: true, slug: true },
         });

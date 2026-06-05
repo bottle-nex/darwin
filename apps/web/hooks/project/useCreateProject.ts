@@ -1,0 +1,37 @@
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiClient } from "@/lib/axios";
+import { CREATE_PROJECT } from "@/routes/api_routes";
+import { ORGANIZATIONS_QUERY_KEY } from "@/hooks/playground/useFetchOrganizations";
+import type { ApiResponse } from "@/types/api";
+
+export interface CreateProjectInput {
+    org_id: string;
+    name: string;
+    slug: string;
+    description?: string;
+    repo?: {
+        githubRepoId: string;
+        fullName: string;
+        htmlUrl: string;
+        defaultBranch: string;
+    };
+}
+
+interface CreatedProject {
+    id: string;
+    name: string;
+    slug: string;
+}
+
+export function useCreateProject() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async (input: CreateProjectInput) => {
+            const res = await apiClient.post<ApiResponse<CreatedProject>>(CREATE_PROJECT, input);
+            return res.data.data;
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ORGANIZATIONS_QUERY_KEY });
+        },
+    });
+}
