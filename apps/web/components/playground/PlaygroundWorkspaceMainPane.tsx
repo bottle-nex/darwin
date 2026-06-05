@@ -20,7 +20,7 @@ export default function PlaygroundWorkspaceMainPane() {
                 </p>
                 <Button
                     size="sm"
-                    className="mt-4 h-8 cursor-pointer rounded-full bg-neutral-200 px-4 text-[12px] font-medium text-neutral-900 hover:bg-white"
+                    className="mt-4 h-8 cursor-pointer rounded-[8px] bg-neutral-200 px-4 text-[12px] font-medium text-neutral-900 hover:bg-white"
                 >
                     Invite people
                 </Button>
