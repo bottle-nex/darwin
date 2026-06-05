@@ -23,7 +23,7 @@ interface AccessControlContext {
 
 const AccessControlContext = createContext<AccessControlContext | null>(null);
 
-export function AccessControlProvider({ children }: { children: React.ReactNode }) {
+export default function AccessControlProvider({ children }: { children: React.ReactNode }) {
     const [orgRole, setOrgRole] = useState<OrgRole | null>(null);
     const [projectRole, setProjectRole] = useState<ProjectRole | null>(null);
     const [teamRole, setTeamRole] = useState<TeamRole | null>(null);
