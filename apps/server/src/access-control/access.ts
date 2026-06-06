@@ -2,6 +2,14 @@ import { prisma } from "@trymatcha/database";
 import { OrgRole, ProjectRole, TeamRole } from "@trymatcha/types";
 import { Permissions } from "@trymatcha/access-control";
 
+const PROJECT_ROLE_RANK: Record<ProjectRole, number> = {
+    [ProjectRole.Admin]: 4,
+    [ProjectRole.Maintain]: 3,
+    [ProjectRole.Write]: 2,
+    [ProjectRole.Triage]: 1,
+    [ProjectRole.Read]: 0,
+};
+
 export default class Access {
     static async org(userId: string, orgId: string): Promise<OrgRole | null> {
         const member = await prisma.orgMember.findUnique({
@@ -23,21 +31,25 @@ export default class Access {
             }),
         ]);
 
-        if (team_member) return team_member.team.projectRole;
-
         if (!project) return null;
-        if (project.ownerId === userId) return ProjectRole.Admin;
+
+        const roles: ProjectRole[] = [];
+        if (team_member) roles.push(team_member.team.projectRole);
+        if (project.ownerId === userId) roles.push(ProjectRole.Admin);
 
         const org_member = await prisma.orgMember.findUnique({
             where: { orgId_userId: { orgId: project.orgId, userId } },
             select: { role: true },
         });
-
         if (org_member && Permissions.has_implicit_project_access(org_member.role)) {
-            return ProjectRole.Admin;
+            roles.push(ProjectRole.Admin);
         }
 
-        return null;
+        if (roles.length === 0) return null;
+
+        return roles.reduce((highest, role) =>
+            PROJECT_ROLE_RANK[role] > PROJECT_ROLE_RANK[highest] ? role : highest,
+        );
     }
 
     static async team(userId: string, teamId: string): Promise<TeamRole | null> {

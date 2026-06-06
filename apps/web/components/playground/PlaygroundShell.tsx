@@ -5,6 +5,7 @@ import PlaygroundIconRail from "@/components/playground/PlaygroundIconRail";
 import PlaygroundTopBar from "@/components/playground/PlaygroundTopBar";
 import PlaygroundWorkspace from "@/components/playground/PlaygroundWorkspace";
 import CreateTeamDialog from "@/components/team/CreateTeamDialog";
+import DeleteTeamDialog from "@/components/team/DeleteTeamDialog";
 import { useGetDashboard } from "@/hooks/dashboard/useGetDashboard";
 import { useGetProject } from "@/hooks/project/useGetProject";
 import { usePlaygroundSurfaceStore } from "@/store/playground/usePlaygroundSurfaceStore";
@@ -49,6 +50,7 @@ export default function PlaygroundShell() {
                 />
             </section>
             <CreateTeamDialog />
+            <DeleteTeamDialog />
         </main>
     );
 }

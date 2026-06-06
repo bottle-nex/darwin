@@ -2,13 +2,12 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { azeretMono, Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import AppLogo from "@/components/app/Applogo";
 import { FaDiscord, FaPhoneAlt } from "react-icons/fa";
 import { useUserSessionStore } from "@/store/user/useUserSessionStore";
 import SigninModal from "../utility/modal/SigninModal";
 import { PiArrowRight } from "react-icons/pi";
-import { ChevronRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 const NAV_ITEMS = [

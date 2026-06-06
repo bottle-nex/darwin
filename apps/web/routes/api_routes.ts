@@ -17,6 +17,8 @@ export const CREATE_PROJECT = API_URL + "/project/create";
 export const GET_PROJECT = (projectId: string) => `${API_URL}/project/${projectId}`;
 
 export const CREATE_TEAM = API_URL + "/teams/create";
+export const GET_TEAM_MEMBERS = (teamId: string) => `${API_URL}/teams/${teamId}/members`;
+export const DELETE_TEAM = (teamId: string) => `${API_URL}/teams/${teamId}`;
 
 export const GITHUB_URL = API_URL + "/github";
 export const GITHUB_CONNECT_START = GITHUB_URL + "/connect/start";

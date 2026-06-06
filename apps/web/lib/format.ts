@@ -25,6 +25,12 @@ export function formatRelativeTime(date: string | Date): string {
     return rtf.format(Math.round(duration), "year");
 }
 
+/** Absolute date, e.g. "Jan 10, 2025". */
+export function formatDate(date: string | Date): string {
+    const value = typeof date === "string" ? new Date(date) : date;
+    return value.toLocaleDateString("en-US", { month: "short", day: "2-digit", year: "numeric" });
+}
+
 /** Turn an organization name into a url-safe slug, e.g. "Acme Labs" -> "acme-labs". */
 export function slugify(name: string): string {
     return name

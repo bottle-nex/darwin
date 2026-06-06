@@ -1,6 +1,5 @@
 import { cn } from "@/lib/utils";
 
-/** Tone token → concrete background/text classes. */
 const AVATAR_TONE = {
     dark: "bg-neutral-800 text-white",
     indigo: "bg-indigo-500 text-white",
@@ -11,18 +10,21 @@ const AVATAR_TONE = {
 
 export type AvatarTone = keyof typeof AVATAR_TONE;
 
+const AVATAR_SIZE = {
+    sm: "size-4 text-[9px]",
+    md: "size-5 text-[11px]",
+    xl: "size-8 text-[14px]",
+} as const;
+
+export type AvatarSize = keyof typeof AVATAR_SIZE;
+
 type PlaygroundAvatarProps = {
     letter: string;
     tone: AvatarTone;
-    size?: "sm" | "md";
+    size?: AvatarSize;
     className?: string;
 };
 
-/**
- * Small letter avatar used across the playground — workspace logo, teams,
- * agents. Tone tokens map to concrete classes via AVATAR_TONE so usage sites
- * stay declarative.
- */
 export default function PlaygroundAvatar({
     letter,
     tone,
@@ -33,7 +35,7 @@ export default function PlaygroundAvatar({
         <span
             className={cn(
                 "inline-flex shrink-0 items-center justify-center rounded-[5px] font-semibold leading-none",
-                size === "sm" ? "size-4 text-[9px]" : "size-5 text-[11px]",
+                AVATAR_SIZE[size],
                 AVATAR_TONE[tone],
                 className,
             )}

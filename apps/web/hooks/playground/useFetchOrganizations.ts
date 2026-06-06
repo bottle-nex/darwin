@@ -1,7 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { apiClient } from "@/lib/axios";
 import { LIST_ORG } from "@/routes/api_routes";
-import { useUserSessionStore } from "@/store/user/useUserSessionStore";
 import type { ApiResponse } from "@/types/api";
 import type { Organization } from "@/types/organization";
 import SessionServices from "@/lib/session";
