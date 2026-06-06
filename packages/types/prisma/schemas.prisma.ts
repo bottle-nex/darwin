@@ -13,6 +13,8 @@ export interface User {
     ownedProjects?: Project[];
     createdProjects?: Project[];
     createdOrganizations?: Organization[];
+    createdIssues: Issue[];
+    assignedIssues: Issue[];
 
     createdAt: Date;
     updatedAt: Date;
@@ -91,3 +93,15 @@ export interface TeamMember {
     createdAt: Date;
     updatedAt: Date;
 }
+
+export interface Issue {
+    id: string;
+    createdById: string;
+    title: string;
+    description: string;
+
+    creator: User;
+    assignees: User[];
+
+}
+
