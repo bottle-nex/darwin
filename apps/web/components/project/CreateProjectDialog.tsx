@@ -37,11 +37,13 @@ type FormValues = {
 };
 
 export default function CreateProjectDialog() {
-    const { open, setOpen } = useNewProjectStore();
-    const { projectId } = useParams<{ projectId: string }>();
+    const { open, setOpen, targetOrgSlug, setTargetOrgSlug } = useNewProjectStore();
+    const { orgSlug: orgSlugParam } = useParams<{ orgSlug: string }>();
     const { data: organizations } = useFetchOrganizations();
 
-    const orgSlug = typeof projectId === "string" ? projectId : "";
+    // Off-route (e.g. the playground landing) the target org comes from the
+    // store; inside a workspace it falls back to the route param.
+    const orgSlug = targetOrgSlug ?? (typeof orgSlugParam === "string" ? orgSlugParam : "");
     const org = (organizations ?? []).find((o) => o.slug === orgSlug);
 
     const repos = useGithubRepos(org?.id, Boolean(org?.githubConnected));
@@ -88,6 +90,7 @@ export default function CreateProjectDialog() {
             setSlugEdited(false);
             setSelectedRepo(null);
             setRepoSearch("");
+            setTargetOrgSlug(null);
             createProject.reset();
         }
     }

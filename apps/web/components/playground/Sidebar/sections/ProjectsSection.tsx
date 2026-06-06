@@ -1,35 +1,27 @@
 "use client";
 import { Folder, Plus } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { useParams, useRouter } from "next/navigation";
 import Row from "../PlaygroundSidebarRow";
 import Section from "../PlaygroundSidebarSection";
+import { useGetDashboard } from "@/hooks/dashboard/useGetDashboard";
 import { matchesQuery, type SidebarNavRow, type SidebarSectionProps } from "./shared";
 
-type ProjectColor = "blue" | "yellow" | "emerald" | "red";
+const DEFAULT_FOLDER_COLOR = "#6366f1";
 
-const FOLDER_COLOR: Record<ProjectColor, string> = {
-    blue: "fill-indigo-700 text-indigo-700",
-    yellow: "fill-yellow-700 text-yellow-700",
-    emerald: "fill-emerald-700 text-emerald-700",
-    red: "fill-red-700 text-red-700",
-};
+// Projects are fetched per-org at render time, so they can't be listed statically
+// for keyboard-search navigation (mirrors the dynamic Favorites section).
+export const rows: SidebarNavRow[] = [];
 
-const PROJECTS: { id: string; name: string; suffix?: string; color: ProjectColor }[] = [
-    { id: "trymatcha-web", name: "trymatcha-web", suffix: "Piyush's Org", color: "blue" },
-    { id: "trymatcha-api", name: "trymatcha-api", color: "emerald" },
-    { id: "trymatcha-docs", name: "trymatcha-docs", color: "yellow" },
-    { id: "trymatcha-infra", name: "trymatcha-infra", color: "red" },
-];
+export default function PlaygroundSidebarProjectsSection({ query }: SidebarSectionProps) {
+    const router = useRouter();
+    const { orgSlug, projectSlug } = useParams<{
+        orgSlug: string;
+        projectSlug?: string;
+    }>();
+    const { data: dashboard } = useGetDashboard(orgSlug);
 
-export const rows: SidebarNavRow[] = PROJECTS.map((p) => ({ id: p.id, label: p.name }));
-
-export default function PlaygroundSidebarProjectsSection({
-    selectedRowId,
-    onSelect,
-    query,
-}: SidebarSectionProps) {
     const searching = query.trim().length > 0;
-    const projects = PROJECTS.filter((p) => matchesQuery(p.name, query));
+    const projects = (dashboard?.projects ?? []).filter((p) => matchesQuery(p.name, query));
     if (searching && projects.length === 0) return null;
 
     return (
@@ -39,18 +31,21 @@ export default function PlaygroundSidebarProjectsSection({
                     <Row
                         key={p.id}
                         label={p.name}
-                        suffix={p.suffix}
                         leading={{
                             kind: "node",
                             node: (
                                 <Folder
-                                    className={cn("size-3.5", FOLDER_COLOR[p.color])}
+                                    className="size-3.5"
+                                    style={{
+                                        color: p.color ?? DEFAULT_FOLDER_COLOR,
+                                        fill: p.color ?? DEFAULT_FOLDER_COLOR,
+                                    }}
                                     aria-hidden
                                 />
                             ),
                         }}
-                        active={selectedRowId === p.id}
-                        onClick={() => onSelect(p.id)}
+                        active={p.slug === projectSlug}
+                        onClick={() => router.push(`/playground/${orgSlug}/${p.slug}`)}
                     />
                 ))}
                 {!searching && <Row label="Add Project" leading={{ kind: "icon", icon: Plus }} />}

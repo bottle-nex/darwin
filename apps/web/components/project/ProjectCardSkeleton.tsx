@@ -1,6 +1,6 @@
-export default function OrganizationCardSkeleton() {
+export default function ProjectCardSkeleton() {
     return (
-        <div className="flex w-full animate-pulse flex-col gap-4 rounded-sm border border-neutral-800 bg-neutral-900 p-5">
+        <div className="flex w-full animate-pulse flex-col gap-4 rounded-sm bg-neutral-900 p-5">
             <div className="flex items-start justify-between gap-3">
                 <div className="flex min-w-0 items-center gap-3">
                     <div className="size-8 shrink-0 rounded-md bg-neutral-800" />
@@ -17,7 +17,7 @@ export default function OrganizationCardSkeleton() {
                 <div className="h-3 w-3/4 rounded bg-neutral-800" />
             </div>
 
-            <div className="flex items-center gap-4 border-t border-white/6 pt-3">
+            <div className="flex items-center gap-4 pt-3">
                 <div className="h-3 w-16 rounded bg-neutral-800" />
                 <div className="h-3 w-16 rounded bg-neutral-800" />
                 <div className="ml-auto h-3 w-12 rounded bg-neutral-800" />

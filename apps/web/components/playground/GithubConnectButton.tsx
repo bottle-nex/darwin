@@ -13,12 +13,12 @@ import { Button } from "../ui/button";
  * the route slug, matching {@link PlaygroundOrgSwitcher}.
  */
 export default function GithubConnectButton() {
-    const { projectId } = useParams<{ projectId: string }>();
+    const { orgSlug } = useParams<{ orgSlug: string }>();
     const { data: organizations } = useFetchOrganizations();
     const connect = useConnectGithub();
     const disconnect = useDisconnectGithub();
 
-    const slug = typeof projectId === "string" ? projectId : "";
+    const slug = typeof orgSlug === "string" ? orgSlug : "";
     const org = (organizations ?? []).find((o) => o.slug === slug);
 
     if (!org) return null;

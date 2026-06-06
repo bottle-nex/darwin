@@ -9,10 +9,10 @@ import PlaygroundAvatar from "./PlaygroundAvatar";
 /** Top-bar workspace switcher — shows the active org and lets you jump to another. */
 export default function PlaygroundOrgSwitcher() {
     const router = useRouter();
-    const { projectId } = useParams<{ projectId: string }>();
+    const { orgSlug } = useParams<{ orgSlug: string }>();
     const { data: organizations } = useFetchOrganizations();
 
-    const slug = typeof projectId === "string" ? projectId : "";
+    const slug = typeof orgSlug === "string" ? orgSlug : "";
     const orgs = organizations ?? [];
     const currentName = orgs.find((o) => o.slug === slug)?.name ?? slug ?? "Workspace";
     const letter = currentName.trim().charAt(0).toUpperCase() || "W";

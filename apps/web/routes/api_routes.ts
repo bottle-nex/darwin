@@ -11,8 +11,10 @@ export const LIST_ORG = API_URL + "/org";
 export const CREATE_ORG = API_URL + "/org/create";
 export const PLAYGROUND_URL = API_URL + "/playground";
 export const PRELOAD_URL = PLAYGROUND_URL + "/preload";
+export const DASHBOARD_URL = (orgSlug: string) => `${PLAYGROUND_URL}/dashboard/${orgSlug}`;
 
 export const CREATE_PROJECT = API_URL + "/project/create";
+export const GET_PROJECT = (projectId: string) => `${API_URL}/project/${projectId}`;
 
 export const GITHUB_URL = API_URL + "/github";
 export const GITHUB_CONNECT_START = GITHUB_URL + "/connect/start";

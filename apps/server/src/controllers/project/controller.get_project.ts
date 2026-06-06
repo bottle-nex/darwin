@@ -33,6 +33,7 @@ export default async function get_project_controller(req: Request, res: Response
                 name: true,
                 slug: true,
                 description: true,
+                color: true,
                 ownerId: true,
                 createdAt: true,
                 updatedAt: true,

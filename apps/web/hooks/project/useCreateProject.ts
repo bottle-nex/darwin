@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/lib/axios";
 import { CREATE_PROJECT } from "@/routes/api_routes";
 import { ORGANIZATIONS_QUERY_KEY } from "@/hooks/playground/useFetchOrganizations";
+import { DASHBOARD_QUERY_KEY } from "@/hooks/dashboard/useGetDashboard";
 import type { ApiResponse } from "@/types/api";
 
 export interface CreateProjectInput {
@@ -32,6 +33,7 @@ export function useCreateProject() {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ORGANIZATIONS_QUERY_KEY });
+            queryClient.invalidateQueries({ queryKey: DASHBOARD_QUERY_KEY });
         },
     });
 }
