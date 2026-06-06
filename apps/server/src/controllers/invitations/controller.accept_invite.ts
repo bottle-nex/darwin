@@ -17,14 +17,15 @@ export default class AcceptInviteController {
 
         try {
             const userId = req.user.id;
-            // Only the hash is stored, so hash the raw token from the URL before lookup.
+            const userEmail = req.user.email.toLowerCase();
+
             const token = createHash("sha256").update(parsed.data.token).digest("hex");
 
             const invitation = await prisma.invitation.findUnique({
                 where: { token },
                 select: {
                     id: true,
-                    userId: true,
+                    email: true,
                     orgId: true,
                     teamId: true,
                     status: true,
@@ -35,8 +36,10 @@ export default class AcceptInviteController {
                 return ResponseWriter.not_found(res, "invitation not found");
             }
 
-            // The invite is bound to a specific user; only that user may accept it.
-            if (invitation.userId !== userId) {
+            // The invite is bound to an email (the recipient may not have had an
+            // account when it was sent), so authorize on the accepting user's
+            // verified email rather than a pre-assigned userId.
+            if (invitation.email.toLowerCase() !== userEmail) {
                 return ResponseWriter.not_authorized(res, "this invitation is not for you");
             }
             if (invitation.status !== InvitationStatus.Pending) {
@@ -80,7 +83,9 @@ export default class AcceptInviteController {
 
                 await tx.invitation.update({
                     where: { id: invitation.id },
-                    data: { status: InvitationStatus.Accepted },
+                    // Stamp the now-known account onto the invite (it may have been
+                    // sent before the recipient signed up).
+                    data: { status: InvitationStatus.Accepted, userId },
                 });
             });
 

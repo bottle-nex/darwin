@@ -13,6 +13,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from "../../ui/dialog";
+import { IoCloseOutline } from "react-icons/io5";
 import { useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
@@ -31,13 +32,19 @@ const signin_options: SigninOptions[] = [
     { type: "github", image: "/images/github.png" },
 ];
 
-export default function SigninModal() {
+interface SigninModalProps {
+    // Where to land after OAuth sign-in. Defaults to the home page; the invite page
+    // passes its own URL so OAuth returns the user to the invitation.
+    callbackUrl?: string;
+}
+
+export default function SigninModal({ callbackUrl = "/" }: SigninModalProps) {
     const { openSigninModal, setOpenSigninModal } = useUserSessionStore();
-    const [email, setEmail] = useState("");
-    const [otp, setOtp] = useState("");
+    const [email, setEmail] = useState<string>("");
+    const [otp, setOtp] = useState<string>("");
     const [step, setStep] = useState<"email" | "otp">("email");
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState("");
+    const [loading, setLoading] = useState<boolean>(false);
+    const [error, setError] = useState<string>("");
     const router = useRouter();
 
     function handleOpenChange(open: boolean) {
@@ -50,7 +57,7 @@ export default function SigninModal() {
     }
 
     function singinHandler(type: "github" | "google" | "facebook") {
-        signIn(type, { callbackUrl: "/" });
+        signIn(type, { callbackUrl });
     }
 
     async function handleSendOtp() {
@@ -103,20 +110,24 @@ export default function SigninModal() {
                         className="object-cover"
                         aria-hidden
                     />
-                    <div className="relative flex h-full flex-col justify-between p-6">
-                        <div className="flex items-center gap-x-2">
-                            <span
-                                className="flex size-6 items-center justify-center rounded-md shadow-sm"
-                                style={{
-                                    background: `linear-gradient(135deg, ${ACCENT}, #bcdb6f)`,
-                                }}
-                                aria-hidden
-                            >
-                                <span className="size-2 rounded-full bg-[#1a2e05]/80" />
-                            </span>
-                            <span className="text-sm font-semibold tracking-tight text-white">
-                                matcha
-                            </span>
+                    <div className="absolute inset-0 bg-black/40" aria-hidden />
+                    <div className="relative flex h-full flex-col justify-between p-5.5">
+                        <div className="flex items-center justify-between gap-x-2 w-full">
+                            <div className="flex items-center gap-x-2">
+                                <span
+                                    className="flex size-6 items-center justify-center rounded-md shadow-sm"
+                                    style={{
+                                        background: `linear-gradient(135deg, ${ACCENT}, #bcdb6f)`,
+                                    }}
+                                    aria-hidden
+                                >
+                                    <span className="size-2 rounded-full bg-[#1a2e05]/80" />
+                                </span>
+                                <span className="text-sm font-semibold tracking-tight text-white">
+                                    matcha
+                                </span>
+                            </div>
+
                         </div>
 
                         <div>
@@ -255,7 +266,7 @@ export default function SigninModal() {
 
                 <div className="border-t border-border bg-surface/50 px-6 py-3.5">
                     <p className="text-center text-xs text-muted-foreground">
-                        New to matcha? Just enter your email — we&apos;ll create your account.
+                        New to matcha? Just enter your email & we&apos;ll create your account.
                     </p>
                 </div>
             </DialogContent>

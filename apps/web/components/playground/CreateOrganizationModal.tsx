@@ -48,7 +48,7 @@ export default function CreateOrganizationModal({
 
     const queryClient = useQueryClient();
     const { mutate, isPending } = useCreateOrganization();
-    const [slugEdited, setSlugEdited] = useState(false);
+    const [slugEdited, setSlugEdited] = useState<boolean>(false);
     const name = useWatch({ control, name: "name" });
     const description = useWatch({ control, name: "description" });
 

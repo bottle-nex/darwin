@@ -68,7 +68,9 @@ export default class InviteMembersController {
                 }
             }
 
-            const requested_emails = [...new Set(emails)];
+            // Invites are keyed by email so they can be sent before the recipient
+            // signs up; normalize to lowercase to match how accounts store email.
+            const requested_emails = [...new Set(emails.map((e) => e.toLowerCase()))];
             const users = await prisma.user.findMany({
                 where: { email: { in: requested_emails } },
                 select: { id: true, email: true },
@@ -76,8 +78,9 @@ export default class InviteMembersController {
             const user_by_email = new Map(users.map((u) => [u.email, u]));
             const user_ids = users.map((u) => u.id);
 
-            // Anyone already in the target scope, and anyone already holding a live
-            // invite to it, is skipped rather than re-invited.
+            // Anyone already in the target scope (only accounts can be members), and
+            // anyone already holding a live invite to it, is skipped rather than
+            // re-invited. Membership is checked by userId, pending invites by email.
             const [members, pending_invites] = await Promise.all([
                 is_team_invite
                     ? prisma.teamMember.findMany({
@@ -93,13 +96,13 @@ export default class InviteMembersController {
                         orgId,
                         teamId: teamId ?? null,
                         status: InvitationStatus.Pending,
-                        userId: { in: user_ids },
+                        email: { in: requested_emails },
                     },
-                    select: { userId: true },
+                    select: { email: true },
                 }),
             ]);
             const member_ids = new Set(members.map((m) => m.userId));
-            const pending_ids = new Set(pending_invites.map((i) => i.userId));
+            const pending_emails = new Set(pending_invites.map((i) => i.email));
 
             const expires_at = new Date(
                 Date.now() + ENV.INVITATION_URL_TTL_DAYS * 24 * 60 * 60 * 1000,
@@ -112,16 +115,14 @@ export default class InviteMembersController {
 
             for (const email of requested_emails) {
                 const user = user_by_email.get(email);
-                if (!user) {
-                    failed.push({ email, reason: "no_account" });
-                    continue;
-                }
-                if (member_ids.has(user.id)) {
-                    failed.push({ email, reason: "already_member" });
-                    continue;
-                }
-                if (pending_ids.has(user.id)) {
+                if (pending_emails.has(email)) {
                     failed.push({ email, reason: "already_invited" });
+                    continue;
+                }
+                // Only existing accounts can already be members; an email with no
+                // account simply gets invited and is linked on accept.
+                if (user && member_ids.has(user.id)) {
+                    failed.push({ email, reason: "already_member" });
                     continue;
                 }
 
@@ -133,7 +134,8 @@ export default class InviteMembersController {
                 const token = createHash("sha256").update(raw_token).digest("hex");
                 to_create.push({
                     email,
-                    userId: user.id,
+                    // Linked now if the account exists, otherwise stamped on accept.
+                    userId: user?.id ?? null,
                     token,
                     orgId,
                     teamId: teamId ?? null,

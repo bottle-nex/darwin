@@ -132,24 +132,30 @@ model TeamMember {
 model Invitation {
   id          String           @id @default(cuid())
   email       String
-  userId      String
+  // Null until the invited email has a matching account: invites are bound to an
+  // email so they can be sent before the recipient signs up, and userId is stamped
+  // when the invite is accepted (or when the account already exists at send time).
   token       String           @unique @default(cuid())
-  orgId       String
-  teamId      String? // null = org invite, set = team invite
   status      InvitationStatus @default(Pending)
-  invitedById String
   expiresAt   DateTime
 
-  user         User         @relation("InviteRecipient", fields: [userId], references: [id], onDelete: Cascade)
+  userId      String?
+  user         User?        @relation("InviteRecipient", fields: [userId], references: [id], onDelete: SetNull)
+
+  invitedById String
   invitedBy    User         @relation("InviteSender", fields: [invitedById], references: [id], onDelete: Cascade)
+
+  orgId       String
   organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  
+  teamId      String? // null = org invite, set = team invite
   team         Team?        @relation(fields: [teamId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@unique([userId, orgId, teamId])
-  @@index([userId, status])
+  @@unique([email, orgId, teamId])
+  @@index([email, status])
 }
 
 model GithubInstallation {
