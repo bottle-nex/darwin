@@ -3,7 +3,7 @@ import { apiClient } from "@/lib/axios";
 import { GET_TEAM_MEMBERS } from "@/routes/api_routes";
 import { useUserSessionStore } from "@/store/user/useUserSessionStore";
 import type { ApiResponse } from "@/types/api";
-import type { TeamMemberDetail } from "@/types/team";
+import type { TeamMembersData } from "@/types/team";
 
 export const TEAM_MEMBERS_QUERY_KEY = ["team-members"] as const;
 
@@ -13,10 +13,10 @@ export function useGetTeamMembers(teamId: string | undefined) {
         queryKey: [...TEAM_MEMBERS_QUERY_KEY, teamId],
         enabled: Boolean(token) && Boolean(teamId),
         queryFn: async () => {
-            const res = await apiClient.get<ApiResponse<{ members: TeamMemberDetail[] }>>(
+            const res = await apiClient.get<ApiResponse<TeamMembersData>>(
                 GET_TEAM_MEMBERS(teamId!),
             );
-            return res.data.data.members;
+            return res.data.data;
         },
     });
 }

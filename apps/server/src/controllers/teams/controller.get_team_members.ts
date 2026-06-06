@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { z } from "zod";
-import { prisma } from "@trymatcha/database";
+import { InvitationStatus, prisma } from "@trymatcha/database";
 import ResponseWriter from "../../services/service.response";
 import Access from "../../access-control/access";
 import { Action, Permissions } from "@trymatcha/access-control";
@@ -33,25 +33,30 @@ export default class GetTeamMembersController {
                 return ResponseWriter.not_authorized(res, "You don't have access to this team");
             }
 
-            const members = await prisma.teamMember.findMany({
-                where: { teamId },
-                select: {
-                    id: true,
-                    role: true,
-                    createdAt: true,
-                    user: {
-                        select: {
-                            id: true,
-                            name: true,
-                            email: true,
-                            image: true,
+            const [members, pendingInvites] = await Promise.all([
+                prisma.teamMember.findMany({
+                    where: { teamId },
+                    select: {
+                        id: true,
+                        role: true,
+                        createdAt: true,
+                        user: {
+                            select: {
+                                id: true,
+                                name: true,
+                                email: true,
+                                image: true,
+                            },
                         },
                     },
-                },
-                orderBy: { createdAt: "asc" },
-            });
+                    orderBy: { createdAt: "asc" },
+                }),
+                prisma.invitation.count({
+                    where: { teamId, status: InvitationStatus.Pending },
+                }),
+            ]);
 
-            ResponseWriter.success(res, { members });
+            ResponseWriter.success(res, { members, pendingInvites });
         } catch (error) {
             console.error("error in get_team_members controller:", error);
             ResponseWriter.system_error(res);

@@ -3,7 +3,6 @@ import { Trash2, X } from "lucide-react";
 import type { ProjectTeam } from "@/types/project";
 import { useDeleteTeamStore } from "@/store/team/useDeleteTeamStore";
 import PlaygroundAvatar from "../PlaygroundAvatar";
-import { TEAM_STATS } from "./data";
 import PlaygroundTeamStats from "./PlaygroundTeamStats";
 import PlaygroundTeamMembers from "./PlaygroundTeamMembers";
 
@@ -53,7 +52,7 @@ export default function PlaygroundTeamViewMain({ team, onClose }: PlaygroundTeam
                 data-lenis-prevent
                 className="flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto px-5 py-5"
             >
-                <PlaygroundTeamStats stats={TEAM_STATS} />
+                <PlaygroundTeamStats teamId={team.id} />
                 <PlaygroundTeamMembers teamId={team.id} />
             </div>
         </div>

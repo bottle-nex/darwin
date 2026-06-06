@@ -11,3 +11,8 @@ export interface TeamMemberDetail {
         image: string | null;
     };
 }
+
+export interface TeamMembersData {
+    members: TeamMemberDetail[];
+    pendingInvites: number;
+}

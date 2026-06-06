@@ -4,7 +4,8 @@ import { useGetTeamMembers } from "@/hooks/team/useGetTeamMembers";
 import PlaygroundTeamMemberRow from "./PlaygroundTeamMemberRow";
 
 export default function PlaygroundTeamMembers({ teamId }: { teamId: string }) {
-    const { data: members, isLoading, isError } = useGetTeamMembers(teamId);
+    const { data, isLoading, isError } = useGetTeamMembers(teamId);
+    const members = data?.members;
 
     return (
         <section className="rounded-xl ring-1 ring-white/5 bg-charcoal p-3">
