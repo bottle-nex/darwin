@@ -12,7 +12,7 @@ invitations_router.post("/invite", require_auth, InviteMembersController.process
 invitations_router.post("/accept", require_auth, AcceptInviteController.process);
 invitations_router.post("/reject", require_auth, RejectInviteController.process);
 
-invitations_router.get("/:token", requireAuth, GetInviteController.process);
-invitations_router.get("/", requireAuth, ListInvitesController.process);
+invitations_router.get("/:token", require_auth, GetInviteController.process);
+invitations_router.get("/", require_auth, ListInvitesController.process);
 
 export default invitations_router;

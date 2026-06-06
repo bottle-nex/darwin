@@ -15,8 +15,6 @@ const body_schema = z
         projectId: z.string().optional(),
         teamId: z.string().optional(),
     })
-    // A team invite needs the full org > project > team chain; an org invite has
-    // neither. Reject the half-specified cases (only one of project/team).
     .refine((d) => Boolean(d.projectId) === Boolean(d.teamId), {
         message: "projectId and teamId must be provided together",
         path: ["teamId"],
@@ -34,7 +32,6 @@ export default class InviteMembersController {
             const invitedById = req.user.id;
             const is_team_invite = Boolean(teamId);
 
-            // Team invites need team add_member; org invites need org invite_member.
             if (teamId) {
                 const role = await Access.team(invitedById, teamId);
                 if (!role || !Permissions.team(role, Action.team.add_member)) {
@@ -55,8 +52,6 @@ export default class InviteMembersController {
                 return ResponseWriter.not_found(res, "organization not found");
             }
 
-            // Validate the full org > project > team chain so a caller authorized on
-            // this org can't invite into a team that lives under a different org/project.
             let team: { id: string; name: string } | null = null;
             if (teamId) {
                 team = await prisma.team.findFirst({
@@ -68,8 +63,6 @@ export default class InviteMembersController {
                 }
             }
 
-            // Invites are keyed by email so they can be sent before the recipient
-            // signs up; normalize to lowercase to match how accounts store email.
             const requested_emails = [...new Set(emails.map((e) => e.toLowerCase()))];
             const users = await prisma.user.findMany({
                 where: { email: { in: requested_emails } },
@@ -78,9 +71,6 @@ export default class InviteMembersController {
             const user_by_email = new Map(users.map((u) => [u.email, u]));
             const user_ids = users.map((u) => u.id);
 
-            // Anyone already in the target scope (only accounts can be members), and
-            // anyone already holding a live invite to it, is skipped rather than
-            // re-invited. Membership is checked by userId, pending invites by email.
             const [members, pending_invites] = await Promise.all([
                 is_team_invite
                     ? prisma.teamMember.findMany({
@@ -119,22 +109,16 @@ export default class InviteMembersController {
                     failed.push({ email, reason: "already_invited" });
                     continue;
                 }
-                // Only existing accounts can already be members; an email with no
-                // account simply gets invited and is linked on accept.
                 if (user && member_ids.has(user.id)) {
                     failed.push({ email, reason: "already_member" });
                     continue;
                 }
 
-                // The raw token goes in the email URL; only its SHA-256 hash is
-                // stored, so a DB leak can't be used to accept invites. The token is
-                // already high-entropy, so a fast deterministic hash (indexable for
-                // single-query lookup) is enough — no bcrypt needed.
                 const raw_token = randomBytes(32).toString("hex");
                 const token = createHash("sha256").update(raw_token).digest("hex");
+
                 to_create.push({
                     email,
-                    // Linked now if the account exists, otherwise stamped on accept.
                     userId: user?.id ?? null,
                     token,
                     orgId,
@@ -149,9 +133,6 @@ export default class InviteMembersController {
             if (to_create.length > 0) {
                 await prisma.invitation.createMany({ data: to_create });
 
-                // Fire-and-forget: the invite rows are committed, so don't block the
-                // response on email delivery. Failures only get logged (and can be
-                // resent later) — they were never part of the response anyway.
                 void Promise.allSettled(
                     to_email.map(({ email, token }) =>
                         inviteMember(

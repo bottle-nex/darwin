@@ -5,6 +5,8 @@ import { useUserSessionStore } from "@/store/user/useUserSessionStore";
 import type { ApiResponse } from "@/types/api";
 import type { ProjectDetail } from "@/types/project";
 
+export const PROJECT_QUERY_KEY = ["project"] as const;
+
 /**
  * Fetch a single project (with its teams) by id. Only runs once the user is
  * authenticated and a `projectId` is known.
@@ -12,7 +14,7 @@ import type { ProjectDetail } from "@/types/project";
 export function useGetProject(projectId: string | undefined) {
     const token = useUserSessionStore((s) => s.session?.user?.token);
     return useQuery({
-        queryKey: ["project", projectId],
+        queryKey: [...PROJECT_QUERY_KEY, projectId],
         enabled: Boolean(token) && Boolean(projectId),
         queryFn: async () => {
             const res = await apiClient.get<ApiResponse<ProjectDetail>>(GET_PROJECT(projectId!));

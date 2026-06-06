@@ -2,11 +2,12 @@
 import { useState } from "react";
 import { useParams } from "next/navigation";
 import PlaygroundIconRail from "@/components/playground/PlaygroundIconRail";
-import { RailSurface } from "@/components/playground/IconRail/railSurface";
 import PlaygroundTopBar from "@/components/playground/PlaygroundTopBar";
 import PlaygroundWorkspace from "@/components/playground/PlaygroundWorkspace";
+import CreateTeamDialog from "@/components/team/CreateTeamDialog";
 import { useGetDashboard } from "@/hooks/dashboard/useGetDashboard";
 import { useGetProject } from "@/hooks/project/useGetProject";
+import { usePlaygroundSurfaceStore } from "@/store/playground/usePlaygroundSurfaceStore";
 
 /**
  * Shared playground workspace shell rendered by both the org route
@@ -22,7 +23,8 @@ export default function PlaygroundShell() {
     }>();
 
     const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(false);
-    const [activeSurface, setActiveSurface] = useState<RailSurface>(RailSurface.Home);
+    const surface = usePlaygroundSurfaceStore((s) => s.surface);
+    const setSurface = usePlaygroundSurfaceStore((s) => s.setSurface);
 
     const { data: dashboard } = useGetDashboard(orgSlug);
     const activeProject = projectSlug
@@ -31,21 +33,22 @@ export default function PlaygroundShell() {
     useGetProject(activeProject?.id);
 
     return (
-        <main className="flex h-screen flex-col overflow-hidden bg-[#0c0c0c] text-neutral-100 pt-px">
+        <main className="flex h-screen flex-col overflow-hidden bg-linear-to-br from-cement to-primary/10 text-neutral-100 pt-px">
             <PlaygroundTopBar />
             <section className="flex flex-1 min-h-0 gap-2 p-2 pt-px">
                 <PlaygroundIconRail
-                    activeSurface={activeSurface}
-                    onSelectSurface={setActiveSurface}
+                    activeSurface={surface}
+                    onSelectSurface={setSurface}
                     sidebarCollapsed={sidebarCollapsed}
                     onExpandSidebar={() => setSidebarCollapsed(false)}
                 />
                 <PlaygroundWorkspace
-                    surface={activeSurface}
+                    surface={surface}
                     sidebarCollapsed={sidebarCollapsed}
                     onCollapseSidebar={() => setSidebarCollapsed(true)}
                 />
             </section>
+            <CreateTeamDialog />
         </main>
     );
 }

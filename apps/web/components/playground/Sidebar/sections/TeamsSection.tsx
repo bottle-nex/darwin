@@ -1,52 +1,55 @@
 "use client";
 
-import { UserPlus } from "lucide-react";
+import { Plus } from "lucide-react";
+import { useParams } from "next/navigation";
 import Row from "../PlaygroundSidebarRow";
 import Section from "../PlaygroundSidebarSection";
-import {
-    matchesQuery,
-    rowLeading,
-    type LeadingSpec,
-    type SidebarNavRow,
-    type SidebarSectionProps,
-} from "./shared";
+import { useGetDashboard } from "@/hooks/dashboard/useGetDashboard";
+import { useGetProject } from "@/hooks/project/useGetProject";
+import { useNewTeamStore } from "@/store/team/useNewTeamStore";
+import { matchesQuery, rowLeading, type SidebarNavRow, type SidebarSectionProps } from "./shared";
 
-// Org-level groupings that own projects and issues.
-const TEAMS: { id: string; name: string; suffix?: string; leading: LeadingSpec }[] = [
-    {
-        id: "team-frontend",
-        name: "Frontend",
-        leading: { kind: "avatar", letter: "F", tone: "indigo" },
-    },
-    { id: "team-backend", name: "Backend", leading: { kind: "avatar", letter: "B", tone: "dark" } },
-];
+export const rows: SidebarNavRow[] = [];
 
-export const rows: SidebarNavRow[] = TEAMS.map((t) => ({ id: t.id, label: t.name }));
+export default function PlaygroundSidebarTeamsSection({ query }: SidebarSectionProps) {
+    const { orgSlug, projectSlug } = useParams<{ orgSlug: string; projectSlug?: string }>();
+    const { data: dashboard } = useGetDashboard(orgSlug);
+    const activeProject = projectSlug
+        ? dashboard?.projects.find((p) => p.slug === projectSlug)
+        : undefined;
+    const { data: project } = useGetProject(activeProject?.id);
+    const { setOpen, setTargetProjectId } = useNewTeamStore();
 
-export default function PlaygroundSidebarTeamsSection({
-    selectedRowId,
-    onSelect,
-    query,
-}: SidebarSectionProps) {
     const searching = query.trim().length > 0;
-    const rows = TEAMS.filter((t) => matchesQuery(t.name, query));
-    if (searching && rows.length === 0) return null;
+    const teams = (project?.teams ?? []).filter((t) => matchesQuery(t.name, query));
+    if (searching && teams.length === 0) return null;
+
+    function openCreateTeam() {
+        if (!activeProject) return;
+        setTargetProjectId(activeProject.id);
+        setOpen(true);
+    }
 
     return (
         <div className="mt-3">
             <Section title="Teams">
-                {rows.map((t) => (
+                {teams.map((t) => (
                     <Row
                         key={t.id}
                         label={t.name}
-                        suffix={t.suffix}
-                        leading={rowLeading(t.leading)}
-                        active={selectedRowId === t.id}
-                        onClick={() => onSelect(t.id)}
+                        leading={rowLeading({
+                            kind: "avatar",
+                            letter: t.name.trim().charAt(0).toUpperCase(),
+                            tone: "indigo",
+                        })}
                     />
                 ))}
                 {!searching && (
-                    <Row label="Invite to team" leading={{ kind: "icon", icon: UserPlus }} />
+                    <Row
+                        label="Add team"
+                        leading={{ kind: "icon", icon: Plus }}
+                        onClick={openCreateTeam}
+                    />
                 )}
             </Section>
         </div>

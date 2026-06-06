@@ -10,6 +10,8 @@
     /* deepest dark — page base in dark mode */
     --color-charcoal: #121212;
     /* lighter dark — cards/surfaces in dark mode */
+    --color-cement: #0c0c0c;
+    /* lighter dark — playground bg in dark mode */
     --color-snow: #fafafa;
     /* lightest — page base in light mode */
     --color-mist: #f4f4f4;

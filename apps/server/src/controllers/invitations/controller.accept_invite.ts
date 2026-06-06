@@ -32,6 +32,7 @@ export default class AcceptInviteController {
                     expiresAt: true,
                 },
             });
+
             if (!invitation) {
                 return ResponseWriter.not_found(res, "invitation not found");
             }

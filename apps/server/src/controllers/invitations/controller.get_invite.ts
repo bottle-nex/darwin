@@ -18,6 +18,7 @@ export default class GetInviteController {
 
         try {
             const user_email = req.user.email.toLowerCase();
+
             const token = createHash("sha256").update(data.token).digest("hex");
 
             const invitation = await prisma.invitation.findUnique({

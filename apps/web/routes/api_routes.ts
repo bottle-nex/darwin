@@ -16,6 +16,8 @@ export const DASHBOARD_URL = (orgSlug: string) => `${PLAYGROUND_URL}/dashboard/$
 export const CREATE_PROJECT = API_URL + "/project/create";
 export const GET_PROJECT = (projectId: string) => `${API_URL}/project/${projectId}`;
 
+export const CREATE_TEAM = API_URL + "/teams/create";
+
 export const GITHUB_URL = API_URL + "/github";
 export const GITHUB_CONNECT_START = GITHUB_URL + "/connect/start";
 export const GITHUB_CONNECT_COMPLETE = GITHUB_URL + "/connect/complete";
@@ -25,6 +27,6 @@ export const GITHUB_REPOS = (orgId: string) => `${GITHUB_URL}/installations/${or
 // <----------------- INVITATION ROUTES ----------------->
 export const INVITATIONS_URL = API_URL + "/invitations";
 export const LIST_INVITES_URL = INVITATIONS_URL;
-export const ACCEPT_INVITE_URL = INVITATIONS_URL + '/accept';
-export const REJECT_INVITE_URL = INVITATIONS_URL + '/reject';
+export const ACCEPT_INVITE_URL = INVITATIONS_URL + "/accept";
+export const REJECT_INVITE_URL = INVITATIONS_URL + "/reject";
 export const INVITES_PREVIEW_URL = (token: string) => `${INVITATIONS_URL}/${token}`;

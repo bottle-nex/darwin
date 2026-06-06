@@ -18,7 +18,7 @@ export default function PlaygroundWorkspace({
     onCollapseSidebar,
 }: PlaygroundWorkspaceProps) {
     return (
-        <div className="flex flex-1 min-w-0 overflow-hidden rounded-lg ring-1 ring-white/6">
+        <div className="flex flex-1 min-w-0 overflow-hidden rounded-lg ring-1 ring-white/6 bg-cement/60 backdrop-blur-md">
             <AnimatePresence initial={false}>
                 {!sidebarCollapsed && (
                     <motion.div

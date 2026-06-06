@@ -75,7 +75,6 @@ model Project {
   createdById String?
   color       String?
 
-  githubInstallationId String?
   githubRepoId         BigInt?
   githubRepoFullName   String?
   githubRepoUrl        String?
@@ -85,6 +84,8 @@ model Project {
   owner              User                @relation("ProjectOwner", fields: [ownerId], references: [id], onDelete: Restrict)
   createdBy          User?               @relation("ProjectCreator", fields: [createdById], references: [id], onDelete: SetNull)
   teams              Team[]
+  
+  githubInstallationId String?
   githubInstallation GithubInstallation? @relation(fields: [githubInstallationId], references: [id], onDelete: SetNull)
 
   createdAt DateTime @default(now())

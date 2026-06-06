@@ -2,7 +2,6 @@ import { Router } from "express";
 import auth_router from "../auth/router.auth";
 import playground_router from "../playground/router.playground";
 import org_router from "../org/router.org";
-import project_router from "../project/router.project";
 import teams_router from "../teams/router.teams";
 import invitations_router from "../invitations/router.invitations";
 import github_router from "../github/router.github";
