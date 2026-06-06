@@ -18,6 +18,7 @@ const envSchema = z.object({
     SERVER_OTP_COOLDOWN_SECONDS: z.coerce.number().default(60),
     SERVER_OTP_MAX_ATTEMPTS: z.coerce.number().default(5),
     SERVER_RESEND_API_KEY: z.string().min(1, "Resend api key is required"),
+    SERVER_EMAIL_FROM: z.string().min(1).default("matcha <noreply@nocturn.app>"),
     SERVER_WEB_URL: z.string().min(1, "Web URL is required"),
     DATABASE_URL: z.string().min(1, "Database URL is required"),
     SERVER_GITHUB_APP_ID: z.string().min(1, "GitHub App ID is required"),

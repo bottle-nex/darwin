@@ -5,6 +5,30 @@ import { Action, Permissions } from "@trymatcha/access-control";
 import Access from "../../access-control/access";
 import { Prisma, prisma } from "@trymatcha/database";
 
+const PROJECT_COLORS = [
+    "#ef4444",
+    "#f97316",
+    "#f59e0b",
+    "#eab308",
+    "#84cc16",
+    "#22c55e",
+    "#10b981",
+    "#14b8a6",
+    "#06b6d4",
+    "#0ea5e9",
+    "#3b82f6",
+    "#6366f1",
+    "#8b5cf6",
+    "#a855f7",
+    "#d946ef",
+    "#ec4899",
+    "#f43f5e",
+];
+
+function random_color() {
+    return PROJECT_COLORS[Math.floor(Math.random() * PROJECT_COLORS.length)];
+}
+
 const body_schema = z.object({
     org_id: z.string(),
     name: z.string().min(1),
@@ -75,11 +99,12 @@ export default async function create_project_controller(req: Request, res: Respo
                 name,
                 slug,
                 description,
+                color: random_color(),
                 ownerId: user_id,
                 createdById: user_id,
                 ...repo_fields,
             },
-            select: { id: true, name: true, slug: true },
+            select: { id: true, name: true, slug: true, color: true },
         });
 
         ResponseWriter.created(res, project, "Project created successfully");

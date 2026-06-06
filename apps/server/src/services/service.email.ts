@@ -1,5 +1,6 @@
 import { Resend } from "resend";
 import { ENV } from "../configs/env";
+import EmailTemplate from "../templates/templates";
 
 let _resend: Resend | null = null;
 
@@ -24,13 +25,17 @@ function client(): Resend {
  * thrown error for callers to catch.
  */
 export async function sendOtpEmail(to: string, code: string) {
+    const { subject, html, text } = EmailTemplate.otp({
+        code,
+        expiryMinutes: Math.floor(ENV.SERVER_OTP_TTL_SECONDS / 60),
+    });
+
     const { error } = await client().emails.send({
-        from: "trymatcha <onboarding@resend.dev>",
+        from: ENV.SERVER_EMAIL_FROM,
         to,
-        subject: "Your trymatcha sign-in code",
-        text: `Your trymatcha signin code is ${code}.\n\nIt expires in ${Math.floor(
-            ENV.SERVER_OTP_TTL_SECONDS / 60,
-        )} minutes. If you didn't request this, you can ignore this email.`,
+        subject,
+        html,
+        text,
     });
 
     if (error) {
@@ -66,7 +71,7 @@ export async function inviteMember(to: string, url: string, invite: InviteContex
             : `You've been invited to join the organization "${invite.orgName}" on trymatcha.`;
 
     const { error } = await client().emails.send({
-        from: "trymatcha <onboarding@resend.dev>",
+        from: ENV.SERVER_EMAIL_FROM,
         to,
         subject,
         text: `${body}\n\nAccept the invitation here: ${url}\n\nIf you weren't expecting this, you can ignore this email.`,
