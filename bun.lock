@@ -151,7 +151,8 @@
         "@prisma/adapter-pg": "7.8.0",
         "@prisma/client": "7.8.0",
         "@prisma/client-runtime-utils": "7.8.0",
-        "dotenv": "^17.2.3",
+        "@types/dotenv": "^8.2.3",
+        "dotenv": "^17.4.2",
         "pg": "^8.16.3",
       },
       "devDependencies": {
