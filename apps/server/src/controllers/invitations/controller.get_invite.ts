@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import z from "zod";
-import { createHash } from 'crypto';
+import { createHash } from "crypto";
 import ResponseWriter from "../../services/service.response";
 import { prisma } from "@trymatcha/database";
 
@@ -12,13 +12,13 @@ export default class GetInviteController {
     static async process(req: Request, res: Response) {
         const { data, success } = GetInviteController.get_invite_schema.safeParse(req.params);
         if (!success) {
-            ResponseWriter.invalid_data(res, 'invalid token');
+            ResponseWriter.invalid_data(res, "invalid token");
             return;
         }
 
         try {
-           const user_email = req.user.email.toLowerCase();
-           const token = createHash("sha256").update(data.token).digest('hex');
+            const user_email = req.user.email.toLowerCase();
+            const token = createHash("sha256").update(data.token).digest("hex");
 
             const invitation = await prisma.invitation.findUnique({
                 where: { token },
@@ -49,7 +49,7 @@ export default class GetInviteController {
             });
 
             if (!invitation) {
-                ResponseWriter.not_found(res, 'Invitation not found.');
+                ResponseWriter.not_found(res, "Invitation not found.");
                 return;
             }
 
@@ -61,23 +61,23 @@ export default class GetInviteController {
                 expiresAt: invitation.expiresAt,
                 org: invitation.organization,
                 invitedBy: invitation.invitedBy,
-                team: invitation.team ?
-                    {
-                        name: invitation.team.name,
-                        projectRole: invitation.team.projectRole,
-                        project: invitation.team.project,
-                    } : null,
+                team: invitation.team
+                    ? {
+                          name: invitation.team.name,
+                          projectRole: invitation.team.projectRole,
+                          project: invitation.team.project,
+                      }
+                    : null,
                 teamRoleOnAccept: "Member",
                 emailMatches,
                 isExpired: invitation.expiresAt.getTime() <= Date.now(),
-            }
+            };
 
-            ResponseWriter.success(res, res_body, 'invitation fetched');
+            ResponseWriter.success(res, res_body, "invitation fetched");
             return;
         } catch (err) {
-            console.error('error in GetInviteController', err);
+            console.error("error in GetInviteController", err);
             ResponseWriter.system_error(res);
         }
     }
-
-} 
+}

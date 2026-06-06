@@ -42,7 +42,7 @@ export default class ListInvitesController {
                     },
                 },
                 orderBy: {
-                    createdAt: 'asc',
+                    createdAt: "asc",
                 },
             });
 
@@ -53,23 +53,26 @@ export default class ListInvitesController {
                 expiresAt: i.expiresAt,
                 createdAt: i.createdAt,
                 invitedBy: i.invitedBy,
-                organization: i.organization ?
-                    {
-                        name: i.organization.name,
-                        slug: i.organization.slug,
-                    } : null,
-                team: i.team ? {
-                    name: i.team.name,
-                    project: i.team.project,
-                    projectRole: i.team.projectRole,
-                } : null,
+                organization: i.organization
+                    ? {
+                          name: i.organization.name,
+                          slug: i.organization.slug,
+                      }
+                    : null,
+                team: i.team
+                    ? {
+                          name: i.team.name,
+                          project: i.team.project,
+                          projectRole: i.team.projectRole,
+                      }
+                    : null,
                 teamRoleOnAccept: "Member",
             }));
 
-            ResponseWriter.success(res, res_body, 'invitatons fetched');
+            ResponseWriter.success(res, res_body, "invitatons fetched");
             return;
         } catch (err) {
-            console.error('error in ListInvitationsController', err);
+            console.error("error in ListInvitationsController", err);
             ResponseWriter.system_error(res);
         }
     }

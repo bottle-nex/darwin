@@ -14,13 +14,14 @@ export default function useAcceptInvite() {
 
     return useMutation({
         mutationFn: async (token: string) => {
-            const res = await apiClient.post<ApiResponse<AcceptResult>>(ACCEPT_INVITE_URL, { token });
+            const res = await apiClient.post<ApiResponse<AcceptResult>>(ACCEPT_INVITE_URL, {
+                token,
+            });
             return res.data.data;
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['invitations', 'pending'] });
+            queryClient.invalidateQueries({ queryKey: ["invitations", "pending"] });
             queryClient.invalidateQueries({ queryKey: ORGANIZATIONS_QUERY_KEY });
-        }
-
-    })
+        },
+    });
 }

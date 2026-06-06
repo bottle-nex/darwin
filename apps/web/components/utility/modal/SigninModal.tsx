@@ -127,7 +127,6 @@ export default function SigninModal({ callbackUrl = "/" }: SigninModalProps) {
                                     matcha
                                 </span>
                             </div>
-
                         </div>
 
                         <div>

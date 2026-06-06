@@ -12,7 +12,7 @@ export default function useRejectInvite() {
             return res.data.data;
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['invitations', 'pending'] });
+            queryClient.invalidateQueries({ queryKey: ["invitations", "pending"] });
         },
     });
 }
