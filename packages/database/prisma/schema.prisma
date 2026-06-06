@@ -73,6 +73,7 @@ model Project {
   description String?
   ownerId     String
   createdById String?
+  color       String?
 
   githubInstallationId String?
   githubRepoId         BigInt?
