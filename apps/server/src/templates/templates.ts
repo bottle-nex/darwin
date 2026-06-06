@@ -65,7 +65,13 @@ export default class EmailTemplate {
      * `preheader` is the hidden inbox preview text; `bodyHtml` is trusted, pre-escaped markup
      * produced by a specific builder.
      */
-    private static layout({ preheader, bodyHtml }: { preheader: string; bodyHtml: string }): string {
+    private static layout({
+        preheader,
+        bodyHtml,
+    }: {
+        preheader: string;
+        bodyHtml: string;
+    }): string {
         const c = this.COLORS;
         return `<!DOCTYPE html>
 <html lang="en">

@@ -9,7 +9,6 @@ const params_schema = z.object({
 });
 
 export default class GetDashboardController {
-
     static async process(req: Request, res: Response) {
         try {
             const parsed = params_schema.safeParse(req.params);
