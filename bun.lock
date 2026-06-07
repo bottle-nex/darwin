@@ -18,6 +18,34 @@
         "turbo": "^2.9.16",
       },
     },
+    "apps/agent": {
+      "name": "agent",
+      "dependencies": {
+        "@trymatcha/database": "*",
+        "@trymatcha/types": "*",
+        "@types/dotenv": "^8.2.3",
+        "@types/express": "^5.0.6",
+        "chalk": "^5.6.2",
+        "dotenv": "^17.4.2",
+        "express": "^5.2.1",
+        "zod": "^4.4.3",
+      },
+      "devDependencies": {
+        "@trymatcha/eslint-config": "*",
+        "@trymatcha/typescript-config": "*",
+        "@types/bun": "latest",
+        "@typescript-eslint/eslint-plugin": "^7.1.0",
+        "@typescript-eslint/parser": "^7.1.0",
+        "eslint": "^8.57.0",
+        "eslint-config-prettier": "^9.1.0",
+        "eslint-config-turbo": "^2.0.0",
+        "eslint-plugin-only-warn": "^1.1.0",
+        "eslint-plugin-turbo": "^2.0.0",
+      },
+      "peerDependencies": {
+        "typescript": "^5",
+      },
+    },
     "apps/server": {
       "name": "@trymatcha/server",
       "version": "1.0.0",
@@ -134,7 +162,8 @@
         "@prisma/adapter-pg": "7.8.0",
         "@prisma/client": "7.8.0",
         "@prisma/client-runtime-utils": "7.8.0",
-        "dotenv": "^17.2.3",
+        "@types/dotenv": "^8.2.3",
+        "dotenv": "^17.4.2",
         "pg": "^8.16.3",
       },
       "devDependencies": {
@@ -854,6 +883,8 @@
     "acorn": ["acorn@8.16.0", "", { "bin": { "acorn": "bin/acorn" } }, "sha512-UVJyE9MttOsBQIDKw1skb9nAwQuR5wuGD3+82K6JgJlm/Y+KI92oNsMNGZCYdDsVtRHSak0pcV5Dno5+4jh9sw=="],
 
     "acorn-jsx": ["acorn-jsx@5.3.2", "", { "peerDependencies": { "acorn": "^6.0.0 || ^7.0.0 || ^8.0.0" } }, "sha512-rq9s+JNhf0IChjtDXxllJ7g41oZk5SlXtp0LHwyA5cejwn7vKmKp4pPri6YEePv2PU65sAsegbXtIinmDFDXgQ=="],
+
+    "agent": ["agent@workspace:apps/agent"],
 
     "agent-base": ["agent-base@6.0.2", "", { "dependencies": { "debug": "4" } }, "sha512-RZNwNclF7+MS/8bDg70amg32dyeZGZxiDuQmZxKLAlQjr3jGyLx+4Kkk58UO7D2QdgFIQCovuSuZESne6RG6XQ=="],
 

@@ -1,3 +1,7 @@
+// Mirrors the Prisma-generated enums (const object + string-literal union) so that
+// values returned from the Prisma client are structurally assignable to these types.
+// Keep in sync with the enums in packages/database/prisma/schema.prisma.
+
 export const OrgRole = {
     Owner: "Owner",
     Admin: "Admin",
@@ -20,3 +24,14 @@ export const TeamRole = {
     Member: "Member",
 } as const;
 export type TeamRole = (typeof TeamRole)[keyof typeof TeamRole];
+
+export const Chunk = {
+    Imports: "Imports",
+    Function: "Function",
+    Class: "Class",
+    Interface: "Interface",
+    Type: "Type",
+    Variable: "Variable",
+    Block: "Block",
+} as const;
+export type Chunk = (typeof Chunk)[keyof typeof Chunk];

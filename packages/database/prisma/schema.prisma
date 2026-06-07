@@ -2,12 +2,14 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 datasource db {
-  provider = "postgresql"
+  provider   = "postgresql"
+  extensions = [vector]
 }
 
 generator client {
-  provider = "prisma-client-js"
-  output   = "../generated/client"
+  provider        = "prisma-client-js"
+  output          = "../generated/client"
+  previewFeatures = ["postgresqlExtensions"]
 }
 
 model User {
@@ -27,6 +29,10 @@ model User {
   sentInvitations      Invitation[]         @relation("InviteSender")
   githubAccount        GithubAccount?
   githubInstallations  GithubInstallation[] @relation("GithubInstallationConnector")
+
+  // this is for issues
+  createdIssues  Issue[] @relation(name: "IssueCreator")
+  assignedIssues Issue[] @relation(name: "IssueAssignees")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -75,21 +81,21 @@ model Project {
   createdById String?
   color       String?
 
-  githubRepoId         BigInt?
-  githubRepoFullName   String?
-  githubRepoUrl        String?
-  githubDefaultBranch  String?
+  githubRepoId        BigInt?
+  githubRepoFullName  String?
+  githubRepoUrl       String?
+  githubDefaultBranch String?
 
-  organization       Organization        @relation(fields: [orgId], references: [id], onDelete: Cascade)
-  owner              User                @relation("ProjectOwner", fields: [ownerId], references: [id], onDelete: Restrict)
-  createdBy          User?               @relation("ProjectCreator", fields: [createdById], references: [id], onDelete: SetNull)
-  teams              Team[]
-  
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  owner        User         @relation("ProjectOwner", fields: [ownerId], references: [id], onDelete: Restrict)
+  createdBy    User?        @relation("ProjectCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  teams        Team[]
+
   githubInstallationId String?
-  githubInstallation GithubInstallation? @relation(fields: [githubInstallationId], references: [id], onDelete: SetNull)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  githubInstallation   GithubInstallation? @relation(fields: [githubInstallationId], references: [id], onDelete: SetNull)
+  codeEmbeddings       CodeEmbedding[]
+  createdAt            DateTime            @default(now())
+  updatedAt            DateTime            @updatedAt
 
   @@unique([orgId, slug])
   @@index([ownerId])
@@ -131,26 +137,26 @@ model TeamMember {
 }
 
 model Invitation {
-  id          String           @id @default(cuid())
-  email       String
+  id        String           @id @default(cuid())
+  email     String
   // Null until the invited email has a matching account: invites are bound to an
   // email so they can be sent before the recipient signs up, and userId is stamped
   // when the invite is accepted (or when the account already exists at send time).
-  token       String           @unique @default(cuid())
-  status      InvitationStatus @default(Pending)
-  expiresAt   DateTime
+  token     String           @unique @default(cuid())
+  status    InvitationStatus @default(Pending)
+  expiresAt DateTime
 
-  userId      String?
-  user         User?        @relation("InviteRecipient", fields: [userId], references: [id], onDelete: SetNull)
+  userId String?
+  user   User?   @relation("InviteRecipient", fields: [userId], references: [id], onDelete: SetNull)
 
   invitedById String
-  invitedBy    User         @relation("InviteSender", fields: [invitedById], references: [id], onDelete: Cascade)
+  invitedBy   User   @relation("InviteSender", fields: [invitedById], references: [id], onDelete: Cascade)
 
-  orgId       String
+  orgId        String
   organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
-  
-  teamId      String? // null = org invite, set = team invite
-  team         Team?        @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  teamId String? // null = org invite, set = team invite
+  team   Team?   @relation(fields: [teamId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -192,6 +198,45 @@ model GithubAccount {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Issue {
+  id          String @id @default(cuid())
+  createdById String
+  title       String
+  description String
+
+  creator User @relation(name: "IssueCreator", fields: [createdById], references: [id], onDelete: Cascade)
+
+  assignees User[] @relation(name: "IssueAssignees")
+}
+
+model CodeEmbedding {
+  id        String                      @id
+  projectId String
+  filePath  String
+  chunkText String
+  chunkType Chunk
+  startLine Int
+  endLine   Int
+  embedding Unsupported("vector(1536)")
+  createdAt DateTime                    @default(now())
+  updatedAt DateTime                    @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@map("code_embeddings")
+}
+
+enum Chunk {
+  Imports
+  Function
+  Class
+  Interface
+  Type
+  Variable
+  Block
 }
 
 enum InvitationStatus {
