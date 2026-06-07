@@ -9,12 +9,13 @@ import {
 } from "@/components/ui/dialog";
 import { useDeleteTeam } from "@/hooks/team/useDeleteTeam";
 import { useDeleteTeamStore } from "@/store/team/useDeleteTeamStore";
-import { usePlaygroundMainViewStore } from "@/store/playground/usePlaygroundMainViewStore";
+import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
 
 export default function DeleteTeamDialog() {
     const { team, close } = useDeleteTeamStore();
-    const view = usePlaygroundMainViewStore((s) => s.view);
-    const setView = usePlaygroundMainViewStore((s) => s.setView);
+    const surface = usePlaygroundNavStore((s) => s.surface);
+    const selectedTeam = usePlaygroundNavStore((s) => s.selectedTeam);
+    const clearTeam = usePlaygroundNavStore((s) => s.clearTeam);
     const deleteTeam = useDeleteTeam();
 
     function handleOpenChange(next: boolean) {
@@ -28,8 +29,8 @@ export default function DeleteTeamDialog() {
         if (!team) return;
         deleteTeam.mutate(team.id, {
             onSuccess: () => {
-                if (view.type === "team" && view.team.id === team.id) {
-                    setView({ type: "home" });
+                if (selectedTeam?.id === team.id) {
+                    clearTeam(surface);
                 }
                 close();
             },
