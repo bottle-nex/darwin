@@ -74,9 +74,7 @@ export default class Chunker {
 
     private chunk_ts(lines: string[], file_path: string): CodeChunk[] {
         const chunks: CodeChunk[] = [];
-        const split_points: Array<{ line: number; type: Chunk }> = [
-            { line: 0, type: Chunk.Block },
-        ];
+        const split_points: Array<{ line: number; type: Chunk }> = [{ line: 0, type: Chunk.Block }];
 
         let in_imports = false;
         let last_import_line = -1;

@@ -10,6 +10,4 @@ app.use(express.json());
 
 app.use("/agent/v1", v1_router);
 
-
-app.listen()
-
+app.listen();

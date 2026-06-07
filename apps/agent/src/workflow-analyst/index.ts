@@ -1,7 +1,1 @@
-
-
-export default class WorkflowAnalyst {
-
-
-
-}
+export default class WorkflowAnalyst {}

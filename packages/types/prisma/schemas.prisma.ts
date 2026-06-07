@@ -102,6 +102,4 @@ export interface Issue {
 
     creator: User;
     assignees: User[];
-
 }
-
