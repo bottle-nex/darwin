@@ -9,6 +9,7 @@ import DeleteTeamDialog from "@/components/team/DeleteTeamDialog";
 import { useGetDashboard } from "@/hooks/dashboard/useGetDashboard";
 import { useGetProject } from "@/hooks/project/useGetProject";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
+import { usePlaygroundUrlSync } from "./usePlaygroundUrlSync";
 
 /**
  * Shared playground workspace shell rendered by both the org route
@@ -31,7 +32,10 @@ export default function PlaygroundShell() {
     const activeProject = projectSlug
         ? dashboard?.projects.find((p) => p.slug === projectSlug)
         : undefined;
-    useGetProject(activeProject?.id);
+    const { data: project } = useGetProject(activeProject?.id);
+
+    // Keep the active surface/tab (and open team) in the URL so a refresh restores it.
+    usePlaygroundUrlSync(project?.teams);
 
     return (
         <main className="flex h-screen flex-col overflow-hidden bg-linear-to-br from-cement to-primary/10 text-neutral-100 pt-px">
