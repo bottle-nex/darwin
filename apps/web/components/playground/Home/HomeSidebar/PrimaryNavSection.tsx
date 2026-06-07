@@ -1,12 +1,11 @@
 "use client";
-
-import { AtSign, FileCheck, Inbox, Kanban, type LucideIcon } from "lucide-react";
+import { AtSign, FileCheck, Inbox, LayoutDashboard, type LucideIcon } from "lucide-react";
 import Row from "../../Sidebar/SidebarRow";
 import { matchesQuery, type SidebarNavRow, type SidebarSectionProps } from "../../Sidebar/shared";
 
 const PRIMARY_ROWS: { id: string; label: string; icon: LucideIcon }[] = [
     { id: "inbox", label: "Inbox", icon: Inbox },
-    { id: "kanban", label: "Kanban", icon: Kanban },
+    { id: "kanban", label: "Kanban", icon: LayoutDashboard },
     { id: "mentions", label: "Mentions", icon: AtSign },
     { id: "reviews", label: "Reviews", icon: FileCheck },
 ];

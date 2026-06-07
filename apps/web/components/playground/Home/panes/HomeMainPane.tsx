@@ -4,7 +4,7 @@ import { RailSurface } from "../../IconRail/railSurface";
 import { HomeTab } from "../homeTabs";
 import TeamDetailPane from "../../Projects/panes/TeamDetailPane";
 import InboxMainPane from "./InboxMainPane";
-import KanbanMainPane from "./KanbanMainPane";
+import KanbanMainPane from "./kanban/KanbanMainPane";
 import MentionsMainPane from "./MentionsMainPane";
 import ReviewsMainPane from "./ReviewsMainPane";
 import AssignedToMePane from "./AssignedToMePane";

@@ -1,17 +1,14 @@
 "use client";
 import { Plus, Search } from "lucide-react";
-import Image from "next/image";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useUserSessionStore } from "@/store/user/useUserSessionStore";
 import { useNewProjectStore } from "@/store/project/useNewProjectStore";
 import CreateProjectDialog from "@/components/project/CreateProjectDialog";
-import PlaygroundAvatar from "@/components/playground/Core/components/PlaygroundAvatar";
 import PlaygroundOrgSwitcher from "./PlaygroundOrgSwitcher";
 import GithubConnectButton from "./GithubConnectButton";
+import PlaygroundUserMenu from "./PlaygroundUserMenu";
 
 export default function PlaygroundTopBar() {
-    const session = useUserSessionStore((s) => s.session);
     const { setOpen } = useNewProjectStore();
 
     return (
@@ -46,27 +43,7 @@ export default function PlaygroundTopBar() {
                     <Plus className="size-3.5" aria-hidden />
                     Create Project
                 </Button>
-                <div className="relative h-7 w-7 overflow-hidden rounded-full">
-                    {session?.user?.image ? (
-                        <Image
-                            src={session.user.image}
-                            alt="img"
-                            className="object-cover"
-                            fill
-                            unoptimized
-                        />
-                    ) : (
-                        <PlaygroundAvatar
-                            size="xl"
-                            tone="dark"
-                            letter={(session?.user?.name || session?.user?.email || "?")
-                                .trim()
-                                .charAt(0)
-                                .toUpperCase()}
-                            className="h-full w-full rounded-full"
-                        />
-                    )}
-                </div>
+                <PlaygroundUserMenu />
             </div>
 
             <CreateProjectDialog />

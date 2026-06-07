@@ -1,0 +1,128 @@
+"use client";
+import {
+    ChevronDown,
+    Layers,
+    Plus,
+    Search,
+    Settings,
+    Settings2,
+    Upload,
+    Users,
+} from "lucide-react";
+import { AnimatePresence } from "motion/react";
+import { DropdownMenu } from "radix-ui";
+import { cn } from "@/lib/utils";
+import type { KanbanOptions } from "./useKanbanOptions";
+import OptionButton from "./KanbanOptionPanels/OptionButton";
+import FilterPanel from "./KanbanOptionPanels/FilterPanel";
+import LabelPanel from "./KanbanOptionPanels/LabelPanel";
+import SearchBar from "./KanbanOptionPanels/SearchBar";
+import SelectedLabels from "./KanbanOptionPanels/SelectedLabels";
+
+const TASK_OPTIONS = [
+    { id: "issue", label: "New issue", icon: Plus },
+    { id: "import", label: "Import issues", icon: Upload },
+];
+
+/** Secondary toolbar below the header: grouping, filters, search, labels, +Task. */
+export default function KanbanOptionsBar({ options }: { options: KanbanOptions }) {
+    const {
+        searchOpen,
+        search,
+        setSearch,
+        openSearch,
+        closeSearch,
+        selectedLabels,
+        toggleLabel,
+        removeLabel,
+        clearLabels,
+        filter,
+        setFilter,
+    } = options;
+
+    return (
+        <div className="flex h-10 shrink-0 items-center justify-between gap-2 border-b border-white/5 px-3">
+            <div className="flex min-w-0 items-center gap-1.5">
+                <button
+                    type="button"
+                    className="flex h-7 shrink-0 cursor-pointer items-center gap-1.5 rounded-md bg-white/5 px-2 text-[12px] font-medium text-neutral-200 ring-1 ring-white/10 hover:bg-white/10"
+                >
+                    <Layers className="size-3.5 text-violet-300" aria-hidden />
+                    Group: Status
+                </button>
+
+                <AnimatePresence initial={false}>
+                    {searchOpen && (
+                        <SearchBar value={search} onChange={setSearch} onClose={closeSearch} />
+                    )}
+                </AnimatePresence>
+
+                <SelectedLabels selected={selectedLabels} onRemove={removeLabel} />
+            </div>
+
+            <div className="flex shrink-0 items-center gap-0.5">
+                <LabelPanel
+                    selected={selectedLabels}
+                    onToggle={toggleLabel}
+                    onClear={clearLabels}
+                />
+                <FilterPanel value={filter} onChange={setFilter} />
+                <OptionButton label="Assignees" icon={Users} />
+                <OptionButton
+                    label="Search"
+                    icon={Search}
+                    active={searchOpen}
+                    onClick={() => (searchOpen ? closeSearch() : openSearch())}
+                />
+                <OptionButton label="Board settings" icon={Settings2} />
+                <div className="mx-1 h-4 w-px bg-white/8" />
+                <OptionButton label="Settings" icon={Settings} />
+
+                {/* Split button: primary "Add Task" + a chevron that opens a menu. */}
+                <div className="ml-1 flex items-center overflow-hidden rounded-sm bg-neutral-100 text-neutral-900">
+                    <button
+                        type="button"
+                        className="flex h-6 cursor-pointer items-center px-2 text-[11.5px] font-medium hover:bg-black/5"
+                    >
+                        Add Task
+                    </button>
+                    <span className="h-3.5 w-px bg-neutral-300" aria-hidden />
+                    <DropdownMenu.Root>
+                        <DropdownMenu.Trigger asChild>
+                            <button
+                                type="button"
+                                aria-label="More task options"
+                                className="flex h-6 cursor-pointer items-center px-1 hover:bg-black/5"
+                            >
+                                <ChevronDown className="size-3.5" aria-hidden />
+                            </button>
+                        </DropdownMenu.Trigger>
+                        <DropdownMenu.Portal>
+                            <DropdownMenu.Content
+                                align="end"
+                                sideOffset={6}
+                                className="z-50 w-52 origin-(--radix-dropdown-menu-content-transform-origin) rounded-lg border border-neutral-800 bg-charcoal p-1 shadow-xl animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95"
+                            >
+                                {TASK_OPTIONS.map((option) => (
+                                    <DropdownMenu.Item
+                                        key={option.id}
+                                        className={cn(
+                                            "flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 text-[13px] text-neutral-300 outline-none select-none",
+                                            "data-highlighted:bg-white/5 data-highlighted:text-neutral-100",
+                                        )}
+                                    >
+                                        <option.icon
+                                            className="size-3.5 text-neutral-400"
+                                            aria-hidden
+                                        />
+                                        {option.label}
+                                    </DropdownMenu.Item>
+                                ))}
+                            </DropdownMenu.Content>
+                        </DropdownMenu.Portal>
+                    </DropdownMenu.Root>
+                </div>
+            </div>
+        </div>
+    );
+}
