@@ -16,6 +16,8 @@
         "typescript": "^5"
     },
     "dependencies": {
+        "@trymatcha/database": "*",
+        "@trymatcha/types": "*",
         "@types/dotenv": "^8.2.3",
         "@types/express": "^5.0.6",
         "chalk": "^5.6.2",
