@@ -1,22 +1,29 @@
-export const OrgRole = {
-    Owner: "Owner",
-    Admin: "Admin",
-    Member: "Member",
-    Billing: "Billing",
-} as const;
-export type OrgRole = (typeof OrgRole)[keyof typeof OrgRole];
+export enum OrgRole {
+    Owner = "Owner",
+    Admin = "Admin",
+    Member = "Member",
+    Billing = "Billing",
+}
 
-export const ProjectRole = {
-    Admin: "Admin",
-    Maintain: "Maintain",
-    Write: "Write",
-    Triage: "Triage",
-    Read: "Read",
-} as const;
-export type ProjectRole = (typeof ProjectRole)[keyof typeof ProjectRole];
+export enum ProjectRole {
+    Admin = "Admin",
+    Maintain = "Maintain",
+    Write = "Write",
+    Triage = "Triage",
+    Read = "Read",
+}
 
-export const TeamRole = {
-    Maintainer: "Maintainer",
-    Member: "Member",
-} as const;
-export type TeamRole = (typeof TeamRole)[keyof typeof TeamRole];
+export enum TeamRole {
+    Maintainer = "Maintainer",
+    Member = "Member",
+}
+
+export enum Chunk {
+    Imports = "Imports",
+    Function = "Function",
+    Class = "Class",
+    Interface = "Interface",
+    Type = "Type",
+    Variable = "Variable",
+    Block = "Block",
+}
