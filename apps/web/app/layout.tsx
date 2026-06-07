@@ -4,6 +4,7 @@ import "./globals.css";
 import LenisProvider from "@/providers/LenisProvider";
 import QueryProvider from "@/providers/QueryProvider";
 import SessionSetter from "@/components/utility/SessionSetter";
+import { Toaster } from "@/components/ui/sonner";
 import { getServerSession } from "next-auth";
 import { authOption } from "./api/auth/[...nextauth]/options";
 
@@ -34,6 +35,7 @@ export default async function RootLayout({
             <LenisProvider>
                 <body className="min-h-full flex flex-col">
                     <QueryProvider>{children}</QueryProvider>
+                    <Toaster />
                 </body>
                 <SessionSetter session={session} />
             </LenisProvider>

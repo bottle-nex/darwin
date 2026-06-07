@@ -14,6 +14,7 @@ const body_schema = z
         orgId: z.string(),
         projectId: z.string().optional(),
         teamId: z.string().optional(),
+        message: z.string().trim().max(500).optional(),
     })
     .refine((d) => Boolean(d.projectId) === Boolean(d.teamId), {
         message: "projectId and teamId must be provided together",
@@ -28,13 +29,14 @@ export default class InviteMembersController {
         }
 
         try {
-            const { emails, orgId, projectId, teamId } = parsed.data;
+            const { emails, orgId, projectId, teamId, message } = parsed.data;
             const invitedById = req.user.id;
             const is_team_invite = Boolean(teamId);
 
             if (teamId) {
-                const role = await Access.team(invitedById, teamId);
-                if (!role || !Permissions.team(role, Action.team.add_member)) {
+                // Inviting into a team is project-level management — project Admins only.
+                const role = await Access.project(invitedById, projectId!);
+                if (!role || !Permissions.project(role, Action.project.manage_team)) {
                     return ResponseWriter.not_authorized(res, "insufficient permissions", 403);
                 }
             } else {
@@ -141,6 +143,7 @@ export default class InviteMembersController {
                             team
                                 ? { type: "team", teamName: team.name, orgName: organization.name }
                                 : { type: "org", orgName: organization.name },
+                            { inviter: req.user.name || req.user.email, message },
                         ),
                     ),
                 ).then((results) => {

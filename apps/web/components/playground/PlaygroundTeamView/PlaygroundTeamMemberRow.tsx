@@ -7,7 +7,7 @@ export default function PlaygroundTeamMemberRow({ member }: { member: TeamMember
     const name = member.user.name?.trim() || member.user.email;
 
     return (
-        <div className="flex items-center gap-4 rounded-lg ring-1 ring-white/5 bg-neutral-800/30 px-3 py-2.5 hover:bg-neutral-800/55 cursor-pointer">
+        <div className="flex items-center gap-4 rounded-[7px] ring-1 ring-white/5 bg-neutral-800/30 px-3 py-2.5 hover:bg-neutral-800/55 cursor-pointer">
             {member.user.image ? (
                 <Image
                     src={member.user.image}

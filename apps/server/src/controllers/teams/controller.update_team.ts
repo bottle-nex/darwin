@@ -27,8 +27,17 @@ export default class UpdateTeamController {
         try {
             const { teamId, name, slug, description, projectRole } = parsed.data;
 
-            const role = await Access.team(req.user.id, teamId);
-            if (!role || !Permissions.team(role, Action.team.update)) {
+            const team = await prisma.team.findUnique({
+                where: { id: teamId },
+                select: { projectId: true },
+            });
+            if (!team) {
+                return ResponseWriter.not_found(res, "team not found");
+            }
+
+            // Managing a team (incl. its role) is project-level — project Admins only.
+            const role = await Access.project(req.user.id, team.projectId);
+            if (!role || !Permissions.project(role, Action.project.manage_team)) {
                 return ResponseWriter.not_authorized(res, "insufficient permissions", 403);
             }
 

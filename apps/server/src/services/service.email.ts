@@ -55,26 +55,33 @@ type InviteContext =
 /**
  * Send a team or organization invite link to `to` via Resend.
  *
- * `invite` selects the wording and names; `url` is the accept-invite link. Like
- * {@link sendOtpEmail}, Resend reports failures in the response body, so this
+ * `invite` selects the target name; `url` is the accept-invite link. `opts.inviter` is the
+ * human-readable sender shown as social proof and `opts.message` is an optional note from the
+ * inviter. Like {@link sendOtpEmail}, Resend reports failures in the response body, so this
  * normalizes them into a thrown error for callers to catch.
  */
-export async function inviteMember(to: string, url: string, invite: InviteContext) {
-    const subject =
-        invite.type === "team"
-            ? `You've been invited to join ${invite.teamName} on trymatcha`
-            : `You've been invited to join ${invite.orgName} on trymatcha`;
+export async function inviteMember(
+    to: string,
+    url: string,
+    invite: InviteContext,
+    opts?: { inviter?: string; message?: string },
+) {
+    const target = invite.type === "team" ? invite.teamName : invite.orgName;
+    const inviter = opts?.inviter?.trim() || "Someone";
 
-    const body =
-        invite.type === "team"
-            ? `You've been invited to join the team "${invite.teamName}" in ${invite.orgName} on trymatcha.`
-            : `You've been invited to join the organization "${invite.orgName}" on trymatcha.`;
+    const { subject, html, text } = EmailTemplate.invite({
+        inviter,
+        target,
+        url,
+        message: opts?.message,
+    });
 
     const { error } = await client().emails.send({
         from: ENV.SERVER_EMAIL_FROM,
         to,
         subject,
-        text: `${body}\n\nAccept the invitation here: ${url}\n\nIf you weren't expecting this, you can ignore this email.`,
+        html,
+        text,
     });
 
     if (error) {

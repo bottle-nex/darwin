@@ -25,6 +25,7 @@ export default function PlaygroundSidebarTeamsSection({ query }: SidebarSectionP
     const requestDelete = useDeleteTeamStore((s) => s.requestDelete);
 
     const searching = query.trim().length > 0;
+    const isAdmin = project?.viewerRole === "Admin";
     const { view, setView } = usePlaygroundMainViewStore();
     const teams = (project?.teams ?? []).filter((t) => matchesQuery(t.name, query));
     if (searching && teams.length === 0) return null;
@@ -72,7 +73,7 @@ export default function PlaygroundSidebarTeamsSection({ query }: SidebarSectionP
                         </div>
                     );
                 })}
-                {!searching && (
+                {!searching && isAdmin && (
                     <Row
                         label="Add team"
                         leading={{ kind: "icon", icon: Plus }}

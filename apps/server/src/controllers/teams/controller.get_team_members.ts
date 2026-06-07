@@ -13,7 +13,8 @@ export default class GetTeamMembersController {
     static async process(req: Request, res: Response) {
         const parsed = params_schema.safeParse(req.params);
         if (!parsed.success) {
-            return ResponseWriter.invalid_data(res, "Invalid team id");
+            ResponseWriter.invalid_data(res, "Invalid team id");
+            return;
         }
 
         try {
@@ -25,12 +26,14 @@ export default class GetTeamMembersController {
                 select: { projectId: true },
             });
             if (!team) {
-                return ResponseWriter.not_found(res, "Team not found");
+                ResponseWriter.not_found(res, "Team not found");
+                return;
             }
 
             const role = await Access.project(userId, team.projectId);
             if (!role || !Permissions.project(role, Action.project.read)) {
-                return ResponseWriter.not_authorized(res, "You don't have access to this team");
+                ResponseWriter.not_authorized(res, "You don't have access to this team");
+                return;
             }
 
             const [members, pendingInvites] = await Promise.all([
@@ -56,7 +59,7 @@ export default class GetTeamMembersController {
                 }),
             ]);
 
-            ResponseWriter.success(res, { members, pendingInvites });
+            ResponseWriter.success(res, { members, pendingInvites, viewerRole: role });
         } catch (error) {
             console.error("error in get_team_members controller:", error);
             ResponseWriter.system_error(res);

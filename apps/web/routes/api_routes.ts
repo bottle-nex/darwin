@@ -31,4 +31,5 @@ export const INVITATIONS_URL = API_URL + "/invitations";
 export const LIST_INVITES_URL = INVITATIONS_URL;
 export const ACCEPT_INVITE_URL = INVITATIONS_URL + "/accept";
 export const REJECT_INVITE_URL = INVITATIONS_URL + "/reject";
+export const INVITE_MEMBER_URL = INVITATIONS_URL + "/invite";
 export const INVITES_PREVIEW_URL = (token: string) => `${INVITATIONS_URL}/${token}`;

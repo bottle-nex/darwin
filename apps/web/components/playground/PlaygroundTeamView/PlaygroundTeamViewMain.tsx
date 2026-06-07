@@ -53,7 +53,7 @@ export default function PlaygroundTeamViewMain({ team, onClose }: PlaygroundTeam
                 className="flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto px-5 py-5"
             >
                 <PlaygroundTeamStats teamId={team.id} />
-                <PlaygroundTeamMembers teamId={team.id} />
+                <PlaygroundTeamMembers teamId={team.id} teamName={team.name} />
             </div>
         </div>
     );

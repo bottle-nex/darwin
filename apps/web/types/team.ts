@@ -1,3 +1,5 @@
+import type { ProjectRole } from "./project";
+
 export type TeamRole = "Maintainer" | "Member";
 
 export interface TeamMemberDetail {
@@ -15,4 +17,6 @@ export interface TeamMemberDetail {
 export interface TeamMembersData {
     members: TeamMemberDetail[];
     pendingInvites: number;
+    /** The requesting user's effective role in the team's project. */
+    viewerRole: ProjectRole | null;
 }

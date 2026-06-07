@@ -60,7 +60,7 @@ export default function PlaygroundTeamStats({ teamId }: { teamId: string }) {
                     : stats.map((stat) => (
                           <div
                               key={stat.id}
-                              className="rounded-xl border border-white/5 bg-white/2 p-3 px-4"
+                              className="rounded-[9px] border border-white/5 bg-white/2 p-3 px-4"
                           >
                               <div className="flex items-start justify-between">
                                   <p className="text-[12px] text-neutral-500">{stat.label}</p>

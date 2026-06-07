@@ -31,7 +31,8 @@
     "dependencies": {
         "@prisma/adapter-pg": "7.8.0",
         "@prisma/client": "7.8.0",
-        "lucide-react": "^1.17.0"
+        "lucide-react": "^1.17.0",
+        "sonner": "^2.0.7"
     },
     "devDependencies": {
         "husky": "^9.1.7",

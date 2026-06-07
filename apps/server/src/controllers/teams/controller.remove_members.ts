@@ -23,20 +23,20 @@ export default class RemoveMembersController {
             const requested_ids = [...new Set(userIds)];
 
             if (teamId) {
-                // Team-level removal needs the team remove_member permission.
-                const role = await Access.team(req.user.id, teamId);
-                if (!role || !Permissions.team(role, Action.team.remove_member)) {
-                    return ResponseWriter.not_authorized(res, "insufficient permissions", 403);
-                }
-
                 // Validate the team belongs to the org so a team from another org
                 // can't be targeted, then drop only this team's membership.
                 const team = await prisma.team.findFirst({
                     where: { id: teamId, project: { orgId } },
-                    select: { id: true },
+                    select: { id: true, projectId: true },
                 });
                 if (!team) {
                     return ResponseWriter.not_found(res, "team not found in this organization");
+                }
+
+                // Removing members is project-level management — project Admins only.
+                const role = await Access.project(req.user.id, team.projectId);
+                if (!role || !Permissions.project(role, Action.project.manage_team)) {
+                    return ResponseWriter.not_authorized(res, "insufficient permissions", 403);
                 }
 
                 await prisma.teamMember.deleteMany({

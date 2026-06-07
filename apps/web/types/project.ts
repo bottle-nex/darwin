@@ -37,4 +37,6 @@ export interface ProjectDetail {
     createdAt: string;
     updatedAt: string;
     teams: ProjectTeam[];
+    /** The requesting user's effective role in this project (highest of org/owner/team). */
+    viewerRole: ProjectRole | null;
 }

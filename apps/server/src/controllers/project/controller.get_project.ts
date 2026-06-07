@@ -53,7 +53,7 @@ export default async function get_project_controller(req: Request, res: Response
             return;
         }
 
-        ResponseWriter.success(res, project);
+        ResponseWriter.success(res, { ...project, viewerRole: project_role });
     } catch (error) {
         console.error("error in get_project_controller:", error);
         ResponseWriter.system_error(res);

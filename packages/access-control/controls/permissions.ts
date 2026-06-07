@@ -49,8 +49,6 @@ const PROJECT_PERMISSIONS: Record<ProjectRole, Set<ProjectAction>> = {
     [ProjectRole.Maintain]: new Set([
         Action.project.read,
         Action.project.update,
-        Action.project.create_team,
-        Action.project.manage_team,
         Action.project.create_issue,
         Action.project.triage_issue,
         Action.project.close_issue,

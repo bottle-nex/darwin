@@ -125,6 +125,68 @@ export default class EmailTemplate {
     }
 
     /**
+     * Build the branded invite email.
+     *
+     * `inviter` is the human-readable sender (name or email) shown as social proof; `target`
+     * is the org/team the recipient is being invited into; `url` is the accept-invite link.
+     * An optional `message` from the inviter is rendered as a quoted note when present.
+     */
+    static invite({
+        inviter,
+        target,
+        url,
+        message,
+    }: {
+        inviter: string;
+        target: string;
+        url: string;
+        message?: string;
+    }): { subject: string; html: string; text: string } {
+        const c = this.COLORS;
+        const subject = `You've been invited to join ${target} on trymatcha`;
+
+        const note = message
+            ? `
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 24px;">
+            <tr>
+                <td style="border-left:3px solid ${c.accent};padding:4px 0 4px 14px;">
+                    <p class="mc-muted" style="margin:0;font-family:${this.FONT_SANS};font-size:14px;line-height:21px;font-style:italic;color:${c.muted};">
+                        ${this.escape_html(message)}
+                    </p>
+                </td>
+            </tr>
+        </table>`
+            : "";
+
+        const bodyHtml = `
+        <h1 class="mc-text" style="margin:0 0 8px;font-family:${this.FONT_SANS};font-size:18px;font-weight:600;color:${c.text};">
+            You've been invited
+        </h1>
+        <p class="mc-muted" style="margin:0 0 24px;font-family:${this.FONT_SANS};font-size:14px;line-height:21px;color:${c.muted};">
+            ${this.escape_html(inviter)} invited you to join <strong style="color:${c.text};">${this.escape_html(target)}</strong> on matcha.
+        </p>
+        ${note}
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+            <tr>
+                <td>${this.action_button({ href: url, label: "Accept invite" })}</td>
+            </tr>
+        </table>
+        <p class="mc-muted" style="margin:24px 0 0;font-family:${this.FONT_SANS};font-size:13px;line-height:20px;color:${c.muted};">
+            If you weren't expecting this, you can safely ignore this email.
+        </p>`;
+
+        const text = `${inviter} invited you to join ${target} on matcha.${
+            message ? `\n\n"${message}"` : ""
+        }\n\nAccept the invitation here: ${url}\n\nIf you weren't expecting this, you can ignore this email.`;
+
+        return {
+            subject,
+            html: this.layout({ preheader: `${inviter} invited you to join ${target}`, bodyHtml }),
+            text,
+        };
+    }
+
+    /**
      * Build the branded sign-in OTP email.
      *
      * The flow is code-entry only — the recipient types the code back into the app — so the email

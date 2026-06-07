@@ -8,6 +8,7 @@ import PlaygroundOrgSwitcher from "./PlaygroundOrgSwitcher";
 import GithubConnectButton from "./GithubConnectButton";
 import { useNewProjectStore } from "@/store/project/useNewProjectStore";
 import CreateProjectDialog from "@/components/project/CreateProjectDialog";
+import PlaygroundAvatar from "./PlaygroundAvatar";
 
 export default function PlaygroundTopBar() {
     const session = useUserSessionStore((s) => s.session);
@@ -46,13 +47,23 @@ export default function PlaygroundTopBar() {
                     Create Project
                 </Button>
                 <div className="relative h-7 w-7 overflow-hidden rounded-full">
-                    {session?.user?.image && (
+                    {session?.user?.image ? (
                         <Image
                             src={session.user.image}
-                            alt=""
+                            alt="img"
                             className="object-cover"
                             fill
                             unoptimized
+                        />
+                    ) : (
+                        <PlaygroundAvatar
+                            size="xl"
+                            tone="dark"
+                            letter={(session?.user?.name || session?.user?.email || "?")
+                                .trim()
+                                .charAt(0)
+                                .toUpperCase()}
+                            className="h-full w-full rounded-full"
                         />
                     )}
                 </div>
