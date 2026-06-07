@@ -2,14 +2,14 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 datasource db {
-    provider = "postgresql"
-    extensions = [vector]
+  provider   = "postgresql"
+  extensions = [vector]
 }
 
 generator client {
-    provider = "prisma-client-js"
-    output   = "../generated/client"
-    previewFeatures = ["postgresqlExtensions"]
+  provider        = "prisma-client-js"
+  output          = "../generated/client"
+  previewFeatures = ["postgresqlExtensions"]
 }
 
 model User {
@@ -216,7 +216,7 @@ model CodeEmbedding {
   projectId String
   filePath  String
   chunkText String
-  chunkType String
+  chunkType Chunk
   startLine Int
   endLine   Int
   embedding Unsupported("vector(1536)")
@@ -230,13 +230,13 @@ model CodeEmbedding {
 }
 
 enum Chunk {
-    Imports
-    Function
-    Class
-    Interface
-    Type
-    Variable
-    Block
+  Imports
+  Function
+  Class
+  Interface
+  Type
+  Variable
+  Block
 }
 
 enum InvitationStatus {
