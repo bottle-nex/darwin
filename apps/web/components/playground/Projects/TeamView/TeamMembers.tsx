@@ -10,13 +10,18 @@ import { useUserSessionStore } from "@/store/user/useUserSessionStore";
 import useInviteTeamMember from "@/hooks/invitations/useInviteTeamMember";
 import InviteToTeamDialog from "@/components/team/InviteToTeamDialog";
 import PlaygroundTeamMemberRow from "./TeamMemberRow";
+import { StatType } from "./TeamStats";
+import { TeamMemberDetail, TeamMembersData } from "@/types/team";
+import { TeamRole } from "@trymatcha/types";
 
 export default function PlaygroundTeamMembers({
     teamId,
     teamName,
+    currentStat,
 }: {
     teamId: string;
     teamName: string;
+    currentStat: StatType,
 }) {
     const { data, isLoading, isError } = useGetTeamMembers(teamId);
     const members = data?.members;
@@ -62,9 +67,10 @@ export default function PlaygroundTeamMembers({
                 ) : !members?.length ? (
                     <p className="px-1 py-2 text-[12px] text-neutral-500">No members yet.</p>
                 ) : (
-                    members.map((member) => (
-                        <PlaygroundTeamMemberRow key={member.id} member={member} />
-                    ))
+                    <RenderMembers
+                        membersData={data}
+                        currentStat={currentStat}
+                    />
                 )}
             </div>
 
@@ -89,8 +95,7 @@ export default function PlaygroundTeamMembers({
                             onSuccess: ({ invited, failed }) => {
                                 if (invited.length) {
                                     toast.success(
-                                        `Invited ${invited.length} ${
-                                            invited.length === 1 ? "person" : "people"
+                                        `Invited ${invited.length} ${invited.length === 1 ? "person" : "people"
                                         }`,
                                     );
                                 }
@@ -117,4 +122,48 @@ export default function PlaygroundTeamMembers({
             />
         </section>
     );
+}
+
+function RenderMembers(
+    {
+        membersData,
+        currentStat,
+    }: {
+        membersData: NoInfer<TeamMembersData> | undefined,
+        currentStat: StatType,
+    }
+) {
+
+    switch (currentStat) {
+        case StatType.Total: {
+            const members = membersData?.members;
+            return members?.map((member) => (
+                <PlaygroundTeamMemberRow key={member.id} teamMember={member} />
+            ));
+        };
+        case StatType.Maintainers: {
+            const filteredMembers = membersData?.members.filter(m => m.role === TeamRole.Maintainer);
+            return filteredMembers?.map((member) => (
+                <PlaygroundTeamMemberRow key={member.id} teamMember={member} />
+            ));
+        };
+        case StatType.Members: {
+            const filteredMembers = membersData?.members.filter(m => m.role === TeamRole.Member);
+            return filteredMembers?.map((member) => (
+                <PlaygroundTeamMemberRow key={member.id} teamMember={member} />
+            ));
+        };
+        case StatType.Pending: {
+            const pendingMembers = membersData?.pendingInvites;
+            return pendingMembers?.map((member) => (
+                <PlaygroundTeamMemberRow key={member.id} pendingMember={member} />
+            ));
+        };
+        default: {
+            return (
+                <div></div>
+            )
+        }
+    }
+
 }

@@ -51,15 +51,50 @@ export default class GetTeamMembersController {
                                 image: true,
                             },
                         },
+
                     },
                     orderBy: { createdAt: "asc" },
                 }),
-                prisma.invitation.count({
-                    where: { teamId, status: InvitationStatus.Pending },
+                prisma.invitation.findMany({
+                    where: {
+                        teamId,
+                        status: InvitationStatus.Pending,
+                    },
+                    select: {
+                        id: true,
+                        email: true,
+                        status: true,
+                        invitedBy: {
+                            select: {
+                                id: true,
+                                name: true,
+                                email: true,
+                                image: true,
+                            }
+                        },
+                        createdAt: true,
+                        expiresAt: true,
+                    },
                 }),
             ]);
 
-            ResponseWriter.success(res, { members, pendingInvites, viewerRole: role });
+            const updatedPendingInvites = pendingInvites.map((invite) => ({
+                id: invite.id,
+                invitedBy: {
+                    id: invite.invitedBy.id,
+                    name: invite.invitedBy.name,
+                    email: invite.invitedBy.email,
+                    image: invite.invitedBy.image,
+                },
+                status: invite.status,
+                sentAt: invite.createdAt,
+                expiresAt: invite.expiresAt,
+                user: {
+                    email: invite.email,
+                },
+            }));
+
+            ResponseWriter.success(res, { members, pendingInvites: updatedPendingInvites, viewerRole: role });
         } catch (error) {
             console.error("error in get_team_members controller:", error);
             ResponseWriter.system_error(res);

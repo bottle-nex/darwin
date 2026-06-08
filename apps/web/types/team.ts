@@ -1,6 +1,6 @@
-import type { ProjectRole } from "./project";
+import { ProjectRole, TeamRole } from "@trymatcha/types";
+import { INVITATION_STATUS } from "./types.invitation";
 
-export type TeamRole = "Maintainer" | "Member";
 
 export interface TeamMemberDetail {
     id: string;
@@ -14,9 +14,25 @@ export interface TeamMemberDetail {
     };
 }
 
+export interface PendingInviteDetail {
+    id: string;
+    invitedBy: {
+        id: string;
+        name: string | null;
+        email: string;
+        image: string | null;
+    };
+    status: INVITATION_STATUS;
+    sentAt: Date;
+    expiresAt: Date;
+    user: {
+        email: string;
+    };
+}
+
 export interface TeamMembersData {
     members: TeamMemberDetail[];
-    pendingInvites: number;
+    pendingInvites: PendingInviteDetail[];
     /** The requesting user's effective role in the team's project. */
     viewerRole: ProjectRole | null;
 }
