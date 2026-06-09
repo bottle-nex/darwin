@@ -3,8 +3,10 @@ import { Trash2, X } from "lucide-react";
 import type { ProjectTeam } from "@/types/project";
 import { useDeleteTeamStore } from "@/store/team/useDeleteTeamStore";
 import PlaygroundAvatar from "@/components/playground/Core/components/PlaygroundAvatar";
-import PlaygroundTeamStats from "./TeamStats";
+import PlaygroundTeamStats, { StatType } from "./TeamStats";
 import PlaygroundTeamMembers from "./TeamMembers";
+import { useGetTeamMembers } from "@/hooks/team/useGetTeamMembers";
+import { useState } from "react";
 
 type PlaygroundTeamViewProps = {
     team: ProjectTeam;
@@ -13,6 +15,7 @@ type PlaygroundTeamViewProps = {
 
 export default function PlaygroundTeamViewMain({ team, onClose }: PlaygroundTeamViewProps) {
     const requestDelete = useDeleteTeamStore((s) => s.requestDelete);
+    const [currentStat, setCurrentStat] = useState<StatType>(StatType.Total);
 
     return (
         <div className="flex min-h-0 flex-1 flex-col">
@@ -52,8 +55,16 @@ export default function PlaygroundTeamViewMain({ team, onClose }: PlaygroundTeam
                 data-lenis-prevent
                 className="flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto px-5 py-5"
             >
-                <PlaygroundTeamStats teamId={team.id} />
-                <PlaygroundTeamMembers teamId={team.id} teamName={team.name} />
+                <PlaygroundTeamStats
+                    teamId={team.id}
+                    currentStat={currentStat}
+                    onStatChange={(stat) => setCurrentStat(stat)}
+                />
+                <PlaygroundTeamMembers
+                    teamId={team.id}
+                    teamName={team.name}
+                    currentStat={currentStat}
+                />
             </div>
         </div>
     );

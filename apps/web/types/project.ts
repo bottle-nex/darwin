@@ -1,4 +1,4 @@
-export type ProjectRole = "Admin" | "Maintain" | "Write" | "Triage" | "Read";
+import { ProjectRole } from "@trymatcha/types";
 
 export interface Project {
     id: string;

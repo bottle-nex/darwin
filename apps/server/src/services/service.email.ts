@@ -1,6 +1,7 @@
 import { Resend } from "resend";
 import { ENV } from "../configs/env";
 import EmailTemplate from "../templates/templates";
+import chalk from "chalk";
 
 let _resend: Resend | null = null;
 
@@ -65,7 +66,7 @@ export async function inviteMember(
     url: string,
     invite: InviteContext,
     opts?: { inviter?: string; message?: string },
-) {
+): Promise<boolean> {
     const target = invite.type === "team" ? invite.teamName : invite.orgName;
     const inviter = opts?.inviter?.trim() || "Someone";
 
@@ -85,6 +86,8 @@ export async function inviteMember(
     });
 
     if (error) {
-        throw new Error(`resend send failed: ${error.message}`);
+        console.error(chalk.red("resend send failed: "), error?.message);
+        return false;
     }
+    return true;
 }

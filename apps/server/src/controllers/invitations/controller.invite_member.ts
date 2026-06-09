@@ -102,8 +102,11 @@ export default class InviteMembersController {
 
             const invited: string[] = [];
             const failed: { email: string; reason: string }[] = [];
-            const to_create: Prisma.InvitationCreateManyInput[] = [];
-            const to_email: { email: string; token: string }[] = [];
+            const to_process: {
+                email: string;
+                raw_token: string;
+                db_record: Prisma.InvitationCreateManyInput;
+            }[] = [];
 
             for (const email of requested_emails) {
                 const user = user_by_email.get(email);
@@ -119,40 +122,50 @@ export default class InviteMembersController {
                 const raw_token = randomBytes(32).toString("hex");
                 const token = createHash("sha256").update(raw_token).digest("hex");
 
-                to_create.push({
+                to_process.push({
                     email,
-                    userId: user?.id ?? null,
-                    token,
-                    orgId,
-                    teamId: teamId ?? null,
-                    invitedById,
-                    expiresAt: expires_at,
+                    raw_token,
+                    db_record: {
+                        email,
+                        userId: user?.id ?? null,
+                        token,
+                        orgId,
+                        teamId: teamId ?? null,
+                        invitedById,
+                        expiresAt: expires_at,
+                    },
                 });
-                to_email.push({ email, token: raw_token });
-                invited.push(email);
             }
 
-            if (to_create.length > 0) {
-                await prisma.invitation.createMany({ data: to_create });
-
-                void Promise.allSettled(
-                    to_email.map(({ email, token }) =>
+            if (to_process.length > 0) {
+                const email_results = await Promise.allSettled(
+                    to_process.map(({ email, raw_token }) =>
                         inviteMember(
                             email,
-                            `${ENV.SERVER_WEB_URL}/invite/${token}`,
+                            `${ENV.SERVER_WEB_URL}/invite/${raw_token}`,
                             team
                                 ? { type: "team", teamName: team.name, orgName: organization.name }
                                 : { type: "org", orgName: organization.name },
                             { inviter: req.user.name || req.user.email, message },
                         ),
                     ),
-                ).then((results) => {
-                    results.forEach((r, i) => {
-                        if (r.status === "rejected") {
-                            console.error(`invite email failed for ${to_email[i].email}`, r.reason);
-                        }
-                    });
+                );
+
+                const to_create: Prisma.InvitationCreateManyInput[] = [];
+
+                email_results.forEach((result, i) => {
+                    const { email, db_record } = to_process[i];
+                    if (result.status === "fulfilled" && result.value) {
+                        to_create.push(db_record);
+                        invited.push(email);
+                    } else {
+                        failed.push({ email, reason: "email_failed" });
+                    }
                 });
+
+                if (to_create.length > 0) {
+                    await prisma.invitation.createMany({ data: to_create });
+                }
             }
 
             return ResponseWriter.success(res, { invited, failed }, "invitations processed");
