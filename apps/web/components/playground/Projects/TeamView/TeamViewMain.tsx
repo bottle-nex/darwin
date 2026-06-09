@@ -55,8 +55,16 @@ export default function PlaygroundTeamViewMain({ team, onClose }: PlaygroundTeam
                 data-lenis-prevent
                 className="flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto px-5 py-5"
             >
-                <PlaygroundTeamStats teamId={team.id} currentStat={currentStat} onStatChange={(stat) => setCurrentStat(stat)} />
-                <PlaygroundTeamMembers teamId={team.id} teamName={team.name} currentStat={currentStat} />
+                <PlaygroundTeamStats
+                    teamId={team.id}
+                    currentStat={currentStat}
+                    onStatChange={(stat) => setCurrentStat(stat)}
+                />
+                <PlaygroundTeamMembers
+                    teamId={team.id}
+                    teamName={team.name}
+                    currentStat={currentStat}
+                />
             </div>
         </div>
     );

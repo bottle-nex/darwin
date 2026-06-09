@@ -51,7 +51,6 @@ export default class GetTeamMembersController {
                                 image: true,
                             },
                         },
-
                     },
                     orderBy: { createdAt: "asc" },
                 }),
@@ -70,7 +69,7 @@ export default class GetTeamMembersController {
                                 name: true,
                                 email: true,
                                 image: true,
-                            }
+                            },
                         },
                         createdAt: true,
                         expiresAt: true,
@@ -94,7 +93,11 @@ export default class GetTeamMembersController {
                 },
             }));
 
-            ResponseWriter.success(res, { members, pendingInvites: updatedPendingInvites, viewerRole: role });
+            ResponseWriter.success(res, {
+                members,
+                pendingInvites: updatedPendingInvites,
+                viewerRole: role,
+            });
         } catch (error) {
             console.error("error in get_team_members controller:", error);
             ResponseWriter.system_error(res);

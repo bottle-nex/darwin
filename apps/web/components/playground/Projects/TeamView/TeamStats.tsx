@@ -23,7 +23,11 @@ interface PlaygroundTeamStatsProps {
     onStatChange: (stat: StatType) => void;
 }
 
-export default function PlaygroundTeamStats({ teamId, currentStat, onStatChange }: PlaygroundTeamStatsProps) {
+export default function PlaygroundTeamStats({
+    teamId,
+    currentStat,
+    onStatChange,
+}: PlaygroundTeamStatsProps) {
     const { data, isLoading } = useGetTeamMembers(teamId);
     const [clickCounts, setClickCounts] = useState<Record<string, number>>({});
 
@@ -73,44 +77,47 @@ export default function PlaygroundTeamStats({ teamId, currentStat, onStatChange 
             <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
                 {isLoading
                     ? [0, 1, 2, 3].map((i) => (
-                        <div key={i} className="h-[92px] animate-pulse rounded-xl bg-white/2" />
-                    ))
+                          <div key={i} className="h-[92px] animate-pulse rounded-xl bg-white/2" />
+                      ))
                     : stats.map((stat) => (
-                        <div
-                            key={stat.id}
-                            className={cn(
-                                "rounded-[9px] border border-white/5 bg-white/2 p-3 px-4 cursor-pointer ",
-                            )}
-                            onClick={() => {
-                                onStatChange(stat.id);
-                                setClickCounts((prev) => ({ ...prev, [stat.id]: (prev[stat.id] ?? 0) + 1 }));
-                            }}
-                        >
-                            <div className="flex items-start justify-between">
-                                <BumpingText
-                                    text={stat.label}
-                                    isSelected={currentStat === stat.id}
-                                    trigger={clickCounts[stat.id] ?? 0}
-                                />
-                                <div className="group flex size-6 cursor-pointer items-center justify-center rounded-sm transition-colors duration-200 hover:bg-neutral-800/70">
-                                    <MoreVertical
-                                        className="size-4 text-neutral-600 transition-colors duration-200 group-hover:text-neutral-300"
-                                        aria-hidden
-                                    />
-                                </div>
-                            </div>
+                          <div
+                              key={stat.id}
+                              className={cn(
+                                  "rounded-[9px] border border-white/5 bg-white/2 p-3 px-4 cursor-pointer ",
+                              )}
+                              onClick={() => {
+                                  onStatChange(stat.id);
+                                  setClickCounts((prev) => ({
+                                      ...prev,
+                                      [stat.id]: (prev[stat.id] ?? 0) + 1,
+                                  }));
+                              }}
+                          >
+                              <div className="flex items-start justify-between">
+                                  <BumpingText
+                                      text={stat.label}
+                                      isSelected={currentStat === stat.id}
+                                      trigger={clickCounts[stat.id] ?? 0}
+                                  />
+                                  <div className="group flex size-6 cursor-pointer items-center justify-center rounded-sm transition-colors duration-200 hover:bg-neutral-800/70">
+                                      <MoreVertical
+                                          className="size-4 text-neutral-600 transition-colors duration-200 group-hover:text-neutral-300"
+                                          aria-hidden
+                                      />
+                                  </div>
+                              </div>
 
-                            <p className="mt-1.5">
-                                <span className="text-[19px] font-semibold text-neutral-100">
-                                    {stat.value}
-                                </span>
-                                <span className="ml-1.5 text-[14px] text-neutral-400">
-                                    {stat.unit}
-                                </span>
-                            </p>
-                            <p className="mt-0.5 text-[12px] text-neutral-500">{stat.caption}</p>
-                        </div>
-                    ))}
+                              <p className="mt-1.5">
+                                  <span className="text-[19px] font-semibold text-neutral-100">
+                                      {stat.value}
+                                  </span>
+                                  <span className="ml-1.5 text-[14px] text-neutral-400">
+                                      {stat.unit}
+                                  </span>
+                              </p>
+                              <p className="mt-0.5 text-[12px] text-neutral-500">{stat.caption}</p>
+                          </div>
+                      ))}
             </div>
         </section>
     );

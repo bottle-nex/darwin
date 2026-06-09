@@ -13,10 +13,7 @@ type MemberDetailProps =
           pendingMember: PendingInviteDetail;
       };
 
-export default function PlaygroundTeamMemberRow({
-    teamMember,
-    pendingMember,
-}: MemberDetailProps) {
+export default function PlaygroundTeamMemberRow({ teamMember, pendingMember }: MemberDetailProps) {
     const isMember = !!teamMember;
 
     const user = isMember
@@ -26,10 +23,10 @@ export default function PlaygroundTeamMemberRow({
               email: pendingMember.user.email,
               image: null,
           };
-    
+
     const email = isMember
         ? teamMember.user.email
-        : `invited by: ${pendingMember.invitedBy.name} | ${pendingMember.invitedBy.email}`
+        : `invited by: ${pendingMember.invitedBy.name} | ${pendingMember.invitedBy.email}`;
 
     const name = user.name?.trim() || user.email;
 
@@ -51,29 +48,21 @@ export default function PlaygroundTeamMemberRow({
             )}
 
             <div className="min-w-0 flex-1">
-                <p className="truncate text-[13px] font-medium text-neutral-100">
-                    {name}
-                </p>
+                <p className="truncate text-[13px] font-medium text-neutral-100">{name}</p>
 
-                <p className="truncate text-[12px] text-neutral-500">
-                    {email}
-                </p>
+                <p className="truncate text-[12px] text-neutral-500">{email}</p>
             </div>
 
             <div className="hidden w-28 shrink-0 text-[12px] text-neutral-400 sm:block">
                 {isMember ? (
                     <>
                         Role:{" "}
-                        <span className="font-medium text-neutral-200">
-                            {teamMember.role}
-                        </span>
+                        <span className="font-medium text-neutral-200">{teamMember.role}</span>
                     </>
                 ) : (
                     <>
                         Status:{" "}
-                        <span className="font-medium text-neutral-200">
-                            {pendingMember.status}
-                        </span>
+                        <span className="font-medium text-neutral-200">{pendingMember.status}</span>
                     </>
                 )}
             </div>
@@ -81,9 +70,7 @@ export default function PlaygroundTeamMemberRow({
             <div className="flex w-36 shrink-0 items-center gap-1.5 text-[12px] text-neutral-400">
                 <Flag className="size-3.5 shrink-0 text-neutral-500" aria-hidden />
 
-                {isMember
-                    ? formatDate(teamMember.createdAt)
-                    : formatDate(pendingMember.sentAt)}
+                {isMember ? formatDate(teamMember.createdAt) : formatDate(pendingMember.sentAt)}
             </div>
         </div>
     );
