@@ -21,6 +21,9 @@ export default function ProfileCard({
     banner,
     issues,
 }: ProfileCardProps) {
+
+    function handleMessageOnClick() {}
+
     return (
         <div
             className={cn(
@@ -78,9 +81,10 @@ export default function ProfileCard({
                     variant={"tertiary"}
                     type="button"
                     size={"default"}
-                // loading={connect.isPending}
-                // onClick={() => connect.mutate(org.id)}
-                // disabled={connect.isPending}
+                    // loading={connect.isPending}
+                    onClick={handleMessageOnClick}
+                    // disabled={connect.isPending}
+                    className="rounded-md"
                 >
                     Message
                 </Button>
