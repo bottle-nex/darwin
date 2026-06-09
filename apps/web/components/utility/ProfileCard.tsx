@@ -25,10 +25,10 @@ interface ProfileCardProps {
     orgId: string;
     banner?: string;
     issues?: {
-        created?: number,
-        fixed?: number,
-        notAnswered?: number,
-    }
+        created?: number;
+        fixed?: number;
+        notAnswered?: number;
+    };
 }
 
 export default function ProfileCard({
@@ -41,35 +41,42 @@ export default function ProfileCard({
     banner,
     issues,
 }: ProfileCardProps) {
-
     const { session } = useUserSessionStore();
     const queryClient = useQueryClient();
 
-    function handleMessageOnClick() { }
+    function handleMessageOnClick() {}
 
     async function handleChangeAuthority(role: TeamRole) {
-        await axios.post(CHANGE_MEMBER_AUTHORITY, {
-            teamId,
-            memberId: id,
-            role,
-        }, {
-            headers: {
-                Authorization: `Bearer ${session?.user?.token}`,
+        await axios.post(
+            CHANGE_MEMBER_AUTHORITY,
+            {
+                teamId,
+                memberId: id,
+                role,
             },
-        });
+            {
+                headers: {
+                    Authorization: `Bearer ${session?.user?.token}`,
+                },
+            },
+        );
         queryClient.invalidateQueries({ queryKey: [...TEAM_MEMBERS_QUERY_KEY, teamId] });
     }
 
     async function handleKick() {
-        await axios.post(REMOVE_MEMBERS, {
-            orgId,
-            teamId,
-            userIds: [id],
-        }, {
-            headers: {
-                Authorization: `Bearer ${session?.user?.token}`,
+        await axios.post(
+            REMOVE_MEMBERS,
+            {
+                orgId,
+                teamId,
+                userIds: [id],
             },
-        });
+            {
+                headers: {
+                    Authorization: `Bearer ${session?.user?.token}`,
+                },
+            },
+        );
         queryClient.invalidateQueries({ queryKey: [...TEAM_MEMBERS_QUERY_KEY, teamId] });
     }
 
@@ -79,7 +86,7 @@ export default function ProfileCard({
                 "relative",
                 "h-74 w-66 bg-charcoal ring ring-white/5 rounded-xl p-2",
                 "flex flex-col justify-between items-center",
-                "shadow-md"
+                "shadow-md",
             )}
         >
             <div className="relative h-28 w-full rounded-md overflow-hidden">
@@ -97,12 +104,20 @@ export default function ProfileCard({
                         >
                             <div className="p-1">
                                 <DropdownMenu.Sub>
-                                    <DropdownMenu.SubTrigger className={cn(ITEM, "justify-between")}>
+                                    <DropdownMenu.SubTrigger
+                                        className={cn(ITEM, "justify-between")}
+                                    >
                                         <span className="flex items-center gap-2.5">
-                                            <ShieldCheck className="size-4 text-neutral-400" aria-hidden />
+                                            <ShieldCheck
+                                                className="size-4 text-neutral-400"
+                                                aria-hidden
+                                            />
                                             Change authority
                                         </span>
-                                        <ChevronRight className="size-3.5 text-neutral-500" aria-hidden />
+                                        <ChevronRight
+                                            className="size-3.5 text-neutral-500"
+                                            aria-hidden
+                                        />
                                     </DropdownMenu.SubTrigger>
                                     <DropdownMenu.Portal>
                                         <DropdownMenu.SubContent
@@ -133,7 +148,10 @@ export default function ProfileCard({
                                     )}
                                     onClick={handleKick}
                                 >
-                                    <UserX className="size-4 text-neutral-400 group-hover:text-red-300" aria-hidden />
+                                    <UserX
+                                        className="size-4 text-neutral-400 group-hover:text-red-300"
+                                        aria-hidden
+                                    />
                                     Kick
                                 </DropdownMenu.Item>
                             </div>
@@ -149,12 +167,7 @@ export default function ProfileCard({
             </div>
             <div className="absolute top-23 left-5 bg-red size-14 rounded-full ring-2 ring-charcoal overflow-hidden ">
                 {profilimage ? (
-                    <Image
-                        src={profilimage}
-                        alt={name}
-                        fill
-                        className="object-cover"
-                    />
+                    <Image src={profilimage} alt={name} fill className="object-cover" />
                 ) : (
                     <div className="h-full w-full  bg-charcoal ">
                         <div className="h-full w-full bg-neutral-800/30 flex justify-center items-center">
@@ -165,17 +178,15 @@ export default function ProfileCard({
             </div>
             <div className="w-full flex flex-col justify-between gap-y-2 ">
                 <div className="w-full flex flex-col leading-tight">
-                    <div className="truncate ">
-                        {name}
-                    </div>
-                    <div className="text-white/40 text-xs ">
-                        {role}
-                    </div>
+                    <div className="truncate ">{name}</div>
+                    <div className="text-white/40 text-xs ">{role}</div>
                 </div>
                 <div className="flex h-11 w-full overflow-hidden rounded-md border border-white/5 bg-neutral-800/30">
                     <div className="flex flex-1 flex-col items-center justify-center">
                         <span className="text-[10px] text-neutral-500">Created</span>
-                        <span className="text-xs font-medium text-white">{issues?.created || 0}</span>
+                        <span className="text-xs font-medium text-white">
+                            {issues?.created || 0}
+                        </span>
                     </div>
 
                     <div className="w-px bg-white/5" />
@@ -189,7 +200,9 @@ export default function ProfileCard({
 
                     <div className="flex flex-1 flex-col items-center justify-center">
                         <span className="text-[10px] text-neutral-500">Not Answered</span>
-                        <span className="text-xs font-medium text-white">{issues?.notAnswered || 0}</span>
+                        <span className="text-xs font-medium text-white">
+                            {issues?.notAnswered || 0}
+                        </span>
                     </div>
                 </div>
                 <Button

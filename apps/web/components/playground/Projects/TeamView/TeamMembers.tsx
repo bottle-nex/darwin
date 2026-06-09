@@ -56,7 +56,6 @@ export default function PlaygroundTeamMembers({
                 )}
             </div>
 
-
             <div className="mt-5 flex flex-col gap-2.25">
                 {isLoading ? (
                     [0, 1, 2].map((i) => (
@@ -69,7 +68,12 @@ export default function PlaygroundTeamMembers({
                 ) : !members?.length ? (
                     <p className="px-1 py-2 text-[12px] text-neutral-500">No members yet.</p>
                 ) : (
-                    <RenderMembers membersData={data} currentStat={currentStat} teamId={teamId} orgId={dashboard?.org.id ?? ""} />
+                    <RenderMembers
+                        membersData={data}
+                        currentStat={currentStat}
+                        teamId={teamId}
+                        orgId={dashboard?.org.id ?? ""}
+                    />
                 )}
             </div>
 
@@ -94,7 +98,8 @@ export default function PlaygroundTeamMembers({
                             onSuccess: ({ invited, failed }) => {
                                 if (invited.length) {
                                     toast.success(
-                                        `Invited ${invited.length} ${invited.length === 1 ? "person" : "people"
+                                        `Invited ${invited.length} ${
+                                            invited.length === 1 ? "person" : "people"
                                         }`,
                                     );
                                 }
@@ -167,7 +172,7 @@ function RenderMembers({
                                     role={member.role}
                                     profilimage={member.user.image ?? ""}
                                     teamId={teamId}
-                                orgId={orgId}
+                                    orgId={orgId}
                                 />
                             }
                         >
@@ -187,7 +192,7 @@ function RenderMembers({
                                     role={member.role}
                                     profilimage={member.user.image ?? ""}
                                     teamId={teamId}
-                                orgId={orgId}
+                                    orgId={orgId}
                                 />
                             }
                         >

@@ -24,7 +24,12 @@ export default class ChangeMemberAuthority {
             const { teamId, memberId, role } = parsed.data;
 
             if (memberId === req.user.id) {
-                return ResponseWriter.success(res, "CALLING_YOURSELF", "can't change your own authority", undefined);
+                return ResponseWriter.success(
+                    res,
+                    "CALLING_YOURSELF",
+                    "can't change your own authority",
+                    undefined,
+                );
             }
 
             const team = await prisma.team.findUnique({
