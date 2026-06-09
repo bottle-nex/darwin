@@ -69,7 +69,7 @@ export default function PlaygroundTeamMembers({
                 ) : !members?.length ? (
                     <p className="px-1 py-2 text-[12px] text-neutral-500">No members yet.</p>
                 ) : (
-                    <RenderMembers membersData={data} currentStat={currentStat} />
+                    <RenderMembers membersData={data} currentStat={currentStat} teamId={teamId} orgId={dashboard?.org.id ?? ""} />
                 )}
             </div>
 
@@ -126,9 +126,13 @@ export default function PlaygroundTeamMembers({
 function RenderMembers({
     membersData,
     currentStat,
+    teamId,
+    orgId,
 }: {
     membersData: NoInfer<TeamMembersData> | undefined;
     currentStat: StatType;
+    teamId: string;
+    orgId: string;
 }) {
     function renderRows() {
         switch (currentStat) {
@@ -138,9 +142,12 @@ function RenderMembers({
                         key={member.id}
                         card={
                             <ProfileCard
+                                id={member.id}
                                 name={member.user.name ?? member.user.email}
                                 role={member.role}
                                 profilimage={member.user.image ?? ""}
+                                teamId={teamId}
+                                orgId={orgId}
                             />
                         }
                     >
@@ -155,9 +162,12 @@ function RenderMembers({
                             key={member.id}
                             card={
                                 <ProfileCard
+                                    id={member.id}
                                     name={member.user.name ?? member.user.email}
                                     role={member.role}
                                     profilimage={member.user.image ?? ""}
+                                    teamId={teamId}
+                                orgId={orgId}
                                 />
                             }
                         >
@@ -172,9 +182,12 @@ function RenderMembers({
                             key={member.id}
                             card={
                                 <ProfileCard
+                                    id={member.id}
                                     name={member.user.name ?? member.user.email}
                                     role={member.role}
                                     profilimage={member.user.image ?? ""}
+                                    teamId={teamId}
+                                orgId={orgId}
                                 />
                             }
                         >
@@ -187,9 +200,12 @@ function RenderMembers({
                         key={member.id}
                         card={
                             <ProfileCard
+                                id={member.id}
                                 name={member.user.email}
                                 role="Pending"
                                 profilimage=""
+                                teamId={teamId}
+                                orgId={orgId}
                             />
                         }
                     >
@@ -230,13 +246,18 @@ function HoverRow({ card, children }: { card: React.ReactNode; children: React.R
         if (timer.current) clearTimeout(timer.current);
     };
 
+    const CARD_W = 300;
+    const CARD_H = 296; // h-74 = 18.5rem at 16px base
+    const leftPos = Math.min(pos.x - 59, window.innerWidth - CARD_W - 8);
+    const topPos = Math.min(pos.y - 55, window.innerHeight - CARD_H - 8);
+
     return (
         <div onMouseEnter={show} onMouseLeave={hide}>
             {children}
             {visible && (
                 <div
                     className="fixed z-50"
-                    style={{ top: pos.y - 55, left: pos.x - 59 }}
+                    style={{ top: topPos, left: leftPos }}
                     onMouseEnter={cancelHide}
                     onMouseLeave={hide}
                 >
