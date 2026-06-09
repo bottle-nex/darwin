@@ -12,21 +12,22 @@ export default class Reconciler {
                 where: {
                     routingClaimedAt: {
                         lt: cut_off,
-                    }
+                    },
                 },
                 select: {
                     id: true,
-                }
-            })
+                },
+            });
 
             for (const p of projects) {
                 await prisma.project.update({
                     where: {
                         id: p.id,
-                    }, data: {
+                    },
+                    data: {
                         routingClaimedAt: null,
-                    }
-                })
+                    },
+                });
                 await this.ring(p.id);
             }
         } catch (err) {
@@ -39,22 +40,22 @@ export default class Reconciler {
             const cut_off = new Date(Date.now() - ORPHAN_TODO_MS);
             const issues = await prisma.issue.findMany({
                 where: {
-                    status: 'Todo',
+                    status: "Todo",
                     createdAt: {
                         lt: cut_off,
                     },
                 },
                 select: {
-                    projectId: true
-                }
-            })
+                    projectId: true,
+                },
+            });
             for (const i of issues) await this.ring(i.projectId);
         } catch (err) {
             console.error("error while sweeping orphan issues", err);
         }
     }
 
-    static async ring(projectId: Project['id']) {
+    static async ring(projectId: Project["id"]) {
         // abhi nahi likha hu
     }
 
