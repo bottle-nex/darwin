@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import React, { useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import { toast } from "sonner";
 import { IoPersonAddOutline } from "react-icons/io5";
@@ -11,8 +11,9 @@ import useInviteTeamMember from "@/hooks/invitations/useInviteTeamMember";
 import InviteToTeamDialog from "@/components/team/InviteToTeamDialog";
 import PlaygroundTeamMemberRow from "./TeamMemberRow";
 import { StatType } from "./TeamStats";
-import { TeamMemberDetail, TeamMembersData } from "@/types/team";
+import { TeamMembersData } from "@/types/team";
 import { TeamRole } from "@trymatcha/types";
+import ProfileCard from "@/components/utility/ProfileCard";
 
 export default function PlaygroundTeamMembers({
     teamId,
@@ -55,6 +56,7 @@ export default function PlaygroundTeamMembers({
                 )}
             </div>
 
+
             <div className="mt-5 flex flex-col gap-2.25">
                 {isLoading ? (
                     [0, 1, 2].map((i) => (
@@ -92,8 +94,7 @@ export default function PlaygroundTeamMembers({
                             onSuccess: ({ invited, failed }) => {
                                 if (invited.length) {
                                     toast.success(
-                                        `Invited ${invited.length} ${
-                                            invited.length === 1 ? "person" : "people"
+                                        `Invited ${invited.length} ${invited.length === 1 ? "person" : "people"
                                         }`,
                                     );
                                 }
@@ -129,35 +130,119 @@ function RenderMembers({
     membersData: NoInfer<TeamMembersData> | undefined;
     currentStat: StatType;
 }) {
-    switch (currentStat) {
-        case StatType.Total: {
-            const members = membersData?.members;
-            return members?.map((member) => (
-                <PlaygroundTeamMemberRow key={member.id} teamMember={member} />
-            ));
-        }
-        case StatType.Maintainers: {
-            const filteredMembers = membersData?.members.filter(
-                (m) => m.role === TeamRole.Maintainer,
-            );
-            return filteredMembers?.map((member) => (
-                <PlaygroundTeamMemberRow key={member.id} teamMember={member} />
-            ));
-        }
-        case StatType.Members: {
-            const filteredMembers = membersData?.members.filter((m) => m.role === TeamRole.Member);
-            return filteredMembers?.map((member) => (
-                <PlaygroundTeamMemberRow key={member.id} teamMember={member} />
-            ));
-        }
-        case StatType.Pending: {
-            const pendingMembers = membersData?.pendingInvites;
-            return pendingMembers?.map((member) => (
-                <PlaygroundTeamMemberRow key={member.id} pendingMember={member} />
-            ));
-        }
-        default: {
-            return <div></div>;
+    function renderRows() {
+        switch (currentStat) {
+            case StatType.Total:
+                return membersData?.members.map((member) => (
+                    <HoverRow
+                        key={member.id}
+                        card={
+                            <ProfileCard
+                                name={member.user.name ?? member.user.email}
+                                role={member.role}
+                                profilimage={member.user.image ?? ""}
+                            />
+                        }
+                    >
+                        <PlaygroundTeamMemberRow teamMember={member} />
+                    </HoverRow>
+                ));
+            case StatType.Maintainers:
+                return membersData?.members
+                    .filter((m) => m.role === TeamRole.Maintainer)
+                    .map((member) => (
+                        <HoverRow
+                            key={member.id}
+                            card={
+                                <ProfileCard
+                                    name={member.user.name ?? member.user.email}
+                                    role={member.role}
+                                    profilimage={member.user.image ?? ""}
+                                />
+                            }
+                        >
+                            <PlaygroundTeamMemberRow teamMember={member} />
+                        </HoverRow>
+                    ));
+            case StatType.Members:
+                return membersData?.members
+                    .filter((m) => m.role === TeamRole.Member)
+                    .map((member) => (
+                        <HoverRow
+                            key={member.id}
+                            card={
+                                <ProfileCard
+                                    name={member.user.name ?? member.user.email}
+                                    role={member.role}
+                                    profilimage={member.user.image ?? ""}
+                                />
+                            }
+                        >
+                            <PlaygroundTeamMemberRow teamMember={member} />
+                        </HoverRow>
+                    ));
+            case StatType.Pending:
+                return membersData?.pendingInvites.map((member) => (
+                    <HoverRow
+                        key={member.id}
+                        card={
+                            <ProfileCard
+                                name={member.user.email}
+                                role="Pending"
+                                profilimage=""
+                            />
+                        }
+                    >
+                        <PlaygroundTeamMemberRow pendingMember={member} />
+                    </HoverRow>
+                ));
+            default:
+                return null;
         }
     }
+
+    return <div>{renderRows()}</div>;
+}
+
+function HoverRow({ card, children }: { card: React.ReactNode; children: React.ReactNode }) {
+    const [visible, setVisible] = useState(false);
+    const [pos, setPos] = useState({ x: 0, y: 0 });
+    const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const locked = useRef(false);
+
+    const show = (e: React.MouseEvent) => {
+        if (timer.current) clearTimeout(timer.current);
+        if (!locked.current) {
+            setPos({ x: e.clientX, y: e.clientY });
+            locked.current = true;
+        }
+        setVisible(true);
+    };
+
+    const hide = () => {
+        timer.current = setTimeout(() => {
+            setVisible(false);
+            locked.current = false;
+        }, 200);
+    };
+
+    const cancelHide = () => {
+        if (timer.current) clearTimeout(timer.current);
+    };
+
+    return (
+        <div onMouseEnter={show} onMouseLeave={hide}>
+            {children}
+            {visible && (
+                <div
+                    className="fixed z-50"
+                    style={{ top: pos.y - 55, left: pos.x - 59 }}
+                    onMouseEnter={cancelHide}
+                    onMouseLeave={hide}
+                >
+                    {card}
+                </div>
+            )}
+        </div>
+    );
 }
