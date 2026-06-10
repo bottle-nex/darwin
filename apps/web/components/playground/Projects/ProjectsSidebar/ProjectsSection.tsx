@@ -5,6 +5,7 @@ import Row from "../../Sidebar/SidebarRow";
 import Section from "../../Sidebar/SidebarSection";
 import { useGetDashboard } from "@/hooks/dashboard/useGetDashboard";
 import { matchesQuery, type SidebarNavRow, type SidebarSectionProps } from "../../Sidebar/shared";
+import { ProjectsTab } from "../projectsTabs";
 
 const DEFAULT_FOLDER_COLOR = "#6366f1";
 
@@ -12,7 +13,7 @@ const DEFAULT_FOLDER_COLOR = "#6366f1";
 // for keyboard-search navigation (mirrors the dynamic Favorites section).
 export const rows: SidebarNavRow[] = [];
 
-export default function PlaygroundSidebarProjectsSection({ query }: SidebarSectionProps) {
+export default function PlaygroundSidebarProjectsSection({ query, onSelect }: SidebarSectionProps) {
     const router = useRouter();
     const { orgSlug, projectSlug } = useParams<{
         orgSlug: string;
@@ -45,7 +46,10 @@ export default function PlaygroundSidebarProjectsSection({ query }: SidebarSecti
                             ),
                         }}
                         active={p.slug === projectSlug}
-                        onClick={() => router.push(`/playground/${orgSlug}/${p.slug}`)}
+                        onClick={() => {
+                            router.push(`/playground/${orgSlug}/${p.slug}`);
+                            onSelect(ProjectsTab.Gantt);
+                        }}
                     />
                 ))}
                 {!searching && <Row label="Add Project" leading={{ kind: "icon", icon: Plus }} />}
