@@ -14,7 +14,7 @@ const NAV_ITEMS = [
     { label: "Why", href: "/why" },
     { label: "Features", href: "/#features" },
     { label: "Pricing", href: "/#pricing" },
-    { label: "About", href: "/#about" },
+    { label: "About", href: "/about" },
 ];
 
 export function NavBar({ isMarkettingPage = false }: { isMarkettingPage?: boolean }) {
@@ -61,10 +61,12 @@ export function NavBar({ isMarkettingPage = false }: { isMarkettingPage?: boolea
                         <AppLogo className={isMarkettingPage ? "text-neutral-100" : ""} />
                     </Link>
                 </div>
-                <nav className={cn("flex items-center gap-x-24 ml-12")}>
-                    <section className="hidden md:flex items-center gap-x-8 uppercase">
+                <nav
+                    className={cn("hidden md:flex items-center gap-x-8 lg:gap-x-24 ml-4 lg:ml-12")}
+                >
+                    <section className="flex items-center gap-x-5 lg:gap-x-8 uppercase">
                         {NAV_ITEMS.map((item, i) => (
-                            <div key={item.label} className="flex items-center gap-x-8">
+                            <div key={item.label} className="flex items-center gap-x-5 lg:gap-x-8">
                                 {i > 0 && <span className="h-2.5 w-px bg-neutral-400" />}
                                 <Link
                                     href={item.href}
@@ -89,7 +91,7 @@ export function NavBar({ isMarkettingPage = false }: { isMarkettingPage?: boolea
                 <div className="flex items-center gap-2">
                     <Button
                         variant={isMarkettingPage ? "tertiary" : "secondary"}
-                        className="flex items-center justify-center"
+                        className="hidden lg:flex items-center justify-center"
                         onClick={session ? handleRedirect : handleSignin}
                     >
                         Connect with us

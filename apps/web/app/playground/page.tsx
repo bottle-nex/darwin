@@ -65,8 +65,8 @@ function PlaygroundLanding() {
     const noOrgs = !orgsPending && !orgsError && orgs.length === 0;
 
     return (
-        <main className="h-dvh overflow-y-auto bg-charcoal px-6 py-8 text-neutral-100 sm:px-10">
-            <div className="mx-auto flex max-w-7xl flex-col gap-6 lg:min-h-[calc(100dvh-4rem)] lg:flex-row lg:gap-8">
+        <main className="h-dvh overflow-y-auto bg-charcoal px-6 text-neutral-100 sm:px-10">
+            <div className="mx-auto flex flex-col gap-6 lg:min-h-[calc(100dvh-4rem)] lg:flex-row lg:gap-8 h-full">
                 {noOrgs ? (
                     <div className="flex h-[90vh] w-full flex-col items-center justify-center gap-4 text-center">
                         <span className="flex size-12 items-center justify-center rounded-xl border border-white/10 bg-white/5">
@@ -96,7 +96,7 @@ function PlaygroundLanding() {
 
                         <div className="hidden w-px self-stretch bg-white/10 lg:block" />
 
-                        <section className="flex min-w-0 flex-1 flex-col gap-5">
+                        <section className="flex min-w-0 flex-1 flex-col gap-5 py-8">
                             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                                 <div className="relative w-full sm:max-w-xs">
                                     <FaMagnifyingGlass className="pointer-events-none absolute top-1/2 left-3 size-3.5 -translate-y-1/2 text-neutral-500" />

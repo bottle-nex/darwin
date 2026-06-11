@@ -32,12 +32,12 @@ export default function OrgList({
     }, [orgs, search]);
 
     return (
-        <aside className="flex w-full shrink-0 flex-col gap-3 sm:w-64">
+        <aside className="flex w-full shrink-0 flex-col gap-3 sm:w-64 py-8">
             <div className="flex items-center justify-between">
-                <h2 className="text-[13px] font-semibold text-neutral-200">Organizations</h2>
-                <Button size="xs" variant="tertiary" onClick={onCreateOrg}>
+                <h2 className="text-[13px] font-semibold">Organizations</h2>
+                <Button variant="tertiary" onClick={onCreateOrg}>
                     <IoAddSharp className="size-3" />
-                    New
+                    create org
                 </Button>
             </div>
 

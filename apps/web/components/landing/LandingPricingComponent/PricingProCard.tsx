@@ -100,10 +100,10 @@ export default function PricingProCard() {
     const subtitle = isYearly ? "$119.99 billed yearly" : "billed monthly";
 
     return (
-        <div className="h-full w-1/2 bg-[#AB9FF2] rounded-4xl flex flex-col items-center justify-center px-12 gap-9 text-white">
+        <div className="w-full lg:h-full lg:w-1/2 bg-[#AB9FF2] rounded-4xl flex flex-col items-center justify-center px-6 sm:px-12 py-16 lg:py-0 gap-9 text-white">
             {/* Price block */}
             <div className="flex flex-col items-center gap-2 scale-105">
-                <div className="font-serif text-7xl text-[#FAFAFE] tracking-tight leading-none tabular-nums">
+                <div className="font-serif text-5xl sm:text-7xl text-[#FAFAFE] tracking-tight leading-none tabular-nums">
                     $<AnimatedNumber value={priceValue} />
                     /mo
                 </div>

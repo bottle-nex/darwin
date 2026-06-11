@@ -11,7 +11,7 @@ export default function SectionHeader({ title, header, description }: SectionHea
         <div className="w-full h-auto flex flex-col items-center max-w-170">
             <div className={cn("text-neutral-400 text-2xl")}>{header}</div>
 
-            <div className="text-neutral-900 text-5xl font-semibold tracking-tight text-center -mt-1">
+            <div className="text-neutral-900 text-3xl sm:text-4xl md:text-5xl font-semibold tracking-tight text-center -mt-1">
                 {title}
             </div>
 

@@ -39,14 +39,12 @@ export default function PricingFreeCard() {
 
     return (
         <div
-            className="h-full w-1/2 bg-[#1A1A1A] rounded-4xl relative overflow-hidden"
+            className="w-full lg:h-full lg:w-1/2 bg-[#1A1A1A] rounded-4xl relative overflow-hidden"
             onMouseEnter={() => setHovered(true)}
             onMouseLeave={() => setHovered(false)}
         >
-            {/* iphone card */}
             <div className="absolute -top-5 left-1/2 -translate-x-1/2 h-90 w-75 rounded-b-[3rem] bg-[#121212] border-8 border-[#202020] shadow-2xl shadow-black p-2">
                 <div className="h-full w-full bg-[#202020] rounded-b-4xl flex flex-col relative">
-                    {/* commit cards */}
                     <div className="flex-1 pt-4 px-2.5 flex flex-col gap-1.5">
                         {COMMITS.map((c, i) => (
                             <div key={i} className="bg-neutral-800/70 rounded-xl p-2.5">
@@ -113,15 +111,14 @@ export default function PricingFreeCard() {
                         </motion.div>
                     </div>
 
-                    {/* bottom nav */}
                     <div className="h-13 bg-neutral-900 border-t border-neutral-800/60 flex items-center justify-around px-3 pb-1 rounded-b-4xl">
                         {NAV_ICONS.map(({ Icon, highlight }, i) =>
                             highlight ? (
                                 <div
                                     key={i}
-                                    className="bg-[#FF6B42] rounded-full size-7 flex items-center justify-center"
+                                    className="bg-primary rounded-full size-7 flex items-center justify-center"
                                 >
-                                    <Icon className="size-3.5 text-white" />
+                                    <Icon className="size-3.5 text-black" />
                                 </div>
                             ) : (
                                 <Icon key={i} className="size-4 text-neutral-500" />
@@ -129,12 +126,11 @@ export default function PricingFreeCard() {
                         )}
                     </div>
 
-                    {/* swipe bar */}
                     <div className="absolute bottom-1 left-1/2 -translate-x-1/2 z-10 h-0.75 w-22 bg-neutral-700/60 rounded-full" />
                 </div>
             </div>
 
-            <div className="h-full w-full mt-[55%] flex flex-col max-w-md mx-auto items-center gap-y-2">
+            <div className="h-full w-full mt-88 lg:mt-[55%] px-6 flex flex-col max-w-md mx-auto items-center gap-y-2">
                 <div className="text-neutral-300 text-3xl">Explore for free</div>
 
                 <div className="text-neutral-500 text-[17px] leading-[1.4] text-center">
@@ -142,15 +138,15 @@ export default function PricingFreeCard() {
                     pr and let our matcha agent handle the bug with minor approvals.
                 </div>
 
-                <div className="h-11 w-full flex gap-x-4 items-center justify-center mt-5">
-                    <div className="h-full w-40 text-neutral-100 px-4 flex items-center justify-center gap-x-2 bg-neutral-600/90 rounded-md shadow-sm shadow-black/5 group hover:bg-primary hover:text-neutral-800 transition-all transform duration-300 cursor-pointer">
+                <div className="w-full flex flex-col sm:flex-row gap-3 sm:gap-x-4 items-center justify-center mt-5 pb-10">
+                    <div className="h-11 w-40 text-neutral-100 px-4 flex items-center justify-center gap-x-2 bg-neutral-600/90 rounded-md shadow-sm shadow-black/5 group hover:bg-primary hover:text-neutral-800 transition-all transform duration-300 cursor-pointer">
                         <span className="flex gap-x-2 items-center group-hover:scale-[0.94] transition-all transform duration-300">
                             Get Started
                             <HiMiniChevronRight className="size-5.5" />
                         </span>
                     </div>
 
-                    <div className="h-full w-40 text-neutral-100 px-4 flex items-center justify-center gap-x-2 bg-neutral-600/90 rounded-md shadow-sm shadow-black/5 group hover:bg-primary hover:text-neutral-800 transition-all transform duration-300 cursor-pointer">
+                    <div className="h-11 w-40 text-neutral-100 px-4 flex items-center justify-center gap-x-2 bg-neutral-600/90 rounded-md shadow-sm shadow-black/5 group hover:bg-primary hover:text-neutral-800 transition-all transform duration-300 cursor-pointer">
                         <span className="flex gap-x-2 items-center group-hover:scale-[0.94] transition-all transform duration-250">
                             Know more
                             <MdOutlineReadMore className="size-5" />

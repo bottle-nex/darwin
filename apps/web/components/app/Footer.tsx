@@ -107,7 +107,7 @@ export function Footer({ isMarkettingPage = false }: { isMarkettingPage?: boolea
                     </div>
                     <div
                         className={cn(
-                            "mt-12 flex flex-col sm:flex-row items-center justify-between -mx-6 px-6",
+                            "mt-12 flex flex-col sm:flex-row items-center justify-between gap-3 -mx-6 px-6",
                             "pt-6",
                             "text-xs",
                             isMarkettingPage ? "text-neutral-500" : "text-neutral-400",

@@ -7,7 +7,6 @@ import CreateProjectDialog from "@/components/project/CreateProjectDialog";
 import PlaygroundOrgSwitcher from "./PlaygroundOrgSwitcher";
 import GithubConnectButton from "./GithubConnectButton";
 import PlaygroundUserMenu from "./PlaygroundUserMenu";
-
 export default function PlaygroundTopBar() {
     const { setOpen } = useNewProjectStore();
 
