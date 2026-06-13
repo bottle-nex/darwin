@@ -79,10 +79,13 @@ export default function FeaturesSection() {
             </div>
             <div className="grid grid-cols-1 gap-px border-y border-neutral-200 bg-neutral-200 md:grid-cols-2 lg:grid-cols-3">
                 {FEATURES.map((feature, i) => (
-                    <div key={feature.index} className="bg-snow">
+                    <div
+                        key={feature.index}
+                        className="relative border border-transparent bg-snow transition-all duration-300 ease-out hover:z-10 hover:scale-[1.04] hover:rounded-lg hover:border-neutral-300/60 hover:shadow-2xl hover:shadow-neutral-900/10 [&:hover]:overflow-hidden"
+                    >
                         <Reveal
                             delay={(i % 3) * 0.07}
-                            className="group flex h-full flex-col gap-5 p-6 transition-colors duration-200 hover:bg-mist sm:p-8"
+                            className="group flex h-full flex-col gap-5 p-6 transition-colors duration-200 hover:bg-neutral-200 sm:p-8"
                         >
                             <div className="flex items-center justify-between">
                                 <feature.icon

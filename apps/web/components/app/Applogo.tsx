@@ -3,8 +3,6 @@ interface AppLogoProps {
     className?: string;
 }
 
-const M_PATH = "M9 21.5V14a3.5 3.5 0 0 1 7 0V21.5V14a3.5 3.5 0 0 1 7 0V21.5";
-
 export default function AppLogo({ iconOnly = false, className = "" }: AppLogoProps) {
     return (
         <div className={`flex items-center gap-2 ${className}`}>
@@ -49,6 +47,18 @@ export default function AppLogo({ iconOnly = false, className = "" }: AppLogoPro
                         <stop offset="0" stopColor="#fff" stopOpacity="0.55" />
                         <stop offset="1" stopColor="#fff" stopOpacity="0.05" />
                     </linearGradient>
+                    <linearGradient id="matcha-logo-lid" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0" stopColor="#fff" stopOpacity="1" />
+                        <stop offset="1" stopColor="#fff" stopOpacity="0.75" />
+                    </linearGradient>
+                    <linearGradient id="matcha-logo-face-right" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0" stopColor="#fff" stopOpacity="0.92" />
+                        <stop offset="1" stopColor="#fff" stopOpacity="0.5" />
+                    </linearGradient>
+                    <linearGradient id="matcha-logo-face-left" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0" stopColor="#fff" stopOpacity="0.7" />
+                        <stop offset="1" stopColor="#fff" stopOpacity="0.38" />
+                    </linearGradient>
                 </defs>
                 <rect x="1.5" y="1.5" width="29" height="29" rx="9" fill="url(#matcha-logo-base)" />
                 <rect
@@ -68,22 +78,11 @@ export default function AppLogo({ iconOnly = false, className = "" }: AppLogoPro
                     stroke="url(#matcha-logo-edge)"
                     strokeWidth="0.8"
                 />
-                <path
-                    d={M_PATH}
-                    transform="translate(0 0.9)"
-                    stroke="#4B3AA8"
-                    strokeOpacity="0.4"
-                    strokeWidth="2.6"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                />
-                <path
-                    d={M_PATH}
-                    stroke="#fff"
-                    strokeWidth="2.6"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                />
+                {/* Exploded isometric cube: floating lid over an open body */}
+                <path d="M7.9 12.6L16 8.4L24.1 12.6L16 16.9Z" fill="#fff" fillOpacity="0.25" />
+                <path d="M16 5.4L24.1 9.6L16 13.9L7.9 9.6Z" fill="url(#matcha-logo-lid)" />
+                <path d="M7.9 12.6L16 16.9V25.6L7.9 21.4Z" fill="url(#matcha-logo-face-left)" />
+                <path d="M24.1 12.6L16 16.9V25.6L24.1 21.4Z" fill="url(#matcha-logo-face-right)" />
             </svg>
             {!iconOnly && (
                 <span className="text-xl font-semibold leading-none tracking-tight">

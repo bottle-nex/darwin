@@ -18,6 +18,7 @@ import FilterPanel from "./KanbanOptionPanels/FilterPanel";
 import LabelPanel from "./KanbanOptionPanels/LabelPanel";
 import SearchBar from "./KanbanOptionPanels/SearchBar";
 import SelectedLabels from "./KanbanOptionPanels/SelectedLabels";
+import { Button } from "@/components/ui/button";
 
 const TASK_OPTIONS = [
     { id: "issue", label: "New issue", icon: Plus },
@@ -80,22 +81,23 @@ export default function KanbanOptionsBar({ options }: { options: KanbanOptions }
 
                 {/* Split button: primary "Add Task" + a chevron that opens a menu. */}
                 <div className="ml-1 flex items-center overflow-hidden rounded-sm bg-neutral-100 text-neutral-900">
-                    <button
+                    <Button
+                        variant="tertiary"
                         type="button"
-                        className="flex h-6 cursor-pointer items-center px-2 text-[11.5px] font-medium hover:bg-black/5"
+                        className="flex h-6 cursor-pointer items-center px-2 text-[11.5px] font-medium hover:bg-black/5 rounded-l-[1px] rounded-r-none"
                     >
                         Add Task
-                    </button>
-                    <span className="h-3.5 w-px bg-neutral-300" aria-hidden />
+                    </Button>
                     <DropdownMenu.Root>
                         <DropdownMenu.Trigger asChild>
-                            <button
+                            <Button
+                                variant="tertiary"
                                 type="button"
                                 aria-label="More task options"
-                                className="flex h-6 cursor-pointer items-center px-1 hover:bg-black/5"
+                                className="flex h-6 cursor-pointer items-center px-1 hover:bg-black/5 rounded-none"
                             >
                                 <ChevronDown className="size-3.5" aria-hidden />
-                            </button>
+                            </Button>
                         </DropdownMenu.Trigger>
                         <DropdownMenu.Portal>
                             <DropdownMenu.Content
