@@ -6,6 +6,7 @@ export enum ProjectsTab {
     Overview = "projects-overview",
     TeamDetail = "team-detail",
     Gantt = "gantt",
+    Settings = "project-settings",
 }
 
 export const PROJECTS_DEFAULT_TAB: ProjectsTab = ProjectsTab.Overview;

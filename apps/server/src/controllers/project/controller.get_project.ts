@@ -11,6 +11,12 @@ const params_schema = z.object({
 
 export default async function get_project_controller(req: Request, res: Response) {
     try {
+        const user = req.user;
+        if (!user || !user.id) {
+            ResponseWriter.not_authorized(res);
+            return;
+        }
+
         const parsed = params_schema.safeParse(req.params);
         if (!parsed.success) {
             ResponseWriter.invalid_data(res, "Invalid project id");
@@ -18,11 +24,10 @@ export default async function get_project_controller(req: Request, res: Response
         }
 
         const { project_id } = parsed.data;
-        const user_id = req.user.id;
 
-        const project_role = await Access.project(user_id, project_id);
+        const project_role = await Access.project(user.id, project_id);
         if (!project_role || !Permissions.project(project_role, Action.project.read)) {
-            ResponseWriter.not_authorized(res, "You don't have access to this project");
+            ResponseWriter.not_authorized(res, "You dont have access to this project");
             return;
         }
 

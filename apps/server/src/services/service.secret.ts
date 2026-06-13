@@ -12,14 +12,6 @@ type EncryptedPayload = {
     authTag: string;
 };
 
-/**
- * Project-secret vault.
- *
- * Encrypts secret values with AES-256-GCM and stores the ciphertext, nonce, and auth
- * tag on {@link ProjectSecret} (base64-encoded). The encryption key lives only in
- * `SERVER_SECRET_ENCRYPTION_KEY` (server env), never in the database — a DB leak alone
- * exposes nothing. Secrets are project-scoped and reused across every issue-run.
- */
 export default class SecretService {
     private static encrypt(plaintext: string): EncryptedPayload {
         const iv = randomBytes(IV_LENGTH);
@@ -64,6 +56,20 @@ export default class SecretService {
 
         if (!row) return null;
         return this.decrypt(row);
+    }
+
+    /**
+     * Lists the secret *keys* for a project (with last-updated time) — never the
+     * values. Backs the settings UI, which is write-only: members can see which
+     * secrets exist and overwrite/delete them, but values are never sent to the
+     * browser. Use {@link get_all_secrets} only for server-side runner injection.
+     */
+    static async list_secret_keys(projectId: string): Promise<{ key: string; updatedAt: Date }[]> {
+        return prisma.projectSecret.findMany({
+            where: { projectId },
+            select: { key: true, updatedAt: true },
+            orderBy: { key: "asc" },
+        });
     }
 
     static async get_all_secrets(projectId: string): Promise<Record<string, string>> {

@@ -48,7 +48,7 @@ export default function PlaygroundSidebarProjectsSection({ query, onSelect }: Si
                         active={p.slug === projectSlug}
                         onClick={() => {
                             router.push(`/playground/${orgSlug}/${p.slug}`);
-                            onSelect(ProjectsTab.Gantt);
+                            onSelect(ProjectsTab.Overview);
                         }}
                     />
                 ))}

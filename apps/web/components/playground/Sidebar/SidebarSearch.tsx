@@ -12,6 +12,8 @@ type SidebarSearchProps = {
     onArrowUp?: () => void;
     /** Open the highlighted result. */
     onEnter?: () => void;
+    /** Override the input placeholder (defaults to the sidebar copy). */
+    placeholder?: string;
 };
 
 /** Full-width sidebar search field that the header expands into. */
@@ -22,6 +24,7 @@ export default function SidebarSearch({
     onArrowDown,
     onArrowUp,
     onEnter,
+    placeholder = "Search sidebar...",
 }: SidebarSearchProps) {
     const inputRef = useRef<HTMLInputElement>(null);
 
@@ -60,7 +63,7 @@ export default function SidebarSearch({
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="Search sidebar..."
+                placeholder={placeholder}
                 className="h-7 w-full rounded-md border border-white/8 bg-white/5 pr-9 pl-8 text-[12px] text-neutral-100 placeholder:text-neutral-500 focus:border-white/25 focus:outline-none"
             />
             <button

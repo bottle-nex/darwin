@@ -1,34 +1,48 @@
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
-
 export const API_URL = BACKEND_URL + "/api/v1";
-export const AUTH_URL = API_URL + "/auth";
 
+// <--------------------- AUTH ROUTES --------------------->
+export const AUTH_URL = API_URL + "/auth";
 export const SIGNIN_URL = AUTH_URL + "/sign-in";
 export const REQUEST_OTP_URL = AUTH_URL + "/otp/request";
 export const VERIFY_OTP_URL = AUTH_URL + "/otp/verify";
 
+// <--------------------- ORG ROUTES --------------------->
 export const LIST_ORG = API_URL + "/org";
 export const CREATE_ORG = API_URL + "/org/create";
 export const PLAYGROUND_URL = API_URL + "/playground";
 export const PRELOAD_URL = PLAYGROUND_URL + "/preload";
 export const DASHBOARD_URL = (orgSlug: string) => `${PLAYGROUND_URL}/dashboard/${orgSlug}`;
 
-export const CREATE_PROJECT = API_URL + "/project/create";
-export const GET_PROJECT = (projectId: string) => `${API_URL}/project/${projectId}`;
+// <--------------------- PROJECT ROUTES --------------------->
+export const PROJECT_URL = API_URL + "/project";
+export const CREATE_PROJECT = PROJECT_URL + "/create";
+export const GET_PROJECT = (projectId: string) => `${PROJECT_URL}/${projectId}`;
+export const UPDATE_PROJECT_URL = PROJECT_URL + "/update";
+export const DELETE_PROJECT_URL = PROJECT_URL + "/delete";
+export const LIST_PROJECT_MEMBERS_URL = (project_id: string) =>
+    `${PROJECT_URL}/${project_id}/members`;
+export const SET_PROJECT_SECRET = (project_id: string) => `${PROJECT_URL}/${project_id}/secrets`;
+export const LIST_PROJECT_SECRETS_URL = (project_id: string) =>
+    `${PROJECT_URL}/${project_id}/secrets`;
+export const DELETE_PROJECT_SECRET_URL = (project_id: string, key: string) =>
+    `${PROJECT_URL}/${project_id}/secrets/${encodeURIComponent(key)}`;
 
+// <--------------------- TEAM ROUTES --------------------->
 export const CREATE_TEAM = API_URL + "/teams/create";
 export const GET_TEAM_MEMBERS = (teamId: string) => `${API_URL}/teams/${teamId}/members`;
 export const DELETE_TEAM = (teamId: string) => `${API_URL}/teams/${teamId}`;
 export const CHANGE_MEMBER_AUTHORITY = API_URL + "/teams/change-authority";
 export const REMOVE_MEMBERS = API_URL + "/teams/remove-members";
 
+// <--------------------- GITHUB ROUTES --------------------->
 export const GITHUB_URL = API_URL + "/github";
 export const GITHUB_CONNECT_START = GITHUB_URL + "/connect/start";
 export const GITHUB_CONNECT_COMPLETE = GITHUB_URL + "/connect/complete";
 export const GITHUB_DISCONNECT = (orgId: string) => `${GITHUB_URL}/connect/${orgId}`;
 export const GITHUB_REPOS = (orgId: string) => `${GITHUB_URL}/installations/${orgId}/repos`;
 
-// <----------------- INVITATION ROUTES ----------------->
+// <--------------------- INVITATAION ROUTES --------------------->
 export const INVITATIONS_URL = API_URL + "/invitations";
 export const LIST_INVITES_URL = INVITATIONS_URL;
 export const ACCEPT_INVITE_URL = INVITATIONS_URL + "/accept";
