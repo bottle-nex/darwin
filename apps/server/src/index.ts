@@ -17,7 +17,6 @@ app.use(
     }),
 );
 app.use(express.json());
-
 app.use("/api/v1", v1_router);
 
 server.listen(ENV.SERVER_PORT, () => {
