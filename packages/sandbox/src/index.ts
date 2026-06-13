@@ -95,7 +95,7 @@ export class McpServerService {
             body: JSON.stringify(args),
         });
 
-        for (; ;) {
+        for (;;) {
             const res = await this.api(`/sandbox/answer?key=${encodeURIComponent(args.key)}`);
             if (res.status === 200) {
                 const { value, provided } = (await res.json()) as {
