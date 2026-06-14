@@ -73,7 +73,8 @@ export default function FeaturesSection() {
                 </Reveal>
                 <Reveal delay={0.08}>
                     <h2 className="text-4xl font-extralight leading-[1.05] text-neutral-900 sm:text-5xl md:text-6xl">
-                        Everything between <br /> issue and merge.
+                        Everything between <br />{" "}
+                        <span className="text-neutral-400">issue and merge.</span>
                     </h2>
                 </Reveal>
             </div>

@@ -4,9 +4,11 @@ import { motion, useScroll, useTransform } from "motion/react";
 import { Kanban, Layers, List, Search, Settings2, Share2, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { COLUMNS, INITIAL_BOARD } from "@/components/playground/Home/panes/kanban/data";
+import { HiPlusSmall } from "react-icons/hi2";
 import type { KanbanColumnDef } from "@/components/playground/Home/panes/kanban/types";
 import CardRenderer from "@/components/playground/Home/panes/kanban/cards/CardRenderer";
 import Reveal from "@/components/utility/Reveal";
+import { Button } from "@/components/ui/button";
 
 const CARDS_PER_COLUMN = 3;
 
@@ -47,9 +49,9 @@ function ShowcaseOptionsBar() {
                         <Icon className="size-3.5" aria-hidden />
                     </span>
                 ))}
-                <span className="ml-1 flex h-6 items-center rounded-sm bg-neutral-100 px-2 text-[11.5px] font-medium text-neutral-900">
+                <Button variant={'tertiary'} className="ml-1 flex h-6 items-center rounded-sm bg-neutral-100 px-2 text-[11.5px] font-medium text-neutral-900">
                     Add Task
-                </span>
+                </Button>
             </div>
         </div>
     );
@@ -108,9 +110,12 @@ export default function BoardShowcase() {
                         <span className="size-2.5 rounded-full bg-[#FF5F57]" />
                         <span className="size-2.5 rounded-full bg-[#FEBC2E]" />
                         <span className="size-2.5 rounded-full bg-[#28C840]" />
-                        <span className="ml-3 font-mono text-[11px] text-neutral-500">
-                            app.trymatcha.com
-                        </span>
+                        <div className="ml-3 font-mono text-[11px] text-neutral-900 bg-primary px-2 py-0.75 rounded-sm flex items-center justify-start">
+                            <HiPlusSmall className="mr-1 rotate-45" />
+                            <span>
+                                app.trymatcha.com
+                            </span>
+                        </div>
                     </div>
                     <ShowcaseTopbar />
                     <ShowcaseOptionsBar />

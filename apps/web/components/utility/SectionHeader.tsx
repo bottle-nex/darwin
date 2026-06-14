@@ -1,21 +1,22 @@
 import { cn } from "@/lib/utils";
+import type { ReactNode } from "react";
 
 interface SectionHeaderProps {
     header: string;
-    title: string;
+    title: ReactNode;
     description?: string;
 }
 
 export default function SectionHeader({ title, header, description }: SectionHeaderProps) {
     return (
-        <div className="w-full h-auto flex flex-col items-center max-w-170">
+        <div className="w-full h-auto flex flex-col items-start max-w-170">
             <div className={cn("text-neutral-400 text-2xl")}>{header}</div>
 
-            <div className="text-neutral-900 text-3xl sm:text-4xl md:text-5xl font-semibold tracking-tight text-center -mt-1">
+            <div className="text-neutral-900 text-4xl sm:text-6xl md:text-7xl font-light tracking-tight text-left leading-[1.08] sm:leading-[1.02] -mt-1">
                 {title}
             </div>
 
-            <div className="text-neutral-500 text-base mt-4 text-center leading-[1.3]">
+            <div className="text-neutral-500 text-base mt-4 text-left leading-[1.3]">
                 {description}
             </div>
         </div>
