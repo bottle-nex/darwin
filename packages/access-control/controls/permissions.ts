@@ -45,6 +45,8 @@ const PROJECT_PERMISSIONS: Record<ProjectRole, Set<ProjectAction>> = {
         Action.project.cancel_runner,
         Action.project.view_runner_logs,
         Action.project.manage_connectors,
+        Action.project.write_envs,
+        Action.project.read_envs,
     ]),
     [ProjectRole.Maintain]: new Set([
         Action.project.read,
@@ -57,6 +59,8 @@ const PROJECT_PERMISSIONS: Record<ProjectRole, Set<ProjectAction>> = {
         Action.project.cancel_runner,
         Action.project.view_runner_logs,
         Action.project.manage_connectors,
+        Action.project.write_envs,
+        Action.project.read_envs,
     ]),
     [ProjectRole.Write]: new Set([
         Action.project.read,
@@ -66,6 +70,8 @@ const PROJECT_PERMISSIONS: Record<ProjectRole, Set<ProjectAction>> = {
         Action.project.assign_issue,
         Action.project.trigger_runner,
         Action.project.view_runner_logs,
+        Action.project.write_envs,
+        Action.project.read_envs,
     ]),
     [ProjectRole.Triage]: new Set([
         Action.project.read,
@@ -83,8 +89,10 @@ const TEAM_PERMISSIONS: Record<TeamRole, Set<TeamAction>> = {
         Action.team.add_member,
         Action.team.remove_member,
         Action.team.change_member_role,
+        Action.team.write_envs,
+        Action.team.read_envs,
     ]),
-    [TeamRole.Member]: new Set([Action.team.read]),
+    [TeamRole.Member]: new Set([Action.team.read, Action.team.read_envs]),
 };
 
 export default class Permissions {
