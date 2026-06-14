@@ -6,7 +6,7 @@ import WorkersOverviewPane from "./WorkersOverviewPane";
 import WorkerDetailPane from "./WorkerDetailPane";
 
 /** Renders the Workers surface — overview, or a selected worker's detail. */
-export default function WorkersMainPane() {
+export default function WorkersDisplay() {
     const tab = usePlaygroundNavStore((s) => s.tabBySurface[RailSurface.Workers]);
 
     switch (tab) {

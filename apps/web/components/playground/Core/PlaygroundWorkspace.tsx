@@ -1,7 +1,7 @@
 "use client";
 import { AnimatePresence, motion } from "motion/react";
 import type { RailSurface } from "../IconRail/railSurface";
-import PlaygroundMainPane from "./PlaygroundMainPane";
+import PlaygroundDisplay from "./PlaygroundDisplay";
 import PlaygroundSidebar from "../Sidebar/PlaygroundSidebar";
 
 const SIDEBAR_W = 240;
@@ -33,7 +33,7 @@ export default function PlaygroundWorkspace({
                     </motion.div>
                 )}
             </AnimatePresence>
-            <PlaygroundMainPane />
+            <PlaygroundDisplay />
         </div>
     );
 }

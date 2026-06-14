@@ -9,7 +9,7 @@ type PaneEmptyStateProps = {
 
 /**
  * Placeholder body for a main pane that isn't built yet. Centered icon + title
- * + optional subtitle, sized to fill the pane area provided by `PlaygroundMainPane`.
+ * + optional subtitle, sized to fill the pane area provided by `PlaygroundDisplay`.
  */
 export default function PaneEmptyState({
     icon: Icon,

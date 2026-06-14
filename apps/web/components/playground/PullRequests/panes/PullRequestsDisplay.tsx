@@ -6,7 +6,7 @@ import PullRequestsOverviewPane from "./PullRequestsOverviewPane";
 import PullRequestDetailPane from "./PullRequestDetailPane";
 
 /** Renders the Pull Requests surface — overview, or a selected PR's detail. */
-export default function PullRequestsMainPane() {
+export default function PullRequestsDisplay() {
     const tab = usePlaygroundNavStore((s) => s.tabBySurface[RailSurface.PullRequests]);
 
     switch (tab) {

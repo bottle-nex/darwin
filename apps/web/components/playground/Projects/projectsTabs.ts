@@ -9,4 +9,4 @@ export enum ProjectsTab {
     Settings = "project-settings",
 }
 
-export const PROJECTS_DEFAULT_TAB: ProjectsTab = ProjectsTab.Overview;
+export const PROJECTS_DEFAULT_TAB: ProjectsTab = ProjectsTab.Settings;

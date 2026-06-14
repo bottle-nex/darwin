@@ -6,7 +6,7 @@ import AllRunsPane from "./AllRunsPane";
 import AgentDetailPane from "./AgentDetailPane";
 
 /** Renders the Agents surface — all runs, or a selected agent's detail. */
-export default function AgentsMainPane() {
+export default function AgentsDisplay() {
     const tab = usePlaygroundNavStore((s) => s.tabBySurface[RailSurface.Agents]);
 
     switch (tab) {

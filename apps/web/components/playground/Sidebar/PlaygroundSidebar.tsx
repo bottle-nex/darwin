@@ -21,7 +21,7 @@ type PlaygroundSidebarProps = {
 };
 
 /** Renders the active surface's sidebar sections. */
-function SurfaceSidebar({ surface, ...section }: { surface: RailSurface } & SidebarSectionProps) {
+function SidebarRenderer({ surface, ...section }: { surface: RailSurface } & SidebarSectionProps) {
     switch (surface) {
         case RailSurface.Home:
             return <HomeSidebar {...section} />;
@@ -135,7 +135,7 @@ export default function PlaygroundSidebar({ surface, onCollapse }: PlaygroundSid
 
             <div className="min-h-0 flex-1 overflow-y-auto px-2 pb-3">
                 <div className="peer flex flex-col">
-                    <SurfaceSidebar
+                    <SidebarRenderer
                         surface={surface}
                         selectedRowId={activeRowId}
                         onSelect={(id) => setTab(surface, id)}

@@ -13,7 +13,7 @@ import DraftsPane from "./DraftsPane";
 import EnvironmentPane from "./EnvironmentPane";
 
 /** Renders the Home surface's active tab. */
-export default function HomeMainPane() {
+export default function HomeDisplay() {
     const tab = usePlaygroundNavStore((s) => s.tabBySurface[RailSurface.Home]);
 
     switch (tab) {

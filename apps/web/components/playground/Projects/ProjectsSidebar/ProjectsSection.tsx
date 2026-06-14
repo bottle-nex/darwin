@@ -1,5 +1,5 @@
 "use client";
-import { Folder, Plus } from "lucide-react";
+import { Folder } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import Row from "../../Sidebar/SidebarRow";
 import Section from "../../Sidebar/SidebarSection";
@@ -48,7 +48,7 @@ export default function PlaygroundSidebarProjectsSection({ query, onSelect }: Si
                         active={p.slug === projectSlug}
                         onClick={() => {
                             router.push(`/playground/${orgSlug}/${p.slug}`);
-                            onSelect(ProjectsTab.Overview);
+                            onSelect(ProjectsTab.Settings);
                         }}
                     />
                 ))}

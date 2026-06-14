@@ -1,28 +1,28 @@
 "use client";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
 import { RailSurface } from "../IconRail/railSurface";
-import HomeMainPane from "../Home/panes/HomeMainPane";
-import ProjectsMainPane from "../Projects/panes/ProjectsMainPane";
-import PullRequestsMainPane from "../PullRequests/panes/PullRequestsMainPane";
-import AgentsMainPane from "../Agents/panes/AgentsMainPane";
-import WorkersMainPane from "../Workers/panes/WorkersMainPane";
-import MoreMainPane from "../More/panes/MoreMainPane";
+import HomeDisplay from "../Home/panes/HomeDisplay";
+import ProjectsDisplay from "../Projects/panes/ProjectsDisplay";
+import PullRequestsDisplay from "../PullRequests/panes/PullRequestsDisplay";
+import AgentsDisplay from "../Agents/panes/AgentsDisplay";
+import WorkersDisplay from "../Workers/panes/WorkersDisplay";
+import MoreDisplay from "../More/panes/MoreDisplay";
 
 /** Picks the active surface's main pane. */
 function SurfacePane({ surface }: { surface: RailSurface }) {
     switch (surface) {
         case RailSurface.Home:
-            return <HomeMainPane />;
+            return <HomeDisplay />;
         case RailSurface.Projects:
-            return <ProjectsMainPane />;
+            return <ProjectsDisplay />;
         case RailSurface.PullRequests:
-            return <PullRequestsMainPane />;
+            return <PullRequestsDisplay />;
         case RailSurface.Agents:
-            return <AgentsMainPane />;
+            return <AgentsDisplay />;
         case RailSurface.Workers:
-            return <WorkersMainPane />;
+            return <WorkersDisplay />;
         case RailSurface.More:
-            return <MoreMainPane />;
+            return <MoreDisplay />;
     }
 }
 
@@ -30,7 +30,7 @@ function SurfacePane({ surface }: { surface: RailSurface }) {
  * Top-level main-pane router. Provides the shared `<main>` frame and delegates
  * to the active surface's pane, which in turn switches on its active tab.
  */
-export default function PlaygroundMainPane() {
+export default function PlaygroundDisplay() {
     const surface = usePlaygroundNavStore((s) => s.surface);
 
     return (
