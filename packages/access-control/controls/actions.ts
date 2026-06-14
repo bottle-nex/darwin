@@ -9,6 +9,8 @@ const Action = {
         manage_billing: "manage_billing",
         create_project: "create_project",
         manage_connectors: "manage_connectors",
+        write_envs: "write_env_access",
+        read_envs: "read_envs",
     },
     project: {
         read: "read",
@@ -24,6 +26,8 @@ const Action = {
         cancel_runner: "cancel_runner",
         view_runner_logs: "view_runner_logs",
         manage_connectors: "manage_connectors",
+        write_envs: "write_env_access",
+        read_envs: "read_envs",
     },
     team: {
         read: "read",
@@ -31,6 +35,8 @@ const Action = {
         add_member: "add_member",
         remove_member: "remove_member",
         change_member_role: "change_member_role",
+        write_envs: "write_env_access",
+        read_envs: "read_envs",
     },
 } as const;
 

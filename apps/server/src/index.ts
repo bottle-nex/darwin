@@ -4,10 +4,8 @@ import cors from "cors";
 import v1_router from "./routers/v1/router.v1";
 import { ENV } from "./configs/env";
 import RedisService from "./services/service.redis";
-import E2B from "./sandbox/e2b";
 
 await RedisService.connect();
-await E2B.create()
 
 const app = express();
 const server = http.createServer(app);

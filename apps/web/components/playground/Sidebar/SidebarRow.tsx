@@ -1,6 +1,6 @@
 "use client";
 
-import type { LucideIcon } from "lucide-react";
+import { Lock, type LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type RowProps = {
@@ -15,6 +15,7 @@ type RowProps = {
     onClick?: () => void;
     /** Trailing actions revealed on hover (e.g. ellipsis + plus). */
     trailing?: React.ReactNode;
+    isLocked?: boolean;
 };
 
 /**
@@ -30,6 +31,7 @@ export default function PlaygroundSidebarRow({
     active = false,
     onClick,
     trailing,
+    isLocked,
 }: RowProps) {
     const Icon = leading?.kind === "icon" ? leading.icon : null;
 
@@ -69,6 +71,12 @@ export default function PlaygroundSidebarRow({
 
             {trailing && (
                 <span className="ml-1 hidden items-center gap-1 group-hover:flex">{trailing}</span>
+            )}
+
+            {isLocked && (
+                <span className="flex size-5 shrink-0 items-center justify-center text-neutral-400 ">
+                    <Lock className="size-3.5" />
+                </span>
             )}
         </button>
     );
