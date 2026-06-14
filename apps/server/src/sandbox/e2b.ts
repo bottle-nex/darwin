@@ -4,7 +4,6 @@ import GithubService from "../services/service.github";
 import SecretService from "../services/service.secret";
 
 export default class E2B {
-
     public static async create(): Promise<string> {
         const sandbox = await Sandbox.create("node-py-claude-template", {
             apiKey: ENV.SERVER_E2B_API_KEY,
@@ -20,12 +19,14 @@ export default class E2B {
 
     public static async exec_js_code(sandbox_id: string, code: string) {
         const sandbox = await Sandbox.connect(sandbox_id, { apiKey: ENV.SERVER_E2B_API_KEY });
-        const result = await sandbox.commands.run(`node -e \"${code}\"`);
+        const result = await sandbox.commands.run(`node -e '${code}'`);
         console.log(result.stdout);
     }
 
     public static async take_snapshot(sandbox_id: string): Promise<SnapshotInfo> {
-        const snapshot = await Sandbox.createSnapshot(sandbox_id, { apiKey: ENV.SERVER_E2B_API_KEY });
+        const snapshot = await Sandbox.createSnapshot(sandbox_id, {
+            apiKey: ENV.SERVER_E2B_API_KEY,
+        });
         return snapshot;
     }
 

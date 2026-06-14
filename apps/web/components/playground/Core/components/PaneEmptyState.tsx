@@ -11,7 +11,12 @@ type PaneEmptyStateProps = {
  * Placeholder body for a main pane that isn't built yet. Centered icon + title
  * + optional subtitle, sized to fill the pane area provided by `PlaygroundMainPane`.
  */
-export default function PaneEmptyState({ icon: Icon, title, subtitle, children }: PaneEmptyStateProps) {
+export default function PaneEmptyState({
+    icon: Icon,
+    title,
+    subtitle,
+    children,
+}: PaneEmptyStateProps) {
     return (
         <div className="flex flex-1 flex-col items-center justify-center px-6 pb-16 text-center">
             <span

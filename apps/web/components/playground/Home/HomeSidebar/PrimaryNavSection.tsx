@@ -1,9 +1,17 @@
 "use client";
-import { AtSign, FileCheck, Inbox, LayoutDashboard, type LucideIcon, KeyRound, FolderKey } from "lucide-react";
+import {
+    AtSign,
+    FileCheck,
+    Inbox,
+    LayoutDashboard,
+    type LucideIcon,
+    KeyRound,
+    FolderKey,
+} from "lucide-react";
 import Row from "../../Sidebar/SidebarRow";
 import { matchesQuery, type SidebarNavRow, type SidebarSectionProps } from "../../Sidebar/shared";
 
-const PRIMARY_ROWS: { id: string; label: string; icon: LucideIcon, isLocked?: boolean }[] = [
+const PRIMARY_ROWS: { id: string; label: string; icon: LucideIcon; isLocked?: boolean }[] = [
     { id: "inbox", label: "Inbox", icon: Inbox },
     { id: "setup", label: "Setup", icon: FolderKey },
     { id: "kanban", label: "Kanban", icon: LayoutDashboard },
