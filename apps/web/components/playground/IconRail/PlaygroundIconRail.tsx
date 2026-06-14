@@ -97,16 +97,7 @@ function RailButton({
                     active && "text-neutral-100",
                 )}
             >
-                <Icon
-                    className={cn(
-                        "size-4 transition-[filter] duration-300",
-                        active &&
-                            "[filter:drop-shadow(0_0_4px_rgba(139,92,246,0.95))_drop-shadow(0_0_12px_rgba(139,92,246,0.7))_drop-shadow(0_0_24px_rgba(139,92,246,0.5))_drop-shadow(0_0_44px_rgba(139,92,246,0.25))]",
-                        !active &&
-                            "group-hover:[filter:drop-shadow(0_0_6px_rgba(255,255,255,0.4))_drop-shadow(0_0_16px_rgba(255,255,255,0.18))_drop-shadow(0_0_30px_rgba(255,255,255,0.08))]",
-                    )}
-                    aria-hidden
-                />
+                <Icon className="size-4" aria-hidden />
                 {item.badge !== undefined && (
                     <span className="absolute -top-1 -right-1 flex h-3.5 min-w-3.5 items-center justify-center rounded-full bg-rose-500 px-1 text-[9px] font-semibold text-white">
                         {item.badge}
@@ -124,7 +115,7 @@ function FooterButton({ icon, label }: { icon: React.ReactNode; label: string })
             type="button"
             className="group flex w-full cursor-pointer flex-col items-center gap-1 rounded-md px-1 py-1.5 text-[10px] font-medium text-neutral-500 transition-colors hover:text-neutral-200"
         >
-            <span className="flex size-7 items-center justify-center transition-[filter] duration-300 group-hover:[filter:drop-shadow(0_0_6px_rgba(255,255,255,0.4))_drop-shadow(0_0_16px_rgba(255,255,255,0.18))_drop-shadow(0_0_30px_rgba(255,255,255,0.08))]">
+            <span className="flex size-7 items-center justify-center">
                 {icon}
             </span>
             <span>{label}</span>

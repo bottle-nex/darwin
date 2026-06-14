@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 /**
  * Top-bar affordance for connecting the active org to GitHub. Only shown to
  * members who can manage connectors (Owner/Admin). Resolves the active org from
- * the route slug, matching {@link PlaygroundOrgSwitcher}.
+ * the route slug, matching {@link PlaygroundUserMenu}.
  */
 export default function GithubConnectButton() {
     const { orgSlug } = useParams<{ orgSlug: string }>();

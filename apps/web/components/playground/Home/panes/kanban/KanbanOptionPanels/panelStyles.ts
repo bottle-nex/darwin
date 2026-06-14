@@ -1,5 +1,5 @@
 // Shared classNames for the option dropdown panels, matching the app's dark
-// popover style (see PlaygroundOrgSwitcher).
+// popover style (see PlaygroundUserMenu).
 
 export const PANEL_CONTENT =
     "z-50 origin-(--radix-dropdown-menu-content-transform-origin) rounded-lg border border-neutral-800 bg-charcoal p-1 shadow-xl animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95";

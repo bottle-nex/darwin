@@ -38,7 +38,7 @@ export default function PlaygroundShell() {
     usePlaygroundUrlSync(project?.teams);
 
     return (
-        <main className="flex h-screen flex-col overflow-hidden bg-linear-to-br from-cement to-primary/10 text-neutral-100 pt-px">
+        <main className="flex h-screen flex-col overflow-hidden bg-linear-to-br from-cement to-primary/10 text-neutral-100 pt-px select-none">
             <PlaygroundTopBar />
             <section className="flex flex-1 min-h-0 gap-2 p-2 pt-px">
                 <PlaygroundIconRail

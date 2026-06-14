@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useNewProjectStore } from "@/store/project/useNewProjectStore";
 import CreateProjectDialog from "@/components/project/CreateProjectDialog";
-import PlaygroundOrgSwitcher from "./PlaygroundOrgSwitcher";
+import PlaygroundProjectSwitcher from "./PlaygroundProjectSwitcher";
 import GithubConnectButton from "./GithubConnectButton";
 import PlaygroundUserMenu from "./PlaygroundUserMenu";
 export default function PlaygroundTopBar() {
@@ -13,8 +13,9 @@ export default function PlaygroundTopBar() {
     return (
         <header className="relative flex h-11 shrink-0 items-center justify-between gap-4 px-2">
             <div className="flex items-center gap-1">
-                <PlaygroundOrgSwitcher />
+                <PlaygroundProjectSwitcher />
             </div>
+
 
             {/* search — absolutely centered so a long org name never shifts it */}
             <div className="absolute left-1/2 top-1/2 w-full max-w-md -translate-x-1/2 -translate-y-1/2">

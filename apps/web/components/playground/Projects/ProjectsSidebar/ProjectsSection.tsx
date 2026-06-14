@@ -52,7 +52,6 @@ export default function PlaygroundSidebarProjectsSection({ query, onSelect }: Si
                         }}
                     />
                 ))}
-                {!searching && <Row label="Add Project" leading={{ kind: "icon", icon: Plus }} />}
             </Section>
         </div>
     );

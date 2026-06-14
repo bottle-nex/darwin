@@ -16,7 +16,11 @@ const FIELD =
 const KEY_PATTERN = /^[A-Za-z_][A-Za-z0-9_]*$/;
 
 /** Environment-variables settings section. Values are write-only over the wire. */
-export default function ProjectEnvSettings({ projectId }: { projectId: string | undefined }) {
+export default function ProjectSettingsEnvSection({
+    projectId,
+}: {
+    projectId: string | undefined;
+}) {
     const secrets = useProjectSecrets(projectId);
     const setSecrets = useSetProjectSecrets();
     const deleteSecret = useDeleteProjectSecret();

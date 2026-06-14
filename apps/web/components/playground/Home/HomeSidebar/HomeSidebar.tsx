@@ -11,11 +11,11 @@ export default function HomeSidebar(props: SidebarSectionProps) {
     return (
         <>
             <PrimaryNavSection {...props} />
-            <MyWorkSection {...props} />
+            {/* <MyWorkSection {...props} /> */}
             <FavoritesSection {...props} />
-            <ProjectsSection {...props} />
+            {/* <ProjectsSection {...props} /> */}
             <TeamsSection {...props} />
-            <AgentsSection {...props} />
+            {/* <AgentsSection {...props} /> */}
         </>
     );
 }

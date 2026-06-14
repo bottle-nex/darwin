@@ -1,5 +1,5 @@
 import type { FC } from "react";
-import type { LucideProps } from "lucide-react";
+import type { IconBaseProps } from "react-icons";
 import { RailSurface } from "./railSurface";
 import {
     AgentsIcon,
@@ -13,7 +13,7 @@ import {
 export type RailItem = {
     surface: RailSurface;
     label: string;
-    Icon: FC<LucideProps>;
+    Icon: FC<IconBaseProps>;
     badge?: number;
     /** Accent treatment for the active item — currently only "green" for Home. */
     accent?: "green";
