@@ -115,9 +115,7 @@ function FooterButton({ icon, label }: { icon: React.ReactNode; label: string })
             type="button"
             className="group flex w-full cursor-pointer flex-col items-center gap-1 rounded-md px-1 py-1.5 text-[10px] font-medium text-neutral-500 transition-colors hover:text-neutral-200"
         >
-            <span className="flex size-7 items-center justify-center">
-                {icon}
-            </span>
+            <span className="flex size-7 items-center justify-center">{icon}</span>
             <span>{label}</span>
         </button>
     );

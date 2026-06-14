@@ -16,7 +16,6 @@ export default function PlaygroundTopBar() {
                 <PlaygroundProjectSwitcher />
             </div>
 
-
             {/* search — absolutely centered so a long org name never shifts it */}
             <div className="absolute left-1/2 top-1/2 w-full max-w-md -translate-x-1/2 -translate-y-1/2">
                 <Search

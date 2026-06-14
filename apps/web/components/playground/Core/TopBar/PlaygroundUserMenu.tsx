@@ -128,11 +128,7 @@ export default function PlaygroundUserMenu() {
             </DropdownMenu.Trigger>
 
             <DropdownMenu.Portal>
-                <DropdownMenu.Content
-                    align="end"
-                    sideOffset={8}
-                    className={cn(PANEL, "w-66")}
-                >
+                <DropdownMenu.Content align="end" sideOffset={8} className={cn(PANEL, "w-66")}>
                     <div className="flex items-center gap-3 px-3.5 py-3">
                         <span className="relative size-9 shrink-0 overflow-hidden rounded-xl shadow-sm ring-1 ring-white/15">
                             {user?.image ? (

@@ -49,7 +49,10 @@ function ShowcaseOptionsBar() {
                         <Icon className="size-3.5" aria-hidden />
                     </span>
                 ))}
-                <Button variant={'tertiary'} className="ml-1 flex h-6 items-center rounded-sm bg-neutral-100 px-2 text-[11.5px] font-medium text-neutral-900">
+                <Button
+                    variant={"tertiary"}
+                    className="ml-1 flex h-6 items-center rounded-sm bg-neutral-100 px-2 text-[11.5px] font-medium text-neutral-900"
+                >
                     Add Task
                 </Button>
             </div>
@@ -112,9 +115,7 @@ export default function BoardShowcase() {
                         <span className="size-2.5 rounded-full bg-[#28C840]" />
                         <div className="ml-3 font-mono text-[11px] text-neutral-900 bg-primary px-2 py-0.75 rounded-sm flex items-center justify-start">
                             <HiPlusSmall className="mr-1 rotate-45" />
-                            <span>
-                                app.trymatcha.com
-                            </span>
+                            <span>app.trymatcha.com</span>
                         </div>
                     </div>
                     <ShowcaseTopbar />
