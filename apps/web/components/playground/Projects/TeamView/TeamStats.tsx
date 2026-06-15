@@ -3,6 +3,7 @@ import { LayoutGrid, MoreVertical } from "lucide-react";
 import { useGetTeamMembers } from "@/hooks/team/useGetTeamMembers";
 import { cn } from "@/lib/utils";
 import { BumpingText } from "@/components/utility/BumpingText";
+import { useState } from "react";
 
 function plural(count: number, word: string) {
     return `${word}${count === 1 ? "" : "s"}`;
