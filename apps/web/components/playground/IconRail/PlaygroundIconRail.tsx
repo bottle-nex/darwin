@@ -65,7 +65,7 @@ export default function PlaygroundIconRail({
 
             <div className="flex w-full flex-col items-center gap-1 px-1">
                 <FooterButton icon={<UserPlus className="size-4" />} label="Invite" />
-                <FooterButton icon={<ArrowUpCircle className="size-4" />} label="Upgrade" />
+                <FooterButton icon={<ArrowUpCircle className="size-4" />} label="Pro" />
             </div>
         </nav>
     );
@@ -113,7 +113,7 @@ function FooterButton({ icon, label }: { icon: React.ReactNode; label: string })
     return (
         <button
             type="button"
-            className="group flex w-full cursor-pointer flex-col items-center gap-1 rounded-md px-1 py-1.5 text-[10px] font-medium text-neutral-500 transition-colors hover:text-neutral-200"
+            className="group flex w-full cursor-pointer flex-col items-center rounded-md px-1 py-1.5 text-[10px] font-medium text-neutral-500 transition-colors hover:text-neutral-200"
         >
             <span className="flex size-7 items-center justify-center">{icon}</span>
             <span>{label}</span>

@@ -10,7 +10,6 @@ import ReviewsMainPane from "./ReviewsMainPane";
 import AssignedToMePane from "./AssignedToMePane";
 import InProgressPane from "./InProgressPane";
 import DraftsPane from "./DraftsPane";
-import EnvironmentPane from "./EnvironmentPane";
 
 /** Renders the Home surface's active tab. */
 export default function HomeDisplay() {
@@ -31,8 +30,6 @@ export default function HomeDisplay() {
             return <DraftsPane />;
         case HomeTab.TeamDetail:
             return <TeamDetailPane surface={RailSurface.Home} />;
-        case HomeTab.Environment:
-            return <EnvironmentPane />;
         case HomeTab.Inbox:
         default:
             return <InboxMainPane />;

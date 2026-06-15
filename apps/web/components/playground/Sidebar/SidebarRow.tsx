@@ -49,21 +49,21 @@ export default function PlaygroundSidebarRow({
         >
             <span className="flex size-5 shrink-0 items-center justify-center text-neutral-400">
                 {Icon ? (
-                    <Icon className="size-4" aria-hidden />
+                    <Icon className="size-3.75" aria-hidden />
                 ) : leading?.kind === "node" ? (
                     leading.node
                 ) : null}
             </span>
 
             <span className="flex min-w-0 flex-1 items-baseline gap-1.5">
-                <span className="truncate">{label}</span>
+                <span className="truncate text-[12.5px]">{label}</span>
                 {suffix && (
-                    <span className="truncate text-[12px] text-neutral-500">- {suffix}</span>
+                    <span className="truncate text-[10px] text-neutral-500">- {suffix}</span>
                 )}
             </span>
 
             {badge !== undefined && (
-                <span className="inline-flex h-4 min-w-4 items-center justify-center rounded text-[11px] font-medium text-neutral-400">
+                <span className="inline-flex h-4 min-w-4 items-center justify-center rounded text-[7px] font-medium text-neutral-400">
                     <span className="mr-0.5 size-2.5 rounded-sm bg-neutral-700" aria-hidden />
                     {badge}
                 </span>

@@ -9,7 +9,6 @@ export enum HomeTab {
     Kanban = "kanban",
     Mentions = "mentions",
     Reviews = "reviews",
-    Environment = "environment",
     AssignedToMe = "assigned-to-me",
     InProgress = "in-progress",
     Drafts = "drafts",
