@@ -1,6 +1,8 @@
 "use client";
+import { House } from "lucide-react";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
 import { RailSurface } from "../../IconRail/railSurface";
+import PaneBreadcrumb from "../../Core/components/PaneBreadcrumb";
 import { HomeTab } from "../homeTabs";
 import TeamDetailPane from "../../Projects/panes/TeamDetailPane";
 import InboxMainPane from "./InboxMainPane";
@@ -17,7 +19,17 @@ export default function HomeDisplay() {
 
     switch (tab) {
         case HomeTab.Kanban:
-            return <KanbanMainPane />;
+            return (
+                <div className="flex min-h-0 flex-1 flex-col">
+                    <PaneBreadcrumb
+                        leading={
+                            <House className="size-3.5 shrink-0 text-neutral-400" aria-hidden />
+                        }
+                        segments={[{ label: "Home" }, { label: "Kanban" }]}
+                    />
+                    <KanbanMainPane />
+                </div>
+            );
         case HomeTab.Mentions:
             return <MentionsMainPane />;
         case HomeTab.Reviews:

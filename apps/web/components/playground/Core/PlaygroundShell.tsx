@@ -2,6 +2,8 @@
 import { useState } from "react";
 import { useParams } from "next/navigation";
 import PlaygroundIconRail from "@/components/playground/IconRail/PlaygroundIconRail";
+import { RailSurface } from "@/components/playground/IconRail/railSurface";
+import { ProjectsTab } from "@/components/playground/Projects/projectsTabs";
 import PlaygroundTopBar from "@/components/playground/Core/TopBar/PlaygroundTopBar";
 import PlaygroundWorkspace from "@/components/playground/Core/PlaygroundWorkspace";
 import CreateTeamDialog from "@/components/team/CreateTeamDialog";
@@ -27,6 +29,18 @@ export default function PlaygroundShell() {
     const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(false);
     const surface = usePlaygroundNavStore((s) => s.surface);
     const setSurface = usePlaygroundNavStore((s) => s.setSurface);
+    const setTab = usePlaygroundNavStore((s) => s.setTab);
+    const setProjectsSidebarMode = usePlaygroundNavStore((s) => s.setProjectsSidebarMode);
+
+    // Tapping the Projects rail icon opens the active project's nav on its Overview.
+    // The project list is reachable from that nav's "Back to projects" row.
+    function selectSurface(next: RailSurface) {
+        setSurface(next);
+        if (next === RailSurface.Projects) {
+            setProjectsSidebarMode("nav");
+            setTab(RailSurface.Projects, ProjectsTab.Overview);
+        }
+    }
 
     const { data: dashboard } = useGetDashboard(orgSlug);
     const activeProject = projectSlug
@@ -43,7 +57,7 @@ export default function PlaygroundShell() {
             <section className="flex flex-1 min-h-0 gap-2 p-2 pt-px">
                 <PlaygroundIconRail
                     activeSurface={surface}
-                    onSelectSurface={setSurface}
+                    onSelectSurface={selectSurface}
                     sidebarCollapsed={sidebarCollapsed}
                     onExpandSidebar={() => setSidebarCollapsed(false)}
                 />

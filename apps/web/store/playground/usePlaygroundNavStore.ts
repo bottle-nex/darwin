@@ -25,6 +25,14 @@ const DEFAULT_TAB: Record<RailSurface, string> = {
 export const TEAM_DETAIL_TAB = "team-detail";
 
 /**
+ * The Projects sidebar has two faces: the project `list` (shown when the Projects
+ * rail icon is tapped) and a single project's `nav` (shown once a project is
+ * opened). It's its own bit of state because both faces can share the same active
+ * tab, so the tab alone can't tell them apart.
+ */
+export type ProjectsSidebarMode = "list" | "nav";
+
+/**
  * Central navigation state for the playground workspace.
  *
  * `surface` is the active icon-rail surface; `tabBySurface` remembers the active
@@ -41,8 +49,11 @@ interface PlaygroundNavState {
     selectedTeam: ProjectTeam | null;
     /** Slug of the project the selected team belongs to — guards stale detail. */
     selectedTeamProjectSlug: string | null;
+    /** Which face the Projects sidebar shows — the project list or a project's nav. */
+    projectsSidebarMode: ProjectsSidebarMode;
     setSurface: (surface: RailSurface) => void;
     setTab: (surface: RailSurface, tabId: string) => void;
+    setProjectsSidebarMode: (mode: ProjectsSidebarMode) => void;
     openTeam: (surface: RailSurface, team: ProjectTeam, projectSlug: string) => void;
     clearTeam: (surface: RailSurface) => void;
 }
@@ -52,9 +63,11 @@ export const usePlaygroundNavStore = create<PlaygroundNavState>((set) => ({
     tabBySurface: { ...DEFAULT_TAB },
     selectedTeam: null,
     selectedTeamProjectSlug: null,
+    projectsSidebarMode: "nav",
     setSurface: (surface) => set({ surface }),
     setTab: (surface, tabId) =>
         set((state) => ({ tabBySurface: { ...state.tabBySurface, [surface]: tabId } })),
+    setProjectsSidebarMode: (mode) => set({ projectsSidebarMode: mode }),
     openTeam: (surface, team, projectSlug) =>
         set((state) => ({
             selectedTeam: team,

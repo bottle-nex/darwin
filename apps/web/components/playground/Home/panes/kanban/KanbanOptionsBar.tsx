@@ -1,32 +1,47 @@
 "use client";
 import {
     ChevronDown,
-    Layers,
+    Kanban,
+    List,
     Plus,
     Search,
     Settings,
     Settings2,
+    Share2,
     Upload,
     Users,
+    type LucideIcon,
 } from "lucide-react";
 import { AnimatePresence } from "motion/react";
 import { DropdownMenu } from "radix-ui";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import type { KanbanOptions } from "./useKanbanOptions";
+import type { KanbanView } from "./types";
 import OptionButton from "./KanbanOptionPanels/OptionButton";
 import FilterPanel from "./KanbanOptionPanels/FilterPanel";
 import LabelPanel from "./KanbanOptionPanels/LabelPanel";
 import SearchBar from "./KanbanOptionPanels/SearchBar";
 import SelectedLabels from "./KanbanOptionPanels/SelectedLabels";
-import { Button } from "@/components/ui/button";
+
+const VIEWS: { id: KanbanView; label: string; icon: LucideIcon }[] = [
+    { id: "board", label: "Board", icon: Kanban },
+    { id: "list", label: "List", icon: List },
+];
 
 const TASK_OPTIONS = [
     { id: "issue", label: "New issue", icon: Plus },
     { id: "import", label: "Import issues", icon: Upload },
 ];
 
-/** Secondary toolbar below the header: grouping, filters, search, labels, +Task. */
-export default function KanbanOptionsBar({ options }: { options: KanbanOptions }) {
+type KanbanOptionsBarProps = {
+    options: KanbanOptions;
+    view: KanbanView;
+    onViewChange: (view: KanbanView) => void;
+};
+
+/** Board toolbar: Board/List toggle, search, labels, filters, share, and +Task. */
+export default function KanbanOptionsBar({ options, view, onViewChange }: KanbanOptionsBarProps) {
     const {
         searchOpen,
         search,
@@ -44,13 +59,24 @@ export default function KanbanOptionsBar({ options }: { options: KanbanOptions }
     return (
         <div className="flex h-10 shrink-0 items-center justify-between gap-2 border-b border-white/5 px-3">
             <div className="flex min-w-0 items-center gap-1.5">
-                <button
-                    type="button"
-                    className="flex h-7 shrink-0 cursor-pointer items-center gap-1.5 rounded-md bg-white/5 px-2 text-[12px] font-medium text-neutral-200 ring-1 ring-white/10 hover:bg-white/10"
-                >
-                    <Layers className="size-3.5 text-violet-300" aria-hidden />
-                    Group: Status
-                </button>
+                <div className="flex shrink-0 items-center gap-0.5">
+                    {VIEWS.map((v) => (
+                        <button
+                            key={v.id}
+                            type="button"
+                            onClick={() => onViewChange(v.id)}
+                            className={cn(
+                                "flex h-7 cursor-pointer items-center gap-1.5 rounded-md px-2 text-[12px] font-medium transition-colors",
+                                view === v.id
+                                    ? "bg-white/10 text-neutral-100"
+                                    : "text-neutral-400 hover:bg-white/5 hover:text-neutral-200",
+                            )}
+                        >
+                            <v.icon className="size-3.5" aria-hidden />
+                            {v.label}
+                        </button>
+                    ))}
+                </div>
 
                 <AnimatePresence initial={false}>
                     {searchOpen && (
@@ -75,6 +101,7 @@ export default function KanbanOptionsBar({ options }: { options: KanbanOptions }
                     active={searchOpen}
                     onClick={() => (searchOpen ? closeSearch() : openSearch())}
                 />
+                <OptionButton label="Share" icon={Share2} />
                 <OptionButton label="Board settings" icon={Settings2} />
                 <div className="mx-1 h-4 w-px bg-white/8" />
                 <OptionButton label="Settings" icon={Settings} />

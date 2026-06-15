@@ -3,17 +3,18 @@ import { useParams } from "next/navigation";
 import { useGetDashboard } from "@/hooks/dashboard/useGetDashboard";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
 import { RailSurface } from "../../IconRail/railSurface";
-import { isProjectSettingsTab, ProjectsTab } from "../projectsTabs";
+import { ProjectsTab } from "../projectsTabs";
 import ProjectTopbar from "./ProjectTopbar";
-import ProjectsOverviewPane from "./ProjectsOverviewPane";
+import ProjectOverview from "./ProjectOverview";
+import KanbanMainPane from "../../Home/panes/kanban/KanbanMainPane";
 import GanttPane from "./GanttPane";
 import ProjectSettingsView from "./ProjectSettingsView";
 import TeamDetailPane from "./TeamDetailPane";
 
 /**
- * Renders the Projects surface: a shared top bar (project + view switcher) over
- * the active view. Overview / Gantt / Settings are switched from the top bar;
- * the Settings view additionally swaps the sidebar to the per-project settings nav.
+ * Renders the Projects surface: a shared header (project + contextual toolbar)
+ * over the active view. Overview / Kanban / Gantt / Settings are all selected from
+ * the project sidebar nav (`ProjectNav`).
  */
 export default function ProjectsDisplay() {
     const tab = usePlaygroundNavStore((s) => s.tabBySurface[RailSurface.Projects]);
@@ -26,22 +27,31 @@ export default function ProjectsDisplay() {
     // The workspace always resolves to a project; render nothing until it does.
     if (!activeProject) return <div className="flex min-h-0 flex-1" />;
 
+    // Capture the narrowed value so it holds inside the closure below.
+    const project = activeProject;
+
     function content() {
-        if (isProjectSettingsTab(tab)) return <ProjectSettingsView />;
         switch (tab) {
+            case ProjectsTab.Kanban:
+                return <KanbanMainPane />;
             case ProjectsTab.Gantt:
                 return <GanttPane />;
+            case ProjectsTab.SettingsProject:
+            case ProjectsTab.SettingsTeams:
+            case ProjectsTab.SettingsMembers:
+            case ProjectsTab.SettingsEnv:
+                return <ProjectSettingsView />;
             case ProjectsTab.TeamDetail:
                 return <TeamDetailPane surface={RailSurface.Projects} />;
             case ProjectsTab.Overview:
             default:
-                return <ProjectsOverviewPane />;
+                return <ProjectOverview project={project} />;
         }
     }
 
     return (
         <div className="flex min-h-0 flex-1 flex-col">
-            <ProjectTopbar project={activeProject} />
+            <ProjectTopbar project={project} />
             <div className="flex min-h-0 flex-1 flex-col">{content()}</div>
         </div>
     );

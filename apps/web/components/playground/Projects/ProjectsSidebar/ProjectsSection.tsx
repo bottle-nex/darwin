@@ -2,9 +2,11 @@
 import { Folder } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import Row from "../../Sidebar/SidebarRow";
-import Section from "../../Sidebar/SidebarSection";
 import { useGetDashboard } from "@/hooks/dashboard/useGetDashboard";
 import { matchesQuery, type SidebarNavRow, type SidebarSectionProps } from "../../Sidebar/shared";
+import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
+import { RailSurface } from "../../IconRail/railSurface";
+import { ProjectsTab } from "../projectsTabs";
 
 const DEFAULT_FOLDER_COLOR = "#6366f1";
 
@@ -19,6 +21,15 @@ export default function PlaygroundSidebarProjectsSection({ query }: SidebarSecti
         projectSlug?: string;
     }>();
     const { data: dashboard } = useGetDashboard(orgSlug);
+    const setTab = usePlaygroundNavStore((s) => s.setTab);
+    const setProjectsSidebarMode = usePlaygroundNavStore((s) => s.setProjectsSidebarMode);
+
+    // Open a project: route to it, flip the sidebar to its nav, and land on Overview.
+    function openProject(slug: string) {
+        router.push(`/playground/${orgSlug}/${slug}`);
+        setTab(RailSurface.Projects, ProjectsTab.Overview);
+        setProjectsSidebarMode("nav");
+    }
 
     const searching = query.trim().length > 0;
     const projects = (dashboard?.projects ?? []).filter((p) => matchesQuery(p.name, query));
@@ -34,32 +45,28 @@ export default function PlaygroundSidebarProjectsSection({ query }: SidebarSecti
     }
 
     return (
-        <div className="mt-3">
-            <Section title="Projects">
-                {projects.map((p) => (
-                    <Row
-                        key={p.id}
-                        label={p.name}
-                        leading={{
-                            kind: "node",
-                            node: (
-                                <Folder
-                                    className="size-3.5"
-                                    style={{
-                                        color: p.color ?? DEFAULT_FOLDER_COLOR,
-                                        fill: p.color ?? DEFAULT_FOLDER_COLOR,
-                                    }}
-                                    aria-hidden
-                                />
-                            ),
-                        }}
-                        active={p.slug === projectSlug}
-                        // Just switch projects — the active view (Overview / Gantt /
-                        // Settings) is kept, mirroring how you'd expect tabs to persist.
-                        onClick={() => router.push(`/playground/${orgSlug}/${p.slug}`)}
-                    />
-                ))}
-            </Section>
+        <div className="mt-1 flex flex-col gap-0.5">
+            {projects.map((p) => (
+                <Row
+                    key={p.id}
+                    label={p.name}
+                    leading={{
+                        kind: "node",
+                        node: (
+                            <Folder
+                                className="size-3.5"
+                                style={{
+                                    color: p.color ?? DEFAULT_FOLDER_COLOR,
+                                    fill: p.color ?? DEFAULT_FOLDER_COLOR,
+                                }}
+                                aria-hidden
+                            />
+                        ),
+                    }}
+                    active={p.slug === projectSlug}
+                    onClick={() => openProject(p.slug)}
+                />
+            ))}
         </div>
     );
 }
