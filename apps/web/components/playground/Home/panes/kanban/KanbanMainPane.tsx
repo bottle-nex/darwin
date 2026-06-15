@@ -25,15 +25,19 @@ export default function KanbanMainPane() {
         [kanban.board, options.search, options.selectedLabels],
     );
 
+    function renderBoard() {
+        if (view === "board") {
+            return <KanbanBoardView {...kanban} board={filteredBoard} filter={options.filter} />;
+        } else {
+            return <KanbanListView board={filteredBoard} filter={options.filter} />;
+        }
+    }
+
     return (
         <div className="flex min-h-0 flex-1 flex-col">
             <KanbanTopbar view={view} onViewChange={setView} />
             <KanbanOptionsBar options={options} />
-            {view === "board" ? (
-                <KanbanBoardView {...kanban} board={filteredBoard} filter={options.filter} />
-            ) : (
-                <KanbanListView board={filteredBoard} filter={options.filter} />
-            )}
+            {renderBoard()}
         </div>
     );
 }

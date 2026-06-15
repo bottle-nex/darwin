@@ -42,6 +42,10 @@ export const GITHUB_CONNECT_COMPLETE = GITHUB_URL + "/connect/complete";
 export const GITHUB_DISCONNECT = (orgId: string) => `${GITHUB_URL}/connect/${orgId}`;
 export const GITHUB_REPOS = (orgId: string) => `${GITHUB_URL}/installations/${orgId}/repos`;
 
+// <--------------------- ISSUE ROUTES --------------------->
+export const ISSUES_URL = API_URL + "/issues";
+export const CREATE_ISSUE_URL = ISSUES_URL + "/create";
+
 // <--------------------- INVITATAION ROUTES --------------------->
 export const INVITATIONS_URL = API_URL + "/invitations";
 export const LIST_INVITES_URL = INVITATIONS_URL;

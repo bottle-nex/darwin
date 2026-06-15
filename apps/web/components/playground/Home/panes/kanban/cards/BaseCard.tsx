@@ -20,10 +20,11 @@ type BaseCardProps = {
  * overlay so the lifted card looks identical to the resting one.
  */
 export default function BaseCard({ issue, children, className }: BaseCardProps) {
+    const issue_assignees_length = issue.assignees.length;
     return (
         <div
             className={cn(
-                "rounded-lg border border-white/6 bg-neutral-800/70 p-3 text-left shadow-sm ring-1 ring-black/20 transition-colors hover:border-white/12",
+                "rounded-lg bg-neutral-800/70 p-3 text-left  shadow-[inset_0_2px_0_0_rgba(255,255,255,0.07)] transition-colors hover:border-white/12",
                 className,
             )}
         >
@@ -62,13 +63,12 @@ export default function BaseCard({ issue, children, className }: BaseCardProps) 
                     <span className="truncate text-neutral-600">{issue.project}</span>
                 </div>
                 <div className="flex shrink-0 items-center -space-x-1">
-                    {issue.assignees.map((a) => (
+                    {issue.assignees.map((a, index) => (
                         <PlaygroundAvatar
                             key={a.id}
                             letter={a.name.charAt(0).toUpperCase()}
                             tone={a.tone}
-                            size="sm"
-                            className="ring-1 ring-neutral-800"
+                            className={cn(index === 0 && issue_assignees_length > 1 && "-rotate-7")}
                         />
                     ))}
                 </div>

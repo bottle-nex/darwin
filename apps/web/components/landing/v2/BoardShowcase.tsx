@@ -65,7 +65,10 @@ function ShowcaseColumn({ column, columnIndex }: { column: KanbanColumnDef; colu
     const issues = INITIAL_BOARD[status].slice(0, CARDS_PER_COLUMN);
 
     return (
-        <div className="flex w-60 flex-none flex-col rounded-xl bg-white/2.5 p-2 ring-1 ring-white/5 lg:w-auto lg:min-w-0 lg:flex-1">
+        <Reveal
+            delay={0.15 + columnIndex * 0.08}
+            className="flex w-60 flex-none flex-col rounded-xl bg-white/2.5 p-2 ring-1 ring-white/5 lg:w-auto lg:min-w-0 lg:flex-1"
+        >
             <div className="mb-2 flex items-center justify-between gap-2 px-0.5">
                 <div
                     className={cn(
@@ -81,13 +84,11 @@ function ShowcaseColumn({ column, columnIndex }: { column: KanbanColumnDef; colu
                 </div>
             </div>
             <div className="flex flex-col gap-2 p-0.5">
-                {issues.map((issue, i) => (
-                    <Reveal key={issue.id} delay={0.15 + columnIndex * 0.08 + i * 0.06}>
-                        <CardRenderer issue={issue} />
-                    </Reveal>
+                {issues.map((issue) => (
+                    <CardRenderer key={issue.id} issue={issue} />
                 ))}
             </div>
-        </div>
+        </Reveal>
     );
 }
 
@@ -103,11 +104,11 @@ export default function BoardShowcase() {
 
     return (
         <section className="mx-auto w-full max-w-7xl px-4 pb-20 sm:px-6 sm:pb-28">
-            <div className="perspective-distant">
+            <div className="perspective-distant rounded-xl shadow-[0_40px_80px_-20px_rgba(15,23,42,0.35)]">
                 <motion.div
                     ref={frameRef}
                     style={{ rotateX, scale, y }}
-                    className="origin-top overflow-hidden rounded-xl outline-8 outline-neutral-200 bg-charcoal shadow-[0_40px_80px_-20px_rgba(15,23,42,0.35)]"
+                    className="origin-top transform-gpu backface-hidden will-change-transform overflow-hidden rounded-xl outline-8 outline-neutral-200 bg-charcoal"
                 >
                     <div className="flex h-9 items-center gap-2 border-b border-white/5 px-4">
                         <span className="size-2.5 rounded-full bg-[#FF5F57]" />
