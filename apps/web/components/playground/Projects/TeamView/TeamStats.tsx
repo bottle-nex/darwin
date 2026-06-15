@@ -2,8 +2,6 @@
 import { LayoutGrid, MoreVertical } from "lucide-react";
 import { useGetTeamMembers } from "@/hooks/team/useGetTeamMembers";
 import { cn } from "@/lib/utils";
-import { useAnimate } from "motion/react";
-import { useEffect, useState } from "react";
 import { BumpingText } from "@/components/utility/BumpingText";
 
 function plural(count: number, word: string) {

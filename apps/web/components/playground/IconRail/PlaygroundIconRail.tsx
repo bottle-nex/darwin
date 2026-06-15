@@ -4,7 +4,6 @@ import { ArrowUpCircle, ChevronsRight, UserPlus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { RAIL_ITEMS, type RailItem } from "./railItems";
 import { RailSurface } from "./railSurface";
-import AppLogo from "@/components/app/Applogo";
 
 type PlaygroundIconRailProps = {
     activeSurface: RailSurface;

@@ -5,7 +5,6 @@ import { PiArrowRight } from "react-icons/pi";
 import { cn } from "@/lib/utils";
 import { azeretMono, Button } from "@/components/ui/button";
 import Reveal from "@/components/utility/Reveal";
-import HeroIssueCards from "@/components/landing/v2/HeroIssueCards";
 
 const MICRO_LABELS = ["Reads the repo", "Writes the patch", "Opens the PR"];
 

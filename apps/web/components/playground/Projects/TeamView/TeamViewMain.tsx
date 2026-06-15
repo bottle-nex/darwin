@@ -5,7 +5,6 @@ import { useDeleteTeamStore } from "@/store/team/useDeleteTeamStore";
 import PlaygroundAvatar from "@/components/playground/Core/components/PlaygroundAvatar";
 import PlaygroundTeamStats, { StatType } from "./TeamStats";
 import PlaygroundTeamMembers from "./TeamMembers";
-import { useGetTeamMembers } from "@/hooks/team/useGetTeamMembers";
 import { useState } from "react";
 
 type PlaygroundTeamViewProps = {
