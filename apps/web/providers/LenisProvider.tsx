@@ -7,11 +7,5 @@ interface LenisProviderProps {
 }
 
 export default function LenisProvider({ children }: LenisProviderProps) {
-    return (
-        <ReactLenis
-            root
-        >
-            {children}
-        </ReactLenis>
-    );
+    return <ReactLenis root>{children}</ReactLenis>;
 }
