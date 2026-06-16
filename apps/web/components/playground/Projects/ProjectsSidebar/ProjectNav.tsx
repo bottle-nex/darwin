@@ -14,6 +14,7 @@ import Row from "../../Sidebar/SidebarRow";
 import type { SidebarSectionProps } from "../../Sidebar/shared";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
 import { PROJECT_TAB_LABELS, ProjectsTab } from "../projectsTabs";
+import ProjectTeamsNavItem from "./ProjectTeamsNavItem";
 
 type NavItem = { tab: ProjectsTab; icon: LucideIcon };
 
@@ -59,7 +60,17 @@ export default function ProjectNav({ selectedRowId, onSelect }: SidebarSectionPr
             <div className="my-1.5 h-px bg-white/5" />
             {VIEWS.map(renderItem)}
             <div className="my-1.5 h-px bg-white/5" />
-            {SETTINGS.map(renderItem)}
+            {SETTINGS.map((item) =>
+                item.tab === ProjectsTab.SettingsTeams ? (
+                    <ProjectTeamsNavItem
+                        key={item.tab}
+                        selectedRowId={selectedRowId}
+                        onSelect={onSelect}
+                    />
+                ) : (
+                    renderItem(item)
+                ),
+            )}
         </div>
     );
 }

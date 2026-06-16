@@ -24,10 +24,7 @@ export default function ProjectsDisplay() {
         ? dashboard?.projects.find((p) => p.slug === projectSlug)
         : undefined;
 
-    // The workspace always resolves to a project; render nothing until it does.
     if (!activeProject) return <div className="flex min-h-0 flex-1" />;
-
-    // Capture the narrowed value so it holds inside the closure below.
     const project = activeProject;
 
     function content() {

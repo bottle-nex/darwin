@@ -9,7 +9,7 @@ export default function HomeSidebar(props: SidebarSectionProps) {
         <>
             <PrimaryNavSection {...props} />
             {/* <MyWorkSection {...props} /> */}
-            <FavoritesSection {...props} />
+            {/* <FavoritesSection {...props} /> */}
             {/* <ProjectsSection {...props} /> */}
             <TeamsSection {...props} />
             {/* <AgentsSection {...props} /> */}

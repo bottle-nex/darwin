@@ -5,7 +5,6 @@ import {
     Inbox,
     LayoutDashboard,
     type LucideIcon,
-    KeyRound,
     FolderKey,
 } from "lucide-react";
 import Row from "../../Sidebar/SidebarRow";
@@ -17,7 +16,6 @@ const PRIMARY_ROWS: { id: string; label: string; icon: LucideIcon; isLocked?: bo
     { id: "kanban", label: "Kanban", icon: LayoutDashboard },
     { id: "mentions", label: "Mentions", icon: AtSign },
     { id: "reviews", label: "Reviews", icon: FileCheck },
-    { id: "environment", label: "Environment", icon: KeyRound, isLocked: true },
 ];
 
 export const rows: SidebarNavRow[] = PRIMARY_ROWS.map((r) => ({ id: r.id, label: r.label }));

@@ -130,7 +130,7 @@ export default function PricingFreeCard() {
                 </div>
             </div>
 
-            <div className="h-full w-full mt-88 lg:mt-[55%] px-6 flex flex-col max-w-md mx-auto items-center gap-y-2">
+            <div className="h-full w-full mt-88 lg:mt-[61%] px-6 flex flex-col max-w-md mx-auto items-center gap-y-2">
                 <div className="text-neutral-300 text-3xl">Explore for free</div>
 
                 <div className="text-neutral-500 text-[17px] leading-[1.4] text-center">
