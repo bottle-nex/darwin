@@ -104,11 +104,11 @@ export default function BoardShowcase() {
 
     return (
         <section className="mx-auto w-full max-w-7xl px-4 pb-20 sm:px-6 sm:pb-28">
-            <div className="perspective-distant rounded-xl shadow-[0_40px_80px_-20px_rgba(15,23,42,0.35)]">
+            <div className="perspective-distant rounded-xl">
                 <motion.div
                     ref={frameRef}
                     style={{ rotateX, scale, y }}
-                    className="origin-top transform-gpu backface-hidden will-change-transform overflow-hidden rounded-xl outline-8 outline-neutral-200 bg-charcoal"
+                    className="origin-top transform-gpu backface-hidden will-change-transform overflow-hidden rounded-xl outline-8 outline-neutral-200 bg-charcoal shadow-[0_40px_80px_-20px_rgba(15,23,42,0.35)]"
                 >
                     <div className="flex h-9 items-center gap-2 border-b border-white/5 px-4">
                         <span className="size-2.5 rounded-full bg-[#FF5F57]" />

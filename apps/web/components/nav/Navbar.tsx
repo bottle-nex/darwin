@@ -55,7 +55,7 @@ export function NavBar({ isMarkettingPage = false }: { isMarkettingPage?: boolea
                     : "border-b border-transparent h-17",
             )}
         >
-            <div className="mx-auto max-w-7xl flex h-full items-center justify-between px-4">
+            <div className="mx-auto max-w-7xl flex h-full items-center justify-between">
                 <div className="flex items-center gap-8 justify-between">
                     <Link href="/" aria-label="try matcha home">
                         <AppLogo className={isMarkettingPage ? "text-neutral-100" : ""} />

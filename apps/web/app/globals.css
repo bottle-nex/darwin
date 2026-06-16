@@ -6,17 +6,17 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-    --color-ink: #0A0A0A;
+    --color-ink: #0a0a0a;
     /* deepest dark — page base in dark mode */
-    --color-charcoal: #121212;
+    --color-charcoal: #101011;
     /* lighter dark — cards/surfaces in dark mode */
-    --color-cement: #0c0c0c;
+    --color-cement: #232325;
     /* lighter dark — playground bg in dark mode */
     --color-snow: #fafafa;
     /* lightest — page base in light mode */
     --color-mist: #f4f4f4;
     /* off-white — cards/surfaces in light mode */
-    --color-primary: #AB9FF2;
+    --color-primary: #ab9ff2;
 }
 
 :root {
@@ -30,7 +30,7 @@
     --popover: #ffffff;
     --popover-foreground: #171717;
 
-    --primary: #BCAFFF;
+    --primary: #bcafff;
     --primary-foreground: var(--color-snow);
     --secondary: var(--color-mist);
     --secondary-foreground: #171717;
@@ -115,5 +115,12 @@
     .grain {
         background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='linear' slope='0.12'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
         background-repeat: repeat;
+    }
+
+    /* Apple-style continuous corner. Pair with any Tailwind rounded-* for the
+       radius; superellipse(4) turns the circular corner into a squircle.
+       Browsers without corner-shape just keep the plain rounded corner. */
+    .squircle {
+        corner-shape: superellipse(4);
     }
 }

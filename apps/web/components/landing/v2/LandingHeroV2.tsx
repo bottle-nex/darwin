@@ -16,7 +16,7 @@ export default function LandingHeroV2() {
                 className="absolute inset-0 bg-[radial-gradient(circle,#d9d9d9_1px,transparent_1px)] bg-size-[28px_28px] mask-[radial-gradient(ellipse_at_top,black_20%,transparent_70%)]"
             />
             {/* <HeroIssueCards /> */}
-            <div className="relative mx-auto flex w-full max-w-7xl flex-col items-center gap-8 px-6 pt-28 pb-16 text-center md:pt-36">
+            <div className="relative mx-auto flex w-full max-w-7xl flex-col items-center gap-8 px-6 pt-28 pb-16 text-center md:pt-24">
                 <Reveal immediate>
                     <div
                         className={cn(
@@ -44,11 +44,11 @@ export default function LandingHeroV2() {
                 </Reveal>
                 <Reveal immediate delay={0.24}>
                     <div className="flex flex-col items-center gap-3 sm:flex-row sm:gap-x-4">
-                        <Button size="lg">
+                        <Button size="lg" variant="secondary">
                             Get started
                             <PiArrowRight className="h-3 w-3" />
                         </Button>
-                        <Button size="lg" variant="secondary" asChild>
+                        <Button size="lg" asChild>
                             <Link href="/why" className="uppercase">
                                 Why matcha
                                 <ArrowRight />
