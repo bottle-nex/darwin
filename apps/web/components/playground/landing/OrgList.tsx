@@ -36,7 +36,7 @@ export default function OrgList({
             <div className="flex items-center justify-between">
                 <h2 className="text-[13px] font-semibold">Organizations</h2>
                 <Button variant="tertiary" onClick={onCreateOrg}>
-                    <IoAddSharp className="size-3" />
+                    <IoAddSharp className="size-3 text-charcoal!" />
                     create org
                 </Button>
             </div>

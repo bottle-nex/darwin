@@ -6,6 +6,9 @@ export interface Project {
     slug: string;
     description: string | null;
     color: string | null;
+    githubRepoFullName: string | null;
+    githubRepoUrl: string | null;
+    githubDefaultBranch: string | null;
     createdAt: string;
 }
 

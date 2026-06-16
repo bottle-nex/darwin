@@ -15,6 +15,18 @@ const FIELD =
 
 const KEY_PATTERN = /^[A-Za-z_][A-Za-z0-9_]*$/;
 
+/**
+ * Secret values are write-only and never returned, so render a masked placeholder.
+ * Length is derived from the key (stable across renders) so it varies per row but
+ * never flickers, between a clean 8–18 dots.
+ */
+function maskDots(key: string) {
+    let hash = 0;
+    for (let i = 0; i < key.length; i++) hash = (hash * 31 + key.charCodeAt(i)) | 0;
+    const length = 8 + (Math.abs(hash) % 11);
+    return "•".repeat(length);
+}
+
 /** Environment-variables settings section. Values are write-only over the wire. */
 export default function ProjectSettingsEnvSection({
     projectId,
@@ -179,30 +191,39 @@ export default function ProjectSettingsEnvSection({
                             return (
                                 <div
                                     key={s.key}
-                                    className="group flex items-center gap-3 rounded-lg bg-white/5 px-3 py-2 shadow-[inset_0_1px_0_0_#262626]"
+                                    className="group flex items-center justify-between gap-3 rounded-lg bg-white/5 px-3 py-2 shadow-[inset_0_1px_0_0_#262626]"
                                 >
-                                    <KeyRound
-                                        className="size-3 shrink-0 text-neutral-500"
-                                        aria-hidden
-                                    />
-                                    <span className="min-w-0 flex-1 truncate font-mono text-[12px] text-neutral-200">
-                                        {s.key}
-                                    </span>
-                                    <span className="shrink-0 text-[10px] text-neutral-600">
-                                        Updated {formatRelativeTime(s.updatedAt)}
-                                    </span>
-                                    <button
-                                        type="button"
-                                        aria-label={`Delete ${s.key}`}
-                                        disabled={deleting}
-                                        onClick={() =>
-                                            projectId &&
-                                            deleteSecret.mutate({ projectId, key: s.key })
-                                        }
-                                        className="flex size-6 shrink-0 cursor-pointer items-center justify-center rounded text-neutral-400 hover:bg-neutral-700/50 hover:text-red-500 disabled:opacity-40"
-                                    >
-                                        <Trash2 className="size-3" aria-hidden />
-                                    </button>
+                                    <section>
+                                        <div className="flex items-center justify-center gap-x-3">
+                                            <KeyRound
+                                                className="size-3 shrink-0 text-neutral-500"
+                                                aria-hidden
+                                            />
+                                            <span className="min-w-0 flex-1 truncate font-mono text-[12px] text-neutral-200">
+                                                {s.key}
+                                            </span>
+                                        </div>
+                                        <div className="mt-1 truncate pl-6 font-mono text-[12px] leading-none text-neutral-600">
+                                            {maskDots(s.key)}
+                                        </div>
+                                    </section>
+                                    <section className="flex items-center justify-center gap-x-3">
+                                        <span className="shrink-0 text-[10px] text-neutral-600">
+                                            Updated {formatRelativeTime(s.updatedAt)}
+                                        </span>
+                                        <button
+                                            type="button"
+                                            aria-label={`Delete ${s.key}`}
+                                            disabled={deleting}
+                                            onClick={() =>
+                                                projectId &&
+                                                deleteSecret.mutate({ projectId, key: s.key })
+                                            }
+                                            className="flex size-6 shrink-0 cursor-pointer items-center justify-center rounded text-neutral-400 hover:bg-neutral-700/50 hover:text-red-500 disabled:opacity-40"
+                                        >
+                                            <Trash2 className="size-3" aria-hidden />
+                                        </button>
+                                    </section>
                                 </div>
                             );
                         })}
