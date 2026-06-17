@@ -16,7 +16,7 @@ export default function LandingHeroV2() {
                 className="absolute inset-0 bg-[radial-gradient(circle,#d9d9d9_1px,transparent_1px)] bg-size-[28px_28px] mask-[radial-gradient(ellipse_at_top,black_20%,transparent_70%)]"
             />
             {/* <HeroIssueCards /> */}
-            <div className="relative mx-auto flex w-full max-w-7xl flex-col items-center gap-8 px-6 pt-28 pb-16 text-center md:pt-24">
+            <div className="relative mx-auto flex min-h-[68vh] w-full max-w-7xl flex-col items-center justify-center gap-7 px-6 py-20 text-center">
                 <Reveal immediate>
                     <div
                         className={cn(
@@ -29,7 +29,7 @@ export default function LandingHeroV2() {
                     </div>
                 </Reveal>
                 <Reveal immediate delay={0.08}>
-                    <h1 className="text-5xl font-light leading-[0.95] tracking-tight text-neutral-900 sm:text-7xl md:text-8xl lg:text-9xl">
+                    <h1 className="text-6xl font-light leading-[0.95] tracking-tight text-neutral-900 sm:text-7xl lg:text-8xl">
                         File the issue.
                         <br />
                         <span className="text-neutral-400">Review the PR.</span>

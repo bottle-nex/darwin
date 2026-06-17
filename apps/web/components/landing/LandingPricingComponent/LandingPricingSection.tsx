@@ -8,6 +8,7 @@ export default function LandingPricingSection() {
             <div className="flex w-full max-w-7xl flex-col">
                 <SectionHeader
                     header=""
+                    align="center"
                     title={
                         <>
                             Pricing that <br />

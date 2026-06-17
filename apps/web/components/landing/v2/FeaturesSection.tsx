@@ -1,5 +1,5 @@
 import { Bot, GitPullRequest, Kanban, ScanSearch, Server, ShieldCheck } from "lucide-react";
-import { RiFilePaperFill, RiGithubFill } from "react-icons/ri";
+import { RiBookOpenFill, RiFilePaperFill, RiGithubFill } from "react-icons/ri";
 import Reveal from "@/components/utility/Reveal";
 import FeatureCard from "./features/FeatureCard";
 import BoardPreview from "./features/previews/BoardPreview";
@@ -30,12 +30,12 @@ export default function FeaturesSection() {
                 </div>
                 <div className="w-full flex justify-center items-center gap-3 my-12">
                     <Button variant="tertiary" className="flex items-center gap-2">
-                        <RiGithubFill className="size-4 text-neutral-900!" />
                         View on GitHub
+                        <RiGithubFill className="size-4 text-neutral-900!" />
                     </Button>
                     <Button className="flex items-center gap-2">
-                        <RiFilePaperFill className="size-4" />
                         Read Docs
+                        <RiFilePaperFill className="size-4" />
                     </Button>
                 </div>
                 <div className="grid grid-cols-1 gap-4 px-6 md:grid-cols-2 lg:grid-cols-3">
@@ -90,9 +90,29 @@ export default function FeaturesSection() {
                         delay={0.14}
                     />
                 </div>
+                <Reveal>
+                    <div className="mt-16 flex flex-col gap-8 px-6 pt-12 sm:flex-row sm:items-center sm:justify-between sm:gap-12">
+                        <div className="max-w-5xl">
+                            <h3 className="text-2xl font-extralight leading-snug text-neutral-100 sm:text-3xl">
+                                Hold your matcha.{" "}
+                                <span className="text-neutral-400">We&apos;ll bank the busywork.</span>
+                            </h3>
+                            <p className="mt-4 leading-relaxed text-neutral-400">
+                                Pour a cup and step away from the backlog. Our agents claim your
+                                issues, ship the fix on real runners, and hand it back as a reviewed
+                                pull request — so your team keeps its hours for the work that grows
+                                the business.
+                            </p>
+                        </div>
+                        <Button variant="tertiary" className="shrink-0">
+                            Read more
+                            <RiBookOpenFill className="size-4 text-neutral-800!" />
+                        </Button>
+                    </div>
+                </Reveal>
             </section>
             {/* Bottom fade blends the cards into the main's charcoal edge. */}
-            <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-48 rounded-b-2xl bg-linear-to-t from-neutral-900/80 via-neutral-800 to-transparent" />
+            {/* <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-48 rounded-b-2xl bg-linear-to-t from-neutral-900/80 via-neutral-800 to-transparent" /> */}
         </main>
     );
 }

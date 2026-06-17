@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
 import { PiArrowRight } from "react-icons/pi";
+import { RiRocketFill, RiTeamFill } from "react-icons/ri";
 import { cn } from "@/lib/utils";
 import { azeretMono, Button } from "@/components/ui/button";
 import Reveal from "@/components/utility/Reveal";
@@ -35,12 +35,12 @@ export default function LandingCtaV2() {
                 <div className="flex flex-col items-center gap-3 pt-2 sm:flex-row sm:gap-x-4">
                     <Button size="lg">
                         Get started
-                        <PiArrowRight className="h-3 w-3" />
+                        <RiRocketFill className="size-4" />
                     </Button>
                     <Button size="lg" variant="secondary" asChild>
                         <Link href="/about" className="uppercase">
                             Meet the team
-                            <ArrowRight />
+                            <RiTeamFill className="size-4" />
                         </Link>
                     </Button>
                 </div>
