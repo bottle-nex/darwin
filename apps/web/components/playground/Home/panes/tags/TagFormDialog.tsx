@@ -1,7 +1,7 @@
 "use client";
 import { useEffect } from "react";
 import { useForm, useWatch } from "react-hook-form";
-import { Check } from "lucide-react";
+import { Check, Pipette } from "lucide-react";
 import { toast } from "sonner";
 import { AxiosError } from "axios";
 import { Button } from "@/components/ui/button";
@@ -15,6 +15,8 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { ColorPicker } from "@/components/ui/color-picker";
 import { cn } from "@/lib/utils";
 import { useCreateTag } from "@/hooks/tags/useCreateTag";
 import { useUpdateTag } from "@/hooks/tags/useUpdateTag";
@@ -123,7 +125,7 @@ export default function TagFormDialog({ open, onOpenChange, projectId, tag }: Ta
 
     return (
         <Dialog open={open} onOpenChange={handleOpenChange}>
-            <DialogContent className="border-white/10 bg-charcoal sm:max-w-105">
+            <DialogContent className="bg-charcoal sm:max-w-105">
                 <DialogHeader>
                     <DialogTitle className="text-neutral-100">
                         {isEdit ? "Edit tag" : "New tag"}
@@ -165,7 +167,7 @@ export default function TagFormDialog({ open, onOpenChange, projectId, tag }: Ta
                                         aria-label={`Use color ${c}`}
                                         aria-pressed={selected}
                                         className={cn(
-                                            "flex size-7 items-center justify-center rounded-full transition-all",
+                                            "flex size-7 items-center justify-center rounded-full transition-all cursor-pointer",
                                             selected
                                                 ? "ring-2 ring-white/80 ring-offset-2 ring-offset-charcoal"
                                                 : "ring-1 ring-white/10 hover:ring-white/30",
@@ -178,6 +180,47 @@ export default function TagFormDialog({ open, onOpenChange, projectId, tag }: Ta
                                     </button>
                                 );
                             })}
+
+                            {(() => {
+                                const customActive = !TAG_COLORS.includes(color);
+                                return (
+                                    <Popover>
+                                        <PopoverTrigger asChild>
+                                            <button
+                                                type="button"
+                                                aria-label="Choose a custom color"
+                                                aria-pressed={customActive}
+                                                className={cn(
+                                                    "flex size-7 items-center justify-center rounded-full transition-all cursor-pointer",
+                                                    customActive
+                                                        ? "ring-2 ring-white/80 ring-offset-2 ring-offset-charcoal"
+                                                        : "ring-1 ring-white/10 hover:ring-white/30",
+                                                )}
+                                                style={{
+                                                    background: customActive
+                                                        ? color
+                                                        : "conic-gradient(from 0deg, #f00, #ff0, #0f0, #0ff, #00f, #f0f, #f00)",
+                                                }}
+                                            >
+                                                {customActive ? (
+                                                    <Check className="size-3.5 text-neutral-900" />
+                                                ) : (
+                                                    <Pipette className="size-3.5 text-white drop-shadow" />
+                                                )}
+                                            </button>
+                                        </PopoverTrigger>
+                                        <PopoverContent
+                                            align="start"
+                                            className="w-auto border-white/10 bg-charcoal"
+                                        >
+                                            <ColorPicker
+                                                value={color}
+                                                onChange={(hex) => setValue("color", hex)}
+                                            />
+                                        </PopoverContent>
+                                    </Popover>
+                                );
+                            })()}
                         </div>
                     </div>
 

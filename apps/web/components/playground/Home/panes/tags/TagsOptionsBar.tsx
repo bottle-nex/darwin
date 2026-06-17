@@ -87,7 +87,7 @@ export default function TagsOptionsBar({ options, count, onCreate }: TagsOptions
                     onClick={onCreate}
                     className="ml-0.5 flex h-6 items-center gap-1 rounded-sm bg-neutral-100 px-2 text-[11.5px] font-medium text-neutral-900 hover:bg-neutral-200"
                 >
-                    <Plus className="size-3.5" aria-hidden />
+                    <Plus className="size-3.5 text-neutral-800!" aria-hidden />
                     New tag
                 </Button>
             </div>

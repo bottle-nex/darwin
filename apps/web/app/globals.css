@@ -132,4 +132,46 @@
     .no-scrollbar::-webkit-scrollbar {
         display: none; /* Chrome, Safari, WebKit */
     }
+
+    /* Static, non-uniform gradient border ring. A masked conic-gradient on a
+       ::before pseudo-element paints only the padding band, so the visible
+       ring is bright on some arcs and fades to nothing (transparent stops) on
+       others. border-radius: inherit keeps the ring on the host's rounded
+       corners; padding sets the max ring thickness. The host must already
+       establish a positioning context (relative/absolute/fixed) — we don't set
+       `position` here so we never override a host's own positioning (e.g. a
+       `fixed` centered dialog). */
+    .gradient-border::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        padding: 1px; /* max ring thickness */
+        /* Neutral-800 (#262626) that appears and vanishes at several irregular
+           points around the perimeter, so the ring reads as randomly broken
+           rather than a single smooth ramp. */
+        background: conic-gradient(
+            from 140deg,
+            rgba(38, 38, 38, 1) 0deg,
+            rgba(38, 38, 38, 0.35) 26deg,
+            transparent 52deg,
+            transparent 88deg,
+            rgba(38, 38, 38, 0.7) 118deg,
+            rgba(38, 38, 38, 1) 148deg,
+            rgba(38, 38, 38, 0.3) 176deg,
+            transparent 204deg,
+            transparent 236deg,
+            rgba(38, 38, 38, 0.65) 264deg,
+            transparent 292deg,
+            transparent 320deg,
+            rgba(38, 38, 38, 0.9) 346deg,
+            rgba(38, 38, 38, 1) 360deg
+        );
+        -webkit-mask:
+            linear-gradient(#fff 0 0) content-box,
+            linear-gradient(#fff 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
+        pointer-events: none;
+    }
 }
