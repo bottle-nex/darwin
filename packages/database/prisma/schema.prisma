@@ -99,10 +99,25 @@ model Project {
     customColumns    CustomColumn[]
     setupSessions    SetupSession[]
     secrets          ProjectSecret[]
+    tags             Tag[]
 
     @@unique([orgId, slug])
     @@index([ownerId])
     @@index([githubInstallationId])
+}
+
+model Tag {
+    id    String @id @default(cuid())
+    name  String
+    color String
+
+    projectId String
+    project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@unique([projectId, name])
 }
 
 model Team {
