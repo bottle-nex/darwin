@@ -26,7 +26,7 @@ const buttonVariants = cva(
                     "bg-linear-to-b from-white to-neutral-50 text-foreground border border-neutral-200 shadow-[inset_0_1px_0_0_rgba(255,255,255,1),inset_0_-1px_0_0_rgba(15,23,42,0.06),0_1px_3px_0_rgba(15,23,42,0.06)] hover:bg-neutral-50 focus-visible:border-ring aria-expanded:bg-neutral-50 dark:from-neutral-800 dark:to-neutral-800 dark:border-neutral-600 dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05),inset_0_-1px_0_0_rgba(0,0,0,0.2)] dark:hover:from-neutral-700 dark:hover:to-neutral-700 dark:aria-expanded:from-neutral-700",
                 destructive:
                     "bg-linear-to-b from-red-500 to-red-700 text-white shadow-[inset_0_1.5px_0_0_rgba(255,255,255,0.20),inset_0_-2px_0_0_rgba(0,0,0,0.40),0_1px_2px_0_rgba(185,28,28,0.25),0_2px_4px_1px_rgba(185,28,28,0.20)] hover:brightness-110 focus-visible:ring-destructive/40 dark:from-red-600 dark:to-red-800 dark:shadow-[inset_0_1.5px_0_0_rgba(255,255,255,0.15),inset_0_-2px_0_0_rgba(0,0,0,0.5)]",
-                ghost: "text-foreground hover:bg-muted aria-expanded:bg-muted dark:hover:bg-muted/60",
+                ghost: "text-foreground",
                 link: "text-primary underline-offset-4 hover:underline",
             },
             size: {

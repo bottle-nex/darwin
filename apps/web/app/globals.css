@@ -123,4 +123,13 @@
     .squircle {
         corner-shape: superellipse(4);
     }
+
+    /* Keep an element scrollable but hide the scrollbar across browsers. */
+    .no-scrollbar {
+        -ms-overflow-style: none; /* IE and legacy Edge */
+        scrollbar-width: none; /* Firefox */
+    }
+    .no-scrollbar::-webkit-scrollbar {
+        display: none; /* Chrome, Safari, WebKit */
+    }
 }

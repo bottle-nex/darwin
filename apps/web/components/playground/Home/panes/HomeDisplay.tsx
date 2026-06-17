@@ -12,6 +12,7 @@ import ReviewsMainPane from "./ReviewsMainPane";
 import AssignedToMePane from "./AssignedToMePane";
 import InProgressPane from "./InProgressPane";
 import DraftsPane from "./DraftsPane";
+import TagsMainPane from "./tags/TagsMainPane";
 
 /** Renders the Home surface's active tab. */
 export default function HomeDisplay() {
@@ -28,6 +29,18 @@ export default function HomeDisplay() {
                         segments={[{ label: "Home" }, { label: "Kanban" }]}
                     />
                     <KanbanMainPane />
+                </div>
+            );
+        case HomeTab.Tags:
+            return (
+                <div className="flex min-h-0 flex-1 flex-col">
+                    <PaneBreadcrumb
+                        leading={
+                            <House className="size-3.5 shrink-0 text-neutral-400" aria-hidden />
+                        }
+                        segments={[{ label: "Home" }, { label: "Tags" }]}
+                    />
+                    <TagsMainPane />
                 </div>
             );
         case HomeTab.Mentions:

@@ -1,11 +1,13 @@
 "use client";
 
-import { Lock, type LucideIcon } from "lucide-react";
+import { Lock } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type RowProps = {
     /** Leading slot — supply either an icon or a fully-formed react node (e.g. an avatar). */
-    leading?: { kind: "icon"; icon: LucideIcon } | { kind: "node"; node: React.ReactNode };
+    leading?:
+        | { kind: "icon"; icon: React.ComponentType<React.SVGProps<SVGSVGElement>> }
+        | { kind: "node"; node: React.ReactNode };
     label: string;
     /** Lighter trailing text that follows the label after a dash. */
     suffix?: string;

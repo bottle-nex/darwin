@@ -8,6 +8,10 @@ import set_secrets_controller from "../../controllers/project/controller.set_sec
 import list_secrets_controller from "../../controllers/project/controller.list_secrets";
 import delete_secret_controller from "../../controllers/project/controller.delete_secret";
 import list_members_controller from "../../controllers/project/controller.list_members";
+import list_tags_controller from "../../controllers/project/controller.list_tags";
+import create_tag_controller from "../../controllers/project/controller.create_tag";
+import update_tag_controller from "../../controllers/project/controller.update_tag";
+import delete_tag_controller from "../../controllers/project/controller.delete_tag";
 
 const project_router: Router = Router();
 
@@ -19,5 +23,9 @@ project_router.get("/:project_id/members", require_auth, list_members_controller
 project_router.get("/:project_id/secrets", require_auth, list_secrets_controller);
 project_router.post("/:project_id/secrets", require_auth, set_secrets_controller);
 project_router.delete("/:project_id/secrets/:key", require_auth, delete_secret_controller);
+project_router.get("/:project_id/tags", require_auth, list_tags_controller);
+project_router.post("/:project_id/tags", require_auth, create_tag_controller);
+project_router.patch("/:project_id/tags/:tag_id", require_auth, update_tag_controller);
+project_router.delete("/:project_id/tags/:tag_id", require_auth, delete_tag_controller);
 
 export default project_router;

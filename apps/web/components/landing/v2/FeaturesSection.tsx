@@ -95,7 +95,9 @@ export default function FeaturesSection() {
                         <div className="max-w-5xl">
                             <h3 className="text-2xl font-extralight leading-snug text-neutral-100 sm:text-3xl">
                                 Hold your matcha.{" "}
-                                <span className="text-neutral-400">We&apos;ll bank the busywork.</span>
+                                <span className="text-neutral-400">
+                                    We&apos;ll bank the busywork.
+                                </span>
                             </h3>
                             <p className="mt-4 leading-relaxed text-neutral-400">
                                 Pour a cup and step away from the backlog. Our agents claim your

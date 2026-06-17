@@ -28,6 +28,14 @@ export const LIST_PROJECT_SECRETS_URL = (project_id: string) =>
 export const DELETE_PROJECT_SECRET_URL = (project_id: string, key: string) =>
     `${PROJECT_URL}/${project_id}/secrets/${encodeURIComponent(key)}`;
 
+// <--------------------- TAG ROUTES --------------------->
+export const LIST_TAGS_URL = (project_id: string) => `${PROJECT_URL}/${project_id}/tags`;
+export const CREATE_TAG_URL = (project_id: string) => `${PROJECT_URL}/${project_id}/tags`;
+export const UPDATE_TAG_URL = (project_id: string, tagId: string) =>
+    `${PROJECT_URL}/${project_id}/tags/${tagId}`;
+export const DELETE_TAG_URL = (project_id: string, tagId: string) =>
+    `${PROJECT_URL}/${project_id}/tags/${tagId}`;
+
 // <--------------------- TEAM ROUTES --------------------->
 export const CREATE_TEAM = API_URL + "/teams/create";
 export const GET_TEAM_MEMBERS = (teamId: string) => `${API_URL}/teams/${teamId}/members`;

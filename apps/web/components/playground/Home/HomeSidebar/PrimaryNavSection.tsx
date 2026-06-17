@@ -1,22 +1,18 @@
 "use client";
-import {
-    AtSign,
-    FileCheck,
-    Inbox,
-    LayoutDashboard,
-    type LucideIcon,
-    FolderKey,
-} from "lucide-react";
+import { BsFillKanbanFill } from "react-icons/bs";
+import { FaInbox, FaAt, FaCheckCircle, FaTags, FaCog } from "react-icons/fa";
 import Row from "../../Sidebar/SidebarRow";
 import { matchesQuery, type SidebarNavRow, type SidebarSectionProps } from "../../Sidebar/shared";
 
-const PRIMARY_ROWS: { id: string; label: string; icon: LucideIcon; isLocked?: boolean }[] = [
-    { id: "inbox", label: "Inbox", icon: Inbox },
-    { id: "setup", label: "Setup", icon: FolderKey },
-    { id: "kanban", label: "Kanban", icon: LayoutDashboard },
-    { id: "mentions", label: "Mentions", icon: AtSign },
-    { id: "reviews", label: "Reviews", icon: FileCheck },
-];
+const PRIMARY_ROWS: { id: string; label: string; icon: React.ComponentType; isLocked?: boolean }[] =
+    [
+        { id: "kanban", label: "Kanban", icon: BsFillKanbanFill },
+        { id: "inbox", label: "Inbox", icon: FaInbox },
+        { id: "mentions", label: "Mentions", icon: FaAt },
+        { id: "reviews", label: "Reviews", icon: FaCheckCircle },
+        { id: "tags", label: "Tags", icon: FaTags },
+        { id: "setup", label: "Setup", icon: FaCog },
+    ];
 
 export const rows: SidebarNavRow[] = PRIMARY_ROWS.map((r) => ({ id: r.id, label: r.label }));
 

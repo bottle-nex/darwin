@@ -7,6 +7,7 @@ export enum HomeTab {
     Inbox = "inbox",
     Setup = "setup",
     Kanban = "kanban",
+    Tags = "tags",
     Mentions = "mentions",
     Reviews = "reviews",
     AssignedToMe = "assigned-to-me",
