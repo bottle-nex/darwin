@@ -140,12 +140,12 @@ export default function PricingFreeCard() {
                 </div>
 
                 <div className="w-full flex flex-col sm:flex-row gap-3 sm:gap-x-4 items-center justify-center mt-5 pb-10">
-                    <Button size={'lg'}>
+                    <Button size={"lg"}>
                         Get Started
                         <HiMiniChevronRight className="size-5.5" />
                     </Button>
 
-                    <Button size={'lg'} variant={'tertiary'}>
+                    <Button size={"lg"} variant={"tertiary"}>
                         Know more
                         <MdOutlineReadMore className="size-5" />
                     </Button>

@@ -53,7 +53,8 @@ export default function FeatureCard({
                 dark && "border-white/10 hover:border-white/20 hover:shadow-black/50 border-none",
                 primary &&
                     "border-transparent hover:border-white/30 hover:shadow-[#AB9FF2]/40 border-none",
-                ink && "bg-ink/50 border-none hover:shadow-black/50 border-neutral-800 border shadow-[inset_0_2px_0_0_#262626]",
+                ink &&
+                    "bg-ink/50 border-none hover:shadow-black/50 border-neutral-800 border shadow-[inset_0_2px_0_0_#262626]",
                 light &&
                     "border-neutral-200 bg-white hover:border-neutral-300 hover:shadow-neutral-900/10",
             )}
