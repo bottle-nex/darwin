@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { MoreHorizontal, Plus, Trash2 } from "lucide-react";
+import { MdMoreHoriz, MdAdd, MdDelete } from "react-icons/md";
 import { DropdownMenu } from "radix-ui";
 import { useDroppable } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
@@ -51,7 +51,7 @@ export default function CustomKanbanColumn({
                             aria-label={`${column.title} options`}
                             className="flex size-6 cursor-pointer items-center justify-center rounded text-neutral-400 opacity-0 transition-opacity hover:bg-white/10 hover:text-neutral-200 focus-visible:opacity-100 group-hover:opacity-100 data-[state=open]:opacity-100"
                         >
-                            <MoreHorizontal className="size-4" aria-hidden />
+                            <MdMoreHoriz className="size-4" aria-hidden />
                         </button>
                     </DropdownMenu.Trigger>
                     <DropdownMenu.Portal>
@@ -64,7 +64,7 @@ export default function CustomKanbanColumn({
                                 onSelect={onDelete}
                                 className={`${PANEL_ITEM} text-rose-300 data-highlighted:text-rose-200`}
                             >
-                                <Trash2 className="size-3.5" aria-hidden />
+                                <MdDelete className="size-3.5" aria-hidden />
                                 <span className="flex-1">Delete list</span>
                             </DropdownMenu.Item>
                         </DropdownMenu.Content>
@@ -91,7 +91,7 @@ export default function CustomKanbanColumn({
                 onClick={() => setAdding(true)}
                 className="mt-2 flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-[12px] font-medium text-neutral-400 transition-colors hover:bg-white/5 hover:text-neutral-200 cursor-pointer"
             >
-                <Plus className="size-3.5" aria-hidden />
+                <MdAdd className="size-3.5" aria-hidden />
                 Add a card
             </button>
 

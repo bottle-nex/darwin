@@ -1,10 +1,10 @@
-import { Clock } from "lucide-react";
+import { MdAccessTimeFilled } from "react-icons/md";
 import PaneEmptyState from "@/components/playground/Core/components/PaneEmptyState";
 
 export default function InProgressPane() {
     return (
         <PaneEmptyState
-            icon={Clock}
+            icon={MdAccessTimeFilled}
             title="In Progress"
             subtitle="Work currently being implemented will show up here."
         />

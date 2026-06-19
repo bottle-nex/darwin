@@ -1,10 +1,10 @@
-import { FilePen } from "lucide-react";
+import { MdEditDocument } from "react-icons/md";
 import PaneEmptyState from "@/components/playground/Core/components/PaneEmptyState";
 
 export default function DraftsPane() {
     return (
         <PaneEmptyState
-            icon={FilePen}
+            icon={MdEditDocument}
             title="Drafts"
             subtitle="Issues you've started but not yet filed live here."
         />

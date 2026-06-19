@@ -1,13 +1,15 @@
 "use client";
-import { Check, Kanban, List, SlidersHorizontal, type LucideIcon } from "lucide-react";
+import { MdCheck, MdViewKanban, MdList, MdTune } from "react-icons/md";
+import { type IconType } from "react-icons";
 import { DropdownMenu } from "radix-ui";
 import type { KanbanView } from "../types";
 import OptionButton from "./OptionButton";
 import { PANEL_CONTENT, PANEL_ITEM, PANEL_LABEL } from "./panelStyles";
+import { TooltipComponent } from "@/components/ui/tooltip-component";
 
-const OPTIONS: { value: KanbanView; label: string; icon: LucideIcon }[] = [
-    { value: "board", label: "Board view", icon: Kanban },
-    { value: "list", label: "List view", icon: List },
+const OPTIONS: { value: KanbanView; label: string; icon: IconType }[] = [
+    { value: "board", label: "Board view", icon: MdViewKanban },
+    { value: "list", label: "List view", icon: MdList },
 ];
 
 type ViewsPanelProps = {
@@ -23,9 +25,11 @@ type ViewsPanelProps = {
 export default function ViewsPanel({ value, onChange }: ViewsPanelProps) {
     return (
         <DropdownMenu.Root>
-            <DropdownMenu.Trigger asChild>
-                <OptionButton label="Views" icon={SlidersHorizontal} active={value !== "board"} />
-            </DropdownMenu.Trigger>
+            <TooltipComponent content="Views" side="bottom">
+                <DropdownMenu.Trigger asChild>
+                    <OptionButton label="Views" icon={MdTune} active={value !== "board"} />
+                </DropdownMenu.Trigger>
+            </TooltipComponent>
             <DropdownMenu.Portal>
                 <DropdownMenu.Content
                     align="end"
@@ -46,7 +50,7 @@ export default function ViewsPanel({ value, onChange }: ViewsPanelProps) {
                                 <option.icon className="size-3.5 text-neutral-400" aria-hidden />
                                 <span className="flex-1">{option.label}</span>
                                 <DropdownMenu.ItemIndicator>
-                                    <Check className="size-3.5 text-neutral-300" aria-hidden />
+                                    <MdCheck className="size-3.5 text-neutral-300" aria-hidden />
                                 </DropdownMenu.ItemIndicator>
                             </DropdownMenu.RadioItem>
                         ))}

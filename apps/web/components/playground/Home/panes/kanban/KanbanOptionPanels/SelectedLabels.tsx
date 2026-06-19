@@ -1,5 +1,5 @@
 "use client";
-import { X } from "lucide-react";
+import { MdClose } from "react-icons/md";
 import { cn } from "@/lib/utils";
 import { getLabel } from "../data";
 
@@ -32,7 +32,7 @@ export default function SelectedLabels({ selected, onRemove }: SelectedLabelsPro
                             aria-label={`Remove ${name} filter`}
                             className="cursor-pointer opacity-70 hover:opacity-100"
                         >
-                            <X className="size-2.5" aria-hidden />
+                            <MdClose className="size-2.5" aria-hidden />
                         </button>
                     </span>
                 );

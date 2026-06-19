@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useRef } from "react";
 import { motion } from "motion/react";
-import { Search, X } from "lucide-react";
+import { MdClose, MdSearch } from "react-icons/md";
 
 type SearchBarProps = {
     value: string;
@@ -25,7 +25,7 @@ export default function SearchBar({ value, onChange, onClose }: SearchBarProps) 
             transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
             className="relative flex shrink-0 items-center overflow-hidden"
         >
-            <Search
+            <MdSearch
                 className="pointer-events-none absolute left-2.5 size-3.5 text-neutral-500"
                 aria-hidden
             />
@@ -45,7 +45,7 @@ export default function SearchBar({ value, onChange, onClose }: SearchBarProps) 
                 aria-label="Close search"
                 className="absolute right-1.5 flex size-4 cursor-pointer items-center justify-center rounded-full bg-white/10 text-neutral-400 hover:bg-white/20 hover:text-neutral-100"
             >
-                <X className="size-2.5" aria-hidden />
+                <MdClose className="size-2.5" aria-hidden />
             </button>
         </motion.div>
     );

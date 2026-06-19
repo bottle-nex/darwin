@@ -1,5 +1,5 @@
 "use client";
-import { Folder } from "lucide-react";
+import { MdFolder } from "react-icons/md";
 import type { Project } from "@/types/project";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
 import PaneBreadcrumb from "../../Core/components/PaneBreadcrumb";
@@ -21,7 +21,7 @@ export default function ProjectTopbar({ project }: { project: Project }) {
     return (
         <PaneBreadcrumb
             leading={
-                <Folder className="size-3.5 shrink-0" style={{ color, fill: color }} aria-hidden />
+                <MdFolder className="size-3.5 shrink-0" style={{ color, fill: color }} aria-hidden />
             }
             segments={[
                 { label: project.name, onClick: () => showProjectList("list") },

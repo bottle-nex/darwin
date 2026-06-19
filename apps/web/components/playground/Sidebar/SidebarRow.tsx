@@ -1,6 +1,6 @@
 "use client";
 
-import { Lock } from "lucide-react";
+import { MdLock } from "react-icons/md";
 import { cn } from "@/lib/utils";
 
 type RowProps = {
@@ -77,7 +77,7 @@ export default function PlaygroundSidebarRow({
 
             {isLocked && (
                 <span className="flex size-5 shrink-0 items-center justify-center text-neutral-400 ">
-                    <Lock className="size-3.5" />
+                    <MdLock className="size-3.5" />
                 </span>
             )}
         </button>

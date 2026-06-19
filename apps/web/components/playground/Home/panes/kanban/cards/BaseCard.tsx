@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { MessageSquare } from "lucide-react";
+import { MdChat } from "react-icons/md";
 import { cn } from "@/lib/utils";
 import PlaygroundAvatar from "@/components/playground/Core/components/PlaygroundAvatar";
 import type { Issue } from "../types";
@@ -57,7 +57,7 @@ export default function BaseCard({ issue, children, className }: BaseCardProps) 
             <div className="mt-3 flex items-center justify-between border-t border-white/5 pt-2.5">
                 <div className="flex min-w-0 items-center gap-2 text-[11px] text-neutral-500">
                     <span className="inline-flex items-center gap-1">
-                        <MessageSquare className="size-3" aria-hidden />
+                        <MdChat className="size-3" aria-hidden />
                         {issue.comments}
                     </span>
                     <span className="truncate text-neutral-600">{issue.project}</span>

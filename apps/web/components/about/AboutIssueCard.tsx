@@ -1,11 +1,5 @@
-import {
-    CheckCircle2,
-    GitPullRequest,
-    Loader,
-    MessageSquare,
-    Server,
-    Sparkles,
-} from "lucide-react";
+import { MdAutoAwesome, MdAutorenew, MdChat, MdCheckCircle, MdStorage } from "react-icons/md";
+import { FaCodePullRequest } from "react-icons/fa6";
 import { cn } from "@/lib/utils";
 import PlaygroundAvatar, {
     type AvatarTone,
@@ -59,7 +53,7 @@ function AgentChip({ name, dark }: { name: string; dark: boolean }) {
                     : "bg-neutral-100 text-neutral-600 ring-black/5",
             )}
         >
-            <Sparkles className={cn("size-2.5", dark ? "text-amber-300" : "text-amber-500")} />
+            <MdAutoAwesome className={cn("size-2.5", dark ? "text-amber-300" : "text-amber-500")} />
             {name}
         </span>
     );
@@ -76,14 +70,14 @@ function StatusRow({ issue, dark }: { issue: AboutIssue; dark: boolean }) {
                             dark ? "text-amber-300/90" : "text-amber-600",
                         )}
                     >
-                        <Loader className="size-3 animate-spin" aria-hidden />
+                        <MdAutorenew className="size-3 animate-spin" aria-hidden />
                         {issue.step}
                     </span>
                 )}
                 <div className="flex items-center justify-between">
                     {issue.runner && (
                         <span className="inline-flex items-center gap-1 text-[11px] text-neutral-500">
-                            <Server className="size-3" aria-hidden />
+                            <MdStorage className="size-3" aria-hidden />
                             {issue.runner}
                         </span>
                     )}
@@ -103,7 +97,7 @@ function StatusRow({ issue, dark }: { issue: AboutIssue; dark: boolean }) {
                             dark ? "text-violet-300" : "text-violet-600",
                         )}
                     >
-                        <GitPullRequest className="size-3" aria-hidden />
+                        <FaCodePullRequest className="size-3" aria-hidden />
                         {issue.pr?.number}
                     </span>
                     {issue.pr && (
@@ -134,7 +128,7 @@ function StatusRow({ issue, dark }: { issue: AboutIssue; dark: boolean }) {
                     dark ? "text-emerald-400/90" : "text-emerald-600",
                 )}
             >
-                <CheckCircle2 className="size-3" aria-hidden />
+                <MdCheckCircle className="size-3" aria-hidden />
                 Merged
             </span>
             <span className="text-neutral-500">{issue.duration}</span>
@@ -208,7 +202,7 @@ export default function AboutIssueCard({
             >
                 <div className="flex min-w-0 items-center gap-2 text-[11px] text-neutral-500">
                     <span className="inline-flex items-center gap-1">
-                        <MessageSquare className="size-3" aria-hidden />
+                        <MdChat className="size-3" aria-hidden />
                         {issue.comments}
                     </span>
                     <span

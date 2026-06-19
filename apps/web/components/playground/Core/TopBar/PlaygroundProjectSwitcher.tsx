@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Popover } from "radix-ui";
-import { Check, ChevronDown, Folder } from "lucide-react";
+import { MdCheck, MdKeyboardArrowDown, MdFolder } from "react-icons/md";
 import { cn } from "@/lib/utils";
 import { useGetDashboard } from "@/hooks/dashboard/useGetDashboard";
 import SidebarSearch from "../../Sidebar/SidebarSearch";
@@ -44,13 +44,13 @@ export default function PlaygroundProjectSwitcher() {
                     type="button"
                     className="flex h-7 cursor-pointer items-center gap-2 rounded-md bg-white/5 px-2 text-[13px] font-semibold text-neutral-100 outline-none hover:bg-white/10 data-[state=open]:bg-white/10"
                 >
-                    <Folder
+                    <MdFolder
                         className="size-3.5 shrink-0"
                         style={{ color: activeColor, fill: activeColor }}
                         aria-hidden
                     />
                     <span className="max-w-60 truncate">{active?.name ?? "Select a project"}</span>
-                    <ChevronDown className="size-3 text-neutral-500" aria-hidden />
+                    <MdKeyboardArrowDown className="size-3 text-neutral-500" aria-hidden />
                 </button>
             </Popover.Trigger>
 
@@ -87,7 +87,7 @@ export default function PlaygroundProjectSwitcher() {
                                             : "text-neutral-300 hover:bg-white/5 hover:text-neutral-100",
                                     )}
                                 >
-                                    <Folder
+                                    <MdFolder
                                         className="size-3.5 shrink-0"
                                         style={{
                                             color: p.color ?? DEFAULT_FOLDER_COLOR,
@@ -97,7 +97,7 @@ export default function PlaygroundProjectSwitcher() {
                                     />
                                     <span className="min-w-0 flex-1 truncate">{p.name}</span>
                                     {p.slug === projectSlug && (
-                                        <Check
+                                        <MdCheck
                                             className="size-3.5 shrink-0 text-neutral-400"
                                             aria-hidden
                                         />

@@ -7,7 +7,7 @@ import {
     useMotionValue,
     type MotionValue,
 } from "framer-motion";
-import { Star } from "lucide-react";
+import { MdStar } from "react-icons/md";
 import { useEffect, useRef } from "react";
 import Node from "./Node";
 import type { PositionedNode } from "./types";
@@ -104,7 +104,7 @@ function NodeItem({
                                 filter: "drop-shadow(0 0 4px " + period.color + "99)",
                             }}
                         >
-                            <Star size={14} fill={period.color} color={period.color} />
+                            <MdStar size={14} fill={period.color} color={period.color} />
                         </div>
                     );
                 })}

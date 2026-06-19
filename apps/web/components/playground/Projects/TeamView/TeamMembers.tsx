@@ -3,7 +3,7 @@ import React, { useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import { toast } from "sonner";
 import { IoPersonAddOutline } from "react-icons/io5";
-import { Users } from "lucide-react";
+import { MdGroup } from "react-icons/md";
 import { useGetTeamMembers } from "@/hooks/team/useGetTeamMembers";
 import { useGetDashboard } from "@/hooks/dashboard/useGetDashboard";
 import { useUserSessionStore } from "@/store/user/useUserSessionStore";
@@ -40,7 +40,7 @@ export default function PlaygroundTeamMembers({
         <section className="rounded-xl ring-1 ring-white/5 bg-charcoal p-3">
             <div className="mb-2 flex items-center justify-between gap-2 px-1">
                 <div className="flex items-center gap-2">
-                    <Users className="size-4 text-neutral-400" aria-hidden />
+                    <MdGroup className="size-4 text-neutral-400" aria-hidden />
                     <h3 className="text-[15px] font-medium text-neutral-100">Current Members</h3>
                     <span className="text-[13px] text-neutral-500">({members?.length ?? 0})</span>
                 </div>

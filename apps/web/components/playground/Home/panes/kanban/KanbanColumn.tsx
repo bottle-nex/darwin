@@ -1,5 +1,5 @@
 "use client";
-import { MoreHorizontal } from "lucide-react";
+import { MdMoreHoriz } from "react-icons/md";
 import { useDroppable } from "@dnd-kit/core";
 import { cn } from "@/lib/utils";
 import type { Issue, KanbanColumnDef } from "./types";
@@ -61,7 +61,7 @@ export default function KanbanColumn({
                     aria-label={`${title} options`}
                     className="flex size-6 cursor-pointer items-center justify-center rounded text-neutral-400 opacity-0 transition-opacity hover:bg-white/10 hover:text-neutral-200 focus-visible:opacity-100 group-hover:opacity-100"
                 >
-                    <MoreHorizontal className="size-4" aria-hidden />
+                    <MdMoreHoriz className="size-4" aria-hidden />
                 </button>
             </div>
 

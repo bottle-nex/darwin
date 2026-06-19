@@ -1,10 +1,18 @@
 "use client";
-import { Check, ChevronLeft, Filter, Kanban, LayoutGrid, Sparkles } from "lucide-react";
+import {
+    MdAutoAwesome,
+    MdCheck,
+    MdFilterAlt,
+    MdKeyboardArrowLeft,
+    MdViewKanban,
+    MdWindow,
+} from "react-icons/md";
 import { DropdownMenu } from "radix-ui";
 import { COLUMNS } from "../data";
 import type { FilterValue } from "../useKanbanOptions";
 import OptionButton from "./OptionButton";
 import { PANEL_CONTENT, PANEL_ITEM, PANEL_LABEL } from "./panelStyles";
+import { TooltipComponent } from "@/components/ui/tooltip-component";
 
 type FilterPanelProps = {
     value: FilterValue;
@@ -29,9 +37,15 @@ export default function FilterPanel({ value, onChange, customColumns }: FilterPa
 
     return (
         <DropdownMenu.Root dir="rtl">
-            <DropdownMenu.Trigger asChild>
-                <OptionButton label="Filter" icon={Filter} active={value.kind !== "default"} />
-            </DropdownMenu.Trigger>
+            <TooltipComponent content="Filter" side="bottom">
+                <DropdownMenu.Trigger asChild>
+                    <OptionButton
+                        label="Filter"
+                        icon={MdFilterAlt}
+                        active={value.kind !== "default"}
+                    />
+                </DropdownMenu.Trigger>
+            </TooltipComponent>
             <DropdownMenu.Portal>
                 <DropdownMenu.Content
                     align="end"
@@ -44,18 +58,21 @@ export default function FilterPanel({ value, onChange, customColumns }: FilterPa
                         className={PANEL_ITEM}
                         onSelect={() => onChange({ kind: "default" })}
                     >
-                        <LayoutGrid className="size-3.5 text-neutral-400" aria-hidden />
+                        <MdWindow className="size-3.5 text-neutral-400" aria-hidden />
                         <span className="flex-1">Default</span>
                         {value.kind === "default" && (
-                            <Check className="size-3.5 text-neutral-300" aria-hidden />
+                            <MdCheck className="size-3.5 text-neutral-300" aria-hidden />
                         )}
                     </DropdownMenu.Item>
 
                     {hasCustom ? (
                         <DropdownMenu.Sub>
                             <DropdownMenu.SubTrigger className={PANEL_ITEM}>
-                                <ChevronLeft className="size-3.5 text-neutral-500" aria-hidden />
-                                <Kanban className="size-3.5 text-neutral-400" aria-hidden />
+                                <MdKeyboardArrowLeft
+                                    className="size-3.5 text-neutral-500"
+                                    aria-hidden
+                                />
+                                <MdViewKanban className="size-3.5 text-neutral-400" aria-hidden />
                                 <span className="flex-1">Custom</span>
                             </DropdownMenu.SubTrigger>
                             <DropdownMenu.Portal>
@@ -74,7 +91,7 @@ export default function FilterPanel({ value, onChange, customColumns }: FilterPa
                                             <span className="flex-1 truncate">{col.title}</span>
                                             {value.kind === "custom" &&
                                                 value.columnId === col.id && (
-                                                    <Check
+                                                    <MdCheck
                                                         className="size-3.5 text-neutral-300"
                                                         aria-hidden
                                                     />
@@ -86,7 +103,7 @@ export default function FilterPanel({ value, onChange, customColumns }: FilterPa
                         </DropdownMenu.Sub>
                     ) : (
                         <DropdownMenu.Item disabled className={`${PANEL_ITEM} opacity-50`}>
-                            <Kanban className="size-3.5 text-neutral-400" aria-hidden />
+                            <MdViewKanban className="size-3.5 text-neutral-400" aria-hidden />
                             <span className="flex-1">Custom</span>
                             <span className="text-[11px] text-neutral-600">No lists yet</span>
                         </DropdownMenu.Item>
@@ -94,8 +111,11 @@ export default function FilterPanel({ value, onChange, customColumns }: FilterPa
 
                     <DropdownMenu.Sub>
                         <DropdownMenu.SubTrigger className={PANEL_ITEM}>
-                            <ChevronLeft className="size-3.5 text-neutral-500" aria-hidden />
-                            <Sparkles className="size-3.5 text-neutral-400" aria-hidden />
+                            <MdKeyboardArrowLeft
+                                className="size-3.5 text-neutral-500"
+                                aria-hidden
+                            />
+                            <MdAutoAwesome className="size-3.5 text-neutral-400" aria-hidden />
                             <span className="flex-1">LLM</span>
                         </DropdownMenu.SubTrigger>
                         <DropdownMenu.Portal>
@@ -117,7 +137,7 @@ export default function FilterPanel({ value, onChange, customColumns }: FilterPa
                                         />
                                         <span className="flex-1">{col.title}</span>
                                         {value.kind === "llm" && value.status === col.status && (
-                                            <Check
+                                            <MdCheck
                                                 className="size-3.5 text-neutral-300"
                                                 aria-hidden
                                             />

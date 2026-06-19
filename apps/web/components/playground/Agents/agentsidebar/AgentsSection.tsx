@@ -1,6 +1,6 @@
 "use client";
 
-import { MoreHorizontal, Plus, Sparkles } from "lucide-react";
+import { MdMoreHoriz, MdAdd, MdAutoAwesome } from "react-icons/md";
 import Row from "../../Sidebar/SidebarRow";
 import Section from "../../Sidebar/SidebarSection";
 import {
@@ -26,7 +26,7 @@ const AGENTS: {
         id: "all-runs",
         name: "All Runs",
         suffix: "Piyush's Org",
-        leading: { kind: "icon", icon: Sparkles },
+        leading: { kind: "icon", icon: MdAutoAwesome },
     },
     {
         id: "prod-agent",
@@ -69,10 +69,10 @@ export default function PlaygroundSidebarAgentsSection({
                             trailing={
                                 <>
                                     <PlaygroundSidebarRowAction>
-                                        <MoreHorizontal className="size-3.5" aria-hidden />
+                                        <MdMoreHoriz className="size-3.5" aria-hidden />
                                     </PlaygroundSidebarRowAction>
                                     <PlaygroundSidebarRowAction>
-                                        <Plus className="size-3.5" aria-hidden />
+                                        <MdAdd className="size-3.5" aria-hidden />
                                     </PlaygroundSidebarRowAction>
                                 </>
                             }
@@ -81,12 +81,12 @@ export default function PlaygroundSidebarAgentsSection({
                             <Row
                                 indent={1}
                                 label="Add task"
-                                leading={{ kind: "icon", icon: Plus }}
+                                leading={{ kind: "icon", icon: MdAdd }}
                             />
                         )}
                     </div>
                 ))}
-                {!searching && <Row label="New Agent" leading={{ kind: "icon", icon: Plus }} />}
+                {!searching && <Row label="New Agent" leading={{ kind: "icon", icon: MdAdd }} />}
             </Section>
         </div>
     );

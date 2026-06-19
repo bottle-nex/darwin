@@ -1,6 +1,6 @@
 "use client";
 import { useRef, useState } from "react";
-import { Eye, EyeOff, KeyRound, Plus, Trash2, Upload } from "lucide-react";
+import { MdAdd, MdDelete, MdUpload, MdVisibility, MdVisibilityOff, MdVpnKey } from "react-icons/md";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
@@ -86,7 +86,7 @@ export default function ProjectSettingsEnvSection({
                     disabled={!projectId || setSecrets.isPending}
                     onClick={() => fileRef.current?.click()}
                 >
-                    <Upload className="size-3" aria-hidden />
+                    <MdUpload className="size-3" aria-hidden />
                     Import .env
                 </Button>
                 <input
@@ -145,9 +145,9 @@ export default function ProjectSettingsEnvSection({
                                 className="absolute top-1/2 right-2 -translate-y-1/2 cursor-pointer text-neutral-500 hover:text-neutral-300"
                             >
                                 {reveal ? (
-                                    <EyeOff className="size-3" aria-hidden />
+                                    <MdVisibilityOff className="size-3" aria-hidden />
                                 ) : (
-                                    <Eye className="size-3" aria-hidden />
+                                    <MdVisibility className="size-3" aria-hidden />
                                 )}
                             </button>
                         </div>
@@ -160,7 +160,7 @@ export default function ProjectSettingsEnvSection({
                         disabled={!canAdd}
                         onClick={addSecret}
                     >
-                        <Plus className="size-3" aria-hidden />
+                        <MdAdd className="size-3" aria-hidden />
                         Add
                     </Button>
                 </div>
@@ -195,7 +195,7 @@ export default function ProjectSettingsEnvSection({
                                 >
                                     <section>
                                         <div className="flex items-center justify-center gap-x-3">
-                                            <KeyRound
+                                            <MdVpnKey
                                                 className="size-3 shrink-0 text-neutral-500"
                                                 aria-hidden
                                             />
@@ -221,7 +221,7 @@ export default function ProjectSettingsEnvSection({
                                             }
                                             className="flex size-6 shrink-0 cursor-pointer items-center justify-center rounded text-neutral-400 hover:bg-neutral-700/50 hover:text-red-500 disabled:opacity-40"
                                         >
-                                            <Trash2 className="size-3" aria-hidden />
+                                            <MdDelete className="size-3" aria-hidden />
                                         </button>
                                     </section>
                                 </div>

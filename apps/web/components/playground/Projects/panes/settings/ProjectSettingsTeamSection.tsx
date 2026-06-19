@@ -1,5 +1,5 @@
 "use client";
-import { Plus, Trash2 } from "lucide-react";
+import { MdAdd, MdDelete } from "react-icons/md";
 import { Button } from "@/components/ui/button";
 import PlaygroundAvatar from "@/components/playground/Core/components/PlaygroundAvatar";
 import { useNewTeamStore } from "@/store/team/useNewTeamStore";
@@ -37,7 +37,7 @@ export default function ProjectSettingsTeamSection({
                             setOpen(true);
                         }}
                     >
-                        <Plus className="size-3" aria-hidden />
+                        <MdAdd className="size-3" aria-hidden />
                         Add team
                     </Button>
                 )}
@@ -71,7 +71,7 @@ export default function ProjectSettingsTeamSection({
                                     onClick={() => requestDelete(t)}
                                     className="flex size-6 shrink-0 cursor-pointer items-center justify-center rounded text-neutral-400 hover:bg-neutral-700/50 hover:text-red-500"
                                 >
-                                    <Trash2 className="size-3" aria-hidden />
+                                    <MdDelete className="size-3" aria-hidden />
                                 </button>
                             )}
                         </div>

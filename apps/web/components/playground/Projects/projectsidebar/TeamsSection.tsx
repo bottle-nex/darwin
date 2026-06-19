@@ -1,6 +1,6 @@
 "use client";
 
-import { Plus, Trash2 } from "lucide-react";
+import { MdAdd, MdDelete } from "react-icons/md";
 import { useParams } from "next/navigation";
 import { cn } from "@/lib/utils";
 import Row from "../../Sidebar/SidebarRow";
@@ -69,7 +69,7 @@ export default function PlaygroundSidebarTeamsSection({ query }: SidebarSectionP
                                     isActive ? "flex" : "hidden group-hover:flex",
                                 )}
                             >
-                                <Trash2 className="size-3.5" aria-hidden />
+                                <MdDelete className="size-3.5" aria-hidden />
                             </button>
                         </div>
                     );
@@ -77,7 +77,7 @@ export default function PlaygroundSidebarTeamsSection({ query }: SidebarSectionP
                 {!searching && isAdmin && (
                     <Row
                         label="Add team"
-                        leading={{ kind: "icon", icon: Plus }}
+                        leading={{ kind: "icon", icon: MdAdd }}
                         onClick={openCreateTeam}
                     />
                 )}

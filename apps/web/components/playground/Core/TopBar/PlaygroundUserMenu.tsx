@@ -4,15 +4,15 @@ import { useParams, useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { DropdownMenu } from "radix-ui";
 import {
-    Check,
-    ChevronRight,
-    FolderOpen,
-    LayoutGrid,
-    LogOut,
-    Settings,
-    UserRound,
-    type LucideIcon,
-} from "lucide-react";
+    MdCheck,
+    MdFolderOpen,
+    MdKeyboardArrowRight,
+    MdLogout,
+    MdPerson,
+    MdSettings,
+    MdWindow,
+} from "react-icons/md";
+import { type IconType } from "react-icons";
 import { cn } from "@/lib/utils";
 import { useUserSessionStore } from "@/store/user/useUserSessionStore";
 import { useFetchOrganizations } from "@/hooks/playground/useFetchOrganizations";
@@ -25,11 +25,11 @@ const ITEM =
 const PANEL =
     "z-50 origin-(--radix-dropdown-menu-content-transform-origin) overflow-hidden rounded-xl border border-white/10 bg-linear-to-b from-charcoal to-[#101010] shadow-[0_24px_60px_-15px_rgba(0,0,0,0.85),inset_0_1px_0_0_rgba(255,255,255,0.07)] ring-1 ring-black/40 animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95";
 
-const MENU_ITEMS: { id: string; label: string; icon: LucideIcon }[] = [
-    { id: "personal", label: "Personal info", icon: UserRound },
-    { id: "Projects", label: "Projects", icon: FolderOpen },
-    { id: "Teams", label: "Teams", icon: LayoutGrid },
-    { id: "settings", label: "Settings", icon: Settings },
+const MENU_ITEMS: { id: string; label: string; icon: IconType }[] = [
+    { id: "personal", label: "Personal info", icon: MdPerson },
+    { id: "Projects", label: "Projects", icon: MdFolderOpen },
+    { id: "Teams", label: "Teams", icon: MdWindow },
+    { id: "settings", label: "Settings", icon: MdSettings },
 ];
 
 /** Submenu row showing the active organization and a flyout to switch between them. */
@@ -50,7 +50,7 @@ function OrgSwitcherSubMenu() {
                     <PlaygroundAvatar letter={activeOrgInitial} tone="emerald" size="sm" />
                     <span className="truncate">{activeOrgName}</span>
                 </span>
-                <ChevronRight className="size-3.5 text-neutral-500" aria-hidden />
+                <MdKeyboardArrowRight className="size-3.5 text-neutral-500" aria-hidden />
             </DropdownMenu.SubTrigger>
 
             <DropdownMenu.Portal>
@@ -80,7 +80,7 @@ function OrgSwitcherSubMenu() {
                                 />
                                 <span className="min-w-0 flex-1 truncate">{org.name}</span>
                                 {org.slug === orgSlug && (
-                                    <Check
+                                    <MdCheck
                                         className="size-3.5 shrink-0 text-neutral-400"
                                         aria-hidden
                                     />
@@ -179,7 +179,7 @@ export default function PlaygroundUserMenu() {
                                 "text-neutral-300 data-highlighted:bg-red-500/10 data-highlighted:text-red-300 group",
                             )}
                         >
-                            <LogOut
+                            <MdLogout
                                 className="size-4 text-neutral-400 group-hover:text-red-300"
                                 aria-hidden
                             />

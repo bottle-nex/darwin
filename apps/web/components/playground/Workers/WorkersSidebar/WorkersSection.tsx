@@ -1,6 +1,6 @@
 "use client";
 
-import { Plus, Server } from "lucide-react";
+import { MdAdd, MdStorage } from "react-icons/md";
 import Row from "../../Sidebar/SidebarRow";
 import Section from "../../Sidebar/SidebarSection";
 import { matchesQuery, type SidebarNavRow, type SidebarSectionProps } from "../../Sidebar/shared";
@@ -31,12 +31,12 @@ export default function PlaygroundSidebarWorkersSection({
                         key={w.id}
                         label={w.name}
                         suffix={w.status}
-                        leading={{ kind: "icon", icon: Server }}
+                        leading={{ kind: "icon", icon: MdStorage }}
                         active={selectedRowId === w.id}
                         onClick={() => onSelect(w.id)}
                     />
                 ))}
-                {!searching && <Row label="New Worker" leading={{ kind: "icon", icon: Plus }} />}
+                {!searching && <Row label="New Worker" leading={{ kind: "icon", icon: MdAdd }} />}
             </Section>
         </div>
     );

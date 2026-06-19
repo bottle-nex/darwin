@@ -1,11 +1,11 @@
 "use client";
 import { forwardRef } from "react";
-import type { LucideIcon } from "lucide-react";
+import type { IconType } from "react-icons";
 import { cn } from "@/lib/utils";
 
 type OptionButtonProps = {
     label: string;
-    icon: LucideIcon;
+    icon: IconType;
     /** When active (panel open / filter applied), keep the hover look pinned. */
     active?: boolean;
 } & React.ButtonHTMLAttributes<HTMLButtonElement>;

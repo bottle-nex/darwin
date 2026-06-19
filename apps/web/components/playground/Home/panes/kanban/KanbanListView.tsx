@@ -1,5 +1,5 @@
 "use client";
-import { MessageSquare } from "lucide-react";
+import { MdChat } from "react-icons/md";
 import { cn } from "@/lib/utils";
 import PlaygroundAvatar from "@/components/playground/Core/components/PlaygroundAvatar";
 import { COLUMNS, PRIORITY_DOT } from "./data";
@@ -79,7 +79,7 @@ function ListRow({ issue }: { issue: Issue }) {
             )}
 
             <span className="ml-auto hidden shrink-0 items-center gap-1 text-[11px] text-neutral-500 sm:flex">
-                <MessageSquare className="size-3" aria-hidden />
+                <MdChat className="size-3" aria-hidden />
                 {issue.comments}
             </span>
             <span className="hidden shrink-0 truncate text-[11px] text-neutral-600 md:block">

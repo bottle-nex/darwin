@@ -1,21 +1,22 @@
 "use client";
 import {
-    ChevronDown,
-    Columns3,
-    Kanban,
-    Plus,
-    Search,
-    Settings,
-    Share2,
-    Sparkles,
-    Upload,
-    Users,
-    type LucideIcon,
-} from "lucide-react";
+    MdAdd,
+    MdAutoAwesome,
+    MdGroup,
+    MdKeyboardArrowDown,
+    MdSearch,
+    MdSettings,
+    MdShare,
+    MdUpload,
+    MdViewColumn,
+    MdViewKanban,
+} from "react-icons/md";
+import { type IconType } from "react-icons";
 import { AnimatePresence } from "motion/react";
 import { DropdownMenu } from "radix-ui";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { TooltipComponent } from "@/components/ui/tooltip-component";
 import type { KanbanOptions } from "./useKanbanOptions";
 import type { BoardView, KanbanView } from "./types";
 import OptionButton from "./KanbanOptionPanels/OptionButton";
@@ -26,14 +27,14 @@ import SelectedLabels from "./KanbanOptionPanels/SelectedLabels";
 import ViewsPanel from "./KanbanOptionPanels/ViewsPanel";
 
 const TASK_OPTIONS = [
-    { id: "issue", label: "New issue", icon: Plus },
-    { id: "import", label: "Import issues", icon: Upload },
+    { id: "issue", label: "New issue", icon: MdAdd },
+    { id: "import", label: "Import issues", icon: MdUpload },
 ];
 
-const BOARD_VIEWS: { id: BoardView; label: string; icon: LucideIcon }[] = [
-    { id: "default", label: "Default", icon: Columns3 },
-    { id: "custom", label: "Custom Kanban", icon: Kanban },
-    { id: "llm", label: "LLM Kanban", icon: Sparkles },
+const BOARD_VIEWS: { id: BoardView; label: string; icon: IconType }[] = [
+    { id: "default", label: "Default", icon: MdViewColumn },
+    { id: "custom", label: "Custom Kanban", icon: MdViewKanban },
+    { id: "llm", label: "LLM Kanban", icon: MdAutoAwesome },
 ];
 
 type KanbanOptionsBarProps = {
@@ -107,17 +108,25 @@ export default function KanbanOptionsBar({
                     onClear={clearLabels}
                 />
                 <FilterPanel value={filter} onChange={setFilter} customColumns={customColumns} />
-                <OptionButton label="Assignees" icon={Users} />
-                <OptionButton
-                    label="Search"
-                    icon={Search}
-                    active={searchOpen}
-                    onClick={() => (searchOpen ? closeSearch() : openSearch())}
-                />
-                <OptionButton label="Share" icon={Share2} />
+                <TooltipComponent content="Assignees" side="bottom">
+                    <OptionButton label="Assignees" icon={MdGroup} />
+                </TooltipComponent>
+                <TooltipComponent content="Search" side="bottom">
+                    <OptionButton
+                        label="Search"
+                        icon={MdSearch}
+                        active={searchOpen}
+                        onClick={() => (searchOpen ? closeSearch() : openSearch())}
+                    />
+                </TooltipComponent>
+                <TooltipComponent content="Share" side="bottom">
+                    <OptionButton label="Share" icon={MdShare} />
+                </TooltipComponent>
                 <ViewsPanel value={kanbanView} onChange={onKanbanViewChange} />
                 <div className="mx-1 h-4 w-px bg-white/8" />
-                <OptionButton label="Settings" icon={Settings} />
+                <TooltipComponent content="Settings" side="bottom">
+                    <OptionButton label="Settings" icon={MdSettings} />
+                </TooltipComponent>
 
                 {/* Split button: primary "Add Task" + a chevron that opens a menu. */}
                 <div className="ml-1 flex items-center overflow-hidden rounded-sm bg-neutral-100 text-neutral-900">
@@ -136,7 +145,7 @@ export default function KanbanOptionsBar({
                                 aria-label="More task options"
                                 className="flex h-6 cursor-pointer items-center px-1 hover:bg-black/5 rounded-none"
                             >
-                                <ChevronDown className="size-3.5" aria-hidden />
+                                <MdKeyboardArrowDown className="size-3.5" aria-hidden />
                             </Button>
                         </DropdownMenu.Trigger>
                         <DropdownMenu.Portal>

@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { X } from "lucide-react";
+import { MdClose } from "react-icons/md";
 import { IoPersonAddOutline } from "react-icons/io5";
 import {
     Dialog,
@@ -214,7 +214,7 @@ export default function InviteToTeamDialog({
                                         aria-label={`Remove ${email}`}
                                         className="flex size-4 cursor-pointer items-center justify-center rounded text-neutral-400 hover:bg-white/10 hover:text-neutral-100"
                                     >
-                                        <X className="size-3" />
+                                        <MdClose className="size-3" />
                                     </button>
                                 </span>
                             ))}

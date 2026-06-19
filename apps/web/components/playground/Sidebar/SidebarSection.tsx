@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronDown, ChevronRight } from "lucide-react";
+import { MdKeyboardArrowDown, MdKeyboardArrowRight } from "react-icons/md";
 import { cn } from "@/lib/utils";
 
 type SectionProps = {
@@ -31,7 +31,7 @@ export default function PlaygroundSidebarSection({
     children,
 }: SectionProps) {
     const [open, setOpen] = useState(defaultOpen);
-    const Chevron = open ? ChevronDown : ChevronRight;
+    const Chevron = open ? MdKeyboardArrowDown : MdKeyboardArrowRight;
 
     return (
         <section className="flex flex-col">

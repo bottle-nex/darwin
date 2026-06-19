@@ -1,7 +1,7 @@
 "use client";
 import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { ChevronsLeft, Search } from "lucide-react";
+import { MdKeyboardDoubleArrowLeft, MdSearch } from "react-icons/md";
 import { RailSurface } from "../IconRail/railSurface";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
 import { getSurfaceNavRows, SURFACE_TITLES } from "./surfaceConfig";
@@ -102,10 +102,10 @@ export default function PlaygroundSidebar({ surface, onCollapse }: PlaygroundSid
                     </h1>
                     <div className="flex items-center">
                         <SidebarHeaderIcon label="Search" onClick={() => setSearchOpen(true)}>
-                            <Search className="size-3.5" aria-hidden />
+                            <MdSearch className="size-3.5" aria-hidden />
                         </SidebarHeaderIcon>
                         <SidebarHeaderIcon label="Collapse sidebar" onClick={onCollapse}>
-                            <ChevronsLeft className="size-3.5" aria-hidden />
+                            <MdKeyboardDoubleArrowLeft className="size-3.5" aria-hidden />
                         </SidebarHeaderIcon>
                     </div>
                 </div>

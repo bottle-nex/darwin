@@ -1,5 +1,5 @@
 "use client";
-import { House } from "lucide-react";
+import { MdHome } from "react-icons/md";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
 import { RailSurface } from "../../IconRail/railSurface";
 import PaneBreadcrumb from "../../Core/components/PaneBreadcrumb";
@@ -24,7 +24,7 @@ export default function HomeDisplay() {
                 <div className="flex min-h-0 flex-1 flex-col">
                     <PaneBreadcrumb
                         leading={
-                            <House className="size-3.5 shrink-0 text-neutral-400" aria-hidden />
+                            <MdHome className="size-3.5 shrink-0 text-neutral-400" aria-hidden />
                         }
                         segments={[{ label: "Home" }, { label: "Kanban" }]}
                     />
@@ -36,7 +36,7 @@ export default function HomeDisplay() {
                 <div className="flex min-h-0 flex-1 flex-col">
                     <PaneBreadcrumb
                         leading={
-                            <House className="size-3.5 shrink-0 text-neutral-400" aria-hidden />
+                            <MdHome className="size-3.5 shrink-0 text-neutral-400" aria-hidden />
                         }
                         segments={[{ label: "Home" }, { label: "Tags" }]}
                     />

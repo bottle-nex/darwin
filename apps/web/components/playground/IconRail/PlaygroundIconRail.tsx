@@ -1,6 +1,6 @@
 "use client";
 import { AnimatePresence, motion } from "motion/react";
-import { ArrowUpCircle, ChevronsRight, UserPlus } from "lucide-react";
+import { MdArrowCircleUp, MdKeyboardDoubleArrowRight, MdPersonAdd } from "react-icons/md";
 import { cn } from "@/lib/utils";
 import { RAIL_ITEMS, type RailItem } from "./railItems";
 import { RailSurface } from "./railSurface";
@@ -41,7 +41,7 @@ export default function PlaygroundIconRail({
                                     className="flex size-8 cursor-pointer items-center justify-center rounded-md text-neutral-400 hover:bg-white/5 hover:text-neutral-100"
                                     aria-label="Expand sidebar"
                                 >
-                                    <ChevronsRight className="size-4" aria-hidden />
+                                    <MdKeyboardDoubleArrowRight className="size-4" aria-hidden />
                                 </button>
                                 <div className="h-px w-8 bg-white/10" aria-hidden />
                             </div>
@@ -63,8 +63,8 @@ export default function PlaygroundIconRail({
             </div>
 
             <div className="flex w-full flex-col items-center gap-1 px-1">
-                <FooterButton icon={<UserPlus className="size-4" />} label="Invite" />
-                <FooterButton icon={<ArrowUpCircle className="size-4" />} label="Pro" />
+                <FooterButton icon={<MdPersonAdd className="size-4" />} label="Invite" />
+                <FooterButton icon={<MdArrowCircleUp className="size-4" />} label="Pro" />
             </div>
         </nav>
     );

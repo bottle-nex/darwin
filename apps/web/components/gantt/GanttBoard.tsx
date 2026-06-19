@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
 import GanttRuler from "./GanttRuler";
 import GanttGrid from "./GanttGrid";
 import GanttSidebar from "./GanttSidebar";
@@ -42,7 +42,7 @@ export default function GanttBoard() {
                         className="flex size-8 items-center justify-center rounded-md border border-border text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
                         aria-label="Previous day"
                     >
-                        <ChevronLeft className="size-4" aria-hidden />
+                        <MdKeyboardArrowLeft className="size-4" aria-hidden />
                     </button>
                     <input
                         type="date"
@@ -58,7 +58,7 @@ export default function GanttBoard() {
                         className="flex size-8 items-center justify-center rounded-md border border-border text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
                         aria-label="Next day"
                     >
-                        <ChevronRight className="size-4" aria-hidden />
+                        <MdKeyboardArrowRight className="size-4" aria-hidden />
                     </button>
                 </div>
             </header>

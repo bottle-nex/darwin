@@ -1,6 +1,6 @@
 "use client";
 import { Fragment } from "react";
-import { ChevronRight } from "lucide-react";
+import { MdKeyboardArrowRight } from "react-icons/md";
 import { FaGithub } from "react-icons/fa6";
 import { cn } from "@/lib/utils";
 
@@ -31,7 +31,7 @@ export default function PaneBreadcrumb({
                     return (
                         <Fragment key={i}>
                             {i > 0 && (
-                                <ChevronRight
+                                <MdKeyboardArrowRight
                                     className="size-3.5 shrink-0 text-neutral-600"
                                     aria-hidden
                                 />

@@ -1,6 +1,6 @@
 "use client";
 
-import { GitPullRequest } from "lucide-react";
+import { FaCodePullRequest } from "react-icons/fa6";
 import Row from "../../Sidebar/SidebarRow";
 import Section from "../../Sidebar/SidebarSection";
 import { matchesQuery, type SidebarNavRow, type SidebarSectionProps } from "../../Sidebar/shared";
@@ -30,7 +30,7 @@ export default function PlaygroundSidebarPullRequestsSection({
                         key={pr.id}
                         label={pr.title}
                         suffix={pr.repo}
-                        leading={{ kind: "icon", icon: GitPullRequest }}
+                        leading={{ kind: "icon", icon: FaCodePullRequest }}
                         active={selectedRowId === pr.id}
                         onClick={() => onSelect(pr.id)}
                     />

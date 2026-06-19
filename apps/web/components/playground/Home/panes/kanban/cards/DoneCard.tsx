@@ -1,4 +1,4 @@
-import { CheckCircle2 } from "lucide-react";
+import { MdCheckCircle } from "react-icons/md";
 import type { Issue } from "../types";
 import BaseCard from "./BaseCard";
 
@@ -8,7 +8,7 @@ export default function DoneCard({ issue }: { issue: Issue }) {
         <BaseCard issue={issue} className="opacity-80">
             <div className="mt-2.5 flex items-center justify-between text-[11px]">
                 <span className="inline-flex items-center gap-1.5 font-medium text-emerald-400/90">
-                    <CheckCircle2 className="size-3" aria-hidden />
+                    <MdCheckCircle className="size-3" aria-hidden />
                     Merged
                 </span>
                 <span className="text-neutral-500">

@@ -1,6 +1,14 @@
 "use client";
 import { useEffect, useRef } from "react";
-import { ArrowDownAZ, ArrowUpDown, Check, Clock, Plus, Search, X } from "lucide-react";
+import {
+    MdAccessTimeFilled,
+    MdAdd,
+    MdCheck,
+    MdClose,
+    MdSearch,
+    MdSortByAlpha,
+    MdSwapVert,
+} from "react-icons/md";
 import { AnimatePresence, motion } from "motion/react";
 import { DropdownMenu } from "radix-ui";
 import { cn } from "@/lib/utils";
@@ -8,9 +16,9 @@ import { Button } from "@/components/ui/button";
 import OptionButton from "../kanban/KanbanOptionPanels/OptionButton";
 import type { TagSort, TagsOptions } from "./useTagsOptions";
 
-const SORTS: { id: TagSort; label: string; icon: typeof ArrowDownAZ }[] = [
-    { id: "name", label: "Name (A–Z)", icon: ArrowDownAZ },
-    { id: "newest", label: "Newest first", icon: Clock },
+const SORTS: { id: TagSort; label: string; icon: typeof MdSortByAlpha }[] = [
+    { id: "name", label: "Name (A–Z)", icon: MdSortByAlpha },
+    { id: "newest", label: "Newest first", icon: MdAccessTimeFilled },
 ];
 
 type TagsOptionsBarProps = {
@@ -41,14 +49,14 @@ export default function TagsOptionsBar({ options, count, onCreate }: TagsOptions
             <div className="flex shrink-0 items-center gap-0.5">
                 <OptionButton
                     label="Search"
-                    icon={Search}
+                    icon={MdSearch}
                     active={searchOpen}
                     onClick={() => (searchOpen ? closeSearch() : openSearch())}
                 />
 
                 <DropdownMenu.Root>
                     <DropdownMenu.Trigger asChild>
-                        <OptionButton label="Sort" icon={ArrowUpDown} active={sort !== "name"} />
+                        <OptionButton label="Sort" icon={MdSwapVert} active={sort !== "name"} />
                     </DropdownMenu.Trigger>
                     <DropdownMenu.Portal>
                         <DropdownMenu.Content
@@ -71,7 +79,7 @@ export default function TagsOptionsBar({ options, count, onCreate }: TagsOptions
                                     />
                                     <span className="flex-1">{option.label}</span>
                                     {sort === option.id && (
-                                        <Check className="size-3.5 text-neutral-200" aria-hidden />
+                                        <MdCheck className="size-3.5 text-neutral-200" aria-hidden />
                                     )}
                                 </DropdownMenu.Item>
                             ))}
@@ -87,7 +95,7 @@ export default function TagsOptionsBar({ options, count, onCreate }: TagsOptions
                     onClick={onCreate}
                     className="ml-0.5 flex h-6 items-center gap-1 rounded-sm bg-neutral-100 px-2 text-[11.5px] font-medium text-neutral-900 hover:bg-neutral-200"
                 >
-                    <Plus className="size-3.5 text-neutral-800!" aria-hidden />
+                    <MdAdd className="size-3.5 text-neutral-800!" aria-hidden />
                     New tag
                 </Button>
             </div>
@@ -117,7 +125,7 @@ function TagsSearchBar({ value, onChange, onClose }: TagsSearchBarProps) {
             transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
             className="relative flex shrink-0 items-center overflow-hidden"
         >
-            <Search
+            <MdSearch
                 className="pointer-events-none absolute left-2.5 size-3.5 text-neutral-500"
                 aria-hidden
             />
@@ -137,7 +145,7 @@ function TagsSearchBar({ value, onChange, onClose }: TagsSearchBarProps) {
                 aria-label="Close search"
                 className="absolute right-1.5 flex size-4 cursor-pointer items-center justify-center rounded-full bg-white/10 text-neutral-400 hover:bg-white/20 hover:text-neutral-100"
             >
-                <X className="size-2.5" aria-hidden />
+                <MdClose className="size-2.5" aria-hidden />
             </button>
         </motion.div>
     );

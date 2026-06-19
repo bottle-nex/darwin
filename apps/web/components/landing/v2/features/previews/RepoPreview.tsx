@@ -1,15 +1,27 @@
-import { Check, FileCode2, FileText, Folder } from "lucide-react";
-import type { LucideIcon } from "lucide-react";
+import { MdCheck, MdDescription, MdFolder, MdIntegrationInstructions } from "react-icons/md";
+import { type IconType } from "react-icons";
 import { cn } from "@/lib/utils";
 
-type Node = { label: string; icon: LucideIcon; indent: number; file?: boolean; tone: string };
+type Node = { label: string; icon: IconType; indent: number; file?: boolean; tone: string };
 
 const TREE: Node[] = [
-    { label: "apps/web", icon: Folder, indent: 0, tone: "text-indigo-500" },
-    { label: "app/layout.tsx", icon: FileCode2, indent: 1, file: true, tone: "text-sky-500" },
-    { label: "components/board", icon: Folder, indent: 1, tone: "text-indigo-500" },
-    { label: "lib/utils.ts", icon: FileCode2, indent: 1, file: true, tone: "text-sky-500" },
-    { label: "CONVENTIONS.md", icon: FileText, indent: 0, file: true, tone: "text-neutral-400" },
+    { label: "apps/web", icon: MdFolder, indent: 0, tone: "text-indigo-500" },
+    {
+        label: "app/layout.tsx",
+        icon: MdIntegrationInstructions,
+        indent: 1,
+        file: true,
+        tone: "text-sky-500",
+    },
+    { label: "components/board", icon: MdFolder, indent: 1, tone: "text-indigo-500" },
+    {
+        label: "lib/utils.ts",
+        icon: MdIntegrationInstructions,
+        indent: 1,
+        file: true,
+        tone: "text-sky-500",
+    },
+    { label: "CONVENTIONS.md", icon: MdDescription, indent: 0, file: true, tone: "text-neutral-400" },
 ];
 
 /** Stagger the "read" checkmarks so files resolve top-to-bottom on hover. */
@@ -33,7 +45,7 @@ export default function RepoPreview() {
                             />
                             <span className="truncate">{node.label}</span>
                             {node.file && (
-                                <Check
+                                <MdCheck
                                     className={cn(
                                         "ml-auto size-3 shrink-0 text-emerald-500 opacity-0 transition-opacity duration-300 group-hover:opacity-100 motion-reduce:transition-none",
                                         DELAY[i],

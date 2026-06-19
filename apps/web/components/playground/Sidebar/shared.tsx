@@ -1,17 +1,18 @@
 "use client";
 
-import { Plus, type LucideIcon } from "lucide-react";
+import { type IconType } from "react-icons";
+import { MdAdd } from "react-icons/md";
 import PlaygroundAvatar, {
     type AvatarTone,
 } from "@/components/playground/Core/components/PlaygroundAvatar";
 
 // ── Shared row-leading helpers ──────────────────────────────────────────────
-// A row leads with either a lucide icon or a letter avatar. Sections declare
+// A row leads with either an icon or a letter avatar. Sections declare
 // the intent with `LeadingSpec`; `rowLeading` turns that into the concrete
 // prop a row expects (it needs a ready-made node for avatars).
 
 export type LeadingSpec =
-    | { kind: "icon"; icon: LucideIcon }
+    | { kind: "icon"; icon: IconType }
     | { kind: "avatar"; letter: string; tone: AvatarTone };
 
 export function rowLeading(spec: LeadingSpec) {
@@ -56,7 +57,7 @@ export function PlaygroundSidebarSectionAddButton({ label }: { label: string }) 
             aria-label={label}
             className="flex size-5 cursor-pointer items-center justify-center rounded text-neutral-400 hover:bg-white/5 hover:text-neutral-100"
         >
-            <Plus className="size-3.5" aria-hidden />
+            <MdAdd className="size-3.5" aria-hidden />
         </button>
     );
 }

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { MdArrowForward } from "react-icons/md";
 import { PiArrowRight } from "react-icons/pi";
 import { Button } from "@/components/ui/button";
 import Reveal from "@/components/utility/Reveal";
@@ -73,7 +73,7 @@ export default function AboutCta() {
                     >
                         <Link href="/why">
                             Why matcha
-                            <ArrowRight />
+                            <MdArrowForward />
                         </Link>
                     </Button>
                 </div>

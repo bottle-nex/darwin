@@ -1,10 +1,11 @@
 "use client";
 import { useState } from "react";
-import { Check, Search, Tag } from "lucide-react";
+import { MdCheck, MdSearch, MdLabel } from "react-icons/md";
 import { DropdownMenu } from "radix-ui";
 import { cn } from "@/lib/utils";
 import { ALL_LABELS } from "../data";
 import OptionButton from "./OptionButton";
+import { TooltipComponent } from "@/components/ui/tooltip-component";
 
 type LabelPanelProps = {
     selected: string[];
@@ -31,9 +32,11 @@ export default function LabelPanel({ selected, onToggle, onClear }: LabelPanelPr
 
     return (
         <DropdownMenu.Root onOpenChange={(open) => !open && setQuery("")}>
-            <DropdownMenu.Trigger asChild>
-                <OptionButton label="Label" icon={Tag} active={selected.length > 0} />
-            </DropdownMenu.Trigger>
+            <TooltipComponent content="Label" side="bottom">
+                <DropdownMenu.Trigger asChild>
+                    <OptionButton label="Label" icon={MdLabel} active={selected.length > 0} />
+                </DropdownMenu.Trigger>
+            </TooltipComponent>
             <DropdownMenu.Portal>
                 <DropdownMenu.Content align="end" sideOffset={6} className={CONTENT}>
                     <div className="flex shrink-0 flex-col gap-1.5 p-2">
@@ -52,7 +55,7 @@ export default function LabelPanel({ selected, onToggle, onClear }: LabelPanelPr
                             )}
                         </div>
                         <div className="relative">
-                            <Search
+                            <MdSearch
                                 className="pointer-events-none absolute top-1/2 left-2 size-3 -translate-y-1/2 text-neutral-500"
                                 aria-hidden
                             />
@@ -94,11 +97,7 @@ export default function LabelPanel({ selected, onToggle, onClear }: LabelPanelPr
                                             )}
                                         >
                                             {isOn && (
-                                                <Check
-                                                    className="size-2.5"
-                                                    strokeWidth={3}
-                                                    aria-hidden
-                                                />
+                                                <MdCheck className="size-2.5" aria-hidden />
                                             )}
                                         </span>
                                         <span

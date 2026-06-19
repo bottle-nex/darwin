@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { BriefcaseBusiness, ChevronRight, Plus, Trash2 } from "lucide-react";
+import { MdAdd, MdBusinessCenter, MdDelete, MdKeyboardArrowRight } from "react-icons/md";
 import { useParams } from "next/navigation";
 import { cn } from "@/lib/utils";
 import Row from "../../Sidebar/SidebarRow";
@@ -77,12 +77,12 @@ export default function ProjectTeamsNavItem({
                 )}
             >
                 <span className="flex size-5 shrink-0 items-center justify-center text-neutral-400">
-                    <BriefcaseBusiness className="size-3.75" aria-hidden />
+                    <MdBusinessCenter className="size-3.75" aria-hidden />
                 </span>
                 <span className="min-w-0 flex-1 truncate text-[12.5px]">
                     {PROJECT_TAB_LABELS[ProjectsTab.SettingsTeams]}
                 </span>
-                <ChevronRight
+                <MdKeyboardArrowRight
                     className={cn(
                         "size-3.5 shrink-0 text-neutral-500 transition-transform duration-150",
                         treeOpen && "rotate-90",
@@ -125,7 +125,7 @@ export default function ProjectTeamsNavItem({
                                             isActive ? "flex" : "hidden group-hover:flex",
                                         )}
                                     >
-                                        <Trash2 className="size-3.5" aria-hidden />
+                                        <MdDelete className="size-3.5" aria-hidden />
                                     </button>
                                 )}
                             </div>
@@ -140,7 +140,7 @@ export default function ProjectTeamsNavItem({
                         <Row
                             indent={1}
                             label="Add team"
-                            leading={{ kind: "icon", icon: Plus }}
+                            leading={{ kind: "icon", icon: MdAdd }}
                             onClick={openCreateTeam}
                         />
                     )}

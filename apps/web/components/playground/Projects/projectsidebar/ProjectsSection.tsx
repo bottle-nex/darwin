@@ -1,5 +1,5 @@
 "use client";
-import { Folder } from "lucide-react";
+import { MdFolder } from "react-icons/md";
 import { useParams, useRouter } from "next/navigation";
 import Row from "../../Sidebar/SidebarRow";
 import { useGetDashboard } from "@/hooks/dashboard/useGetDashboard";
@@ -53,7 +53,7 @@ export default function PlaygroundSidebarProjectsSection({ query }: SidebarSecti
                     leading={{
                         kind: "node",
                         node: (
-                            <Folder
+                            <MdFolder
                                 className="size-3.5"
                                 style={{
                                     color: p.color ?? DEFAULT_FOLDER_COLOR,

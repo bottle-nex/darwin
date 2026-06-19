@@ -1,5 +1,5 @@
 "use client";
-import { Trash2, X } from "lucide-react";
+import { MdDelete, MdClose } from "react-icons/md";
 import type { ProjectTeam } from "@/types/project";
 import { useDeleteTeamStore } from "@/store/team/useDeleteTeamStore";
 import PlaygroundAvatar from "@/components/playground/Core/components/PlaygroundAvatar";
@@ -37,7 +37,7 @@ export default function PlaygroundTeamViewMain({ team, onClose }: PlaygroundTeam
                         aria-label="Delete team"
                         className="flex size-7 cursor-pointer items-center justify-center rounded-md text-neutral-400 hover:bg-white/5 hover:text-rose-300"
                     >
-                        <Trash2 className="size-4" aria-hidden />
+                        <MdDelete className="size-4" aria-hidden />
                     </button>
                     <button
                         type="button"
@@ -45,7 +45,7 @@ export default function PlaygroundTeamViewMain({ team, onClose }: PlaygroundTeam
                         aria-label="Close"
                         className="flex size-7 cursor-pointer items-center justify-center rounded-md text-neutral-400 hover:bg-white/5 hover:text-neutral-100"
                     >
-                        <X className="size-4" aria-hidden />
+                        <MdClose className="size-4" aria-hidden />
                     </button>
                 </div>
             </div>

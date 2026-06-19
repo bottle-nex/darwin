@@ -1,35 +1,35 @@
 "use client";
+import { type IconType } from "react-icons";
 import {
-    ArrowLeft,
-    BriefcaseBusiness,
-    GanttChart,
-    Kanban,
-    KeyRound,
-    LayoutGrid,
-    Pencil,
-    Users,
-    type LucideIcon,
-} from "lucide-react";
+    MdArrowBack,
+    MdBusinessCenter,
+    MdEdit,
+    MdGroup,
+    MdViewKanban,
+    MdViewTimeline,
+    MdVpnKey,
+    MdWindow,
+} from "react-icons/md";
 import Row from "../../Sidebar/SidebarRow";
 import type { SidebarSectionProps } from "../../Sidebar/shared";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
 import { PROJECT_TAB_LABELS, ProjectsTab } from "../projectsTabs";
 import ProjectTeamsNavItem from "./ProjectTeamsNavItem";
 
-type NavItem = { tab: ProjectsTab; icon: LucideIcon };
+type NavItem = { tab: ProjectsTab; icon: IconType };
 
 // The project's views, then its settings sections — split by a divider in render.
 const VIEWS: NavItem[] = [
-    { tab: ProjectsTab.Overview, icon: LayoutGrid },
-    { tab: ProjectsTab.Kanban, icon: Kanban },
-    { tab: ProjectsTab.Gantt, icon: GanttChart },
+    { tab: ProjectsTab.Overview, icon: MdWindow },
+    { tab: ProjectsTab.Kanban, icon: MdViewKanban },
+    { tab: ProjectsTab.Gantt, icon: MdViewTimeline },
 ];
 
 const SETTINGS: NavItem[] = [
-    { tab: ProjectsTab.SettingsProject, icon: Pencil },
-    { tab: ProjectsTab.SettingsTeams, icon: BriefcaseBusiness },
-    { tab: ProjectsTab.SettingsMembers, icon: Users },
-    { tab: ProjectsTab.SettingsEnv, icon: KeyRound },
+    { tab: ProjectsTab.SettingsProject, icon: MdEdit },
+    { tab: ProjectsTab.SettingsTeams, icon: MdBusinessCenter },
+    { tab: ProjectsTab.SettingsMembers, icon: MdGroup },
+    { tab: ProjectsTab.SettingsEnv, icon: MdVpnKey },
 ];
 
 /**
@@ -53,7 +53,7 @@ export default function ProjectNav({ selectedRowId, onSelect }: SidebarSectionPr
     return (
         <div className="mt-1 flex flex-col gap-0.5">
             <Row
-                leading={{ kind: "icon", icon: ArrowLeft }}
+                leading={{ kind: "icon", icon: MdArrowBack }}
                 label="Back to projects"
                 onClick={() => showProjectList("list")}
             />

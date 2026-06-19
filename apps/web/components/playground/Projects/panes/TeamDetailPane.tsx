@@ -1,5 +1,5 @@
 "use client";
-import { Users } from "lucide-react";
+import { MdGroup } from "react-icons/md";
 import { useParams } from "next/navigation";
 import type { RailSurface } from "../../IconRail/railSurface";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
@@ -18,7 +18,7 @@ export default function TeamDetailPane({ surface }: { surface: RailSurface }) {
     const clearTeam = usePlaygroundNavStore((s) => s.clearTeam);
 
     if (!selectedTeam || selectedTeamProjectSlug !== projectSlug) {
-        return <PaneEmptyState icon={Users} title="No team selected" />;
+        return <PaneEmptyState icon={MdGroup} title="No team selected" />;
     }
 
     return <TeamViewMain team={selectedTeam} onClose={() => clearTeam(surface)} />;

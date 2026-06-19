@@ -1,6 +1,6 @@
 "use client";
 
-import { Clock, FilePen, MoreHorizontal } from "lucide-react";
+import { MdAccessTimeFilled, MdEditDocument, MdMoreHoriz } from "react-icons/md";
 import Row from "../../Sidebar/SidebarRow";
 import Section from "../../Sidebar/SidebarSection";
 import {
@@ -17,8 +17,13 @@ const MY_WORK: { id: string; label: string; badge?: number; leading: LeadingSpec
         label: "Assigned to me",
         leading: { kind: "avatar", letter: "P", tone: "dark" },
     },
-    { id: "in-progress", label: "In Progress", badge: 2, leading: { kind: "icon", icon: Clock } },
-    { id: "drafts", label: "Drafts", leading: { kind: "icon", icon: FilePen } },
+    {
+        id: "in-progress",
+        label: "In Progress",
+        badge: 2,
+        leading: { kind: "icon", icon: MdAccessTimeFilled },
+    },
+    { id: "drafts", label: "Drafts", leading: { kind: "icon", icon: MdEditDocument } },
 ];
 
 export const rows: SidebarNavRow[] = MY_WORK.map((c) => ({ id: c.id, label: c.label }));
@@ -47,7 +52,7 @@ export default function PlaygroundSidebarMyWorkSection({
                     />
                 ))}
                 {!searching && (
-                    <Row indent={1} label="More" leading={{ kind: "icon", icon: MoreHorizontal }} />
+                    <Row indent={1} label="More" leading={{ kind: "icon", icon: MdMoreHoriz }} />
                 )}
             </Section>
         </div>

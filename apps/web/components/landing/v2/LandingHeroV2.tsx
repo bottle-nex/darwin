@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { MdArrowForward } from "react-icons/md";
 import { PiArrowRight } from "react-icons/pi";
 import { cn } from "@/lib/utils";
 import { azeretMono, Button } from "@/components/ui/button";
@@ -51,7 +51,7 @@ export default function LandingHeroV2() {
                         <Button size="lg" asChild>
                             <Link href="/why" className="uppercase">
                                 Why matcha
-                                <ArrowRight />
+                                <MdArrowForward />
                             </Link>
                         </Button>
                     </div>

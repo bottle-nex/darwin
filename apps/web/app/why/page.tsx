@@ -2,7 +2,7 @@
 import Image from "next/image";
 import { NavBar } from "@/components/nav/Navbar";
 import { PiArrowRight } from "react-icons/pi";
-import { ArrowRight } from "lucide-react";
+import { MdArrowForward } from "react-icons/md";
 import { azeretMono, Button } from "@/components/ui/button";
 import { Footer } from "@/components/app/Footer";
 import { cn } from "@/lib/utils";
@@ -46,7 +46,7 @@ export default function WhyPage() {
                             className="text-secondary hover:bg-transparent hover:text-secondary/70"
                         >
                             See how it works
-                            <ArrowRight />
+                            <MdArrowForward />
                         </Button>
                     </div>
                     <div
@@ -145,7 +145,7 @@ export default function WhyPage() {
                 </div>
                 <Button size={"lg"}>
                     Get Started
-                    <ArrowRight className="text-neutral-800!" />
+                    <MdArrowForward className="text-neutral-800!" />
                 </Button>
             </div>
             <Footer isMarkettingPage={true} />

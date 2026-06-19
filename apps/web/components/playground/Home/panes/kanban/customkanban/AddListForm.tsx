@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { Plus, X } from "lucide-react";
+import { MdAdd, MdClose } from "react-icons/md";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
@@ -32,7 +32,7 @@ export default function AddListForm({ onAdd }: { onAdd: (title: string) => void 
                 onClick={() => setEditing(true)}
                 className="flex h-9 w-72 shrink-0 items-center gap-1.5 rounded-xl bg-white/2.5 px-3 text-[13px] font-medium text-neutral-400 ring-1 ring-white/5 transition-colors hover:bg-white/5 hover:text-neutral-200 cursor-pointer"
             >
-                <Plus className="size-3.5" aria-hidden />
+                <MdAdd className="size-3.5" aria-hidden />
                 Add list
             </button>
         );
@@ -65,7 +65,7 @@ export default function AddListForm({ onAdd }: { onAdd: (title: string) => void 
                     onClick={close}
                     className="flex size-7 cursor-pointer items-center justify-center rounded-md text-neutral-400 transition-colors hover:bg-white/5 hover:text-neutral-200"
                 >
-                    <X className="size-4" aria-hidden />
+                    <MdClose className="size-4" aria-hidden />
                 </button>
             </div>
         </div>

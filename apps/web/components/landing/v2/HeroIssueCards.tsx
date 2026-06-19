@@ -1,6 +1,7 @@
 "use client";
 import { motion, useReducedMotion } from "motion/react";
-import { CircleDashed, GitPullRequest, MessageSquare } from "lucide-react";
+import { MdChat, MdIncompleteCircle } from "react-icons/md";
+import { FaCodePullRequest } from "react-icons/fa6";
 import { cn } from "@/lib/utils";
 import { azeretMono } from "@/components/ui/button";
 
@@ -69,7 +70,7 @@ export default function HeroIssueCards() {
                         </p>
                         <div className="mt-3 flex items-center justify-between text-[11px] text-neutral-400">
                             <span className="flex items-center gap-1.5">
-                                <CircleDashed className="size-3" />
+                                <MdIncompleteCircle className="size-3" />
                                 To Do
                             </span>
                             <span>Queued for agent</span>
@@ -118,7 +119,7 @@ export default function HeroIssueCards() {
                                 #145
                             </span>
                             <span className="flex items-center gap-1 text-[11px] text-neutral-400">
-                                <MessageSquare className="size-3" />
+                                <MdChat className="size-3" />
                                 12
                             </span>
                         </div>
@@ -127,7 +128,7 @@ export default function HeroIssueCards() {
                         </p>
                         <div className="mt-3 flex items-center justify-between text-[11px]">
                             <span className="flex items-center gap-1.5 text-violet-500">
-                                <GitPullRequest className="size-3" />
+                                <FaCodePullRequest className="size-3" />
                                 PR #234
                             </span>
                             <span className={cn(azeretMono.className)}>

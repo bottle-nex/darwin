@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useRef } from "react";
-import { Search, X } from "lucide-react";
+import { MdClose, MdSearch } from "react-icons/md";
 
 type SidebarSearchProps = {
     value: string;
@@ -54,7 +54,7 @@ export default function SidebarSearch({
 
     return (
         <div className="relative flex w-full items-center">
-            <Search
+            <MdSearch
                 className="pointer-events-none absolute left-3 size-3.5 text-neutral-400"
                 aria-hidden
             />
@@ -72,7 +72,7 @@ export default function SidebarSearch({
                 aria-label="Close search"
                 className="absolute right-2 flex size-3.5 cursor-pointer items-center justify-center rounded-full bg-white/10 text-neutral-400 transition-colors hover:bg-white/20 hover:text-neutral-100"
             >
-                <X className="size-2.25" aria-hidden />
+                <MdClose className="size-2.25" aria-hidden />
             </button>
         </div>
     );

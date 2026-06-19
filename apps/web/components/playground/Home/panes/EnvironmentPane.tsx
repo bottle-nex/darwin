@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { KeyRound, Plus } from "lucide-react";
+import { MdAdd, MdVpnKey } from "react-icons/md";
 import { useParams } from "next/navigation";
 import { toast } from "sonner";
 import { useGetDashboard } from "@/hooks/dashboard/useGetDashboard";
@@ -60,7 +60,7 @@ export default function EnvironmentPane() {
         <section className="h-full rounded-xl ring-1 ring-white/5 bg-charcoal p-3 m-5 ">
             <div className="mb-2 flex items-center justify-between gap-2 px-1">
                 <div className="flex items-center gap-2">
-                    <KeyRound className="size-4 text-neutral-400" aria-hidden />
+                    <MdVpnKey className="size-4 text-neutral-400" aria-hidden />
                     <h3 className="text-[15px] font-medium text-neutral-100">
                         Environment Variables
                     </h3>
@@ -68,7 +68,7 @@ export default function EnvironmentPane() {
                 </div>
 
                 <Button size="sm" variant={"tertiary"} onClick={() => setOpen(true)}>
-                    <Plus className="size-3.5" />
+                    <MdAdd className="size-3.5" />
                     Add variable
                 </Button>
             </div>
@@ -85,7 +85,7 @@ export default function EnvironmentPane() {
                 ) : !secrets?.length ? (
                     <div className="h-full flex flex-col justify-center ">
                         <PaneEmptyState
-                            icon={KeyRound}
+                            icon={MdVpnKey}
                             title="No environment variables"
                             subtitle="Add the secrets your project needs to build and run."
                         />
@@ -96,7 +96,7 @@ export default function EnvironmentPane() {
                             key={secret.key}
                             className="flex items-center gap-3 rounded-lg bg-white/5 px-3 py-2.5"
                         >
-                            <KeyRound className="size-3.5 shrink-0 text-neutral-500" aria-hidden />
+                            <MdVpnKey className="size-3.5 shrink-0 text-neutral-500" aria-hidden />
                             <span className="font-mono text-[13px] text-neutral-200">
                                 {secret.key}
                             </span>

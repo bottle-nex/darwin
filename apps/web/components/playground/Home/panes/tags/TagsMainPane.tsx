@@ -1,6 +1,6 @@
 "use client";
 import { useMemo, useState } from "react";
-import { Pencil, Tag as TagIcon, Trash2 } from "lucide-react";
+import { MdDelete, MdEdit, MdLabel } from "react-icons/md";
 import { useParams } from "next/navigation";
 import { toast } from "sonner";
 import { useGetDashboard } from "@/hooks/dashboard/useGetDashboard";
@@ -89,7 +89,7 @@ export default function TagsMainPane() {
                 ) : !tags?.length ? (
                     <div className="flex h-full flex-col justify-center">
                         <PaneEmptyState
-                            icon={TagIcon}
+                            icon={MdLabel}
                             title="No tags yet"
                             subtitle="Make a tag to start labeling your issues, like labels on GitHub."
                         />
@@ -97,7 +97,7 @@ export default function TagsMainPane() {
                 ) : !visibleTags.length ? (
                     <div className="flex h-full flex-col justify-center">
                         <PaneEmptyState
-                            icon={TagIcon}
+                            icon={MdLabel}
                             title="No tags match your search"
                             subtitle="Try a different name."
                         />
@@ -118,7 +118,7 @@ export default function TagsMainPane() {
                                     aria-label={`Edit ${tag.name}`}
                                     onClick={() => openEdit(tag)}
                                 >
-                                    <Pencil className="size-3.5 text-neutral-400" />
+                                    <MdEdit className="size-3.5 text-neutral-400" />
                                 </Button>
                                 <Button
                                     type="button"
@@ -127,7 +127,7 @@ export default function TagsMainPane() {
                                     aria-label={`Delete ${tag.name}`}
                                     onClick={() => setDeleteTarget(tag)}
                                 >
-                                    <Trash2 className="size-3.5 text-red-400" />
+                                    <MdDelete className="size-3.5 text-red-400" />
                                 </Button>
                             </div>
                         </div>

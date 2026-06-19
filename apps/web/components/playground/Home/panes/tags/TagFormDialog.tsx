@@ -1,7 +1,7 @@
 "use client";
 import { useEffect } from "react";
 import { useForm, useWatch } from "react-hook-form";
-import { Check, Pipette } from "lucide-react";
+import { MdCheck, MdColorize } from "react-icons/md";
 import { toast } from "sonner";
 import { AxiosError } from "axios";
 import { Button } from "@/components/ui/button";
@@ -175,7 +175,7 @@ export default function TagFormDialog({ open, onOpenChange, projectId, tag }: Ta
                                         style={{ backgroundColor: c }}
                                     >
                                         {selected && (
-                                            <Check className="size-3.5 text-neutral-900" />
+                                            <MdCheck className="size-3.5 text-neutral-900" />
                                         )}
                                     </button>
                                 );
@@ -203,9 +203,9 @@ export default function TagFormDialog({ open, onOpenChange, projectId, tag }: Ta
                                                 }}
                                             >
                                                 {customActive ? (
-                                                    <Check className="size-3.5 text-neutral-900" />
+                                                    <MdCheck className="size-3.5 text-neutral-900" />
                                                 ) : (
-                                                    <Pipette className="size-3.5 text-white drop-shadow" />
+                                                    <MdColorize className="size-3.5 text-white drop-shadow" />
                                                 )}
                                             </button>
                                         </PopoverTrigger>

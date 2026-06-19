@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { isAxiosError } from "axios";
-import { Trash2 } from "lucide-react";
+import { MdDelete } from "react-icons/md";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -129,7 +129,7 @@ export default function ProjectSettingsGeneralSection({
                         className="ml-auto"
                         onClick={() => setConfirmOpen(true)}
                     >
-                        <Trash2 className="size-3" aria-hidden />
+                        <MdDelete className="size-3" aria-hidden />
                         Delete project
                     </Button>
                 )}

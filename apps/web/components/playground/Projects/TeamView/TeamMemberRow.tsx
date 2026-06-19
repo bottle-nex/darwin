@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { Flag } from "lucide-react";
+import { MdFlag } from "react-icons/md";
 import { formatDate } from "@/lib/format";
 import type { PendingInviteDetail, TeamMemberDetail } from "@/types/team";
 
@@ -68,7 +68,7 @@ export default function PlaygroundTeamMemberRow({ teamMember, pendingMember }: M
             </div>
 
             <div className="flex w-36 shrink-0 items-center gap-1.5 text-[12px] text-neutral-400">
-                <Flag className="size-3.5 shrink-0 text-neutral-500" aria-hidden />
+                <MdFlag className="size-3.5 shrink-0 text-neutral-500" aria-hidden />
 
                 {isMember ? formatDate(teamMember.createdAt) : formatDate(pendingMember.sentAt)}
             </div>

@@ -1,5 +1,5 @@
 "use client";
-import { Plus, Search } from "lucide-react";
+import { MdAdd, MdSearch } from "react-icons/md";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useNewProjectStore } from "@/store/project/useNewProjectStore";
@@ -18,7 +18,7 @@ export default function PlaygroundTopBar() {
 
             {/* search — absolutely centered so a long org name never shifts it */}
             <div className="absolute left-1/2 top-1/2 w-full max-w-md -translate-x-1/2 -translate-y-1/2">
-                <Search
+                <MdSearch
                     className="pointer-events-none absolute top-1/2 left-3 size-3.5 -translate-y-1/2 text-neutral-500"
                     aria-hidden
                 />
@@ -37,9 +37,9 @@ export default function PlaygroundTopBar() {
                 <Button
                     onClick={() => setOpen(true)}
                     size="sm"
-                    className="h-6.75 cursor-pointer gap-1 rounded-sm bg-neutral-100 px-2.5 text-[11px] font-medium text-neutral-900 hover:bg-white"
+                    className="h-6.75 cursor-pointer gap-1 bg-neutral-100 px-2.5 text-[11px] font-medium text-neutral-900 hover:bg-white"
                 >
-                    <Plus className="size-3.5" aria-hidden />
+                    <MdAdd className="size-3.5" aria-hidden />
                     Create Project
                 </Button>
                 <PlaygroundUserMenu />

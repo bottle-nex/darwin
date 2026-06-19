@@ -1,4 +1,4 @@
-import { Clock, MessageSquare, Pause } from "lucide-react";
+import { MdAccessTimeFilled, MdChat, MdPause } from "react-icons/md";
 import { cn } from "@/lib/utils";
 import { barGeometry, issueMeta, MINUTE_WIDTH, PRIORITY_DOT, type GanttIssue } from "./types";
 
@@ -76,7 +76,7 @@ export default function GanttIssueCard({ issue, now }: { issue: GanttIssue; now:
                     </p>
 
                     <div className="mt-2 flex items-center gap-1 text-[11px] text-neutral-500">
-                        <Clock className="size-3 shrink-0" aria-hidden />
+                        <MdAccessTimeFilled className="size-3 shrink-0" aria-hidden />
                         <span className="truncate">
                             <span style={{ color: accent }}>{statusLabel}</span> ·{" "}
                             {issueMeta(issue, now)}
@@ -85,7 +85,7 @@ export default function GanttIssueCard({ issue, now }: { issue: GanttIssue; now:
 
                     {isPaused && (
                         <div className="mt-2 flex items-center gap-1 text-[11px] text-amber-400">
-                            <Pause className="size-3 shrink-0" aria-hidden />
+                            <MdPause className="size-3 shrink-0" aria-hidden />
                             <span className="truncate">
                                 Paused {pausedMinutes}m · {issue.pauseReason}
                             </span>
@@ -94,7 +94,7 @@ export default function GanttIssueCard({ issue, now }: { issue: GanttIssue; now:
 
                     <div className="mt-auto flex items-center justify-between border-t border-neutral-700 pt-2">
                         <span className="flex items-center gap-1 text-[11px] text-neutral-500">
-                            <MessageSquare className="size-3" aria-hidden />
+                            <MdChat className="size-3" aria-hidden />
                             {issue.comments ? issue.comments : null}
                         </span>
                         {issue.agent && (

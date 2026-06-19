@@ -1,4 +1,4 @@
-import type { LucideIcon } from "lucide-react";
+import type { IconType } from "react-icons";
 import type { AvatarTone } from "@/components/playground/Core/components/PlaygroundAvatar";
 
 /**
@@ -73,7 +73,7 @@ export type Issue = {
 export type KanbanColumnDef = {
     status: KanbanStatus;
     title: string;
-    icon: LucideIcon;
+    icon: IconType;
     /** Tailwind classes for the coloured box wrapping the column title. */
     titleBox: string;
 };

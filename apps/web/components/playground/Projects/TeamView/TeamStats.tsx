@@ -1,5 +1,5 @@
 "use client";
-import { LayoutGrid, MoreVertical } from "lucide-react";
+import { MdWindow, MdMoreVert } from "react-icons/md";
 import { useGetTeamMembers } from "@/hooks/team/useGetTeamMembers";
 import { cn } from "@/lib/utils";
 import { BumpingText } from "@/components/utility/BumpingText";
@@ -69,7 +69,7 @@ export default function PlaygroundTeamStats({
     return (
         <section className="rounded-xl ring-1 ring-white/5 bg-charcoal p-3">
             <div className="mb-3 flex items-center gap-2">
-                <LayoutGrid className="size-4 text-neutral-400" aria-hidden />
+                <MdWindow className="size-4 text-neutral-400" aria-hidden />
                 <h3 className="text-[15px] font-medium text-neutral-100">Team Members</h3>
             </div>
 
@@ -99,7 +99,7 @@ export default function PlaygroundTeamStats({
                                       trigger={clickCounts[stat.id] ?? 0}
                                   />
                                   <div className="group flex size-6 cursor-pointer items-center justify-center rounded-sm transition-colors duration-200 hover:bg-neutral-800/70">
-                                      <MoreVertical
+                                      <MdMoreVert
                                           className="size-4 text-neutral-600 transition-colors duration-200 group-hover:text-neutral-300"
                                           aria-hidden
                                       />

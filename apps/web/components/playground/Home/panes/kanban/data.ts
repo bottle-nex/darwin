@@ -1,4 +1,5 @@
-import { CircleDashed, Loader, GitPullRequest, CheckCircle2 } from "lucide-react";
+import { MdIncompleteCircle, MdAutorenew, MdCheckCircle } from "react-icons/md";
+import { FaCodePullRequest } from "react-icons/fa6";
 import {
     KanbanStatus,
     type BoardState,
@@ -29,25 +30,25 @@ export const COLUMNS: KanbanColumnDef[] = [
     {
         status: KanbanStatus.Todo,
         title: "To Do",
-        icon: CircleDashed,
+        icon: MdIncompleteCircle,
         titleBox: "bg-neutral-500/15 text-neutral-200",
     },
     {
         status: KanbanStatus.InProgress,
         title: "In Progress",
-        icon: Loader,
+        icon: MdAutorenew,
         titleBox: "bg-amber-500/15 text-amber-200",
     },
     {
         status: KanbanStatus.InReview,
         title: "In Review",
-        icon: GitPullRequest,
+        icon: FaCodePullRequest,
         titleBox: "bg-violet-500/15 text-violet-200",
     },
     {
         status: KanbanStatus.Done,
         title: "Done",
-        icon: CheckCircle2,
+        icon: MdCheckCircle,
         titleBox: "bg-emerald-500/15 text-emerald-200",
     },
 ];

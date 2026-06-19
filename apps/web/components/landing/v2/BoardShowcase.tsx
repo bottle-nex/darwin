@@ -1,4 +1,12 @@
-import { Kanban, Layers, List, Search, Settings2, Share2, Users } from "lucide-react";
+import {
+    MdViewKanban,
+    MdLayers,
+    MdList,
+    MdSearch,
+    MdSettings,
+    MdShare,
+    MdGroup,
+} from "react-icons/md";
 import { cn } from "@/lib/utils";
 import { COLUMNS, INITIAL_BOARD } from "@/components/playground/Home/panes/kanban/data";
 import { HiPlusSmall } from "react-icons/hi2";
@@ -16,17 +24,17 @@ function ShowcaseTopbar() {
                 <h3 className="text-[14px] font-semibold text-neutral-100">Issues</h3>
                 <div className="flex items-center gap-0.5">
                     <span className="flex h-7 items-center gap-1.5 rounded-md bg-white/10 px-2 text-[12px] font-medium text-neutral-100">
-                        <Kanban className="size-3.5" aria-hidden />
+                        <MdViewKanban className="size-3.5" aria-hidden />
                         Board
                     </span>
                     <span className="flex h-7 items-center gap-1.5 rounded-md px-2 text-[12px] font-medium text-neutral-400">
-                        <List className="size-3.5" aria-hidden />
+                        <MdList className="size-3.5" aria-hidden />
                         List
                     </span>
                 </div>
             </div>
             <span className="flex h-7 items-center gap-1.5 rounded-md px-2.5 text-[12px] font-medium text-neutral-300">
-                <Share2 className="size-3.5" aria-hidden />
+                <MdShare className="size-3.5" aria-hidden />
                 Share
             </span>
         </div>
@@ -37,11 +45,11 @@ function ShowcaseOptionsBar() {
     return (
         <div className="flex h-10 shrink-0 items-center justify-between gap-2 border-b border-white/5 px-3">
             <span className="flex h-7 items-center gap-1.5 rounded-md bg-white/5 px-2 text-[12px] font-medium text-neutral-200 ring-1 ring-white/10">
-                <Layers className="size-3.5 text-violet-300" aria-hidden />
+                <MdLayers className="size-3.5 text-violet-300" aria-hidden />
                 Group: Status
             </span>
             <div className="flex items-center gap-0.5 text-neutral-400">
-                {[Users, Search, Settings2].map((Icon, i) => (
+                {[MdGroup, MdSearch, MdSettings].map((Icon, i) => (
                     <span key={i} className="flex size-7 items-center justify-center rounded-md">
                         <Icon className="size-3.5" aria-hidden />
                     </span>

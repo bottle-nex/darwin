@@ -4,11 +4,10 @@ import { Button } from "../ui/button";
 import Image from "next/image";
 import { PiDotsThreeOutlineVerticalLight } from "react-icons/pi";
 import { DropdownMenu } from "radix-ui";
-import { ShieldCheck, UserX } from "lucide-react";
+import { MdVerifiedUser, MdPersonOff, MdKeyboardArrowRight } from "react-icons/md";
 import axios from "axios";
 import { CHANGE_MEMBER_AUTHORITY, REMOVE_MEMBERS } from "@/routes/api_routes";
 import { TeamRole } from "@trymatcha/types";
-import { ChevronRight } from "lucide-react";
 import { useUserSessionStore } from "@/store/user/useUserSessionStore";
 import { useQueryClient } from "@tanstack/react-query";
 import { TEAM_MEMBERS_QUERY_KEY } from "@/hooks/team/useGetTeamMembers";
@@ -108,13 +107,13 @@ export default function ProfileCard({
                                         className={cn(ITEM, "justify-between")}
                                     >
                                         <span className="flex items-center gap-2.5">
-                                            <ShieldCheck
+                                            <MdVerifiedUser
                                                 className="size-4 text-neutral-400"
                                                 aria-hidden
                                             />
                                             Change authority
                                         </span>
-                                        <ChevronRight
+                                        <MdKeyboardArrowRight
                                             className="size-3.5 text-neutral-500"
                                             aria-hidden
                                         />
@@ -148,7 +147,7 @@ export default function ProfileCard({
                                     )}
                                     onClick={handleKick}
                                 >
-                                    <UserX
+                                    <MdPersonOff
                                         className="size-4 text-neutral-400 group-hover:text-red-300"
                                         aria-hidden
                                     />
