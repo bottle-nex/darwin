@@ -33,7 +33,12 @@ export function TooltipComponent({
         <TooltipProvider delayDuration={delayDuration}>
             <Tooltip>
                 <TooltipTrigger asChild={asChild}>{children}</TooltipTrigger>
-                <TooltipContent side={side} align={align} sideOffset={sideOffset} className={className}>
+                <TooltipContent
+                    side={side}
+                    align={align}
+                    sideOffset={sideOffset}
+                    className={className}
+                >
                     {content}
                 </TooltipContent>
             </Tooltip>

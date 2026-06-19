@@ -21,7 +21,13 @@ const TREE: Node[] = [
         file: true,
         tone: "text-sky-500",
     },
-    { label: "CONVENTIONS.md", icon: MdDescription, indent: 0, file: true, tone: "text-neutral-400" },
+    {
+        label: "CONVENTIONS.md",
+        icon: MdDescription,
+        indent: 0,
+        file: true,
+        tone: "text-neutral-400",
+    },
 ];
 
 /** Stagger the "read" checkmarks so files resolve top-to-bottom on hover. */

@@ -21,7 +21,11 @@ export default function ProjectTopbar({ project }: { project: Project }) {
     return (
         <PaneBreadcrumb
             leading={
-                <MdFolder className="size-3.5 shrink-0" style={{ color, fill: color }} aria-hidden />
+                <MdFolder
+                    className="size-3.5 shrink-0"
+                    style={{ color, fill: color }}
+                    aria-hidden
+                />
             }
             segments={[
                 { label: project.name, onClick: () => showProjectList("list") },

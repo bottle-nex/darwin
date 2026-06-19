@@ -79,7 +79,10 @@ export default function TagsOptionsBar({ options, count, onCreate }: TagsOptions
                                     />
                                     <span className="flex-1">{option.label}</span>
                                     {sort === option.id && (
-                                        <MdCheck className="size-3.5 text-neutral-200" aria-hidden />
+                                        <MdCheck
+                                            className="size-3.5 text-neutral-200"
+                                            aria-hidden
+                                        />
                                     )}
                                 </DropdownMenu.Item>
                             ))}

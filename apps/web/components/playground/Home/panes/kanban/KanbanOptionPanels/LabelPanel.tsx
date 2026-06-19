@@ -96,9 +96,7 @@ export default function LabelPanel({ selected, onToggle, onClear }: LabelPanelPr
                                                     : "border-white/25",
                                             )}
                                         >
-                                            {isOn && (
-                                                <MdCheck className="size-2.5" aria-hidden />
-                                            )}
+                                            {isOn && <MdCheck className="size-2.5" aria-hidden />}
                                         </span>
                                         <span
                                             className={cn(
