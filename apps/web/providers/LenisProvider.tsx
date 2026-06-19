@@ -7,5 +7,17 @@ interface LenisProviderProps {
 }
 
 export default function LenisProvider({ children }: LenisProviderProps) {
-    return <ReactLenis root>{children}</ReactLenis>;
+    return (
+        <ReactLenis
+            root
+            options={{
+                lerp: 0.075,
+                wheelMultiplier: 1.15,
+                touchMultiplier: 1.8,
+                smoothWheel: true,
+            }}
+        >
+            {children}
+        </ReactLenis>
+    );
 }

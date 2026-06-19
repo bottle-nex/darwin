@@ -1,11 +1,20 @@
-import { Bot, GitPullRequest, Kanban, ScanSearch, Server, ShieldCheck } from "lucide-react";
-import { RiBookOpenFill, RiFilePaperFill, RiGithubFill } from "react-icons/ri";
+import { Button } from "@/components/ui/button";
+import {
+    RiBookOpenFill,
+    RiFilePaperFill,
+    RiGitPullRequestFill,
+    RiGithubFill,
+    RiLayoutColumnFill,
+    RiRobot2Fill,
+    RiSearchEyeFill,
+    RiServerFill,
+    RiShieldCheckFill,
+} from "react-icons/ri";
 import Reveal from "@/components/utility/Reveal";
 import FeatureCard from "./features/FeatureCard";
 import BoardPreview from "./features/previews/BoardPreview";
 import RepoPreview from "./features/previews/RepoPreview";
 import StackPreview from "./features/previews/StackPreview";
-import { Button } from "@/components/ui/button";
 import AppLogo from "@/components/app/Applogo";
 
 export default function FeaturesSection() {
@@ -41,7 +50,7 @@ export default function FeaturesSection() {
                 <div className="grid grid-cols-1 gap-4 px-6 md:grid-cols-2 lg:grid-cols-3">
                     <FeatureCard
                         index="01"
-                        icon={Kanban}
+                        icon={RiLayoutColumnFill}
                         tone="dark"
                         title="The board you already know"
                         description="A Kanban canvas your whole team plans on — except the assignees are agents and the columns drain themselves."
@@ -50,7 +59,7 @@ export default function FeaturesSection() {
                     />
                     <FeatureCard
                         index="02"
-                        icon={ScanSearch}
+                        icon={RiSearchEyeFill}
                         title="Reads the repo first"
                         description="Before touching a line, the agent builds context: your conventions, your structure, the blast radius of the change."
                         preview={<RepoPreview />}
@@ -58,7 +67,7 @@ export default function FeaturesSection() {
                     />
                     <FeatureCard
                         index="03"
-                        icon={Server}
+                        icon={RiServerFill}
                         tone="primary"
                         title="Sandboxed code runners"
                         description="Every change is made on ephemeral compute that clones your project, runs the build, and executes your tests."
@@ -67,7 +76,7 @@ export default function FeaturesSection() {
                     />
                     <FeatureCard
                         index="04"
-                        icon={GitPullRequest}
+                        icon={RiGitPullRequestFill}
                         tone="ink"
                         title="PRs with reasoning"
                         description="Work lands as a pull request with the diff and the agent's thinking side by side. Review it like a teammate wrote it."
@@ -75,7 +84,7 @@ export default function FeaturesSection() {
                     />
                     <FeatureCard
                         index="05"
-                        icon={ShieldCheck}
+                        icon={RiShieldCheckFill}
                         tone="ink"
                         title="Your rules, your gates"
                         description="Nothing merges itself. Your review process, your branch protections, and your CI stay exactly where they are."
@@ -83,7 +92,7 @@ export default function FeaturesSection() {
                     />
                     <FeatureCard
                         index="06"
-                        icon={Bot}
+                        icon={RiRobot2Fill}
                         tone="ink"
                         title="Pick the right agent"
                         description="Assign Opus to the gnarly refactor and Sonnet to the long tail of chores — per issue, straight from the card."

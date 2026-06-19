@@ -250,12 +250,12 @@ model Issue {
 model Chat {
     id        String  @id @default(cuid())
     issueId   String
-    senderId  String
+    senderId  String?
     message   String  @db.Text
     isDeleted Boolean @default(false)
 
     issue  Issue @relation(fields: [issueId], references: [id], onDelete: Cascade)
-    sender User  @relation(fields: [senderId], references: [id], onDelete: SetNull)
+    sender User? @relation(fields: [senderId], references: [id], onDelete: SetNull)
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt

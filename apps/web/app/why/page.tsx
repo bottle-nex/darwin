@@ -117,7 +117,7 @@ export default function WhyPage() {
                         >
                             <div className="text-xl"> {card.title} </div>
                             <div className="border-t border-b border-neutral-800 border-dotted h-65 w-full overflow-hidden">
-                                <HalftoneShape src={card.image} ink="#4A38F5" />
+                                <HalftoneShape src={card.image} ink="#ab9ff2" />
                             </div>
                             <div className="text-neutral-400 min-h-30"> {card.description} </div>
                             <div className="flex items-center justify-between">
@@ -127,8 +127,8 @@ export default function WhyPage() {
                                     </div>
                                     <div className="text-neutral-500">{card.company}</div>
                                 </div>
-                                <Button size={"icon"} variant={"secondary"}>
-                                    <PiArrowRight className="text-neutral-800!" />
+                                <Button size={"icon"}>
+                                    <PiArrowRight className="" />
                                 </Button>{" "}
                             </div>
                         </div>

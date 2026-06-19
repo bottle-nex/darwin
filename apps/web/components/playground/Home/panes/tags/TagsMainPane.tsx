@@ -91,7 +91,7 @@ export default function TagsMainPane() {
                         <PaneEmptyState
                             icon={TagIcon}
                             title="No tags yet"
-                            subtitle="Make a tag to start labeling your issues — like labels on GitHub."
+                            subtitle="Make a tag to start labeling your issues, like labels on GitHub."
                         />
                     </div>
                 ) : !visibleTags.length ? (

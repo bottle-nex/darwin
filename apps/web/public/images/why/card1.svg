@@ -1,3 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="800" height="700" viewBox="0 0 800 700">
-  <polygon points="438,150 280,400 392,400 350,560 540,310 420,310" fill="#111111"/>
+  <g fill="#111111">
+    <rect x="274" y="215" width="52" height="285"/>
+    <polygon points="506,194 534,236 319,381 291,339"/>
+    <circle cx="300" cy="215" r="52"/>
+    <circle cx="300" cy="500" r="52"/>
+    <circle cx="520" cy="215" r="52"/>
+  </g>
 </svg>

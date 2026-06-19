@@ -131,7 +131,7 @@ export default function TagFormDialog({ open, onOpenChange, projectId, tag }: Ta
                         {isEdit ? "Edit tag" : "New tag"}
                     </DialogTitle>
                     <DialogDescription className="text-neutral-500">
-                        Tags are labels you put on issues so you can group and find them — like
+                        Tags are labels you put on issues so you can group and find them, like
                         labels on GitHub.
                     </DialogDescription>
                 </DialogHeader>

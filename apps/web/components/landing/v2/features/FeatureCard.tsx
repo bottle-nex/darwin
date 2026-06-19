@@ -1,4 +1,4 @@
-import type { LucideIcon } from "lucide-react";
+import type { IconType } from "react-icons";
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { azeretMono } from "@/components/ui/button";
@@ -22,7 +22,7 @@ const PRIMARY_SURFACE = {
 
 type FeatureCardProps = {
     index: string;
-    icon: LucideIcon;
+    icon: IconType;
     title: string;
     description: string;
     /** Light cells match the base grid; dark / primary cells carry grain + the real app UI. */
@@ -53,7 +53,7 @@ export default function FeatureCard({
                 dark && "border-white/10 hover:border-white/20 hover:shadow-black/50 border-none",
                 primary &&
                     "border-transparent hover:border-white/30 hover:shadow-[#AB9FF2]/40 border-none",
-                ink && "bg-ink/50 border-none hover:shadow-black/50 border-neutral-800 border",
+                ink && "bg-ink/50 border-none hover:shadow-black/50 border-neutral-800 border shadow-[inset_0_2px_0_0_#262626]",
                 light &&
                     "border-neutral-200 bg-white hover:border-neutral-300 hover:shadow-neutral-900/10",
             )}

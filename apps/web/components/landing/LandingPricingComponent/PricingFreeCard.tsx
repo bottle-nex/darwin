@@ -4,6 +4,7 @@ import { motion } from "motion/react";
 import { FiHome, FiBarChart2, FiPlus, FiBell, FiUser } from "react-icons/fi";
 import { HiMiniChevronRight } from "react-icons/hi2";
 import { MdOutlineReadMore } from "react-icons/md";
+import { Button } from "@/components/ui/button";
 
 const COMMITS = [
     {
@@ -39,7 +40,7 @@ export default function PricingFreeCard() {
 
     return (
         <div
-            className="w-full lg:h-full lg:w-1/2 bg-[#1A1A1A] rounded-4xl relative overflow-hidden"
+            className="w-full lg:h-full lg:w-1/2 bg-[#0D0D0D] rounded-4xl relative overflow-hidden"
             onMouseEnter={() => setHovered(true)}
             onMouseLeave={() => setHovered(false)}
         >
@@ -139,19 +140,15 @@ export default function PricingFreeCard() {
                 </div>
 
                 <div className="w-full flex flex-col sm:flex-row gap-3 sm:gap-x-4 items-center justify-center mt-5 pb-10">
-                    <div className="h-11 w-40 text-neutral-100 px-4 flex items-center justify-center gap-x-2 bg-neutral-600/90 rounded-md shadow-sm shadow-black/5 group hover:bg-primary hover:text-neutral-800 transition-all transform duration-300 cursor-pointer">
-                        <span className="flex gap-x-2 items-center group-hover:scale-[0.94] transition-all transform duration-300">
-                            Get Started
-                            <HiMiniChevronRight className="size-5.5" />
-                        </span>
-                    </div>
+                    <Button size={'lg'}>
+                        Get Started
+                        <HiMiniChevronRight className="size-5.5" />
+                    </Button>
 
-                    <div className="h-11 w-40 text-neutral-100 px-4 flex items-center justify-center gap-x-2 bg-neutral-600/90 rounded-md shadow-sm shadow-black/5 group hover:bg-primary hover:text-neutral-800 transition-all transform duration-300 cursor-pointer">
-                        <span className="flex gap-x-2 items-center group-hover:scale-[0.94] transition-all transform duration-250">
-                            Know more
-                            <MdOutlineReadMore className="size-5" />
-                        </span>
-                    </div>
+                    <Button size={'lg'} variant={'tertiary'}>
+                        Know more
+                        <MdOutlineReadMore className="size-5" />
+                    </Button>
                 </div>
             </div>
         </div>
