@@ -1,11 +1,11 @@
 "use client";
 import { Folder } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
-import Row from "../../Sidebar/SidebarRow";
+import Row from "../../sidebar/SidebarRow";
 import { useGetDashboard } from "@/hooks/dashboard/useGetDashboard";
-import { matchesQuery, type SidebarNavRow, type SidebarSectionProps } from "../../Sidebar/shared";
+import { matchesQuery, type SidebarNavRow, type SidebarSectionProps } from "../../sidebar/shared";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
-import { RailSurface } from "../../IconRail/railSurface";
+import { RailSurface } from "../../iconrail/railSurface";
 import { ProjectsTab } from "../projectsTabs";
 
 const DEFAULT_FOLDER_COLOR = "#6366f1";

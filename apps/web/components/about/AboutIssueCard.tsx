@@ -9,7 +9,7 @@ import {
 import { cn } from "@/lib/utils";
 import PlaygroundAvatar, {
     type AvatarTone,
-} from "@/components/playground/Core/components/PlaygroundAvatar";
+} from "@/components/playground/core/components/PlaygroundAvatar";
 
 export type AboutIssue = {
     number: string;

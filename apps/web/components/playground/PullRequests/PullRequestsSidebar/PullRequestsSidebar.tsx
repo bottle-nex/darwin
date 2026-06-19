@@ -1,5 +1,5 @@
 "use client";
-import type { SidebarSectionProps } from "../../Sidebar/shared";
+import type { SidebarSectionProps } from "../../sidebar/shared";
 import PullRequestsSection from "./PullRequestsSection";
 
 export default function PullRequestsSidebar(props: SidebarSectionProps) {

@@ -1,10 +1,10 @@
 "use client";
 import { Users } from "lucide-react";
 import { useParams } from "next/navigation";
-import type { RailSurface } from "../../IconRail/railSurface";
+import type { RailSurface } from "../../iconrail/railSurface";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
-import PaneEmptyState from "@/components/playground/Core/components/PaneEmptyState";
-import TeamViewMain from "../TeamView/TeamViewMain";
+import PaneEmptyState from "@/components/playground/core/components/PaneEmptyState";
+import TeamViewMain from "../teamview/TeamViewMain";
 
 /**
  * The one fully-built pane: team detail. Shared by the Home and Projects

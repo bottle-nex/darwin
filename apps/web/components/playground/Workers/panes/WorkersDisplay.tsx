@@ -1,6 +1,6 @@
 "use client";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
-import { RailSurface } from "../../IconRail/railSurface";
+import { RailSurface } from "../../iconrail/railSurface";
 import { WorkersTab } from "../workersTabs";
 import WorkersOverviewPane from "./WorkersOverviewPane";
 import WorkerDetailPane from "./WorkerDetailPane";

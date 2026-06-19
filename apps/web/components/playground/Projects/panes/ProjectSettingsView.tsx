@@ -5,7 +5,7 @@ import { Lock } from "lucide-react";
 import { useGetDashboard } from "@/hooks/dashboard/useGetDashboard";
 import { useGetProject } from "@/hooks/project/useGetProject";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
-import { RailSurface } from "../../IconRail/railSurface";
+import { RailSurface } from "../../iconrail/railSurface";
 import { ProjectsTab } from "../projectsTabs";
 import ProjectSettingsGeneralSection from "./settings/ProjectSettingsGeneralSection";
 import ProjectSettingsTeamSection from "./settings/ProjectSettingsTeamSection";

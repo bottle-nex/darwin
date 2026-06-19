@@ -2,7 +2,7 @@
 import { useEffect, useRef } from "react";
 import { useParams } from "next/navigation";
 import type { ProjectTeam } from "@/types/project";
-import { RailSurface } from "@/components/playground/IconRail/railSurface";
+import { RailSurface } from "@/components/playground/iconrail/railSurface";
 import { TEAM_DETAIL_TAB, usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
 
 const SURFACE_VALUES = new Set<string>(Object.values(RailSurface));

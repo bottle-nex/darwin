@@ -1,5 +1,5 @@
 import type { LucideIcon } from "lucide-react";
-import type { AvatarTone } from "@/components/playground/Core/components/PlaygroundAvatar";
+import type { AvatarTone } from "@/components/playground/core/components/PlaygroundAvatar";
 
 /**
  * Board columns map to matcha's agent flow: a team files an issue (To Do), an

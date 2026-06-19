@@ -1,8 +1,8 @@
 "use client";
 import { BsFillKanbanFill } from "react-icons/bs";
 import { FaInbox, FaAt, FaCheckCircle, FaTags, FaCog } from "react-icons/fa";
-import Row from "../../Sidebar/SidebarRow";
-import { matchesQuery, type SidebarNavRow, type SidebarSectionProps } from "../../Sidebar/shared";
+import Row from "../../sidebar/SidebarRow";
+import { matchesQuery, type SidebarNavRow, type SidebarSectionProps } from "../../sidebar/shared";
 
 const PRIMARY_ROWS: { id: string; label: string; icon: React.ComponentType; isLocked?: boolean }[] =
     [

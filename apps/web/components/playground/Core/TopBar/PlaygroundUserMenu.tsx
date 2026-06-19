@@ -16,7 +16,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useUserSessionStore } from "@/store/user/useUserSessionStore";
 import { useFetchOrganizations } from "@/hooks/playground/useFetchOrganizations";
-import PlaygroundAvatar from "@/components/playground/Core/components/PlaygroundAvatar";
+import PlaygroundAvatar from "@/components/playground/core/components/PlaygroundAvatar";
 import SessionServices from "@/lib/session";
 
 const ITEM =

@@ -1,8 +1,8 @@
 "use client";
 import { AnimatePresence, motion } from "motion/react";
-import type { RailSurface } from "../IconRail/railSurface";
+import type { RailSurface } from "../iconrail/railSurface";
 import PlaygroundDisplay from "./PlaygroundDisplay";
-import PlaygroundSidebar from "../Sidebar/PlaygroundSidebar";
+import PlaygroundSidebar from "../sidebar/PlaygroundSidebar";
 
 const SIDEBAR_W = 240;
 

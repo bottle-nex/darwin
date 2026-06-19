@@ -1,9 +1,9 @@
 import { Kanban, Layers, List, Search, Settings2, Share2, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { COLUMNS, INITIAL_BOARD } from "@/components/playground/Home/panes/kanban/data";
+import { COLUMNS, INITIAL_BOARD } from "@/components/playground/home/panes/kanban/data";
 import { HiPlusSmall } from "react-icons/hi2";
-import type { KanbanColumnDef } from "@/components/playground/Home/panes/kanban/types";
-import CardRenderer from "@/components/playground/Home/panes/kanban/cards/CardRenderer";
+import type { KanbanColumnDef } from "@/components/playground/home/panes/kanban/types";
+import CardRenderer from "@/components/playground/home/panes/kanban/cards/CardRenderer";
 import Reveal from "@/components/utility/Reveal";
 import { Button } from "@/components/ui/button";
 

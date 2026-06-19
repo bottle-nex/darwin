@@ -2,18 +2,18 @@
 import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { ChevronsLeft, Search } from "lucide-react";
-import { RailSurface } from "../IconRail/railSurface";
+import { RailSurface } from "../iconrail/railSurface";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
 import { getSurfaceNavRows, SURFACE_TITLES } from "./surfaceConfig";
 import type { SidebarSectionProps } from "./shared";
 import SidebarHeaderIcon from "./SidebarHeaderIcon";
 import SidebarSearch from "./SidebarSearch";
-import HomeSidebar from "../Home/HomeSidebar/HomeSidebar";
-import ProjectsSidebar from "../Projects/ProjectsSidebar/ProjectsSidebar";
-import PullRequestsSidebar from "../PullRequests/PullRequestsSidebar/PullRequestsSidebar";
-import AgentsSidebar from "../Agents/AgentsSidebar/AgentsSidebar";
-import WorkersSidebar from "../Workers/WorkersSidebar/WorkersSidebar";
-import MoreSidebar from "../More/MoreSidebar/MoreSidebar";
+import HomeSidebar from "../home/homesidebar/HomeSidebar";
+import ProjectsSidebar from "../projects/projectsidebar/ProjectsSidebar";
+import PullRequestsSidebar from "../pullrequests/PullRequestsSidebar/PullRequestsSidebar";
+import AgentsSidebar from "../agents/agentsidebar/AgentsSidebar";
+import WorkersSidebar from "../workers/WorkersSidebar/WorkersSidebar";
+import MoreSidebar from "../more/moresidebar/MoreSidebar";
 
 type PlaygroundSidebarProps = {
     surface: RailSurface;

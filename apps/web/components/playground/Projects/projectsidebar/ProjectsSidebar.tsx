@@ -1,6 +1,6 @@
 "use client";
 import { AnimatePresence, motion } from "motion/react";
-import type { SidebarSectionProps } from "../../Sidebar/shared";
+import type { SidebarSectionProps } from "../../sidebar/shared";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
 import ProjectsSection from "./ProjectsSection";
 import ProjectNav from "./ProjectNav";

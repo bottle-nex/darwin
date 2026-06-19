@@ -1,10 +1,10 @@
 "use client";
 import { House } from "lucide-react";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
-import { RailSurface } from "../../IconRail/railSurface";
-import PaneBreadcrumb from "../../Core/components/PaneBreadcrumb";
+import { RailSurface } from "../../iconrail/railSurface";
+import PaneBreadcrumb from "../../core/components/PaneBreadcrumb";
 import { HomeTab } from "../homeTabs";
-import TeamDetailPane from "../../Projects/panes/TeamDetailPane";
+import TeamDetailPane from "../../projects/panes/TeamDetailPane";
 import InboxMainPane from "./InboxMainPane";
 import KanbanMainPane from "./kanban/KanbanMainPane";
 import MentionsMainPane from "./MentionsMainPane";

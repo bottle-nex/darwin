@@ -1,5 +1,5 @@
 import { MoreHorizontal } from "lucide-react";
-import PaneEmptyState from "@/components/playground/Core/components/PaneEmptyState";
+import PaneEmptyState from "@/components/playground/core/components/PaneEmptyState";
 
 export default function MoreDisplay() {
     return (

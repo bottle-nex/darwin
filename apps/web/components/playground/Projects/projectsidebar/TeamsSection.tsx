@@ -3,8 +3,8 @@
 import { Plus, Trash2 } from "lucide-react";
 import { useParams } from "next/navigation";
 import { cn } from "@/lib/utils";
-import Row from "../../Sidebar/SidebarRow";
-import Section from "../../Sidebar/SidebarSection";
+import Row from "../../sidebar/SidebarRow";
+import Section from "../../sidebar/SidebarSection";
 import { useGetDashboard } from "@/hooks/dashboard/useGetDashboard";
 import { useGetProject } from "@/hooks/project/useGetProject";
 import { useNewTeamStore } from "@/store/team/useNewTeamStore";
@@ -14,7 +14,7 @@ import {
     rowLeading,
     type SidebarNavRow,
     type SidebarSectionProps,
-} from "../../Sidebar/shared";
+} from "../../sidebar/shared";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
 
 export const rows: SidebarNavRow[] = [];

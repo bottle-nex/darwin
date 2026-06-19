@@ -1,9 +1,9 @@
 "use client";
 
 import { Plus, Server } from "lucide-react";
-import Row from "../../Sidebar/SidebarRow";
-import Section from "../../Sidebar/SidebarSection";
-import { matchesQuery, type SidebarNavRow, type SidebarSectionProps } from "../../Sidebar/shared";
+import Row from "../../sidebar/SidebarRow";
+import Section from "../../sidebar/SidebarSection";
+import { matchesQuery, type SidebarNavRow, type SidebarSectionProps } from "../../sidebar/shared";
 
 // Sandboxed compute that clones and runs the target project so agents can
 // build, test, and validate before shipping a PR.

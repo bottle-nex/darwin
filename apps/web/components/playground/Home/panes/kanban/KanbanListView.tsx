@@ -1,7 +1,7 @@
 "use client";
 import { MessageSquare } from "lucide-react";
 import { cn } from "@/lib/utils";
-import PlaygroundAvatar from "@/components/playground/Core/components/PlaygroundAvatar";
+import PlaygroundAvatar from "@/components/playground/core/components/PlaygroundAvatar";
 import { COLUMNS, PRIORITY_DOT } from "./data";
 import type { BoardState, Issue } from "./types";
 import type { FilterValue } from "./useKanbanOptions";

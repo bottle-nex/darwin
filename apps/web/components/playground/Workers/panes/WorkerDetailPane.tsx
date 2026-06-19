@@ -1,5 +1,5 @@
 import { Server } from "lucide-react";
-import PaneEmptyState from "@/components/playground/Core/components/PaneEmptyState";
+import PaneEmptyState from "@/components/playground/core/components/PaneEmptyState";
 
 /** Placeholder detail view for a selected worker (keyed by its id). */
 export default function WorkerDetailPane({ id }: { id: string }) {
