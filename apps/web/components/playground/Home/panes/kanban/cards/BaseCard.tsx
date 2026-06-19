@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { MessageSquare } from "lucide-react";
 import { cn } from "@/lib/utils";
-import PlaygroundAvatar from "@/components/playground/core/components/PlaygroundAvatar";
+import PlaygroundAvatar from "@/components/playground/Core/components/PlaygroundAvatar";
 import type { Issue } from "../types";
 import { PRIORITY_DOT } from "../data";
 

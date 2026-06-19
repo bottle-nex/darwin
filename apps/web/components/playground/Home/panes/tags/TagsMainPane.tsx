@@ -7,7 +7,7 @@ import { useGetDashboard } from "@/hooks/dashboard/useGetDashboard";
 import { useListTags } from "@/hooks/tags/useListTags";
 import { useDeleteTag } from "@/hooks/tags/useDeleteTag";
 import { Button } from "@/components/ui/button";
-import PaneEmptyState from "@/components/playground/core/components/PaneEmptyState";
+import PaneEmptyState from "@/components/playground/Core/components/PaneEmptyState";
 import {
     Dialog,
     DialogContent,

@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
-import { COLUMNS, INITIAL_BOARD } from "@/components/playground/home/panes/kanban/data";
-import CardRenderer from "@/components/playground/home/panes/kanban/cards/CardRenderer";
-import { KanbanStatus } from "@/components/playground/home/panes/kanban/types";
+import { COLUMNS, INITIAL_BOARD } from "@/components/playground/Home/panes/kanban/data";
+import CardRenderer from "@/components/playground/Home/panes/kanban/cards/CardRenderer";
+import { KanbanStatus } from "@/components/playground/Home/panes/kanban/types";
 
 export default function BoardPreview() {
     const inProgress = INITIAL_BOARD[KanbanStatus.InProgress][0];

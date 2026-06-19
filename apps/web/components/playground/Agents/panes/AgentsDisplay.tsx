@@ -1,6 +1,6 @@
 "use client";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
-import { RailSurface } from "../../iconrail/railSurface";
+import { RailSurface } from "../../IconRail/railSurface";
 import { AgentsTab } from "../agentsTabs";
 import AllRunsPane from "./AllRunsPane";
 import AgentDetailPane from "./AgentDetailPane";

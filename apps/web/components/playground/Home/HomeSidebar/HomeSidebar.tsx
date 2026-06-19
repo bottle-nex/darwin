@@ -1,8 +1,8 @@
 "use client";
-import type { SidebarSectionProps } from "../../sidebar/shared";
+import type { SidebarSectionProps } from "../../Sidebar/shared";
 import PrimaryNavSection from "./PrimaryNavSection";
 import FavoritesSection from "./FavoritesSection";
-import TeamsSection from "../../projects/projectsidebar/TeamsSection";
+import TeamsSection from "../../Projects/projectsidebar/TeamsSection";
 
 export default function HomeSidebar(props: SidebarSectionProps) {
     return (

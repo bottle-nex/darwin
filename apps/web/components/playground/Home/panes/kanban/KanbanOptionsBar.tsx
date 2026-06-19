@@ -1,13 +1,13 @@
 "use client";
 import {
     ChevronDown,
+    Columns3,
     Kanban,
-    List,
     Plus,
     Search,
     Settings,
-    Settings2,
     Share2,
+    Sparkles,
     Upload,
     Users,
     type LucideIcon,
@@ -17,31 +17,44 @@ import { DropdownMenu } from "radix-ui";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import type { KanbanOptions } from "./useKanbanOptions";
-import type { KanbanView } from "./types";
+import type { BoardView, KanbanView } from "./types";
 import OptionButton from "./KanbanOptionPanels/OptionButton";
 import FilterPanel from "./KanbanOptionPanels/FilterPanel";
 import LabelPanel from "./KanbanOptionPanels/LabelPanel";
 import SearchBar from "./KanbanOptionPanels/SearchBar";
 import SelectedLabels from "./KanbanOptionPanels/SelectedLabels";
-
-const VIEWS: { id: KanbanView; label: string; icon: LucideIcon }[] = [
-    { id: "board", label: "Board", icon: Kanban },
-    { id: "list", label: "List", icon: List },
-];
+import ViewsPanel from "./KanbanOptionPanels/ViewsPanel";
 
 const TASK_OPTIONS = [
     { id: "issue", label: "New issue", icon: Plus },
     { id: "import", label: "Import issues", icon: Upload },
 ];
 
+const BOARD_VIEWS: { id: BoardView; label: string; icon: LucideIcon }[] = [
+    { id: "default", label: "Default", icon: Columns3 },
+    { id: "custom", label: "Custom Kanban", icon: Kanban },
+    { id: "llm", label: "LLM Kanban", icon: Sparkles },
+];
+
 type KanbanOptionsBarProps = {
     options: KanbanOptions;
-    view: KanbanView;
-    onViewChange: (view: KanbanView) => void;
+    /** Custom columns, listed under the filter's "custom" group. */
+    customColumns: { id: string; title: string }[];
+    boardView: BoardView;
+    onBoardViewChange: (view: BoardView) => void;
+    kanbanView: KanbanView;
+    onKanbanViewChange: (view: KanbanView) => void;
 };
 
-/** Board toolbar: Board/List toggle, search, labels, filters, share, and +Task. */
-export default function KanbanOptionsBar({ options, view, onViewChange }: KanbanOptionsBarProps) {
+/** Board toolbar: the board switcher, search, labels, filters, Views, and +Task. */
+export default function KanbanOptionsBar({
+    options,
+    customColumns,
+    boardView,
+    onBoardViewChange,
+    kanbanView,
+    onKanbanViewChange,
+}: KanbanOptionsBarProps) {
     const {
         searchOpen,
         search,
@@ -60,14 +73,14 @@ export default function KanbanOptionsBar({ options, view, onViewChange }: Kanban
         <div className="flex h-10 shrink-0 items-center justify-between gap-2 border-b border-white/5 px-3">
             <div className="flex min-w-0 items-center gap-1.5">
                 <div className="flex shrink-0 items-center gap-0.5">
-                    {VIEWS.map((v) => (
+                    {BOARD_VIEWS.map((v) => (
                         <button
                             key={v.id}
                             type="button"
-                            onClick={() => onViewChange(v.id)}
+                            onClick={() => onBoardViewChange(v.id)}
                             className={cn(
                                 "flex h-7 cursor-pointer items-center gap-1.5 rounded-md px-2 text-[12px] font-medium transition-colors",
-                                view === v.id
+                                boardView === v.id
                                     ? "bg-white/10 text-neutral-100"
                                     : "text-neutral-400 hover:bg-white/5 hover:text-neutral-200",
                             )}
@@ -93,7 +106,7 @@ export default function KanbanOptionsBar({ options, view, onViewChange }: Kanban
                     onToggle={toggleLabel}
                     onClear={clearLabels}
                 />
-                <FilterPanel value={filter} onChange={setFilter} />
+                <FilterPanel value={filter} onChange={setFilter} customColumns={customColumns} />
                 <OptionButton label="Assignees" icon={Users} />
                 <OptionButton
                     label="Search"
@@ -102,7 +115,7 @@ export default function KanbanOptionsBar({ options, view, onViewChange }: Kanban
                     onClick={() => (searchOpen ? closeSearch() : openSearch())}
                 />
                 <OptionButton label="Share" icon={Share2} />
-                <OptionButton label="Board settings" icon={Settings2} />
+                <ViewsPanel value={kanbanView} onChange={onKanbanViewChange} />
                 <div className="mx-1 h-4 w-px bg-white/8" />
                 <OptionButton label="Settings" icon={Settings} />
 

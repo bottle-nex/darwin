@@ -1,7 +1,7 @@
 "use client";
 
-import Section from "../../sidebar/SidebarSection";
-import type { SidebarSectionProps } from "../../sidebar/shared";
+import Section from "../../Sidebar/SidebarSection";
+import type { SidebarSectionProps } from "../../Sidebar/shared";
 
 export default function PlaygroundSidebarFavoritesSection({ query }: SidebarSectionProps) {
     if (query.trim()) return null;

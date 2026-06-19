@@ -2,8 +2,8 @@
 import { Folder } from "lucide-react";
 import type { Project } from "@/types/project";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
-import PaneBreadcrumb from "../../core/components/PaneBreadcrumb";
-import { RailSurface } from "../../iconrail/railSurface";
+import PaneBreadcrumb from "../../Core/components/PaneBreadcrumb";
+import { RailSurface } from "../../IconRail/railSurface";
 import { PROJECT_TAB_LABELS, ProjectsTab } from "../projectsTabs";
 
 const DEFAULT_FOLDER_COLOR = "#6366f1";

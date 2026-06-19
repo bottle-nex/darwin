@@ -1,11 +1,11 @@
 "use client";
 import { useState } from "react";
 import { useParams } from "next/navigation";
-import PlaygroundIconRail from "@/components/playground/iconrail/PlaygroundIconRail";
-import { RailSurface } from "@/components/playground/iconrail/railSurface";
-import { ProjectsTab } from "@/components/playground/projects/projectsTabs";
-import PlaygroundTopBar from "@/components/playground/core/topbar/PlaygroundTopBar";
-import PlaygroundWorkspace from "@/components/playground/core/PlaygroundWorkspace";
+import PlaygroundIconRail from "@/components/playground/IconRail/PlaygroundIconRail";
+import { RailSurface } from "@/components/playground/IconRail/railSurface";
+import { ProjectsTab } from "@/components/playground/Projects/projectsTabs";
+import PlaygroundTopBar from "@/components/playground/Core/TopBar/PlaygroundTopBar";
+import PlaygroundWorkspace from "@/components/playground/Core/PlaygroundWorkspace";
 import CreateTeamDialog from "@/components/team/CreateTeamDialog";
 import DeleteTeamDialog from "@/components/team/DeleteTeamDialog";
 import { useGetDashboard } from "@/hooks/dashboard/useGetDashboard";

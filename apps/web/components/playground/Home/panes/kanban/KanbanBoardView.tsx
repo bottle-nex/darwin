@@ -1,64 +1,44 @@
 "use client";
-import { closestCorners, DndContext, DragOverlay } from "@dnd-kit/core";
+import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
-import { COLUMNS } from "./data";
-import type { FilterValue } from "./useKanbanOptions";
-import type { KanbanBoardApi } from "./useKanbanBoard";
+import { COLUMNS, isBridgeStatus } from "./data";
+import type { BoardState } from "./types";
 import KanbanColumn from "./KanbanColumn";
-import CardRenderer from "./cards/CardRenderer";
 
-type KanbanBoardViewProps = KanbanBoardApi & { filter: FilterValue };
+type KanbanBoardViewProps = {
+    board: BoardState;
+    /** Columns to render before the LLM columns (e.g. the Custom Kanban) so both
+     *  boards flow through one continuous scroll row. */
+    leading?: ReactNode;
+    /** Size columns to their content (Trello-style) instead of stretching them. */
+    startAligned?: boolean;
+};
 
 /**
- * Board view: the drag-and-drop column grid. When the filter focuses a single
- * status, that column expands full-width and its cards flow into a grid;
- * otherwise all columns show as stacked lists. The dragged card renders in a
- * portal `DragOverlay` so it floats above the columns and follows the cursor.
+ * Board view: the LLM columns as a horizontal row. `leading` lets a caller
+ * prepend the Custom Kanban so the two boards share one scroll. Only bridge
+ * columns accept drops / let their cards be dragged out (see `BRIDGE_STATUSES`);
+ * single-column focus is rendered by `KanbanMainPane`, not here. The shared
+ * DndContext lives in `KanbanMainPane`.
  */
-export default function KanbanBoardView({
-    board,
-    activeIssue,
-    sensors,
-    onDragStart,
-    onDragOver,
-    onDragEnd,
-    filter,
-}: KanbanBoardViewProps) {
-    const focused = filter !== "default";
-    const columns = focused ? COLUMNS.filter((c) => c.status === filter) : COLUMNS;
-
+export default function KanbanBoardView({ board, leading, startAligned }: KanbanBoardViewProps) {
     return (
-        <DndContext
-            sensors={sensors}
-            collisionDetection={closestCorners}
-            onDragStart={onDragStart}
-            onDragOver={onDragOver}
-            onDragEnd={onDragEnd}
+        <div
+            className={cn(
+                "flex min-h-0 flex-1 gap-4 overflow-x-auto px-3 pt-3 pb-3",
+                startAligned && "items-start",
+            )}
         >
-            <div
-                className={cn(
-                    "flex min-h-0 flex-1 gap-4 px-3 pt-3 pb-3",
-                    focused ? "overflow-hidden" : "overflow-x-auto",
-                )}
-            >
-                {columns.map((column) => (
-                    <KanbanColumn
-                        key={column.status}
-                        column={column}
-                        issues={board[column.status]}
-                        layout={focused ? "grid" : "list"}
-                        fullWidth={focused}
-                    />
-                ))}
-            </div>
-
-            <DragOverlay dropAnimation={null}>
-                {activeIssue ? (
-                    <div className="w-72 rotate-2 cursor-grabbing shadow-2xl">
-                        <CardRenderer issue={activeIssue} />
-                    </div>
-                ) : null}
-            </DragOverlay>
-        </DndContext>
+            {leading}
+            {COLUMNS.map((column) => (
+                <KanbanColumn
+                    key={column.status}
+                    column={column}
+                    issues={board[column.status]}
+                    droppable={isBridgeStatus(column.status)}
+                    draggableCards={isBridgeStatus(column.status)}
+                />
+            ))}
+        </div>
     );
 }

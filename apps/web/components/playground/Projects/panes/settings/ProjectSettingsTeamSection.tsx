@@ -1,7 +1,7 @@
 "use client";
 import { Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import PlaygroundAvatar from "@/components/playground/core/components/PlaygroundAvatar";
+import PlaygroundAvatar from "@/components/playground/Core/components/PlaygroundAvatar";
 import { useNewTeamStore } from "@/store/team/useNewTeamStore";
 import { useDeleteTeamStore } from "@/store/team/useDeleteTeamStore";
 import type { ProjectDetail } from "@/types/project";

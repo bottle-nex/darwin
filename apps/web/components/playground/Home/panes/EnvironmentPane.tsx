@@ -8,7 +8,7 @@ import { useProjectSecrets } from "@/hooks/project/useProjectSecrets";
 import { useSetProjectSecrets } from "@/hooks/project/useSetProjectSecrets";
 import { Button } from "@/components/ui/button";
 import ProjectEnvStep, { type EnvRow } from "@/components/project/ProjectEnvStep";
-import PaneEmptyState from "@/components/playground/core/components/PaneEmptyState";
+import PaneEmptyState from "@/components/playground/Core/components/PaneEmptyState";
 import {
     Dialog,
     DialogContent,

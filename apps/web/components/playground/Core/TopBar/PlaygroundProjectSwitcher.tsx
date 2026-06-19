@@ -5,7 +5,7 @@ import { Popover } from "radix-ui";
 import { Check, ChevronDown, Folder } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useGetDashboard } from "@/hooks/dashboard/useGetDashboard";
-import SidebarSearch from "../../sidebar/SidebarSearch";
+import SidebarSearch from "../../Sidebar/SidebarSearch";
 
 const DEFAULT_FOLDER_COLOR = "#6366f1";
 

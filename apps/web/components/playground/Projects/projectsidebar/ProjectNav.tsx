@@ -10,8 +10,8 @@ import {
     Users,
     type LucideIcon,
 } from "lucide-react";
-import Row from "../../sidebar/SidebarRow";
-import type { SidebarSectionProps } from "../../sidebar/shared";
+import Row from "../../Sidebar/SidebarRow";
+import type { SidebarSectionProps } from "../../Sidebar/shared";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
 import { PROJECT_TAB_LABELS, ProjectsTab } from "../projectsTabs";
 import ProjectTeamsNavItem from "./ProjectTeamsNavItem";

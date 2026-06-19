@@ -1,8 +1,8 @@
 "use client";
 
 import { MoreHorizontal, Plus, Sparkles } from "lucide-react";
-import Row from "../../sidebar/SidebarRow";
-import Section from "../../sidebar/SidebarSection";
+import Row from "../../Sidebar/SidebarRow";
+import Section from "../../Sidebar/SidebarSection";
 import {
     PlaygroundSidebarRowAction,
     PlaygroundSidebarSectionAddButton,
@@ -11,7 +11,7 @@ import {
     type LeadingSpec,
     type SidebarNavRow,
     type SidebarSectionProps,
-} from "../../sidebar/shared";
+} from "../../Sidebar/shared";
 
 // Configured LLM agents. "All Runs" surfaces every run; child rows are
 // individual agents. `hasAddItem` adds an indented quick-add row beneath one.

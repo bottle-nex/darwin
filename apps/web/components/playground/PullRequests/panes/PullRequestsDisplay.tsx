@@ -1,6 +1,6 @@
 "use client";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
-import { RailSurface } from "../../iconrail/railSurface";
+import { RailSurface } from "../../IconRail/railSurface";
 import { PullRequestsTab } from "../pullRequestsTabs";
 import PullRequestsOverviewPane from "./PullRequestsOverviewPane";
 import PullRequestDetailPane from "./PullRequestDetailPane";

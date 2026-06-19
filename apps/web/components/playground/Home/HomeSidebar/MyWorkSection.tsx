@@ -1,15 +1,15 @@
 "use client";
 
 import { Clock, FilePen, MoreHorizontal } from "lucide-react";
-import Row from "../../sidebar/SidebarRow";
-import Section from "../../sidebar/SidebarSection";
+import Row from "../../Sidebar/SidebarRow";
+import Section from "../../Sidebar/SidebarSection";
 import {
     matchesQuery,
     rowLeading,
     type LeadingSpec,
     type SidebarNavRow,
     type SidebarSectionProps,
-} from "../../sidebar/shared";
+} from "../../Sidebar/shared";
 
 const MY_WORK: { id: string; label: string; badge?: number; leading: LeadingSpec }[] = [
     {

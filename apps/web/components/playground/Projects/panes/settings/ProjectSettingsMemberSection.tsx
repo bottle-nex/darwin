@@ -1,5 +1,5 @@
 "use client";
-import PlaygroundAvatar from "@/components/playground/core/components/PlaygroundAvatar";
+import PlaygroundAvatar from "@/components/playground/Core/components/PlaygroundAvatar";
 import { useProjectMembers } from "@/hooks/project/useProjectMembers";
 
 export default function ProjectSettingsMemberSection({

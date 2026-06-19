@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 import type { Organization, OrgRole } from "@/types/organization";
 import PlaygroundAvatar, {
     type AvatarTone,
-} from "@/components/playground/core/components/PlaygroundAvatar";
+} from "@/components/playground/Core/components/PlaygroundAvatar";
 
 const ROLE_DOT: Record<OrgRole, string> = {
     Owner: "bg-emerald-400 shadow-[0_0_6px_0] shadow-emerald-400/60",

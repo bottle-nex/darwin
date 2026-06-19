@@ -3,7 +3,7 @@
 import { Plus, type LucideIcon } from "lucide-react";
 import PlaygroundAvatar, {
     type AvatarTone,
-} from "@/components/playground/core/components/PlaygroundAvatar";
+} from "@/components/playground/Core/components/PlaygroundAvatar";
 
 // ── Shared row-leading helpers ──────────────────────────────────────────────
 // A row leads with either a lucide icon or a letter avatar. Sections declare

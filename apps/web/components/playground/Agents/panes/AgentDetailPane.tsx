@@ -1,5 +1,5 @@
 import { Bot } from "lucide-react";
-import PaneEmptyState from "@/components/playground/core/components/PaneEmptyState";
+import PaneEmptyState from "@/components/playground/Core/components/PaneEmptyState";
 
 /** Placeholder detail view for a selected agent (keyed by its id). */
 export default function AgentDetailPane({ id }: { id: string }) {

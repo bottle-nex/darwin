@@ -1,12 +1,12 @@
 "use client";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
-import { RailSurface } from "../iconrail/railSurface";
-import HomeDisplay from "../home/panes/HomeDisplay";
-import ProjectsDisplay from "../projects/panes/ProjectsDisplay";
-import PullRequestsDisplay from "../pullrequests/panes/PullRequestsDisplay";
-import AgentsDisplay from "../agents/panes/AgentsDisplay";
-import WorkersDisplay from "../workers/panes/WorkersDisplay";
-import MoreDisplay from "../more/panes/MoreDisplay";
+import { RailSurface } from "../IconRail/railSurface";
+import HomeDisplay from "../Home/panes/HomeDisplay";
+import ProjectsDisplay from "../Projects/panes/ProjectsDisplay";
+import PullRequestsDisplay from "../PullRequests/panes/PullRequestsDisplay";
+import AgentsDisplay from "../Agents/panes/AgentsDisplay";
+import WorkersDisplay from "../Workers/panes/WorkersDisplay";
+import MoreDisplay from "../More/panes/MoreDisplay";
 
 /** Picks the active surface's main pane. */
 function SurfacePane({ surface }: { surface: RailSurface }) {

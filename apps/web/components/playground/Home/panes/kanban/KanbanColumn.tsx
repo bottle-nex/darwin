@@ -1,14 +1,10 @@
 "use client";
 import { MoreHorizontal } from "lucide-react";
 import { useDroppable } from "@dnd-kit/core";
-import {
-    rectSortingStrategy,
-    SortableContext,
-    verticalListSortingStrategy,
-} from "@dnd-kit/sortable";
 import { cn } from "@/lib/utils";
 import type { Issue, KanbanColumnDef } from "./types";
-import SortableIssue from "./SortableIssue";
+import CardRenderer from "./cards/CardRenderer";
+import DraggableIssue from "./DraggableIssue";
 
 type KanbanColumnProps = {
     column: KanbanColumnDef;
@@ -17,30 +13,36 @@ type KanbanColumnProps = {
     layout?: "list" | "grid";
     /** When focused via the filter, the column stretches to fill the board. */
     fullWidth?: boolean;
+    /** Whether a dragged Custom Kanban card can be dropped here (To Do only). */
+    droppable?: boolean;
+    /** Whether this column's cards can be dragged out to the Custom board (To Do only). */
+    draggableCards?: boolean;
 };
 
 /**
- * Reusable column: a uniform rounded panel with a per-status coloured title box
- * over a scrollable, droppable card area. Cards stack as a list by default, or
- * flow into a grid when the column is focused full-width. The ⋯ button only
- * appears on hover.
+ * Reusable LLM column: a uniform rounded panel with a per-status coloured title
+ * box over a scrollable card area. The agent owns these cards, so they aren't
+ * draggable; only the To Do column is a drop target — for cards dragged in from
+ * the Custom Kanban — and it highlights while a card hovers over it.
  */
 export default function KanbanColumn({
     column,
     issues,
     layout = "list",
     fullWidth = false,
+    droppable = false,
+    draggableCards = false,
 }: KanbanColumnProps) {
-    const { setNodeRef, isOver } = useDroppable({ id: column.status });
+    const { setNodeRef, isOver } = useDroppable({ id: column.status, disabled: !droppable });
     const { icon: Icon, title, titleBox } = column;
     const grid = layout === "grid";
 
     return (
         <div
             className={cn(
-                "group flex min-h-0 flex-col rounded-xl bg-white/2.5 p-2 ring-1 transition-colors",
+                "group flex max-h-full min-h-0 flex-col rounded-xl bg-white/2.5 p-2 ring-1 transition-colors",
                 fullWidth ? "min-w-0 flex-1" : "w-72 shrink-0",
-                isOver ? "ring-white/15" : "ring-white/5",
+                droppable && isOver ? "ring-white/15" : "ring-white/5",
             )}
         >
             <div className="mb-2 flex items-center justify-between gap-2 px-0.5">
@@ -72,14 +74,13 @@ export default function KanbanColumn({
                         : "flex flex-col gap-2",
                 )}
             >
-                <SortableContext
-                    items={issues.map((i) => i.id)}
-                    strategy={grid ? rectSortingStrategy : verticalListSortingStrategy}
-                >
-                    {issues.map((issue) => (
-                        <SortableIssue key={issue.id} issue={issue} />
-                    ))}
-                </SortableContext>
+                {issues.map((issue) =>
+                    draggableCards ? (
+                        <DraggableIssue key={issue.id} issue={issue} />
+                    ) : (
+                        <CardRenderer key={issue.id} issue={issue} />
+                    ),
+                )}
 
                 {issues.length === 0 && (
                     <p

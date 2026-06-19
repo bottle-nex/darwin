@@ -2,11 +2,11 @@
 import { useParams } from "next/navigation";
 import { useGetDashboard } from "@/hooks/dashboard/useGetDashboard";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
-import { RailSurface } from "../../iconrail/railSurface";
+import { RailSurface } from "../../IconRail/railSurface";
 import { ProjectsTab } from "../projectsTabs";
 import ProjectTopbar from "./ProjectTopbar";
 import ProjectOverview from "./ProjectOverview";
-import KanbanMainPane from "../../home/panes/kanban/KanbanMainPane";
+import KanbanMainPane from "../../Home/panes/kanban/KanbanMainPane";
 import GanttPane from "./GanttPane";
 import ProjectSettingsView from "./ProjectSettingsView";
 import TeamDetailPane from "./TeamDetailPane";

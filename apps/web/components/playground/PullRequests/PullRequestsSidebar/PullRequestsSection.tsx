@@ -1,9 +1,9 @@
 "use client";
 
 import { GitPullRequest } from "lucide-react";
-import Row from "../../sidebar/SidebarRow";
-import Section from "../../sidebar/SidebarSection";
-import { matchesQuery, type SidebarNavRow, type SidebarSectionProps } from "../../sidebar/shared";
+import Row from "../../Sidebar/SidebarRow";
+import Section from "../../Sidebar/SidebarSection";
+import { matchesQuery, type SidebarNavRow, type SidebarSectionProps } from "../../Sidebar/shared";
 
 // PRs agents have opened from workers back to the connected repos.
 const PULL_REQUESTS: { id: string; title: string; repo: string }[] = [

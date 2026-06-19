@@ -2,7 +2,7 @@
 import { Trash2, X } from "lucide-react";
 import type { ProjectTeam } from "@/types/project";
 import { useDeleteTeamStore } from "@/store/team/useDeleteTeamStore";
-import PlaygroundAvatar from "@/components/playground/core/components/PlaygroundAvatar";
+import PlaygroundAvatar from "@/components/playground/Core/components/PlaygroundAvatar";
 import PlaygroundTeamStats, { StatType } from "./TeamStats";
 import PlaygroundTeamMembers from "./TeamMembers";
 import { useState } from "react";

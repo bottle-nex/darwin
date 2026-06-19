@@ -11,6 +11,19 @@ import {
 /** All board statuses in display order. */
 export const STATUSES = Object.values(KanbanStatus);
 
+/**
+ * LLM columns that bridge with the Custom Kanban: their cards can be dragged out
+ * to a custom column, and a custom card can be dropped in. Every other LLM
+ * column stays locked. To bridge another column, add its status here — the
+ * board view, the drag logic, and the To Do intake all read from this list.
+ */
+export const BRIDGE_STATUSES: KanbanStatus[] = [KanbanStatus.Todo];
+
+/** Whether a status is a Custom-Kanban bridge column. */
+export function isBridgeStatus(status: string): status is KanbanStatus {
+    return (BRIDGE_STATUSES as string[]).includes(status);
+}
+
 /** Column headers in board order. Only `titleBox` is per-status coloured. */
 export const COLUMNS: KanbanColumnDef[] = [
     {

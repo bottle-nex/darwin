@@ -1,24 +1,23 @@
 "use client";
 import { MessageSquare } from "lucide-react";
 import { cn } from "@/lib/utils";
-import PlaygroundAvatar from "@/components/playground/core/components/PlaygroundAvatar";
+import PlaygroundAvatar from "@/components/playground/Core/components/PlaygroundAvatar";
 import { COLUMNS, PRIORITY_DOT } from "./data";
 import type { BoardState, Issue } from "./types";
-import type { FilterValue } from "./useKanbanOptions";
 import AgentChip from "./cards/AgentChip";
 
 type KanbanListViewProps = {
     board: BoardState;
-    filter: FilterValue;
 };
 
 /**
- * List view: the same issues grouped by status as compact rows. Shares the
- * board's (filtered) state, so search/label filters and reorders are reflected
- * here too; the focus filter narrows it to a single status group.
+ * List view: the LLM issues grouped by status as compact rows. Shares the
+ * board's (filtered) state, so search/label filters are reflected here too.
+ * Single-column focus is handled by `KanbanMainPane` (it renders the board grid
+ * instead), so the list always shows every status group.
  */
-export default function KanbanListView({ board, filter }: KanbanListViewProps) {
-    const groups = filter === "default" ? COLUMNS : COLUMNS.filter((c) => c.status === filter);
+export default function KanbanListView({ board }: KanbanListViewProps) {
+    const groups = COLUMNS;
 
     return (
         <div className="min-h-0 flex-1 overflow-y-auto px-3 py-3">

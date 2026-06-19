@@ -1,11 +1,11 @@
-import { RailSurface } from "../iconrail/railSurface";
-import { rows as primaryNavRows } from "../home/homesidebar/PrimaryNavSection";
-import { rows as myWorkRows } from "../home/homesidebar/MyWorkSection";
-import { rows as projectRows } from "../projects/projectsidebar/ProjectsSection";
-import { rows as teamRows } from "../projects/projectsidebar/TeamsSection";
-import { rows as agentRows } from "../agents/agentsidebar/AgentsSection";
-import { rows as pullRequestRows } from "../pullrequests/PullRequestsSidebar/PullRequestsSection";
-import { rows as workerRows } from "../workers/WorkersSidebar/WorkersSection";
+import { RailSurface } from "../IconRail/railSurface";
+import { rows as primaryNavRows } from "../Home/HomeSidebar/PrimaryNavSection";
+import { rows as myWorkRows } from "../Home/HomeSidebar/MyWorkSection";
+import { rows as projectRows } from "../Projects/projectsidebar/ProjectsSection";
+import { rows as teamRows } from "../Projects/projectsidebar/TeamsSection";
+import { rows as agentRows } from "../Agents/agentsidebar/AgentsSection";
+import { rows as pullRequestRows } from "../PullRequests/PullRequestsSidebar/PullRequestsSection";
+import { rows as workerRows } from "../Workers/WorkersSidebar/WorkersSection";
 import { matchesQuery, type SidebarNavRow } from "./shared";
 
 /** Header label shown for each surface. */

@@ -1,11 +1,11 @@
 import { create } from "zustand";
-import { RailSurface } from "@/components/playground/iconrail/railSurface";
-import { HOME_DEFAULT_TAB } from "@/components/playground/home/homeTabs";
-import { PROJECTS_DEFAULT_TAB } from "@/components/playground/projects/projectsTabs";
-import { PULL_REQUESTS_DEFAULT_TAB } from "@/components/playground/pullrequests/pullRequestsTabs";
-import { AGENTS_DEFAULT_TAB } from "@/components/playground/agents/agentsTabs";
-import { WORKERS_DEFAULT_TAB } from "@/components/playground/workers/workersTabs";
-import { MORE_DEFAULT_TAB } from "@/components/playground/more/moreTabs";
+import { RailSurface } from "@/components/playground/IconRail/railSurface";
+import { HOME_DEFAULT_TAB } from "@/components/playground/Home/homeTabs";
+import { PROJECTS_DEFAULT_TAB } from "@/components/playground/Projects/projectsTabs";
+import { PULL_REQUESTS_DEFAULT_TAB } from "@/components/playground/PullRequests/pullRequestsTabs";
+import { AGENTS_DEFAULT_TAB } from "@/components/playground/Agents/agentsTabs";
+import { WORKERS_DEFAULT_TAB } from "@/components/playground/Workers/workersTabs";
+import { MORE_DEFAULT_TAB } from "@/components/playground/More/moreTabs";
 import type { ProjectTeam } from "@/types/project";
 
 /** Default landing tab for each surface, used on first load and on reset. */

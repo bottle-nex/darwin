@@ -180,6 +180,7 @@ export default function SigninModal({ callbackUrl = "/" }: SigninModalProps) {
                                 type="email"
                                 placeholder="youremail@example.com"
                                 value={email}
+                                className="bg-neutral-100 shadow-[inset_0_2px_0_0_#F0F0F0] hover:bg-neutral-200/60 transition-colors transform duration-150"
                                 onChange={(e) => setEmail(e.target.value)}
                                 onKeyDown={(e) => e.key === "Enter" && handleSendOtp()}
                             />

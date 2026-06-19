@@ -1,5 +1,5 @@
 import { FileCheck } from "lucide-react";
-import PaneEmptyState from "@/components/playground/core/components/PaneEmptyState";
+import PaneEmptyState from "@/components/playground/Core/components/PaneEmptyState";
 
 export default function ReviewsMainPane() {
     return (

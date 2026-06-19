@@ -3,14 +3,14 @@ import { useState } from "react";
 import { BriefcaseBusiness, ChevronRight, Plus, Trash2 } from "lucide-react";
 import { useParams } from "next/navigation";
 import { cn } from "@/lib/utils";
-import Row from "../../sidebar/SidebarRow";
-import { rowLeading } from "../../sidebar/shared";
+import Row from "../../Sidebar/SidebarRow";
+import { rowLeading } from "../../Sidebar/shared";
 import { useGetDashboard } from "@/hooks/dashboard/useGetDashboard";
 import { useGetProject } from "@/hooks/project/useGetProject";
 import { useNewTeamStore } from "@/store/team/useNewTeamStore";
 import { useDeleteTeamStore } from "@/store/team/useDeleteTeamStore";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
-import { RailSurface } from "../../iconrail/railSurface";
+import { RailSurface } from "../../IconRail/railSurface";
 import { PROJECT_TAB_LABELS, ProjectsTab } from "../projectsTabs";
 
 /**
