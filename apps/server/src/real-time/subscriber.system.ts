@@ -9,6 +9,7 @@ export default class SubscriberSystem extends PubSubSystem {
         return this.redis.unsubscribe(this.get_channel_name(project_id));
     }
 
+    // eslint-disable-next-line no-unused-vars
     public on_message(handler: (project_id: string, message: string) => void) {
         this.redis.on("message", (channel: string, message: string) => {
             handler(this.get_project_id(channel), message);
