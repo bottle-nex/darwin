@@ -9,12 +9,25 @@ import {
     useSensors,
 } from "@dnd-kit/core";
 import { arrayMove } from "@dnd-kit/sortable";
+import { toast } from "sonner";
 import { isBridgeStatus } from "../data";
-import type { KanbanStatus, Issue } from "../types";
+import type { KanbanStatus, Issue, Priority } from "../types";
+import { useCreateColumn } from "@/hooks/issues/useCreateColumn";
+import { useCreateIssue } from "@/hooks/issues/useCreateIssue";
 import { INITIAL_CUSTOM_COLUMNS } from "./data";
 import type { CustomCard, CustomColumn, NewCardInput } from "./types";
 
+/** Frontend priority labels → the backend's numeric scale (1=Urgent … 4=Low). */
+const PRIORITY_TO_NUMBER: Record<Priority, 1 | 2 | 3 | 4> = {
+    urgent: 1,
+    high: 2,
+    normal: 3,
+    low: 4,
+};
+
 type UseCustomKanbanArgs = {
+    /** The project these columns/issues belong to. Creation is disabled until it resolves. */
+    projectId: string | undefined;
     /** File a custom card into an LLM bridge column when dropped over it. */
     onSendToBoard: (status: KanbanStatus, card: CustomCard) => void;
     /** Read a bridge-column issue being dragged in (to render / convert it). */
@@ -38,38 +51,68 @@ export type CustomKanbanApi = ReturnType<typeof useCustomKanban>;
  * whether the drop target is a custom column or not. Kept local like the LLM
  * board's state — no work-item backend yet, so a refresh resets it.
  */
-export function useCustomKanban({ onSendToBoard, getIssue, removeIssue }: UseCustomKanbanArgs) {
+export function useCustomKanban({
+    projectId,
+    onSendToBoard,
+    getIssue,
+    removeIssue,
+}: UseCustomKanbanArgs) {
     const [columns, setColumns] = useState<CustomColumn[]>(INITIAL_CUSTOM_COLUMNS);
     const [activeItem, setActiveItem] = useState<ActiveItem | null>(null);
+
+    const createColumn = useCreateColumn();
+    const createIssue = useCreateIssue();
 
     // A small drag threshold so clicking a card doesn't start a drag.
     const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
 
-    const addColumn = (title: string) => {
+    // Persist the column first, then add it locally using the server's id — that
+    // id is what cards created in this column send back as `custom_column_id`.
+    const addColumn = async (title: string) => {
         const name = title.trim();
-        if (!name) return;
-        setColumns((prev) => [...prev, { id: crypto.randomUUID(), title: name, cards: [] }]);
+        if (!name || !projectId) return;
+        try {
+            const column = await createColumn.mutateAsync({ project_id: projectId, label: name });
+            setColumns((prev) => [...prev, { id: column.id, title: column.label, cards: [] }]);
+        } catch {
+            toast.error("Couldn't create the list.");
+        }
     };
 
     const removeColumn = (columnId: string) => {
         setColumns((prev) => prev.filter((col) => col.id !== columnId));
     };
 
-    const addCard = (columnId: string, input: NewCardInput) => {
+    // A card is a real Issue filed into this custom column. Persist it, then mirror
+    // it into local state keyed by the server's issue id.
+    const addCard = async (columnId: string, input: NewCardInput) => {
         const title = input.title.trim();
-        if (!title) return;
-        const card: CustomCard = {
-            id: crypto.randomUUID(),
-            title,
-            description: input.description.trim() || undefined,
-            label: input.label,
-            priority: input.priority,
-        };
-        setColumns((prev) =>
-            prev.map((col) =>
-                col.id === columnId ? { ...col, cards: [...col.cards, card] } : col,
-            ),
-        );
+        if (!title || !projectId) return;
+        const description = input.description.trim();
+        try {
+            const created = await createIssue.mutateAsync({
+                project_id: projectId,
+                title,
+                description,
+                priority: PRIORITY_TO_NUMBER[input.priority],
+                label: input.label,
+                custom_column_id: columnId,
+            });
+            const card: CustomCard = {
+                id: created.issue_id,
+                title,
+                description: description || undefined,
+                label: input.label,
+                priority: input.priority,
+            };
+            setColumns((prev) =>
+                prev.map((col) =>
+                    col.id === columnId ? { ...col, cards: [...col.cards, card] } : col,
+                ),
+            );
+        } catch {
+            toast.error("Couldn't create the card.");
+        }
     };
 
     /** Locate a card (and the column holding it) by id. */

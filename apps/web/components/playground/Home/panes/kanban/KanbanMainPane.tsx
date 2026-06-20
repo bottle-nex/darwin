@@ -1,6 +1,8 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
+import { useParams } from "next/navigation";
 import { closestCorners, DndContext, DragOverlay } from "@dnd-kit/core";
+import { useGetDashboard } from "@/hooks/dashboard/useGetDashboard";
 import { COLUMNS, filterBoard, isBridgeStatus } from "./data";
 import type { BoardView, KanbanView } from "./types";
 import { useKanbanBoard } from "./useKanbanBoard";
@@ -28,9 +30,14 @@ import CardRenderer from "./cards/CardRenderer";
  * card can cross from one board to the other.
  */
 export default function KanbanMainPane() {
+    const { orgSlug, projectSlug } = useParams<{ orgSlug: string; projectSlug?: string }>();
+    const { data: dashboard } = useGetDashboard(orgSlug);
+    const activeProject = dashboard?.projects.find((p) => p.slug === projectSlug);
+
     const kanban = useKanbanBoard();
     const options = useKanbanOptions();
     const custom = useCustomKanban({
+        projectId: activeProject?.id,
         onSendToBoard: kanban.addIssue,
         getIssue: kanban.findIssue,
         removeIssue: kanban.removeIssue,

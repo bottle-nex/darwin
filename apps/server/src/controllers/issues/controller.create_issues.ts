@@ -14,6 +14,7 @@ export default class IssueCreateController {
         description: z.string(),
         priority: z.number().int().min(1).max(4).optional(),
         label: z.string().optional(),
+        custom_column_id: z.string().optional(),
     });
 
     static async process(req: Request, res: Response) {
@@ -38,6 +39,21 @@ export default class IssueCreateController {
                 return;
             }
 
+            // If the issue is being filed into a custom column, that column must belong to this same project
+            if (parsed_body.data.custom_column_id) {
+                const column = await prisma.customColumn.findFirst({
+                    where: {
+                        id: parsed_body.data.custom_column_id,
+                        projectId: parsed_body.data.project_id,
+                    },
+                    select: { id: true },
+                });
+                if (!column) {
+                    ResponseWriter.invalid_data(res, "Column not found in this project");
+                    return;
+                }
+            }
+
             let issue: { id: string } | undefined;
             for (let attempt = 0; attempt < 5; attempt++) {
                 try {
@@ -56,6 +72,7 @@ export default class IssueCreateController {
                                 label: parsed_body.data.label,
                                 projectId: parsed_body.data.project_id,
                                 createdById: user.id,
+                                customColumnId: parsed_body.data.custom_column_id,
                                 number: (last_issue?.number ?? 0) + 1,
                             },
                             select: { id: true },

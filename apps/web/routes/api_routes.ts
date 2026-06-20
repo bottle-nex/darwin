@@ -53,6 +53,7 @@ export const GITHUB_REPOS = (orgId: string) => `${GITHUB_URL}/installations/${or
 // <--------------------- ISSUE ROUTES --------------------->
 export const ISSUES_URL = API_URL + "/issues";
 export const CREATE_ISSUE_URL = ISSUES_URL + "/create";
+export const CREATE_COLUMN_URL = ISSUES_URL + "/columns";
 
 // <--------------------- INVITATAION ROUTES --------------------->
 export const INVITATIONS_URL = API_URL + "/invitations";

@@ -10,6 +10,8 @@ export interface CreateIssueInput {
     description: string;
     priority?: 1 | 2 | 3 | 4;
     label?: string;
+    /** Set to file the issue into a custom column; omit for the To-Do lane. */
+    custom_column_id?: string;
 }
 
 interface CreatedIssue {

@@ -22,6 +22,7 @@ const Action = {
         triage_issue: "triage_issue",
         close_issue: "close_issue",
         assign_issue: "assign_issue",
+        manage_columns: "manage_columns",
         manage_tags: "manage_tags",
         trigger_runner: "trigger_runner",
         cancel_runner: "cancel_runner",
