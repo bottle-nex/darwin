@@ -80,8 +80,14 @@ export default class IssueCreateController {
             const channel_name = server_services.publisher.get_channel_name(
                 parsed_body.data.project_id,
             );
-            const publishing_body = { type: OutboundSocketMessageType.ISSUE_CREATED, data: { issue_id: issue.id, }, }
-            await server_services.publisher.publish_message(channel_name, JSON.stringify(publishing_body))
+            const publishing_body = {
+                type: OutboundSocketMessageType.ISSUE_CREATED,
+                data: { issue_id: issue.id },
+            };
+            await server_services.publisher.publish_message(
+                channel_name,
+                JSON.stringify(publishing_body),
+            );
 
             ResponseWriter.created(res, { issue_id: issue.id }, "Issue created successfully");
         } catch (err) {
