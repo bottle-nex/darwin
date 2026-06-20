@@ -17,8 +17,7 @@ export default class SocketServer {
     }
 
     private start_listening() {
-        this.subscriber_system.redis.on("message", (channel: string, message: string) => {
-            const project_id = channel.split(":")[1];
+        this.subscriber_system.on_message((project_id, message) => {
             this.broadcast_message(project_id, message);
         });
     }
@@ -33,7 +32,7 @@ export default class SocketServer {
             if (!connections) {
                 connections = new Set();
                 this.project_connections.set(project_id, connections);
-                this.subscriber_system.redis.subscribe(`project:${project_id}`);
+                this.subscriber_system.subscribe(project_id);
             }
             connections.add(ws);
             this.add_listeners(ws, project_id);
@@ -74,7 +73,7 @@ export default class SocketServer {
             connections.delete(ws);
             if (connections.size === 0) {
                 this.project_connections.delete(project_id);
-                this.subscriber_system.redis.unsubscribe(`project:${project_id}`);
+                this.subscriber_system.unsubscribe(project_id);
             }
         }
     }

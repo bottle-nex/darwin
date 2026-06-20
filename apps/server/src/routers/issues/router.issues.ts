@@ -1,6 +1,6 @@
 import { Router } from "express";
-import IssueCreateController from "../../controllers/issues/controller.create_issues";
 import { require_auth } from "../../middlewares/middleware.auth";
+import IssueCreateController from "../../controllers/issues/controller.create_issues";
 
 const issues_router: Router = Router();
 

@@ -4,13 +4,15 @@ import ResponseWriter from "../../services/service.response";
 import Access from "../../access-control/access";
 import { Action, Permissions } from "@trymatcha/access-control";
 import { Prisma, prisma } from "@trymatcha/database";
+import { server_services } from "../..";
+import { OutboundSocketMessageType } from "@trymatcha/types";
 
 export default class IssueCreateController {
     static body_schema = z.object({
         project_id: z.string().min(1),
         title: z.string().min(1).max(200),
         description: z.string(),
-        priority: z.number().int().min(1).max(4).optional(), // 1=Urgent 2=High 3=Normal 4=Low
+        priority: z.number().int().min(1).max(4).optional(),
         label: z.string().optional(),
     });
 
@@ -75,6 +77,11 @@ export default class IssueCreateController {
                 ResponseWriter.system_error(res);
                 return;
             }
+            const channel_name = server_services.publisher.get_channel_name(
+                parsed_body.data.project_id,
+            );
+            const publishing_body = { type: OutboundSocketMessageType.ISSUE_CREATED, data: { issue_id: issue.id, }, }
+            await server_services.publisher.publish_message(channel_name, JSON.stringify(publishing_body))
 
             ResponseWriter.created(res, { issue_id: issue.id }, "Issue created successfully");
         } catch (err) {
