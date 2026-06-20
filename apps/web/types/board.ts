@@ -1,18 +1,13 @@
+import type { IssueStatus } from "@trymatcha/types";
+
 /**
  * Shapes returned by `GET /issues/board/:project_id`. These mirror the server's
  * Prisma rows verbatim — raw, un-mapped. The kanban layer converts a `BoardIssue`
  * into its display card (priority number → label, status → KanbanStatus, etc.).
  */
 
-/** The server's IssueStatus enum, as it arrives over JSON (PascalCase strings). */
-export type ServerIssueStatus =
-    | "Todo"
-    | "Queued"
-    | "InProgress"
-    | "InReview"
-    | "Done"
-    | "Failed"
-    | "Cancelled";
+/** The server's IssueStatus enum, as it arrives over JSON (the shared enum). */
+export type ServerIssueStatus = IssueStatus;
 
 /** A user on an issue. `name`/`image` are nullable on the User model. */
 export type BoardAssignee = {

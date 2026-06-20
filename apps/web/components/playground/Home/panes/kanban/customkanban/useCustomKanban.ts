@@ -309,7 +309,8 @@ export function useCustomKanban({
         const fromCustom = findCard(activeId);
         const toCustomColumn = columnIdOf(overId);
 
-        // A bridge-column issue dragged onto a custom column lands as a new card.
+        // A bridge-lane issue (a real server issue) dragged onto a custom column.
+        // Keep its real id and persist the move into that column.
         if (!fromCustom) {
             const issue = getIssue(activeId);
             if (!toCustomColumn || !issue) return;
@@ -317,14 +318,19 @@ export function useCustomKanban({
             insertCard(
                 toCustomColumn,
                 {
-                    id: crypto.randomUUID(),
+                    id: activeId,
                     title: issue.title,
                     label: issue.label?.name,
                     priority: issue.priority,
-                    assignees: [],
+                    assignees: issue.assignees.map((a) => ({
+                        id: a.id,
+                        name: a.name,
+                        image: null,
+                    })),
                 },
                 overId,
             );
+            persistMove(activeId, toCustomColumn);
             return;
         }
 

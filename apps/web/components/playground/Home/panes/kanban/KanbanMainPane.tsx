@@ -36,7 +36,7 @@ export default function KanbanMainPane() {
     const activeProject = dashboard?.projects.find((p) => p.slug === projectSlug);
 
     const { data: board } = useBoard(activeProject?.id);
-    const kanban = useKanbanBoard();
+    const kanban = useKanbanBoard({ board, projectName: activeProject?.name ?? "" });
     const options = useKanbanOptions();
     const custom = useCustomKanban({
         projectId: activeProject?.id,

@@ -35,3 +35,14 @@ export const Chunk = {
     Block: "Block",
 } as const;
 export type Chunk = (typeof Chunk)[keyof typeof Chunk];
+
+export const IssueStatus = {
+    Todo: "Todo",
+    Queued: "Queued",
+    InProgress: "InProgress",
+    InReview: "InReview",
+    Done: "Done",
+    Failed: "Failed",
+    Cancelled: "Cancelled",
+} as const;
+export type IssueStatus = (typeof IssueStatus)[keyof typeof IssueStatus];

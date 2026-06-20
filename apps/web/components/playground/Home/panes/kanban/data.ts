@@ -1,4 +1,11 @@
-import { MdIncompleteCircle, MdAutorenew, MdCheckCircle } from "react-icons/md";
+import {
+    MdIncompleteCircle,
+    MdAutorenew,
+    MdCheckCircle,
+    MdSchedule,
+    MdErrorOutline,
+    MdBlock,
+} from "react-icons/md";
 import { FaCodePullRequest } from "react-icons/fa6";
 import {
     KanbanStatus,
@@ -34,6 +41,12 @@ export const COLUMNS: KanbanColumnDef[] = [
         titleBox: "bg-neutral-500/15 text-neutral-200",
     },
     {
+        status: KanbanStatus.Queued,
+        title: "Queued",
+        icon: MdSchedule,
+        titleBox: "bg-sky-500/15 text-sky-200",
+    },
+    {
         status: KanbanStatus.InProgress,
         title: "In Progress",
         icon: MdAutorenew,
@@ -50,6 +63,18 @@ export const COLUMNS: KanbanColumnDef[] = [
         title: "Done",
         icon: MdCheckCircle,
         titleBox: "bg-emerald-500/15 text-emerald-200",
+    },
+    {
+        status: KanbanStatus.Failed,
+        title: "Failed",
+        icon: MdErrorOutline,
+        titleBox: "bg-rose-500/15 text-rose-200",
+    },
+    {
+        status: KanbanStatus.Cancelled,
+        title: "Cancelled",
+        icon: MdBlock,
+        titleBox: "bg-neutral-600/15 text-neutral-400",
     },
 ];
 
@@ -88,12 +113,13 @@ export function getLabel(name: string): IssueLabel | undefined {
  * Custom Kanban bridge), not from placeholder data. Once the To-Do/stage lanes
  * are hydrated from `GET /issues/board`, seed this from the server instead.
  */
-export const INITIAL_BOARD: BoardState = {
-    [KanbanStatus.Todo]: [],
-    [KanbanStatus.InProgress]: [],
-    [KanbanStatus.InReview]: [],
-    [KanbanStatus.Done]: [],
-};
+/** An empty board with one (empty) lane per status — keyed off `STATUSES` so it
+ *  always matches `KanbanStatus` and can never drift out of sync with it. */
+export function emptyBoard(): BoardState {
+    return Object.fromEntries(STATUSES.map((s) => [s, [] as Issue[]])) as BoardState;
+}
+
+export const INITIAL_BOARD: BoardState = emptyBoard();
 
 /**
  * Apply the active search query and selected labels to every column. An issue
