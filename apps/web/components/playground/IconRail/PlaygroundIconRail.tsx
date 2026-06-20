@@ -20,7 +20,7 @@ export default function PlaygroundIconRail({
 }: PlaygroundIconRailProps) {
     return (
         <nav
-            className="flex w-14 shrink-0 flex-col items-center justify-between rounded-lg bg-charcoal py-1.5 ring-1 ring-white/5"
+            className="flex w-14 shrink-0 flex-col items-center justify-between py-1"
             aria-label="App"
         >
             <div className="flex w-full flex-col items-center">

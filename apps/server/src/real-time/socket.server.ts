@@ -1,6 +1,6 @@
 import { WebSocketServer, WebSocket } from "ws";
 import { IncomingMessage, Server } from "http";
-import SubscriberSystem from "./subscriber.server";
+import SubscriberSystem from "./subscriber.system";
 import { verifySessionJwt } from "../services/service.jwt";
 import { InboundSocketMessageType, type InboundSocketMessage } from "@trymatcha/types";
 

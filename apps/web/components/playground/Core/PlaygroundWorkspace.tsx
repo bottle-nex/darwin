@@ -27,7 +27,7 @@ export default function PlaygroundWorkspace({
                         animate={{ width: SIDEBAR_W }}
                         exit={{ width: 0 }}
                         transition={{ duration: 0.28, ease: [0.4, 0, 0.2, 1] }}
-                        className="h-full shrink-0 overflow-hidden"
+                        className="h-full shrink-0 overflow-hidden bg-[linear-gradient(180deg,#CDBFF233_0%,#9C82E833_50%,#6E4FD133_100%)]"
                     >
                         <PlaygroundSidebar surface={surface} onCollapse={onCollapseSidebar} />
                     </motion.div>

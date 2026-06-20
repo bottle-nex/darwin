@@ -93,7 +93,7 @@ export default function PlaygroundSidebar({ surface, onCollapse }: PlaygroundSid
     return (
         <aside
             data-lenis-prevent
-            className="flex h-full min-h-0 w-60 shrink-0 flex-col border-r border-white/5 bg-charcoal overflow-y-auto"
+            className="flex h-full min-h-0 w-60 shrink-0 flex-col border-r border-white/5 overflow-y-auto"
         >
             <div className="relative flex h-12 items-center px-2">
                 <div className="flex w-full items-center justify-between gap-1">
