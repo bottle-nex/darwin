@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import WebSocketClient from "@/socket/socket.client";
 import { get_socket_client, close_socket_client } from "@/socket/singleton.socket";
 import { type MessageHandler } from "@/socket/socket.client";
@@ -9,6 +9,7 @@ import SessionServices from "@/lib/session";
 export function useWebSocket(project_id: string | undefined) {
     const socket = useRef<WebSocketClient | null>(null);
     const last_project_id = useRef<string | null>(null);
+    const [is_connected, set_is_connected] = useState(false);
 
     useEffect(() => {
         const token = SessionServices.get_token();
@@ -17,11 +18,14 @@ export function useWebSocket(project_id: string | undefined) {
 
         last_project_id.current = project_id;
         socket.current = get_socket_client(project_id, token);
+        socket.current.set_connection_state_handler(set_is_connected);
+        set_is_connected(socket.current.is_connected);
 
         return () => {
             if (last_project_id.current !== project_id) {
                 close_socket_client();
                 socket.current = null;
+                set_is_connected(false);
             }
         };
     }, [project_id]);
@@ -53,8 +57,7 @@ export function useWebSocket(project_id: string | undefined) {
     }
 
     return {
-        socket: socket.current,
-        is_connected: socket.current?.is_connected ?? false,
+        is_connected,
         subscribe,
         unsubscribe,
         send_issue_create,

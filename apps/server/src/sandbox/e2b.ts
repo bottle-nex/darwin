@@ -5,7 +5,6 @@ import SecretService from "../services/service.secret";
 import { prisma } from "@trymatcha/database";
 
 export default class E2B {
-
     public static async run_setup_job(
         session_id: string,
         project_id: string,

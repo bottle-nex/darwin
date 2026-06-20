@@ -5,7 +5,7 @@
     "type": "module",
     "main": "dist/index.js",
     "scripts": {
-        "build": "tsup src/index.ts --bundle --platform=node --format=esm",
+        "build": "tsup src/index.ts --platform=node --format=esm",
         "typecheck": "tsc --noEmit"
     },
     "dependencies": {

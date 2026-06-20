@@ -20,6 +20,7 @@ export default class WebSocketClient {
     private message_queue: InboundSocketMessage[] = [];
     private handlers: Map<OutboundSocketMessageType, MessageHandler[]> = new Map();
     private is_manually_closed: boolean = false;
+    private connection_state_handler?: (connected: boolean) => void;
 
     constructor(url: string) {
         this.url = url;
@@ -36,6 +37,7 @@ export default class WebSocketClient {
             this.is_connected = true;
             this.reconnect_attempts = 0;
             this.reconnect_delay = 1000;
+            this.connection_state_handler?.(true);
             this.flush_message_queue();
         };
 
@@ -50,6 +52,7 @@ export default class WebSocketClient {
 
         this.ws.onclose = (event: CloseEvent) => {
             this.is_connected = false;
+            this.connection_state_handler?.(false);
 
             if (this.reconnect_timeout) {
                 clearTimeout(this.reconnect_timeout);
@@ -157,5 +160,9 @@ export default class WebSocketClient {
             queued_messages: this.message_queue.length,
             is_manually_closed: this.is_manually_closed,
         };
+    }
+
+    public set_connection_state_handler(cb: (connected: boolean) => void) {
+        this.connection_state_handler = cb;
     }
 }

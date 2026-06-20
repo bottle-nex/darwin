@@ -23,7 +23,6 @@ const params_schema = z.object({
     project_id: z.string().nonempty(),
 });
 
-
 export default async function start_setup(req: Request, res: Response) {
     try {
         const parsed_body = body_schema.safeParse(req.body);
@@ -81,7 +80,9 @@ export default async function start_setup(req: Request, res: Response) {
             }),
         ]);
 
-        await Promise.all(envs.map(({ key, value }) => SecretService.set_secret(project_id, key, value)));
+        await Promise.all(
+            envs.map(({ key, value }) => SecretService.set_secret(project_id, key, value)),
+        );
 
         ResponseWriter.created(res, { project: updated_project, session });
 
