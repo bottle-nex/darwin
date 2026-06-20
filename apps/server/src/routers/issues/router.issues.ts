@@ -7,6 +7,8 @@ import IssueDeleteController from "../../controllers/issues/controller.delete_is
 import ColumnCreateController from "../../controllers/issues/controller.create_column";
 import ColumnUpdateController from "../../controllers/issues/controller.update_column";
 import ColumnDeleteController from "../../controllers/issues/controller.delete_column";
+import IssueAssignController from "../../controllers/issues/controller.assign_issue";
+import IssueUnassignController from "../../controllers/issues/controller.unassign_issue";
 
 const issues_router: Router = Router();
 
@@ -19,5 +21,8 @@ issues_router.delete("/columns/:id", require_auth, ColumnDeleteController.proces
 
 issues_router.patch("/:id", require_auth, IssueUpdateController.process);
 issues_router.delete("/:id", require_auth, IssueDeleteController.process);
+
+issues_router.post("/:id/assignees", require_auth, IssueAssignController.process);
+issues_router.delete("/:id/assignees/:user_id", require_auth, IssueUnassignController.process);
 
 export default issues_router;
