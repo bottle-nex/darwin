@@ -2,8 +2,57 @@ import { CommandResult, Sandbox, SnapshotInfo } from "e2b";
 import { ENV } from "../configs/env";
 import GithubService from "../services/service.github";
 import SecretService from "../services/service.secret";
+import { prisma } from "@trymatcha/database";
 
 export default class E2B {
+    public static async run_setup_job(
+        session_id: string,
+        project_id: string,
+        github_repo_url: string,
+        installation_id: number,
+    ) {
+        try {
+            await prisma.setupSession.update({
+                where: { id: session_id },
+                data: { status: "Provisioning" },
+            });
+
+            const sandbox_id = await E2B.create();
+
+            await prisma.setupSession.update({
+                where: { id: session_id },
+                data: { sandboxId: sandbox_id, status: "Cloning" },
+            });
+
+            await E2B.clone_repo(sandbox_id, github_repo_url, installation_id, project_id);
+
+            await prisma.setupSession.update({
+                where: { id: session_id },
+                data: { status: "InstallingDeps" },
+            });
+
+            await E2B.exec_command(sandbox_id, "bun i");
+
+            await prisma.setupSession.update({
+                where: { id: session_id },
+                data: { status: "Ready", finishedAt: new Date() },
+            });
+        } catch (error) {
+            console.error(`[setup] session ${session_id} failed:`, error);
+            try {
+                await prisma.setupSession.update({
+                    where: { id: session_id },
+                    data: {
+                        status: "Failed",
+                        error: error instanceof Error ? error.message : String(error),
+                        finishedAt: new Date(),
+                    },
+                });
+            } catch (e) {
+                console.error(`[setup] failed to mark session as Failed:`, e);
+            }
+        }
+    }
     public static async create(): Promise<string> {
         const sandbox = await Sandbox.create("node-py-claude-template", {
             apiKey: ENV.SERVER_E2B_API_KEY,

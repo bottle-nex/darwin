@@ -13,7 +13,7 @@ type EncryptedPayload = {
 };
 
 export default class SecretService {
-    private static encrypt(plaintext: string): EncryptedPayload {
+    public static encrypt(plaintext: string): EncryptedPayload {
         const iv = randomBytes(IV_LENGTH);
         const cipher = createCipheriv(ALGORITHM, KEY, iv);
 
@@ -27,7 +27,7 @@ export default class SecretService {
         };
     }
 
-    private static decrypt({ ciphertext, iv, authTag }: EncryptedPayload): string {
+    public static decrypt({ ciphertext, iv, authTag }: EncryptedPayload): string {
         const decipher = createDecipheriv(ALGORITHM, KEY, Buffer.from(iv, "base64"));
         decipher.setAuthTag(Buffer.from(authTag, "base64"));
 
