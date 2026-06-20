@@ -48,7 +48,7 @@ export default function FilterPanel({ value, onChange, customColumns }: FilterPa
             </TooltipComponent>
             <DropdownMenu.Portal>
                 <DropdownMenu.Content
-                    align="end"
+                    align="start"
                     sideOffset={6}
                     className={`w-48 [direction:ltr] ${PANEL_CONTENT}`}
                 >
