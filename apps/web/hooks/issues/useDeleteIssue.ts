@@ -1,28 +1,19 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/lib/axios";
-import { CREATE_ISSUE_URL } from "@/routes/api_routes";
+import { ISSUE_URL } from "@/routes/api_routes";
 import { BOARD_QUERY_KEY } from "@/hooks/issues/useBoard";
 import type { ApiResponse } from "@/types/api";
 
-export interface CreateIssueInput {
+export interface DeleteIssueInput {
+    id: string;
     project_id: string;
-    title: string;
-    description: string;
-    priority?: 1 | 2 | 3 | 4;
-    label?: string;
-    /** Set to file the issue into a custom column; omit for the To-Do lane. */
-    custom_column_id?: string;
 }
 
-interface CreatedIssue {
-    issue_id: string;
-}
-
-export function useCreateIssue() {
+export function useDeleteIssue() {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: async (input: CreateIssueInput) => {
-            const res = await apiClient.post<ApiResponse<CreatedIssue>>(CREATE_ISSUE_URL, input);
+        mutationFn: async ({ id }: DeleteIssueInput) => {
+            const res = await apiClient.delete<ApiResponse<{ ok: boolean }>>(ISSUE_URL(id));
             return res.data.data;
         },
         onSuccess: (_data, variables) => {

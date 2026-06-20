@@ -15,7 +15,8 @@ export default class RemoveMembersController {
     static async process(req: Request, res: Response) {
         const parsed = body_schema.safeParse(req.body);
         if (!parsed.success) {
-            return ResponseWriter.invalid_data(res, "invalid_data");
+            ResponseWriter.invalid_data(res, "invalid_data");
+            return;
         }
 
         try {
@@ -23,45 +24,65 @@ export default class RemoveMembersController {
             const requested_ids = [...new Set(userIds)];
 
             if (teamId) {
-                // Validate the team belongs to the org so a team from another org
-                // can't be targeted, then drop only this team's membership.
                 const team = await prisma.team.findFirst({
-                    where: { id: teamId, project: { orgId } },
-                    select: { id: true, projectId: true },
+                    where: {
+                        id: teamId,
+                        project: {
+                            orgId,
+                        },
+                    },
+                    select: {
+                        id: true,
+                        projectId: true,
+                    },
                 });
                 if (!team) {
-                    return ResponseWriter.not_found(res, "team not found in this organization");
+                    ResponseWriter.not_found(res, "team not found in this organization");
+                    return;
                 }
 
-                // Removing members is project-level management — project Admins only.
                 const role = await Access.project(req.user.id, team.projectId);
                 if (!role || !Permissions.project(role, Action.project.manage_team)) {
-                    return ResponseWriter.not_authorized(res, "insufficient permissions", 403);
+                    ResponseWriter.not_authorized(res, "insufficient permissions", 403);
+                    return;
                 }
 
                 await prisma.teamMember.deleteMany({
                     where: { teamId, userId: { in: requested_ids } },
                 });
             } else {
-                // Org-level removal needs the org remove_member permission.
                 const role = await Access.org(req.user.id, orgId);
                 if (!role || !Permissions.org(role, Action.org.remove_member)) {
-                    return ResponseWriter.not_authorized(res, "insufficient permissions", 403);
+                    ResponseWriter.not_authorized(res, "insufficient permissions", 403);
+                    return;
                 }
 
-                // Drop org membership AND every team membership in this org (no FK
-                // cascade exists between OrgMember and TeamMember).
                 await prisma.$transaction([
                     prisma.teamMember.deleteMany({
-                        where: { userId: { in: requested_ids }, team: { project: { orgId } } },
+                        where: {
+                            userId: {
+                                in: requested_ids,
+                            },
+                            team: {
+                                project: {
+                                    orgId,
+                                },
+                            },
+                        },
                     }),
                     prisma.orgMember.deleteMany({
-                        where: { orgId, userId: { in: requested_ids } },
+                        where: {
+                            orgId,
+                            userId: {
+                                in: requested_ids,
+                            },
+                        },
                     }),
                 ]);
             }
 
-            return ResponseWriter.success(res, { removed: requested_ids }, "members removed");
+            ResponseWriter.success(res, { removed: requested_ids }, "members removed");
+            return;
         } catch (error) {
             console.error("error in RemoveMembersController", error);
             ResponseWriter.system_error(res);

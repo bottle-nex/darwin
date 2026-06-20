@@ -54,6 +54,12 @@ export const GITHUB_REPOS = (orgId: string) => `${GITHUB_URL}/installations/${or
 export const ISSUES_URL = API_URL + "/issues";
 export const CREATE_ISSUE_URL = ISSUES_URL + "/create";
 export const CREATE_COLUMN_URL = ISSUES_URL + "/columns";
+export const BOARD_URL = (project_id: string) => `${ISSUES_URL}/board/${project_id}`;
+export const ISSUE_URL = (id: string) => `${ISSUES_URL}/${id}`;
+export const COLUMN_URL = (id: string) => `${ISSUES_URL}/columns/${id}`;
+export const ASSIGN_ISSUE_URL = (id: string) => `${ISSUES_URL}/${id}/assignees`;
+export const UNASSIGN_ISSUE_URL = (id: string, userId: string) =>
+    `${ISSUES_URL}/${id}/assignees/${userId}`;
 
 // <--------------------- INVITATAION ROUTES --------------------->
 export const INVITATIONS_URL = API_URL + "/invitations";

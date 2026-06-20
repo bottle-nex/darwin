@@ -1,19 +1,26 @@
 "use client";
 import { useState } from "react";
-import { MdMoreHoriz, MdAdd, MdDelete } from "react-icons/md";
+import { MdMoreHoriz, MdAdd, MdDelete, MdEdit } from "react-icons/md";
 import { DropdownMenu } from "radix-ui";
 import { useDroppable } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { cn } from "@/lib/utils";
+import { Input } from "@/components/ui/input";
 import { PANEL_CONTENT, PANEL_ITEM } from "../KanbanOptionPanels/panelStyles";
 import AddCardModal from "./AddCardModal";
 import SortableCustomCard from "./SortableCustomCard";
-import type { CustomColumn, NewCardInput } from "./types";
+import type { CustomCard, CustomColumn, NewCardInput } from "./types";
 
 type CustomKanbanColumnProps = {
     column: CustomColumn;
     onAddCard: (input: NewCardInput) => void;
     onDelete: () => void;
+    onRename: (label: string) => void;
+    onEditCard: (cardId: string, input: NewCardInput) => void;
+    onDeleteCard: (cardId: string) => void;
+    projectId?: string;
+    onAssign: (cardId: string, userId: string) => void;
+    onUnassign: (cardId: string, userId: string) => void;
 };
 
 /**
@@ -26,9 +33,24 @@ export default function CustomKanbanColumn({
     column,
     onAddCard,
     onDelete,
+    onRename,
+    onEditCard,
+    onDeleteCard,
+    projectId,
+    onAssign,
+    onUnassign,
 }: CustomKanbanColumnProps) {
     const [adding, setAdding] = useState(false);
+    const [editingCard, setEditingCard] = useState<CustomCard | null>(null);
+    const [renaming, setRenaming] = useState(false);
+    const [draftTitle, setDraftTitle] = useState(column.title);
     const { setNodeRef, isOver } = useDroppable({ id: column.id });
+
+    const commitRename = () => {
+        const next = draftTitle.trim();
+        if (next && next !== column.title) onRename(next);
+        setRenaming(false);
+    };
 
     return (
         <div
@@ -38,12 +60,31 @@ export default function CustomKanbanColumn({
             )}
         >
             <div className="mb-2 flex items-center justify-between gap-2 px-0.5">
-                <div className="flex items-center gap-1.5 rounded-md px-2 py-1 text-[12px] font-semibold text-neutral-200">
-                    <span>{column.title}</span>
-                    <span className="text-[11px] font-medium opacity-60">
-                        {column.cards.length}
-                    </span>
-                </div>
+                {renaming ? (
+                    <Input
+                        autoFocus
+                        value={draftTitle}
+                        onChange={(e) => setDraftTitle(e.target.value)}
+                        onBlur={commitRename}
+                        onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                                e.preventDefault();
+                                commitRename();
+                            } else if (e.key === "Escape") {
+                                setDraftTitle(column.title);
+                                setRenaming(false);
+                            }
+                        }}
+                        className="h-7 text-[12px]"
+                    />
+                ) : (
+                    <div className="flex items-center gap-1.5 rounded-md px-2 py-1 text-[12px] font-semibold text-neutral-200">
+                        <span>{column.title}</span>
+                        <span className="text-[11px] font-medium opacity-60">
+                            {column.cards.length}
+                        </span>
+                    </div>
+                )}
                 <DropdownMenu.Root>
                     <DropdownMenu.Trigger asChild>
                         <button
@@ -60,6 +101,16 @@ export default function CustomKanbanColumn({
                             sideOffset={6}
                             className={`w-44 ${PANEL_CONTENT}`}
                         >
+                            <DropdownMenu.Item
+                                onSelect={() => {
+                                    setDraftTitle(column.title);
+                                    setRenaming(true);
+                                }}
+                                className={PANEL_ITEM}
+                            >
+                                <MdEdit className="size-3.5" aria-hidden />
+                                <span className="flex-1">Rename list</span>
+                            </DropdownMenu.Item>
                             <DropdownMenu.Item
                                 onSelect={onDelete}
                                 className={`${PANEL_ITEM} text-rose-300 data-highlighted:text-rose-200`}
@@ -81,7 +132,15 @@ export default function CustomKanbanColumn({
                     className="flex min-h-10 flex-col gap-2 overflow-y-auto rounded-lg p-0.5"
                 >
                     {column.cards.map((card) => (
-                        <SortableCustomCard key={card.id} card={card} />
+                        <SortableCustomCard
+                            key={card.id}
+                            card={card}
+                            onEdit={() => setEditingCard(card)}
+                            onDelete={() => onDeleteCard(card.id)}
+                            projectId={projectId}
+                            onAssign={(userId) => onAssign(card.id, userId)}
+                            onUnassign={(userId) => onUnassign(card.id, userId)}
+                        />
                     ))}
                 </div>
             </SortableContext>
@@ -101,6 +160,29 @@ export default function CustomKanbanColumn({
                 columnTitle={column.title}
                 onSubmit={onAddCard}
             />
+
+            {editingCard && (
+                <AddCardModal
+                    key={editingCard.id}
+                    open
+                    onOpenChange={(next) => {
+                        if (!next) setEditingCard(null);
+                    }}
+                    columnTitle={column.title}
+                    heading="Edit card"
+                    submitLabel="Save"
+                    initial={{
+                        title: editingCard.title,
+                        description: editingCard.description ?? "",
+                        label: editingCard.label,
+                        priority: editingCard.priority,
+                    }}
+                    onSubmit={(input) => {
+                        onEditCard(editingCard.id, input);
+                        setEditingCard(null);
+                    }}
+                />
+            )}
         </div>
     );
 }

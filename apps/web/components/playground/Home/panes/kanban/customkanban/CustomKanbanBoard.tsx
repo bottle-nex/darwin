@@ -10,10 +10,16 @@ import type { CustomKanbanApi } from "./useCustomKanban";
  * same scroll row as the LLM board for one continuous left-to-right board.
  */
 export default function CustomKanbanBoard({
+    projectId,
     columns,
     addColumn,
     removeColumn,
+    renameColumn,
     addCard,
+    removeCard,
+    editCard,
+    assignMember,
+    unassignMember,
 }: CustomKanbanApi) {
     return (
         <>
@@ -23,6 +29,12 @@ export default function CustomKanbanBoard({
                     column={column}
                     onAddCard={(input) => addCard(column.id, input)}
                     onDelete={() => removeColumn(column.id)}
+                    onRename={(label) => renameColumn(column.id, label)}
+                    onEditCard={editCard}
+                    onDeleteCard={removeCard}
+                    projectId={projectId}
+                    onAssign={assignMember}
+                    onUnassign={unassignMember}
                 />
             ))}
             <AddListForm onAdd={addColumn} />

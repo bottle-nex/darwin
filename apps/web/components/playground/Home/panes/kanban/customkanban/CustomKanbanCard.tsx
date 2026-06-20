@@ -1,19 +1,105 @@
 "use client";
+import { useState } from "react";
+import { MdMoreHoriz, MdEdit, MdDelete, MdPeople } from "react-icons/md";
+import { DropdownMenu } from "radix-ui";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog";
 import { getLabel, PRIORITY_DOT } from "../data";
+import { PANEL_CONTENT, PANEL_ITEM } from "../KanbanOptionPanels/panelStyles";
+import CardAvatars from "./CardAvatars";
+import AssigneePicker from "./AssigneePicker";
 import type { CustomCard } from "./types";
 
+type CustomKanbanCardProps = {
+    card: CustomCard;
+    /** Open the edit modal for this card. */
+    onEdit?: () => void;
+    /** Permanently delete this card's issue (already confirmed). */
+    onDelete?: () => void;
+    /** Project id — enables the assignee picker when provided alongside the handlers. */
+    projectId?: string;
+    onAssign?: (userId: string) => void;
+    onUnassign?: (userId: string) => void;
+};
+
 /**
- * A card on the Custom Kanban: title with a priority dot, an optional label
- * chip, and a clamped description preview. Mirrors the LLM board's card look so
- * the two boards read as one product.
+ * A card on the Custom Kanban: title with a priority dot, an optional label chip,
+ * a clamped description, and a footer with the issue number and assignee avatars.
+ * A hover ⋯ menu offers Edit and Delete; Delete routes through a confirm dialog
+ * since it can't be undone. Mirrors the LLM board's card look.
  */
-export default function CustomKanbanCard({ card }: { card: CustomCard }) {
+export default function CustomKanbanCard({
+    card,
+    onEdit,
+    onDelete,
+    projectId,
+    onAssign,
+    onUnassign,
+}: CustomKanbanCardProps) {
     const label = card.label ? getLabel(card.label) : undefined;
+    const [confirmOpen, setConfirmOpen] = useState(false);
+    const [assignOpen, setAssignOpen] = useState(false);
+    const canAssign = Boolean(projectId && onAssign && onUnassign);
 
     return (
-        <div className="rounded-lg bg-white/5 p-2.5 ring-1 ring-white/5 transition-colors hover:ring-white/15">
-            <div className="flex items-start gap-2">
+        <div className="group/card relative rounded-lg bg-white/5 p-2.5 ring-1 ring-white/5 transition-colors hover:ring-white/15">
+            {(onEdit || onDelete || canAssign) && (
+                <DropdownMenu.Root>
+                    <DropdownMenu.Trigger asChild>
+                        <button
+                            type="button"
+                            aria-label="Card options"
+                            // Stop the pointerdown reaching the drag listeners on the wrapper.
+                            onPointerDown={(e) => e.stopPropagation()}
+                            className="absolute top-1.5 right-1.5 flex size-6 cursor-pointer items-center justify-center rounded text-neutral-400 opacity-0 transition-opacity hover:bg-white/10 hover:text-neutral-200 focus-visible:opacity-100 group-hover/card:opacity-100 data-[state=open]:opacity-100"
+                        >
+                            <MdMoreHoriz className="size-4" aria-hidden />
+                        </button>
+                    </DropdownMenu.Trigger>
+                    <DropdownMenu.Portal>
+                        <DropdownMenu.Content
+                            align="end"
+                            sideOffset={6}
+                            className={`w-40 ${PANEL_CONTENT}`}
+                        >
+                            {onEdit && (
+                                <DropdownMenu.Item onSelect={onEdit} className={PANEL_ITEM}>
+                                    <MdEdit className="size-3.5" aria-hidden />
+                                    <span className="flex-1">Edit</span>
+                                </DropdownMenu.Item>
+                            )}
+                            {canAssign && (
+                                <DropdownMenu.Item
+                                    onSelect={() => setAssignOpen(true)}
+                                    className={PANEL_ITEM}
+                                >
+                                    <MdPeople className="size-3.5" aria-hidden />
+                                    <span className="flex-1">Assignees</span>
+                                </DropdownMenu.Item>
+                            )}
+                            {onDelete && (
+                                <DropdownMenu.Item
+                                    onSelect={() => setConfirmOpen(true)}
+                                    className={`${PANEL_ITEM} text-rose-300 data-highlighted:text-rose-200`}
+                                >
+                                    <MdDelete className="size-3.5" aria-hidden />
+                                    <span className="flex-1">Delete</span>
+                                </DropdownMenu.Item>
+                            )}
+                        </DropdownMenu.Content>
+                    </DropdownMenu.Portal>
+                </DropdownMenu.Root>
+            )}
+
+            <div className="flex items-start gap-2 pr-5">
                 <span
                     className={cn(
                         "mt-1.5 size-1.5 shrink-0 rounded-full",
@@ -43,6 +129,54 @@ export default function CustomKanbanCard({ card }: { card: CustomCard }) {
                         {label.name}
                     </span>
                 </div>
+            )}
+
+            <div className="mt-2 flex items-center justify-between gap-2 pl-3.5">
+                <span className="text-[11px] font-medium text-neutral-500">
+                    {card.number ? `#${card.number}` : ""}
+                </span>
+                <CardAvatars assignees={card.assignees} />
+            </div>
+
+            <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+                <DialogContent className="border-white/10 bg-charcoal sm:max-w-100">
+                    <DialogHeader>
+                        <DialogTitle className="text-neutral-100">Delete issue</DialogTitle>
+                        <DialogDescription className="text-neutral-500">
+                            This permanently deletes “{card.title}”. You can&apos;t undo this.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter>
+                        <Button
+                            type="button"
+                            variant="tertiary"
+                            onClick={() => setConfirmOpen(false)}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            type="button"
+                            variant="destructive"
+                            onClick={() => {
+                                setConfirmOpen(false);
+                                onDelete?.();
+                            }}
+                        >
+                            Delete
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            {canAssign && projectId && onAssign && onUnassign && (
+                <AssigneePicker
+                    open={assignOpen}
+                    onOpenChange={setAssignOpen}
+                    projectId={projectId}
+                    assignees={card.assignees}
+                    onAssign={onAssign}
+                    onUnassign={onUnassign}
+                />
             )}
         </div>
     );

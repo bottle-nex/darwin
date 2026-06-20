@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import {
     type DragEndEvent,
     type DragOverEvent,
@@ -14,7 +14,14 @@ import { isBridgeStatus } from "../data";
 import type { KanbanStatus, Issue, Priority } from "../types";
 import { useCreateColumn } from "@/hooks/issues/useCreateColumn";
 import { useCreateIssue } from "@/hooks/issues/useCreateIssue";
+import { useUpdateIssue } from "@/hooks/issues/useUpdateIssue";
+import { useDeleteIssue } from "@/hooks/issues/useDeleteIssue";
+import { useUpdateColumn } from "@/hooks/issues/useUpdateColumn";
+import { useDeleteColumn } from "@/hooks/issues/useDeleteColumn";
+import { useAssignIssue, useUnassignIssue } from "@/hooks/issues/useAssignIssue";
+import type { BoardResponse } from "@/types/board";
 import { INITIAL_CUSTOM_COLUMNS } from "./data";
+import { boardToColumns } from "./mappers";
 import type { CustomCard, CustomColumn, NewCardInput } from "./types";
 
 /** Frontend priority labels → the backend's numeric scale (1=Urgent … 4=Low). */
@@ -28,6 +35,8 @@ const PRIORITY_TO_NUMBER: Record<Priority, 1 | 2 | 3 | 4> = {
 type UseCustomKanbanArgs = {
     /** The project these columns/issues belong to. Creation is disabled until it resolves. */
     projectId: string | undefined;
+    /** The hydrated board from the server; seeds the columns once it loads. */
+    board: BoardResponse | undefined;
     /** File a custom card into an LLM bridge column when dropped over it. */
     onSendToBoard: (status: KanbanStatus, card: CustomCard) => void;
     /** Read a bridge-column issue being dragged in (to render / convert it). */
@@ -53,21 +62,33 @@ export type CustomKanbanApi = ReturnType<typeof useCustomKanban>;
  */
 export function useCustomKanban({
     projectId,
+    board,
     onSendToBoard,
     getIssue,
     removeIssue,
 }: UseCustomKanbanArgs) {
     const [columns, setColumns] = useState<CustomColumn[]>(INITIAL_CUSTOM_COLUMNS);
+    const [seededBoard, setSeededBoard] = useState<BoardResponse | undefined>(undefined);
     const [activeItem, setActiveItem] = useState<ActiveItem | null>(null);
 
     const createColumn = useCreateColumn();
     const createIssue = useCreateIssue();
+    const updateIssue = useUpdateIssue();
+    const deleteIssue = useDeleteIssue();
+    const updateColumn = useUpdateColumn();
+    const deleteColumn = useDeleteColumn();
+    const assignIssue = useAssignIssue();
+    const unassignIssue = useUnassignIssue();
 
-    // A small drag threshold so clicking a card doesn't start a drag.
+    const dragOriginColumn = useRef<string | null>(null);
+
+    if (board && board !== seededBoard) {
+        setSeededBoard(board);
+        setColumns(boardToColumns(board));
+    }
+
     const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
 
-    // Persist the column first, then add it locally using the server's id — that
-    // id is what cards created in this column send back as `custom_column_id`.
     const addColumn = async (title: string) => {
         const name = title.trim();
         if (!name || !projectId) return;
@@ -79,8 +100,93 @@ export function useCustomKanban({
         }
     };
 
-    const removeColumn = (columnId: string) => {
+    const removeColumn = async (columnId: string) => {
+        if (!projectId) return;
         setColumns((prev) => prev.filter((col) => col.id !== columnId));
+        try {
+            await deleteColumn.mutateAsync({ id: columnId, project_id: projectId });
+        } catch {
+            toast.error("Couldn't delete the list.");
+        }
+    };
+
+    const renameColumn = async (columnId: string, label: string) => {
+        const name = label.trim();
+        if (!name || !projectId) return;
+        setColumns((prev) =>
+            prev.map((col) => (col.id === columnId ? { ...col, title: name } : col)),
+        );
+        try {
+            await updateColumn.mutateAsync({ id: columnId, project_id: projectId, label: name });
+        } catch {
+            toast.error("Couldn't rename the list.");
+        }
+    };
+
+    const removeCard = async (cardId: string) => {
+        if (!projectId) return;
+        setColumns((prev) =>
+            prev.map((col) => ({ ...col, cards: col.cards.filter((c) => c.id !== cardId) })),
+        );
+        try {
+            await deleteIssue.mutateAsync({ id: cardId, project_id: projectId });
+        } catch {
+            toast.error("Couldn't delete the issue.");
+        }
+    };
+
+    const editCard = async (cardId: string, input: NewCardInput) => {
+        if (!projectId) return;
+        const title = input.title.trim();
+        const description = input.description.trim();
+        setColumns((prev) =>
+            prev.map((col) => ({
+                ...col,
+                cards: col.cards.map((c) =>
+                    c.id === cardId
+                        ? {
+                              ...c,
+                              title: title || c.title,
+                              description: description || undefined,
+                              label: input.label,
+                              priority: input.priority,
+                          }
+                        : c,
+                ),
+            })),
+        );
+        try {
+            await updateIssue.mutateAsync({
+                id: cardId,
+                project_id: projectId,
+                title: title || undefined,
+                description,
+                priority: PRIORITY_TO_NUMBER[input.priority],
+                label: input.label ?? null, // null clears the label
+            });
+        } catch {
+            toast.error("Couldn't update the issue.");
+        }
+    };
+
+    // Assignment has no local optimistic step (we lack the member's name/image
+    // here) — the board refetch on success refreshes the card's avatars.
+    const assignMember = async (cardId: string, userId: string) => {
+        if (!projectId) return;
+        try {
+            await assignIssue.mutateAsync({ id: cardId, project_id: projectId, user_id: userId });
+        } catch {
+            toast.error("Couldn't assign the member.");
+        }
+    };
+
+    const unassignMember = async (cardId: string, userId: string) => {
+        if (!projectId) return;
+        try {
+            await unassignIssue.mutateAsync({ id: cardId, project_id: projectId, user_id: userId });
+        } catch {
+            toast.error("Couldn't unassign the member.");
+        }
     };
 
     // A card is a real Issue filed into this custom column. Persist it, then mirror
@@ -104,6 +210,7 @@ export function useCustomKanban({
                 description: description || undefined,
                 label: input.label,
                 priority: input.priority,
+                assignees: [],
             };
             setColumns((prev) =>
                 prev.map((col) =>
@@ -147,8 +254,10 @@ export function useCustomKanban({
         const found = findCard(id);
         if (found) {
             setActiveItem({ kind: "custom", card: found.card });
+            dragOriginColumn.current = found.columnId;
             return;
         }
+        dragOriginColumn.current = null;
         const issue = getIssue(id);
         setActiveItem(issue ? { kind: "issue", issue } : null);
     }
@@ -212,6 +321,7 @@ export function useCustomKanban({
                     title: issue.title,
                     label: issue.label?.name,
                     priority: issue.priority,
+                    assignees: [],
                 },
                 overId,
             );
@@ -229,6 +339,8 @@ export function useCustomKanban({
                 ),
             );
             onSendToBoard(overId, fromCustom.card);
+            // Persist: the issue leaves its custom column (moves into a status lane).
+            persistMove(activeId, null);
             return;
         }
 
@@ -243,13 +355,33 @@ export function useCustomKanban({
                 return { ...col, cards: arrayMove(col.cards, oldIndex, newIndex) };
             }),
         );
+
+        // If onDragOver moved the card into a different column, persist the new
+        // column. (Within-column reorder isn't persisted — no position field.)
+        if (dragOriginColumn.current && dragOriginColumn.current !== fromCustom.columnId) {
+            persistMove(activeId, fromCustom.columnId);
+        }
+    }
+
+    /** Persist a card's column move; `columnId === null` moves it out into a lane. */
+    function persistMove(cardId: string, columnId: string | null) {
+        if (!projectId) return;
+        updateIssue
+            .mutateAsync({ id: cardId, project_id: projectId, custom_column_id: columnId })
+            .catch(() => toast.error("Couldn't move the issue."));
     }
 
     return {
+        projectId,
         columns,
         addColumn,
         removeColumn,
+        renameColumn,
         addCard,
+        removeCard,
+        editCard,
+        assignMember,
+        unassignMember,
         activeItem,
         sensors,
         onDragStart,

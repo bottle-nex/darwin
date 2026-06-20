@@ -1,27 +1,24 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/lib/axios";
-import { CREATE_COLUMN_URL } from "@/routes/api_routes";
+import { COLUMN_URL } from "@/routes/api_routes";
 import { BOARD_QUERY_KEY } from "@/hooks/issues/useBoard";
 import type { ApiResponse } from "@/types/api";
+import type { BoardColumn } from "@/types/board";
 
-export interface CreateColumnInput {
-    project_id: string;
-    label: string;
-}
-
-export interface CreatedColumn {
+export interface UpdateColumnInput {
     id: string;
-    label: string;
-    order: number;
+    project_id: string;
+    label?: string;
+    order?: number;
 }
 
-export function useCreateColumn() {
+export function useUpdateColumn() {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: async (input: CreateColumnInput) => {
-            const res = await apiClient.post<ApiResponse<{ column: CreatedColumn }>>(
-                CREATE_COLUMN_URL,
-                input,
+        mutationFn: async (input: UpdateColumnInput) => {
+            const res = await apiClient.patch<ApiResponse<{ column: BoardColumn }>>(
+                COLUMN_URL(input.id),
+                { label: input.label, order: input.order },
             );
             return res.data.data.column;
         },

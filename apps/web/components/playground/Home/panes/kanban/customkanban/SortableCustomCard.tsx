@@ -11,7 +11,23 @@ import type { CustomCard } from "./types";
  * dragging, the original dims and the real card follows the cursor via the
  * board's `DragOverlay`.
  */
-export default function SortableCustomCard({ card }: { card: CustomCard }) {
+type SortableCustomCardProps = {
+    card: CustomCard;
+    onEdit?: () => void;
+    onDelete?: () => void;
+    projectId?: string;
+    onAssign?: (userId: string) => void;
+    onUnassign?: (userId: string) => void;
+};
+
+export default function SortableCustomCard({
+    card,
+    onEdit,
+    onDelete,
+    projectId,
+    onAssign,
+    onUnassign,
+}: SortableCustomCardProps) {
     const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
         id: card.id,
     });
@@ -26,7 +42,14 @@ export default function SortableCustomCard({ card }: { card: CustomCard }) {
             {...listeners}
             className={cn("cursor-grab touch-none", isDragging && "opacity-40")}
         >
-            <CustomKanbanCard card={card} />
+            <CustomKanbanCard
+                card={card}
+                onEdit={onEdit}
+                onDelete={onDelete}
+                projectId={projectId}
+                onAssign={onAssign}
+                onUnassign={onUnassign}
+            />
         </div>
     );
 }

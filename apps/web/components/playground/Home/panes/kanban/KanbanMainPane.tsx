@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 import { closestCorners, DndContext, DragOverlay } from "@dnd-kit/core";
 import { useGetDashboard } from "@/hooks/dashboard/useGetDashboard";
+import { useBoard } from "@/hooks/issues/useBoard";
 import { COLUMNS, filterBoard, isBridgeStatus } from "./data";
 import type { BoardView, KanbanView } from "./types";
 import { useKanbanBoard } from "./useKanbanBoard";
@@ -34,10 +35,12 @@ export default function KanbanMainPane() {
     const { data: dashboard } = useGetDashboard(orgSlug);
     const activeProject = dashboard?.projects.find((p) => p.slug === projectSlug);
 
+    const { data: board } = useBoard(activeProject?.id);
     const kanban = useKanbanBoard();
     const options = useKanbanOptions();
     const custom = useCustomKanban({
         projectId: activeProject?.id,
+        board,
         onSendToBoard: kanban.addIssue,
         getIssue: kanban.findIssue,
         removeIssue: kanban.removeIssue,
@@ -88,6 +91,12 @@ export default function KanbanMainPane() {
                 column={column}
                 onAddCard={(input) => custom.addCard(column.id, input)}
                 onDelete={() => custom.removeColumn(column.id)}
+                onRename={(label) => custom.renameColumn(column.id, label)}
+                onEditCard={custom.editCard}
+                onDeleteCard={custom.removeCard}
+                projectId={custom.projectId}
+                onAssign={custom.assignMember}
+                onUnassign={custom.unassignMember}
             />
         );
     }
