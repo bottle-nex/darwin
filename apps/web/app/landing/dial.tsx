@@ -94,7 +94,13 @@ export default function Dial({
             overflow="visible"
             className={cn(className)}
             animate={controls}
-            style={shadow ? { filter: `drop-shadow(${shadowX}px ${shadowY}px ${shadowBlur}px ${shadowColor})` } : undefined}
+            style={
+                shadow
+                    ? {
+                          filter: `drop-shadow(${shadowX}px ${shadowY}px ${shadowBlur}px ${shadowColor})`,
+                      }
+                    : undefined
+            }
         >
             <circle cx={cx} cy={cy} r={r} fill={color} />
             {ticks.map((t, i) => (

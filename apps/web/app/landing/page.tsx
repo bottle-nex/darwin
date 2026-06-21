@@ -10,7 +10,9 @@ export default function Landing() {
                 <div className="absolute z-50 bottom-16 left-12 flex flex-col gap-5 max-w-lg">
                     <div className="flex items-center gap-2 w-fit rounded-full border border-white/20 bg-white/10 backdrop-blur-sm px-3 py-1.5">
                         <span className="size-2 rounded-full bg-white/80" />
-                        <span className="text-xs text-white/80 font-medium">Beta Version is Live!</span>
+                        <span className="text-xs text-white/80 font-medium">
+                            Beta Version is Live!
+                        </span>
                     </div>
 
                     <div className="flex flex-col gap-1">
@@ -23,8 +25,8 @@ export default function Landing() {
                     </div>
 
                     <p className="text-sm text-white/60 leading-relaxed">
-                        Say goodbye to repetitive tasks. Our AI-driven platform streamlines
-                        your workflows so your team can focus on what really matters.
+                        Say goodbye to repetitive tasks. Our AI-driven platform streamlines your
+                        workflows so your team can focus on what really matters.
                     </p>
 
                     <div className="flex items-center gap-3">
