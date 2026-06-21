@@ -45,6 +45,8 @@ type KanbanOptionsBarProps = {
     onBoardViewChange: (view: BoardView) => void;
     kanbanView: KanbanView;
     onKanbanViewChange: (view: KanbanView) => void;
+    /** Open the create-task modal (toolbar "Add Task" / "New issue"). */
+    onAddTask: () => void;
 };
 
 /** Board toolbar: the board switcher, search, labels, filters, Views, and +Task. */
@@ -55,6 +57,7 @@ export default function KanbanOptionsBar({
     onBoardViewChange,
     kanbanView,
     onKanbanViewChange,
+    onAddTask,
 }: KanbanOptionsBarProps) {
     const {
         searchOpen,
@@ -133,6 +136,7 @@ export default function KanbanOptionsBar({
                     <Button
                         variant="tertiary"
                         type="button"
+                        onClick={onAddTask}
                         className="flex h-6 cursor-pointer items-center px-2 text-[11.5px] font-medium hover:bg-black/5 rounded-l-[1px] rounded-r-none"
                     >
                         Add Task
@@ -154,21 +158,33 @@ export default function KanbanOptionsBar({
                                 sideOffset={6}
                                 className="z-50 w-52 origin-(--radix-dropdown-menu-content-transform-origin) rounded-lg border border-neutral-800 bg-charcoal p-1 shadow-xl animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95"
                             >
-                                {TASK_OPTIONS.map((option) => (
-                                    <DropdownMenu.Item
-                                        key={option.id}
-                                        className={cn(
-                                            "flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 text-[13px] text-neutral-300 outline-none select-none",
-                                            "data-highlighted:bg-white/5 data-highlighted:text-neutral-100",
-                                        )}
-                                    >
-                                        <option.icon
-                                            className="size-3.5 text-neutral-400"
-                                            aria-hidden
-                                        />
-                                        {option.label}
-                                    </DropdownMenu.Item>
-                                ))}
+                                {TASK_OPTIONS.map((option) => {
+                                    const disabled = option.id === "import";
+                                    return (
+                                        <DropdownMenu.Item
+                                            key={option.id}
+                                            disabled={disabled}
+                                            onSelect={option.id === "issue" ? onAddTask : undefined}
+                                            className={cn(
+                                                "flex items-center gap-2 rounded-md px-2 py-1.5 text-[13px] text-neutral-300 outline-none select-none",
+                                                disabled
+                                                    ? "cursor-not-allowed opacity-40"
+                                                    : "cursor-pointer data-highlighted:bg-white/5 data-highlighted:text-neutral-100",
+                                            )}
+                                        >
+                                            <option.icon
+                                                className="size-3.5 text-neutral-400"
+                                                aria-hidden
+                                            />
+                                            {option.label}
+                                            {disabled && (
+                                                <span className="ml-auto text-[10px] text-neutral-500">
+                                                    Soon
+                                                </span>
+                                            )}
+                                        </DropdownMenu.Item>
+                                    );
+                                })}
                             </DropdownMenu.Content>
                         </DropdownMenu.Portal>
                     </DropdownMenu.Root>

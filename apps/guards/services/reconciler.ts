@@ -49,7 +49,8 @@ export default class Reconciler {
                     projectId: true,
                 },
             });
-            for (const i of issues) await this.ring(i.projectId);
+            const project_ids = new Set(issues.map((i) => i.projectId));
+            for (const projectId of project_ids) await this.ring(projectId);
         } catch (err) {
             console.error("error while sweeping orphan issues", err);
         }

@@ -2,12 +2,12 @@
 import { useEffect, useRef } from "react";
 import { motion } from "motion/react";
 import { MdClose, MdSearch } from "react-icons/md";
-
-type SearchBarProps = {
+import { Input } from "@/components/ui/input";
+interface SearchBarProps {
     value: string;
     onChange: (value: string) => void;
     onClose: () => void;
-};
+}
 
 /** Search field that slides in beside the toolbar's left edge. Esc closes it. */
 export default function SearchBar({ value, onChange, onClose }: SearchBarProps) {
@@ -29,7 +29,7 @@ export default function SearchBar({ value, onChange, onClose }: SearchBarProps) 
                 className="pointer-events-none absolute left-2.5 size-3.5 text-neutral-500"
                 aria-hidden
             />
-            <input
+            <Input
                 ref={inputRef}
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
@@ -37,7 +37,7 @@ export default function SearchBar({ value, onChange, onClose }: SearchBarProps) 
                     if (e.key === "Escape") onClose();
                 }}
                 placeholder="Search issues..."
-                className="h-7 w-full rounded-md border border-white/10 bg-white/5 pr-7 pl-8 text-[12px] text-neutral-100 placeholder:text-neutral-500 focus:border-white/25 focus:outline-none"
+                className="h-7 w-full rounded-md pr-7 pl-8 text-[12px] text-neutral-100 placeholder:text-neutral-500 focus:border-white/25 focus:outline-none"
             />
             <button
                 type="button"

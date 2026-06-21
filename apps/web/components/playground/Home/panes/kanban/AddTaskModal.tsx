@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import {
     Dialog,
@@ -19,53 +20,37 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { ALL_LABELS } from "../data";
-import type { Priority } from "../types";
-import { TaskTargetBadge } from "../taskTheme";
-import { PRIORITIES } from "./data";
-import type { NewCardInput } from "./types";
+import { useCreateIssue } from "@/hooks/issues/useCreateIssue";
+import { ALL_LABELS } from "./data";
+import type { Priority } from "./types";
+import { TaskTargetBadge } from "./taskTheme";
+import { PRIORITIES, PRIORITY_TO_NUMBER } from "./customkanban/data";
 
 const NO_LABEL = "none";
 
-type AddCardModalProps = {
+type AddTaskModalProps = {
     open: boolean;
     onOpenChange: (open: boolean) => void;
-    /** The column the card lands in — shown for context in the header. */
-    columnTitle: string;
-    onSubmit: (input: NewCardInput) => void;
-    /** Prefill for edit mode; omit to create a fresh card. */
-    initial?: NewCardInput;
-    /** Header title — defaults to "New card". */
-    heading?: string;
-    /** Submit button label — defaults to "Add card". */
-    submitLabel?: string;
+    /** Project the task is filed under; submission is disabled until it resolves. */
+    projectId: string | undefined;
 };
 
 /**
- * Centered overlay for creating or editing a card on the Custom Kanban — the
- * Trello "new card" panel rebuilt as a modal. Collects title, description, label,
- * and priority, then hands the values back. Pass `initial` (plus a `key` from the
- * caller so it remounts per card) to drive it in edit mode.
+ * Toolbar "Add Task" modal. Always files the issue onto the LLM board as To-Do
+ * for the agent to pick up; custom columns get their own per-column "add card".
  */
-export default function AddCardModal({
-    open,
-    onOpenChange,
-    columnTitle,
-    onSubmit,
-    initial,
-    heading = "New card",
-    submitLabel = "Add card",
-}: AddCardModalProps) {
-    const [title, setTitle] = useState(initial?.title ?? "");
-    const [description, setDescription] = useState(initial?.description ?? "");
-    const [label, setLabel] = useState<string>(initial?.label ?? NO_LABEL);
-    const [priority, setPriority] = useState<Priority>(initial?.priority ?? "normal");
+export default function AddTaskModal({ open, onOpenChange, projectId }: AddTaskModalProps) {
+    const [title, setTitle] = useState("");
+    const [description, setDescription] = useState("");
+    const [label, setLabel] = useState<string>(NO_LABEL);
+    const [priority, setPriority] = useState<Priority>("normal");
+    const createIssue = useCreateIssue();
 
     const reset = () => {
-        setTitle(initial?.title ?? "");
-        setDescription(initial?.description ?? "");
-        setLabel(initial?.label ?? NO_LABEL);
-        setPriority(initial?.priority ?? "normal");
+        setTitle("");
+        setDescription("");
+        setLabel(NO_LABEL);
+        setPriority("normal");
     };
 
     const close = () => {
@@ -73,28 +58,34 @@ export default function AddCardModal({
         reset();
     };
 
-    const submit = () => {
-        if (!title.trim()) return;
-        onSubmit({
-            title,
-            description,
-            label: label === NO_LABEL ? undefined : label,
-            priority,
-        });
-        close();
+    const submit = async () => {
+        const trimmed = title.trim();
+        if (!trimmed || !projectId || createIssue.isPending) return;
+        try {
+            await createIssue.mutateAsync({
+                project_id: projectId,
+                title: trimmed,
+                description: description.trim(),
+                priority: PRIORITY_TO_NUMBER[priority],
+                label: label === NO_LABEL ? undefined : label,
+            });
+            close();
+        } catch {
+            toast.error("Couldn't create the task.");
+        }
     };
 
     return (
         <Dialog open={open} onOpenChange={(next) => (next ? onOpenChange(true) : close())}>
             <DialogContent className="dark border-neutral-800 bg-charcoal text-neutral-100 sm:max-w-md">
                 <DialogHeader>
-                    <DialogTitle className="text-neutral-100">{heading}</DialogTitle>
-                    <DialogDescription className="sr-only">
-                        New card in “{columnTitle}”.
+                    <DialogTitle className="text-neutral-100">Create a task</DialogTitle>
+                    <DialogDescription>
+                        File a new issue for the agent to pick up.
                     </DialogDescription>
                 </DialogHeader>
 
-                <TaskTargetBadge kind="custom" columnTitle={columnTitle} />
+                <TaskTargetBadge kind="llm" />
 
                 <div className="flex flex-col gap-4">
                     <Field label="Title">
@@ -169,8 +160,12 @@ export default function AddCardModal({
                     <Button variant="outline" type="button" onClick={close}>
                         Cancel
                     </Button>
-                    <Button type="button" onClick={submit} disabled={!title.trim()}>
-                        {submitLabel}
+                    <Button
+                        type="button"
+                        onClick={submit}
+                        disabled={!title.trim() || !projectId || createIssue.isPending}
+                    >
+                        {createIssue.isPending ? "Creating…" : "Create task"}
                     </Button>
                 </DialogFooter>
             </DialogContent>

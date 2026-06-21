@@ -52,10 +52,7 @@ export default class IssueAssignController {
             }
 
             if (target_user_id === user.id) {
-                // Self-pick: any member may claim an issue, but only while it's still
-                // in To-Do (custom-column issues are Todo too). Stages past To-Do are
-                // agent-driven and can't be picked.
-                if (issue.status !== IssueStatus.Todo) {
+                if (issue.status !== IssueStatus.Todo && issue.status !== IssueStatus.Parked) {
                     ResponseWriter.custom(
                         res,
                         false,

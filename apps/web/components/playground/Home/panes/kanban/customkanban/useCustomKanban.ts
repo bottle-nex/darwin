@@ -11,7 +11,7 @@ import {
 import { arrayMove } from "@dnd-kit/sortable";
 import { toast } from "sonner";
 import { isBridgeStatus } from "../data";
-import type { KanbanStatus, Issue, Priority } from "../types";
+import type { KanbanStatus, Issue } from "../types";
 import { useCreateColumn } from "@/hooks/issues/useCreateColumn";
 import { useCreateIssue } from "@/hooks/issues/useCreateIssue";
 import { useUpdateIssue } from "@/hooks/issues/useUpdateIssue";
@@ -20,18 +20,11 @@ import { useUpdateColumn } from "@/hooks/issues/useUpdateColumn";
 import { useDeleteColumn } from "@/hooks/issues/useDeleteColumn";
 import { useAssignIssue, useUnassignIssue } from "@/hooks/issues/useAssignIssue";
 import type { BoardResponse } from "@/types/board";
-import { INITIAL_CUSTOM_COLUMNS } from "./data";
+import { INITIAL_CUSTOM_COLUMNS, PRIORITY_TO_NUMBER } from "./data";
 import { boardToColumns } from "./mappers";
 import type { CustomCard, CustomColumn, NewCardInput } from "./types";
 
 /** Frontend priority labels → the backend's numeric scale (1=Urgent … 4=Low). */
-const PRIORITY_TO_NUMBER: Record<Priority, 1 | 2 | 3 | 4> = {
-    urgent: 1,
-    high: 2,
-    normal: 3,
-    low: 4,
-};
-
 type UseCustomKanbanArgs = {
     /** The project these columns/issues belong to. Creation is disabled until it resolves. */
     projectId: string | undefined;

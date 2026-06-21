@@ -10,6 +10,7 @@ import { useKanbanBoard } from "./useKanbanBoard";
 import { useKanbanOptions } from "./useKanbanOptions";
 import { useCustomKanban } from "./customkanban/useCustomKanban";
 import KanbanOptionsBar from "./KanbanOptionsBar";
+import AddTaskModal from "./AddTaskModal";
 import KanbanBoardView from "./KanbanBoardView";
 import KanbanListView from "./KanbanListView";
 import KanbanColumn from "./KanbanColumn";
@@ -47,6 +48,7 @@ export default function KanbanMainPane() {
     });
     const [boardView, setBoardView] = useState<BoardView>("default");
     const [kanbanView, setKanbanView] = useState<KanbanView>("board");
+    const [addTaskOpen, setAddTaskOpen] = useState(false);
 
     const filteredBoard = useMemo(
         () => filterBoard(kanban.board, options.search, options.selectedLabels),
@@ -160,6 +162,12 @@ export default function KanbanMainPane() {
                 onBoardViewChange={setBoardView}
                 kanbanView={kanbanView}
                 onKanbanViewChange={setKanbanView}
+                onAddTask={() => setAddTaskOpen(true)}
+            />
+            <AddTaskModal
+                open={addTaskOpen}
+                onOpenChange={setAddTaskOpen}
+                projectId={activeProject?.id}
             />
             <DndContext
                 sensors={custom.sensors}

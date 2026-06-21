@@ -421,6 +421,7 @@ enum IssueStatus {
     Done
     Failed
     Cancelled
+    Parked
 }
 
 enum ProjectRole {

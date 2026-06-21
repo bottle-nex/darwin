@@ -49,6 +49,8 @@ export default class IssueUpdateController {
                 },
                 select: {
                     projectId: true,
+                    status: true,
+                    customColumnId: true,
                 },
             });
             if (!issue) {
@@ -72,6 +74,22 @@ export default class IssueUpdateController {
                 }
             }
 
+            const next_column_id =
+                body_data.custom_column_id !== undefined
+                    ? body_data.custom_column_id
+                    : issue.customColumnId;
+
+            let next_status: IssueStatus;
+            if (next_column_id !== null) {
+                next_status = IssueStatus.Parked;
+            } else if (body_data.status && body_data.status !== IssueStatus.Parked) {
+                next_status = body_data.status;
+            } else if (issue.status === IssueStatus.Parked) {
+                next_status = IssueStatus.Todo;
+            } else {
+                next_status = issue.status;
+            }
+
             const updated = await prisma.issue.update({
                 where: { id },
                 data: {
@@ -79,8 +97,8 @@ export default class IssueUpdateController {
                     description: body_data.description,
                     priority: body_data.priority,
                     label: body_data.label,
-                    status: body_data.status,
-                    customColumnId: body_data.custom_column_id,
+                    status: next_status,
+                    customColumnId: next_column_id,
                 },
                 select: {
                     id: true,

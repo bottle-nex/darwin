@@ -14,7 +14,6 @@ export default function PlaygroundProjectSwitcher() {
     const router = useRouter();
     const { orgSlug, projectSlug } = useParams<{ orgSlug: string; projectSlug?: string }>();
     const { data: dashboard } = useGetDashboard(orgSlug);
-
     const [open, setOpen] = useState(false);
     const [query, setQuery] = useState("");
 

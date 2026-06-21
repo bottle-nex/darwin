@@ -3,7 +3,7 @@ import z from "zod";
 import ResponseWriter from "../../services/service.response";
 import Access from "../../access-control/access";
 import { Action, Permissions } from "@trymatcha/access-control";
-import { Prisma, prisma } from "@trymatcha/database";
+import { IssueStatus, Prisma, prisma } from "@trymatcha/database";
 import { server_services } from "../..";
 import { OutboundSocketMessageType } from "@trymatcha/types";
 
@@ -73,6 +73,9 @@ export default class IssueCreateController {
                                 projectId: parsed_body.data.project_id,
                                 createdById: user.id,
                                 customColumnId: parsed_body.data.custom_column_id,
+                                status: parsed_body.data.custom_column_id
+                                    ? IssueStatus.Parked
+                                    : IssueStatus.Todo,
                                 number: (last_issue?.number ?? 0) + 1,
                             },
                             select: { id: true },

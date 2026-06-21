@@ -9,6 +9,14 @@ export const PRIORITIES: { value: Priority; label: string }[] = [
     { value: "low", label: "Low" },
 ];
 
+/** Map a card's `Priority` to the server's 1–4 priority scale. */
+export const PRIORITY_TO_NUMBER: Record<Priority, 1 | 2 | 3 | 4> = {
+    urgent: 1,
+    high: 2,
+    normal: 3,
+    low: 4,
+};
+
 /**
  * The Custom Kanban starts empty — the user builds it from scratch with "Add
  * list". The custom-board domain isn't persisted yet (mirrors the LLM board's

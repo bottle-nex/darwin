@@ -1,4 +1,5 @@
 "use client";
+import { Input } from "@/components/ui/input";
 import { useEffect, useRef } from "react";
 import { MdClose, MdSearch } from "react-icons/md";
 
@@ -58,13 +59,13 @@ export default function SidebarSearch({
                 className="pointer-events-none absolute left-3 size-3.5 text-neutral-400"
                 aria-hidden
             />
-            <input
+            <Input
                 ref={inputRef}
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder={placeholder}
-                className="h-7 w-full rounded-md border border-white/8 bg-white/5 pr-9 pl-8 text-[12px] text-neutral-100 placeholder:text-neutral-500 focus:border-white/25 focus:outline-none"
+                className="h-7 w-full rounded-md pr-9 pl-8 text-[12px] text-neutral-100 placeholder:text-neutral-500 focus:border-white/25 focus:outline-none"
             />
             <button
                 type="button"

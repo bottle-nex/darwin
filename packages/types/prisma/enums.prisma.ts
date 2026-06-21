@@ -44,5 +44,6 @@ export const IssueStatus = {
     Done: "Done",
     Failed: "Failed",
     Cancelled: "Cancelled",
+    Parked: "Parked",
 } as const;
 export type IssueStatus = (typeof IssueStatus)[keyof typeof IssueStatus];
