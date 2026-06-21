@@ -1,10 +1,30 @@
 import { cn } from "@/lib/utils";
-import { COLUMNS, INITIAL_BOARD } from "@/components/playground/Home/panes/kanban/data";
+import { COLUMNS } from "@/components/playground/Home/panes/kanban/data";
 import CardRenderer from "@/components/playground/Home/panes/kanban/cards/CardRenderer";
-import { KanbanStatus } from "@/components/playground/Home/panes/kanban/types";
+import { KanbanStatus, type Issue } from "@/components/playground/Home/panes/kanban/types";
+
+/**
+ * Self-contained sample card for the landing preview. The live LLM board
+ * (`INITIAL_BOARD`) now starts empty and hydrates from the agent flow, so the
+ * landing page keeps its own static issue rather than reading board state.
+ */
+const SAMPLE_IN_PROGRESS: Issue = {
+    id: "preview-1",
+    number: "MTC-128",
+    title: "Fix flaky auth redirect on email-OTP verify",
+    project: "trymatcha/web",
+    label: { name: "bug", className: "bg-rose-500/15 text-rose-300" },
+    priority: "high",
+    agent: "Opus 4.8",
+    assignees: [{ id: "a1", name: "Maya", tone: "purple" }],
+    comments: 3,
+    status: KanbanStatus.InProgress,
+    step: "Running test suite on runner",
+    runner: "runner-eph-7f2a",
+};
 
 export default function BoardPreview() {
-    const inProgress = INITIAL_BOARD[KanbanStatus.InProgress][0];
+    const inProgress = SAMPLE_IN_PROGRESS;
     return (
         <div className="flex flex-col gap-2.5">
             <div className="flex flex-wrap gap-1.5">

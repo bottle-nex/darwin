@@ -10,12 +10,25 @@ import {
 import { cn } from "@/lib/utils";
 import { COLUMNS, INITIAL_BOARD } from "@/components/playground/Home/panes/kanban/data";
 import { HiPlusSmall } from "react-icons/hi2";
-import type { KanbanColumnDef } from "@/components/playground/Home/panes/kanban/types";
+import {
+    KanbanStatus,
+    type KanbanColumnDef,
+} from "@/components/playground/Home/panes/kanban/types";
 import CardRenderer from "@/components/playground/Home/panes/kanban/cards/CardRenderer";
 import Reveal from "@/components/utility/Reveal";
 import { Button } from "@/components/ui/button";
 
-const CARDS_PER_COLUMN = 3;
+/** Cards shown per column — varied so the board reads naturally, not uniform. */
+const CARDS_PER_COLUMN: Partial<Record<KanbanStatus, number>> = {
+    [KanbanStatus.Todo]: 3,
+    [KanbanStatus.Queued]: 2,
+    [KanbanStatus.InProgress]: 3,
+    [KanbanStatus.InReview]: 2,
+    [KanbanStatus.Done]: 3,
+    [KanbanStatus.Failed]: 2,
+    [KanbanStatus.Cancelled]: 2,
+};
+const DEFAULT_CARDS_PER_COLUMN = 3;
 
 function ShowcaseTopbar() {
     return (
@@ -67,12 +80,15 @@ function ShowcaseOptionsBar() {
 
 function ShowcaseColumn({ column, columnIndex }: { column: KanbanColumnDef; columnIndex: number }) {
     const { icon: Icon, title, titleBox, status } = column;
-    const issues = INITIAL_BOARD[status].slice(0, CARDS_PER_COLUMN);
+    const issues = INITIAL_BOARD[status].slice(
+        0,
+        CARDS_PER_COLUMN[status] ?? DEFAULT_CARDS_PER_COLUMN,
+    );
 
     return (
         <Reveal
             delay={0.15 + columnIndex * 0.08}
-            className="flex w-60 flex-none flex-col rounded-xl bg-white/2.5 p-2 ring-1 ring-white/5 lg:w-auto lg:min-w-0 lg:flex-1"
+            className="flex w-72 min-w-72 flex-none flex-col rounded-xl bg-white/2.5 p-2 ring-1 ring-white/5"
         >
             <div className="mb-2 flex items-center justify-between gap-2 px-0.5">
                 <div
@@ -115,7 +131,7 @@ export default function BoardShowcase() {
                         <ShowcaseTopbar />
                         <ShowcaseOptionsBar />
                         <div className="relative">
-                            <div className="flex gap-4 overflow-x-auto px-3 pt-3 pb-3">
+                            <div className="flex min-h-120 gap-4 overflow-x-auto px-3 pt-3 pb-3">
                                 {COLUMNS.map((column, i) => (
                                     <ShowcaseColumn
                                         key={column.status}
@@ -125,6 +141,8 @@ export default function BoardShowcase() {
                                 ))}
                             </div>
                             <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-linear-to-t from-charcoal to-transparent" />
+                            <div className="pointer-events-none absolute inset-y-0 left-0 w-16 bg-linear-to-r from-charcoal to-transparent" />
+                            <div className="pointer-events-none absolute inset-y-0 right-0 w-16 bg-linear-to-l from-charcoal to-transparent" />
                         </div>
                     </div>
                 </div>

@@ -55,8 +55,10 @@ export type Issue = {
     pr?: PullRequest;
     /** Done: wall-clock time the agent took. */
     duration?: string;
-    /** Done: human-readable resolution time. */
+    /** Done / Cancelled: human-readable resolution time. */
     resolvedAt?: string;
+    /** Failed: short reason the run errored out. */
+    error?: string;
 };
 
 /** Static definition for a column header. `titleBox` is the only per-status colour. */

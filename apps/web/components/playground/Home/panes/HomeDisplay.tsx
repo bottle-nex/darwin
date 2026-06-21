@@ -1,36 +1,24 @@
 "use client";
 import { MdHome } from "react-icons/md";
-import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
-import { RailSurface } from "../../IconRail/railSurface";
-import PaneBreadcrumb from "../../Core/components/PaneBreadcrumb";
 import { HomeTab } from "../homeTabs";
-import TeamDetailPane from "../../Projects/panes/TeamDetailPane";
-import InboxMainPane from "./InboxMainPane";
-import KanbanMainPane from "./kanban/KanbanMainPane";
-import MentionsMainPane from "./MentionsMainPane";
-import ReviewsMainPane from "./ReviewsMainPane";
-import AssignedToMePane from "./AssignedToMePane";
-import InProgressPane from "./InProgressPane";
+import { RailSurface } from "../../IconRail/railSurface";
+import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
 import DraftsPane from "./DraftsPane";
 import TagsMainPane from "./tags/TagsMainPane";
+import InboxMainPane from "./InboxMainPane";
+import PaneBreadcrumb from "../../Core/components/PaneBreadcrumb";
+import InProgressPane from "./InProgressPane";
+import TeamDetailPane from "../../Projects/panes/TeamDetailPane";
+import KanbanMainPane from "./kanban/KanbanMainPane";
+import ReviewsMainPane from "./ReviewsMainPane";
+import MentionsMainPane from "./MentionsMainPane";
+import AssignedToMePane from "./AssignedToMePane";
 
 /** Renders the Home surface's active tab. */
 export default function HomeDisplay() {
     const tab = usePlaygroundNavStore((s) => s.tabBySurface[RailSurface.Home]);
 
     switch (tab) {
-        case HomeTab.Kanban:
-            return (
-                <div className="flex min-h-0 flex-1 flex-col">
-                    <PaneBreadcrumb
-                        leading={
-                            <MdHome className="size-3.5 shrink-0 text-neutral-400" aria-hidden />
-                        }
-                        segments={[{ label: "Home" }, { label: "Kanban" }]}
-                    />
-                    <KanbanMainPane />
-                </div>
-            );
         case HomeTab.Tags:
             return (
                 <div className="flex min-h-0 flex-1 flex-col">
@@ -56,7 +44,20 @@ export default function HomeDisplay() {
         case HomeTab.TeamDetail:
             return <TeamDetailPane surface={RailSurface.Home} />;
         case HomeTab.Inbox:
-        default:
             return <InboxMainPane />;
+
+        case HomeTab.Kanban:
+        default:
+            return (
+                <div className="flex min-h-0 flex-1 flex-col">
+                    <PaneBreadcrumb
+                        leading={
+                            <MdHome className="size-3.5 shrink-0 text-neutral-400" aria-hidden />
+                        }
+                        segments={[{ label: "Home" }, { label: "Kanban" }]}
+                    />
+                    <KanbanMainPane />
+                </div>
+            );
     }
 }

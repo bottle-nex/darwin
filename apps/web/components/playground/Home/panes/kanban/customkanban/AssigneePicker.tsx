@@ -63,7 +63,7 @@ export default function AssigneePicker({
                                         assigned ? onUnassign(member.id) : onAssign(member.id)
                                     }
                                     className={cn(
-                                        "flex items-center justify-between gap-3 rounded-lg px-3 py-2 text-left transition-colors",
+                                        "flex items-center justify-between gap-3 rounded-lg px-3 py-2 text-left transition-colors cursor-pointer",
                                         assigned ? "bg-white/8" : "hover:bg-white/5",
                                     )}
                                 >
