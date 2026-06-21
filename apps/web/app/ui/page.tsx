@@ -56,12 +56,16 @@ export default function UIPage() {
                                             transition={
                                                 reduceMotion
                                                     ? { duration: 0 }
-                                                    : { type: "spring", stiffness: 500, damping: 40 }
+                                                    : {
+                                                          type: "spring",
+                                                          stiffness: 500,
+                                                          damping: 40,
+                                                      }
                                             }
                                         />
                                     )}
                                     <p className="text-xs pr-1">
-                                        { '(' + String(index + 1).padStart(2, "0") + ')'}
+                                        {"(" + String(index + 1).padStart(2, "0") + ")"}
                                     </p>
                                     <div className="text-xl whitespace-pre-line"> {item.title}</div>
                                 </div>
