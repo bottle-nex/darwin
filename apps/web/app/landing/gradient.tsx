@@ -1,7 +1,9 @@
-export default function Gradient() {
+import { cn } from "@/lib/utils";
+
+export default function Gradient({ className }: { className?: string }) {
     return (
         <div
-            className="absolute inset-0 z-40"
+            className={cn("absolute inset-0 z-40", className)}
             style={{
                 background: `
                     radial-gradient(ellipse at 0% 136%,

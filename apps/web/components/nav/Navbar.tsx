@@ -47,7 +47,7 @@ export function NavBar({ isMarkettingPage = false }: { isMarkettingPage?: boolea
             ref={headerRef}
             className={cn(
                 "fixed top-0 left-0 right-0 z-50",
-                "transition-[height,border-color] duration-300 ease-out",
+                "transition-[height,border-color] duration-300 ease-out z-100",
                 scrolled
                     ? isMarkettingPage
                         ? "border-b border-neutral-800 h-15 bg-charcoal"
