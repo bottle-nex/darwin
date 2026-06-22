@@ -1,6 +1,6 @@
 import { Queue, Worker, type Job } from "bullmq";
 import queue_config from "../config/config.queue";
-import process_route_job from "../processors/processor.route";
+import RouterProcessor from "../processors/processor.route";
 
 interface RouteJobData {
     projectId: string;
@@ -22,7 +22,7 @@ export default class QueueService {
         this.consumer = new Worker<RouteJobData>(
             this.SR_QUEUE,
             async (job: Job<RouteJobData>) => {
-                await process_route_job(job.data.projectId, this);
+                await RouterProcessor.process_route_job(job.data.projectId, this);
             },
             {
                 connection: queue_config.connection!,
