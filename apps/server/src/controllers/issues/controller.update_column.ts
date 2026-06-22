@@ -53,8 +53,6 @@ export default class ColumnUpdateController {
                 return;
             }
 
-            // Only provided keys are written — Prisma skips `undefined`, so this one
-            // endpoint handles both rename (label) and a single position nudge (order).
             const updated = await prisma.customColumn.update({
                 where: { id: params_data.id },
                 data: {

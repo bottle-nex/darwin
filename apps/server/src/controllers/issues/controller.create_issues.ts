@@ -54,7 +54,7 @@ export default class IssueCreateController {
                 }
             }
 
-            let issue: { id: string } | undefined;
+            let issue: { id: string; status: IssueStatus } | undefined;
             for (let attempt = 0; attempt < 5; attempt++) {
                 try {
                     issue = await prisma.$transaction(async (tx) => {
@@ -78,7 +78,10 @@ export default class IssueCreateController {
                                     : IssueStatus.Todo,
                                 number: (last_issue?.number ?? 0) + 1,
                             },
-                            select: { id: true },
+                            select: {
+                                id: true,
+                                status: true,
+                            },
                         });
                     });
                     break;
@@ -100,6 +103,8 @@ export default class IssueCreateController {
             const channel_name = server_services.publisher.get_channel_name(
                 parsed_body.data.project_id,
             );
+
+            // publish for real-time changes visiblity
             const publishing_body = {
                 type: OutboundSocketMessageType.ISSUE_CREATED,
                 data: { issue_id: issue.id },
@@ -108,6 +113,12 @@ export default class IssueCreateController {
                 channel_name,
                 JSON.stringify(publishing_body),
             );
+
+            if (!parsed_body.data.custom_column_id || issue.status === IssueStatus.Todo) {
+                // add to queue, server -> router
+                await server_services.queue.enqueue_project(parsed_body.data.project_id);
+                console.log("queued to router");
+            }
 
             ResponseWriter.created(res, { issue_id: issue.id }, "Issue created successfully");
         } catch (err) {
