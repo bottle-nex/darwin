@@ -1,12 +1,12 @@
 import PublisherSystem from "../real-time/publisher.system";
-import RouteQueueService from "./services.queue";
+import QueueService from "./services.queue";
 
 export default class InitService {
     public publisher: PublisherSystem;
-    public queue: RouteQueueService;
+    public queue: QueueService;
 
     constructor() {
         this.publisher = new PublisherSystem();
-        this.queue = new RouteQueueService();
+        this.queue = new QueueService();
     }
 }

@@ -101,6 +101,8 @@ model Project {
     secrets          ProjectSecret[]
     tags             Tag[]
 
+    workers Worker[]
+
     @@unique([orgId, slug])
     @@index([ownerId])
     @@index([githubInstallationId])
@@ -241,10 +243,17 @@ model Issue {
     resolvedAt DateTime?
     chats      Chat[]
 
+    assignerWorkerId String?
+    assignedWorker   Worker? @relation(fields: [assignerWorkerId], references: [id], onDelete: Cascade)
+
+    queuePosition  Int?
+    specialization String?
+
     @@unique([projectId, number])
     @@index([projectId, status])
     @@index([projectId, customColumnId])
     @@index([status, createdAt])
+    @@index([assignerWorkerId, status, queuePosition])
 }
 
 model Chat {
@@ -359,6 +368,39 @@ model ProjectSecret {
     @@index([projectId])
 }
 
+// the actual VM
+model Worker {
+    id String @id @default(cuid())
+
+    projectId String
+    project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+    specialization String?
+    status         WorkerStatus
+
+    sandboxId      String?
+    contextSummary Json? // this will contain queuedCount, currentSpecialization, recentFilesEdited, lastIssue fixed, etc... -> basically for routing decisions
+    contextBlobUrl String? // this willl contain transcripts, logs, etc. vm-worker will read it before dispatching the project's issues to a worker, so it can rehydrate the worker/ VM, or else every issue will start fresh, no previous state known
+
+    nextQueuePos     Int       @default(1)
+    leaseExpiresAt   DateTime?
+
+    issues Issue[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@index([projectId, status])
+    @@index([projectId, specialization])
+}
+
+enum WorkerStatus {
+    Booting
+    Idle
+    Busy
+    Dead
+}
+
 enum SetupStatus {
     Pending
     Provisioning
@@ -436,4 +478,3 @@ enum TeamRole {
     Maintainer
     Member
 }
-
