@@ -26,6 +26,8 @@ interface DialProps {
         angle?: number;
         interval?: number;
         direction?: "clockwise" | "counterclockwise";
+        /** Delay in seconds before the first tick — used to offset/alternate dials. */
+        delay?: number;
     };
     className?: string;
 }
@@ -60,18 +62,29 @@ export default function Dial({
 
         const step = rotation.angle ?? 6;
         const interval = (rotation.interval ?? 1) * 1000;
+        const delay = (rotation.delay ?? 0) * 1000;
         const signed = rotation.direction === "counterclockwise" ? -step : step;
 
-        const id = setInterval(() => {
+        const tick = () => {
             currentAngle.current += signed;
             controls.start({
                 rotate: currentAngle.current,
-                transition: { duration: 0.3, ease: "easeOut" },
+                // Snappy "tick" like a clock's second hand — no overshoot.
+                transition: { duration: 0.15, ease: "easeOut" },
             });
-        }, interval);
+        };
 
-        return () => clearInterval(id);
-    }, [rotation?.angle, rotation?.interval, rotation?.direction]);
+        let id: ReturnType<typeof setInterval>;
+        const timeout = setTimeout(() => {
+            tick();
+            id = setInterval(tick, interval);
+        }, delay);
+
+        return () => {
+            clearTimeout(timeout);
+            clearInterval(id);
+        };
+    }, [rotation?.angle, rotation?.interval, rotation?.direction, rotation?.delay]);
 
     const ticks = Array.from({ length: tickCount }, (_, i) => {
         const angle = (i / tickCount) * 2 * Math.PI - Math.PI / 2;

@@ -41,7 +41,7 @@ export default function PlaygroundProjectSwitcher() {
             <Popover.Trigger asChild>
                 <button
                     type="button"
-                    className="flex h-7 cursor-pointer items-center gap-2 rounded-md bg-white/5 px-2 text-[13px] font-semibold text-neutral-100 outline-none hover:bg-white/10 data-[state=open]:bg-white/10"
+                    className="flex h-7 cursor-pointer items-center gap-2 rounded-md bg-white/5 px-2 text-[13px] font-semibold text-neutral-100 outline-none hover:bg-white/10 data-[state=open]:bg-white/10 shadow-[inset_0_1px_0_0_#232323]"
                 >
                     <MdFolder
                         className="size-3.5 shrink-0"
@@ -57,7 +57,7 @@ export default function PlaygroundProjectSwitcher() {
                 <Popover.Content
                     align="start"
                     sideOffset={6}
-                    className="z-50 w-72 origin-(--radix-popover-content-transform-origin) rounded-lg border border-neutral-800 bg-charcoal p-2 shadow-xl animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95"
+                    className="z-50 w-72 origin-(--radix-popover-content-transform-origin) rounded-lg border border-neutral-800 bg-charcoal p-2 shadow-xl animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 "
                 >
                     <SidebarSearch
                         value={query}

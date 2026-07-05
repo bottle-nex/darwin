@@ -15,7 +15,6 @@ import {
     type KanbanColumnDef,
 } from "@/components/playground/Home/panes/kanban/types";
 import CardRenderer from "@/components/playground/Home/panes/kanban/cards/CardRenderer";
-import Reveal from "@/components/utility/Reveal";
 import { Button } from "@/components/ui/button";
 
 /** Cards shown per column — varied so the board reads naturally, not uniform. */
@@ -78,7 +77,7 @@ function ShowcaseOptionsBar() {
     );
 }
 
-function ShowcaseColumn({ column, columnIndex }: { column: KanbanColumnDef; columnIndex: number }) {
+function ShowcaseColumn({ column }: { column: KanbanColumnDef }) {
     const { icon: Icon, title, titleBox, status } = column;
     const issues = INITIAL_BOARD[status].slice(
         0,
@@ -86,10 +85,7 @@ function ShowcaseColumn({ column, columnIndex }: { column: KanbanColumnDef; colu
     );
 
     return (
-        <Reveal
-            delay={0.15 + columnIndex * 0.08}
-            className="flex w-72 min-w-72 flex-none flex-col rounded-xl bg-white/2.5 p-2 ring-1 ring-white/5"
-        >
+        <div className="flex w-72 min-w-72 flex-none flex-col rounded-xl bg-white/2.5 p-2 ring-1 ring-white/5">
             <div className="mb-2 flex items-center justify-between gap-2 px-0.5">
                 <div
                     className={cn(
@@ -109,7 +105,7 @@ function ShowcaseColumn({ column, columnIndex }: { column: KanbanColumnDef; colu
                     <CardRenderer key={issue.id} issue={issue} />
                 ))}
             </div>
-        </Reveal>
+        </div>
     );
 }
 
@@ -132,12 +128,8 @@ export default function BoardShowcase() {
                         <ShowcaseOptionsBar />
                         <div className="relative">
                             <div className="flex min-h-120 gap-4 overflow-x-auto px-3 pt-3 pb-3">
-                                {COLUMNS.map((column, i) => (
-                                    <ShowcaseColumn
-                                        key={column.status}
-                                        column={column}
-                                        columnIndex={i}
-                                    />
+                                {COLUMNS.map((column) => (
+                                    <ShowcaseColumn key={column.status} column={column} />
                                 ))}
                             </div>
                             <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-linear-to-t from-charcoal to-transparent" />

@@ -6,16 +6,15 @@ import { cn } from "@/lib/utils";
 import { azeretMono, Button } from "@/components/ui/button";
 import Reveal from "@/components/utility/Reveal";
 import Dial from "@/app/landing/dial";
-import Gradient from "@/app/landing/gradient";
+import HeroBuddy from "@/components/landing/v2/HeroBuddy";
 
 const MICRO_LABELS = ["Reads the repo", "Writes the patch", "Opens the PR"];
 
 export default function LandingHeroV2() {
     return (
         <section className="bg-snow">
-            <div className="relative min-h-[calc(100vh-3.5rem)] overflow-hidden bg-snow">
+            <div className="relative -mt-14 min-h-screen overflow-hidden bg-snow">
                 {/* Background — gradient + dials moved from the landing prototype */}
-                <Gradient />
                 <Dial
                     size={1300}
                     color={"#fafafa"}
@@ -30,7 +29,7 @@ export default function LandingHeroV2() {
                     className="absolute z-10 -bottom-150 -right-150 opacity-30"
                     shadow={{ blur: 20, color: "#00000025" }}
                     rotation={{
-                        angle: 5,
+                        angle: 6,
                         interval: 2,
                         direction: "clockwise",
                     }}
@@ -48,14 +47,15 @@ export default function LandingHeroV2() {
                     className="absolute z-20 -bottom-130 -right-130 opacity-30"
                     shadow={{ blur: 20, color: "#00000025" }}
                     rotation={{
-                        angle: 5,
+                        angle: 6,
                         interval: 2,
                         direction: "counterclockwise",
+                        delay: 1,
                     }}
                 />
                 <Dial
                     size={900}
-                    color={"#ab9ff2"}
+                    color={"#ffffff"}
                     tick={{
                         size: 0,
                         width: 0,
@@ -78,15 +78,15 @@ export default function LandingHeroV2() {
                 />
 
                 {/* Hero content (kept from the / page) */}
-                <div className="relative z-50 mx-auto flex min-h-[calc(100vh-3.5rem)] w-full max-w-7xl flex-col items-center justify-center gap-7 px-6 pt-20 pb-[25vh] text-center">
+                <div className="relative z-50 mx-auto flex min-h-screen w-full max-w-7xl flex-col items-center justify-center gap-7 px-6 pt-34 pb-[25vh] text-center">
                     <Reveal immediate>
                         <div
                             className={cn(
-                                "flex items-center gap-2 rounded-full border border-neutral-200 bg-white px-3 py-1.5 text-[11px] uppercase tracking-wide text-neutral-500 shadow-sm",
+                                "buddy-zone flex items-center gap-2 rounded-full border border-neutral-200 bg-white px-3 py-1.5 text-[11px] uppercase tracking-wide text-neutral-500 shadow-sm",
                                 azeretMono.className,
                             )}
                         >
-                            <span className="size-1.5 rounded-full bg-[#AB9FF2]" />
+                            <HeroBuddy className="size-6 -my-1" />
                             The agent-native board
                         </div>
                     </Reveal>

@@ -12,10 +12,10 @@ export default function Home() {
             <NavBar />
             <LandingHeroV2 />
             <BoardShowcase />
+            <FeaturesSection />
             <div id="pricing" className="scroll-mt-20">
                 <LandingPricingSection />
             </div>
-            <FeaturesSection />
             <LandingCtaV2 />
             <Footer />
         </main>

@@ -72,7 +72,7 @@ export default function ProjectCard({
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 onClick={(e) => e.stopPropagation()}
-                                className="pointer-events-auto inline-flex min-w-0 items-center gap-1.5 rounded-full bg-white/5 px-3 py-1 font-mono text-[12px] text-neutral-300 ring-1 ring-white/10 transition-colors hover:bg-white/10 hover:text-neutral-100"
+                                className="pointer-events-auto inline-flex min-w-0 items-center gap-1.5 rounded-full bg-white/5 px-3 py-1.25 font-mono text-[12px] text-neutral-300 transition-colors hover:bg-white/10 hover:text-neutral-100 shadow-[inset_0_1px_0_0_#2f2f2f]"
                             >
                                 <FaGithub className="size-3 shrink-0 text-snow!" />
                                 <span className="truncate">{project.githubRepoFullName}</span>

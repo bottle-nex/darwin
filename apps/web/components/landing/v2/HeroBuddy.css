@@ -1,0 +1,432 @@
+.buddy {
+    animation: buddy-slot 32s ease-in-out infinite;
+}
+.buddy-sprite {
+    width: 1.5rem;
+    height: 1.5rem;
+    overflow: visible;
+    animation: buddy-moves 32s step-end infinite;
+}
+.buddy-figure {
+    animation: buddy-bob 0.9s step-end infinite;
+}
+
+.buddy-trick {
+    transform-box: view-box;
+    transform-origin: 8px 5.5px;
+    animation: buddy-trick 32s step-end infinite;
+}
+
+.buddy-cap {
+    opacity: 0;
+    animation: buddy-hat 32s step-end infinite;
+}
+.buddy-capless .buddy-cap {
+    animation: none;
+}
+.buddy-arm-r {
+    animation: buddy-arm-right 32s step-end infinite;
+}
+.buddy-arm-l {
+    animation: buddy-arm-left 32s step-end infinite;
+}
+.buddy-leg-l {
+    animation: buddy-leg-left 32s step-end infinite;
+}
+.buddy-leg-r {
+    animation: buddy-leg-right 32s step-end infinite;
+}
+
+.buddy-eyes {
+    transform-box: fill-box;
+    transform-origin: 50% 100%;
+    animation: buddy-glance 32s step-end infinite;
+}
+.buddy-eye {
+    animation: buddy-blink 5s step-end infinite;
+}
+
+.buddy-eye-r {
+    transform-box: fill-box;
+    transform-origin: 50% 100%;
+    animation:
+        buddy-blink 5s step-end infinite,
+        buddy-wink 32s step-end infinite;
+}
+.buddy-zone:hover .buddy-figure {
+    animation-duration: 0.35s;
+}
+
+@keyframes buddy-slot {
+    0%,
+    10%,
+    59.5%,
+    100% {
+        width: 1.5rem;
+        margin-left: 0rem;
+    }
+    11.5%,
+    57.5% {
+        width: 0rem;
+        margin-left: -0.5rem;
+    }
+}
+
+@keyframes buddy-moves {
+    0%,
+    8%,
+    61.5%,
+    69%,
+    70.5%,
+    100% {
+        transform: translate(0, 0);
+    }
+    8.25%,
+    61% {
+        transform: translate(0, -8px);
+    }
+    8.75%,
+    60.5% {
+        transform: translate(1px, -16px);
+    }
+    9.5% {
+        transform: translate(2px, -22px);
+    }
+    12% {
+        transform: translate(2px, -22px);
+        animation-timing-function: steps(6, end);
+    }
+    16% {
+        transform: translate(70px, -22px);
+    }
+
+    26.5%,
+    28%,
+    29.5%,
+    31% {
+        transform: translate(70px, -24px);
+    }
+    27.25%,
+    28.75%,
+    30.25%,
+    31.75% {
+        transform: translate(70px, -22px);
+    }
+
+    32.75%,
+    34% {
+        transform: translate(70px, -26px);
+    }
+    33.25% {
+        transform: translate(70px, -30px);
+    }
+    34.75% {
+        transform: translate(70px, -22px);
+    }
+
+    49.5% {
+        transform: translate(70px, -22px);
+        animation-timing-function: linear;
+    }
+    53%,
+    60% {
+        transform: translate(2px, -22px);
+    }
+
+    55.75% {
+        transform: translate(2px, -24px);
+    }
+    56.25% {
+        transform: translate(2px, -22px);
+    }
+
+    68%,
+    69.75% {
+        transform: translate(0, -3px);
+    }
+}
+
+@keyframes buddy-bob {
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-0.5px);
+    }
+}
+
+@keyframes buddy-trick {
+    0%,
+    19.5% {
+        transform: rotate(0deg);
+    }
+    20.1% {
+        transform: rotate(90deg);
+    }
+    20.7% {
+        transform: rotate(180deg);
+    }
+    21.3% {
+        transform: rotate(270deg);
+    }
+    21.9%,
+    22.5%,
+    26%,
+    32.5% {
+        transform: rotate(360deg);
+    }
+    23%,
+    24.5% {
+        transform: rotate(360deg) scale(0.96, 1.12);
+    }
+    25.25% {
+        transform: rotate(360deg) scale(1.06, 0.9);
+    }
+    33% {
+        transform: rotate(270deg);
+    }
+    33.5% {
+        transform: rotate(180deg);
+    }
+    34% {
+        transform: rotate(90deg);
+    }
+    34.5%,
+    35.5% {
+        transform: rotate(0deg);
+    }
+    35.75% {
+        transform: rotate(90deg);
+    }
+    36%,
+    38% {
+        transform: rotate(180deg);
+    }
+    38.25% {
+        transform: rotate(90deg);
+    }
+    38.5%,
+    53% {
+        transform: rotate(0deg);
+    }
+    53.5%,
+    55.5% {
+        transform: scale(1.04, 0.92);
+    }
+    55.75%,
+    100% {
+        transform: rotate(0deg);
+    }
+}
+
+@keyframes buddy-hat {
+    0%,
+    39%,
+    49.25%,
+    100% {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+    39.5% {
+        opacity: 1;
+        transform: translateY(-4px);
+    }
+    40%,
+    45%,
+    46.25%,
+    48.5% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    45.75% {
+        opacity: 1;
+        transform: translateY(-2px);
+    }
+    48.75% {
+        opacity: 1;
+        transform: translateY(-6px);
+    }
+}
+
+@keyframes buddy-arm-right {
+    0%,
+    15.5%,
+    19.25%,
+    22.5%,
+    26%,
+    27.25%,
+    28.75%,
+    30.25%,
+    31.75%,
+    42%,
+    43.25%,
+    44.75%,
+    46.25%,
+    100% {
+        transform: translate(0, 0);
+    }
+    16%,
+    19%,
+    23%,
+    24.5%,
+    26.5%,
+    28%,
+    29.5%,
+    31%,
+    42.5%,
+    44%,
+    45.5% {
+        transform: translate(0, -2px);
+    }
+    25.25% {
+        transform: translate(0, -1px);
+    }
+}
+
+@keyframes buddy-arm-left {
+    0%,
+    22.5%,
+    26%,
+    27.25%,
+    28.75%,
+    30.25%,
+    31.75%,
+    42.5%,
+    44%,
+    45.5%,
+    46.25%,
+    100% {
+        transform: translate(0, 0);
+    }
+    23%,
+    24.5%,
+    26.5%,
+    28%,
+    29.5%,
+    31%,
+    43.25%,
+    44.75% {
+        transform: translate(0, -2px);
+    }
+    25.25% {
+        transform: translate(0, -1px);
+    }
+}
+
+@keyframes buddy-leg-left {
+    0%,
+    36.5%,
+    37.25%,
+    38%,
+    100% {
+        transform: translateY(0);
+    }
+    36.75%,
+    37.75% {
+        transform: translateY(1px);
+    }
+}
+
+@keyframes buddy-leg-right {
+    0%,
+    36.25%,
+    37%,
+    38%,
+    63.25%,
+    64%,
+    65%,
+    66%,
+    100% {
+        transform: translateY(0);
+    }
+    36.5%,
+    37.5% {
+        transform: translateY(1px);
+    }
+    63.5%,
+    64.5%,
+    65.5% {
+        transform: translateY(-1px);
+    }
+}
+
+@keyframes buddy-wink {
+    0%,
+    16.25%,
+    18.75%,
+    100% {
+        transform: scaleY(1);
+    }
+    16.75%,
+    18.25% {
+        transform: scaleY(0.5);
+    }
+}
+
+@keyframes buddy-glance {
+    0%,
+    1.5%,
+    7.5%,
+    11.5%,
+    16.5%,
+    46.25%,
+    48.5%,
+    53.25%,
+    57%,
+    100% {
+        transform: translate(0, 0);
+    }
+    2%,
+    4.5%,
+    12%,
+    16%,
+    49.5%,
+    53%,
+    56% {
+        transform: translate(1px, 0);
+    }
+    5.5%,
+    7%,
+    56.5% {
+        transform: translate(-1px, 0);
+    }
+    46.5%,
+    48.25% {
+        transform: translate(0, 1px);
+    }
+    53.75%,
+    55.5% {
+        transform: translate(0, 0) scaleY(0.5);
+    }
+}
+
+@keyframes buddy-blink {
+    0%,
+    91%,
+    96%,
+    100% {
+        opacity: 1;
+    }
+    92% {
+        opacity: 0;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .buddy,
+    .buddy-sprite,
+    .buddy-figure,
+    .buddy-trick,
+    .buddy-cap,
+    .buddy-arm-r,
+    .buddy-arm-l,
+    .buddy-leg-l,
+    .buddy-leg-r,
+    .buddy-eyes,
+    .buddy-eye,
+    .buddy-eye-r,
+    .buddy-zone:hover .buddy-figure {
+        animation: none;
+    }
+}
