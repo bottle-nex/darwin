@@ -122,9 +122,7 @@ export function useCustomKanban({
     // Set (or clear, with null) a column's colour. Optimistic like renameColumn.
     const recolorColumn = async (columnId: string, color: string | null) => {
         if (!projectId) return;
-        setColumns((prev) =>
-            prev.map((col) => (col.id === columnId ? { ...col, color } : col)),
-        );
+        setColumns((prev) => prev.map((col) => (col.id === columnId ? { ...col, color } : col)));
         try {
             await updateColumn.mutateAsync({ id: columnId, project_id: projectId, color });
         } catch {
