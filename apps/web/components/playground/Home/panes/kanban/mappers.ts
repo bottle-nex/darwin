@@ -3,7 +3,7 @@ import type { BoardAssignee, BoardIssue, BoardResponse, ServerIssueStatus } from
 import { emptyBoard, getLabel } from "./data";
 import { KanbanStatus, type Assignee, type BoardState, type Issue, type Priority } from "./types";
 
-const NUMBER_TO_PRIORITY: Record<number, Priority> = {
+export const NUMBER_TO_PRIORITY: Record<number, Priority> = {
     1: "urgent",
     2: "high",
     3: "normal",
@@ -28,7 +28,7 @@ function toneFor(id: string): AvatarTone {
     return TONES[hash % TONES.length];
 }
 
-function toAssignee(a: BoardAssignee): Assignee {
+export function toAssignee(a: BoardAssignee): Assignee {
     return { id: a.id, name: a.name ?? "?", tone: toneFor(a.id) };
 }
 

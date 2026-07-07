@@ -12,6 +12,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog";
+import { useOpenIssue } from "@/components/playground/issue/useOpenIssue";
 import { getLabel, PRIORITY_DOT } from "../data";
 import { PANEL_CONTENT, PANEL_ITEM } from "../KanbanOptionPanels/panelStyles";
 import CardAvatars from "./CardAvatars";
@@ -28,6 +29,8 @@ type CustomKanbanCardProps = {
     projectId?: string;
     onAssign?: (userId: string) => void;
     onUnassign?: (userId: string) => void;
+    /** Use a solid background so a coloured column's tint can't bleed through. */
+    opaque?: boolean;
 };
 
 /**
@@ -43,14 +46,21 @@ export default function CustomKanbanCard({
     projectId,
     onAssign,
     onUnassign,
+    opaque,
 }: CustomKanbanCardProps) {
     const label = card.label ? getLabel(card.label) : undefined;
     const [confirmOpen, setConfirmOpen] = useState(false);
     const [assignOpen, setAssignOpen] = useState(false);
     const canAssign = Boolean(projectId && onAssign && onUnassign);
+    const { openIssue } = useOpenIssue();
 
     return (
-        <div className="group/card relative rounded-lg bg-white/5 p-2.5 ring-1 ring-white/5 transition-colors hover:ring-white/15">
+        <div
+            className={cn(
+                "group/card relative rounded-lg p-2.5 ring-1 ring-white/5 transition-colors hover:ring-white/15",
+                opaque ? "bg-neutral-800" : "bg-white/5",
+            )}
+        >
             {(onEdit || onDelete || canAssign) && (
                 <DropdownMenu.Root>
                     <DropdownMenu.Trigger asChild>
@@ -99,43 +109,56 @@ export default function CustomKanbanCard({
                 </DropdownMenu.Root>
             )}
 
-            <div className="flex items-start gap-2 pr-5">
-                <span
-                    className={cn(
-                        "mt-1.5 size-1.5 shrink-0 rounded-full",
-                        PRIORITY_DOT[card.priority],
-                    )}
-                    aria-hidden
-                />
-                <p className="text-[13px] leading-snug font-medium text-neutral-100">
-                    {card.title}
-                </p>
-            </div>
-
-            {card.description && (
-                <p className="mt-1.5 line-clamp-2 pl-3.5 text-[12px] leading-snug text-neutral-400">
-                    {card.description}
-                </p>
-            )}
-
-            {label && (
-                <div className="mt-2 pl-3.5">
+            <div
+                role="button"
+                tabIndex={0}
+                className="cursor-pointer"
+                onClick={() => openIssue(card.id)}
+                onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        openIssue(card.id);
+                    }
+                }}
+            >
+                <div className="flex items-start gap-2 pr-5">
                     <span
                         className={cn(
-                            "inline-flex items-center rounded px-1.5 py-0.5 text-[11px] font-medium",
-                            label.className,
+                            "mt-1.5 size-1.5 shrink-0 rounded-full",
+                            PRIORITY_DOT[card.priority],
                         )}
-                    >
-                        {label.name}
-                    </span>
+                        aria-hidden
+                    />
+                    <p className="text-[13px] leading-snug font-medium text-neutral-100">
+                        {card.title}
+                    </p>
                 </div>
-            )}
 
-            <div className="mt-2 flex items-center justify-between gap-2 pl-3.5">
-                <span className="text-[11px] font-medium text-neutral-500">
-                    {card.number ? `#${card.number}` : ""}
-                </span>
-                <CardAvatars assignees={card.assignees} />
+                {card.description && (
+                    <p className="mt-1.5 line-clamp-2 pl-3.5 text-[12px] leading-snug text-neutral-400">
+                        {card.description}
+                    </p>
+                )}
+
+                {label && (
+                    <div className="mt-2 pl-3.5">
+                        <span
+                            className={cn(
+                                "inline-flex items-center rounded px-1.5 py-0.5 text-[11px] font-medium",
+                                label.className,
+                            )}
+                        >
+                            {label.name}
+                        </span>
+                    </div>
+                )}
+
+                <div className="mt-2 flex items-center justify-between gap-2 pl-3.5">
+                    <span className="text-[11px] font-medium text-neutral-500">
+                        {card.number ? `#${card.number}` : ""}
+                    </span>
+                    <CardAvatars assignees={card.assignees} />
+                </div>
             </div>
 
             <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>

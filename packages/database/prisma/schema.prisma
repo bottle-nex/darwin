@@ -275,10 +275,11 @@ model Chat {
 }
 
 model CustomColumn {
-    id        String @id @default(cuid())
+    id        String  @id @default(cuid())
     projectId String
     label     String
     order     Int
+    color     String? // hex like "#9bc24f"; null = default (uncoloured) column
 
     project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
     issues  Issue[]

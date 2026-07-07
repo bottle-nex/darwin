@@ -15,6 +15,7 @@ export default function CustomKanbanBoard({
     addColumn,
     removeColumn,
     renameColumn,
+    recolorColumn,
     addCard,
     removeCard,
     editCard,
@@ -30,6 +31,7 @@ export default function CustomKanbanBoard({
                     onAddCard={(input) => addCard(column.id, input)}
                     onDelete={() => removeColumn(column.id)}
                     onRename={(label) => renameColumn(column.id, label)}
+                    onRecolor={(color) => recolorColumn(column.id, color)}
                     onEditCard={editCard}
                     onDeleteCard={removeCard}
                     projectId={projectId}

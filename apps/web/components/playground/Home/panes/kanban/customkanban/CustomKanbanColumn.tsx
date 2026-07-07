@@ -1,21 +1,49 @@
 "use client";
 import { useState } from "react";
-import { MdMoreHoriz, MdAdd, MdDelete, MdEdit } from "react-icons/md";
+import {
+    MdMoreHoriz,
+    MdAdd,
+    MdDelete,
+    MdEdit,
+    MdPalette,
+    MdChevronRight,
+    MdCheck,
+    MdColorize,
+    MdFormatColorReset,
+} from "react-icons/md";
 import { DropdownMenu } from "radix-ui";
 import { useDroppable } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import {
+    Dialog,
+    DialogContent,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog";
+import { ColorPicker } from "@/components/ui/color-picker";
+import { TAG_COLORS } from "@/types/tags";
 import { PANEL_CONTENT, PANEL_ITEM } from "../KanbanOptionPanels/panelStyles";
 import AddCardModal from "./AddCardModal";
 import SortableCustomCard from "./SortableCustomCard";
 import type { CustomCard, CustomColumn, NewCardInput } from "./types";
+
+/** A column tinted with its own colour uses that colour as its background. srgb
+ *  mixing keeps the hue saturated (oklab reads muddy over the dark board). */
+function columnTint(color: string | null): string | undefined {
+    return color ? `color-mix(in srgb, ${color} 56%, transparent)` : undefined;
+}
 
 type CustomKanbanColumnProps = {
     column: CustomColumn;
     onAddCard: (input: NewCardInput) => void;
     onDelete: () => void;
     onRename: (label: string) => void;
+    /** Set the column's colour (hex), or clear it with null. */
+    onRecolor: (color: string | null) => void;
     onEditCard: (cardId: string, input: NewCardInput) => void;
     onDeleteCard: (cardId: string) => void;
     projectId?: string;
@@ -34,6 +62,7 @@ export default function CustomKanbanColumn({
     onAddCard,
     onDelete,
     onRename,
+    onRecolor,
     onEditCard,
     onDeleteCard,
     projectId,
@@ -44,6 +73,8 @@ export default function CustomKanbanColumn({
     const [editingCard, setEditingCard] = useState<CustomCard | null>(null);
     const [renaming, setRenaming] = useState(false);
     const [draftTitle, setDraftTitle] = useState(column.title);
+    const [customColorOpen, setCustomColorOpen] = useState(false);
+    const [customHex, setCustomHex] = useState(column.color ?? TAG_COLORS[0]);
     const { setNodeRef, isOver } = useDroppable({ id: column.id });
 
     const commitRename = () => {
@@ -55,9 +86,10 @@ export default function CustomKanbanColumn({
     return (
         <div
             className={cn(
-                "group flex max-h-full w-72 shrink-0 flex-col rounded-xl bg-white/2.5 p-2 ring-1 transition-colors",
+                "group flex max-h-full w-72 shrink-0 flex-col rounded-xl bg-white/2.5 p-1 ring-1 transition-colors",
                 isOver ? "ring-white/15" : "ring-white/5",
             )}
+            style={{ backgroundColor: columnTint(column.color) }}
         >
             <div className="mb-2 flex items-center justify-between gap-2 px-0.5">
                 {renaming ? (
@@ -111,6 +143,58 @@ export default function CustomKanbanColumn({
                                 <MdEdit className="size-3.5" aria-hidden />
                                 <span className="flex-1">Rename list</span>
                             </DropdownMenu.Item>
+
+                            <DropdownMenu.Sub>
+                                <DropdownMenu.SubTrigger className={PANEL_ITEM}>
+                                    <MdPalette className="size-3.5" aria-hidden />
+                                    <span className="flex-1">Change color</span>
+                                    <MdChevronRight className="size-3.5 opacity-60" aria-hidden />
+                                </DropdownMenu.SubTrigger>
+                                <DropdownMenu.Portal>
+                                    <DropdownMenu.SubContent
+                                        sideOffset={6}
+                                        className={`w-auto ${PANEL_CONTENT}`}
+                                    >
+                                        <div className="flex max-w-38 flex-wrap gap-1.5 p-1">
+                                            {TAG_COLORS.map((c) => (
+                                                <DropdownMenu.Item
+                                                    key={c}
+                                                    onSelect={() => onRecolor(c)}
+                                                    aria-label={`Use ${c}`}
+                                                    className="flex size-6 cursor-pointer items-center justify-center rounded-full ring-1 ring-white/10 outline-none data-highlighted:ring-white/50"
+                                                    style={{ backgroundColor: c }}
+                                                >
+                                                    {column.color === c && (
+                                                        <MdCheck className="size-3 text-neutral-900" />
+                                                    )}
+                                                </DropdownMenu.Item>
+                                            ))}
+                                            <DropdownMenu.Item
+                                                onSelect={() => {
+                                                    setCustomHex(column.color ?? TAG_COLORS[0]);
+                                                    setCustomColorOpen(true);
+                                                }}
+                                                aria-label="Custom color"
+                                                className="flex size-6 cursor-pointer items-center justify-center rounded-full ring-1 ring-white/10 outline-none data-highlighted:ring-white/50"
+                                                style={{
+                                                    background:
+                                                        "conic-gradient(from 0deg, #f00, #ff0, #0f0, #0ff, #00f, #f0f, #f00)",
+                                                }}
+                                            >
+                                                <MdColorize className="size-3 text-white drop-shadow" />
+                                            </DropdownMenu.Item>
+                                        </div>
+                                        <DropdownMenu.Item
+                                            onSelect={() => onRecolor(null)}
+                                            className={PANEL_ITEM}
+                                        >
+                                            <MdFormatColorReset className="size-3.5" aria-hidden />
+                                            <span className="flex-1">No color</span>
+                                        </DropdownMenu.Item>
+                                    </DropdownMenu.SubContent>
+                                </DropdownMenu.Portal>
+                            </DropdownMenu.Sub>
+
                             <DropdownMenu.Item
                                 onSelect={onDelete}
                                 className={`${PANEL_ITEM} text-rose-300 data-highlighted:text-rose-200`}
@@ -129,7 +213,7 @@ export default function CustomKanbanColumn({
             >
                 <div
                     ref={setNodeRef}
-                    className="flex min-h-10 flex-col gap-2 overflow-y-auto rounded-lg p-0.5"
+                    className="flex min-h-10 flex-col gap-1.5 overflow-y-auto rounded-lg p-0.5"
                 >
                     {column.cards.map((card) => (
                         <SortableCustomCard
@@ -140,6 +224,7 @@ export default function CustomKanbanColumn({
                             projectId={projectId}
                             onAssign={(userId) => onAssign(card.id, userId)}
                             onUnassign={(userId) => onUnassign(card.id, userId)}
+                            opaque={Boolean(column.color)}
                         />
                     ))}
                 </div>
@@ -160,6 +245,33 @@ export default function CustomKanbanColumn({
                 columnTitle={column.title}
                 onSubmit={onAddCard}
             />
+
+            <Dialog open={customColorOpen} onOpenChange={setCustomColorOpen}>
+                <DialogContent className="dark w-auto border-white/10 bg-charcoal">
+                    <DialogHeader>
+                        <DialogTitle className="text-neutral-100">Column color</DialogTitle>
+                    </DialogHeader>
+                    <ColorPicker value={customHex} onChange={setCustomHex} />
+                    <DialogFooter>
+                        <Button
+                            type="button"
+                            variant="tertiary"
+                            onClick={() => setCustomColorOpen(false)}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            type="button"
+                            onClick={() => {
+                                onRecolor(customHex);
+                                setCustomColorOpen(false);
+                            }}
+                        >
+                            Apply
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
 
             {editingCard && (
                 <AddCardModal

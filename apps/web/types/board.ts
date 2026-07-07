@@ -35,6 +35,8 @@ export type BoardColumn = {
     id: string;
     label: string;
     order: number;
+    /** Hex like "#9bc24f"; null = default (uncoloured) column. */
+    color: string | null;
 };
 
 /** The full board payload: every column and every issue for the project. */

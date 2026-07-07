@@ -87,7 +87,10 @@ export function useCustomKanban({
         if (!name || !projectId) return;
         try {
             const column = await createColumn.mutateAsync({ project_id: projectId, label: name });
-            setColumns((prev) => [...prev, { id: column.id, title: column.label, cards: [] }]);
+            setColumns((prev) => [
+                ...prev,
+                { id: column.id, title: column.label, color: null, cards: [] },
+            ]);
         } catch {
             toast.error("Couldn't create the list.");
         }
@@ -113,6 +116,19 @@ export function useCustomKanban({
             await updateColumn.mutateAsync({ id: columnId, project_id: projectId, label: name });
         } catch {
             toast.error("Couldn't rename the list.");
+        }
+    };
+
+    // Set (or clear, with null) a column's colour. Optimistic like renameColumn.
+    const recolorColumn = async (columnId: string, color: string | null) => {
+        if (!projectId) return;
+        setColumns((prev) =>
+            prev.map((col) => (col.id === columnId ? { ...col, color } : col)),
+        );
+        try {
+            await updateColumn.mutateAsync({ id: columnId, project_id: projectId, color });
+        } catch {
+            toast.error("Couldn't update the colour.");
         }
     };
 
@@ -376,6 +392,7 @@ export function useCustomKanban({
         addColumn,
         removeColumn,
         renameColumn,
+        recolorColumn,
         addCard,
         removeCard,
         editCard,

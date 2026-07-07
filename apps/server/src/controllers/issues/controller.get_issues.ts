@@ -44,6 +44,7 @@ export default class IssueGetController {
                         id: true,
                         label: true,
                         order: true,
+                        color: true,
                     },
                 }),
                 prisma.issue.findMany({

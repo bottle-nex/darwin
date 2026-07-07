@@ -18,6 +18,8 @@ type SortableCustomCardProps = {
     projectId?: string;
     onAssign?: (userId: string) => void;
     onUnassign?: (userId: string) => void;
+    /** Solid card background — set when the column is coloured, so the tint can't bleed. */
+    opaque?: boolean;
 };
 
 export default function SortableCustomCard({
@@ -27,6 +29,7 @@ export default function SortableCustomCard({
     projectId,
     onAssign,
     onUnassign,
+    opaque,
 }: SortableCustomCardProps) {
     const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
         id: card.id,
@@ -49,6 +52,7 @@ export default function SortableCustomCard({
                 projectId={projectId}
                 onAssign={onAssign}
                 onUnassign={onUnassign}
+                opaque={opaque}
             />
         </div>
     );
