@@ -100,14 +100,19 @@ export default class IssueCreateController {
                 ResponseWriter.system_error(res);
                 return;
             }
+
+            const full_issue = await prisma.issue.findUniqueOrThrow({
+                where: { id: issue.id },
+                include: { creator: true, assignees: true },
+            });
+
             const channel_name = server_services.publisher.get_channel_name(
                 parsed_body.data.project_id,
             );
-
-            // publish for real-time changes visiblity
             const publishing_body = {
                 type: OutboundSocketMessageType.ISSUE_CREATED,
-                data: { issue_id: issue.id },
+                projectId: parsed_body.data.project_id,
+                payload: full_issue,
             };
             await server_services.publisher.publish_message(
                 channel_name,
