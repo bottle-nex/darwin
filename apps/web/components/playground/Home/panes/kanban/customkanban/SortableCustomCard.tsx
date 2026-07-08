@@ -5,12 +5,6 @@ import { cn } from "@/lib/utils";
 import CustomKanbanCard from "./CustomKanbanCard";
 import type { CustomCard } from "./types";
 
-/**
- * Draggable wrapper around a Custom Kanban card. The card can be reordered and
- * moved between custom columns, or dragged onto the LLM To Do column; while
- * dragging, the original dims and the real card follows the cursor via the
- * board's `DragOverlay`.
- */
 type SortableCustomCardProps = {
     card: CustomCard;
     onEdit?: () => void;
@@ -18,8 +12,6 @@ type SortableCustomCardProps = {
     projectId?: string;
     onAssign?: (userId: string) => void;
     onUnassign?: (userId: string) => void;
-    /** Solid card background — set when the column is coloured, so the tint can't bleed. */
-    opaque?: boolean;
 };
 
 export default function SortableCustomCard({
@@ -29,7 +21,6 @@ export default function SortableCustomCard({
     projectId,
     onAssign,
     onUnassign,
-    opaque,
 }: SortableCustomCardProps) {
     const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
         id: card.id,
@@ -52,7 +43,6 @@ export default function SortableCustomCard({
                 projectId={projectId}
                 onAssign={onAssign}
                 onUnassign={onUnassign}
-                opaque={opaque}
             />
         </div>
     );

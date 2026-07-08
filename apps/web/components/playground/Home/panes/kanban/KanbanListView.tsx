@@ -5,17 +5,12 @@ import PlaygroundAvatar from "@/components/playground/Core/components/Playground
 import { COLUMNS, PRIORITY_DOT } from "./data";
 import type { BoardState, Issue } from "./types";
 import AgentChip from "./cards/AgentChip";
+import LLMIssueStatusTicker from "./LLMIssueStatusTicker";
 
 type KanbanListViewProps = {
     board: BoardState;
 };
 
-/**
- * List view: the LLM issues grouped by status as compact rows. Shares the
- * board's (filtered) state, so search/label filters are reflected here too.
- * Single-column focus is handled by `KanbanMainPane` (it renders the board grid
- * instead), so the list always shows every status group.
- */
 export default function KanbanListView({ board }: KanbanListViewProps) {
     const groups = COLUMNS;
 
@@ -24,21 +19,13 @@ export default function KanbanListView({ board }: KanbanListViewProps) {
             <div className="flex flex-col gap-5">
                 {groups.map((column) => {
                     const issues = board[column.status];
-                    const { icon: Icon, title, titleBox } = column;
                     return (
                         <section key={column.status}>
-                            <div
-                                className={cn(
-                                    "mb-1.5 inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-[12px] font-semibold",
-                                    titleBox,
-                                )}
-                            >
-                                <Icon className="size-3.5" aria-hidden />
-                                <span>{title}</span>
-                                <span className="text-[11px] font-medium opacity-60">
-                                    {issues.length}
-                                </span>
-                            </div>
+                            <LLMIssueStatusTicker
+                                status={column.status}
+                                count={issues.length}
+                                className="mb-1.5"
+                            />
 
                             <div className="overflow-hidden rounded-lg ring-1 ring-white/5">
                                 {issues.length === 0 ? (
@@ -57,7 +44,6 @@ export default function KanbanListView({ board }: KanbanListViewProps) {
     );
 }
 
-/** A single compact issue row in the list view. */
 function ListRow({ issue }: { issue: Issue }) {
     return (
         <div className="flex items-center gap-3 border-b border-white/5 bg-neutral-800/40 px-3 py-2 last:border-b-0 hover:bg-neutral-800/70">

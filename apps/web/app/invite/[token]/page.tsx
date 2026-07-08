@@ -4,7 +4,6 @@ import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
 import { signOut } from "next-auth/react";
 import { Button } from "@/components/ui/button";
-import SigninModal from "@/components/utility/modal/SigninModal";
 import { useUserSessionStore } from "@/store/user/useUserSessionStore";
 import useInvitationPreview from "@/hooks/invitations/useInvitationPreview";
 import useAcceptInvite from "@/hooks/invitations/useAcceptInvite";
@@ -44,7 +43,6 @@ export default function InvitePage() {
 
     const sessionToken = useUserSessionStore((s) => s.session?.user?.token);
     const userEmail = useUserSessionStore((s) => s.session?.user?.email);
-    const setOpenSigninModal = useUserSessionStore((s) => s.setOpenSigninModal);
 
     const { data: invite, isLoading, isError } = useInvitationPreview(token);
     const { mutate: accept, isPending: isAccepting } = useAcceptInvite();
@@ -64,10 +62,12 @@ export default function InvitePage() {
                 <p className="mt-1 text-sm text-muted-foreground">
                     Sign in or create an account to view this invitation.
                 </p>
-                <Button className="mt-5 h-10 w-full" onClick={() => setOpenSigninModal(true)}>
+                <Button
+                    className="mt-5 h-10 w-full"
+                    onClick={() => router.push(`/login?callbackUrl=/invite/${token}`)}
+                >
                     Sign in to continue
                 </Button>
-                <SigninModal callbackUrl={`/invite/${token}`} />
             </Shell>
         );
     }
@@ -159,9 +159,9 @@ export default function InvitePage() {
     }
 
     const scope = invite.team
-        ? `${invite.team.name}${invite.team.project ? ` · ${invite.team.project.name}` : ""}`
+        ? `${invite.team.name}${invite.project ? ` · ${invite.project.name}` : ""}`
         : invite.org?.name;
-    const roleLabel = invite.team ? invite.teamRoleOnAccept : "Member";
+    const roleLabel = invite.role ?? invite.teamRoleOnAccept;
 
     return (
         <Shell>

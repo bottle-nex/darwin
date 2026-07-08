@@ -27,8 +27,6 @@ export type CustomCard = {
 export type CustomColumn = {
     id: string;
     title: string;
-    /** Hex like "#9bc24f"; null = default (uncoloured) column. */
-    color: string | null;
     cards: CustomCard[];
 };
 

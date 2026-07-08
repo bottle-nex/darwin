@@ -42,7 +42,7 @@ export default function HomeDisplay() {
         case HomeTab.Drafts:
             return <DraftsPane />;
         case HomeTab.TeamDetail:
-            return <TeamDetailPane surface={RailSurface.Home} />;
+            return <TeamDetailPane />;
         case HomeTab.Inbox:
             return <InboxMainPane />;
 

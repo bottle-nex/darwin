@@ -54,7 +54,7 @@ export default function OrgList({
             <div className="flex flex-col gap-0.5">
                 {visible.length === 0 ? (
                     <p className="px-2.5 py-2 text-[12px] text-neutral-500">
-                        No organizations match.
+                        {orgs.length === 0 ? "No organizations yet." : "No organizations match."}
                     </p>
                 ) : (
                     visible.map((org) => (

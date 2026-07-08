@@ -1,490 +1,511 @@
 datasource db {
-    provider   = "postgresql"
-    extensions = [vector]
+  provider   = "postgresql"
+  extensions = [vector]
 }
 
 generator client {
-    provider        = "prisma-client-js"
-    output          = "../generated/client"
-    previewFeatures = ["postgresqlExtensions"]
+  provider        = "prisma-client-js"
+  output          = "../generated/client"
+  previewFeatures = ["postgresqlExtensions"]
 }
 
 model User {
-    id            String    @id @default(cuid())
-    name          String?
-    email         String    @unique
-    image         String?
-    emailVerified DateTime?
-    setupComplete Boolean   @default(false)
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  image         String?
+  emailVerified DateTime?
+  setupComplete Boolean   @default(false)
 
-    orgMemberships       OrgMember[]
-    teamMemberships      TeamMember[]
-    ownedProjects        Project[]            @relation("ProjectOwner")
-    createdProjects      Project[]            @relation("ProjectCreator")
-    createdOrganizations Organization[]       @relation("OrgCreator")
-    invitations          Invitation[]         @relation("InviteRecipient")
-    sentInvitations      Invitation[]         @relation("InviteSender")
-    githubAccount        GithubAccount?
-    githubInstallations  GithubInstallation[] @relation("GithubInstallationConnector")
+  orgMemberships       OrgMember[]
+  teamMemberships      TeamMember[]
+  projectMemberships   ProjectMember[]
+  ownedProjects        Project[]            @relation("ProjectOwner")
+  createdProjects      Project[]            @relation("ProjectCreator")
+  createdOrganizations Organization[]       @relation("OrgCreator")
+  invitations          Invitation[]         @relation("InviteRecipient")
+  sentInvitations      Invitation[]         @relation("InviteSender")
+  githubAccount        GithubAccount?
+  githubInstallations  GithubInstallation[] @relation("GithubInstallationConnector")
 
-    createdIssues  Issue[] @relation(name: "IssueCreator")
-    assignedIssues Issue[] @relation(name: "IssueAssignees")
+  createdIssues  Issue[] @relation(name: "IssueCreator")
+  assignedIssues Issue[] @relation(name: "IssueAssignees")
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-    chats     Chat[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  chats     Chat[]
 }
 
 model Organization {
-    id          String  @id @default(cuid())
-    createdById String
-    name        String
-    slug        String  @unique
-    description String?
+  id          String  @id @default(cuid())
+  createdById String
+  name        String
+  slug        String  @unique
+  description String?
 
-    members            OrgMember[]
-    projects           Project[]
-    invitations        Invitation[]
-    createdBy          User                @relation("OrgCreator", fields: [createdById], references: [id])
-    githubInstallation GithubInstallation?
+  members            OrgMember[]
+  projects           Project[]
+  invitations        Invitation[]
+  createdBy          User                @relation("OrgCreator", fields: [createdById], references: [id])
+  githubInstallation GithubInstallation?
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model OrgMember {
-    id     String  @id @default(cuid())
-    orgId  String
-    userId String
-    role   OrgRole
+  id     String  @id @default(cuid())
+  orgId  String
+  userId String
+  role   OrgRole
 
-    organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
-    user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-    @@unique([orgId, userId])
-    @@index([userId])
+  @@unique([orgId, userId])
+  @@index([userId])
 }
 
 model Project {
-    id          String  @id @default(cuid())
-    orgId       String
-    name        String
-    slug        String
-    description String?
-    ownerId     String
-    createdById String?
-    color       String?
+  id          String  @id @default(cuid())
+  orgId       String
+  name        String
+  slug        String
+  description String?
+  ownerId     String
+  createdById String?
+  color       String?
 
-    githubRepoId        BigInt?
-    githubRepoFullName  String?
-    githubRepoUrl       String?
-    githubDefaultBranch String?
+  githubRepoId        BigInt?
+  githubRepoFullName  String?
+  githubRepoUrl       String?
+  githubDefaultBranch String?
 
-    organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
-    owner        User         @relation("ProjectOwner", fields: [ownerId], references: [id], onDelete: Restrict)
-    createdBy    User?        @relation("ProjectCreator", fields: [createdById], references: [id], onDelete: SetNull)
-    teams        Team[]
+  organization Organization    @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  owner        User            @relation("ProjectOwner", fields: [ownerId], references: [id], onDelete: Restrict)
+  createdBy    User?           @relation("ProjectCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  teams        Team[]
+  members      ProjectMember[]
+  invitations  Invitation[]
 
-    githubInstallationId String?
-    githubInstallation   GithubInstallation? @relation(fields: [githubInstallationId], references: [id], onDelete: SetNull)
-    codeEmbeddings       CodeEmbedding[]
-    createdAt            DateTime            @default(now())
-    updatedAt            DateTime            @updatedAt
+  githubInstallationId String?
+  githubInstallation   GithubInstallation? @relation(fields: [githubInstallationId], references: [id], onDelete: SetNull)
+  codeEmbeddings       CodeEmbedding[]
+  createdAt            DateTime            @default(now())
+  updatedAt            DateTime            @updatedAt
 
-    routingClaimedAt DateTime?
-    issues           Issue[]
-    customColumns    CustomColumn[]
-    setupSessions    SetupSession[]
-    secrets          ProjectSecret[]
-    tags             Tag[]
-    planMd          String?     @db.Text
-    planStatus      PlanStatus  @default(Pending)
+  routingClaimedAt DateTime?
+  issues           Issue[]
+  customColumns    CustomColumn[]
+  setupSessions    SetupSession[]
+  secrets          ProjectSecret[]
+  tags             Tag[]
+  planMd           String?         @db.Text
+  planStatus       PlanStatus      @default(Pending)
 
-    workers Worker[]
+  workers Worker[]
 
-    @@unique([orgId, slug])
-    @@index([ownerId])
-    @@index([githubInstallationId])
+  @@unique([orgId, slug])
+  @@index([ownerId])
+  @@index([githubInstallationId])
 }
 
 model Tag {
-    id    String @id @default(cuid())
-    name  String
-    color String
+  id    String @id @default(cuid())
+  name  String
+  color String
 
-    projectId String
-    project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-    @@unique([projectId, name])
+  @@unique([projectId, name])
 }
 
 model Team {
-    id          String      @id @default(cuid())
-    projectId   String
-    name        String
-    slug        String
-    description String?
-    projectRole ProjectRole
+  id          String  @id @default(cuid())
+  projectId   String
+  name        String
+  slug        String
+  description String?
 
-    project     Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
-    members     TeamMember[]
-    invitations Invitation[]
+  project     Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  members     TeamMember[]
+  invitations Invitation[]
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-    @@unique([projectId, slug])
+  @@unique([projectId, slug])
+}
+
+model ProjectMember {
+  id        String      @id @default(cuid())
+  projectId String
+  userId    String
+  role      ProjectRole
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([projectId, userId])
+  @@index([userId])
 }
 
 model TeamMember {
-    id     String   @id @default(cuid())
-    teamId String
-    userId String
-    role   TeamRole
+  id     String   @id @default(cuid())
+  teamId String
+  userId String
+  role   TeamRole
 
-    team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
-    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-    @@unique([teamId, userId])
-    @@index([userId])
+  @@unique([teamId, userId])
+  @@index([userId])
 }
 
 model Invitation {
-    id        String           @id @default(cuid())
-    email     String
-    // Null until the invited email has a matching account: invites are bound to an
-    // email so they can be sent before the recipient signs up, and userId is stamped
-    // when the invite is accepted (or when the account already exists at send time).
-    token     String           @unique @default(cuid())
-    status    InvitationStatus @default(Pending)
-    expiresAt DateTime
+  id        String           @id @default(cuid())
+  email     String
+  // Null until the invited email has a matching account: invites are bound to an
+  // email so they can be sent before the recipient signs up, and userId is stamped
+  // when the invite is accepted (or when the account already exists at send time).
+  token     String           @unique @default(cuid())
+  status    InvitationStatus @default(Pending)
+  expiresAt DateTime
 
-    userId String?
-    user   User?   @relation("InviteRecipient", fields: [userId], references: [id], onDelete: SetNull)
+  userId String?
+  user   User?   @relation("InviteRecipient", fields: [userId], references: [id], onDelete: SetNull)
 
-    invitedById String
-    invitedBy   User   @relation("InviteSender", fields: [invitedById], references: [id], onDelete: Cascade)
+  invitedById String
+  invitedBy   User   @relation("InviteSender", fields: [invitedById], references: [id], onDelete: Cascade)
 
-    orgId        String
-    organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  orgId        String
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
 
-    teamId String?
-    team   Team?   @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  projectId String?
+  project   Project?     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  role      ProjectRole?
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  teamId String?
+  team   Team?   @relation(fields: [teamId], references: [id], onDelete: Cascade)
 
-    @@unique([email, orgId, teamId])
-    @@index([email, status])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([email, orgId, teamId])
+  @@index([email, status])
 }
 
 model GithubInstallation {
-    id             String @id @default(cuid())
-    orgId          String @unique
-    installationId BigInt @unique
-    accountLogin   String
-    accountType    String
-    accountId      BigInt
-    connectedById  String
+  id             String @id @default(cuid())
+  orgId          String @unique
+  installationId BigInt @unique
+  accountLogin   String
+  accountType    String
+  accountId      BigInt
+  connectedById  String
 
-    organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
-    connectedBy  User         @relation("GithubInstallationConnector", fields: [connectedById], references: [id], onDelete: Restrict)
-    projects     Project[]
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  connectedBy  User         @relation("GithubInstallationConnector", fields: [connectedById], references: [id], onDelete: Restrict)
+  projects     Project[]
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-    @@index([connectedById])
+  @@index([connectedById])
 }
 
 model GithubAccount {
-    id           String    @id @default(cuid())
-    userId       String    @unique
-    githubUserId BigInt    @unique
-    githubLogin  String
-    accessToken  String
-    refreshToken String?
-    expiresAt    DateTime?
-    scope        String?
+  id           String    @id @default(cuid())
+  userId       String    @unique
+  githubUserId BigInt    @unique
+  githubLogin  String
+  accessToken  String
+  refreshToken String?
+  expiresAt    DateTime?
+  scope        String?
 
-    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Issue {
-    id          String      @id @default(cuid())
-    projectId   String
-    number      Int
-    createdById String
-    title       String
-    description String      @db.Text
-    status      IssueStatus @default(Todo)
-    priority    Int         @default(3) // 1=Urgent 2=High 3=Normal 4=Low
-    label       String?
+  id          String      @id @default(cuid())
+  projectId   String
+  number      Int
+  createdById String
+  title       String
+  description String      @db.Text
+  status      IssueStatus @default(Todo)
+  priority    Int         @default(3) // 1=Urgent 2=High 3=Normal 4=Low
+  label       String?
 
-    customColumnId String? // non-null = parked in a user column
+  customColumnId String? // non-null = parked in a user column
 
-    project      Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
-    creator      User          @relation(name: "IssueCreator", fields: [createdById], references: [id], onDelete: Cascade)
-    assignees    User[]        @relation(name: "IssueAssignees")
-    customColumn CustomColumn? @relation(fields: [customColumnId], references: [id], onDelete: Cascade)
+  project      Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  creator      User          @relation(name: "IssueCreator", fields: [createdById], references: [id], onDelete: Cascade)
+  assignees    User[]        @relation(name: "IssueAssignees")
+  customColumn CustomColumn? @relation(fields: [customColumnId], references: [id], onDelete: Cascade)
 
-    createdAt  DateTime  @default(now())
-    updatedAt  DateTime  @updatedAt
-    resolvedAt DateTime?
-    chats      Chat[]
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  resolvedAt DateTime?
+  chats      Chat[]
 
-    assignerWorkerId String?
-    assignedWorker   Worker? @relation(fields: [assignerWorkerId], references: [id], onDelete: Cascade)
+  assignerWorkerId String?
+  assignedWorker   Worker? @relation(fields: [assignerWorkerId], references: [id], onDelete: Cascade)
 
-    queuePosition  Int?
-    specialization String?
+  queuePosition  Int?
+  specialization String?
 
-    @@unique([projectId, number])
-    @@index([projectId, status])
-    @@index([projectId, customColumnId])
-    @@index([status, createdAt])
-    @@index([assignerWorkerId, status, queuePosition])
+  @@unique([projectId, number])
+  @@index([projectId, status])
+  @@index([projectId, customColumnId])
+  @@index([status, createdAt])
+  @@index([assignerWorkerId, status, queuePosition])
 }
 
 model Chat {
-    id        String  @id @default(cuid())
-    issueId   String
-    senderId  String?
-    message   String  @db.Text
-    isDeleted Boolean @default(false)
+  id        String  @id @default(cuid())
+  issueId   String
+  senderId  String?
+  message   String  @db.Text
+  isDeleted Boolean @default(false)
 
-    issue  Issue @relation(fields: [issueId], references: [id], onDelete: Cascade)
-    sender User? @relation(fields: [senderId], references: [id], onDelete: SetNull)
+  issue  Issue @relation(fields: [issueId], references: [id], onDelete: Cascade)
+  sender User? @relation(fields: [senderId], references: [id], onDelete: SetNull)
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-    @@index([issueId])
+  @@index([issueId])
 }
 
 model CustomColumn {
-    id        String  @id @default(cuid())
-    projectId String
-    label     String
-    order     Int
-    color     String? // hex like "#9bc24f"; null = default (uncoloured) column
+  id        String @id @default(cuid())
+  projectId String
+  label     String
+  order     Int
 
-    project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
-    issues  Issue[]
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  issues  Issue[]
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-    @@index([projectId])
+  @@index([projectId])
 }
 
 model CodeEmbedding {
-    id        String                      @id
-    projectId String
-    filePath  String
-    chunkText String
-    chunkType Chunk
-    startLine Int
-    endLinTe  Int
-    embedding Unsupported("vector(1536)")
-    createdAt DateTime                    @default(now())
-    updatedAt DateTime                    @updatedAt
+  id        String                      @id
+  projectId String
+  filePath  String
+  chunkText String
+  chunkType Chunk
+  startLine Int
+  endLinTe  Int
+  embedding Unsupported("vector(1536)")
+  createdAt DateTime                    @default(now())
+  updatedAt DateTime                    @updatedAt
 
-    project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
-    @@index([projectId])
-    @@map("code_embeddings")
+  @@index([projectId])
+  @@map("code_embeddings")
 }
 
 model SetupSession {
-    id        String  @id @default(cuid())
-    projectId String
-    project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  id        String  @id @default(cuid())
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
-    status           SetupStatus @default(Pending)
-    sandboxId        String? // live E2B sandbox id
-    snapshotId       String? // warm snapshot id, set once baseline is green
-    infrastructureMd String?     @db.Text // generated infrastructure.md
+  status           SetupStatus @default(Pending)
+  sandboxId        String? // live E2B sandbox id
+  snapshotId       String? // warm snapshot id, set once baseline is green
+  infrastructureMd String?     @db.Text // generated infrastructure.md
 
-    error      String?
-    startedAt  DateTime?
-    finishedAt DateTime?
+  error      String?
+  startedAt  DateTime?
+  finishedAt DateTime?
 
-    questions SetupQuestion[]
+  questions SetupQuestion[]
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-    @@index([projectId])
+  @@index([projectId])
 }
 
 model SetupQuestion {
-    id        String       @id @default(cuid())
-    sessionId String
-    session   SetupSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  id        String       @id @default(cuid())
+  sessionId String
+  session   SetupSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
 
-    type    SetupQuestionType
-    key     String // "NPM_TOKEN", "START_COMMAND", ...
-    prompt  String              @db.Text
-    options String[] // for NeedChoice / Confirm
-    status  SetupQuestionStatus @default(Waiting)
+  type    SetupQuestionType
+  key     String // "NPM_TOKEN", "START_COMMAND", ...
+  prompt  String              @db.Text
+  options String[] // for NeedChoice / Confirm
+  status  SetupQuestionStatus @default(Waiting)
 
-    // answer handling — NEVER store a secret value here
-    answerValue String?        @db.Text // non-secret answers
-    secretId    String? // pointer to the vault row for secret answers
-    secret      ProjectSecret? @relation(fields: [secretId], references: [id], onDelete: SetNull)
+  // answer handling — NEVER store a secret value here
+  answerValue String?        @db.Text // non-secret answers
+  secretId    String? // pointer to the vault row for secret answers
+  secret      ProjectSecret? @relation(fields: [secretId], references: [id], onDelete: SetNull)
 
-    askedAt    DateTime  @default(now())
-    answeredAt DateTime?
+  askedAt    DateTime  @default(now())
+  answeredAt DateTime?
 
-    @@index([sessionId, status])
+  @@index([sessionId, status])
 }
 
 model ProjectSecret {
-    id        String  @id @default(cuid())
-    projectId String
-    project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  id        String  @id @default(cuid())
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
-    key        String // "DATABASE_URL", "NPM_TOKEN"
-    ciphertext String @db.Text // AES-256-GCM encrypted value
-    iv         String // GCM nonce
-    authTag    String // GCM auth tag
+  key        String // "DATABASE_URL", "NPM_TOKEN"
+  ciphertext String @db.Text // AES-256-GCM encrypted value
+  iv         String // GCM nonce
+  authTag    String // GCM auth tag
 
-    questions SetupQuestion[]
+  questions SetupQuestion[]
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-    @@unique([projectId, key])
-    @@index([projectId])
+  @@unique([projectId, key])
+  @@index([projectId])
 }
 
 // the actual VM
 model Worker {
-    id String @id @default(cuid())
+  id String @id @default(cuid())
 
-    projectId String
-    project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
-    specialization String?
-    status         WorkerStatus
+  specialization String?
+  status         WorkerStatus
 
-    sandboxId      String?
-    contextSummary Json? // this will contain queuedCount, currentSpecialization, recentFilesEdited, lastIssue fixed, etc... -> basically for routing decisions
-    contextBlobUrl String? // this willl contain transcripts, logs, etc. vm-worker will read it before dispatching the project's issues to a worker, so it can rehydrate the worker/ VM, or else every issue will start fresh, no previous state known
+  sandboxId      String?
+  contextSummary Json? // this will contain queuedCount, currentSpecialization, recentFilesEdited, lastIssue fixed, etc... -> basically for routing decisions
+  contextBlobUrl String? // this willl contain transcripts, logs, etc. vm-worker will read it before dispatching the project's issues to a worker, so it can rehydrate the worker/ VM, or else every issue will start fresh, no previous state known
 
-    nextQueuePos     Int       @default(1)
-    leaseExpiresAt   DateTime?
+  nextQueuePos   Int       @default(1)
+  leaseExpiresAt DateTime?
 
-    issues Issue[]
+  issues Issue[]
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-    @@index([projectId, status])
-    @@index([projectId, specialization])
+  @@index([projectId, status])
+  @@index([projectId, specialization])
 }
 
 enum PlanStatus {
-    Pending
-    Generating
-    Ready
-    Failed
+  Pending
+  Generating
+  Ready
+  Failed
 }
 
 enum WorkerStatus {
-    Booting
-    Idle
-    Busy
-    Dead
+  Booting
+  Idle
+  Busy
+  Dead
 }
 
 enum SetupStatus {
-    Pending
-    Provisioning
-    Cloning
-    Detecting
-    InstallingDeps
-    BootingServices
-    WaitingOnUser
-    Verifying
-    Ready
-    Failed
+  Pending
+  Provisioning
+  Cloning
+  Detecting
+  InstallingDeps
+  BootingServices
+  WaitingOnUser
+  Verifying
+  Ready
+  Failed
 }
 
 enum SetupQuestionType {
-    NeedSecret
-    NeedValue
-    NeedChoice
-    Confirm
-    NeedFile
-    NeedAccess
-    DefineSuccess
-    Clarify
-    ApproveCost
+  NeedSecret
+  NeedValue
+  NeedChoice
+  Confirm
+  NeedFile
+  NeedAccess
+  DefineSuccess
+  Clarify
+  ApproveCost
 }
 
 enum SetupQuestionStatus {
-    Waiting
-    Answered
-    Cancelled
+  Waiting
+  Answered
+  Cancelled
 }
 
 enum Chunk {
-    Imports
-    Function
-    Class
-    Interface
-    Type
-    Variable
-    Block
+  Imports
+  Function
+  Class
+  Interface
+  Type
+  Variable
+  Block
 }
 
 enum InvitationStatus {
-    Pending
-    Accepted
-    Rejected
+  Pending
+  Accepted
+  Rejected
 }
 
 enum OrgRole {
-    Owner
-    Admin
-    Member
-    Billing
+  Owner
+  Admin
+  Member
+  Billing
 }
 
 enum IssueStatus {
-    Todo
-    Queued
-    InProgress
-    InReview
-    Done
-    Failed
-    Cancelled
-    Parked
+  Todo
+  Queued
+  InProgress
+  InReview
+  Done
+  Failed
+  Cancelled
+  Parked
 }
 
 enum ProjectRole {
-    Admin
-    Maintain
-    Write
-    Triage
-    Read
+  Admin
+  Maintain
+  Write
+  Triage
+  Read
 }
 
 enum TeamRole {
-    Maintainer
-    Member
+  Maintainer
+  Member
 }

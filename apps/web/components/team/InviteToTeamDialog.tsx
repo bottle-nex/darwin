@@ -12,8 +12,26 @@ import {
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 import PlaygroundAvatar from "@/components/playground/Core/components/PlaygroundAvatar";
+import { ProjectRole } from "@trymatcha/types";
 import { cn } from "@/lib/utils";
+
+const PROJECT_ROLES = Object.values(ProjectRole);
+
+const ROLE_HINTS: Record<ProjectRole, string> = {
+    Admin: "Full control, including members and settings.",
+    Maintain: "Manage the project without destructive settings.",
+    Write: "Create and update issues and code.",
+    Triage: "Organize and manage issues without write access.",
+    Read: "View the project only.",
+};
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MAX_EMAILS = 50;
@@ -47,10 +65,8 @@ type InviteToTeamDialogProps = {
     orgName: string;
     projectName: string;
     teamName: string;
-    /** Role the invitee receives once they accept (optional display only). */
-    roleOnAccept?: string;
     /** You own this — wire it to your invite mutation. */
-    onSubmit: (payload: { emails: string[]; message?: string }) => void;
+    onSubmit: (payload: { emails: string[]; role: ProjectRole; message?: string }) => void;
     isPending?: boolean;
 };
 
@@ -61,13 +77,13 @@ export default function InviteToTeamDialog({
     orgName,
     projectName,
     teamName,
-    roleOnAccept,
     onSubmit,
     isPending = false,
 }: InviteToTeamDialogProps) {
     const [emails, setEmails] = React.useState<string[]>([]);
     const [draft, setDraft] = React.useState("");
     const [message, setMessage] = React.useState("");
+    const [role, setRole] = React.useState<ProjectRole>(ProjectRole.Write);
 
     const debouncedDraft = useDebouncedValue(draft, 300);
     const draftLooksInvalid = debouncedDraft.trim().length > 0 && !isValidEmail(debouncedDraft);
@@ -79,6 +95,7 @@ export default function InviteToTeamDialog({
             setEmails([]);
             setDraft("");
             setMessage("");
+            setRole(ProjectRole.Write);
         }
         onOpenChange(next);
     }
@@ -140,7 +157,7 @@ export default function InviteToTeamDialog({
         const pending = isValidEmail(draft) ? [draft.trim().toLowerCase()] : [];
         const finalEmails = [...new Set([...emails, ...pending])];
         if (finalEmails.length === 0) return;
-        onSubmit({ emails: finalEmails, message: message.trim() || undefined });
+        onSubmit({ emails: finalEmails, role, message: message.trim() || undefined });
     }
 
     const canSubmit = !isPending && (emails.length > 0 || isValidEmail(draft));
@@ -247,14 +264,31 @@ export default function InviteToTeamDialog({
                         </p>
                     </div>
 
+                    {/* Role */}
+                    <div className="flex flex-col gap-1.5">
+                        <span className="text-[11px] font-medium uppercase tracking-wide text-neutral-500">
+                            Project role
+                        </span>
+                        <Select value={role} onValueChange={(v) => setRole(v as ProjectRole)}>
+                            <SelectTrigger className="w-full">
+                                <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {PROJECT_ROLES.map((r) => (
+                                    <SelectItem key={r} value={r}>
+                                        {r}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                        <p className="min-h-3.5 text-[11px] text-neutral-500">{ROLE_HINTS[role]}</p>
+                    </div>
+
                     {/* Context */}
                     <div className="flex flex-col gap-1.5 rounded-lg bg-white/2 p-3 ring-1 ring-white/5">
                         <Detail label="Organization" value={orgName} />
                         <Detail label="Project" value={projectName} />
                         <Detail label="Team" value={teamName} />
-                        {roleOnAccept ? (
-                            <Detail label="Role on accept" value={roleOnAccept} />
-                        ) : null}
                     </div>
 
                     {/* Message */}

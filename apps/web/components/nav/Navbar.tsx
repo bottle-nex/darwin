@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import AppLogo from "@/components/app/Applogo";
 import { FaDiscord, FaPhoneAlt } from "react-icons/fa";
 import { useUserSessionStore } from "@/store/user/useUserSessionStore";
-import SigninModal from "../utility/modal/SigninModal";
 import { PiArrowRight } from "react-icons/pi";
 import { useRouter } from "next/navigation";
 
@@ -18,7 +17,6 @@ const NAV_ITEMS = [
 ];
 
 export function NavBar({ isMarkettingPage = false }: { isMarkettingPage?: boolean }) {
-    const setOpenSigninModal = useUserSessionStore((s) => s.setOpenSigninModal);
     const router = useRouter();
     const session = useUserSessionStore((s) => s.session);
     const [scrolled, setScrolled] = useState(false);
@@ -35,7 +33,7 @@ export function NavBar({ isMarkettingPage = false }: { isMarkettingPage?: boolea
     }, []);
 
     function handleSignin() {
-        setOpenSigninModal(true);
+        router.push("/login");
     }
 
     function handleRedirect() {
@@ -106,7 +104,6 @@ export function NavBar({ isMarkettingPage = false }: { isMarkettingPage?: boolea
                     </Button>
                 </div>
             </div>
-            <SigninModal />
         </header>
     );
 }

@@ -4,7 +4,7 @@ import ResponseWriter from "../../services/service.response";
 import z from "zod";
 import { Action, Permissions } from "@trymatcha/access-control";
 import Access from "../../access-control/access";
-import { Prisma, prisma } from "@trymatcha/database";
+import { Prisma, prisma, ProjectRole } from "@trymatcha/database";
 
 const PROJECT_COLORS = [
     "#ef4444",
@@ -103,6 +103,9 @@ export default async function create_project_controller(req: Request, res: Respo
                 color: random_color(),
                 ownerId: user_id,
                 createdById: user_id,
+                members: {
+                    create: { userId: user_id, role: ProjectRole.Admin },
+                },
                 ...repo_fields,
             },
             select: { id: true, name: true, slug: true, color: true },

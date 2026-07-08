@@ -5,26 +5,17 @@ import { cn } from "@/lib/utils";
 import type { Issue, KanbanColumnDef } from "./types";
 import CardRenderer from "./cards/CardRenderer";
 import DraggableIssue from "./DraggableIssue";
+import LLMIssueStatusTicker from "./LLMIssueStatusTicker";
 
 type KanbanColumnProps = {
     column: KanbanColumnDef;
     issues: Issue[];
-    /** "list" stacks cards; "grid" lays them out in responsive columns. */
     layout?: "list" | "grid";
-    /** When focused via the filter, the column stretches to fill the board. */
     fullWidth?: boolean;
-    /** Whether a dragged Custom Kanban card can be dropped here (To Do only). */
     droppable?: boolean;
-    /** Whether this column's cards can be dragged out to the Custom board (To Do only). */
     draggableCards?: boolean;
 };
 
-/**
- * Reusable LLM column: a uniform rounded panel with a per-status coloured title
- * box over a scrollable card area. The agent owns these cards, so they aren't
- * draggable; only the To Do column is a drop target — for cards dragged in from
- * the Custom Kanban — and it highlights while a card hovers over it.
- */
 export default function KanbanColumn({
     column,
     issues,
@@ -34,7 +25,7 @@ export default function KanbanColumn({
     draggableCards = false,
 }: KanbanColumnProps) {
     const { setNodeRef, isOver } = useDroppable({ id: column.status, disabled: !droppable });
-    const { icon: Icon, title, titleBox } = column;
+    const { title } = column;
     const grid = layout === "grid";
 
     return (
@@ -46,16 +37,7 @@ export default function KanbanColumn({
             )}
         >
             <div className="mb-2 flex items-center justify-between gap-2 px-0.5">
-                <div
-                    className={cn(
-                        "flex items-center gap-1.5 rounded-md px-2 py-1 text-[12px] font-semibold",
-                        titleBox,
-                    )}
-                >
-                    <Icon className="size-3.5" aria-hidden />
-                    <span>{title}</span>
-                    <span className="text-[11px] font-medium opacity-60">{issues.length}</span>
-                </div>
+                <LLMIssueStatusTicker status={column.status} count={issues.length} />
                 <button
                     type="button"
                     aria-label={`${title} options`}

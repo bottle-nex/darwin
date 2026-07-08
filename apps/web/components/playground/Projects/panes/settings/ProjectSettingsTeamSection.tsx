@@ -61,9 +61,6 @@ export default function ProjectSettingsTeamSection({
                             <span className="min-w-0 flex-1 truncate text-[12px] text-neutral-200">
                                 {t.name}
                             </span>
-                            <span className="shrink-0 rounded bg-white/5 px-1.5 py-0.5 text-[10px] text-neutral-400">
-                                {t.projectRole}
-                            </span>
                             {canManage && (
                                 <button
                                     type="button"

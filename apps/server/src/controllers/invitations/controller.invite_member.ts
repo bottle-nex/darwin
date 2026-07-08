@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { z } from "zod";
 import { createHash, randomBytes } from "crypto";
-import { InvitationStatus, Prisma, prisma } from "@trymatcha/database";
+import { InvitationStatus, Prisma, prisma, ProjectRole } from "@trymatcha/database";
 import ResponseWriter from "../../services/service.response";
 import { ENV } from "../../configs/env";
 import { inviteMember } from "../../services/service.email";
@@ -14,11 +14,16 @@ const body_schema = z
         orgId: z.string(),
         projectId: z.string().optional(),
         teamId: z.string().optional(),
+        role: z.enum(ProjectRole).optional(),
         message: z.string().trim().max(500).optional(),
     })
     .refine((d) => Boolean(d.projectId) === Boolean(d.teamId), {
         message: "projectId and teamId must be provided together",
         path: ["teamId"],
+    })
+    .refine((d) => Boolean(d.projectId) === Boolean(d.role), {
+        message: "role must be provided when inviting to a project",
+        path: ["role"],
     });
 
 export default class InviteMembersController {
@@ -29,7 +34,7 @@ export default class InviteMembersController {
         }
 
         try {
-            const { emails, orgId, projectId, teamId, message } = parsed.data;
+            const { emails, orgId, projectId, teamId, role, message } = parsed.data;
             const invitedById = req.user.id;
             const is_team_invite = Boolean(teamId);
 
@@ -130,6 +135,8 @@ export default class InviteMembersController {
                         userId: user?.id ?? null,
                         token,
                         orgId,
+                        projectId: projectId ?? null,
+                        role: role ?? null,
                         teamId: teamId ?? null,
                         invitedById,
                         expiresAt: expires_at,

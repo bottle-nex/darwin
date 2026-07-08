@@ -27,7 +27,6 @@ export interface ProjectTeam {
     id: string;
     name: string;
     slug: string;
-    projectRole: ProjectRole;
 }
 
 export interface ProjectDetail {

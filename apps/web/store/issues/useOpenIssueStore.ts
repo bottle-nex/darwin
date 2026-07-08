@@ -9,8 +9,8 @@ interface OpenIssueState {
 
 /**
  * Holds which issue's detail dialog is currently open. The store is the single
- * source of truth for rendering; the URL (`…/issue/<id>`) is mirrored to it by
- * `useOpenIssueUrlSync` and written from it by `useOpenIssue`.
+ * source of truth for rendering; the URL (`…/issue/<id>`) is kept in sync with it
+ * by `useOpenIssue` (both directions).
  */
 export const useOpenIssueStore = create<OpenIssueState>((set) => ({
     openIssueId: null,

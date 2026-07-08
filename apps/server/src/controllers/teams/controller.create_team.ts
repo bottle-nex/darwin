@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { z } from "zod";
-import { Prisma, prisma, ProjectRole, TeamRole } from "@trymatcha/database";
+import { Prisma, prisma, TeamRole } from "@trymatcha/database";
 import ResponseWriter from "../../services/service.response";
 import Access from "../../access-control/access";
 import { Action, Permissions } from "@trymatcha/access-control";
@@ -47,7 +47,6 @@ export default class CreateTeamController {
                     name: data.name,
                     slug: data.slug,
                     description: data.description,
-                    projectRole: ProjectRole.Read,
                     members: {
                         create: {
                             userId,

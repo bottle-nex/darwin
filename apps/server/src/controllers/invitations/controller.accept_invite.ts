@@ -27,6 +27,8 @@ export default class AcceptInviteController {
                     id: true,
                     email: true,
                     orgId: true,
+                    projectId: true,
+                    role: true,
                     teamId: true,
                     status: true,
                     expiresAt: true,
@@ -73,6 +75,20 @@ export default class AcceptInviteController {
                     create: { orgId: invitation.orgId, userId, role: OrgRole.Member },
                     update: {},
                 });
+
+                if (invitation.projectId && invitation.role) {
+                    await tx.projectMember.upsert({
+                        where: {
+                            projectId_userId: { projectId: invitation.projectId, userId },
+                        },
+                        create: {
+                            projectId: invitation.projectId,
+                            userId,
+                            role: invitation.role,
+                        },
+                        update: { role: invitation.role },
+                    });
+                }
 
                 if (invitation.teamId) {
                     await tx.teamMember.upsert({

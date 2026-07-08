@@ -77,6 +77,20 @@ export default class GetTeamMembersController {
                 }),
             ]);
 
+            const projectMembers = await prisma.projectMember.findMany({
+                where: {
+                    projectId: team.projectId,
+                    userId: { in: members.map((m) => m.user.id) },
+                },
+                select: { userId: true, role: true },
+            });
+            const roleByUser = new Map(projectMembers.map((pm) => [pm.userId, pm.role]));
+
+            const membersWithProjectRole = members.map((member) => ({
+                ...member,
+                projectRole: roleByUser.get(member.user.id) ?? null,
+            }));
+
             const updatedPendingInvites = pendingInvites.map((invite) => ({
                 id: invite.id,
                 invitedBy: {
@@ -94,7 +108,7 @@ export default class GetTeamMembersController {
             }));
 
             ResponseWriter.success(res, {
-                members,
+                members: membersWithProjectRole,
                 pendingInvites: updatedPendingInvites,
                 viewerRole: role,
             });

@@ -10,8 +10,6 @@ export interface UpdateColumnInput {
     project_id: string;
     label?: string;
     order?: number;
-    /** Hex like "#9bc24f", or null to clear back to the default column colour. */
-    color?: string | null;
 }
 
 export function useUpdateColumn() {
@@ -20,7 +18,7 @@ export function useUpdateColumn() {
         mutationFn: async (input: UpdateColumnInput) => {
             const res = await apiClient.patch<ApiResponse<{ column: BoardColumn }>>(
                 COLUMN_URL(input.id),
-                { label: input.label, order: input.order, color: input.color },
+                { label: input.label, order: input.order },
             );
             return res.data.data.column;
         },

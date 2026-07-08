@@ -39,7 +39,7 @@ export default function ProjectsDisplay() {
             case ProjectsTab.SettingsEnv:
                 return <ProjectSettingsView />;
             case ProjectsTab.TeamDetail:
-                return <TeamDetailPane surface={RailSurface.Projects} />;
+                return <TeamDetailPane />;
             case ProjectsTab.Overview:
             default:
                 return <ProjectOverview project={project} />;

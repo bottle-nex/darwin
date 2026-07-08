@@ -1,17 +1,8 @@
 import { Request, Response } from "express";
 import ResponseWriter from "../../services/service.response";
 import { prisma } from "@trymatcha/database";
-import { ProjectRole } from "@trymatcha/types";
 import Access from "../../access-control/access";
 import { Action, Permissions } from "@trymatcha/access-control";
-
-const PROJECT_ROLE_RANK: Record<ProjectRole, number> = {
-    [ProjectRole.Admin]: 4,
-    [ProjectRole.Maintain]: 3,
-    [ProjectRole.Write]: 2,
-    [ProjectRole.Triage]: 1,
-    [ProjectRole.Read]: 0,
-};
 
 export default async function list_members_controller(req: Request, res: Response) {
     try {
@@ -33,51 +24,21 @@ export default async function list_members_controller(req: Request, res: Respons
             return;
         }
 
-        const project = await prisma.project.findUnique({
-            where: { id: project_id },
+        const project_members = await prisma.projectMember.findMany({
+            where: { projectId: project_id },
             select: {
-                owner: { select: { id: true, name: true, email: true, image: true } },
-                teams: {
-                    select: {
-                        projectRole: true,
-                        members: {
-                            select: {
-                                user: {
-                                    select: { id: true, name: true, email: true, image: true },
-                                },
-                            },
-                        },
-                    },
-                },
+                role: true,
+                user: { select: { id: true, name: true, email: true, image: true } },
             },
+            orderBy: { createdAt: "asc" },
         });
-        if (!project) {
-            ResponseWriter.not_found(res, "Project not found");
-            return;
-        }
 
-        type MemberUser = { id: string; name: string | null; email: string; image: string | null };
-        const byUser = new Map<string, { user: MemberUser; rank: number; role: ProjectRole }>();
-
-        const consider = (u: MemberUser, projectRole: ProjectRole) => {
-            const rank = PROJECT_ROLE_RANK[projectRole];
-            const existing = byUser.get(u.id);
-            if (!existing || rank > existing.rank) {
-                byUser.set(u.id, { user: u, rank, role: projectRole });
-            }
-        };
-
-        if (project.owner) consider(project.owner, ProjectRole.Admin);
-        for (const team of project.teams) {
-            for (const member of team.members) consider(member.user, team.projectRole);
-        }
-
-        const members = [...byUser.values()].map(({ user, role: memberRole }) => ({
-            id: user.id,
-            name: user.name,
-            email: user.email,
-            image: user.image,
-            role: memberRole,
+        const members = project_members.map((m) => ({
+            id: m.user.id,
+            name: m.user.name,
+            email: m.user.email,
+            image: m.user.image,
+            role: m.role,
         }));
 
         ResponseWriter.success(res, { members });

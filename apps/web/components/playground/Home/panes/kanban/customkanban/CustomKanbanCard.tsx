@@ -21,24 +21,13 @@ import type { CustomCard } from "./types";
 
 type CustomKanbanCardProps = {
     card: CustomCard;
-    /** Open the edit modal for this card. */
     onEdit?: () => void;
-    /** Permanently delete this card's issue (already confirmed). */
     onDelete?: () => void;
-    /** Project id — enables the assignee picker when provided alongside the handlers. */
     projectId?: string;
     onAssign?: (userId: string) => void;
     onUnassign?: (userId: string) => void;
-    /** Use a solid background so a coloured column's tint can't bleed through. */
-    opaque?: boolean;
 };
 
-/**
- * A card on the Custom Kanban: title with a priority dot, an optional label chip,
- * a clamped description, and a footer with the issue number and assignee avatars.
- * A hover ⋯ menu offers Edit and Delete; Delete routes through a confirm dialog
- * since it can't be undone. Mirrors the LLM board's card look.
- */
 export default function CustomKanbanCard({
     card,
     onEdit,
@@ -46,7 +35,6 @@ export default function CustomKanbanCard({
     projectId,
     onAssign,
     onUnassign,
-    opaque,
 }: CustomKanbanCardProps) {
     const label = card.label ? getLabel(card.label) : undefined;
     const [confirmOpen, setConfirmOpen] = useState(false);
@@ -55,19 +43,13 @@ export default function CustomKanbanCard({
     const { openIssue } = useOpenIssue();
 
     return (
-        <div
-            className={cn(
-                "group/card relative rounded-lg p-2.5 ring-1 ring-white/5 transition-colors hover:ring-white/15",
-                opaque ? "bg-neutral-800" : "bg-white/5",
-            )}
-        >
+        <div className="group/card relative rounded-lg bg-white/5 p-2.5 ring-1 ring-white/5 transition-colors hover:ring-white/15">
             {(onEdit || onDelete || canAssign) && (
                 <DropdownMenu.Root>
                     <DropdownMenu.Trigger asChild>
                         <button
                             type="button"
                             aria-label="Card options"
-                            // Stop the pointerdown reaching the drag listeners on the wrapper.
                             onPointerDown={(e) => e.stopPropagation()}
                             className="absolute top-1.5 right-1.5 flex size-6 cursor-pointer items-center justify-center rounded text-neutral-400 opacity-0 transition-opacity hover:bg-white/10 hover:text-neutral-200 focus-visible:opacity-100 group-hover/card:opacity-100 data-[state=open]:opacity-100"
                         >

@@ -27,8 +27,15 @@ export default class GetInviteController {
                     email: true,
                     status: true,
                     expiresAt: true,
+                    role: true,
                     invitedBy: { select: { name: true, email: true } },
                     organization: {
+                        select: {
+                            name: true,
+                            slug: true,
+                        },
+                    },
+                    project: {
                         select: {
                             name: true,
                             slug: true,
@@ -37,13 +44,6 @@ export default class GetInviteController {
                     team: {
                         select: {
                             name: true,
-                            projectRole: true,
-                            project: {
-                                select: {
-                                    name: true,
-                                    slug: true,
-                                },
-                            },
                         },
                     },
                 },
@@ -62,13 +62,9 @@ export default class GetInviteController {
                 expiresAt: invitation.expiresAt,
                 org: invitation.organization,
                 invitedBy: invitation.invitedBy,
-                team: invitation.team
-                    ? {
-                          name: invitation.team.name,
-                          projectRole: invitation.team.projectRole,
-                          project: invitation.team.project,
-                      }
-                    : null,
+                role: invitation.role,
+                project: invitation.project,
+                team: invitation.team ? { name: invitation.team.name } : null,
                 teamRoleOnAccept: "Member",
                 emailMatches,
                 isExpired: invitation.expiresAt.getTime() <= Date.now(),

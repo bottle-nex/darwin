@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { z } from "zod";
-import { Prisma, prisma, ProjectRole } from "@trymatcha/database";
+import { Prisma, prisma } from "@trymatcha/database";
 import ResponseWriter from "../../services/service.response";
 import Access from "../../access-control/access";
 import { Action, Permissions } from "@trymatcha/access-control";
@@ -14,7 +14,6 @@ const body_schema = z.object({
         .max(50)
         .regex(/^[a-z0-9-]+$/, "Slug must be lowercase letters, numbers, and hyphens only"),
     description: z.string().optional(),
-    projectRole: z.enum(ProjectRole),
 });
 
 export default class UpdateTeamController {
@@ -25,7 +24,7 @@ export default class UpdateTeamController {
         }
 
         try {
-            const { teamId, name, slug, description, projectRole } = parsed.data;
+            const { teamId, name, slug, description } = parsed.data;
 
             const team = await prisma.team.findUnique({
                 where: { id: teamId },
@@ -47,7 +46,6 @@ export default class UpdateTeamController {
                     name,
                     slug,
                     description,
-                    projectRole,
                 },
             });
 

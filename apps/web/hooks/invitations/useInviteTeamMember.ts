@@ -1,4 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
+import { ProjectRole } from "@trymatcha/types";
 import { apiClient } from "@/lib/axios";
 import { INVITE_MEMBER_URL } from "@/routes/api_routes";
 import { ApiResponse } from "@/types/api";
@@ -8,6 +9,7 @@ interface InvitePayload {
     orgId: string;
     projectId: string;
     teamId: string;
+    role: ProjectRole;
     message?: string;
 }
 

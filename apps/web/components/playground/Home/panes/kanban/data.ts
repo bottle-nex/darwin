@@ -1,12 +1,12 @@
 import {
-    MdIncompleteCircle,
-    MdAutorenew,
-    MdCheckCircle,
-    MdSchedule,
-    MdErrorOutline,
-    MdBlock,
-} from "react-icons/md";
-import { FaCodePullRequest } from "react-icons/fa6";
+    LuCircle,
+    LuCircleDashed,
+    LuCircleDotDashed,
+    LuCircleCheck,
+    LuCircleX,
+    LuCircleSlash,
+} from "react-icons/lu";
+import { RiProgress4Line } from "react-icons/ri";
 import {
     KanbanStatus,
     type BoardState,
@@ -37,44 +37,44 @@ export const COLUMNS: KanbanColumnDef[] = [
     {
         status: KanbanStatus.Todo,
         title: "To Do",
-        icon: MdIncompleteCircle,
-        titleBox: "bg-neutral-500/15 text-neutral-200",
+        icon: LuCircle,
+        titleBox: "text-neutral-100",
     },
     {
         status: KanbanStatus.Queued,
         title: "Queued",
-        icon: MdSchedule,
-        titleBox: "bg-sky-500/15 text-sky-200",
+        icon: LuCircleDashed,
+        titleBox: "text-sky-300",
     },
     {
         status: KanbanStatus.InProgress,
         title: "In Progress",
-        icon: MdAutorenew,
-        titleBox: "bg-amber-500/15 text-amber-200",
+        icon: RiProgress4Line,
+        titleBox: "text-amber-300",
     },
     {
         status: KanbanStatus.InReview,
         title: "In Review",
-        icon: FaCodePullRequest,
-        titleBox: "bg-violet-500/15 text-violet-200",
+        icon: LuCircleDotDashed,
+        titleBox: "text-violet-300",
     },
     {
         status: KanbanStatus.Done,
         title: "Done",
-        icon: MdCheckCircle,
-        titleBox: "bg-emerald-500/15 text-emerald-200",
+        icon: LuCircleCheck,
+        titleBox: "text-emerald-300",
     },
     {
         status: KanbanStatus.Failed,
         title: "Failed",
-        icon: MdErrorOutline,
-        titleBox: "bg-rose-500/15 text-rose-200",
+        icon: LuCircleX,
+        titleBox: "text-rose-300",
     },
     {
         status: KanbanStatus.Cancelled,
         title: "Cancelled",
-        icon: MdBlock,
-        titleBox: "bg-neutral-600/15 text-neutral-400",
+        icon: LuCircleSlash,
+        titleBox: "text-neutral-300",
     },
 ];
 

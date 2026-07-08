@@ -1,7 +1,7 @@
 import Image from "next/image";
-import { MdFlag } from "react-icons/md";
 import { formatDate } from "@/lib/format";
 import type { PendingInviteDetail, TeamMemberDetail } from "@/types/team";
+import ProjectRoleTicker from "./ProjectRoleTicker";
 
 type MemberDetailProps =
     | {
@@ -18,60 +18,55 @@ export default function PlaygroundTeamMemberRow({ teamMember, pendingMember }: M
 
     const user = isMember
         ? teamMember.user
-        : {
-              name: null,
-              email: pendingMember.user.email,
-              image: null,
-          };
-
-    const email = isMember
-        ? teamMember.user.email
-        : `invited by: ${pendingMember.invitedBy.name} | ${pendingMember.invitedBy.email}`;
+        : { name: null, email: pendingMember.user.email, image: null };
 
     const name = user.name?.trim() || user.email;
+    const secondary = isMember
+        ? teamMember.user.email
+        : `Invited by ${pendingMember.invitedBy.name ?? pendingMember.invitedBy.email}`;
+
+    const joined = isMember ? teamMember.createdAt : pendingMember.sentAt;
 
     return (
-        <div className="flex items-center gap-4 rounded-[7px] ring-1 ring-white/5 bg-neutral-800/30 px-3 py-2.5 hover:bg-neutral-800/55 cursor-pointer">
-            {user.image ? (
-                <Image
-                    src={user.image}
-                    alt=""
-                    width={36}
-                    height={36}
-                    unoptimized
-                    className="size-9 shrink-0 rounded-full object-cover"
-                />
-            ) : (
-                <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-neutral-800 text-[13px] font-medium text-neutral-200">
-                    {name.charAt(0).toUpperCase()}
-                </span>
-            )}
-
-            <div className="min-w-0 flex-1">
-                <p className="truncate text-[13px] font-medium text-neutral-100">{name}</p>
-
-                <p className="truncate text-[12px] text-neutral-500">{email}</p>
+        <div className="grid grid-cols-[1fr_120px_140px] items-center gap-4 rounded-md px-2.5 py-2 hover:bg-neutral-800/50 cursor-pointer">
+            <div className="flex min-w-0 items-center gap-3">
+                {user.image ? (
+                    <Image
+                        src={user.image}
+                        alt=""
+                        width={32}
+                        height={32}
+                        unoptimized
+                        className="size-8 shrink-0 rounded-full object-cover"
+                    />
+                ) : (
+                    <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-neutral-800 text-[12px] font-medium text-neutral-200">
+                        {name.charAt(0).toUpperCase()}
+                    </span>
+                )}
+                <div className="min-w-0">
+                    <p className="truncate text-[13px] font-medium text-neutral-100">{name}</p>
+                    <p className="truncate text-[12px] text-neutral-500">{secondary}</p>
+                </div>
             </div>
 
-            <div className="hidden w-28 shrink-0 text-[12px] text-neutral-400 sm:block">
+            <div className="min-w-0">
                 {isMember ? (
-                    <>
-                        Role:{" "}
-                        <span className="font-medium text-neutral-200">{teamMember.role}</span>
-                    </>
+                    teamMember.projectRole ? (
+                        <ProjectRoleTicker role={teamMember.projectRole} />
+                    ) : (
+                        <span className="inline-flex items-center rounded-full bg-white/5 px-2 py-0.5 text-[11px] font-medium text-neutral-500">
+                            —
+                        </span>
+                    )
                 ) : (
-                    <>
-                        Status:{" "}
-                        <span className="font-medium text-neutral-200">{pendingMember.status}</span>
-                    </>
+                    <span className="inline-flex max-w-full items-center truncate rounded-full bg-amber-400/10 px-2 py-0.5 text-[11px] font-medium text-amber-300">
+                        {pendingMember.status}
+                    </span>
                 )}
             </div>
 
-            <div className="flex w-36 shrink-0 items-center gap-1.5 text-[12px] text-neutral-400">
-                <MdFlag className="size-3.5 shrink-0 text-neutral-500" aria-hidden />
-
-                {isMember ? formatDate(teamMember.createdAt) : formatDate(pendingMember.sentAt)}
-            </div>
+            <div className="text-[12px] text-neutral-400">{formatDate(joined)}</div>
         </div>
     );
 }

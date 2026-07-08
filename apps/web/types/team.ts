@@ -4,6 +4,7 @@ import { INVITATION_STATUS } from "./types.invitation";
 export interface TeamMemberDetail {
     id: string;
     role: TeamRole;
+    projectRole: ProjectRole | null;
     createdAt: string;
     user: {
         id: string;

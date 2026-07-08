@@ -47,7 +47,6 @@ export default async function get_project_controller(req: Request, res: Response
                         id: true,
                         name: true,
                         slug: true,
-                        projectRole: true,
                     },
                 },
             },

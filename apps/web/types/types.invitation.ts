@@ -26,8 +26,6 @@ interface Project {
 
 interface Team {
     name: string;
-    projectRole: ProjectRole;
-    project: Project | null;
 }
 
 export interface InvitePreview {
@@ -35,6 +33,8 @@ export interface InvitePreview {
     status: INVITATION_STATUS;
     expiresAt: string;
     org: Organization | null;
+    role: ProjectRole | null;
+    project: Project | null;
     team: Team | null;
     invitedBy: {
         name: string | null;

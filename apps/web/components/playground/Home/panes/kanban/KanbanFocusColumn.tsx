@@ -7,17 +7,11 @@ import KanbanColumn from "./KanbanColumn";
 import CustomKanbanColumn from "./customkanban/CustomKanbanColumn";
 
 type KanbanFocusColumnProps = {
-    /** The active focus — an LLM status or a custom column. */
     filter: FilterValue;
     board: BoardState;
     custom: CustomKanbanApi;
 };
 
-/**
- * The single column shown when the toolbar's focus filter is active. An LLM
- * status expands full-width as a grid; a custom column keeps its normal
- * Trello-width list with all its card actions.
- */
 export default function KanbanFocusColumn({ filter, board, custom }: KanbanFocusColumnProps) {
     if (filter.kind === "llm") {
         const column = COLUMNS.find((c) => c.status === filter.status);
@@ -43,7 +37,6 @@ export default function KanbanFocusColumn({ filter, board, custom }: KanbanFocus
                 onAddCard={(input) => custom.addCard(column.id, input)}
                 onDelete={() => custom.removeColumn(column.id)}
                 onRename={(label) => custom.renameColumn(column.id, label)}
-                onRecolor={(color) => custom.recolorColumn(column.id, color)}
                 onEditCard={custom.editCard}
                 onDeleteCard={custom.removeCard}
                 projectId={custom.projectId}

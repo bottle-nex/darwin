@@ -14,7 +14,6 @@ const body_schema = z.object({
         .max(50)
         .regex(/^[a-z0-9-]+$/, "Slug must be lowercase letters, numbers, and hyphens only"),
     description: z.string().optional(),
-    project_role: z.enum(["Admin", "Maintain", "Write", "Triage", "Read"]),
 });
 
 export default async function add_team_controller(req: Request, res: Response) {
@@ -25,7 +24,7 @@ export default async function add_team_controller(req: Request, res: Response) {
             return;
         }
 
-        const { project_id, name, slug, description, project_role } = parsed.data;
+        const { project_id, name, slug, description } = parsed.data;
         const user_id = req.user.id;
 
         const role = await Access.project(user_id, project_id);
@@ -38,8 +37,8 @@ export default async function add_team_controller(req: Request, res: Response) {
         }
 
         const team = await prisma.team.create({
-            data: { projectId: project_id, name, slug, description, projectRole: project_role },
-            select: { id: true, name: true, slug: true, projectRole: true },
+            data: { projectId: project_id, name, slug, description },
+            select: { id: true, name: true, slug: true },
         });
 
         ResponseWriter.created(res, team, "Team created successfully");

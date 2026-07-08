@@ -13,12 +13,6 @@ export default class ColumnUpdateController {
     static body_schema = z.object({
         label: z.string().min(1).max(100).optional(),
         order: z.number().int().optional(),
-        // null clears the colour (back to default); undefined leaves it unchanged.
-        color: z
-            .string()
-            .regex(/^#[0-9a-fA-F]{6}$/)
-            .nullable()
-            .optional(),
     });
 
     static async process(req: Request, res: Response) {
@@ -64,9 +58,8 @@ export default class ColumnUpdateController {
                 data: {
                     label: body_data.label,
                     order: body_data.order,
-                    color: body_data.color,
                 },
-                select: { id: true, label: true, order: true, color: true },
+                select: { id: true, label: true, order: true },
             });
 
             ResponseWriter.success(res, { column: updated }, "Column updated");

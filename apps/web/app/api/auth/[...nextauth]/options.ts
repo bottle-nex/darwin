@@ -22,7 +22,7 @@ export interface CustomSession {
 
 export const authOption: AuthOptions = {
     pages: {
-        signIn: "/",
+        signIn: "/login",
     },
     callbacks: {
         async signIn({ user, account }: { user: UserType; account: Account | null }) {

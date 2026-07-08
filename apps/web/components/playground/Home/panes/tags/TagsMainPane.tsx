@@ -8,6 +8,8 @@ import { useListTags } from "@/hooks/tags/useListTags";
 import { useDeleteTag } from "@/hooks/tags/useDeleteTag";
 import { Button } from "@/components/ui/button";
 import PaneEmptyState from "@/components/playground/Core/components/PaneEmptyState";
+import NoResource from "@/components/utility/NoResource";
+import ProjectsGlyph from "@/components/utility/ProjectsGlyph";
 import {
     Dialog,
     DialogContent,
@@ -35,7 +37,6 @@ export default function TagsMainPane() {
     const [editingTag, setEditingTag] = useState<Tag | undefined>(undefined);
     const [deleteTarget, setDeleteTarget] = useState<Tag | null>(null);
 
-    // Search narrows the list by name; sort reorders it.
     const visibleTags = useMemo(() => {
         const query = options.search.trim().toLowerCase();
         const list = (tags ?? []).filter((tag) =>
@@ -87,13 +88,13 @@ export default function TagsMainPane() {
                 ) : isError ? (
                     <p className="px-1 py-2 text-[12px] text-red-400">Couldn&apos;t load tags.</p>
                 ) : !tags?.length ? (
-                    <div className="flex h-full flex-col justify-center">
-                        <PaneEmptyState
-                            icon={MdLabel}
-                            title="No tags yet"
-                            subtitle="Make a tag to start labeling your issues, like labels on GitHub."
-                        />
-                    </div>
+                    <NoResource
+                        className="pl-[4%] mt-12"
+                        icon={<ProjectsGlyph className="size-24" />}
+                        title="No tags yet"
+                        description="Tags are labels you attach to issues to group and filter them, like labels on GitHub. Use them to mark bugs, features, or priorities so you and your agents can sort the board at a glance. Create your first tag to start organizing."
+                        action={{ label: "Create tag", onClick: openCreate }}
+                    />
                 ) : !visibleTags.length ? (
                     <div className="flex h-full flex-col justify-center">
                         <PaneEmptyState

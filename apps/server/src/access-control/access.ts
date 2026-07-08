@@ -20,10 +20,10 @@ export default class Access {
     }
 
     static async project(userId: string, projectId: string): Promise<ProjectRole | null> {
-        const [team_member, project] = await Promise.all([
-            prisma.teamMember.findFirst({
-                where: { userId, team: { projectId } },
-                select: { team: { select: { projectRole: true } } },
+        const [project_member, project] = await Promise.all([
+            prisma.projectMember.findUnique({
+                where: { projectId_userId: { projectId, userId } },
+                select: { role: true },
             }),
             prisma.project.findUnique({
                 where: { id: projectId },
@@ -34,7 +34,7 @@ export default class Access {
         if (!project) return null;
 
         const roles: ProjectRole[] = [];
-        if (team_member) roles.push(team_member.team.projectRole);
+        if (project_member) roles.push(project_member.role);
         if (project.ownerId === userId) roles.push(ProjectRole.Admin);
 
         const org_member = await prisma.orgMember.findUnique({

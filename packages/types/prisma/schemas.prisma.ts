@@ -10,6 +10,7 @@ export interface User {
 
     orgMemberships?: OrgMember[];
     teamMemberships?: TeamMember[];
+    projectMemberships?: ProjectMember[];
     ownedProjects?: Project[];
     createdProjects?: Project[];
     createdOrganizations?: Organization[];
@@ -61,6 +62,7 @@ export interface Project {
     owner?: User;
     createdBy?: User | null;
     teams?: Team[];
+    members?: ProjectMember[];
 
     createdAt: Date;
     updatedAt: Date;
@@ -72,7 +74,6 @@ export interface Team {
     name: string;
     slug: string;
     description: string | null;
-    projectRole: ProjectRole;
 
     project?: Project;
     members?: TeamMember[];
@@ -88,6 +89,19 @@ export interface TeamMember {
     role: TeamRole;
 
     team?: Team;
+    user?: User;
+
+    createdAt: Date;
+    updatedAt: Date;
+}
+
+export interface ProjectMember {
+    id: string;
+    projectId: string;
+    userId: string;
+    role: ProjectRole;
+
+    project?: Project;
     user?: User;
 
     createdAt: Date;

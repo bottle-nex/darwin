@@ -1,22 +1,16 @@
 "use client";
-import { useParams } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { useGetDashboard } from "@/hooks/dashboard/useGetDashboard";
 import { useBoard } from "@/hooks/issues/useBoard";
-import PlaygroundAvatar from "@/components/playground/Core/components/PlaygroundAvatar";
-import { COLUMNS, getLabel, PRIORITY_DOT } from "@/components/playground/Home/panes/kanban/data";
-import { NUMBER_TO_PRIORITY, toAssignee } from "@/components/playground/Home/panes/kanban/mappers";
-import type { BoardIssue } from "@/types/board";
+import { useParams } from "next/navigation";
 import { useOpenIssue } from "./useOpenIssue";
+import { useGetDashboard } from "@/hooks/dashboard/useGetDashboard";
+import { getLabel, PRIORITY_DOT } from "@/components/playground/Home/panes/kanban/data";
+import { NUMBER_TO_PRIORITY, toAssignee } from "@/components/playground/Home/panes/kanban/mappers";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import type { BoardIssue } from "@/types/board";
+import PlaygroundAvatar from "@/components/playground/Core/components/PlaygroundAvatar";
+import LLMIssueStatusTicker from "@/components/playground/Home/panes/kanban/LLMIssueStatusTicker";
 
-/**
- * Globally-mounted detail dialog for the issue named in the URL (`…/issue/<id>`).
- * Controlled by the open-issue store via `useOpenIssue`. It resolves the issue
- * straight from the raw board response by id, so it works for issues on either
- * board — the agent/LLM lanes and the ones parked in Custom Kanban columns (both
- * are the same server `BoardIssue` rows). Minimal shell for now.
- */
 export default function IssueDialog() {
     const { orgSlug, projectSlug } = useParams<{ orgSlug: string; projectSlug?: string }>();
     const { openIssueId, closeIssue } = useOpenIssue();
@@ -39,7 +33,6 @@ export default function IssueDialog() {
 function IssueDetail({ issue }: { issue: BoardIssue }) {
     const priority = NUMBER_TO_PRIORITY[issue.priority] ?? "normal";
     const label = issue.label ? getLabel(issue.label) : undefined;
-    const column = COLUMNS.find((c) => c.status === issue.status);
     const assignees = issue.assignees.map(toAssignee);
 
     return (
@@ -61,16 +54,12 @@ function IssueDetail({ issue }: { issue: BoardIssue }) {
                             {label.name}
                         </span>
                     )}
-                    {column && (
-                        <span
-                            className={cn(
-                                "ml-auto rounded px-1.5 py-0.5 text-[10px] font-medium",
-                                column.titleBox,
-                            )}
-                        >
-                            {column.title}
-                        </span>
-                    )}
+                    <LLMIssueStatusTicker
+                        status={issue.status}
+                        size="sm"
+                        showIcon={false}
+                        className="ml-auto"
+                    />
                 </div>
                 <DialogTitle className="mt-1 text-left text-base text-neutral-100">
                     {issue.title}
@@ -103,7 +92,6 @@ function IssueDetail({ issue }: { issue: BoardIssue }) {
     );
 }
 
-/** Shown for a deep-linked issue while the board is still loading, or if it's gone. */
 function IssueMissing() {
     return (
         <>

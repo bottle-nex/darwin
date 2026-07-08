@@ -1,4 +1,5 @@
 "use client";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
     Dialog,
@@ -7,6 +8,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import { useDeleteTeam } from "@/hooks/team/useDeleteTeam";
 import { useDeleteTeamStore } from "@/store/team/useDeleteTeamStore";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
@@ -18,21 +20,28 @@ export default function DeleteTeamDialog() {
     const clearTeam = usePlaygroundNavStore((s) => s.clearTeam);
     const deleteTeam = useDeleteTeam();
 
+    const [confirmText, setConfirmText] = useState("");
+
+    const requiredText = team ? `@${team.slug}` : "";
+    const canDelete = confirmText.trim() === requiredText;
+
     function handleOpenChange(next: boolean) {
         if (!next) {
             close();
             deleteTeam.reset();
+            setConfirmText("");
         }
     }
 
     function confirmDelete() {
-        if (!team) return;
+        if (!team || !canDelete) return;
         deleteTeam.mutate(team.id, {
             onSuccess: () => {
                 if (selectedTeam?.id === team.id) {
                     clearTeam(surface);
                 }
                 close();
+                setConfirmText("");
             },
         });
     }
@@ -46,10 +55,37 @@ export default function DeleteTeamDialog() {
                 <DialogHeader className="gap-1.5">
                     <DialogTitle className="text-base text-neutral-100">Delete team?</DialogTitle>
                     <DialogDescription className="text-[13px] text-neutral-400">
-                        Deleting <span className="font-medium text-neutral-200">{team?.name}</span>{" "}
-                        is permanent, you can&apos;t revert this.
+                        This permanently deletes{" "}
+                        <span className="font-medium text-neutral-200">{team?.name} </span> along
+                        with its member list and any pending invites. People lose access immediately
+                        and this can&apos;t be undone.
                     </DialogDescription>
                 </DialogHeader>
+
+                <div className="flex flex-col gap-2">
+                    <label htmlFor="delete-team-confirm" className="text-[13px] text-neutral-400">
+                        To confirm, type{" "}
+                        <span className="font-mono font-medium text-neutral-200">
+                            {requiredText}
+                        </span>{" "}
+                        below.
+                    </label>
+                    <Input
+                        id="delete-team-confirm"
+                        value={confirmText}
+                        onChange={(e) => setConfirmText(e.target.value)}
+                        onKeyDown={(e) => {
+                            if (e.key === "Enter" && canDelete && !deleteTeam.isPending) {
+                                confirmDelete();
+                            }
+                        }}
+                        placeholder={requiredText}
+                        autoComplete="off"
+                        autoFocus
+                        spellCheck={false}
+                        aria-invalid={confirmText.length > 0 && !canDelete}
+                    />
+                </div>
 
                 {deleteTeam.isError && (
                     <p className="text-[12px] text-red-400">
@@ -70,6 +106,7 @@ export default function DeleteTeamDialog() {
                         variant="destructive"
                         size="sm"
                         loading={deleteTeam.isPending}
+                        disabled={!canDelete || deleteTeam.isPending}
                         onClick={confirmDelete}
                     >
                         Delete

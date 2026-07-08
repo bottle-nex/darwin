@@ -21,8 +21,15 @@ export default class ListInvitesController {
                     status: true,
                     expiresAt: true,
                     createdAt: true,
+                    role: true,
                     invitedBy: true,
                     organization: {
+                        select: {
+                            name: true,
+                            slug: true,
+                        },
+                    },
+                    project: {
                         select: {
                             name: true,
                             slug: true,
@@ -31,13 +38,6 @@ export default class ListInvitesController {
                     team: {
                         select: {
                             name: true,
-                            projectRole: true,
-                            project: {
-                                select: {
-                                    name: true,
-                                    slug: true,
-                                },
-                            },
                         },
                     },
                 },
@@ -53,19 +53,15 @@ export default class ListInvitesController {
                 expiresAt: i.expiresAt,
                 createdAt: i.createdAt,
                 invitedBy: i.invitedBy,
+                role: i.role,
                 organization: i.organization
                     ? {
                           name: i.organization.name,
                           slug: i.organization.slug,
                       }
                     : null,
-                team: i.team
-                    ? {
-                          name: i.team.name,
-                          project: i.team.project,
-                          projectRole: i.team.projectRole,
-                      }
-                    : null,
+                project: i.project,
+                team: i.team ? { name: i.team.name } : null,
                 teamRoleOnAccept: "Member",
             }));
 

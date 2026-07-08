@@ -34,7 +34,6 @@ export function boardToColumns(board: BoardResponse): CustomColumn[] {
         .map((col) => ({
             id: col.id,
             title: col.label,
-            color: col.color,
             cards: board.issues
                 .filter((issue) => issue.customColumnId === col.id)
                 .map(boardIssueToCard),
