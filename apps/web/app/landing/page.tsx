@@ -1,11 +1,9 @@
 import Dial from "./dial";
-import Gradient from "./gradient";
 
 export default function Landing() {
     return (
         <div className="min-h-screen bg-neutral-900 p-3">
             <div className="relative min-h-[calc(100vh-1.5rem)] bg-snow overflow-hidden rounded-2xl ">
-                <Gradient />
                 {/* Hero content */}
                 <div className="absolute z-50 bottom-16 left-12 flex flex-col gap-5 max-w-lg">
                     <div className="flex items-center gap-2 w-fit rounded-full border border-white/20 bg-white/10 backdrop-blur-sm px-3 py-1.5">
