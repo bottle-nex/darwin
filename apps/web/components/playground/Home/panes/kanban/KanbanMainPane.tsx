@@ -5,6 +5,7 @@ import KanbanOptionsBar from "./KanbanOptionsBar";
 import AddTaskModal from "./AddTaskModal";
 import KanbanContent from "./KanbanContent";
 import KanbanDragOverlay from "./KanbanDragOverlay";
+import IssuePlane from "./Issue/IssuePlane";
 
 /**
  * The workspace's Kanban surface. Hosts two boards — the user-built Custom
@@ -33,6 +34,7 @@ export default function KanbanMainPane() {
                 onOpenChange={pane.setAddTaskOpen}
                 projectId={pane.projectId}
             />
+            <IssuePlane projectId={pane.projectId} />
             <DndContext
                 sensors={custom.sensors}
                 collisionDetection={closestCorners}
