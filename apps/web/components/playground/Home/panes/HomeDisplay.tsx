@@ -6,7 +6,6 @@ import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore"
 import DraftsPane from "./DraftsPane";
 import TagsMainPane from "./tags/TagsMainPane";
 import InboxMainPane from "./InboxMainPane";
-import PaneBreadcrumb from "../../Core/components/PaneBreadcrumb";
 import InProgressPane from "./InProgressPane";
 import TeamDetailPane from "../../Projects/panes/TeamDetailPane";
 import KanbanMainPane from "./kanban/KanbanMainPane";
@@ -22,12 +21,6 @@ export default function HomeDisplay() {
         case HomeTab.Tags:
             return (
                 <div className="flex min-h-0 flex-1 flex-col">
-                    <PaneBreadcrumb
-                        leading={
-                            <MdHome className="size-3.5 shrink-0 text-neutral-400" aria-hidden />
-                        }
-                        segments={[{ label: "Home" }, { label: "Tags" }]}
-                    />
                     <TagsMainPane />
                 </div>
             );
@@ -50,12 +43,6 @@ export default function HomeDisplay() {
         default:
             return (
                 <div className="flex min-h-0 flex-1 flex-col">
-                    <PaneBreadcrumb
-                        leading={
-                            <MdHome className="size-3.5 shrink-0 text-neutral-400" aria-hidden />
-                        }
-                        segments={[{ label: "Home" }, { label: "Kanban" }]}
-                    />
                     <KanbanMainPane />
                 </div>
             );

@@ -4,18 +4,12 @@ import { useGetDashboard } from "@/hooks/dashboard/useGetDashboard";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
 import { RailSurface } from "../../IconRail/railSurface";
 import { ProjectsTab } from "../projectsTabs";
-import ProjectTopbar from "./ProjectTopbar";
 import ProjectOverview from "./ProjectOverview";
 import KanbanMainPane from "../../Home/panes/kanban/KanbanMainPane";
 import GanttPane from "./GanttPane";
 import ProjectSettingsView from "./ProjectSettingsView";
 import TeamDetailPane from "./TeamDetailPane";
 
-/**
- * Renders the Projects surface: a shared header (project + contextual toolbar)
- * over the active view. Overview / Kanban / Gantt / Settings are all selected from
- * the project sidebar nav (`ProjectNav`).
- */
 export default function ProjectsDisplay() {
     const tab = usePlaygroundNavStore((s) => s.tabBySurface[RailSurface.Projects]);
     const { orgSlug, projectSlug } = useParams<{ orgSlug: string; projectSlug?: string }>();
@@ -48,7 +42,6 @@ export default function ProjectsDisplay() {
 
     return (
         <div className="flex min-h-0 flex-1 flex-col">
-            <ProjectTopbar project={project} />
             <div className="flex min-h-0 flex-1 flex-col">{content()}</div>
         </div>
     );
