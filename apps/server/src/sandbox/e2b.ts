@@ -53,6 +53,7 @@ export default class E2B {
             }
         }
     }
+
     public static async create(): Promise<string> {
         const sandbox = await Sandbox.create("node-py-claude-template", {
             apiKey: ENV.SERVER_E2B_API_KEY,

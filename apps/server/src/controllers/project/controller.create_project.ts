@@ -108,6 +108,8 @@ export default async function create_project_controller(req: Request, res: Respo
             select: { id: true, name: true, slug: true, color: true },
         });
 
+        // create project's plan.md
+
         ResponseWriter.created(res, project, "Project created successfully");
     } catch (error) {
         if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {

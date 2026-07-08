@@ -100,6 +100,8 @@ model Project {
     setupSessions    SetupSession[]
     secrets          ProjectSecret[]
     tags             Tag[]
+    planMd          String?     @db.Text
+    planStatus      PlanStatus  @default(Pending)
 
     workers Worker[]
 
@@ -392,6 +394,13 @@ model Worker {
 
     @@index([projectId, status])
     @@index([projectId, specialization])
+}
+
+enum PlanStatus {
+    Pending
+    Generating
+    Ready
+    Failed
 }
 
 enum WorkerStatus {
