@@ -35,7 +35,7 @@ export default function GanttBoard() {
 
     return (
         <div className="dark flex h-full min-h-0 w-full flex-col bg-background text-foreground">
-            <header className="flex shrink-0 items-center justify-end border-b border-border px-6 py-4">
+            {/* <header className="flex shrink-0 items-center justify-end border-b border-border px-6 py-4">
                 <div className="flex items-center gap-2">
                     <button
                         onClick={() => stepDay(-1)}
@@ -61,7 +61,7 @@ export default function GanttBoard() {
                         <MdKeyboardArrowRight className="size-4" aria-hidden />
                     </button>
                 </div>
-            </header>
+            </header> */}
 
             <div className="flex min-h-0 flex-1">
                 <GanttSidebar pausedWorkerIds={pausedWorkerIds} />

@@ -83,7 +83,7 @@ export default function IssueCard({
                         <MdChatBubble className="h-3 w-3" />
                         {issue.comments}
                     </span>
-                    <AgentChip name={issue.agent} />
+                    {/* <AgentChip name={issue.agent} /> */}
                 </div>
             </motion.div>
         </motion.div>
