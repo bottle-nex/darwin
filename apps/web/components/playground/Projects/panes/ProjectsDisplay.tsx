@@ -4,11 +4,11 @@ import { useGetDashboard } from "@/hooks/dashboard/useGetDashboard";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
 import { RailSurface } from "../../IconRail/railSurface";
 import { ProjectsTab } from "../projectsTabs";
-import ProjectOverview from "./ProjectOverview";
-import KanbanMainPane from "../../Home/panes/kanban/KanbanMainPane";
-import GanttPane from "./GanttPane";
-import ProjectSettingsView from "./ProjectSettingsView";
-import TeamDetailPane from "./TeamDetailPane";
+import ProjectOverviewDisplay from "./ProjectOverviewDisplay";
+import KanbanMainPane from "../../Home/KanbanDisplay/KanbanMainPane";
+import GanttPane from "../../Home/GanttDisplay/GanttPane";
+import ProjectSettingsView from "../../Home/SettingsDisplay/ProjectSettingsView";
+import TeamDetailDisplay from "./TeamDetailDisplay";
 
 export default function ProjectsDisplay() {
     const tab = usePlaygroundNavStore((s) => s.tabBySurface[RailSurface.Projects]);
@@ -33,10 +33,10 @@ export default function ProjectsDisplay() {
             case ProjectsTab.SettingsEnv:
                 return <ProjectSettingsView />;
             case ProjectsTab.TeamDetail:
-                return <TeamDetailPane />;
+                return <TeamDetailDisplay />;
             case ProjectsTab.Overview:
             default:
-                return <ProjectOverview project={project} />;
+                return <ProjectOverviewDisplay project={project} />;
         }
     }
 

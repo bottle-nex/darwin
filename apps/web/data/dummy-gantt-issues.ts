@@ -1,4 +1,4 @@
-import type { GanttIssue } from "@/components/gantt/types";
+import type { GanttIssue } from "@/components/playground/Home/GanttDisplay/types";
 
 /**
  * Mock issue bars for the three worker lanes, with `start`/`endedAt` given as

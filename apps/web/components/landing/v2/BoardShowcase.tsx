@@ -8,13 +8,13 @@ import {
     MdGroup,
 } from "react-icons/md";
 import { cn } from "@/lib/utils";
-import { COLUMNS, INITIAL_BOARD } from "@/components/playground/Home/panes/kanban/data";
+import { COLUMNS, INITIAL_BOARD } from "@/components/playground/Home/KanbanDisplay/data";
 import { HiPlusSmall } from "react-icons/hi2";
 import {
     KanbanStatus,
     type KanbanColumnDef,
-} from "@/components/playground/Home/panes/kanban/types";
-import CardRenderer from "@/components/playground/Home/panes/kanban/cards/CardRenderer";
+} from "@/components/playground/Home/KanbanDisplay/types";
+import CardRenderer from "@/components/playground/Home/KanbanDisplay/cards/CardRenderer";
 import { Button } from "@/components/ui/button";
 
 /** Cards shown per column — varied so the board reads naturally, not uniform. */

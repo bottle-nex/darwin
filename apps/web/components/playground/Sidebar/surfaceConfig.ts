@@ -1,9 +1,9 @@
 import { RailSurface } from "../IconRail/railSurface";
 import { rows as primaryNavRows } from "../Home/HomeSidebar/PrimaryNavSection";
 import { rows as myWorkRows } from "../Home/HomeSidebar/MyWorkSection";
-import { rows as projectRows } from "../Projects/projectsidebar/ProjectsSection";
-import { rows as teamRows } from "../Projects/projectsidebar/TeamsSection";
-import { rows as agentRows } from "../Agents/agentsidebar/AgentsSection";
+import { rows as projectRows } from "../Projects/ProjectsSidebar/ProjectsSection";
+import { rows as teamRows } from "../Projects/ProjectsSidebar/TeamsSection";
+import { rows as agentRows } from "../Agents/AgentsSidebar/AgentsSection";
 import { rows as pullRequestRows } from "../PullRequests/PullRequestsSidebar/PullRequestsSection";
 import { rows as workerRows } from "../Workers/WorkersSidebar/WorkersSection";
 import { matchesQuery, type SidebarNavRow } from "./shared";

@@ -6,7 +6,7 @@ import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore"
 import { HomeTab } from "../homeTabs";
 import PrimaryNavSection from "./PrimaryNavSection";
 import HomeSettingsNav from "./HomeSettingsNav";
-import TeamsSection from "../../Projects/projectsidebar/TeamsSection";
+import TeamsSection from "../../Projects/ProjectsSidebar/TeamsSection";
 
 const SETTINGS_TABS: string[] = [HomeTab.SettingsProject, HomeTab.SettingsEnv];
 

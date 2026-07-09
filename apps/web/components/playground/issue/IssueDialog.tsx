@@ -4,12 +4,12 @@ import { useBoard } from "@/hooks/issues/useBoard";
 import { useParams } from "next/navigation";
 import { useOpenIssue } from "./useOpenIssue";
 import { useGetDashboard } from "@/hooks/dashboard/useGetDashboard";
-import { getLabel, PRIORITY_DOT } from "@/components/playground/Home/panes/kanban/data";
-import { NUMBER_TO_PRIORITY, toAssignee } from "@/components/playground/Home/panes/kanban/mappers";
+import { getLabel, PRIORITY_DOT } from "@/components/playground/Home/KanbanDisplay/data";
+import { NUMBER_TO_PRIORITY, toAssignee } from "@/components/playground/Home/KanbanDisplay/mappers";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import type { BoardIssue } from "@/types/board";
 import PlaygroundAvatar from "@/components/playground/Core/components/PlaygroundAvatar";
-import LLMIssueStatusTicker from "@/components/playground/Home/panes/kanban/LLMIssueStatusTicker";
+import LLMIssueStatusTicker from "@/components/playground/Home/KanbanDisplay/LLMIssueStatusTicker";
 
 export default function IssueDialog() {
     const { orgSlug, projectSlug } = useParams<{ orgSlug: string; projectSlug?: string }>();
