@@ -14,7 +14,7 @@ export default class QueueService {
             "route",
             { project_id },
             {
-                jobId: `route:${project_id}`,
+                jobId: `route-${project_id}`,
                 removeOnComplete: true,
                 removeOnFail: 100,
             },

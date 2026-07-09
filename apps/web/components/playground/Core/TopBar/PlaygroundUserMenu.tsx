@@ -109,29 +109,31 @@ export default function PlaygroundUserMenu() {
     return (
         <DropdownMenu.Root>
             <DropdownMenu.Trigger asChild>
-                <button
-                    type="button"
-                    aria-label="Account menu"
-                    className="relative size-7 cursor-pointer overflow-hidden rounded-full outline-none ring-1 ring-white/10 transition hover:ring-white/25 data-[state=open]:ring-white/30"
-                >
-                    {user?.image ? (
+                {user?.image ? (
+                    <button
+                        type="button"
+                        aria-label="Account menu"
+                        className="relative size-7 cursor-pointer overflow-hidden rounded-full outline-none ring-1 ring-white/10 transition hover:ring-white/25 data-[state=open]:ring-white/30"
+                    >
                         <Image src={user.image} alt="" fill unoptimized className="object-cover" />
-                    ) : (
+                    </button>
+                ) : (
+                    <button type="button" aria-label="Account menu" className="cursor-pointer">
                         <PlaygroundAvatar
-                            size="xl"
-                            tone="dark"
+                            size="sm"
+                            tone="emerald"
                             letter={initial}
-                            className="h-full w-full rounded-full"
+                            className="size-6.5 text-[12px]"
                         />
-                    )}
-                </button>
+                    </button>
+                )}
             </DropdownMenu.Trigger>
 
             <DropdownMenu.Portal>
                 <DropdownMenu.Content align="end" sideOffset={8} className={cn(PANEL, "w-66")}>
                     <div className="flex items-center gap-3 px-3.5 py-3">
-                        <span className="relative size-9 shrink-0 overflow-hidden rounded-xl shadow-sm ring-1 ring-white/15">
-                            {user?.image ? (
+                        {user?.image ? (
+                            <span className="relative size-9 shrink-0 overflow-hidden rounded-xl shadow-sm ring-1 ring-white/15">
                                 <Image
                                     src={user.image}
                                     alt=""
@@ -139,15 +141,15 @@ export default function PlaygroundUserMenu() {
                                     unoptimized
                                     className="object-cover"
                                 />
-                            ) : (
-                                <PlaygroundAvatar
-                                    size="xl"
-                                    tone="dark"
-                                    letter={initial}
-                                    className="h-full w-full rounded-lg"
-                                />
-                            )}
-                        </span>
+                            </span>
+                        ) : (
+                            <PlaygroundAvatar
+                                size="md"
+                                tone="emerald"
+                                letter={initial}
+                                // className="size-9 text-[15px]"
+                            />
+                        )}
                         <div className="min-w-0">
                             <p className="truncate text-[12px] font-semibold text-neutral-100">
                                 {SessionServices.get_user()?.name}

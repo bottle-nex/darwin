@@ -28,7 +28,7 @@ export const CapsuleTrigger = forwardRef<HTMLButtonElement, React.ComponentProps
                 type="button"
                 ref={ref}
                 className={cn(
-                    "flex items-center gap-1.5 px-3 py-1 bg-white/5 ring ring-white/10 text-xs text-white/90 rounded-xl cursor-pointer hover:bg-white/10 transition-colors",
+                    "flex items-center gap-1.5 px-3 py-1 bg-white/5 ring ring-white/10 text-xs text-white/55 rounded-xl cursor-pointer hover:bg-white/10 transition-colors",
                     className,
                 )}
                 {...props}
@@ -213,7 +213,7 @@ function CapsuleCalendar({
                     {date ? format(date, "MMM d, yyyy") : placeholder}
                 </CapsuleTrigger>
             </PopoverTrigger>
-            <PopoverContent align="start" className="w-auto border-white/10 bg-charcoal p-0">
+            <PopoverContent align="start" className="w-auto border-white/10 p-0 bg-charcoal">
                 <Calendar mode="single" selected={date} onSelect={handleSelect} />
             </PopoverContent>
         </Popover>

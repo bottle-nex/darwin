@@ -48,9 +48,10 @@ export default function KanbanColumn({
             </div>
 
             <div
+                data-lenis-prevent
                 ref={setNodeRef}
                 className={cn(
-                    "min-h-0 flex-1 overflow-y-auto rounded-lg p-0.5",
+                    "min-h-0 flex-1 overflow-y-auto rounded-lg p-0.5 no-scrollbar",
                     grid
                         ? "grid grid-cols-1 content-start gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
                         : "flex flex-col gap-2",

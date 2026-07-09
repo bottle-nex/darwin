@@ -98,7 +98,7 @@ export default function TagsCapsule({
                     )}
                 </CapsuleTrigger>
             </PopoverTrigger>
-            <PopoverContent align="start" className="w-56 border-white/10 bg-charcoal p-0">
+            <PopoverContent align="start" className="w-40 border-white/10 bg-charcoal p-0">
                 <Command shouldFilter={false}>
                     <CommandInput
                         value={search}
@@ -116,6 +116,7 @@ export default function TagsCapsule({
                                     <CommandItem
                                         key={tag.id}
                                         value={tag.id}
+                                        className="hover:bg-transparent! active:bg-transparent! focus:bg-transparent!"
                                         onSelect={() => toggle(tag.id)}
                                     >
                                         <TagDisplay

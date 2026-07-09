@@ -83,7 +83,7 @@ function CommandItem({ className, ...props }: React.ComponentProps<typeof Comman
             data-slot="command-item"
             className={cn(
                 "relative flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 text-[13px] text-neutral-200 outline-none select-none",
-                "data-[selected=true]:bg-white/8 data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50",
+                "data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50",
                 "[&_svg]:pointer-events-none [&_svg]:shrink-0",
                 className,
             )}

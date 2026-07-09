@@ -73,7 +73,10 @@ export default function MembersCapsule({
 
     return (
         <Popover open={open} onOpenChange={setOpen}>
-            <TooltipComponent content="Assigning a member is compulsory, our agent may ask them questions about this issue.">
+            <TooltipComponent
+                className="w-60"
+                content="Assigning a member is compulsory, our agent may ask them questions about this issue."
+            >
                 <PopoverTrigger asChild>
                     <CapsuleTrigger className={className}>
                         <MdPeople className="size-3.5 text-white/60" />

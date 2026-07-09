@@ -2,6 +2,7 @@ import Image from "next/image";
 import { formatDate } from "@/lib/format";
 import type { PendingInviteDetail, TeamMemberDetail } from "@/types/team";
 import ProjectRoleTicker from "./ProjectRoleTicker";
+import { MdJoinLeft } from "react-icons/md";
 
 type MemberDetailProps =
     | {
@@ -45,7 +46,7 @@ export default function PlaygroundTeamMemberRow({ teamMember, pendingMember }: M
                     </span>
                 )}
                 <div className="min-w-0">
-                    <p className="truncate text-[13px] font-medium text-neutral-100">{name}</p>
+                    <p className="truncate text-[13px] font-medium text-neutral-200">{name}</p>
                     <p className="truncate text-[12px] text-neutral-500">{secondary}</p>
                 </div>
             </div>
@@ -60,8 +61,9 @@ export default function PlaygroundTeamMemberRow({ teamMember, pendingMember }: M
                         </span>
                     )
                 ) : (
-                    <span className="inline-flex max-w-full items-center truncate rounded-full bg-amber-400/10 px-2 py-0.5 text-[11px] font-medium text-amber-300">
+                    <span className="inline-flex gap-x-1.25 max-w-full items-center truncate rounded-[4px] bg-pink-400/10 px-2 py-0.5 text-[11px] font-medium text-pink-300">
                         {pendingMember.status}
+                        <MdJoinLeft size={14} />
                     </span>
                 )}
             </div>

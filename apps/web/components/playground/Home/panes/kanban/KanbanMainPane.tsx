@@ -4,7 +4,7 @@ import { useKanbanPane } from "./useKanbanPane";
 import KanbanOptionsBar from "./KanbanOptionsBar";
 import KanbanContent from "./KanbanContent";
 import KanbanDragOverlay from "./KanbanDragOverlay";
-import IssuePlane from "./Issue/IssuePlane";
+import IssuePlane from "./Issue/CreateIssueDialog";
 
 /**
  * The workspace's Kanban surface. Hosts two boards — the user-built Custom
@@ -30,6 +30,7 @@ export default function KanbanMainPane() {
             />
             {pane.issuePlaneOpen && (
                 <IssuePlane
+                    open={pane.issuePlaneOpen}
                     projectId={pane.projectId}
                     onClose={() => pane.setIssuePlaneOpen(false)}
                 />
