@@ -7,11 +7,17 @@ import type { ApiResponse } from "@/types/api";
 export interface CreateIssueInput {
     project_id: string;
     title: string;
+    summary?: string;
     description: string;
     priority?: 1 | 2 | 3 | 4;
     label?: string;
     /** Set to file the issue into a custom column; omit for the To-Do lane. */
     custom_column_id?: string;
+    start_date?: string;
+    target_date?: string;
+    /** Required (at least one) when not filing into a custom column. */
+    assignee_ids?: string[];
+    tag_ids?: string[];
 }
 
 interface CreatedIssue {

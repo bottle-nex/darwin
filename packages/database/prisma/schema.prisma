@@ -120,6 +120,7 @@ model Tag {
 
   projectId String
   project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  issues    Issue[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -250,16 +251,20 @@ model Issue {
   number      Int
   createdById String
   title       String
+  summary     String?
   description String      @db.Text
   status      IssueStatus @default(Todo)
   priority    Int         @default(3) // 1=Urgent 2=High 3=Normal 4=Low
   label       String?
+  startDate   DateTime?
+  targetDate  DateTime?
 
   customColumnId String? // non-null = parked in a user column
 
   project      Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
   creator      User          @relation(name: "IssueCreator", fields: [createdById], references: [id], onDelete: Cascade)
   assignees    User[]        @relation(name: "IssueAssignees")
+  tags         Tag[]
   customColumn CustomColumn? @relation(fields: [customColumnId], references: [id], onDelete: Cascade)
 
   createdAt  DateTime  @default(now())

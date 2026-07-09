@@ -35,7 +35,7 @@ export function useKanbanPane() {
     // Which board(s) to show, and whether the LLM board is a grid or a list.
     const [boardView, setBoardView] = useState<BoardView>("default");
     const [kanbanView, setKanbanView] = useState<KanbanView>("board");
-    const [addTaskOpen, setAddTaskOpen] = useState(false);
+    const [issuePlaneOpen, setIssuePlaneOpen] = useState(false);
 
     // Search + label filters applied to the LLM board.
     const filteredBoard = useMemo(
@@ -60,7 +60,7 @@ export function useKanbanPane() {
         setBoardView,
         kanbanView,
         setKanbanView,
-        addTaskOpen,
-        setAddTaskOpen,
+        issuePlaneOpen,
+        setIssuePlaneOpen,
     };
 }

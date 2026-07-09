@@ -204,6 +204,10 @@
         line-height: 1.6;
     }
 
+    .tiptap ::selection {
+        background: transparent;
+    }
+
     .tiptap > * + * {
         margin-top: 0.5rem;
     }
@@ -300,9 +304,19 @@
         margin: 1rem 0;
     }
 
-    .tiptap img {
-        max-width: 100%;
+    .tiptap .image-node {
+        display: inline-block;
+        width: calc(25% - 8px);
+        margin: 4px;
+        vertical-align: top;
+    }
+
+    .tiptap .image-node img {
+        width: 100%;
+        height: auto;
+        display: block;
         border-radius: 0.5rem;
+        object-fit: cover;
     }
 
     .tiptap:focus,
