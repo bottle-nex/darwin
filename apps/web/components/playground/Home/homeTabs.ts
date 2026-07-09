@@ -5,15 +5,18 @@
  */
 export enum HomeTab {
     Inbox = "inbox",
-    Setup = "setup",
     Kanban = "kanban",
-    Tags = "tags",
+    Gantt = "gantt",
     Mentions = "mentions",
     Reviews = "reviews",
     AssignedToMe = "assigned-to-me",
     InProgress = "in-progress",
     Drafts = "drafts",
     TeamDetail = "team-detail",
+    // Settings sections — selecting either swaps the Home sidebar to its
+    // settings face (see `HomeSidebar` / `HomeSettingsNav`).
+    SettingsProject = "settings-project",
+    SettingsEnv = "settings-env",
 }
 
 export const HOME_DEFAULT_TAB: HomeTab = HomeTab.Inbox;

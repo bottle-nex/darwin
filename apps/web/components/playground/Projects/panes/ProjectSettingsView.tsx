@@ -12,12 +12,23 @@ import ProjectSettingsTeamSection from "./settings/ProjectSettingsTeamSection";
 import ProjectSettingsMemberSection from "./settings/ProjectSettingsMemberSection";
 import ProjectSettingsEnvSection from "./settings/ProjectSettingsEnvSection";
 
+export type ProjectSettingsSection = "project" | "teams" | "members" | "env";
+
+/** Maps a Projects settings tab to its section, for the store-driven fallback. */
+const TAB_SECTION: Partial<Record<ProjectsTab, ProjectSettingsSection>> = {
+    [ProjectsTab.SettingsTeams]: "teams",
+    [ProjectsTab.SettingsMembers]: "members",
+    [ProjectsTab.SettingsEnv]: "env",
+    [ProjectsTab.SettingsProject]: "project",
+};
+
 /**
- * Main pane for project settings. The section nav now lives in the sidebar
- * (`ProjectSettingsNav`); this view just renders the section the active Projects
- * tab points at, gated on the viewer being able to manage the project.
+ * Main pane for project settings. The section nav lives in the sidebar; this
+ * view renders one section, gated on the viewer being able to manage the
+ * project. The section is taken from the `section` prop when given (Home
+ * surface), else derived from the active Projects tab.
  */
-export default function ProjectSettingsView() {
+export default function ProjectSettingsView({ section }: { section?: ProjectSettingsSection }) {
     const { orgSlug, projectSlug } = useParams<{ orgSlug: string; projectSlug?: string }>();
     const { data: dashboard } = useGetDashboard(orgSlug);
     const activeProject = projectSlug
@@ -30,6 +41,8 @@ export default function ProjectSettingsView() {
     const isAdmin = project?.viewerRole === "Admin";
 
     const tab = usePlaygroundNavStore((s) => s.tabBySurface[RailSurface.Projects]);
+    const activeSection: ProjectSettingsSection =
+        section ?? TAB_SECTION[tab as ProjectsTab] ?? "project";
 
     if (!project) {
         return <div className="flex-1" />;
@@ -55,8 +68,8 @@ export default function ProjectSettingsView() {
     const activeProjectDetail = project;
 
     function renderContent() {
-        switch (tab) {
-            case ProjectsTab.SettingsTeams:
+        switch (activeSection) {
+            case "teams":
                 return (
                     <ProjectSettingsTeamSection
                         project={activeProjectDetail}
@@ -64,11 +77,11 @@ export default function ProjectSettingsView() {
                         canManage={canManage}
                     />
                 );
-            case ProjectsTab.SettingsMembers:
+            case "members":
                 return <ProjectSettingsMemberSection projectId={projectId} />;
-            case ProjectsTab.SettingsEnv:
+            case "env":
                 return <ProjectSettingsEnvSection projectId={projectId} />;
-            case ProjectsTab.SettingsProject:
+            case "project":
             default:
                 return (
                     <ProjectSettingsGeneralSection
@@ -84,7 +97,7 @@ export default function ProjectSettingsView() {
     return (
         <div data-lenis-prevent className="min-h-0 flex-1 overflow-y-auto px-6 py-6">
             <motion.div
-                key={tab}
+                key={activeSection}
                 initial={{ opacity: 0, y: 4 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.16, ease: [0.4, 0, 0.2, 1] }}

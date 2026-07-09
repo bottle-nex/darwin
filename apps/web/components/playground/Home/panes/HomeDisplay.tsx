@@ -1,13 +1,13 @@
 "use client";
-import { MdHome } from "react-icons/md";
 import { HomeTab } from "../homeTabs";
 import { RailSurface } from "../../IconRail/railSurface";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
 import DraftsPane from "./DraftsPane";
-import TagsMainPane from "./tags/TagsMainPane";
 import InboxMainPane from "./InboxMainPane";
 import InProgressPane from "./InProgressPane";
 import TeamDetailPane from "../../Projects/panes/TeamDetailPane";
+import GanttPane from "../../Projects/panes/GanttPane";
+import ProjectSettingsView from "../../Projects/panes/ProjectSettingsView";
 import KanbanMainPane from "./kanban/KanbanMainPane";
 import ReviewsMainPane from "./ReviewsMainPane";
 import MentionsMainPane from "./MentionsMainPane";
@@ -18,12 +18,6 @@ export default function HomeDisplay() {
     const tab = usePlaygroundNavStore((s) => s.tabBySurface[RailSurface.Home]);
 
     switch (tab) {
-        case HomeTab.Tags:
-            return (
-                <div className="flex min-h-0 flex-1 flex-col">
-                    <TagsMainPane />
-                </div>
-            );
         case HomeTab.Mentions:
             return <MentionsMainPane />;
         case HomeTab.Reviews:
@@ -36,6 +30,16 @@ export default function HomeDisplay() {
             return <DraftsPane />;
         case HomeTab.TeamDetail:
             return <TeamDetailPane />;
+        case HomeTab.Gantt:
+            return (
+                <div className="flex min-h-0 flex-1 flex-col">
+                    <GanttPane />
+                </div>
+            );
+        case HomeTab.SettingsProject:
+            return <ProjectSettingsView section="project" />;
+        case HomeTab.SettingsEnv:
+            return <ProjectSettingsView section="env" />;
         case HomeTab.Inbox:
             return <InboxMainPane />;
 

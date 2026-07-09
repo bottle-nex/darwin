@@ -1,14 +1,7 @@
 import type { FC } from "react";
 import type { IconBaseProps } from "react-icons";
 import { RailSurface } from "./railSurface";
-import {
-    AgentsIcon,
-    HomeIcon,
-    MoreIcon,
-    ProjectsIcon,
-    PullRequestsIcon,
-    WorkersIcon,
-} from "./icons";
+import { AgentsIcon, HomeIcon, MoreIcon, PullRequestsIcon, WorkersIcon } from "./icons";
 
 export type RailItem = {
     surface: RailSurface;
@@ -24,7 +17,6 @@ export type RailItem = {
  */
 export const RAIL_ITEMS: RailItem[] = [
     { surface: RailSurface.Home, label: "Home", Icon: HomeIcon, accent: "green" },
-    { surface: RailSurface.Projects, label: "Projects", Icon: ProjectsIcon },
     { surface: RailSurface.PullRequests, label: "PRs", Icon: PullRequestsIcon },
     { surface: RailSurface.Agents, label: "Agents", Icon: AgentsIcon },
     { surface: RailSurface.Workers, label: "Workers", Icon: WorkersIcon },

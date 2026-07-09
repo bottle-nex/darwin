@@ -2,7 +2,7 @@ import { ConnectionOptions, QueueOptions } from "bullmq";
 import { ENV } from "./env";
 
 const queue_config: QueueOptions = {
-    connection: ENV.SERVER_REDIS_URL as ConnectionOptions,
+    connection: { url: ENV.SERVER_REDIS_URL } as ConnectionOptions,
     defaultJobOptions: {
         attempts: 3,
         backoff: {

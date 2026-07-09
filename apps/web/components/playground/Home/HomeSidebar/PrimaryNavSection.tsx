@@ -1,17 +1,21 @@
 "use client";
 import { BsFillKanbanFill } from "react-icons/bs";
-import { FaInbox, FaAt, FaCheckCircle, FaTags, FaCog } from "react-icons/fa";
+import { FaInbox, FaAt, FaCheckCircle, FaCog } from "react-icons/fa";
+import { MdViewTimeline } from "react-icons/md";
 import Row from "../../Sidebar/SidebarRow";
 import { matchesQuery, type SidebarNavRow, type SidebarSectionProps } from "../../Sidebar/shared";
+import { HomeTab } from "../homeTabs";
 
 const PRIMARY_ROWS: { id: string; label: string; icon: React.ComponentType; isLocked?: boolean }[] =
     [
-        { id: "kanban", label: "Kanban", icon: BsFillKanbanFill },
-        { id: "inbox", label: "Inbox", icon: FaInbox },
-        { id: "mentions", label: "Mentions", icon: FaAt },
-        { id: "reviews", label: "Reviews", icon: FaCheckCircle },
-        { id: "tags", label: "Tags", icon: FaTags },
-        { id: "setup", label: "Setup", icon: FaCog },
+        { id: HomeTab.Kanban, label: "Kanban", icon: BsFillKanbanFill },
+        { id: HomeTab.Gantt, label: "Gantt", icon: MdViewTimeline },
+        { id: HomeTab.Inbox, label: "Inbox", icon: FaInbox },
+        { id: HomeTab.Mentions, label: "Mentions", icon: FaAt },
+        { id: HomeTab.Reviews, label: "Reviews", icon: FaCheckCircle },
+        // Selecting Settings commits a settings tab, which flips the Home sidebar
+        // to its settings face (`HomeSidebar`).
+        { id: HomeTab.SettingsProject, label: "Settings", icon: FaCog },
     ];
 
 export const rows: SidebarNavRow[] = PRIMARY_ROWS.map((r) => ({ id: r.id, label: r.label }));
