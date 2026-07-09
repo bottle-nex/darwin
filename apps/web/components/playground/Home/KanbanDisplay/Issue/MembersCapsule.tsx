@@ -15,8 +15,24 @@ import {
 } from "@/components/ui/command";
 import { useProjectMembers, type ProjectMember } from "@/hooks/project/useProjectMembers";
 import ProjectRoleTicker from "@/components/playground/Projects/TeamView/ProjectRoleTicker";
-import { toneFor } from "../customkanban/CardAvatars";
 import { CapsuleTrigger } from "./Capsule";
+
+// A small, fixed palette; the tone is picked deterministically from the user id
+// so a given person always reads the same colour across the member list.
+const MEMBER_TONES = [
+    "bg-indigo-500/30 text-indigo-100",
+    "bg-emerald-500/30 text-emerald-100",
+    "bg-sky-500/30 text-sky-100",
+    "bg-rose-500/30 text-rose-100",
+    "bg-amber-500/30 text-amber-100",
+    "bg-violet-500/30 text-violet-100",
+];
+
+function memberTone(id: string): string {
+    let hash = 0;
+    for (let i = 0; i < id.length; i++) hash = (hash * 31 + id.charCodeAt(i)) >>> 0;
+    return MEMBER_TONES[hash % MEMBER_TONES.length];
+}
 
 interface MembersCapsuleProps {
     projectId: string | undefined;
@@ -43,7 +59,7 @@ function MemberAvatar({ member }: { member: ProjectMember }) {
         <span
             className={cn(
                 "flex size-6 shrink-0 items-center justify-center rounded-full text-[10px] font-semibold",
-                toneFor(member.id),
+                memberTone(member.id),
             )}
         >
             {initial}

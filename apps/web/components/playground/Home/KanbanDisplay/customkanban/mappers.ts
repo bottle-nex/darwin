@@ -10,6 +10,17 @@ const NUMBER_TO_PRIORITY: Record<number, Priority> = {
     4: "low",
 };
 
+/**
+ * Descriptions are stored as rich-text editor HTML; card previews are plain text.
+ * Entities are left encoded — a preview is a glance, not a rendering.
+ */
+export function stripHtml(html: string): string {
+    return html
+        .replace(/<[^>]*>/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+}
+
 /** Convert a raw server issue row into the card the Custom Kanban renders. */
 export function boardIssueToCard(issue: BoardIssue): CustomCard {
     return {
@@ -17,7 +28,7 @@ export function boardIssueToCard(issue: BoardIssue): CustomCard {
         number: issue.number,
         title: issue.title,
         description: issue.description || undefined,
-        label: issue.label ?? undefined,
+        tags: issue.tags,
         priority: NUMBER_TO_PRIORITY[issue.priority] ?? "normal",
         assignees: issue.assignees,
     };

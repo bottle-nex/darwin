@@ -5,6 +5,7 @@ import PlaygroundAvatar from "@/components/playground/Core/components/Playground
 import { COLUMNS, PRIORITY_DOT } from "./data";
 import type { BoardState, Issue } from "./types";
 import AgentChip from "./cards/AgentChip";
+import IssueTags from "./IssueTags";
 import LLMIssueStatusTicker from "./LLMIssueStatusTicker";
 
 type KanbanListViewProps = {
@@ -53,16 +54,7 @@ function ListRow({ issue }: { issue: Issue }) {
             />
             <span className="truncate text-[13px] font-medium text-neutral-100">{issue.title}</span>
             <span className="shrink-0 font-mono text-[11px] text-neutral-500">{issue.number}</span>
-            {issue.label && (
-                <span
-                    className={cn(
-                        "hidden shrink-0 rounded px-1.5 py-0.5 text-[10px] font-medium sm:inline",
-                        issue.label.className,
-                    )}
-                >
-                    {issue.label.name}
-                </span>
-            )}
+            <IssueTags tags={issue.tags} className="hidden shrink-0 sm:flex" />
 
             <span className="ml-auto hidden shrink-0 items-center gap-1 text-[11px] text-neutral-500 sm:flex">
                 <MdChat className="size-3" aria-hidden />

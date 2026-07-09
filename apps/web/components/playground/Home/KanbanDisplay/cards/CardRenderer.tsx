@@ -1,5 +1,5 @@
 "use client";
-import { useOpenIssue } from "@/components/playground/issue/useOpenIssue";
+import { useIssueDialog } from "@/components/playground/issue/useIssueDialog";
 import { KanbanStatus, type Issue } from "../types";
 import TodoCard from "./TodoCard";
 import QueuedCard from "./QueuedCard";
@@ -30,24 +30,23 @@ function statusCard(issue: Issue) {
 }
 
 /**
- * Renders the status-specific card and makes it open the issue's detail dialog on
- * tap. This is the single fan-out point for every column, so wiring the click here
- * covers all statuses. Dragging still works on the To Do column — the board's
- * pointer sensor only starts a drag past a 5px threshold, so a tap falls through
- * to this handler.
+ * Renders the status-specific card and opens the issue on tap. This is the single
+ * fan-out point for every column, so wiring the click here covers all statuses.
+ * Dragging still works on the To Do column — the board's pointer sensor only starts
+ * a drag past a 5px threshold, so a tap falls through to this handler.
  */
 export default function CardRenderer({ issue }: { issue: Issue }) {
-    const { openIssue } = useOpenIssue();
+    const { openEdit } = useIssueDialog();
     return (
         <div
             role="button"
             tabIndex={0}
             className="cursor-pointer"
-            onClick={() => openIssue(issue.id)}
+            onClick={() => openEdit(issue.id)}
             onKeyDown={(e) => {
                 if (e.key === "Enter" || e.key === " ") {
                     e.preventDefault();
-                    openIssue(issue.id);
+                    openEdit(issue.id);
                 }
             }}
         >

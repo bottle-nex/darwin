@@ -7,11 +7,11 @@ import {
     LuCircleSlash,
 } from "react-icons/lu";
 import { RiProgress4Line } from "react-icons/ri";
+import type { BoardTag } from "@/types/board";
 import {
     KanbanStatus,
     type BoardState,
     type Issue,
-    type IssueLabel,
     type KanbanColumnDef,
     type Priority,
 } from "./types";
@@ -86,36 +86,31 @@ export const PRIORITY_DOT: Record<Priority, string> = {
     low: "bg-neutral-600",
 };
 
-/** Every label that can be applied to an issue and filtered on. */
-export const ALL_LABELS: IssueLabel[] = [
-    { name: "feature", className: "bg-indigo-500/15 text-indigo-300" },
-    { name: "bug", className: "bg-rose-500/15 text-rose-300" },
-    { name: "ui", className: "bg-pink-500/15 text-pink-300" },
-    { name: "chore", className: "bg-neutral-500/15 text-neutral-300" },
-    { name: "docs", className: "bg-sky-500/15 text-sky-300" },
-    { name: "test", className: "bg-emerald-500/15 text-emerald-300" },
-    { name: "enhancement", className: "bg-teal-500/15 text-teal-300" },
-    { name: "performance", className: "bg-amber-500/15 text-amber-300" },
-    { name: "security", className: "bg-red-500/15 text-red-300" },
-    { name: "refactor", className: "bg-violet-500/15 text-violet-300" },
-    { name: "design", className: "bg-fuchsia-500/15 text-fuchsia-300" },
-];
-
-const LABEL_BY_NAME = new Map(ALL_LABELS.map((l) => [l.name, l]));
-
-/** Look up a label's style by name (used for selected-label chips). */
-export function getLabel(name: string): IssueLabel | undefined {
-    return LABEL_BY_NAME.get(name);
-}
-
 /** An empty board with one (empty) lane per status — keyed off `STATUSES` so it
  *  always matches `KanbanStatus` and can never drift out of sync with it. */
 export function emptyBoard(): BoardState {
     return Object.fromEntries(STATUSES.map((s) => [s, [] as Issue[]])) as BoardState;
 }
 
-/** Style lookup helper for seeding dummy issues with real label colours. */
-const label = (name: string): IssueLabel => LABEL_BY_NAME.get(name)!;
+/** Colours for the dummy issues below; real tags carry their own from the server. */
+const SEED_TAG_COLORS: Record<string, string> = {
+    feature: "#818cf8",
+    bug: "#ff6467",
+    ui: "#f472b6",
+    chore: "#94a3b8",
+    docs: "#38bdf8",
+    test: "#34d399",
+    enhancement: "#2dd4bf",
+    performance: "#fbbf24",
+    security: "#f87171",
+    refactor: "#bcafff",
+    design: "#e879f9",
+};
+
+/** One display-only tag, for seeding dummy issues. */
+const tag = (name: string): BoardTag[] => [
+    { id: `seed-tag-${name}`, name, color: SEED_TAG_COLORS[name] ?? "#94a3b8" },
+];
 
 /**
  * Placeholder issues for local development and demos. The LLM board will
@@ -129,7 +124,7 @@ const SEED_ISSUES: Issue[] = [
         number: "MTC-204",
         title: "Add rate limiting to the OTP request endpoint",
         project: "trymatcha/server",
-        label: label("security"),
+        tags: tag("security"),
         priority: "urgent",
         assignees: [{ id: "u-maya", name: "Maya", tone: "purple" }],
         comments: 2,
@@ -142,7 +137,7 @@ const SEED_ISSUES: Issue[] = [
         number: "MTC-207",
         title: "Document the org → project → team role hierarchy",
         project: "trymatcha/docs",
-        label: label("docs"),
+        tags: tag("docs"),
         priority: "low",
         assignees: [{ id: "u-rishi", name: "Rishi", tone: "blue" }],
         comments: 0,
@@ -154,7 +149,7 @@ const SEED_ISSUES: Issue[] = [
         number: "MTC-211",
         title: "Empty state for the board when no issues are filed",
         project: "trymatcha/web",
-        label: label("ui"),
+        tags: tag("ui"),
         priority: "normal",
         assignees: [{ id: "u-ava", name: "Ava", tone: "indigo" }],
         comments: 1,
@@ -166,7 +161,7 @@ const SEED_ISSUES: Issue[] = [
         number: "MTC-214",
         title: "Validate redirect URLs against an allow-list",
         project: "trymatcha/server",
-        label: label("security"),
+        tags: tag("security"),
         priority: "high",
         assignees: [{ id: "u-sam", name: "Sam", tone: "dark" }],
         comments: 0,
@@ -180,7 +175,7 @@ const SEED_ISSUES: Issue[] = [
         number: "MTC-198",
         title: "Migrate Kanban board state to Zustand store",
         project: "trymatcha/web",
-        label: label("refactor"),
+        tags: tag("refactor"),
         priority: "normal",
         assignees: [{ id: "u-leo", name: "Leo", tone: "emerald" }],
         comments: 4,
@@ -192,7 +187,7 @@ const SEED_ISSUES: Issue[] = [
         number: "MTC-201",
         title: "Add Redis connection retry with backoff",
         project: "trymatcha/server",
-        label: label("enhancement"),
+        tags: tag("enhancement"),
         priority: "high",
         assignees: [{ id: "u-rishi", name: "Rishi", tone: "blue" }],
         comments: 2,
@@ -204,7 +199,7 @@ const SEED_ISSUES: Issue[] = [
         number: "MTC-205",
         title: "Seed script for demo orgs and projects",
         project: "trymatcha/database",
-        label: label("chore"),
+        tags: tag("chore"),
         priority: "low",
         assignees: [{ id: "u-ava", name: "Ava", tone: "indigo" }],
         comments: 0,
@@ -216,7 +211,7 @@ const SEED_ISSUES: Issue[] = [
         number: "MTC-209",
         title: "Tighten CORS config for the production web origin",
         project: "trymatcha/server",
-        label: label("security"),
+        tags: tag("security"),
         priority: "normal",
         assignees: [{ id: "u-maya", name: "Maya", tone: "purple" }],
         comments: 1,
@@ -229,7 +224,7 @@ const SEED_ISSUES: Issue[] = [
         number: "MTC-128",
         title: "Fix flaky auth redirect on email-OTP verify",
         project: "trymatcha/web",
-        label: label("bug"),
+        tags: tag("bug"),
         priority: "high",
         agent: "Opus 4.8",
         assignees: [{ id: "u-maya", name: "Maya", tone: "purple" }],
@@ -243,7 +238,7 @@ const SEED_ISSUES: Issue[] = [
         number: "MTC-132",
         title: "Paginate the issues board API response",
         project: "trymatcha/server",
-        label: label("performance"),
+        tags: tag("performance"),
         priority: "normal",
         agent: "Sonnet 4.6",
         assignees: [{ id: "u-leo", name: "Leo", tone: "emerald" }],
@@ -257,7 +252,7 @@ const SEED_ISSUES: Issue[] = [
         number: "MTC-140",
         title: "Add optimistic UI for card drag between columns",
         project: "trymatcha/web",
-        label: label("enhancement"),
+        tags: tag("enhancement"),
         priority: "normal",
         agent: "Opus 4.8",
         assignees: [{ id: "u-ava", name: "Ava", tone: "indigo" }],
@@ -273,7 +268,7 @@ const SEED_ISSUES: Issue[] = [
         number: "MTC-115",
         title: "Cache Prisma client on globalThis to survive HMR",
         project: "trymatcha/database",
-        label: label("performance"),
+        tags: tag("performance"),
         priority: "normal",
         agent: "Opus 4.8",
         assignees: [{ id: "u-leo", name: "Leo", tone: "emerald" }],
@@ -286,7 +281,7 @@ const SEED_ISSUES: Issue[] = [
         number: "MTC-118",
         title: "Lock OTP after max verify attempts",
         project: "trymatcha/server",
-        label: label("security"),
+        tags: tag("security"),
         priority: "high",
         agent: "Opus 4.8",
         assignees: [{ id: "u-rishi", name: "Rishi", tone: "blue" }],
@@ -299,7 +294,7 @@ const SEED_ISSUES: Issue[] = [
         number: "MTC-121",
         title: "Skeleton loaders for the dashboard panes",
         project: "trymatcha/web",
-        label: label("ui"),
+        tags: tag("ui"),
         priority: "low",
         agent: "Sonnet 4.6",
         assignees: [{ id: "u-ava", name: "Ava", tone: "indigo" }],
@@ -314,7 +309,7 @@ const SEED_ISSUES: Issue[] = [
         number: "MTC-091",
         title: "Wire Resend email delivery into OTP flow",
         project: "trymatcha/server",
-        label: label("feature"),
+        tags: tag("feature"),
         priority: "normal",
         assignees: [{ id: "u-rishi", name: "Rishi", tone: "blue" }],
         comments: 5,
@@ -327,7 +322,7 @@ const SEED_ISSUES: Issue[] = [
         number: "MTC-088",
         title: "Add pg connection pool adapter to Prisma client",
         project: "trymatcha/database",
-        label: label("enhancement"),
+        tags: tag("enhancement"),
         priority: "normal",
         assignees: [{ id: "u-leo", name: "Leo", tone: "emerald" }],
         comments: 2,
@@ -340,7 +335,7 @@ const SEED_ISSUES: Issue[] = [
         number: "MTC-082",
         title: "Set up shared ESLint + Prettier configs",
         project: "trymatcha/config",
-        label: label("chore"),
+        tags: tag("chore"),
         priority: "low",
         assignees: [{ id: "u-sam", name: "Sam", tone: "dark" }],
         comments: 0,
@@ -355,7 +350,7 @@ const SEED_ISSUES: Issue[] = [
         number: "MTC-073",
         title: "Upgrade to Tailwind v4 and drop the config file",
         project: "trymatcha/web",
-        label: label("refactor"),
+        tags: tag("refactor"),
         priority: "normal",
         agent: "Sonnet 4.6",
         assignees: [{ id: "u-ava", name: "Ava", tone: "indigo" }],
@@ -368,7 +363,7 @@ const SEED_ISSUES: Issue[] = [
         number: "MTC-069",
         title: "Add e2e test for the OTP request → verify flow",
         project: "trymatcha/server",
-        label: label("test"),
+        tags: tag("test"),
         priority: "high",
         agent: "Opus 4.8",
         assignees: [{ id: "u-maya", name: "Maya", tone: "purple" }],
@@ -381,7 +376,7 @@ const SEED_ISSUES: Issue[] = [
         number: "MTC-061",
         title: "Generate Prisma client in CI before typecheck",
         project: "trymatcha/database",
-        label: label("chore"),
+        tags: tag("chore"),
         priority: "normal",
         assignees: [{ id: "u-sam", name: "Sam", tone: "dark" }],
         comments: 1,
@@ -395,7 +390,7 @@ const SEED_ISSUES: Issue[] = [
         number: "MTC-058",
         title: "Switch session tokens from HS256 to RS256",
         project: "trymatcha/server",
-        label: label("security"),
+        tags: tag("security"),
         priority: "low",
         assignees: [{ id: "u-rishi", name: "Rishi", tone: "blue" }],
         comments: 3,
@@ -407,7 +402,7 @@ const SEED_ISSUES: Issue[] = [
         number: "MTC-052",
         title: "Replace Lenis smooth scroll with native",
         project: "trymatcha/web",
-        label: label("refactor"),
+        tags: tag("refactor"),
         priority: "low",
         assignees: [{ id: "u-ava", name: "Ava", tone: "indigo" }],
         comments: 1,
@@ -428,12 +423,13 @@ export function seedBoard(): BoardState {
 export const INITIAL_BOARD: BoardState = seedBoard();
 
 /**
- * Apply the active search query and selected labels to every column. An issue
+ * Apply the active search query and selected tags to every column. An issue
  * matches when its title/number/project contains the query (when set) AND it
- * carries one of the selected labels (when any are selected). Returns a new
+ * carries one of the selected tags (when any are selected). Matching is by tag
+ * id, not name — names are renameable and collide across projects. Returns a new
  * board; the focus filter (which single column to show) is applied at render.
  */
-export function filterBoard(board: BoardState, search: string, labels: string[]): BoardState {
+export function filterBoard(board: BoardState, search: string, tagIds: string[]): BoardState {
     const q = search.trim().toLowerCase();
     const matches = (issue: Issue) => {
         const inText =
@@ -441,9 +437,8 @@ export function filterBoard(board: BoardState, search: string, labels: string[])
             issue.title.toLowerCase().includes(q) ||
             issue.number.toLowerCase().includes(q) ||
             issue.project.toLowerCase().includes(q);
-        const inLabels =
-            labels.length === 0 || (issue.label ? labels.includes(issue.label.name) : false);
-        return inText && inLabels;
+        const inTags = tagIds.length === 0 || issue.tags.some((t) => tagIds.includes(t.id));
+        return inText && inTags;
     };
     return Object.fromEntries(STATUSES.map((s) => [s, board[s].filter(matches)])) as BoardState;
 }

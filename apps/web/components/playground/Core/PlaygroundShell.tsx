@@ -8,8 +8,8 @@ import PlaygroundTopBar from "@/components/playground/Core/TopBar/PlaygroundTopB
 import PlaygroundWorkspace from "@/components/playground/Core/PlaygroundWorkspace";
 import CreateTeamDialog from "@/components/team/CreateTeamDialog";
 import DeleteTeamDialog from "@/components/team/DeleteTeamDialog";
-import IssueDialog from "@/components/playground/issue/IssueDialog";
-import { useOpenIssue } from "@/components/playground/issue/useOpenIssue";
+import CreateOrEditIssueDialog from "@/components/playground/Home/KanbanDisplay/Issue/CreateOrEditIssueDialog";
+import { useIssueDialog } from "@/components/playground/issue/useIssueDialog";
 import { useGetDashboard } from "@/hooks/dashboard/useGetDashboard";
 import { useGetProject } from "@/hooks/project/useGetProject";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
@@ -53,7 +53,7 @@ export default function PlaygroundShell() {
     // Keep the active surface/tab (and open team) in the URL so a refresh restores it.
     usePlaygroundUrlSync(project?.teams);
     // Open the issue dialog for a deep-linked `…/issue/<id>` and follow Back/Forward.
-    useOpenIssue({ sync: true });
+    useIssueDialog({ sync: true });
 
     return (
         <main className="flex h-screen flex-col overflow-hidden text-neutral-100 pt-px select-none">
@@ -73,7 +73,7 @@ export default function PlaygroundShell() {
             </section>
             <CreateTeamDialog />
             <DeleteTeamDialog />
-            <IssueDialog />
+            <CreateOrEditIssueDialog />
         </main>
     );
 }

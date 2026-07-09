@@ -13,7 +13,7 @@ const SAMPLE_IN_PROGRESS: Issue = {
     number: "MTC-128",
     title: "Fix flaky auth redirect on email-OTP verify",
     project: "trymatcha/web",
-    label: { name: "bug", className: "bg-rose-500/15 text-rose-300" },
+    tags: [{ id: "preview-tag-bug", name: "bug", color: "#ff6467" }],
     priority: "high",
     agent: "Opus 4.8",
     assignees: [{ id: "a1", name: "Maya", tone: "purple" }],

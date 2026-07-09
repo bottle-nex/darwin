@@ -12,11 +12,16 @@ export interface UpdateIssueInput {
     title?: string;
     description?: string;
     priority?: 1 | 2 | 3 | 4;
-    /** null clears the label. */
-    label?: string | null;
     status?: ServerIssueStatus;
     /** null moves the issue out of its custom column into its status lane. */
     custom_column_id?: string | null;
+    /** Replaces the issue's tags. Omit to leave them untouched; `[]` clears them. */
+    tag_ids?: string[];
+    /** Replaces the issue's assignees. Omit to leave them untouched; `[]` clears them. */
+    assignee_ids?: string[];
+    /** ISO string to set, `null` to clear, omitted to leave untouched. */
+    start_date?: string | null;
+    target_date?: string | null;
 }
 
 export function useUpdateIssue() {
@@ -31,9 +36,12 @@ export function useUpdateIssue() {
                     title: input.title,
                     description: input.description,
                     priority: input.priority,
-                    label: input.label,
                     status: input.status,
                     custom_column_id: input.custom_column_id,
+                    tag_ids: input.tag_ids,
+                    assignee_ids: input.assignee_ids,
+                    start_date: input.start_date,
+                    target_date: input.target_date,
                 },
             );
             return res.data.data.issue;

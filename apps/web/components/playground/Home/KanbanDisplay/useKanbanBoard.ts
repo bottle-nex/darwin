@@ -1,6 +1,6 @@
 "use client";
 import { useRef, useState } from "react";
-import { getLabel, INITIAL_BOARD, STATUSES } from "./data";
+import { INITIAL_BOARD, STATUSES } from "./data";
 import { boardIssuesToLlmBoard } from "./mappers";
 import { KanbanStatus, type BoardState, type Issue } from "./types";
 import type { BoardResponse } from "@/types/board";
@@ -45,7 +45,7 @@ export function useKanbanBoard({ board: serverBoard, projectName }: UseKanbanBoa
                 number: `#${nextNumber.current++}`,
                 title: card.title,
                 project: "custom-kanban",
-                label: card.label ? getLabel(card.label) : undefined,
+                tags: card.tags,
                 priority: card.priority,
                 assignees: [],
                 comments: 0,

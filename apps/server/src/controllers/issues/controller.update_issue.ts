@@ -10,9 +10,15 @@ export default class IssueUpdateController {
         title: z.string().min(1).max(200).optional(),
         description: z.string().optional(),
         priority: z.number().int().min(1).max(4).optional(),
-        label: z.string().nullable().optional(),
         status: z.enum(IssueStatus).optional(),
         custom_column_id: z.string().nullable().optional(),
+        // Omit to leave untouched; an empty array clears them.
+        tag_ids: z.array(z.string()).max(20).optional(),
+        assignee_ids: z.array(z.string()).max(20).optional(),
+        // `null` before `coerce.date()` — otherwise `new Date(null)` silently
+        // coerces a clear into the 1970 epoch. Omit to leave untouched.
+        start_date: z.union([z.null(), z.coerce.date()]).optional(),
+        target_date: z.union([z.null(), z.coerce.date()]).optional(),
     });
 
     static params_schema = z.object({
@@ -74,6 +80,30 @@ export default class IssueUpdateController {
                 }
             }
 
+            if (body_data.tag_ids?.length) {
+                const tag_count = await prisma.tag.count({
+                    where: { id: { in: body_data.tag_ids }, projectId: issue.projectId },
+                });
+                if (tag_count !== body_data.tag_ids.length) {
+                    ResponseWriter.invalid_data(res, "One or more tags are not in this project");
+                    return;
+                }
+            }
+
+            // Every assignee must themselves be a member of this project.
+            if (body_data.assignee_ids?.length) {
+                const assignee_roles = await Promise.all(
+                    body_data.assignee_ids.map((id) => Access.project(id, issue.projectId)),
+                );
+                if (assignee_roles.some((assignee_role) => !assignee_role)) {
+                    ResponseWriter.invalid_data(
+                        res,
+                        "One or more assignees are not project members",
+                    );
+                    return;
+                }
+            }
+
             const next_column_id =
                 body_data.custom_column_id !== undefined
                     ? body_data.custom_column_id
@@ -96,9 +126,18 @@ export default class IssueUpdateController {
                     title: body_data.title,
                     description: body_data.description,
                     priority: body_data.priority,
-                    label: body_data.label,
                     status: next_status,
                     customColumnId: next_column_id,
+                    startDate: body_data.start_date,
+                    targetDate: body_data.target_date,
+                    // `set` replaces; `connect` would only ever append, so a
+                    // removed tag or assignee could never actually be removed.
+                    tags: body_data.tag_ids
+                        ? { set: body_data.tag_ids.map((id) => ({ id })) }
+                        : undefined,
+                    assignees: body_data.assignee_ids
+                        ? { set: body_data.assignee_ids.map((id) => ({ id })) }
+                        : undefined,
                 },
                 select: {
                     id: true,
@@ -106,11 +145,13 @@ export default class IssueUpdateController {
                     title: true,
                     description: true,
                     priority: true,
-                    label: true,
                     status: true,
                     customColumnId: true,
                     createdAt: true,
+                    startDate: true,
+                    targetDate: true,
                     assignees: { select: { id: true, name: true, image: true } },
+                    tags: { select: { id: true, name: true, color: true } },
                 },
             });
 

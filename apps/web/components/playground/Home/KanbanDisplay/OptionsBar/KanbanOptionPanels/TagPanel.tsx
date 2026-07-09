@@ -3,13 +3,16 @@ import { useState } from "react";
 import { MdCheck, MdSearch, MdLabel } from "react-icons/md";
 import { DropdownMenu } from "radix-ui";
 import { cn } from "@/lib/utils";
-import { ALL_LABELS } from "../../data";
+import { useActiveProject } from "@/hooks/useActiveProject";
+import { useListTags } from "@/hooks/tags/useListTags";
+import TagDisplay from "@/components/playground/Home/TagsDisplay/TagDisplay";
 import OptionButton from "./OptionButton";
 import { TooltipComponent } from "@/components/ui/tooltip-component";
 
-type LabelPanelProps = {
+type TagPanelProps = {
+    /** Tag ids, not names — names are renameable and collide across projects. */
     selected: string[];
-    onToggle: (name: string) => void;
+    onToggle: (id: string) => void;
     onClear: () => void;
 };
 
@@ -19,22 +22,24 @@ const CONTENT =
     "z-50 flex max-h-76 w-60 flex-col overflow-hidden origin-(--radix-dropdown-menu-content-transform-origin) rounded-lg border border-neutral-800 bg-charcoal shadow-xl animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95";
 
 /**
- * Label filter. A sticky header (title + Clear all, then a label search) sits
- * above a divider; only the checklist below scrolls. Selecting keeps the menu
- * open so several labels can be toggled at once, and narrows the board to issues
- * carrying any selected label.
+ * Tag filter. A sticky header (title + Clear all, then a tag search) sits above a
+ * divider; only the checklist below scrolls. Selecting keeps the menu open so
+ * several tags can be toggled at once, and narrows the board to issues carrying
+ * any selected tag.
  */
-export default function LabelPanel({ selected, onToggle, onClear }: LabelPanelProps) {
+export default function TagPanel({ selected, onToggle, onClear }: TagPanelProps) {
     const [query, setQuery] = useState("");
-    const labels = ALL_LABELS.filter((l) =>
-        l.name.toLowerCase().includes(query.trim().toLowerCase()),
+    const projectId = useActiveProject()?.id;
+    const { data: allTags } = useListTags(projectId);
+    const tags = (allTags ?? []).filter((t) =>
+        t.name.toLowerCase().includes(query.trim().toLowerCase()),
     );
 
     return (
         <DropdownMenu.Root onOpenChange={(open) => !open && setQuery("")}>
-            <TooltipComponent content="Label" side="bottom">
+            <TooltipComponent content="Tag" side="bottom">
                 <DropdownMenu.Trigger asChild>
-                    <OptionButton label="Label" icon={MdLabel} active={selected.length > 0} />
+                    <OptionButton label="Tag" icon={MdLabel} active={selected.length > 0} />
                 </DropdownMenu.Trigger>
             </TooltipComponent>
             <DropdownMenu.Portal>
@@ -42,7 +47,7 @@ export default function LabelPanel({ selected, onToggle, onClear }: LabelPanelPr
                     <div className="flex shrink-0 flex-col gap-1.5 p-2">
                         <div className="flex items-center justify-between px-0.5">
                             <span className="text-[11px] font-medium tracking-wide text-neutral-500 uppercase">
-                                Filter by label
+                                Filter by tag
                             </span>
                             {selected.length > 0 && (
                                 <button
@@ -63,7 +68,7 @@ export default function LabelPanel({ selected, onToggle, onClear }: LabelPanelPr
                                 value={query}
                                 onChange={(e) => setQuery(e.target.value)}
                                 onKeyDown={(e) => e.stopPropagation()}
-                                placeholder="Search labels..."
+                                placeholder="Search tags..."
                                 className="h-7 w-full rounded-md border border-white/10 bg-white/5 pr-2 pl-7 text-[12px] text-neutral-100 placeholder:text-neutral-500 focus:border-white/25 focus:outline-none"
                             />
                         </div>
@@ -73,18 +78,18 @@ export default function LabelPanel({ selected, onToggle, onClear }: LabelPanelPr
 
                     {/* Scrollable checklist. */}
                     <div data-lenis-prevent className="min-h-0 flex-1 overflow-y-auto p-1">
-                        {labels.length === 0 ? (
+                        {tags.length === 0 ? (
                             <p className="px-2 py-3 text-center text-[12px] text-neutral-600">
-                                No labels
+                                No tags
                             </p>
                         ) : (
-                            labels.map((item) => {
-                                const isOn = selected.includes(item.name);
+                            tags.map((tag) => {
+                                const isOn = selected.includes(tag.id);
                                 return (
                                     <DropdownMenu.CheckboxItem
-                                        key={item.name}
+                                        key={tag.id}
                                         checked={isOn}
-                                        onCheckedChange={() => onToggle(item.name)}
+                                        onCheckedChange={() => onToggle(tag.id)}
                                         onSelect={(e) => e.preventDefault()}
                                         className="flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 outline-none select-none data-highlighted:bg-white/5"
                                     >
@@ -98,14 +103,7 @@ export default function LabelPanel({ selected, onToggle, onClear }: LabelPanelPr
                                         >
                                             {isOn && <MdCheck className="size-2.5" aria-hidden />}
                                         </span>
-                                        <span
-                                            className={cn(
-                                                "rounded px-1.5 py-0.5 text-[11px] font-medium",
-                                                item.className,
-                                            )}
-                                        >
-                                            {item.name}
-                                        </span>
+                                        <TagDisplay name={tag.name} color={tag.color} />
                                     </DropdownMenu.CheckboxItem>
                                 );
                             })

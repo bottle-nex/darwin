@@ -4,7 +4,7 @@ import { useKanbanPane } from "./useKanbanPane";
 import KanbanOptionsBar from "./OptionsBar/KanbanOptionsBar";
 import KanbanContent from "./KanbanContent";
 import KanbanDragOverlay from "./KanbanDragOverlay";
-import IssuePlane from "./Issue/CreateIssueDialog";
+import { useCreateOrEditIssueStore } from "@/store/issues/useCreateOrEditIssueStore";
 
 /**
  * The workspace's Kanban surface. Hosts two boards — the user-built Custom
@@ -16,6 +16,7 @@ import IssuePlane from "./Issue/CreateIssueDialog";
 export default function KanbanMainPane() {
     const pane = useKanbanPane();
     const { custom } = pane;
+    const openCreate = useCreateOrEditIssueStore((s) => s.openCreate);
 
     return (
         <div className="flex min-h-0 flex-1 flex-col">
@@ -26,15 +27,8 @@ export default function KanbanMainPane() {
                 onBoardViewChange={pane.setBoardView}
                 kanbanView={pane.kanbanView}
                 onKanbanViewChange={pane.setKanbanView}
-                onAddTask={() => pane.setIssuePlaneOpen(true)}
+                onAddTask={() => openCreate({ board: "llm" })}
             />
-            {pane.issuePlaneOpen && (
-                <IssuePlane
-                    open={pane.issuePlaneOpen}
-                    projectId={pane.projectId}
-                    onClose={() => pane.setIssuePlaneOpen(false)}
-                />
-            )}
             <DndContext
                 sensors={custom.sensors}
                 collisionDetection={closestCorners}

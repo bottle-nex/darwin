@@ -1,5 +1,6 @@
 import type { IconType } from "react-icons";
 import { IssueStatus } from "@trymatcha/types";
+import type { BoardTag } from "@/types/board";
 import type { AvatarTone } from "@/components/playground/Core/components/PlaygroundAvatar";
 
 export const KanbanStatus = {
@@ -21,11 +22,6 @@ export type Assignee = {
     tone: AvatarTone;
 };
 
-export type IssueLabel = {
-    name: string;
-    className: string;
-};
-
 export type PullRequest = {
     number: string;
     added: number;
@@ -37,7 +33,7 @@ export type Issue = {
     number: string;
     title: string;
     project: string;
-    label?: IssueLabel;
+    tags: BoardTag[];
     priority: Priority;
     /** Claude model assigned to the issue (e.g. "Opus 4.8"). */
     agent?: string;

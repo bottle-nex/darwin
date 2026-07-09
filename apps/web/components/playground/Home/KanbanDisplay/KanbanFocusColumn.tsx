@@ -34,10 +34,8 @@ export default function KanbanFocusColumn({ filter, board, custom }: KanbanFocus
         return (
             <CustomKanbanColumn
                 column={column}
-                onAddCard={(input) => custom.addCard(column.id, input)}
                 onDelete={() => custom.removeColumn(column.id)}
                 onRename={(label) => custom.renameColumn(column.id, label)}
-                onEditCard={custom.editCard}
                 onDeleteCard={custom.removeCard}
                 projectId={custom.projectId}
                 onAssign={custom.assignMember}

@@ -22,7 +22,6 @@ export default class IssueCreateController {
             // room for markup overhead without changing the user-facing limit.
             description: z.string().max(20000),
             priority: z.number().int().min(1).max(4).optional(),
-            label: z.string().optional(),
             custom_column_id: z.string().optional(),
             start_date: z.coerce.date().optional(),
             target_date: z.coerce.date().optional(),
@@ -121,7 +120,6 @@ export default class IssueCreateController {
                                 summary: parsed_body.data.summary,
                                 description: parsed_body.data.description,
                                 priority: parsed_body.data.priority ?? 3,
-                                label: parsed_body.data.label,
                                 startDate: parsed_body.data.start_date,
                                 targetDate: parsed_body.data.target_date,
                                 projectId: parsed_body.data.project_id,

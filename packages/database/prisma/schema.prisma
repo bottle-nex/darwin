@@ -255,7 +255,6 @@ model Issue {
   description String      @db.Text
   status      IssueStatus @default(Todo)
   priority    Int         @default(3) // 1=Urgent 2=High 3=Normal 4=Low
-  label       String?
   startDate   DateTime?
   targetDate  DateTime?
 

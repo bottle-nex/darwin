@@ -22,16 +22,22 @@ const ImageWithControls = Image.extend({
 interface IssueDescriptionEditorProps {
     placeholder?: string;
     className?: string;
+    initialContent?: string;
+    editable?: boolean;
     onChange?: (html: string, isEmpty: boolean) => void;
 }
 
 export default function IssueDescriptionEditor({
     placeholder = "Add a description... type '/' for commands",
     className,
+    initialContent,
+    editable = true,
     onChange,
 }: IssueDescriptionEditorProps) {
     const editor = useEditor({
         immediatelyRender: false,
+        content: initialContent,
+        editable,
         extensions: [
             StarterKit,
             TaskList,
@@ -43,7 +49,7 @@ export default function IssueDescriptionEditor({
         ],
         editorProps: {
             attributes: {
-                class: cn("tiptap min-h-full", className),
+                class: cn("tiptap min-h-full no-scro", className),
             },
         },
         onUpdate: ({ editor: updatedEditor }) => {

@@ -1,5 +1,5 @@
 import type { Priority } from "../types";
-import type { BoardAssignee } from "@/types/board";
+import type { BoardAssignee, BoardTag } from "@/types/board";
 
 /**
  * The Custom Kanban is a Trello-style board the user builds by hand: free-form
@@ -9,16 +9,15 @@ import type { BoardAssignee } from "@/types/board";
 
 /**
  * A card on a user-built column — the display view of a server Issue parked in a
- * custom column. `label` is a label name from `ALL_LABELS`. `number` is the
- * server's per-project issue number (absent only for an optimistic card awaiting
- * its server row).
+ * custom column. `number` is the server's per-project issue number (absent only
+ * for an optimistic card awaiting its server row).
  */
 export type CustomCard = {
     id: string;
     number?: number;
     title: string;
     description?: string;
-    label?: string;
+    tags: BoardTag[];
     priority: Priority;
     assignees: BoardAssignee[];
 };
@@ -28,12 +27,4 @@ export type CustomColumn = {
     id: string;
     title: string;
     cards: CustomCard[];
-};
-
-/** The fields the Add Card modal collects before a card is created. */
-export type NewCardInput = {
-    title: string;
-    description: string;
-    label?: string;
-    priority: Priority;
 };

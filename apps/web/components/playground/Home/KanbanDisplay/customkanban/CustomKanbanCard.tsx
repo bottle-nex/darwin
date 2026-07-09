@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { MdMoreHoriz, MdEdit, MdDelete, MdPeople } from "react-icons/md";
+import { MdMoreHoriz, MdDelete, MdPeople } from "react-icons/md";
 import { DropdownMenu } from "radix-ui";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -12,16 +12,21 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog";
-import { useOpenIssue } from "@/components/playground/issue/useOpenIssue";
-import { getLabel, PRIORITY_DOT } from "../data";
+import { useIssueDialog } from "@/components/playground/issue/useIssueDialog";
+import { PRIORITY_DOT } from "../data";
+import { toAssignee } from "../mappers";
 import { PANEL_CONTENT, PANEL_ITEM } from "../OptionsBar/KanbanOptionPanels/panelStyles";
-import CardAvatars from "./CardAvatars";
+import IssueTags from "../IssueTags";
 import AssigneePicker from "./AssigneePicker";
+import { stripHtml } from "./mappers";
 import type { CustomCard } from "./types";
+import PlaygroundAvatar from "@/components/playground/Core/components/PlaygroundAvatar";
+
+/** Cards are narrow; anything past this collapses into a `+N`. */
+const MAX_AVATARS = 3;
 
 type CustomKanbanCardProps = {
     card: CustomCard;
-    onEdit?: () => void;
     onDelete?: () => void;
     projectId?: string;
     onAssign?: (userId: string) => void;
@@ -30,21 +35,23 @@ type CustomKanbanCardProps = {
 
 export default function CustomKanbanCard({
     card,
-    onEdit,
     onDelete,
     projectId,
     onAssign,
     onUnassign,
 }: CustomKanbanCardProps) {
-    const label = card.label ? getLabel(card.label) : undefined;
+    const preview = card.description ? stripHtml(card.description) : "";
+    // `toAssignee` resolves the nullable server name and the avatar tone together.
+    const shownAssignees = card.assignees.slice(0, MAX_AVATARS).map(toAssignee);
+    const overflowCount = card.assignees.length - shownAssignees.length;
     const [confirmOpen, setConfirmOpen] = useState(false);
     const [assignOpen, setAssignOpen] = useState(false);
     const canAssign = Boolean(projectId && onAssign && onUnassign);
-    const { openIssue } = useOpenIssue();
+    const { openEdit } = useIssueDialog();
 
     return (
         <div className="group/card relative rounded-lg bg-white/5 p-2.5 ring-1 ring-white/5 transition-colors hover:ring-white/15">
-            {(onEdit || onDelete || canAssign) && (
+            {(onDelete || canAssign) && (
                 <DropdownMenu.Root>
                     <DropdownMenu.Trigger asChild>
                         <button
@@ -62,12 +69,6 @@ export default function CustomKanbanCard({
                             sideOffset={6}
                             className={`w-40 ${PANEL_CONTENT}`}
                         >
-                            {onEdit && (
-                                <DropdownMenu.Item onSelect={onEdit} className={PANEL_ITEM}>
-                                    <MdEdit className="size-3.5" aria-hidden />
-                                    <span className="flex-1">Edit</span>
-                                </DropdownMenu.Item>
-                            )}
                             {canAssign && (
                                 <DropdownMenu.Item
                                     onSelect={() => setAssignOpen(true)}
@@ -95,11 +96,11 @@ export default function CustomKanbanCard({
                 role="button"
                 tabIndex={0}
                 className="cursor-pointer"
-                onClick={() => openIssue(card.id)}
+                onClick={() => openEdit(card.id)}
                 onKeyDown={(e) => {
                     if (e.key === "Enter" || e.key === " ") {
                         e.preventDefault();
-                        openIssue(card.id);
+                        openEdit(card.id);
                     }
                 }}
             >
@@ -116,22 +117,15 @@ export default function CustomKanbanCard({
                     </p>
                 </div>
 
-                {card.description && (
+                {preview && (
                     <p className="mt-1.5 line-clamp-2 pl-3.5 text-[12px] leading-snug text-neutral-400">
-                        {card.description}
+                        {preview}
                     </p>
                 )}
 
-                {label && (
+                {card.tags.length > 0 && (
                     <div className="mt-2 pl-3.5">
-                        <span
-                            className={cn(
-                                "inline-flex items-center rounded px-1.5 py-0.5 text-[11px] font-medium",
-                                label.className,
-                            )}
-                        >
-                            {label.name}
-                        </span>
+                        <IssueTags tags={card.tags} />
                     </div>
                 )}
 
@@ -139,7 +133,23 @@ export default function CustomKanbanCard({
                     <span className="text-[11px] font-medium text-neutral-500">
                         {card.number ? `#${card.number}` : ""}
                     </span>
-                    <CardAvatars assignees={card.assignees} />
+                    <div className="flex shrink-0 items-center -space-x-1">
+                        {shownAssignees.map((a, index) => (
+                            <PlaygroundAvatar
+                                key={a.id}
+                                letter={(a.name.trim()[0] ?? "?").toUpperCase()}
+                                tone={a.tone}
+                                className={cn(
+                                    index === 0 && shownAssignees.length > 1 && "-rotate-7",
+                                )}
+                            />
+                        ))}
+                        {overflowCount > 0 && (
+                            <span className="flex size-5 shrink-0 items-center justify-center rounded-[6px] bg-white/10 text-[11px] font-medium text-neutral-300 ring-1 ring-inset ring-white/15">
+                                +{overflowCount}
+                            </span>
+                        )}
+                    </div>
                 </div>
             </div>
 

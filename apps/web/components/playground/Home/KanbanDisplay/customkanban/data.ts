@@ -1,14 +1,6 @@
 import type { Priority } from "../types";
 import type { CustomColumn } from "./types";
 
-/** Priority choices for the Add Card modal, in descending urgency. */
-export const PRIORITIES: { value: Priority; label: string }[] = [
-    { value: "urgent", label: "Urgent" },
-    { value: "high", label: "High" },
-    { value: "normal", label: "Normal" },
-    { value: "low", label: "Low" },
-];
-
 /** Map a card's `Priority` to the server's 1–4 priority scale. */
 export const PRIORITY_TO_NUMBER: Record<Priority, 1 | 2 | 3 | 4> = {
     urgent: 1,

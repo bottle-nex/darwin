@@ -21,9 +21,9 @@ import type { KanbanOptions } from "../useKanbanOptions";
 import type { BoardView, KanbanView } from "../types";
 import OptionButton from "./KanbanOptionPanels/OptionButton";
 import FilterPanel from "./KanbanOptionPanels/FilterPanel";
-import LabelPanel from "./KanbanOptionPanels/LabelPanel";
+import TagPanel from "./KanbanOptionPanels/TagPanel";
 import SearchBar from "./KanbanOptionPanels/SearchBar";
-import SelectedLabels from "./KanbanOptionPanels/SelectedLabels";
+import SelectedTags from "./KanbanOptionPanels/SelectedTags";
 import ViewsPanel from "./KanbanOptionPanels/ViewsPanel";
 
 const TASK_OPTIONS = [
@@ -49,7 +49,7 @@ type KanbanOptionsBarProps = {
     onAddTask: () => void;
 };
 
-/** Board toolbar: the board switcher, search, labels, filters, Views, and +Task. */
+/** Board toolbar: the board switcher, search, tags, filters, Views, and +Task. */
 export default function KanbanOptionsBar({
     options,
     customColumns,
@@ -65,10 +65,10 @@ export default function KanbanOptionsBar({
         setSearch,
         openSearch,
         closeSearch,
-        selectedLabels,
-        toggleLabel,
-        removeLabel,
-        clearLabels,
+        selectedTagIds,
+        toggleTag,
+        removeTag,
+        clearTags,
         filter,
         setFilter,
     } = options;
@@ -101,15 +101,11 @@ export default function KanbanOptionsBar({
                     )}
                 </AnimatePresence>
 
-                <SelectedLabels selected={selectedLabels} onRemove={removeLabel} />
+                <SelectedTags selected={selectedTagIds} onRemove={removeTag} />
             </div>
 
             <div className="flex shrink-0 items-center gap-0.5">
-                <LabelPanel
-                    selected={selectedLabels}
-                    onToggle={toggleLabel}
-                    onClear={clearLabels}
-                />
+                <TagPanel selected={selectedTagIds} onToggle={toggleTag} onClear={clearTags} />
                 <FilterPanel value={filter} onChange={setFilter} customColumns={customColumns} />
                 <TooltipComponent content="Assignees" side="bottom">
                     <OptionButton label="Assignees" icon={MdGroup} />

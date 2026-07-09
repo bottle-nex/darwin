@@ -6,6 +6,13 @@ import type { IssueStatus } from "@trymatcha/types";
  * into its display card (priority number → label, status → KanbanStatus, etc.).
  */
 
+/** A tag as the board projects it; the full `Tag` in `types/tags.ts` adds `createdAt`. */
+export type BoardTag = {
+    id: string;
+    name: string;
+    color: string;
+};
+
 /** The server's IssueStatus enum, as it arrives over JSON (the shared enum). */
 export type ServerIssueStatus = IssueStatus;
 
@@ -16,18 +23,20 @@ export type BoardAssignee = {
     image: string | null;
 };
 
-/** One issue row, with its assignees. `priority` is the numeric scale (1=Urgent…4=Low). */
+/** One issue row, with its assignees and tags. `priority` is the numeric scale (1=Urgent…4=Low). */
 export type BoardIssue = {
     id: string;
     number: number;
     title: string;
     description: string;
     priority: number;
-    label: string | null;
     status: ServerIssueStatus;
     customColumnId: string | null;
     createdAt: string;
+    startDate: string | null;
+    targetDate: string | null;
     assignees: BoardAssignee[];
+    tags: BoardTag[];
 };
 
 /** A custom column row. `order` is its left-to-right board position. */

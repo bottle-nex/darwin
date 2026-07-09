@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
-import { useParams } from "next/navigation";
-import { useGetDashboard } from "@/hooks/dashboard/useGetDashboard";
+import { useActiveProject } from "@/hooks/useActiveProject";
 import { useBoard } from "@/hooks/issues/useBoard";
 import { filterBoard } from "./data";
 import type { BoardView, KanbanView } from "./types";
@@ -17,9 +16,7 @@ import { useCustomKanban } from "./customkanban/useCustomKanban";
  * view toggles.
  */
 export function useKanbanPane() {
-    const { orgSlug, projectSlug } = useParams<{ orgSlug: string; projectSlug?: string }>();
-    const { data: dashboard } = useGetDashboard(orgSlug);
-    const activeProject = dashboard?.projects.find((p) => p.slug === projectSlug);
+    const activeProject = useActiveProject();
 
     const { data: board } = useBoard(activeProject?.id);
     const kanban = useKanbanBoard({ board, projectName: activeProject?.name ?? "" });
@@ -35,12 +32,11 @@ export function useKanbanPane() {
     // Which board(s) to show, and whether the LLM board is a grid or a list.
     const [boardView, setBoardView] = useState<BoardView>("default");
     const [kanbanView, setKanbanView] = useState<KanbanView>("board");
-    const [issuePlaneOpen, setIssuePlaneOpen] = useState(false);
 
-    // Search + label filters applied to the LLM board.
+    // Search + tag filters applied to the LLM board.
     const filteredBoard = useMemo(
-        () => filterBoard(kanban.board, options.search, options.selectedLabels),
-        [kanban.board, options.search, options.selectedLabels],
+        () => filterBoard(kanban.board, options.search, options.selectedTagIds),
+        [kanban.board, options.search, options.selectedTagIds],
     );
 
     // If the focused custom column was deleted, drop the focus so the board returns.
@@ -60,7 +56,5 @@ export function useKanbanPane() {
         setBoardView,
         kanbanView,
         setKanbanView,
-        issuePlaneOpen,
-        setIssuePlaneOpen,
     };
 }

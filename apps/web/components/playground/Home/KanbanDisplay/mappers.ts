@@ -1,6 +1,6 @@
 import type { AvatarTone } from "@/components/playground/Core/components/PlaygroundAvatar";
 import type { BoardAssignee, BoardIssue, BoardResponse, ServerIssueStatus } from "@/types/board";
-import { emptyBoard, getLabel } from "./data";
+import { emptyBoard } from "./data";
 import { KanbanStatus, type Assignee, type BoardState, type Issue, type Priority } from "./types";
 
 export const NUMBER_TO_PRIORITY: Record<number, Priority> = {
@@ -38,7 +38,7 @@ function toLlmIssue(issue: BoardIssue, status: KanbanStatus, projectName: string
         number: `#${issue.number}`,
         title: issue.title,
         project: projectName,
-        label: issue.label ? getLabel(issue.label) : undefined,
+        tags: issue.tags,
         priority: NUMBER_TO_PRIORITY[issue.priority] ?? "normal",
         assignees: issue.assignees.map(toAssignee),
         comments: 0,

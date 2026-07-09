@@ -86,11 +86,13 @@ export default class IssueAssignController {
                     title: true,
                     description: true,
                     priority: true,
-                    label: true,
                     status: true,
                     customColumnId: true,
                     createdAt: true,
+                    startDate: true,
+                    targetDate: true,
                     assignees: { select: { id: true, name: true, image: true } },
+                    tags: { select: { id: true, name: true, color: true } },
                 },
             });
 

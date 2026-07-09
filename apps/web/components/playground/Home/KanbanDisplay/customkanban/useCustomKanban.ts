@@ -13,18 +13,16 @@ import { toast } from "sonner";
 import { isBridgeStatus } from "../data";
 import type { KanbanStatus, Issue } from "../types";
 import { useCreateColumn } from "@/hooks/issues/useCreateColumn";
-import { useCreateIssue } from "@/hooks/issues/useCreateIssue";
 import { useUpdateIssue } from "@/hooks/issues/useUpdateIssue";
 import { useDeleteIssue } from "@/hooks/issues/useDeleteIssue";
 import { useUpdateColumn } from "@/hooks/issues/useUpdateColumn";
 import { useDeleteColumn } from "@/hooks/issues/useDeleteColumn";
 import { useAssignIssue, useUnassignIssue } from "@/hooks/issues/useAssignIssue";
 import type { BoardResponse } from "@/types/board";
-import { INITIAL_CUSTOM_COLUMNS, PRIORITY_TO_NUMBER } from "./data";
+import { INITIAL_CUSTOM_COLUMNS } from "./data";
 import { boardToColumns } from "./mappers";
-import type { CustomCard, CustomColumn, NewCardInput } from "./types";
+import type { CustomCard, CustomColumn } from "./types";
 
-/** Frontend priority labels → the backend's numeric scale (1=Urgent … 4=Low). */
 type UseCustomKanbanArgs = {
     /** The project these columns/issues belong to. Creation is disabled until it resolves. */
     projectId: string | undefined;
@@ -45,13 +43,13 @@ type ActiveItem = { kind: "custom"; card: CustomCard } | { kind: "issue"; issue:
 export type CustomKanbanApi = ReturnType<typeof useCustomKanban>;
 
 /**
- * In-memory state for the user-built Custom Kanban plus its drag-and-drop. Cards
+ * Column/card state for the user-built Custom Kanban plus its drag-and-drop. Cards
  * reorder and move freely between custom columns; dropping one over an LLM
  * bridge column files it there, and a bridge-column issue dragged onto a custom
  * column lands as a new card. Which LLM columns bridge is decided by
  * `BRIDGE_STATUSES` (see `data.ts`) — this hook stays status-agnostic, keying off
- * whether the drop target is a custom column or not. Kept local like the LLM
- * board's state — no work-item backend yet, so a refresh resets it.
+ * whether the drop target is a custom column or not. Cards are real server issues
+ * parked in a column; local state mirrors the board query and reseeds on refetch.
  */
 export function useCustomKanban({
     projectId,
@@ -65,7 +63,6 @@ export function useCustomKanban({
     const [activeItem, setActiveItem] = useState<ActiveItem | null>(null);
 
     const createColumn = useCreateColumn();
-    const createIssue = useCreateIssue();
     const updateIssue = useUpdateIssue();
     const deleteIssue = useDeleteIssue();
     const updateColumn = useUpdateColumn();
@@ -128,40 +125,6 @@ export function useCustomKanban({
         }
     };
 
-    const editCard = async (cardId: string, input: NewCardInput) => {
-        if (!projectId) return;
-        const title = input.title.trim();
-        const description = input.description.trim();
-        setColumns((prev) =>
-            prev.map((col) => ({
-                ...col,
-                cards: col.cards.map((c) =>
-                    c.id === cardId
-                        ? {
-                              ...c,
-                              title: title || c.title,
-                              description: description || undefined,
-                              label: input.label,
-                              priority: input.priority,
-                          }
-                        : c,
-                ),
-            })),
-        );
-        try {
-            await updateIssue.mutateAsync({
-                id: cardId,
-                project_id: projectId,
-                title: title || undefined,
-                description,
-                priority: PRIORITY_TO_NUMBER[input.priority],
-                label: input.label ?? null, // null clears the label
-            });
-        } catch {
-            toast.error("Couldn't update the issue.");
-        }
-    };
-
     // Assignment has no local optimistic step (we lack the member's name/image
     // here) — the board refetch on success refreshes the card's avatars.
     const assignMember = async (cardId: string, userId: string) => {
@@ -179,39 +142,6 @@ export function useCustomKanban({
             await unassignIssue.mutateAsync({ id: cardId, project_id: projectId, user_id: userId });
         } catch {
             toast.error("Couldn't unassign the member.");
-        }
-    };
-
-    // A card is a real Issue filed into this custom column. Persist it, then mirror
-    // it into local state keyed by the server's issue id.
-    const addCard = async (columnId: string, input: NewCardInput) => {
-        const title = input.title.trim();
-        if (!title || !projectId) return;
-        const description = input.description.trim();
-        try {
-            const created = await createIssue.mutateAsync({
-                project_id: projectId,
-                title,
-                description,
-                priority: PRIORITY_TO_NUMBER[input.priority],
-                label: input.label,
-                custom_column_id: columnId,
-            });
-            const card: CustomCard = {
-                id: created.issue_id,
-                title,
-                description: description || undefined,
-                label: input.label,
-                priority: input.priority,
-                assignees: [],
-            };
-            setColumns((prev) =>
-                prev.map((col) =>
-                    col.id === columnId ? { ...col, cards: [...col.cards, card] } : col,
-                ),
-            );
-        } catch {
-            toast.error("Couldn't create the card.");
         }
     };
 
@@ -313,7 +243,7 @@ export function useCustomKanban({
                 {
                     id: activeId,
                     title: issue.title,
-                    label: issue.label?.name,
+                    tags: issue.tags,
                     priority: issue.priority,
                     assignees: issue.assignees.map((a) => ({
                         id: a.id,
@@ -376,9 +306,7 @@ export function useCustomKanban({
         addColumn,
         removeColumn,
         renameColumn,
-        addCard,
         removeCard,
-        editCard,
         assignMember,
         unassignMember,
         activeItem,

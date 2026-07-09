@@ -9,9 +9,7 @@ export default function CustomKanbanBoard({
     addColumn,
     removeColumn,
     renameColumn,
-    addCard,
     removeCard,
-    editCard,
     assignMember,
     unassignMember,
 }: CustomKanbanApi) {
@@ -21,10 +19,8 @@ export default function CustomKanbanBoard({
                 <CustomKanbanColumn
                     key={column.id}
                     column={column}
-                    onAddCard={(input) => addCard(column.id, input)}
                     onDelete={() => removeColumn(column.id)}
                     onRename={(label) => renameColumn(column.id, label)}
-                    onEditCard={editCard}
                     onDeleteCard={removeCard}
                     projectId={projectId}
                     onAssign={assignMember}

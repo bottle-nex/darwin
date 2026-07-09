@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import PlaygroundAvatar from "@/components/playground/Core/components/PlaygroundAvatar";
 import type { Issue } from "../types";
 import { PRIORITY_DOT } from "../data";
+import IssueTags from "../IssueTags";
 
 type BaseCardProps = {
     issue: Issue;
@@ -34,16 +35,7 @@ export default function BaseCard({ issue, children, className }: BaseCardProps) 
                         className={cn("size-1.5 rounded-full", PRIORITY_DOT[issue.priority])}
                         aria-hidden
                     />
-                    {issue.label && (
-                        <span
-                            className={cn(
-                                "rounded px-1.5 py-0.5 text-[10px] font-medium",
-                                issue.label.className,
-                            )}
-                        >
-                            {issue.label.name}
-                        </span>
-                    )}
+                    <IssueTags tags={issue.tags} />
                 </div>
                 <span className="font-mono text-[11px] text-neutral-500">{issue.number}</span>
             </div>

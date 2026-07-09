@@ -7,16 +7,14 @@ import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable"
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { PANEL_CONTENT, PANEL_ITEM } from "../OptionsBar/KanbanOptionPanels/panelStyles";
-import AddCardModal from "./AddCardModal";
+import { useCreateOrEditIssueStore } from "@/store/issues/useCreateOrEditIssueStore";
 import SortableCustomCard from "./SortableCustomCard";
-import type { CustomCard, CustomColumn, NewCardInput } from "./types";
+import type { CustomColumn } from "./types";
 
 type CustomKanbanColumnProps = {
     column: CustomColumn;
-    onAddCard: (input: NewCardInput) => void;
     onDelete: () => void;
     onRename: (label: string) => void;
-    onEditCard: (cardId: string, input: NewCardInput) => void;
     onDeleteCard: (cardId: string) => void;
     projectId?: string;
     onAssign: (cardId: string, userId: string) => void;
@@ -25,17 +23,15 @@ type CustomKanbanColumnProps = {
 
 export default function CustomKanbanColumn({
     column,
-    onAddCard,
     onDelete,
     onRename,
-    onEditCard,
     onDeleteCard,
     projectId,
     onAssign,
     onUnassign,
 }: CustomKanbanColumnProps) {
-    const [adding, setAdding] = useState(false);
-    const [editingCard, setEditingCard] = useState<CustomCard | null>(null);
+    const openCreate = useCreateOrEditIssueStore((s) => s.openCreate);
+
     const [renaming, setRenaming] = useState(false);
     const [draftTitle, setDraftTitle] = useState(column.title);
     const { setNodeRef, isOver } = useDroppable({ id: column.id });
@@ -130,7 +126,6 @@ export default function CustomKanbanColumn({
                         <SortableCustomCard
                             key={card.id}
                             card={card}
-                            onEdit={() => setEditingCard(card)}
                             onDelete={() => onDeleteCard(card.id)}
                             projectId={projectId}
                             onAssign={(userId) => onAssign(card.id, userId)}
@@ -142,42 +137,18 @@ export default function CustomKanbanColumn({
 
             <button
                 type="button"
-                onClick={() => setAdding(true)}
+                onClick={() =>
+                    openCreate({
+                        board: "custom",
+                        columnId: column.id,
+                        columnTitle: column.title,
+                    })
+                }
                 className="mt-2 flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-[12px] font-medium text-neutral-400 transition-colors hover:bg-white/5 hover:text-neutral-200 cursor-pointer"
             >
                 <MdAdd className="size-3.5" aria-hidden />
                 Add a card
             </button>
-
-            <AddCardModal
-                open={adding}
-                onOpenChange={setAdding}
-                columnTitle={column.title}
-                onSubmit={onAddCard}
-            />
-
-            {editingCard && (
-                <AddCardModal
-                    key={editingCard.id}
-                    open
-                    onOpenChange={(next) => {
-                        if (!next) setEditingCard(null);
-                    }}
-                    columnTitle={column.title}
-                    heading="Edit card"
-                    submitLabel="Save"
-                    initial={{
-                        title: editingCard.title,
-                        description: editingCard.description ?? "",
-                        label: editingCard.label,
-                        priority: editingCard.priority,
-                    }}
-                    onSubmit={(input) => {
-                        onEditCard(editingCard.id, input);
-                        setEditingCard(null);
-                    }}
-                />
-            )}
         </div>
     );
 }
