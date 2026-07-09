@@ -2,7 +2,11 @@ import { WebSocketServer, WebSocket } from "ws";
 import { IncomingMessage, Server } from "http";
 import SubscriberSystem from "./subscriber.system";
 import { verifySessionJwt } from "../services/service.jwt";
-import { InboundSocketMessageType, OutboundSocketMessageType, type InboundSocketMessage } from "@trymatcha/types";
+import {
+    InboundSocketMessageType,
+    OutboundSocketMessageType,
+    type InboundSocketMessage,
+} from "@trymatcha/types";
 import { IssueStatus, Prisma, prisma } from "@trymatcha/database";
 import { Action, Permissions } from "@trymatcha/access-control";
 import Access from "../access-control/access";
@@ -125,7 +129,10 @@ export default class SocketServer {
             projectId: project_id,
             payload: full_issue,
         };
-        await server_services.publisher.publish_message(channel_name, JSON.stringify(publishing_body));
+        await server_services.publisher.publish_message(
+            channel_name,
+            JSON.stringify(publishing_body),
+        );
 
         await server_services.queue.enqueue_project(project_id);
     }

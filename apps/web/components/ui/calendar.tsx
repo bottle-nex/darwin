@@ -50,7 +50,8 @@ function Calendar({
                 ),
                 range_start: "day-range-start",
                 range_end: "day-range-end",
-                selected: "[&>button]:bg-white/90 [&>button]:text-neutral-900 [&>button]:hover:bg-white/90",
+                selected:
+                    "[&>button]:bg-white/90 [&>button]:text-neutral-900 [&>button]:hover:bg-white/90",
                 today: "[&>button]:ring [&>button]:ring-white/20",
                 outside: "text-neutral-600",
                 disabled: "text-neutral-700 opacity-50",

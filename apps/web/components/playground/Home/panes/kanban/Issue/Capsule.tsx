@@ -161,7 +161,12 @@ function CapsuleDropdownSearch({
                                     onSelect={() => handleSelect(option.value)}
                                 >
                                     {option.dotClassName && (
-                                        <span className={cn("size-2 rounded-full", option.dotClassName)} />
+                                        <span
+                                            className={cn(
+                                                "size-2 rounded-full",
+                                                option.dotClassName,
+                                            )}
+                                        />
                                     )}
                                     <span className="flex-1">{option.label}</span>
                                     {option.value === value && (
@@ -185,7 +190,12 @@ interface CapsuleCalendarProps {
     className?: string;
 }
 
-function CapsuleCalendar({ defaultValue, onChange, placeholder = "Set date", className }: CapsuleCalendarProps) {
+function CapsuleCalendar({
+    defaultValue,
+    onChange,
+    placeholder = "Set date",
+    className,
+}: CapsuleCalendarProps) {
     const [open, setOpen] = useState(false);
     const [date, setDate] = useState<Date | undefined>(defaultValue);
 

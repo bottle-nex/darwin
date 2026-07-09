@@ -78,10 +78,15 @@ export default class IssueCreateController {
             // Every assignee must themselves be a member of this project.
             if (parsed_body.data.assignee_ids?.length) {
                 const assignee_roles = await Promise.all(
-                    parsed_body.data.assignee_ids.map((id) => Access.project(id, parsed_body.data.project_id)),
+                    parsed_body.data.assignee_ids.map((id) =>
+                        Access.project(id, parsed_body.data.project_id),
+                    ),
                 );
                 if (assignee_roles.some((assignee_role) => !assignee_role)) {
-                    ResponseWriter.invalid_data(res, "One or more assignees are not project members");
+                    ResponseWriter.invalid_data(
+                        res,
+                        "One or more assignees are not project members",
+                    );
                     return;
                 }
             }
@@ -89,7 +94,10 @@ export default class IssueCreateController {
             // Every tag must belong to this same project.
             if (parsed_body.data.tag_ids?.length) {
                 const tag_count = await prisma.tag.count({
-                    where: { id: { in: parsed_body.data.tag_ids }, projectId: parsed_body.data.project_id },
+                    where: {
+                        id: { in: parsed_body.data.tag_ids },
+                        projectId: parsed_body.data.project_id,
+                    },
                 });
                 if (tag_count !== parsed_body.data.tag_ids.length) {
                     ResponseWriter.invalid_data(res, "One or more tags are not in this project");
@@ -124,7 +132,11 @@ export default class IssueCreateController {
                                     : IssueStatus.Todo,
                                 number: (last_issue?.number ?? 0) + 1,
                                 assignees: parsed_body.data.assignee_ids?.length
-                                    ? { connect: parsed_body.data.assignee_ids.map((id) => ({ id })) }
+                                    ? {
+                                          connect: parsed_body.data.assignee_ids.map((id) => ({
+                                              id,
+                                          })),
+                                      }
                                     : undefined,
                                 tags: parsed_body.data.tag_ids?.length
                                     ? { connect: parsed_body.data.tag_ids.map((id) => ({ id })) }

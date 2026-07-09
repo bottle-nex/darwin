@@ -24,7 +24,12 @@ interface TagsCapsuleProps {
     className?: string;
 }
 
-export default function TagsCapsule({ projectId, defaultValue, onChange, className }: TagsCapsuleProps) {
+export default function TagsCapsule({
+    projectId,
+    defaultValue,
+    onChange,
+    className,
+}: TagsCapsuleProps) {
     const [open, setOpen] = useState(false);
     const [search, setSearch] = useState("");
     const [selected, setSelected] = useState<string[]>(defaultValue ?? []);
@@ -41,7 +46,9 @@ export default function TagsCapsule({ projectId, defaultValue, onChange, classNa
 
     const allTags = tags ?? [];
     const query = search.trim().toLowerCase();
-    const filtered = query ? allTags.filter((tag) => tag.name.toLowerCase().includes(query)) : allTags;
+    const filtered = query
+        ? allTags.filter((tag) => tag.name.toLowerCase().includes(query))
+        : allTags;
     const exactMatch = allTags.some((tag) => tag.name.toLowerCase() === query);
     const canCreate = Boolean(projectId) && query.length > 0 && !exactMatch;
 
@@ -99,13 +106,23 @@ export default function TagsCapsule({ projectId, defaultValue, onChange, classNa
                         placeholder="Search or create tag..."
                     />
                     <CommandList>
-                        {filtered.length === 0 && !canCreate && <CommandEmpty>No tags yet</CommandEmpty>}
+                        {filtered.length === 0 && !canCreate && (
+                            <CommandEmpty>No tags yet</CommandEmpty>
+                        )}
                         <CommandGroup>
                             {filtered.map((tag) => {
                                 const isSelected = selected.includes(tag.id);
                                 return (
-                                    <CommandItem key={tag.id} value={tag.id} onSelect={() => toggle(tag.id)}>
-                                        <TagDisplay name={tag.name} color={tag.color} className="flex-1" />
+                                    <CommandItem
+                                        key={tag.id}
+                                        value={tag.id}
+                                        onSelect={() => toggle(tag.id)}
+                                    >
+                                        <TagDisplay
+                                            name={tag.name}
+                                            color={tag.color}
+                                            className="flex-1"
+                                        />
                                         {isSelected && (
                                             <MdCheck className="size-4 shrink-0 text-neutral-400" />
                                         )}
@@ -119,7 +136,9 @@ export default function TagsCapsule({ projectId, defaultValue, onChange, classNa
                                     onSelect={handleCreate}
                                 >
                                     <MdAdd className="size-4 shrink-0 text-neutral-400" />
-                                    <span className="flex-1 truncate">Create &quot;{search.trim()}&quot;</span>
+                                    <span className="flex-1 truncate">
+                                        Create &quot;{search.trim()}&quot;
+                                    </span>
                                 </CommandItem>
                             )}
                         </CommandGroup>

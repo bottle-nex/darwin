@@ -24,7 +24,10 @@ function CommandInput({
     ...props
 }: React.ComponentProps<typeof CommandPrimitive.Input>) {
     return (
-        <div data-slot="command-input-wrapper" className="flex items-center gap-2 border-b border-white/10 px-3">
+        <div
+            data-slot="command-input-wrapper"
+            className="flex items-center gap-2 border-b border-white/10 px-3"
+        >
             <MdSearch className="size-4 shrink-0 text-neutral-500" />
             <CommandPrimitive.Input
                 data-slot="command-input"
@@ -58,7 +61,10 @@ function CommandEmpty({ ...props }: React.ComponentProps<typeof CommandPrimitive
     );
 }
 
-function CommandGroup({ className, ...props }: React.ComponentProps<typeof CommandPrimitive.Group>) {
+function CommandGroup({
+    className,
+    ...props
+}: React.ComponentProps<typeof CommandPrimitive.Group>) {
     return (
         <CommandPrimitive.Group
             data-slot="command-group"

@@ -66,12 +66,13 @@ export default function IssuePlane({ projectId, onClose }: IssuePlaneProps) {
     }
 
     return (
-        <div className={cn(
-            "h-[90%] w-[70%] absolute top-1/2 left-1/2 -translate-1/2 z-40 ",
-            "bg-[#1a1a1b] ring ring-white/10 rounded-xl ",
-            "flex flex-col justify-between divide-y divide-white/10 *:px-8 *:py-4 "
-        )}>
-
+        <div
+            className={cn(
+                "h-[90%] w-[70%] absolute top-1/2 left-1/2 -translate-1/2 z-40 ",
+                "bg-[#1a1a1b] ring ring-white/10 rounded-xl ",
+                "flex flex-col justify-between divide-y divide-white/10 *:px-8 *:py-4 ",
+            )}
+        >
             <div className="flex flex-col items-start gap-y-3 ">
                 <div className="w-full flex flex-col items-start ">
                     <Input
@@ -117,7 +118,8 @@ export default function IssuePlane({ projectId, onClose }: IssuePlaneProps) {
                 <div className="flex items-center justify-center gap-x-1 text-xs text-white/70">
                     <LuInfo size={10} />
                     <span>
-                        The more you briefly define the issue, our agent will more accurately be able to solve it.
+                        The more you briefly define the issue, our agent will more accurately be
+                        able to solve it.
                     </span>
                 </div>
                 <div className="flex items-center justify-end gap-x-2 ">
@@ -129,7 +131,6 @@ export default function IssuePlane({ projectId, onClose }: IssuePlaneProps) {
                     </Button>
                 </div>
             </div>
-
         </div>
-    )
+    );
 }
