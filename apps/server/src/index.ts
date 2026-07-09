@@ -5,6 +5,7 @@ import v1_router from "./routers/v1/router.v1";
 import { ENV } from "./configs/env";
 import RedisService from "./services/service.redis";
 import InitService from "./services/service.init";
+import SocketServer from "./real-time/socket.server";
 
 export const server_services = new InitService();
 await RedisService.connect();
@@ -20,6 +21,8 @@ app.use(
 );
 app.use(express.json());
 app.use("/api/v1", v1_router);
+
+new SocketServer(server);
 
 server.listen(ENV.SERVER_PORT, () => {
     console.log("server listening on: ", ENV.SERVER_PORT);

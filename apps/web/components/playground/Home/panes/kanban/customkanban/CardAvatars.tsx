@@ -14,7 +14,7 @@ const TONES = [
     "bg-violet-500/30 text-violet-100",
 ];
 
-function toneFor(id: string): string {
+export function toneFor(id: string): string {
     let hash = 0;
     for (let i = 0; i < id.length; i++) hash = (hash * 31 + id.charCodeAt(i)) >>> 0;
     return TONES[hash % TONES.length];

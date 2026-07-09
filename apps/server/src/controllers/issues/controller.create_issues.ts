@@ -8,14 +8,35 @@ import { server_services } from "../..";
 import { OutboundSocketMessageType } from "@trymatcha/types";
 
 export default class IssueCreateController {
-    static body_schema = z.object({
-        project_id: z.string().min(1),
-        title: z.string().min(1).max(200),
-        description: z.string(),
-        priority: z.number().int().min(1).max(4).optional(),
-        label: z.string().optional(),
-        custom_column_id: z.string().optional(),
-    });
+    // Custom-column cards (`custom_column_id` set) are parked, personal board
+    // items — the agent never picks them up, so description/assignee stay
+    // optional there. Real To-Do issues (no `custom_column_id`) go straight to
+    // the agent, so title, description, and at least one assignee are required.
+    static body_schema = z
+        .object({
+            project_id: z.string().min(1),
+            title: z.string().min(1).max(80),
+            summary: z.string().max(255).optional(),
+            // Stored as rendered HTML from the rich-text editor, which enforces
+            // a 2500-character *content* limit — capped higher here to leave
+            // room for markup overhead without changing the user-facing limit.
+            description: z.string().max(20000),
+            priority: z.number().int().min(1).max(4).optional(),
+            label: z.string().optional(),
+            custom_column_id: z.string().optional(),
+            start_date: z.coerce.date().optional(),
+            target_date: z.coerce.date().optional(),
+            assignee_ids: z.array(z.string()).max(20).optional(),
+            tag_ids: z.array(z.string()).max(20).optional(),
+        })
+        .refine((data) => data.custom_column_id || data.description.trim().length > 0, {
+            message: "Description is required",
+            path: ["description"],
+        })
+        .refine((data) => data.custom_column_id || (data.assignee_ids?.length ?? 0) > 0, {
+            message: "At least one assignee is required",
+            path: ["assignee_ids"],
+        });
 
     static async process(req: Request, res: Response) {
         try {
@@ -54,6 +75,36 @@ export default class IssueCreateController {
                 }
             }
 
+            // Every assignee must themselves be a member of this project.
+            if (parsed_body.data.assignee_ids?.length) {
+                const assignee_roles = await Promise.all(
+                    parsed_body.data.assignee_ids.map((id) =>
+                        Access.project(id, parsed_body.data.project_id),
+                    ),
+                );
+                if (assignee_roles.some((assignee_role) => !assignee_role)) {
+                    ResponseWriter.invalid_data(
+                        res,
+                        "One or more assignees are not project members",
+                    );
+                    return;
+                }
+            }
+
+            // Every tag must belong to this same project.
+            if (parsed_body.data.tag_ids?.length) {
+                const tag_count = await prisma.tag.count({
+                    where: {
+                        id: { in: parsed_body.data.tag_ids },
+                        projectId: parsed_body.data.project_id,
+                    },
+                });
+                if (tag_count !== parsed_body.data.tag_ids.length) {
+                    ResponseWriter.invalid_data(res, "One or more tags are not in this project");
+                    return;
+                }
+            }
+
             let issue: { id: string; status: IssueStatus } | undefined;
             for (let attempt = 0; attempt < 5; attempt++) {
                 try {
@@ -67,9 +118,12 @@ export default class IssueCreateController {
                         return tx.issue.create({
                             data: {
                                 title: parsed_body.data.title,
+                                summary: parsed_body.data.summary,
                                 description: parsed_body.data.description,
                                 priority: parsed_body.data.priority ?? 3,
                                 label: parsed_body.data.label,
+                                startDate: parsed_body.data.start_date,
+                                targetDate: parsed_body.data.target_date,
                                 projectId: parsed_body.data.project_id,
                                 createdById: user.id,
                                 customColumnId: parsed_body.data.custom_column_id,
@@ -77,6 +131,16 @@ export default class IssueCreateController {
                                     ? IssueStatus.Parked
                                     : IssueStatus.Todo,
                                 number: (last_issue?.number ?? 0) + 1,
+                                assignees: parsed_body.data.assignee_ids?.length
+                                    ? {
+                                          connect: parsed_body.data.assignee_ids.map((id) => ({
+                                              id,
+                                          })),
+                                      }
+                                    : undefined,
+                                tags: parsed_body.data.tag_ids?.length
+                                    ? { connect: parsed_body.data.tag_ids.map((id) => ({ id })) }
+                                    : undefined,
                             },
                             select: {
                                 id: true,
@@ -100,14 +164,19 @@ export default class IssueCreateController {
                 ResponseWriter.system_error(res);
                 return;
             }
+
+            const full_issue = await prisma.issue.findUniqueOrThrow({
+                where: { id: issue.id },
+                include: { creator: true, assignees: true, tags: true },
+            });
+
             const channel_name = server_services.publisher.get_channel_name(
                 parsed_body.data.project_id,
             );
-
-            // publish for real-time changes visiblity
             const publishing_body = {
                 type: OutboundSocketMessageType.ISSUE_CREATED,
-                data: { issue_id: issue.id },
+                projectId: parsed_body.data.project_id,
+                payload: full_issue,
             };
             await server_services.publisher.publish_message(
                 channel_name,

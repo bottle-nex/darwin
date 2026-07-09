@@ -2,9 +2,9 @@
 import { closestCorners, DndContext } from "@dnd-kit/core";
 import { useKanbanPane } from "./useKanbanPane";
 import KanbanOptionsBar from "./KanbanOptionsBar";
-import AddTaskModal from "./AddTaskModal";
 import KanbanContent from "./KanbanContent";
 import KanbanDragOverlay from "./KanbanDragOverlay";
+import IssuePlane from "./Issue/IssuePlane";
 
 /**
  * The workspace's Kanban surface. Hosts two boards — the user-built Custom
@@ -26,13 +26,14 @@ export default function KanbanMainPane() {
                 onBoardViewChange={pane.setBoardView}
                 kanbanView={pane.kanbanView}
                 onKanbanViewChange={pane.setKanbanView}
-                onAddTask={() => pane.setAddTaskOpen(true)}
+                onAddTask={() => pane.setIssuePlaneOpen(true)}
             />
-            <AddTaskModal
-                open={pane.addTaskOpen}
-                onOpenChange={pane.setAddTaskOpen}
-                projectId={pane.projectId}
-            />
+            {pane.issuePlaneOpen && (
+                <IssuePlane
+                    projectId={pane.projectId}
+                    onClose={() => pane.setIssuePlaneOpen(false)}
+                />
+            )}
             <DndContext
                 sensors={custom.sensors}
                 collisionDetection={closestCorners}
