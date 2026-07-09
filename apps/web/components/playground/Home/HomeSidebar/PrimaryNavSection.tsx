@@ -1,6 +1,6 @@
 "use client";
 import { BsFillKanbanFill } from "react-icons/bs";
-import { FaInbox, FaAt, FaCheckCircle, FaCog } from "react-icons/fa";
+import { FaInbox, FaAt, FaCheckCircle, FaTags, FaCog } from "react-icons/fa";
 import { MdViewTimeline } from "react-icons/md";
 import Row from "../../Sidebar/SidebarRow";
 import { matchesQuery, type SidebarNavRow, type SidebarSectionProps } from "../../Sidebar/shared";
@@ -13,6 +13,7 @@ const PRIMARY_ROWS: { id: string; label: string; icon: React.ComponentType; isLo
         { id: HomeTab.Inbox, label: "Inbox", icon: FaInbox },
         { id: HomeTab.Mentions, label: "Mentions", icon: FaAt },
         { id: HomeTab.Reviews, label: "Reviews", icon: FaCheckCircle },
+        { id: HomeTab.Tags, label: "Tags", icon: FaTags },
         // Selecting Settings commits a settings tab, which flips the Home sidebar
         // to its settings face (`HomeSidebar`).
         { id: HomeTab.SettingsProject, label: "Settings", icon: FaCog },

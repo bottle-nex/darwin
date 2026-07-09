@@ -77,7 +77,10 @@ export default function IssuePlane({ projectId, open, onClose }: IssuePlaneProps
                     "flex flex-col justify-between divide-y divide-white/10 *:px-6 *:py-4",
                 )}
             >
-                <div data-slot="slash-command-portal" className="absolute inset-0 pointer-events-none" />
+                <div
+                    data-slot="slash-command-portal"
+                    className="absolute inset-0 pointer-events-none"
+                />
                 <div className="flex flex-col items-start gap-y-3 ">
                     <div className="w-full flex flex-col items-start ">
                         <Input

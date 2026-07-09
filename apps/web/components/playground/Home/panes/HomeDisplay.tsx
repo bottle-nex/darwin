@@ -3,6 +3,7 @@ import { HomeTab } from "../homeTabs";
 import { RailSurface } from "../../IconRail/railSurface";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
 import DraftsPane from "./DraftsPane";
+import TagsMainPane from "./tags/TagsMainPane";
 import InboxMainPane from "./InboxMainPane";
 import InProgressPane from "./InProgressPane";
 import TeamDetailPane from "../../Projects/panes/TeamDetailPane";
@@ -18,6 +19,12 @@ export default function HomeDisplay() {
     const tab = usePlaygroundNavStore((s) => s.tabBySurface[RailSurface.Home]);
 
     switch (tab) {
+        case HomeTab.Tags:
+            return (
+                <div className="flex min-h-0 flex-1 flex-col">
+                    <TagsMainPane />
+                </div>
+            );
         case HomeTab.Mentions:
             return <MentionsMainPane />;
         case HomeTab.Reviews:
