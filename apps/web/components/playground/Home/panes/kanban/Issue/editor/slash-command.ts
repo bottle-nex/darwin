@@ -12,7 +12,7 @@ export const SlashCommand = Extension.create({
             suggestion: {
                 char: "/",
                 startOfLine: false,
-                container: '[data-slot="dialog-content"]',
+                container: '[data-slot="slash-command-portal"]',
                 command: ({ editor, range, props }) => {
                     (props as SlashCommandItem).command({ editor, range });
                 },

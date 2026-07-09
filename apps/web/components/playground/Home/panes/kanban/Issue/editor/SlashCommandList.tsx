@@ -41,7 +41,7 @@ const SlashCommandList = forwardRef<SlashCommandListHandle, SlashCommandListProp
 
         if (!items.length) {
             return (
-                <div className="w-56 rounded-md border border-white/10 bg-charcoal p-2 text-[13px] text-neutral-500 shadow-lg">
+                <div className="w-56 rounded-md border border-white/10 bg-charcoal p-2 text-[13px] text-neutral-500 shadow-lg pointer-events-auto">
                     No matches
                 </div>
             );
@@ -50,7 +50,7 @@ const SlashCommandList = forwardRef<SlashCommandListHandle, SlashCommandListProp
         return (
             <div
                 onMouseDown={(event) => event.preventDefault()}
-                className="flex w-56 flex-col gap-px rounded-md border border-white/10 bg-charcoal p-1 shadow-lg"
+                className="flex w-56 flex-col gap-px rounded-md border border-white/10 bg-neutral-900 p-1 shadow-lg pointer-events-auto"
             >
                 {items.map((item, index) => {
                     const Icon = item.icon;
@@ -62,7 +62,7 @@ const SlashCommandList = forwardRef<SlashCommandListHandle, SlashCommandListProp
                             onClick={() => command(item)}
                             onMouseEnter={() => setSelected(index)}
                             className={cn(
-                                "flex items-center gap-2 rounded-md px-2 py-1 text-left text-[13px] text-neutral-200 transition-colors cursor-pointer",
+                                "flex items-center gap-2 rounded-[5px] px-2 py-1.5 text-left text-[13px] text-neutral-200 transition-colors cursor-pointer",
                                 index === selected ? "bg-white/10" : "hover:bg-white/5",
                             )}
                         >
