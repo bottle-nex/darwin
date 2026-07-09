@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
-import { COLUMNS } from "@/components/playground/Home/panes/kanban/data";
-import CardRenderer from "@/components/playground/Home/panes/kanban/cards/CardRenderer";
-import { KanbanStatus, type Issue } from "@/components/playground/Home/panes/kanban/types";
+import { COLUMNS } from "@/components/playground/Home/KanbanDisplay/data";
+import CardRenderer from "@/components/playground/Home/KanbanDisplay/cards/CardRenderer";
+import { KanbanStatus, type Issue } from "@/components/playground/Home/KanbanDisplay/types";
 
 /**
  * Self-contained sample card for the landing preview. The live LLM board

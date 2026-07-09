@@ -9,9 +9,9 @@ import type { SidebarSectionProps } from "./shared";
 import SidebarHeaderIcon from "./SidebarHeaderIcon";
 import SidebarSearch from "./SidebarSearch";
 import HomeSidebar from "../Home/HomeSidebar/HomeSidebar";
-import ProjectsSidebar from "../Projects/projectsidebar/ProjectsSidebar";
+import ProjectsSidebar from "../Projects/ProjectsSidebar/ProjectsSidebar";
 import PullRequestsSidebar from "../PullRequests/PullRequestsSidebar/PullRequestsSidebar";
-import AgentsSidebar from "../Agents/agentsidebar/AgentsSidebar";
+import AgentsSidebar from "../Agents/AgentsSidebar/AgentsSidebar";
 import WorkersSidebar from "../Workers/WorkersSidebar/WorkersSidebar";
 import MoreSidebar from "../More/MoreSidebar/MoreSidebar";
 

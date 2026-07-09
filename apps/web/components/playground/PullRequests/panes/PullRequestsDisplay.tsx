@@ -2,8 +2,8 @@
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
 import { RailSurface } from "../../IconRail/railSurface";
 import { PullRequestsTab } from "../pullRequestsTabs";
-import PullRequestsOverviewPane from "./PullRequestsOverviewPane";
-import PullRequestDetailPane from "./PullRequestDetailPane";
+import PullRequestsOverviewDisplay from "./PullRequestsOverviewDisplay";
+import PullRequestDetailDisplay from "./PullRequestDetailDisplay";
 
 /** Renders the Pull Requests surface — overview, or a selected PR's detail. */
 export default function PullRequestsDisplay() {
@@ -11,8 +11,8 @@ export default function PullRequestsDisplay() {
 
     switch (tab) {
         case PullRequestsTab.Overview:
-            return <PullRequestsOverviewPane />;
+            return <PullRequestsOverviewDisplay />;
         default:
-            return <PullRequestDetailPane id={tab} />;
+            return <PullRequestDetailDisplay id={tab} />;
     }
 }

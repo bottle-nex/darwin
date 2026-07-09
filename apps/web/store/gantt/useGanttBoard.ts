@@ -1,7 +1,11 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
 import { buildMockIssues } from "@/data/dummy-gantt-issues";
-import { nowMinuteOfDay, toDateKey, type GanttIssue } from "@/components/gantt/types";
+import {
+    nowMinuteOfDay,
+    toDateKey,
+    type GanttIssue,
+} from "@/components/playground/Home/GanttDisplay/types";
 
 /** Everything `useGanttBoard` exposes — the props the Gantt page consumes. */
 export type GanttBoardApi = ReturnType<typeof useGanttBoard>;

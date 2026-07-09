@@ -2,17 +2,17 @@
 import { HomeTab } from "../homeTabs";
 import { RailSurface } from "../../IconRail/railSurface";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
-import DraftsPane from "./DraftsPane";
-import TagsMainPane from "./tags/TagsMainPane";
-import InboxMainPane from "./InboxMainPane";
-import InProgressPane from "./InProgressPane";
-import TeamDetailPane from "../../Projects/panes/TeamDetailPane";
-import GanttPane from "../../Projects/panes/GanttPane";
-import ProjectSettingsView from "../../Projects/panes/ProjectSettingsView";
-import KanbanMainPane from "./kanban/KanbanMainPane";
-import ReviewsMainPane from "./ReviewsMainPane";
-import MentionsMainPane from "./MentionsMainPane";
-import AssignedToMePane from "./AssignedToMePane";
+import DraftsDisplay from "./DraftsDisplay";
+import TagsMainPane from "../TagsDisplay/TagsMainPane";
+import InboxDisplay from "./InboxDisplay";
+import InProgressDisplay from "./InProgressDisplay";
+import TeamDetailDisplay from "../../Projects/panes/TeamDetailDisplay";
+import GanttPane from "../GanttDisplay/GanttPane";
+import ProjectSettingsView from "../SettingsDisplay/ProjectSettingsView";
+import KanbanMainPane from "../KanbanDisplay/KanbanMainPane";
+import ReviewsDisplay from "./ReviewsDisplay";
+import MentionsDisplay from "./MentionsDisplay";
+import AssignedToMeDisplay from "./AssignedToMeDisplay";
 
 /** Renders the Home surface's active tab. */
 export default function HomeDisplay() {
@@ -26,17 +26,17 @@ export default function HomeDisplay() {
                 </div>
             );
         case HomeTab.Mentions:
-            return <MentionsMainPane />;
+            return <MentionsDisplay />;
         case HomeTab.Reviews:
-            return <ReviewsMainPane />;
+            return <ReviewsDisplay />;
         case HomeTab.AssignedToMe:
-            return <AssignedToMePane />;
+            return <AssignedToMeDisplay />;
         case HomeTab.InProgress:
-            return <InProgressPane />;
+            return <InProgressDisplay />;
         case HomeTab.Drafts:
-            return <DraftsPane />;
+            return <DraftsDisplay />;
         case HomeTab.TeamDetail:
-            return <TeamDetailPane />;
+            return <TeamDetailDisplay />;
         case HomeTab.Gantt:
             return (
                 <div className="flex min-h-0 flex-1 flex-col">
@@ -48,7 +48,7 @@ export default function HomeDisplay() {
         case HomeTab.SettingsEnv:
             return <ProjectSettingsView section="env" />;
         case HomeTab.Inbox:
-            return <InboxMainPane />;
+            return <InboxDisplay />;
 
         case HomeTab.Kanban:
         default:
