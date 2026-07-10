@@ -1,6 +1,9 @@
-import Image from "next/image";
 import { formatDate } from "@/lib/format";
 import type { PendingInviteDetail, TeamMemberDetail } from "@/types/team";
+import PlaygroundAvatar, {
+    initialOf,
+    toneFor,
+} from "@/components/playground/Core/components/PlaygroundAvatar";
 import ProjectRoleTicker from "./ProjectRoleTicker";
 import { MdJoinLeft } from "react-icons/md";
 
@@ -21,6 +24,8 @@ export default function PlaygroundTeamMemberRow({ teamMember, pendingMember }: M
         ? teamMember.user
         : { name: null, email: pendingMember.user.email, image: null };
 
+    const toneKey = isMember ? teamMember.user.id : pendingMember.user.email;
+
     const name = user.name?.trim() || user.email;
     const secondary = isMember
         ? teamMember.user.email
@@ -31,20 +36,12 @@ export default function PlaygroundTeamMemberRow({ teamMember, pendingMember }: M
     return (
         <div className="grid grid-cols-[1fr_120px_140px] items-center gap-4 rounded-md px-2.5 py-2 hover:bg-neutral-800/50 cursor-pointer">
             <div className="flex min-w-0 items-center gap-3">
-                {user.image ? (
-                    <Image
-                        src={user.image}
-                        alt=""
-                        width={32}
-                        height={32}
-                        unoptimized
-                        className="size-8 shrink-0 rounded-full object-cover"
-                    />
-                ) : (
-                    <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-neutral-800 text-[12px] font-medium text-neutral-200">
-                        {name.charAt(0).toUpperCase()}
-                    </span>
-                )}
+                <PlaygroundAvatar
+                    size="xl"
+                    src={user.image}
+                    letter={initialOf(user.name, user.email)}
+                    tone={toneFor(toneKey)}
+                />
                 <div className="min-w-0">
                     <p className="truncate text-[13px] font-medium text-neutral-200">{name}</p>
                     <p className="truncate text-[12px] text-neutral-500">{secondary}</p>
