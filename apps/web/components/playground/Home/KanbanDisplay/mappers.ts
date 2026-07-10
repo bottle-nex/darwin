@@ -1,4 +1,4 @@
-import type { AvatarTone } from "@/components/playground/Core/components/PlaygroundAvatar";
+import { displayNameOf, toneFor } from "@/components/playground/Core/components/PlaygroundAvatar";
 import type { BoardAssignee, BoardIssue, BoardResponse, ServerIssueStatus } from "@/types/board";
 import { emptyBoard } from "./data";
 import { KanbanStatus, type Assignee, type BoardState, type Issue, type Priority } from "./types";
@@ -21,15 +21,13 @@ function laneFor(status: ServerIssueStatus): KanbanStatus | null {
     return DISPLAYED_STATUSES.has(status) ? (status as KanbanStatus) : null;
 }
 
-const TONES: AvatarTone[] = ["indigo", "purple", "blue", "emerald", "dark"];
-function toneFor(id: string): AvatarTone {
-    let hash = 0;
-    for (let i = 0; i < id.length; i++) hash = (hash * 31 + id.charCodeAt(i)) >>> 0;
-    return TONES[hash % TONES.length];
-}
-
 export function toAssignee(a: BoardAssignee): Assignee {
-    return { id: a.id, name: a.name ?? "?", tone: toneFor(a.id) };
+    return {
+        id: a.id,
+        name: displayNameOf(a.name, a.email),
+        image: a.image,
+        tone: toneFor(a.id),
+    };
 }
 
 function toLlmIssue(issue: BoardIssue, status: KanbanStatus, projectName: string): Issue {

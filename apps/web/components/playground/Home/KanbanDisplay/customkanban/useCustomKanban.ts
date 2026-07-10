@@ -245,11 +245,7 @@ export function useCustomKanban({
                     title: issue.title,
                     tags: issue.tags,
                     priority: issue.priority,
-                    assignees: issue.assignees.map((a) => ({
-                        id: a.id,
-                        name: a.name,
-                        image: null,
-                    })),
+                    assignees: issue.assignees,
                 },
                 overId,
             );

@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import PlaygroundAvatar from "@/components/playground/Core/components/PlaygroundAvatar";
 import type { Issue } from "../types";
 import { PRIORITY_DOT } from "../data";
+import { CARD_SHELL } from "../cardStyles";
 import IssueTags from "../IssueTags";
 
 type BaseCardProps = {
@@ -23,12 +24,7 @@ type BaseCardProps = {
 export default function BaseCard({ issue, children, className }: BaseCardProps) {
     const issue_assignees_length = issue.assignees.length;
     return (
-        <div
-            className={cn(
-                "rounded-lg bg-neutral-800/70 p-3 text-left  shadow-[inset_0_2px_0_0_rgba(255,255,255,0.07)] transition-colors hover:border-white/12",
-                className,
-            )}
-        >
+        <div className={cn(CARD_SHELL, className)}>
             <div className="flex items-center justify-between gap-2">
                 <div className="flex items-center gap-1.5">
                     <span
@@ -59,6 +55,7 @@ export default function BaseCard({ issue, children, className }: BaseCardProps) 
                         <PlaygroundAvatar
                             key={a.id}
                             letter={a.name.charAt(0).toUpperCase()}
+                            src={a.image}
                             tone={a.tone}
                             className={cn(index === 0 && issue_assignees_length > 1 && "-rotate-7")}
                         />

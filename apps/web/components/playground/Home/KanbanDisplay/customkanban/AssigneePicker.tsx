@@ -9,13 +9,17 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog";
 import { useProjectMembers } from "@/hooks/project/useProjectMembers";
-import type { BoardAssignee } from "@/types/board";
+import PlaygroundAvatar, {
+    initialOf,
+    toneFor,
+} from "@/components/playground/Core/components/PlaygroundAvatar";
+import type { Assignee } from "../types";
 
 type AssigneePickerProps = {
     open: boolean;
     onOpenChange: (open: boolean) => void;
     projectId: string;
-    assignees: BoardAssignee[];
+    assignees: Assignee[];
     onAssign: (userId: string) => void;
     onUnassign: (userId: string) => void;
 };
@@ -67,12 +71,20 @@ export default function AssigneePicker({
                                         assigned ? "bg-white/8" : "hover:bg-white/5",
                                     )}
                                 >
-                                    <span className="flex min-w-0 flex-col">
-                                        <span className="truncate text-[13px] font-medium text-neutral-100">
-                                            {member.name ?? member.email}
-                                        </span>
-                                        <span className="truncate text-[11px] text-neutral-500">
-                                            {member.email}
+                                    <span className="flex min-w-0 items-center gap-2.5">
+                                        <PlaygroundAvatar
+                                            letter={initialOf(member.name, member.email)}
+                                            src={member.image}
+                                            tone={toneFor(member.id)}
+                                            size="xl"
+                                        />
+                                        <span className="flex min-w-0 flex-col">
+                                            <span className="truncate text-[13px] font-medium text-neutral-100">
+                                                {member.name ?? member.email}
+                                            </span>
+                                            <span className="truncate text-[11px] text-neutral-500">
+                                                {member.email}
+                                            </span>
                                         </span>
                                     </span>
                                     {assigned && (

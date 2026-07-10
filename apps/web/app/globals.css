@@ -199,7 +199,7 @@
     /* Tiptap issue-description editor (Notion/Linear-style slash-command doc). */
     .tiptap {
         outline: none;
-        color: var(--color-neutral-200, #e5e5e5);
+        color: #b8b8b8;
         font-size: 0.875rem;
         line-height: 1.6;
     }

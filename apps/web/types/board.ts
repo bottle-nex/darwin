@@ -20,6 +20,7 @@ export type ServerIssueStatus = IssueStatus;
 export type BoardAssignee = {
     id: string;
     name: string | null;
+    email: string;
     image: string | null;
 };
 
@@ -28,6 +29,7 @@ export type BoardIssue = {
     id: string;
     number: number;
     title: string;
+    summary: string | null;
     description: string;
     priority: number;
     status: ServerIssueStatus;

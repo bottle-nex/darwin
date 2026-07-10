@@ -134,6 +134,7 @@ function Assignees({ issue }: { issue: BoardIssue }) {
                 <PlaygroundAvatar
                     key={a.id}
                     letter={a.name.charAt(0).toUpperCase()}
+                    src={a.image}
                     tone={a.tone}
                 />
             ))}
@@ -190,7 +191,7 @@ function IssueForm({ target, issue }: { target: IssueTarget; issue: BoardIssue |
     const isCustom = target.board === "custom";
 
     const [title, setTitle] = useState(issue?.title ?? "");
-    const [summary, setSummary] = useState("");
+    const [summary, setSummary] = useState(issue?.summary ?? "");
     const [description, setDescription] = useState(issue?.description ?? "");
     const [descriptionEmpty, setDescriptionEmpty] = useState(!issue?.description);
     const [priority, setPriority] = useState<Priority>(
@@ -223,6 +224,7 @@ function IssueForm({ target, issue }: { target: IssueTarget; issue: BoardIssue |
                     id: issue.id,
                     project_id: projectId,
                     title: title.trim(),
+                    summary: summary.trim() || null,
                     description,
                     priority: PRIORITY_TO_NUMBER[priority],
                     assignee_ids: memberIds,
@@ -266,16 +268,14 @@ function IssueForm({ target, issue }: { target: IssueTarget; issue: BoardIssue |
                         onChange={(e) => setTitle(e.target.value)}
                         className="text-3xl ring-0 border-0 font-semibold h-9 p-0 bg-transparent hover:bg-transparent!"
                     />
-                    {!isEdit && (
-                        <Input
-                            variant={"ghost"}
-                            placeholder="Add a short summary..."
-                            maxLength={255}
-                            value={summary}
-                            onChange={(e) => setSummary(e.target.value)}
-                            className="h-7 p-0 bg-transparent hover:bg-transparent!"
-                        />
-                    )}
+                    <Input
+                        variant={"ghost"}
+                        placeholder="Add a short summary..."
+                        maxLength={255}
+                        value={summary}
+                        onChange={(e) => setSummary(e.target.value)}
+                        className="h-7 p-0 bg-transparent hover:bg-transparent!"
+                    />
                 </div>
                 <div className="flex items-center gap-x-2.5">
                     <Capsule

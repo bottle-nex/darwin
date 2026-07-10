@@ -8,6 +8,7 @@ import { Action, Permissions } from "@trymatcha/access-control";
 export default class IssueUpdateController {
     static body_scheam = z.object({
         title: z.string().min(1).max(200).optional(),
+        summary: z.string().max(255).nullable().optional(),
         description: z.string().optional(),
         priority: z.number().int().min(1).max(4).optional(),
         status: z.enum(IssueStatus).optional(),
@@ -124,6 +125,7 @@ export default class IssueUpdateController {
                 where: { id },
                 data: {
                     title: body_data.title,
+                    summary: body_data.summary,
                     description: body_data.description,
                     priority: body_data.priority,
                     status: next_status,
@@ -143,6 +145,7 @@ export default class IssueUpdateController {
                     id: true,
                     number: true,
                     title: true,
+                    summary: true,
                     description: true,
                     priority: true,
                     status: true,
@@ -150,7 +153,7 @@ export default class IssueUpdateController {
                     createdAt: true,
                     startDate: true,
                     targetDate: true,
-                    assignees: { select: { id: true, name: true, image: true } },
+                    assignees: { select: { id: true, name: true, email: true, image: true } },
                     tags: { select: { id: true, name: true, color: true } },
                 },
             });

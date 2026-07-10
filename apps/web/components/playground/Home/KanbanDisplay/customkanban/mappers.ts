@@ -1,14 +1,6 @@
 import type { BoardIssue, BoardResponse } from "@/types/board";
-import type { Priority } from "../types";
+import { NUMBER_TO_PRIORITY, toAssignee } from "../mappers";
 import type { CustomCard, CustomColumn } from "./types";
-
-/** Backend numeric priority (1=Urgent…4=Low) → the frontend's label scale. */
-const NUMBER_TO_PRIORITY: Record<number, Priority> = {
-    1: "urgent",
-    2: "high",
-    3: "normal",
-    4: "low",
-};
 
 /**
  * Descriptions are stored as rich-text editor HTML; card previews are plain text.
@@ -30,7 +22,7 @@ export function boardIssueToCard(issue: BoardIssue): CustomCard {
         description: issue.description || undefined,
         tags: issue.tags,
         priority: NUMBER_TO_PRIORITY[issue.priority] ?? "normal",
-        assignees: issue.assignees,
+        assignees: issue.assignees.map(toAssignee),
     };
 }
 

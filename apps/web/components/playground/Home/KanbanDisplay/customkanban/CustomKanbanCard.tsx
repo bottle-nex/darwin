@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/dialog";
 import { useIssueDialog } from "@/components/playground/issue/useIssueDialog";
 import { PRIORITY_DOT } from "../data";
-import { toAssignee } from "../mappers";
+import { CARD_SHELL } from "../cardStyles";
 import { PANEL_CONTENT, PANEL_ITEM } from "../OptionsBar/KanbanOptionPanels/panelStyles";
 import IssueTags from "../IssueTags";
 import AssigneePicker from "./AssigneePicker";
@@ -41,8 +41,7 @@ export default function CustomKanbanCard({
     onUnassign,
 }: CustomKanbanCardProps) {
     const preview = card.description ? stripHtml(card.description) : "";
-    // `toAssignee` resolves the nullable server name and the avatar tone together.
-    const shownAssignees = card.assignees.slice(0, MAX_AVATARS).map(toAssignee);
+    const shownAssignees = card.assignees.slice(0, MAX_AVATARS);
     const overflowCount = card.assignees.length - shownAssignees.length;
     const [confirmOpen, setConfirmOpen] = useState(false);
     const [assignOpen, setAssignOpen] = useState(false);
@@ -50,7 +49,7 @@ export default function CustomKanbanCard({
     const { openEdit } = useIssueDialog();
 
     return (
-        <div className="group/card relative rounded-lg bg-white/5 p-2.5 ring-1 ring-white/5 transition-colors hover:ring-white/15">
+        <div className={cn(CARD_SHELL, "group/card relative")}>
             {(onDelete || canAssign) && (
                 <DropdownMenu.Root>
                     <DropdownMenu.Trigger asChild>
@@ -104,40 +103,36 @@ export default function CustomKanbanCard({
                     }
                 }}
             >
-                <div className="flex items-start gap-2 pr-5">
-                    <span
-                        className={cn(
-                            "mt-1.5 size-1.5 shrink-0 rounded-full",
-                            PRIORITY_DOT[card.priority],
-                        )}
-                        aria-hidden
-                    />
-                    <p className="text-[13px] leading-snug font-medium text-neutral-100">
-                        {card.title}
-                    </p>
+                <div className="flex items-center justify-between gap-2 pr-6">
+                    <div className="flex items-center gap-1.5">
+                        <span
+                            className={cn("size-1.5 rounded-full", PRIORITY_DOT[card.priority])}
+                            aria-hidden
+                        />
+                        <IssueTags tags={card.tags} />
+                    </div>
+                    <span className="font-mono text-[11px] text-neutral-500">
+                        {card.number ? `#${card.number}` : ""}
+                    </span>
                 </div>
 
+                <p className="mt-2 text-[13px] leading-snug font-medium text-neutral-100">
+                    {card.title}
+                </p>
+
                 {preview && (
-                    <p className="mt-1.5 line-clamp-2 pl-3.5 text-[12px] leading-snug text-neutral-400">
+                    <p className="mt-1.5 line-clamp-2 text-[12px] leading-snug text-neutral-400">
                         {preview}
                     </p>
                 )}
 
-                {card.tags.length > 0 && (
-                    <div className="mt-2 pl-3.5">
-                        <IssueTags tags={card.tags} />
-                    </div>
-                )}
-
-                <div className="mt-2 flex items-center justify-between gap-2 pl-3.5">
-                    <span className="text-[11px] font-medium text-neutral-500">
-                        {card.number ? `#${card.number}` : ""}
-                    </span>
+                <div className="mt-3 flex items-center justify-end border-t border-white/5 pt-2.5">
                     <div className="flex shrink-0 items-center -space-x-1">
                         {shownAssignees.map((a, index) => (
                             <PlaygroundAvatar
                                 key={a.id}
-                                letter={(a.name.trim()[0] ?? "?").toUpperCase()}
+                                letter={a.name.charAt(0).toUpperCase()}
+                                src={a.image}
                                 tone={a.tone}
                                 className={cn(
                                     index === 0 && shownAssignees.length > 1 && "-rotate-7",

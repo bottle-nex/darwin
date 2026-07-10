@@ -1,5 +1,8 @@
 "use client";
-import PlaygroundAvatar from "@/components/playground/Core/components/PlaygroundAvatar";
+import PlaygroundAvatar, {
+    initialOf,
+    toneFor,
+} from "@/components/playground/Core/components/PlaygroundAvatar";
 import { useProjectMembers } from "@/hooks/project/useProjectMembers";
 
 export default function ProjectSettingsMemberSection({
@@ -33,8 +36,9 @@ export default function ProjectSettingsMemberSection({
                             className="flex items-center gap-3 rounded-lg bg-white/5 px-3 py-2 shadow-[inset_0_1px_0_0_#262626]"
                         >
                             <PlaygroundAvatar
-                                letter={(m.name ?? m.email).trim().charAt(0).toUpperCase()}
-                                tone="purple"
+                                letter={initialOf(m.name, m.email)}
+                                src={m.image}
+                                tone={toneFor(m.id)}
                             />
                             <div className="min-w-0 flex-1">
                                 <div className="truncate text-[12px] text-neutral-200">

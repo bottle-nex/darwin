@@ -19,6 +19,7 @@ export type Priority = "urgent" | "high" | "normal" | "low";
 export type Assignee = {
     id: string;
     name: string;
+    image?: string | null;
     tone: AvatarTone;
 };
 

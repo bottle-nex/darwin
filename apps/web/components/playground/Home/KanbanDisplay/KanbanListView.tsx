@@ -73,6 +73,7 @@ function ListRow({ issue }: { issue: Issue }) {
                     <PlaygroundAvatar
                         key={a.id}
                         letter={a.name.charAt(0).toUpperCase()}
+                        src={a.image}
                         tone={a.tone}
                         size="sm"
                         className="ring-1 ring-neutral-800"

@@ -1,5 +1,5 @@
-import type { Priority } from "../types";
-import type { BoardAssignee, BoardTag } from "@/types/board";
+import type { Assignee, Priority } from "../types";
+import type { BoardTag } from "@/types/board";
 
 /**
  * The Custom Kanban is a Trello-style board the user builds by hand: free-form
@@ -19,7 +19,7 @@ export type CustomCard = {
     description?: string;
     tags: BoardTag[];
     priority: Priority;
-    assignees: BoardAssignee[];
+    assignees: Assignee[];
 };
 
 /** A user-created column ("list") holding its ordered cards. */

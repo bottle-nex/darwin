@@ -57,6 +57,7 @@ export default class IssueGetController {
                         id: true,
                         number: true,
                         title: true,
+                        summary: true,
                         description: true,
                         priority: true,
                         status: true,
@@ -68,6 +69,7 @@ export default class IssueGetController {
                             select: {
                                 id: true,
                                 name: true,
+                                email: true,
                                 image: true,
                             },
                         },
