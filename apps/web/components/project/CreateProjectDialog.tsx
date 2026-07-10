@@ -4,7 +4,9 @@ import { useForm, useWatch } from "react-hook-form";
 import { isAxiosError } from "axios";
 import { useParams } from "next/navigation";
 import { FaGithub, FaSpinner, FaLock } from "react-icons/fa6";
+import { PiSmileyFill } from "react-icons/pi";
 import { Button } from "@/components/ui/button";
+import IconPicker, { IconPickGlyph, type IconPick } from "@/components/ui/IconPicker";
 import {
     Dialog,
     DialogContent,
@@ -59,6 +61,8 @@ export default function CreateProjectDialog() {
     const [createdProjectId, setCreatedProjectId] = useState<string | null>(null);
     const [envRows, setEnvRows] = useState<EnvRow[]>([{ key: "", value: "" }]);
     const [revealValues, setRevealValues] = useState(false);
+    const [icon, setIcon] = useState<IconPick | null>(null);
+    const [iconPickerOpen, setIconPickerOpen] = useState(false);
 
     const {
         register,
@@ -102,6 +106,8 @@ export default function CreateProjectDialog() {
             setCreatedProjectId(null);
             setEnvRows([{ key: "", value: "" }]);
             setRevealValues(false);
+            setIcon(null);
+            setIconPickerOpen(false);
             createProject.reset();
             setSecrets.reset();
         }
@@ -240,17 +246,46 @@ export default function CreateProjectDialog() {
                                 <Label htmlFor="project-name" className="text-neutral-300">
                                     Name
                                 </Label>
-                                <Input
-                                    id="project-name"
-                                    {...nameField}
-                                    onChange={(e) => {
-                                        nameField.onChange(e);
-                                        if (!slugEdited) setValue("slug", slugify(e.target.value));
-                                    }}
-                                    placeholder="Billing Service"
-                                    autoFocus
-                                    className={FIELD}
-                                />
+                                <div className="mt-1.5 flex items-center gap-2">
+                                    <IconPicker
+                                        open={iconPickerOpen}
+                                        onOpenChange={setIconPickerOpen}
+                                        onSelect={setIcon}
+                                    >
+                                        <button
+                                            type="button"
+                                            aria-label="Pick project icon"
+                                            className={cn(
+                                                "flex size-10 shrink-0 cursor-pointer items-center justify-center transition-colors hover:bg-white/10",
+                                                SURFACE,
+                                            )}
+                                        >
+                                            {icon ? (
+                                                <IconPickGlyph
+                                                    pick={icon}
+                                                    className="size-5 text-xl"
+                                                />
+                                            ) : (
+                                                <PiSmileyFill
+                                                    className="size-5 text-neutral-500"
+                                                    aria-hidden
+                                                />
+                                            )}
+                                        </button>
+                                    </IconPicker>
+                                    <Input
+                                        id="project-name"
+                                        {...nameField}
+                                        onChange={(e) => {
+                                            nameField.onChange(e);
+                                            if (!slugEdited)
+                                                setValue("slug", slugify(e.target.value));
+                                        }}
+                                        placeholder="Billing Service"
+                                        autoFocus
+                                        className={cn(FIELD, "mt-0")}
+                                    />
+                                </div>
                                 {errors.name && (
                                     <p className="mt-1.5 text-xs text-red-400">
                                         {errors.name.message}

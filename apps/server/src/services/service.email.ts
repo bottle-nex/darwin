@@ -50,8 +50,7 @@ export async function sendOtpEmail(to: string, code: string) {
  * discriminated union lets the compiler enforce the right fields per invite type.
  */
 type InviteContext =
-    | { type: "org"; orgName: string }
-    | { type: "team"; teamName: string; orgName: string };
+    { type: "org"; orgName: string } | { type: "team"; teamName: string; orgName: string };
 
 /**
  * Send a team or organization invite link to `to` via Resend.

@@ -12,8 +12,7 @@ import PlaygroundAvatar, {
 // prop a row expects (it needs a ready-made node for avatars).
 
 export type LeadingSpec =
-    | { kind: "icon"; icon: IconType }
-    | { kind: "avatar"; letter: string; tone: AvatarTone };
+    { kind: "icon"; icon: IconType } | { kind: "avatar"; letter: string; tone: AvatarTone };
 
 export function rowLeading(spec: LeadingSpec) {
     return spec.kind === "icon"

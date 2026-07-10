@@ -37,3 +37,6 @@ apps/web/.env
 
 # prisma generated client
 packages/database/generated
+
+# playwright mcp session artifacts
+.playwright-mcp

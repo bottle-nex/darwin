@@ -1,16 +1,14 @@
 import { create } from "zustand";
 
 export type IssueTarget =
-    | { board: "llm" }
-    | { board: "custom"; columnId: string; columnTitle: string };
+    { board: "llm" } | { board: "custom"; columnId: string; columnTitle: string };
 
 /**
  * Creating needs an explicit target. Editing doesn't — the issue already knows
  * where it lives, so the target is derived from its `customColumnId`.
  */
 export type IssueDialogMode =
-    | { kind: "create"; target: IssueTarget }
-    | { kind: "edit"; issueId: string };
+    { kind: "create"; target: IssueTarget } | { kind: "edit"; issueId: string };
 
 interface CreateOrEditIssueState {
     mode: IssueDialogMode | null;
