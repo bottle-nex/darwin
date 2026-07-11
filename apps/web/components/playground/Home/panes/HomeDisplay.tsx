@@ -3,13 +3,13 @@ import { HomeTab } from "../homeTabs";
 import { RailSurface } from "../../IconRail/railSurface";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
 import DraftsDisplay from "./DraftsDisplay";
-import TagsMainPane from "../TagsDisplay/TagsMainPane";
+import TagsDisplay from "../TagsDisplay/TagsDisplay";
 import InboxDisplay from "./InboxDisplay";
 import InProgressDisplay from "./InProgressDisplay";
 import TeamDetailDisplay from "../../Projects/panes/TeamDetailDisplay";
-import GanttPane from "../GanttDisplay/GanttPane";
-import ProjectSettingsView from "../SettingsDisplay/ProjectSettingsView";
-import KanbanMainPane from "../KanbanDisplay/KanbanMainPane";
+import GanttDisplay from "../GanttDisplay/GanttDisplay";
+import SettingsDisplay from "../SettingsDisplay/SettingsDisplay";
+import KanbanDisplay from "../KanbanDisplay/KanbanDisplay";
 import ReviewsDisplay from "./ReviewsDisplay";
 import MentionsDisplay from "./MentionsDisplay";
 import AssignedToMeDisplay from "./AssignedToMeDisplay";
@@ -22,7 +22,7 @@ export default function HomeDisplay() {
         case HomeTab.Tags:
             return (
                 <div className="flex min-h-0 flex-1 flex-col">
-                    <TagsMainPane />
+                    <TagsDisplay />
                 </div>
             );
         case HomeTab.Mentions:
@@ -40,13 +40,13 @@ export default function HomeDisplay() {
         case HomeTab.Gantt:
             return (
                 <div className="flex min-h-0 flex-1 flex-col">
-                    <GanttPane />
+                    <GanttDisplay />
                 </div>
             );
         case HomeTab.SettingsProject:
-            return <ProjectSettingsView section="project" />;
+            return <SettingsDisplay section="project" />;
         case HomeTab.SettingsEnv:
-            return <ProjectSettingsView section="env" />;
+            return <SettingsDisplay section="env" />;
         case HomeTab.Inbox:
             return <InboxDisplay />;
 
@@ -54,7 +54,7 @@ export default function HomeDisplay() {
         default:
             return (
                 <div className="flex min-h-0 flex-1 flex-col">
-                    <KanbanMainPane />
+                    <KanbanDisplay />
                 </div>
             );
     }

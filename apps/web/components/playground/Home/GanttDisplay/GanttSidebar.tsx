@@ -1,5 +1,5 @@
 import { MdPause } from "react-icons/md";
-import { RULER_HEIGHT, SIDEBAR_WIDTH, WORKER_LANES } from "./types";
+import { GanttTimeline } from "@/lib/gantt/GanttTimeline";
 
 /**
  * Fixed left column of worker lane labels. Stays put while the timeline track
@@ -11,10 +11,13 @@ export default function GanttSidebar({ pausedWorkerIds }: { pausedWorkerIds: Set
     return (
         <div
             className="flex h-full shrink-0 flex-col border-r border-border bg-card"
-            style={{ width: SIDEBAR_WIDTH }}
+            style={{ width: GanttTimeline.SIDEBAR_WIDTH }}
         >
-            <div style={{ height: RULER_HEIGHT }} className="shrink-0 border-b border-border" />
-            {WORKER_LANES.map((lane) => (
+            <div
+                style={{ height: GanttTimeline.RULER_HEIGHT }}
+                className="shrink-0 border-b border-border"
+            />
+            {GanttTimeline.WORKER_LANES.map((lane) => (
                 <div
                     key={lane.id}
                     className="flex flex-1 flex-col justify-center gap-1.5 border-b border-border px-4 last:border-b-0"

@@ -2,8 +2,8 @@
 import { MdChat } from "react-icons/md";
 import { cn } from "@/lib/utils";
 import PlaygroundAvatar from "@/components/playground/Core/components/PlaygroundAvatar";
-import { COLUMNS, PRIORITY_DOT } from "./data";
-import type { BoardState, Issue } from "./types";
+import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
+import type { BoardState, Issue } from "@/types/kanban";
 import AgentChip from "./cards/AgentChip";
 import IssueTags from "./IssueTags";
 import LLMIssueStatusTicker from "./LLMIssueStatusTicker";
@@ -13,7 +13,7 @@ type KanbanListViewProps = {
 };
 
 export default function KanbanListView({ board }: KanbanListViewProps) {
-    const groups = COLUMNS;
+    const groups = KanbanBoard.COLUMNS;
 
     return (
         <div className="min-h-0 flex-1 overflow-y-auto px-3 py-3">
@@ -49,7 +49,10 @@ function ListRow({ issue }: { issue: Issue }) {
     return (
         <div className="flex items-center gap-3 border-b border-white/5 bg-neutral-800/40 px-3 py-2 last:border-b-0 hover:bg-neutral-800/70">
             <span
-                className={cn("size-1.5 shrink-0 rounded-full", PRIORITY_DOT[issue.priority])}
+                className={cn(
+                    "size-1.5 shrink-0 rounded-full",
+                    KanbanBoard.PRIORITY_DOT[issue.priority],
+                )}
                 aria-hidden
             />
             <span className="truncate text-[13px] font-medium text-neutral-100">{issue.title}</span>

@@ -1,8 +1,8 @@
 "use client";
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
-import { COLUMNS, isBridgeStatus } from "./data";
-import type { BoardState } from "./types";
+import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
+import type { BoardState } from "@/types/kanban";
 import KanbanColumn from "./KanbanColumn";
 
 type KanbanBoardViewProps = {
@@ -18,8 +18,8 @@ type KanbanBoardViewProps = {
  * Board view: the LLM columns as a horizontal row. `leading` lets a caller
  * prepend the Custom Kanban so the two boards share one scroll. Only bridge
  * columns accept drops / let their cards be dragged out (see `BRIDGE_STATUSES`);
- * single-column focus is rendered by `KanbanMainPane`, not here. The shared
- * DndContext lives in `KanbanMainPane`.
+ * single-column focus is rendered by `KanbanDisplay`, not here. The shared
+ * DndContext lives in `KanbanDisplay`.
  */
 export default function KanbanBoardView({ board, leading, startAligned }: KanbanBoardViewProps) {
     return (
@@ -30,13 +30,13 @@ export default function KanbanBoardView({ board, leading, startAligned }: Kanban
             )}
         >
             {leading}
-            {COLUMNS.map((column) => (
+            {KanbanBoard.COLUMNS.map((column) => (
                 <KanbanColumn
                     key={column.status}
                     column={column}
                     issues={board[column.status]}
-                    droppable={isBridgeStatus(column.status)}
-                    draggableCards={isBridgeStatus(column.status)}
+                    droppable={KanbanBoard.isBridgeStatus(column.status)}
+                    draggableCards={KanbanBoard.isBridgeStatus(column.status)}
                 />
             ))}
         </div>

@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { PANEL_CONTENT, PANEL_ITEM } from "../OptionsBar/KanbanOptionPanels/panelStyles";
 import { useCreateOrEditIssueStore } from "@/store/issues/useCreateOrEditIssueStore";
 import SortableCustomCard from "./SortableCustomCard";
-import type { CustomColumn } from "./types";
+import type { CustomColumn } from "@/types/kanban-custom";
 
 type CustomKanbanColumnProps = {
     column: CustomColumn;

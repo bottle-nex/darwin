@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
-import { COLUMNS } from "@/components/playground/Home/KanbanDisplay/data";
+import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
 import CardRenderer from "@/components/playground/Home/KanbanDisplay/cards/CardRenderer";
-import { KanbanStatus, type Issue } from "@/components/playground/Home/KanbanDisplay/types";
+import { KanbanStatus, type Issue } from "@/types/kanban";
 
 /**
  * Self-contained sample card for the landing preview. The live LLM board
@@ -28,7 +28,7 @@ export default function BoardPreview() {
     return (
         <div className="flex flex-col gap-2.5">
             <div className="flex flex-wrap gap-1.5">
-                {COLUMNS.slice(0, 3).map((column) => {
+                {KanbanBoard.COLUMNS.slice(0, 3).map((column) => {
                     const { icon: Icon, title, titleBox, status } = column;
                     return (
                         <span

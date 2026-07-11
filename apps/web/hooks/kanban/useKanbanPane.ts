@@ -2,15 +2,15 @@
 import { useEffect, useMemo, useState } from "react";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { useBoard } from "@/hooks/issues/useBoard";
-import { filterBoard } from "./data";
-import type { BoardView, KanbanView } from "./types";
+import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
+import type { BoardView, KanbanView } from "@/types/kanban";
 import { useKanbanBoard } from "./useKanbanBoard";
 import { useKanbanOptions } from "./useKanbanOptions";
-import { useCustomKanban } from "./customkanban/useCustomKanban";
+import { useCustomKanban } from "./useCustomKanban";
 
 /**
  * All the data, board hooks, and view state the Kanban pane needs — kept out of
- * the component so `KanbanMainPane` stays a thin layout. Resolves the active
+ * the component so `KanbanDisplay` stays a thin layout. Resolves the active
  * project from the URL, wires the two boards together (a custom card can be filed
  * onto the LLM board and back), and exposes the filtered board plus the toolbar's
  * view toggles.
@@ -35,7 +35,7 @@ export function useKanbanPane() {
 
     // Search + tag filters applied to the LLM board.
     const filteredBoard = useMemo(
-        () => filterBoard(kanban.board, options.search, options.selectedTagIds),
+        () => KanbanBoard.filterBoard(kanban.board, options.search, options.selectedTagIds),
         [kanban.board, options.search, options.selectedTagIds],
     );
 

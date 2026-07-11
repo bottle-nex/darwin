@@ -13,7 +13,7 @@ import PlaygroundAvatar, {
     initialOf,
     toneFor,
 } from "@/components/playground/Core/components/PlaygroundAvatar";
-import type { Assignee } from "../types";
+import type { Assignee } from "@/types/kanban";
 
 type AssigneePickerProps = {
     open: boolean;

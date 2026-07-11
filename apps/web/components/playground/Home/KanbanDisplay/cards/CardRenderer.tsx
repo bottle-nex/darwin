@@ -1,6 +1,6 @@
 "use client";
 import { useIssueDialog } from "@/components/playground/issue/useIssueDialog";
-import { KanbanStatus, type Issue } from "../types";
+import { KanbanStatus, type Issue } from "@/types/kanban";
 import TodoCard from "./TodoCard";
 import QueuedCard from "./QueuedCard";
 import InProgressCard from "./InProgressCard";

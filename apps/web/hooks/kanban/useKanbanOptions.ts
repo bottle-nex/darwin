@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { KanbanStatus } from "./types";
+import { KanbanStatus } from "@/types/kanban";
 
 /**
  * The Filter selection: the normal multi-column board, or a single focused

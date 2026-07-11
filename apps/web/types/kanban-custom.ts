@@ -1,4 +1,4 @@
-import type { Assignee, Priority } from "../types";
+import type { Assignee, Priority } from "@/types/kanban";
 import type { BoardTag } from "@/types/board";
 
 /**

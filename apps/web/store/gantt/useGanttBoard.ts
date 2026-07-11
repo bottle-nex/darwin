@@ -1,11 +1,8 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
 import { buildMockIssues } from "@/data/dummy-gantt-issues";
-import {
-    nowMinuteOfDay,
-    toDateKey,
-    type GanttIssue,
-} from "@/components/playground/Home/GanttDisplay/types";
+import { GanttTimeline } from "@/lib/gantt/GanttTimeline";
+import type { GanttIssue } from "@/types/gantt";
 
 /** Everything `useGanttBoard` exposes — the props the Gantt page consumes. */
 export type GanttBoardApi = ReturnType<typeof useGanttBoard>;
@@ -20,13 +17,15 @@ export type GanttBoardApi = ReturnType<typeof useGanttBoard>;
  */
 export function useGanttBoard() {
     const [selectedDate, setSelectedDate] = useState<Date>(() => new Date());
-    const [nowMinute, setNowMinute] = useState<number>(nowMinuteOfDay);
-    const [issues] = useState<GanttIssue[]>(() => buildMockIssues(Math.floor(nowMinuteOfDay())));
+    const [nowMinute, setNowMinute] = useState<number>(GanttTimeline.nowMinuteOfDay);
+    const [issues] = useState<GanttIssue[]>(() =>
+        buildMockIssues(Math.floor(GanttTimeline.nowMinuteOfDay())),
+    );
 
-    const isToday = toDateKey(selectedDate) === toDateKey(new Date());
+    const isToday = GanttTimeline.toDateKey(selectedDate) === GanttTimeline.toDateKey(new Date());
 
     useEffect(() => {
-        const id = setInterval(() => setNowMinute(nowMinuteOfDay()), 1000);
+        const id = setInterval(() => setNowMinute(GanttTimeline.nowMinuteOfDay()), 1000);
         return () => clearInterval(id);
     }, []);
 

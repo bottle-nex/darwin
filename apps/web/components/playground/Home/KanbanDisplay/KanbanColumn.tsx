@@ -2,7 +2,7 @@
 import { MdMoreHoriz } from "react-icons/md";
 import { useDroppable } from "@dnd-kit/core";
 import { cn } from "@/lib/utils";
-import type { Issue, KanbanColumnDef } from "./types";
+import type { Issue, KanbanColumnDef } from "@/types/kanban";
 import CardRenderer from "./cards/CardRenderer";
 import DraggableIssue from "./DraggableIssue";
 import LLMIssueStatusTicker from "./LLMIssueStatusTicker";

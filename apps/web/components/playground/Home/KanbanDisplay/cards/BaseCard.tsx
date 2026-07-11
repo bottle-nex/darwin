@@ -2,8 +2,8 @@ import type { ReactNode } from "react";
 import { MdChat } from "react-icons/md";
 import { cn } from "@/lib/utils";
 import PlaygroundAvatar from "@/components/playground/Core/components/PlaygroundAvatar";
-import type { Issue } from "../types";
-import { PRIORITY_DOT } from "../data";
+import type { Issue } from "@/types/kanban";
+import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
 import { CARD_SHELL } from "../cardStyles";
 import IssueTags from "../IssueTags";
 
@@ -28,7 +28,10 @@ export default function BaseCard({ issue, children, className }: BaseCardProps) 
             <div className="flex items-center justify-between gap-2">
                 <div className="flex items-center gap-1.5">
                     <span
-                        className={cn("size-1.5 rounded-full", PRIORITY_DOT[issue.priority])}
+                        className={cn(
+                            "size-1.5 rounded-full",
+                            KanbanBoard.PRIORITY_DOT[issue.priority],
+                        )}
                         aria-hidden
                     />
                     <IssueTags tags={issue.tags} />

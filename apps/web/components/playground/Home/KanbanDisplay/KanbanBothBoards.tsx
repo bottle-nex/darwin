@@ -1,6 +1,6 @@
 "use client";
-import type { BoardState, KanbanView } from "./types";
-import type { CustomKanbanApi } from "./customkanban/useCustomKanban";
+import type { BoardState, KanbanView } from "@/types/kanban";
+import type { CustomKanbanApi } from "@/hooks/kanban/useCustomKanban";
 import KanbanBoardView from "./KanbanBoardView";
 import KanbanListView from "./KanbanListView";
 import CustomKanbanBoard from "./customkanban/CustomKanbanBoard";

@@ -1,7 +1,7 @@
 "use client";
 import AddListForm from "./AddListForm";
 import CustomKanbanColumn from "./CustomKanbanColumn";
-import type { CustomKanbanApi } from "./useCustomKanban";
+import type { CustomKanbanApi } from "@/hooks/kanban/useCustomKanban";
 
 export default function CustomKanbanBoard({
     projectId,

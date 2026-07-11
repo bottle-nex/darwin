@@ -13,13 +13,13 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog";
 import { useIssueDialog } from "@/components/playground/issue/useIssueDialog";
-import { PRIORITY_DOT } from "../data";
+import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
+import { CustomKanbanMappers } from "@/lib/kanban/CustomKanbanMappers";
 import { CARD_SHELL } from "../cardStyles";
 import { PANEL_CONTENT, PANEL_ITEM } from "../OptionsBar/KanbanOptionPanels/panelStyles";
 import IssueTags from "../IssueTags";
 import AssigneePicker from "./AssigneePicker";
-import { stripHtml } from "./mappers";
-import type { CustomCard } from "./types";
+import type { CustomCard } from "@/types/kanban-custom";
 import PlaygroundAvatar from "@/components/playground/Core/components/PlaygroundAvatar";
 
 /** Cards are narrow; anything past this collapses into a `+N`. */
@@ -40,7 +40,7 @@ export default function CustomKanbanCard({
     onAssign,
     onUnassign,
 }: CustomKanbanCardProps) {
-    const preview = card.description ? stripHtml(card.description) : "";
+    const preview = card.description ? CustomKanbanMappers.stripHtml(card.description) : "";
     const shownAssignees = card.assignees.slice(0, MAX_AVATARS);
     const overflowCount = card.assignees.length - shownAssignees.length;
     const [confirmOpen, setConfirmOpen] = useState(false);
@@ -106,7 +106,10 @@ export default function CustomKanbanCard({
                 <div className="flex items-center justify-between gap-2 pr-6">
                     <div className="flex items-center gap-1.5">
                         <span
-                            className={cn("size-1.5 rounded-full", PRIORITY_DOT[card.priority])}
+                            className={cn(
+                                "size-1.5 rounded-full",
+                                KanbanBoard.PRIORITY_DOT[card.priority],
+                            )}
                             aria-hidden
                         />
                         <IssueTags tags={card.tags} />

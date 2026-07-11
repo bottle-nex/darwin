@@ -8,12 +8,10 @@ import {
     MdGroup,
 } from "react-icons/md";
 import { cn } from "@/lib/utils";
-import { COLUMNS, INITIAL_BOARD } from "@/components/playground/Home/KanbanDisplay/data";
+import { INITIAL_BOARD } from "@/data/dummy-kanban-issues";
+import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
 import { HiPlusSmall } from "react-icons/hi2";
-import {
-    KanbanStatus,
-    type KanbanColumnDef,
-} from "@/components/playground/Home/KanbanDisplay/types";
+import { KanbanStatus, type KanbanColumnDef } from "@/types/kanban";
 import CardRenderer from "@/components/playground/Home/KanbanDisplay/cards/CardRenderer";
 import { Button } from "@/components/ui/button";
 
@@ -128,7 +126,7 @@ export default function BoardShowcase() {
                         <ShowcaseOptionsBar />
                         <div className="relative">
                             <div className="flex min-h-120 gap-4 overflow-x-auto px-3 pt-3 pb-3">
-                                {COLUMNS.map((column) => (
+                                {KanbanBoard.COLUMNS.map((column) => (
                                     <ShowcaseColumn key={column.status} column={column} />
                                 ))}
                             </div>

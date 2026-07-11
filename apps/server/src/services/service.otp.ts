@@ -12,7 +12,8 @@ import { ENV } from "../configs/env";
  * - `reason: "locked"` — the attempt ceiling was hit; the code has been destroyed and a new one must be requested.
  */
 export type OtpVerifyResult =
-    { ok: true } | { ok: false; reason: "expired" | "invalid" | "locked" };
+    | { ok: true }
+    | { ok: false; reason: "expired" | "invalid" | "locked" };
 
 /**
  * Stateless helper around the Redis-backed OTP lifecycle.

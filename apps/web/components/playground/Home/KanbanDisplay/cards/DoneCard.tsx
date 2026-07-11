@@ -1,5 +1,5 @@
 import { MdCheckCircle } from "react-icons/md";
-import type { Issue } from "../types";
+import type { Issue } from "@/types/kanban";
 import BaseCard from "./BaseCard";
 
 /** Done: the PR merged — the issue is resolved. */

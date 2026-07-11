@@ -1,7 +1,7 @@
 "use client";
-import type { BoardState, BoardView, KanbanView } from "./types";
-import type { FilterValue } from "./useKanbanOptions";
-import type { CustomKanbanApi } from "./customkanban/useCustomKanban";
+import type { BoardState, BoardView, KanbanView } from "@/types/kanban";
+import type { FilterValue } from "@/hooks/kanban/useKanbanOptions";
+import type { CustomKanbanApi } from "@/hooks/kanban/useCustomKanban";
 import KanbanBoardView from "./KanbanBoardView";
 import KanbanListView from "./KanbanListView";
 import KanbanFocusColumn from "./KanbanFocusColumn";

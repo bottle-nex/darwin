@@ -9,7 +9,8 @@ import { ICONS } from "@/data/icons_bulk";
 import { cn } from "@/lib/utils";
 
 export type IconPick =
-    { kind: "icon"; name: string; color: string } | { kind: "emoji"; char: string };
+    | { kind: "icon"; name: string; color: string }
+    | { kind: "emoji"; char: string };
 
 export function IconPickGlyph({ pick, className }: { pick: IconPick; className?: string }) {
     if (pick.kind === "emoji") {

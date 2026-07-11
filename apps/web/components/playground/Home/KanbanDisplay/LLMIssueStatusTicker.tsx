@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 import type { ServerIssueStatus } from "@/types/board";
-import { COLUMNS } from "./data";
-import type { KanbanStatus } from "./types";
+import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
+import type { KanbanStatus } from "@/types/kanban";
 
 const SIZES = {
     md: { box: "gap-1.5 rounded-md px-2 py-1 text-[12px] font-medium", icon: "size-3.5" },
@@ -23,7 +23,7 @@ export default function LLMIssueStatusTicker({
     showIcon = true,
     className,
 }: LLMIssueStatusTickerProps) {
-    const column = COLUMNS.find((c) => c.status === (status as string));
+    const column = KanbanBoard.COLUMNS.find((c) => c.status === (status as string));
     if (!column) return null;
 
     const { icon: Icon, title, titleBox } = column;

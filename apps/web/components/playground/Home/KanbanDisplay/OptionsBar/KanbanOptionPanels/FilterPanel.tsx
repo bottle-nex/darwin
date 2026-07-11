@@ -8,8 +8,8 @@ import {
     MdWindow,
 } from "react-icons/md";
 import { DropdownMenu } from "radix-ui";
-import { COLUMNS } from "../../data";
-import type { FilterValue } from "../../useKanbanOptions";
+import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
+import type { FilterValue } from "@/hooks/kanban/useKanbanOptions";
 import OptionButton from "./OptionButton";
 import { PANEL_CONTENT, PANEL_ITEM, PANEL_LABEL } from "./panelStyles";
 import { TooltipComponent } from "@/components/ui/tooltip-component";
@@ -123,7 +123,7 @@ export default function FilterPanel({ value, onChange, customColumns }: FilterPa
                                 sideOffset={6}
                                 className={`w-48 [direction:ltr] ${PANEL_CONTENT}`}
                             >
-                                {COLUMNS.map((col) => (
+                                {KanbanBoard.COLUMNS.map((col) => (
                                     <DropdownMenu.Item
                                         key={col.status}
                                         className={PANEL_ITEM}

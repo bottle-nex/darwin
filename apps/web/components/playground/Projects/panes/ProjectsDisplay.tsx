@@ -5,9 +5,9 @@ import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore"
 import { RailSurface } from "../../IconRail/railSurface";
 import { ProjectsTab } from "../projectsTabs";
 import ProjectOverviewDisplay from "./ProjectOverviewDisplay";
-import KanbanMainPane from "../../Home/KanbanDisplay/KanbanMainPane";
-import GanttPane from "../../Home/GanttDisplay/GanttPane";
-import ProjectSettingsView from "../../Home/SettingsDisplay/ProjectSettingsView";
+import KanbanDisplay from "../../Home/KanbanDisplay/KanbanDisplay";
+import GanttDisplay from "../../Home/GanttDisplay/GanttDisplay";
+import SettingsDisplay from "../../Home/SettingsDisplay/SettingsDisplay";
 import TeamDetailDisplay from "./TeamDetailDisplay";
 
 export default function ProjectsDisplay() {
@@ -24,14 +24,14 @@ export default function ProjectsDisplay() {
     function content() {
         switch (tab) {
             case ProjectsTab.Kanban:
-                return <KanbanMainPane />;
+                return <KanbanDisplay />;
             case ProjectsTab.Gantt:
-                return <GanttPane />;
+                return <GanttDisplay />;
             case ProjectsTab.SettingsProject:
             case ProjectsTab.SettingsTeams:
             case ProjectsTab.SettingsMembers:
             case ProjectsTab.SettingsEnv:
-                return <ProjectSettingsView />;
+                return <SettingsDisplay />;
             case ProjectsTab.TeamDetail:
                 return <TeamDetailDisplay />;
             case ProjectsTab.Overview:

@@ -1,10 +1,11 @@
 "use client";
 import { useRef, useState } from "react";
-import { INITIAL_BOARD, STATUSES } from "./data";
-import { boardIssuesToLlmBoard } from "./mappers";
-import { KanbanStatus, type BoardState, type Issue } from "./types";
+import { INITIAL_BOARD } from "@/data/dummy-kanban-issues";
+import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
+import { KanbanMappers } from "@/lib/kanban/KanbanMappers";
+import { KanbanStatus, type BoardState, type Issue } from "@/types/kanban";
 import type { BoardResponse } from "@/types/board";
-import type { CustomCard } from "./customkanban/types";
+import type { CustomCard } from "@/types/kanban-custom";
 
 /** Everything `useKanbanBoard` exposes — the board plus the bridge intake. */
 export type KanbanBoardApi = ReturnType<typeof useKanbanBoard>;
@@ -33,7 +34,7 @@ export function useKanbanBoard({ board: serverBoard, projectName }: UseKanbanBoa
     // render-time, mirroring the custom board (see useCustomKanban for the rationale).
     if (serverBoard && serverBoard !== seededBoard) {
         setSeededBoard(serverBoard);
-        setBoard(boardIssuesToLlmBoard(serverBoard, projectName));
+        setBoard(KanbanMappers.boardIssuesToLlmBoard(serverBoard, projectName));
     }
 
     /** File a Custom Kanban card into the given column as a new issue. */
@@ -58,7 +59,7 @@ export function useKanbanBoard({ board: serverBoard, projectName }: UseKanbanBoa
 
     /** Look up an issue by id across every column. */
     function findIssue(id: string): Issue | null {
-        for (const status of STATUSES) {
+        for (const status of KanbanBoard.STATUSES) {
             const issue = board[status].find((i) => i.id === id);
             if (issue) return issue;
         }
@@ -70,7 +71,7 @@ export function useKanbanBoard({ board: serverBoard, projectName }: UseKanbanBoa
         setBoard(
             (prev) =>
                 Object.fromEntries(
-                    STATUSES.map((s) => [s, prev[s].filter((i) => i.id !== id)]),
+                    KanbanBoard.STATUSES.map((s) => [s, prev[s].filter((i) => i.id !== id)]),
                 ) as BoardState,
         );
     }

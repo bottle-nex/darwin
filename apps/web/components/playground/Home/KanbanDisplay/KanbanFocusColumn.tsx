@@ -1,8 +1,8 @@
 "use client";
-import { COLUMNS, isBridgeStatus } from "./data";
-import type { BoardState } from "./types";
-import type { FilterValue } from "./useKanbanOptions";
-import type { CustomKanbanApi } from "./customkanban/useCustomKanban";
+import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
+import type { BoardState } from "@/types/kanban";
+import type { FilterValue } from "@/hooks/kanban/useKanbanOptions";
+import type { CustomKanbanApi } from "@/hooks/kanban/useCustomKanban";
 import KanbanColumn from "./KanbanColumn";
 import CustomKanbanColumn from "./customkanban/CustomKanbanColumn";
 
@@ -14,7 +14,7 @@ type KanbanFocusColumnProps = {
 
 export default function KanbanFocusColumn({ filter, board, custom }: KanbanFocusColumnProps) {
     if (filter.kind === "llm") {
-        const column = COLUMNS.find((c) => c.status === filter.status);
+        const column = KanbanBoard.COLUMNS.find((c) => c.status === filter.status);
         if (!column) return null;
         return (
             <KanbanColumn
@@ -22,8 +22,8 @@ export default function KanbanFocusColumn({ filter, board, custom }: KanbanFocus
                 issues={board[column.status]}
                 layout="grid"
                 fullWidth
-                droppable={isBridgeStatus(column.status)}
-                draggableCards={isBridgeStatus(column.status)}
+                droppable={KanbanBoard.isBridgeStatus(column.status)}
+                draggableCards={KanbanBoard.isBridgeStatus(column.status)}
             />
         );
     }
