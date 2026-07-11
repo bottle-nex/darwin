@@ -23,10 +23,13 @@ import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
 import { KanbanMappers } from "@/lib/kanban/KanbanMappers";
 import { TaskTargetBadge } from "../taskTheme";
 import { PRIORITY_TO_NUMBER } from "../customkanban/data";
+import { BsChatRightTextFill } from "react-icons/bs";
 import IssueTags from "../IssueTags";
 import LLMIssueStatusTicker from "../LLMIssueStatusTicker";
-import { LuInfo } from "react-icons/lu";
+import { LuInfo, LuSendHorizontal } from "react-icons/lu";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { IoIosSend } from "react-icons/io";
+
 
 const PRIORITY_OPTIONS: CapsuleOption[] = [
     { value: "urgent", label: "Urgent", dotClassName: "bg-rose-500" },
@@ -84,28 +87,6 @@ function IssuePending({ resolved }: { resolved: boolean }) {
                 </p>
             </div>
         </IssueShell>
-    );
-}
-
-function IssueShell({ children }: { children: React.ReactNode }) {
-    const { close } = useIssueDialog();
-    return (
-        <Dialog open onOpenChange={close}>
-            <DialogContent
-                showCloseButton={false}
-                className={cn(
-                    "h-[80vh] w-[60vw] max-w-none sm:max-w-none p-0 gap-0 overflow-hidden",
-                    "bg-[#191919] rounded-xl",
-                    "flex flex-col justify-between divide-y divide-white/10 *:px-6 *:py-4",
-                )}
-            >
-                <div
-                    data-slot="slash-command-portal"
-                    className="absolute inset-0 z-50 pointer-events-none"
-                />
-                {children}
-            </DialogContent>
-        </Dialog>
     );
 }
 
@@ -186,6 +167,34 @@ function LockedIssue({ target, issue }: { target: IssueTarget; issue: BoardIssue
     );
 }
 
+function IssueChat() {
+    const [message, setMessage] = useState("");
+
+    return (
+        <section className="m-2.5 flex min-h-0 flex-1 flex-col rounded-[13px] bg-white/3 *:px-4 *:py-3">
+            <header className="text-sm font-medium text-neutral-100 flex items-center gap-x-3">
+                <BsChatRightTextFill />
+                <span>Comments and activity</span>
+            </header>
+            <div
+                data-lenis-prevent
+                className="no-scrollbar flex-1 min-h-0 overflow-y-auto text-[13px] text-neutral-500"
+            />
+            <footer className="flex items-center gap-x-2">
+                <Input
+                    placeholder="Leave a comment..."
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    className="h-9"
+                />
+                <Button size="icon" disabled={!message.trim()} aria-label="Send comment">
+                    <IoIosSend />
+                </Button>
+            </footer>
+        </section>
+    );
+}
+
 function IssueForm({ target, issue }: { target: IssueTarget; issue: BoardIssue | null }) {
     const { close } = useIssueDialog();
     const projectId = useActiveProject()?.id;
@@ -259,86 +268,120 @@ function IssueForm({ target, issue }: { target: IssueTarget; issue: BoardIssue |
 
     return (
         <IssueShell>
-            <div className="flex flex-col items-start gap-y-3 ">
-                <IssueMeta target={target} issue={issue} />
-                <div className="w-full flex flex-col items-start ">
-                    <Input
-                        autoFocus
-                        variant={"ghost"}
-                        placeholder="Issue Title"
-                        maxLength={80}
-                        value={title}
-                        onChange={(e) => setTitle(e.target.value)}
-                        className="text-3xl ring-0 border-0 font-semibold h-9 p-0 bg-transparent hover:bg-transparent!"
-                    />
-                    <Input
-                        variant={"ghost"}
-                        placeholder="Add a short summary..."
-                        maxLength={255}
-                        value={summary}
-                        onChange={(e) => setSummary(e.target.value)}
-                        className="h-7 p-0 bg-transparent hover:bg-transparent!"
-                    />
+            <main className="flex h-full min-h-0 flex-row">
+                <div className="flex h-full min-h-0 flex-col justify-between *:px-6 *:py-4 w-[64%]">
+                    <section className="flex flex-col items-start gap-y-3 ">
+                        <IssueMeta target={target} issue={issue} />
+                        <div className="w-full flex flex-col items-start ">
+                            <Input
+                                autoFocus
+                                variant={"ghost"}
+                                placeholder="Issue Title"
+                                maxLength={80}
+                                value={title}
+                                onChange={(e) => setTitle(e.target.value)}
+                                className="text-3xl ring-0 border-0 font-semibold h-8 p-0 bg-transparent hover:bg-transparent!"
+                            />
+                            <Input
+                                variant={"ghost"}
+                                placeholder="Add a short summary..."
+                                maxLength={255}
+                                value={summary}
+                                onChange={(e) => setSummary(e.target.value)}
+                                className="h-7 p-0 bg-transparent hover:bg-transparent!"
+                            />
+                        </div>
+                        <div className="flex items-center gap-x-2.5">
+                            <Capsule
+                                type="dropdown"
+                                options={PRIORITY_OPTIONS}
+                                defaultValue={priority}
+                                onChange={(value) => setPriority(value as Priority)}
+                            />
+                            <TagsCapsule
+                                projectId={projectId}
+                                defaultValue={tagIds}
+                                onChange={setTagIds}
+                            />
+                            <MembersCapsule
+                                projectId={projectId}
+                                defaultValue={memberIds}
+                                onChange={setMemberIds}
+                            />
+                            <Capsule
+                                type="calendar"
+                                placeholder="Start date"
+                                defaultValue={startDate}
+                                onChange={setStartDate}
+                            />
+                            <Capsule
+                                type="calendar"
+                                placeholder="Target date"
+                                defaultValue={targetDate}
+                                onChange={setTargetDate}
+                            />
+                        </div>
+                    </section>
+                    <section
+                        data-lenis-prevent
+                        className="no-scrollbar flex-1 min-h-0 overflow-y-auto"
+                    >
+                        <IssueDescriptionEditor
+                            initialContent={issue?.description}
+                            onChange={(html, isEmpty) => {
+                                setDescription(html);
+                                setDescriptionEmpty(isEmpty);
+                            }}
+                        />
+                    </section>
+                    <section className="h-fit flex items-center justify-between gap-x-20">
+                        <div className="flex items-start justify-center gap-x-1 text-xs text-white/70">
+                            <LuInfo className="mt-0.75" size={10} />
+                            <span className="">
+                                The more you briefly define the issue, our agent will more
+                                accurately be able to solve it.
+                            </span>
+                        </div>
+                        <div className="flex items-center justify-end gap-x-2 ">
+                            <Button variant={"tertiary"} onClick={close}>
+                                Cancel
+                            </Button>
+                            <Button onClick={handleSubmit} disabled={!canSubmit}>
+                                {pending
+                                    ? isEdit
+                                        ? "Saving..."
+                                        : "Creating..."
+                                    : isEdit
+                                        ? "Save"
+                                        : "Create Issue"}
+                            </Button>
+                        </div>
+                    </section>
                 </div>
-                <div className="flex items-center gap-x-2.5">
-                    <Capsule
-                        type="dropdown"
-                        options={PRIORITY_OPTIONS}
-                        defaultValue={priority}
-                        onChange={(value) => setPriority(value as Priority)}
-                    />
-                    <TagsCapsule projectId={projectId} defaultValue={tagIds} onChange={setTagIds} />
-                    <MembersCapsule
-                        projectId={projectId}
-                        defaultValue={memberIds}
-                        onChange={setMemberIds}
-                    />
-                    <Capsule
-                        type="calendar"
-                        placeholder="Start date"
-                        defaultValue={startDate}
-                        onChange={setStartDate}
-                    />
-                    <Capsule
-                        type="calendar"
-                        placeholder="Target date"
-                        defaultValue={targetDate}
-                        onChange={setTargetDate}
-                    />
-                </div>
-            </div>
-            <div data-lenis-prevent className="flex-1 min-h-0 overflow-y-auto ">
-                <IssueDescriptionEditor
-                    initialContent={issue?.description}
-                    onChange={(html, isEmpty) => {
-                        setDescription(html);
-                        setDescriptionEmpty(isEmpty);
-                    }}
-                />
-            </div>
-            <div className="h-fit flex items-center justify-between">
-                <div className="flex items-center justify-center gap-x-1 text-xs text-white/70">
-                    <LuInfo size={10} />
-                    <span>
-                        The more you briefly define the issue, our agent will more accurately be
-                        able to solve it.
-                    </span>
-                </div>
-                <div className="flex items-center justify-end gap-x-2 ">
-                    <Button variant={"tertiary"} onClick={close}>
-                        Cancel
-                    </Button>
-                    <Button onClick={handleSubmit} disabled={!canSubmit}>
-                        {pending
-                            ? isEdit
-                                ? "Saving..."
-                                : "Creating..."
-                            : isEdit
-                              ? "Save"
-                              : "Create Issue"}
-                    </Button>
-                </div>
-            </div>
+                <IssueChat />
+            </main>
         </IssueShell>
+    );
+}
+
+function IssueShell({ children }: { children: React.ReactNode }) {
+    const { close } = useIssueDialog();
+    return (
+        <Dialog open onOpenChange={close}>
+            <DialogContent
+                showCloseButton={false}
+                className={cn(
+                    "h-[80vh] w-[72vw] max-w-none sm:max-w-none p-0 gap-0 overflow-hidden",
+                    "bg-[#191919] rounded-[18px]",
+                    "",
+                )}
+            >
+                <div
+                    data-slot="slash-command-portal"
+                    className="absolute inset-0 z-50 pointer-events-none"
+                />
+                {children}
+            </DialogContent>
+        </Dialog>
     );
 }
