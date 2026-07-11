@@ -1,5 +1,5 @@
 import { FaCodePullRequest } from "react-icons/fa6";
-import type { Issue } from "../types";
+import type { Issue } from "@/types/kanban";
 import BaseCard from "./BaseCard";
 import AgentChip from "./AgentChip";
 

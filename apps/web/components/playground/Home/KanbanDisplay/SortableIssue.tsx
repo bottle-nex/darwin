@@ -2,7 +2,7 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { cn } from "@/lib/utils";
-import type { Issue } from "./types";
+import type { Issue } from "@/types/kanban";
 import CardRenderer from "./cards/CardRenderer";
 
 /**

@@ -2,7 +2,7 @@
 import { MdCheck, MdViewKanban, MdList, MdTune } from "react-icons/md";
 import { type IconType } from "react-icons";
 import { DropdownMenu } from "radix-ui";
-import type { KanbanView } from "../../types";
+import type { KanbanView } from "@/types/kanban";
 import OptionButton from "./OptionButton";
 import { PANEL_CONTENT, PANEL_ITEM, PANEL_LABEL } from "./panelStyles";
 import { TooltipComponent } from "@/components/ui/tooltip-component";

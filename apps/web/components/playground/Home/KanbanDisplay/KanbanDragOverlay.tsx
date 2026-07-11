@@ -1,6 +1,6 @@
 "use client";
 import { DragOverlay } from "@dnd-kit/core";
-import type { CustomKanbanApi } from "./customkanban/useCustomKanban";
+import type { CustomKanbanApi } from "@/hooks/kanban/useCustomKanban";
 import CustomKanbanCard from "./customkanban/CustomKanbanCard";
 import CardRenderer from "./cards/CardRenderer";
 

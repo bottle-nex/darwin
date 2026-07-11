@@ -1,4 +1,4 @@
-import { MINUTE_WIDTH } from "./types";
+import { GanttTimeline } from "@/lib/gantt/GanttTimeline";
 
 /** Fractional minute-of-day → "HH:MM:SS". */
 function fmtClockSeconds(minute: number): string {
@@ -18,7 +18,7 @@ export default function GanttNowLine({ minute }: { minute: number }) {
     return (
         <div
             className="group pointer-events-none absolute inset-y-0 z-10"
-            style={{ left: minute * MINUTE_WIDTH }}
+            style={{ left: minute * GanttTimeline.MINUTE_WIDTH }}
         >
             {/* wider transparent hover target around the 1px line */}
             <div className="pointer-events-auto absolute inset-y-0 -left-1.5 w-3" />

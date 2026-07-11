@@ -10,8 +10,9 @@ import {
 } from "@dnd-kit/core";
 import { arrayMove } from "@dnd-kit/sortable";
 import { toast } from "sonner";
-import { isBridgeStatus } from "../data";
-import type { KanbanStatus, Issue } from "../types";
+import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
+import { CustomKanbanMappers } from "@/lib/kanban/CustomKanbanMappers";
+import type { KanbanStatus, Issue } from "@/types/kanban";
 import { useCreateColumn } from "@/hooks/issues/useCreateColumn";
 import { useUpdateIssue } from "@/hooks/issues/useUpdateIssue";
 import { useDeleteIssue } from "@/hooks/issues/useDeleteIssue";
@@ -19,9 +20,8 @@ import { useUpdateColumn } from "@/hooks/issues/useUpdateColumn";
 import { useDeleteColumn } from "@/hooks/issues/useDeleteColumn";
 import { useAssignIssue, useUnassignIssue } from "@/hooks/issues/useAssignIssue";
 import type { BoardResponse } from "@/types/board";
-import { INITIAL_CUSTOM_COLUMNS } from "./data";
-import { boardToColumns } from "./mappers";
-import type { CustomCard, CustomColumn } from "./types";
+import { INITIAL_CUSTOM_COLUMNS } from "@/components/playground/Home/KanbanDisplay/customkanban/data";
+import type { CustomCard, CustomColumn } from "@/types/kanban-custom";
 
 type UseCustomKanbanArgs = {
     /** The project these columns/issues belong to. Creation is disabled until it resolves. */
@@ -74,7 +74,7 @@ export function useCustomKanban({
 
     if (board && board !== seededBoard) {
         setSeededBoard(board);
-        setColumns(boardToColumns(board));
+        setColumns(CustomKanbanMappers.boardToColumns(board));
     }
 
     const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
@@ -255,7 +255,7 @@ export function useCustomKanban({
 
         // A custom card dropped onto a bridge column is filed there as an issue.
         if (!toCustomColumn) {
-            if (!isBridgeStatus(overId)) return;
+            if (!KanbanBoard.isBridgeStatus(overId)) return;
             setColumns((prev) =>
                 prev.map((col) =>
                     col.id === fromCustom.columnId

@@ -1,7 +1,7 @@
 "use client";
 import { closestCorners, DndContext } from "@dnd-kit/core";
-import { useKanbanPane } from "./useKanbanPane";
-import KanbanOptionsBar from "./OptionsBar/KanbanOptionsBar";
+import { useKanbanPane } from "@/hooks/kanban/useKanbanPane";
+import OptionsBar from "./OptionsBar/OptionsBar";
 import KanbanContent from "./KanbanContent";
 import KanbanDragOverlay from "./KanbanDragOverlay";
 import { useCreateOrEditIssueStore } from "@/store/issues/useCreateOrEditIssueStore";
@@ -13,14 +13,14 @@ import { useCreateOrEditIssueStore } from "@/store/issues/useCreateOrEditIssueSt
  * picks which board(s) to show and the layout; `KanbanContent` renders the rest.
  * All the data and view state lives in `useKanbanPane`.
  */
-export default function KanbanMainPane() {
+export default function KanbanDisplay() {
     const pane = useKanbanPane();
     const { custom } = pane;
     const openCreate = useCreateOrEditIssueStore((s) => s.openCreate);
 
     return (
         <div className="flex min-h-0 flex-1 flex-col">
-            <KanbanOptionsBar
+            <OptionsBar
                 options={pane.options}
                 customColumns={custom.columns}
                 boardView={pane.boardView}

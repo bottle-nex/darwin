@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { DAY_MINUTES, DAY_WIDTH, MINUTE_WIDTH } from "./types";
+import { GanttTimeline } from "@/lib/gantt/GanttTimeline";
 
 /**
  * Full-height vertical gridlines behind the lanes: a stronger line every hour and
@@ -7,10 +7,13 @@ import { DAY_MINUTES, DAY_WIDTH, MINUTE_WIDTH } from "./types";
  * grid. Sits beneath the lane content and the now-line.
  */
 export default function GanttGrid() {
-    const lines = Array.from({ length: DAY_MINUTES / 15 + 1 }, (_, i) => i * 15);
+    const lines = Array.from({ length: GanttTimeline.DAY_MINUTES / 15 + 1 }, (_, i) => i * 15);
 
     return (
-        <div className="pointer-events-none absolute inset-0 z-0" style={{ width: DAY_WIDTH }}>
+        <div
+            className="pointer-events-none absolute inset-0 z-0"
+            style={{ width: GanttTimeline.DAY_WIDTH }}
+        >
             {lines.map((m) => (
                 <div
                     key={m}
@@ -18,7 +21,7 @@ export default function GanttGrid() {
                         "absolute inset-y-0 w-px",
                         m % 60 === 0 ? "bg-border" : "bg-border/30",
                     )}
-                    style={{ left: m * MINUTE_WIDTH }}
+                    style={{ left: m * GanttTimeline.MINUTE_WIDTH }}
                 />
             ))}
         </div>

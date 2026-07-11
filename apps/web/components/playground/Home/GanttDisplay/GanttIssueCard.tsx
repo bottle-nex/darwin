@@ -1,6 +1,7 @@
 import { MdAccessTimeFilled, MdChat, MdPause } from "react-icons/md";
 import { cn } from "@/lib/utils";
-import { barGeometry, issueMeta, MINUTE_WIDTH, PRIORITY_DOT, type GanttIssue } from "./types";
+import { GanttTimeline } from "@/lib/gantt/GanttTimeline";
+import type { GanttIssue } from "@/types/gantt";
 
 /**
  * An issue card in a worker lane, positioned by time and sized to its duration.
@@ -8,7 +9,7 @@ import { barGeometry, issueMeta, MINUTE_WIDTH, PRIORITY_DOT, type GanttIssue } f
  * solving (blue), paused (amber), done (green). Read-only.
  */
 export default function GanttIssueCard({ issue, now }: { issue: GanttIssue; now: number }) {
-    const { left, width } = barGeometry(issue, now);
+    const { left, width } = GanttTimeline.barGeometry(issue, now);
     const isSolving = issue.status === "solving";
     const isQueued = issue.status === "queued";
     const isDone = issue.status === "done";
@@ -25,7 +26,9 @@ export default function GanttIssueCard({ issue, now }: { issue: GanttIssue; now:
 
     // Paused: a live amber line extends from the frozen bar to "now", counter ticking up.
     const pausedMinutes = isPaused ? Math.max(0, Math.round(now - issue.pausedAt!)) : 0;
-    const pauseLineWidth = isPaused ? Math.max(0, (now - issue.pausedAt!) * MINUTE_WIDTH) : 0;
+    const pauseLineWidth = isPaused
+        ? Math.max(0, (now - issue.pausedAt!) * GanttTimeline.MINUTE_WIDTH)
+        : 0;
     const AMBER_DASH = "repeating-linear-gradient(to right, #f59e0b 0 4px, transparent 4px 8px)";
 
     return (
@@ -54,7 +57,7 @@ export default function GanttIssueCard({ issue, now }: { issue: GanttIssue; now:
                                 className={cn(
                                     "size-1.5 shrink-0 rounded-full",
                                     isSolving && !isPaused && "animate-pulse",
-                                    PRIORITY_DOT[issue.priority],
+                                    GanttTimeline.PRIORITY_DOT[issue.priority],
                                 )}
                             />
                             {issue.label && (
@@ -79,7 +82,7 @@ export default function GanttIssueCard({ issue, now }: { issue: GanttIssue; now:
                         <MdAccessTimeFilled className="size-3 shrink-0" aria-hidden />
                         <span className="truncate">
                             <span style={{ color: accent }}>{statusLabel}</span> ·{" "}
-                            {issueMeta(issue, now)}
+                            {GanttTimeline.issueMeta(issue, now)}
                         </span>
                     </div>
 

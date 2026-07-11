@@ -17,7 +17,7 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog";
 
-// Unused — HomeTab.SettingsEnv actually renders SettingsDisplay/ProjectSettingsView instead.
+// Unused — HomeTab.SettingsEnv actually renders SettingsDisplay/SettingsDisplay instead.
 export default function EnvironmentDisplay() {
     const { orgSlug, projectSlug } = useParams<{ orgSlug: string; projectSlug?: string }>();
     const { data: dashboard } = useGetDashboard(orgSlug);

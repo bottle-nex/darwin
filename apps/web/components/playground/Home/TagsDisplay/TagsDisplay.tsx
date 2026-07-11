@@ -24,7 +24,7 @@ import TagFormDialog from "./TagFormDialog";
 import TagsOptionsBar from "./TagsOptionsBar";
 import { useTagsOptions } from "./useTagsOptions";
 
-export default function TagsMainPane() {
+export default function TagsDisplay() {
     const { orgSlug, projectSlug } = useParams<{ orgSlug: string; projectSlug?: string }>();
     const { data: dashboard } = useGetDashboard(orgSlug);
     const activeProject = dashboard?.projects.find((p) => p.slug === projectSlug);

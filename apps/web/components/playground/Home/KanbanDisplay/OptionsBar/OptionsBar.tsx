@@ -17,8 +17,8 @@ import { DropdownMenu } from "radix-ui";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { TooltipComponent } from "@/components/ui/tooltip-component";
-import type { KanbanOptions } from "../useKanbanOptions";
-import type { BoardView, KanbanView } from "../types";
+import type { KanbanOptions } from "@/hooks/kanban/useKanbanOptions";
+import type { BoardView, KanbanView } from "@/types/kanban";
 import OptionButton from "./KanbanOptionPanels/OptionButton";
 import FilterPanel from "./KanbanOptionPanels/FilterPanel";
 import TagPanel from "./KanbanOptionPanels/TagPanel";
@@ -37,7 +37,7 @@ const BOARD_VIEWS: { id: BoardView; label: string; icon: IconType }[] = [
     { id: "llm", label: "LLM Kanban", icon: MdAutoAwesome },
 ];
 
-type KanbanOptionsBarProps = {
+type OptionsBarProps = {
     options: KanbanOptions;
     /** Custom columns, listed under the filter's "custom" group. */
     customColumns: { id: string; title: string }[];
@@ -50,7 +50,7 @@ type KanbanOptionsBarProps = {
 };
 
 /** Board toolbar: the board switcher, search, tags, filters, Views, and +Task. */
-export default function KanbanOptionsBar({
+export default function OptionsBar({
     options,
     customColumns,
     boardView,
@@ -58,7 +58,7 @@ export default function KanbanOptionsBar({
     kanbanView,
     onKanbanViewChange,
     onAddTask,
-}: KanbanOptionsBarProps) {
+}: OptionsBarProps) {
     const {
         searchOpen,
         search,

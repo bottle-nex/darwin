@@ -28,7 +28,7 @@ const TAB_SECTION: Partial<Record<ProjectsTab, ProjectSettingsSection>> = {
  * project. The section is taken from the `section` prop when given (Home
  * surface), else derived from the active Projects tab.
  */
-export default function ProjectSettingsView({ section }: { section?: ProjectSettingsSection }) {
+export default function SettingsDisplay({ section }: { section?: ProjectSettingsSection }) {
     const { orgSlug, projectSlug } = useParams<{ orgSlug: string; projectSlug?: string }>();
     const { data: dashboard } = useGetDashboard(orgSlug);
     const activeProject = projectSlug

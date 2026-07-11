@@ -18,9 +18,9 @@ import Capsule, { type CapsuleOption } from "./Capsule";
 import MembersCapsule from "./MembersCapsule";
 import TagsCapsule from "./TagsCapsule";
 import IssueDescriptionEditor from "./editor/IssueDescriptionEditor";
-import type { Priority } from "../types";
-import { PRIORITY_DOT } from "../data";
-import { NUMBER_TO_PRIORITY, toAssignee } from "../mappers";
+import type { Priority } from "@/types/kanban";
+import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
+import { KanbanMappers } from "@/lib/kanban/KanbanMappers";
 import { TaskTargetBadge } from "../taskTheme";
 import { PRIORITY_TO_NUMBER } from "../customkanban/data";
 import IssueTags from "../IssueTags";
@@ -130,7 +130,7 @@ function Assignees({ issue }: { issue: BoardIssue }) {
     if (!issue.assignees.length) return null;
     return (
         <div className="flex items-center -space-x-1">
-            {issue.assignees.map(toAssignee).map((a) => (
+            {issue.assignees.map(KanbanMappers.toAssignee).map((a) => (
                 <PlaygroundAvatar
                     key={a.id}
                     letter={a.name.charAt(0).toUpperCase()}
@@ -144,7 +144,7 @@ function Assignees({ issue }: { issue: BoardIssue }) {
 
 function LockedIssue({ target, issue }: { target: IssueTarget; issue: BoardIssue }) {
     const { close } = useIssueDialog();
-    const priority = NUMBER_TO_PRIORITY[issue.priority] ?? "normal";
+    const priority = KanbanMappers.NUMBER_TO_PRIORITY[issue.priority] ?? "normal";
 
     return (
         <IssueShell>
@@ -156,7 +156,10 @@ function LockedIssue({ target, issue }: { target: IssueTarget; issue: BoardIssue
                 <div className="flex items-center gap-x-2.5">
                     <span className="flex items-center gap-1.5 rounded-xl bg-white/5 px-3 py-1 text-xs text-white/55 ring ring-white/10">
                         <span
-                            className={cn("size-2 rounded-full", PRIORITY_DOT[priority])}
+                            className={cn(
+                                "size-2 rounded-full",
+                                KanbanBoard.PRIORITY_DOT[priority],
+                            )}
                             aria-hidden
                         />
                         {PRIORITY_OPTIONS.find((p) => p.value === priority)?.label}
@@ -195,7 +198,7 @@ function IssueForm({ target, issue }: { target: IssueTarget; issue: BoardIssue |
     const [description, setDescription] = useState(issue?.description ?? "");
     const [descriptionEmpty, setDescriptionEmpty] = useState(!issue?.description);
     const [priority, setPriority] = useState<Priority>(
-        issue ? (NUMBER_TO_PRIORITY[issue.priority] ?? "normal") : "normal",
+        issue ? (KanbanMappers.NUMBER_TO_PRIORITY[issue.priority] ?? "normal") : "normal",
     );
     const [memberIds, setMemberIds] = useState<string[]>(issue?.assignees.map((a) => a.id) ?? []);
     const [tagIds, setTagIds] = useState<string[]>(issue?.tags.map((t) => t.id) ?? []);

@@ -1,0 +1,47 @@
+import type { BoardIssue, BoardResponse } from "@/types/board";
+import { KanbanMappers } from "@/lib/kanban/KanbanMappers";
+import type { CustomCard, CustomColumn } from "@/types/kanban-custom";
+
+/** Maps the real API's board payload onto the Custom Kanban's display shapes. */
+export class CustomKanbanMappers {
+    /**
+     * Descriptions are stored as rich-text editor HTML; card previews are plain text.
+     * Entities are left encoded — a preview is a glance, not a rendering.
+     */
+    static stripHtml(html: string): string {
+        return html
+            .replace(/<[^>]*>/g, " ")
+            .replace(/\s+/g, " ")
+            .trim();
+    }
+
+    /** Convert a raw server issue row into the card the Custom Kanban renders. */
+    static boardIssueToCard(issue: BoardIssue): CustomCard {
+        return {
+            id: issue.id,
+            number: issue.number,
+            title: issue.title,
+            description: issue.description || undefined,
+            tags: issue.tags,
+            priority: KanbanMappers.NUMBER_TO_PRIORITY[issue.priority] ?? "normal",
+            assignees: issue.assignees.map(KanbanMappers.toAssignee),
+        };
+    }
+
+    /**
+     * Build the Custom Kanban's columns from a board payload: columns left-to-right
+     * by `order`, each holding the issues parked in it (issues whose `customColumnId`
+     * matches). Issues arrive createdAt-ascending, so card order is insertion order.
+     */
+    static boardToColumns(board: BoardResponse): CustomColumn[] {
+        return [...board.columns]
+            .sort((a, b) => a.order - b.order)
+            .map((col) => ({
+                id: col.id,
+                title: col.label,
+                cards: board.issues
+                    .filter((issue) => issue.customColumnId === col.id)
+                    .map(CustomKanbanMappers.boardIssueToCard),
+            }));
+    }
+}

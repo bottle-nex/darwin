@@ -1,5 +1,5 @@
 import { MdAccessTimeFilled } from "react-icons/md";
-import type { Issue } from "../types";
+import type { Issue } from "@/types/kanban";
 import BaseCard from "./BaseCard";
 import AgentChip from "./AgentChip";
 
