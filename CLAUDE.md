@@ -106,6 +106,15 @@ Next.js App Router (`apps/web/app`). Currently shipped routes: `/` (landing) and
 
 Tailwind v4 is configured via `app/globals.css` + `@tailwindcss/postcss` — there is no `tailwind.config.*`. Theme tokens and animations live in `globals.css`.
 
+## Conventions
+
+Optimize every change for the next reader: the simplest thing that works, named so its intent is obvious. Prefer restructuring to fit a feature cleanly over bolting logic onto existing shapes, and don't reach for a complicated mechanism when a plain one does the job.
+
+- **Naming** — pick meaningful, self-explanatory names for variables, functions, files, and types. A name should tell you what the thing is without reading its body.
+- **React files** — every component file is `PascalCase.tsx` (e.g. `CreateProjectDialog.tsx`). App Router route files (`page.tsx`, `layout.tsx`, `route.ts`) stay lowercase per Next.js.
+- **Types** — shared/domain types live in `apps/web/types/` (or the `@trymatcha/types` package for cross-app types), named `<domain>.type.ts` (e.g. `kanban.type.ts`, `board.type.ts`). Keep component-local `Props` inline; promote a type to the folder once more than one file needs it.
+- **Zustand** — one small, single-purpose store per concern under `apps/web/store/<feature>/use<Feature>Store.ts`. Don't funnel unrelated state into a single mega-store. Server data stays in React Query hooks (`apps/web/hooks/`), not Zustand.
+
 ## Formatting
 
 Prettier (`.prettierrc.json`): 4-space indent, double quotes, semicolons, `trailingComma: "all"`, `printWidth: 100`, LF line endings. Match this when writing/editing files — `format:check` runs in the pre-push hook.

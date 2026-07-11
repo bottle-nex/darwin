@@ -42,12 +42,12 @@ const ALL_EMOJIS = EMOJI_GROUPS.flatMap((group) => group.emojis);
 const EMOJI_NAMES = new Map(ALL_EMOJIS.map((emoji) => [emoji.c, emoji.n]));
 
 const GRID =
-    "grid grid-cols-[repeat(12,minmax(0,1fr))] gap-0.5 sm:grid-cols-[repeat(14,minmax(0,1fr))]";
+    "grid grid-cols-[repeat(6,minmax(0,1fr))] gap-0.5 sm:grid-cols-[repeat(8,minmax(0,1fr))]";
 
 const SEARCH =
     "w-full shrink-0 border-b border-white/10 bg-transparent px-3.5 py-2.5 text-[13px] text-neutral-100 outline-none placeholder:text-neutral-500";
 
-const SCROLL = "min-h-0 flex-1 overflow-y-auto p-1.5";
+const SCROLL = "min-h-0 flex-1 overflow-y-auto p-1.5 no-scrollbar";
 
 function Cell({
     title,
@@ -97,7 +97,7 @@ function IconsTab({ onPick }: { onPick: (pick: IconPick) => void }) {
                         aria-label={swatch}
                         onClick={() => setColor(swatch)}
                         style={{ background: swatch }}
-                        className="flex size-6 cursor-pointer items-center justify-center rounded-full"
+                        className="flex size-4.75 aspect-square cursor-pointer items-center justify-center rounded-full"
                     >
                         {color === swatch && <MdCheck className="size-3.5 text-neutral-900" />}
                     </button>
@@ -111,7 +111,7 @@ function IconsTab({ onPick }: { onPick: (pick: IconPick) => void }) {
                             type="button"
                             aria-label="Custom color"
                             style={{ background: WHEEL }}
-                            className="size-6 cursor-pointer rounded-full"
+                            className="size-4.75 aspect-square cursor-pointer rounded-full"
                         />
                     </PopoverTrigger>
                     <PopoverContent className="w-auto border-white/10 bg-charcoal p-3">
@@ -139,7 +139,7 @@ function IconsTab({ onPick }: { onPick: (pick: IconPick) => void }) {
                                 title={name}
                                 onClick={() => onPick({ kind: "icon", name, color })}
                             >
-                                <Icon className="size-4" style={{ color }} />
+                                <Icon className="size-4.5" style={{ color }} />
                             </Cell>
                         ))}
                     </div>
@@ -191,7 +191,7 @@ function EmojisTab({ recents, onPick }: { recents: string[]; onPick: (pick: Icon
                                         title={`:${emoji.n}:`}
                                         onClick={() => onPick({ kind: "emoji", char: emoji.c })}
                                     >
-                                        <span className="text-base leading-none">{emoji.c}</span>
+                                        <span className="text-[19px] leading-none">{emoji.c}</span>
                                     </Cell>
                                 ))}
                             </div>
@@ -207,7 +207,7 @@ function EmojisTab({ recents, onPick }: { recents: string[]; onPick: (pick: Icon
                                 title={`:${emoji.n}:`}
                                 onClick={() => onPick({ kind: "emoji", char: emoji.c })}
                             >
-                                <span className="text-base leading-none">{emoji.c}</span>
+                                <span className="text-[19px] leading-none">{emoji.c}</span>
                             </Cell>
                         ))}
                     </div>
@@ -250,7 +250,7 @@ export default function IconPicker({
             <PopoverContent
                 align={align}
                 aria-label="Pick an icon or emoji"
-                className="flex h-104 w-88 flex-col overflow-hidden border-white/10 bg-neutral-900 p-0 text-neutral-100"
+                className="flex h-92 w-72 flex-col overflow-hidden border-white/10 bg-neutral-900 p-0 text-neutral-100"
             >
                 <div className="flex shrink-0 gap-0.5 border-b border-white/10 px-2">
                     {(["icons", "emojis"] as const).map((value) => (
