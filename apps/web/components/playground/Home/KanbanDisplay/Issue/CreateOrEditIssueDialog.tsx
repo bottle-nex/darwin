@@ -26,9 +26,13 @@ import { PRIORITY_TO_NUMBER } from "../customkanban/data";
 import { BsChatRightTextFill } from "react-icons/bs";
 import IssueTags from "../IssueTags";
 import LLMIssueStatusTicker from "../LLMIssueStatusTicker";
-import { LuInfo, LuSendHorizontal } from "react-icons/lu";
+import { LuInfo } from "react-icons/lu";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { IoIosSend } from "react-icons/io";
+import { useListTemplates } from "@/hooks/templates/useListTemplates";
+import type { PickableTemplate } from "@/types/issueTemplate";
+import TemplatePicker from "./TemplatePicker";
+import { useIssueDescription } from "./useIssueDescription";
 
 const PRIORITY_OPTIONS: CapsuleOption[] = [
     { value: "urgent", label: "Urgent", dotClassName: "bg-rose-500" },
@@ -56,8 +60,18 @@ function targetForIssue(issue: BoardIssue, columns: BoardColumn[]): IssueTarget 
 export default function CreateOrEditIssueDialog() {
     const { mode } = useIssueDialog();
     if (!mode) return null;
-    if (mode.kind === "create") return <IssueForm target={mode.target} issue={null} />;
+    if (mode.kind === "create") return <CreateIssue target={mode.target} />;
     return <EditIssue issueId={mode.issueId} />;
+}
+
+function CreateIssue({ target }: { target: IssueTarget }) {
+    const projectId = useActiveProject()?.id;
+    const { data: templates, isPending } = useListTemplates(projectId);
+
+    if (projectId && isPending) return <IssuePending resolved={false} />;
+
+    const defaultTemplate = templates?.find((template) => template.isDefault);
+    return <IssueForm target={target} issue={null} initialTemplate={defaultTemplate} />;
 }
 
 function EditIssue({ issueId }: { issueId: string }) {
@@ -70,7 +84,12 @@ function EditIssue({ issueId }: { issueId: string }) {
 
     const target = targetForIssue(issue, board.columns);
     return isEditable(issue) ? (
-        <IssueForm key={issue.id} target={target} issue={issue} />
+        <IssueForm
+            key={issue.id}
+            target={target}
+            issue={issue}
+            initialDescription={issue.description}
+        />
     ) : (
         <LockedIssue key={issue.id} target={target} issue={issue} />
     );
@@ -89,20 +108,33 @@ function IssuePending({ resolved }: { resolved: boolean }) {
     );
 }
 
-function IssueMeta({ target, issue }: { target: IssueTarget; issue: BoardIssue | null }) {
+function IssueTopper({
+    target,
+    issue,
+    action,
+}: {
+    target: IssueTarget;
+    issue: BoardIssue | null;
+    action?: React.ReactNode;
+}) {
     return (
-        <div className="flex w-full items-center gap-2">
-            <TaskTargetBadge
-                kind={target.board}
-                columnTitle={target.board === "custom" ? target.columnTitle : undefined}
-            />
-            {issue && (
-                <div className="ml-auto flex items-center gap-2">
-                    <span className="font-mono text-[11px] text-neutral-500">#{issue.number}</span>
-                    <LLMIssueStatusTicker status={issue.status} size="sm" showIcon={false} />
-                </div>
-            )}
-        </div>
+        <section className="flex items-center justify-between w-full">
+            <div className="flex w-full items-center gap-2">
+                <TaskTargetBadge
+                    kind={target.board}
+                    columnTitle={target.board === "custom" ? target.columnTitle : undefined}
+                />
+                {issue && (
+                    <div className="ml-auto flex items-center gap-2">
+                        <span className="font-mono text-[11px] text-neutral-500">
+                            #{issue.number}
+                        </span>
+                        <LLMIssueStatusTicker status={issue.status} size="sm" showIcon={false} />
+                    </div>
+                )}
+            </div>
+            {action}
+        </section>
     );
 }
 
@@ -129,7 +161,7 @@ function LockedIssue({ target, issue }: { target: IssueTarget; issue: BoardIssue
     return (
         <IssueShell>
             <div className="flex flex-col items-start gap-y-3 ">
-                <IssueMeta target={target} issue={issue} />
+                <IssueTopper target={target} issue={issue} />
                 <DialogTitle className="text-left text-3xl font-semibold text-neutral-100">
                     {issue.title}
                 </DialogTitle>
@@ -194,7 +226,17 @@ function IssueChat() {
     );
 }
 
-function IssueForm({ target, issue }: { target: IssueTarget; issue: BoardIssue | null }) {
+function IssueForm({
+    target,
+    issue,
+    initialDescription,
+    initialTemplate,
+}: {
+    target: IssueTarget;
+    issue: BoardIssue | null;
+    initialDescription?: string;
+    initialTemplate?: PickableTemplate;
+}) {
     const { close } = useIssueDialog();
     const projectId = useActiveProject()?.id;
 
@@ -203,8 +245,8 @@ function IssueForm({ target, issue }: { target: IssueTarget; issue: BoardIssue |
 
     const [title, setTitle] = useState(issue?.title ?? "");
     const [summary, setSummary] = useState(issue?.summary ?? "");
-    const [description, setDescription] = useState(issue?.description ?? "");
-    const [descriptionEmpty, setDescriptionEmpty] = useState(!issue?.description);
+    const body = useIssueDescription(initialDescription, initialTemplate);
+
     const [priority, setPriority] = useState<Priority>(
         issue ? (KanbanMappers.NUMBER_TO_PRIORITY[issue.priority] ?? "normal") : "normal",
     );
@@ -225,7 +267,7 @@ function IssueForm({ target, issue }: { target: IssueTarget; issue: BoardIssue |
         title.trim().length > 0 &&
         Boolean(projectId) &&
         !pending &&
-        (isEdit || isCustom || (!descriptionEmpty && memberIds.length > 0));
+        (isEdit || isCustom || (body.ready && memberIds.length > 0));
 
     async function handleSubmit() {
         if (!canSubmit || !projectId) return;
@@ -236,7 +278,7 @@ function IssueForm({ target, issue }: { target: IssueTarget; issue: BoardIssue |
                     project_id: projectId,
                     title: title.trim(),
                     summary: summary.trim() || null,
-                    description,
+                    description: body.toHtml(),
                     priority: PRIORITY_TO_NUMBER[priority],
                     assignee_ids: memberIds,
                     tag_ids: tagIds,
@@ -250,7 +292,7 @@ function IssueForm({ target, issue }: { target: IssueTarget; issue: BoardIssue |
                     project_id: projectId,
                     title: title.trim(),
                     summary: summary.trim() || undefined,
-                    description,
+                    description: body.toHtml(),
                     priority: PRIORITY_TO_NUMBER[priority],
                     custom_column_id: target.board === "custom" ? target.columnId : undefined,
                     assignee_ids: memberIds,
@@ -270,7 +312,18 @@ function IssueForm({ target, issue }: { target: IssueTarget; issue: BoardIssue |
             <main className="flex h-full min-h-0 flex-row">
                 <div className="flex h-full min-h-0 flex-col justify-between *:px-6 *:py-4 w-[64%]">
                     <section className="flex flex-col items-start gap-y-3 ">
-                        <IssueMeta target={target} issue={issue} />
+                        <IssueTopper
+                            target={target}
+                            issue={issue}
+                            action={
+                                isEdit ? undefined : (
+                                    <TemplatePicker
+                                        projectId={projectId}
+                                        onPick={body.pickTemplate}
+                                    />
+                                )
+                            }
+                        />
                         <div className="w-full flex flex-col items-start ">
                             <Input
                                 autoFocus
@@ -326,22 +379,21 @@ function IssueForm({ target, issue }: { target: IssueTarget; issue: BoardIssue |
                         className="no-scrollbar flex-1 min-h-0 overflow-y-auto"
                     >
                         <IssueDescriptionEditor
-                            initialContent={issue?.description}
-                            onChange={(html, isEmpty) => {
-                                setDescription(html);
-                                setDescriptionEmpty(isEmpty);
-                            }}
+                            key={body.editorKey}
+                            initialContent={body.html}
+                            onChange={body.onEditorChange}
                         />
                     </section>
                     <section className="h-fit flex items-center justify-between gap-x-20">
                         <div className="flex items-start justify-center gap-x-1 text-xs text-white/70">
                             <LuInfo className="mt-0.75" size={10} />
                             <span className="">
-                                The more you briefly define the issue, our agent will more
-                                accurately be able to solve it.
+                                The more you tell the agent, the better it solves this. Detail costs
+                                you a minute and saves it a wrong guess.
                             </span>
                         </div>
                         <div className="flex items-center justify-end gap-x-2 ">
+                            {!isEdit && !isCustom && <BodyGate body={body} />}
                             <Button variant={"tertiary"} onClick={close}>
                                 Cancel
                             </Button>
@@ -360,6 +412,15 @@ function IssueForm({ target, issue }: { target: IssueTarget; issue: BoardIssue |
                 <IssueChat />
             </main>
         </IssueShell>
+    );
+}
+
+function BodyGate({ body }: { body: ReturnType<typeof useIssueDescription> }) {
+    if (body.prompts === 0) return null;
+    return (
+        <span className="shrink-0 text-xs text-white/45">
+            {body.prompts} field{body.prompts === 1 ? "" : "s"} left
+        </span>
     );
 }
 

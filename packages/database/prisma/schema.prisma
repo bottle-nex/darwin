@@ -103,6 +103,7 @@ model Project {
   setupSessions    SetupSession[]
   secrets          ProjectSecret[]
   tags             Tag[]
+  issueTemplates   IssueTemplate[]
   planMd           String?         @db.Text
   planStatus       PlanStatus      @default(Pending)
 
@@ -126,6 +127,27 @@ model Tag {
   updatedAt DateTime @updatedAt
 
   @@unique([projectId, name])
+}
+
+/// A pre-written issue body. Same rich-text HTML an issue description is stored in, because
+/// a template is exactly that — an issue somebody already wrote, saved and reused.
+model IssueTemplate {
+  id          String  @id @default(cuid())
+  name        String
+  summary     String?
+  description String  @db.Text
+  /// An `IconPick`: a named icon with a colour, or an emoji. Null falls back to a document glyph.
+  icon        Json?
+  isDefault   Boolean @default(false)
+
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([projectId, name])
+  @@index([projectId])
 }
 
 model Team {

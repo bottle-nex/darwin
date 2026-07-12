@@ -52,6 +52,8 @@ export default function HomeDisplay() {
             );
         case HomeTab.SettingsProject:
             return <SettingsDisplay section="project" />;
+        case HomeTab.SettingsTemplates:
+            return <SettingsDisplay section="templates" />;
         case HomeTab.SettingsEnv:
             return <SettingsDisplay section="env" />;
         case HomeTab.Inbox:

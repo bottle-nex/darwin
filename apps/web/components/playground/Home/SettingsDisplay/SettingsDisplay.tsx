@@ -2,6 +2,7 @@
 import { useParams } from "next/navigation";
 import { motion } from "motion/react";
 import { MdLock } from "react-icons/md";
+import { cn } from "@/lib/utils";
 import { useGetDashboard } from "@/hooks/dashboard/useGetDashboard";
 import { useGetProject } from "@/hooks/project/useGetProject";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
@@ -11,8 +12,9 @@ import ProjectSettingsGeneralSection from "./ProjectSettingsGeneralSection";
 import ProjectSettingsTeamSection from "./ProjectSettingsTeamSection";
 import ProjectSettingsMemberSection from "./ProjectSettingsMemberSection";
 import ProjectSettingsEnvSection from "./ProjectSettingsEnvSection";
+import IssueTemplatesDisplay from "./templates/IssueTemplatesDisplay";
 
-export type ProjectSettingsSection = "project" | "teams" | "members" | "env";
+export type ProjectSettingsSection = "project" | "teams" | "members" | "env" | "templates";
 
 /** Maps a Projects settings tab to its section, for the store-driven fallback. */
 const TAB_SECTION: Partial<Record<ProjectsTab, ProjectSettingsSection>> = {
@@ -81,6 +83,8 @@ export default function SettingsDisplay({ section }: { section?: ProjectSettings
                 return <ProjectSettingsMemberSection projectId={projectId} />;
             case "env":
                 return <ProjectSettingsEnvSection projectId={projectId} />;
+            case "templates":
+                return <IssueTemplatesDisplay projectId={projectId} />;
             case "project":
             default:
                 return (
@@ -101,7 +105,10 @@ export default function SettingsDisplay({ section }: { section?: ProjectSettings
                 initial={{ opacity: 0, y: 4 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.16, ease: [0.4, 0, 0.2, 1] }}
-                className="mx-auto w-full max-w-2xl"
+                className={cn(
+                    "mx-auto w-full",
+                    activeSection === "templates" ? "max-w-200" : "max-w-2xl",
+                )}
             >
                 {renderContent()}
             </motion.div>

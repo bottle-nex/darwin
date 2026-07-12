@@ -36,6 +36,14 @@ export const UPDATE_TAG_URL = (project_id: string, tagId: string) =>
 export const DELETE_TAG_URL = (project_id: string, tagId: string) =>
     `${PROJECT_URL}/${project_id}/tags/${tagId}`;
 
+// <--------------------- ISSUE TEMPLATE ROUTES --------------------->
+export const LIST_TEMPLATES_URL = (project_id: string) => `${PROJECT_URL}/${project_id}/templates`;
+export const CREATE_TEMPLATE_URL = (project_id: string) => `${PROJECT_URL}/${project_id}/templates`;
+export const UPDATE_TEMPLATE_URL = (project_id: string, templateId: string) =>
+    `${PROJECT_URL}/${project_id}/templates/${templateId}`;
+export const DELETE_TEMPLATE_URL = (project_id: string, templateId: string) =>
+    `${PROJECT_URL}/${project_id}/templates/${templateId}`;
+
 // <--------------------- TEAM ROUTES --------------------->
 export const CREATE_TEAM = API_URL + "/teams/create";
 export const GET_TEAM_MEMBERS = (teamId: string) => `${API_URL}/teams/${teamId}/members`;

@@ -12,6 +12,10 @@ import list_tags_controller from "../../controllers/project/controller.list_tags
 import create_tag_controller from "../../controllers/project/controller.create_tag";
 import update_tag_controller from "../../controllers/project/controller.update_tag";
 import delete_tag_controller from "../../controllers/project/controller.delete_tag";
+import list_templates_controller from "../../controllers/project/controller.list_templates";
+import create_template_controller from "../../controllers/project/controller.create_template";
+import update_template_controller from "../../controllers/project/controller.update_template";
+import delete_template_controller from "../../controllers/project/controller.delete_template";
 
 const project_router: Router = Router();
 
@@ -27,5 +31,17 @@ project_router.get("/:project_id/tags", require_auth, list_tags_controller);
 project_router.post("/:project_id/tags", require_auth, create_tag_controller);
 project_router.patch("/:project_id/tags/:tag_id", require_auth, update_tag_controller);
 project_router.delete("/:project_id/tags/:tag_id", require_auth, delete_tag_controller);
+project_router.get("/:project_id/templates", require_auth, list_templates_controller);
+project_router.post("/:project_id/templates", require_auth, create_template_controller);
+project_router.patch(
+    "/:project_id/templates/:template_id",
+    require_auth,
+    update_template_controller,
+);
+project_router.delete(
+    "/:project_id/templates/:template_id",
+    require_auth,
+    delete_template_controller,
+);
 
 export default project_router;

@@ -15,9 +15,10 @@ export enum HomeTab {
     InProgress = "in-progress",
     Drafts = "drafts",
     TeamDetail = "team-detail",
-    // Settings sections — selecting either swaps the Home sidebar to its
+    // Settings sections — selecting any of these swaps the Home sidebar to its
     // settings face (see `HomeSidebar` / `HomeSettingsNav`).
     SettingsProject = "settings-project",
+    SettingsTemplates = "settings-templates",
     SettingsEnv = "settings-env",
 }
 

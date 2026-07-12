@@ -8,7 +8,11 @@ import PrimaryNavSection from "./PrimaryNavSection";
 import HomeSettingsNav from "./HomeSettingsNav";
 import TeamsSection from "../../Projects/ProjectsSidebar/TeamsSection";
 
-const SETTINGS_TABS: string[] = [HomeTab.SettingsProject, HomeTab.SettingsEnv];
+const SETTINGS_TABS: string[] = [
+    HomeTab.SettingsProject,
+    HomeTab.SettingsTemplates,
+    HomeTab.SettingsEnv,
+];
 
 /**
  * Home sidebar. Two faces, chosen by the committed Home tab: the main nav (with

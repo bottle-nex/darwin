@@ -24,6 +24,7 @@ const Action = {
         assign_issue: "assign_issue",
         manage_columns: "manage_columns",
         manage_tags: "manage_tags",
+        manage_templates: "manage_templates",
         trigger_runner: "trigger_runner",
         cancel_runner: "cancel_runner",
         view_runner_logs: "view_runner_logs",
