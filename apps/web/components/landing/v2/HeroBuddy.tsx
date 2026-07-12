@@ -9,7 +9,13 @@ const CAP = "#6C55DE";
 
 const CYCLE_MS = 32000;
 
-export default function HeroBuddy({ className }: { className?: string }) {
+export default function HeroBuddy({
+    className,
+    move = true,
+}: {
+    className?: string;
+    move?: boolean;
+}) {
     const [wearsCap, setWearsCap] = useState(true);
     useEffect(() => {
         const id = setInterval(() => setWearsCap(Math.random() < 0.5), CYCLE_MS);
@@ -19,7 +25,12 @@ export default function HeroBuddy({ className }: { className?: string }) {
     return (
         <span
             aria-hidden
-            className={cn("buddy inline-flex", !wearsCap && "buddy-capless", className)}
+            className={cn(
+                "buddy inline-flex",
+                !move && "buddy-anchored",
+                !wearsCap && "buddy-capless",
+                className,
+            )}
         >
             <svg viewBox="0 0 16 11" shapeRendering="crispEdges" className="buddy-sprite">
                 <g className="buddy-figure">

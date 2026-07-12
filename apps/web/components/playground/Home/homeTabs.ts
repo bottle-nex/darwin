@@ -6,6 +6,7 @@
 export enum HomeTab {
     Inbox = "inbox",
     Kanban = "kanban",
+    Overview = "overview",
     Gantt = "gantt",
     Tags = "tags",
     Mentions = "mentions",

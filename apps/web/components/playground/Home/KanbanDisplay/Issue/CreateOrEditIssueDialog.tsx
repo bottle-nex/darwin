@@ -30,7 +30,6 @@ import { LuInfo, LuSendHorizontal } from "react-icons/lu";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { IoIosSend } from "react-icons/io";
 
-
 const PRIORITY_OPTIONS: CapsuleOption[] = [
     { value: "urgent", label: "Urgent", dotClassName: "bg-rose-500" },
     { value: "high", label: "High", dotClassName: "bg-amber-400" },
@@ -185,7 +184,7 @@ function IssueChat() {
                     placeholder="Leave a comment..."
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
-                    className="h-9"
+                    className="h-9 placeholder:text-[13px]!"
                 />
                 <Button size="icon" disabled={!message.trim()} aria-label="Send comment">
                     <IoIosSend />
@@ -280,7 +279,7 @@ function IssueForm({ target, issue }: { target: IssueTarget; issue: BoardIssue |
                                 maxLength={80}
                                 value={title}
                                 onChange={(e) => setTitle(e.target.value)}
-                                className="text-3xl ring-0 border-0 font-semibold h-8 p-0 bg-transparent hover:bg-transparent!"
+                                className="text-3xl ring-0 border-0 font-semibold h-8 p-0 bg-transparent hover:bg-transparent! rounded-none"
                             />
                             <Input
                                 variant={"ghost"}
@@ -288,7 +287,7 @@ function IssueForm({ target, issue }: { target: IssueTarget; issue: BoardIssue |
                                 maxLength={255}
                                 value={summary}
                                 onChange={(e) => setSummary(e.target.value)}
-                                className="h-7 p-0 bg-transparent hover:bg-transparent!"
+                                className="h-7 p-0 bg-transparent hover:bg-transparent! rounded-none"
                             />
                         </div>
                         <div className="flex items-center gap-x-2.5">
@@ -352,8 +351,8 @@ function IssueForm({ target, issue }: { target: IssueTarget; issue: BoardIssue |
                                         ? "Saving..."
                                         : "Creating..."
                                     : isEdit
-                                        ? "Save"
-                                        : "Create Issue"}
+                                      ? "Save"
+                                      : "Create Issue"}
                             </Button>
                         </div>
                     </section>

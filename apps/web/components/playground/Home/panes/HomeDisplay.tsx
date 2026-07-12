@@ -10,6 +10,7 @@ import TeamDetailDisplay from "../../Projects/panes/TeamDetailDisplay";
 import GanttDisplay from "../GanttDisplay/GanttDisplay";
 import SettingsDisplay from "../SettingsDisplay/SettingsDisplay";
 import KanbanDisplay from "../KanbanDisplay/KanbanDisplay";
+import OverviewDisplay from "../OverviewDisplay/OverviewDisplay";
 import ReviewsDisplay from "./ReviewsDisplay";
 import MentionsDisplay from "./MentionsDisplay";
 import AssignedToMeDisplay from "./AssignedToMeDisplay";
@@ -19,6 +20,12 @@ export default function HomeDisplay() {
     const tab = usePlaygroundNavStore((s) => s.tabBySurface[RailSurface.Home]);
 
     switch (tab) {
+        case HomeTab.Overview:
+            return (
+                <div className="flex min-h-0 flex-1 flex-col">
+                    <OverviewDisplay />
+                </div>
+            );
         case HomeTab.Tags:
             return (
                 <div className="flex min-h-0 flex-1 flex-col">

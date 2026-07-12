@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Poppins } from "next/font/google";
+import { Geist_Mono, Poppins } from "next/font/google";
 import "./globals.css";
 import LenisProvider from "@/providers/LenisProvider";
 import QueryProvider from "@/providers/QueryProvider";
@@ -12,6 +12,11 @@ const poppins = Poppins({
     variable: "--font-poppins",
     subsets: ["latin"],
     weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
+});
+
+const geistMono = Geist_Mono({
+    variable: "--font-geist-mono",
+    subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
@@ -30,7 +35,7 @@ export default async function RootLayout({
         <html
             lang="en"
             suppressHydrationWarning
-            className={`${poppins.variable} h-full antialiased`}
+            className={`${poppins.variable} ${geistMono.variable} h-full antialiased`}
         >
             <LenisProvider>
                 <body className="min-h-full flex flex-col">
