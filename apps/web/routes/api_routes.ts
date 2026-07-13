@@ -76,3 +76,7 @@ export const ACCEPT_INVITE_URL = INVITATIONS_URL + "/accept";
 export const REJECT_INVITE_URL = INVITATIONS_URL + "/reject";
 export const INVITE_MEMBER_URL = INVITATIONS_URL + "/invite";
 export const INVITES_PREVIEW_URL = (token: string) => `${INVITATIONS_URL}/${token}`;
+
+// <--------------------- CHAT ROUTES --------------------->
+export const CHATS_URL = API_URL + "/chats";
+export const CHAT_URL = (issue_id: string) => `${CHATS_URL}/${issue_id}`;

@@ -117,3 +117,16 @@ export interface Issue {
     creator: User;
     assignees: User[];
 }
+
+export interface Chat {
+    id: string;
+    issueId: string;
+    message: string;
+    isDeleted: boolean;
+
+    senderId: string | null;
+    sender: User | null;
+
+    createdAt: Date;
+    updatedAt: Date;
+}

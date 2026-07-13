@@ -1,4 +1,4 @@
-import type { Issue } from "../prisma/schemas.prisma";
+import type { Chat, Issue } from "../prisma/schemas.prisma";
 
 // Client -> Server
 export enum InboundSocketMessageType {
@@ -14,10 +14,17 @@ export type InboundSocketMessage = {
 // Server -> Client
 export enum OutboundSocketMessageType {
     ISSUE_CREATED = "ISSUE_CREATED",
+    CHAT_CREATED = "CHAT_CREATED",
 }
 
-export type OutboundSocketMessage = {
-    type: OutboundSocketMessageType.ISSUE_CREATED;
-    projectId: string;
-    payload: Issue;
-};
+export type OutboundSocketMessage =
+    | {
+          type: OutboundSocketMessageType.ISSUE_CREATED;
+          projectId: string;
+          payload: Issue;
+      }
+    | {
+          type: OutboundSocketMessageType.CHAT_CREATED;
+          projectId: string;
+          payload: Chat;
+      };

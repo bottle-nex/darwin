@@ -14,6 +14,7 @@ import { useGetDashboard } from "@/hooks/dashboard/useGetDashboard";
 import { useGetProject } from "@/hooks/project/useGetProject";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
 import { usePlaygroundUrlSync } from "./usePlaygroundUrlSync";
+import { useSubscribeEventHandlers } from "@/hooks/socket/useSubscribeEventHandlers";
 
 /**
  * Shared playground workspace shell rendered by both the org route
@@ -49,6 +50,10 @@ export default function PlaygroundShell() {
         ? dashboard?.projects.find((p) => p.slug === projectSlug)
         : undefined;
     const { data: project } = useGetProject(activeProject?.id);
+
+    // open one realtime connection for the active project and
+    // register the inbound handlers.
+    useSubscribeEventHandlers(activeProject?.id);
 
     // Keep the active surface/tab (and open team) in the URL so a refresh restores it.
     usePlaygroundUrlSync(project?.teams);
