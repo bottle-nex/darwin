@@ -94,7 +94,7 @@ export default function CreateTemplateDisplay({
                 e.preventDefault();
                 handleSave();
             }}
-            className="flex flex-col gap-6"
+            className="flex flex-col gap-6 h-full"
         >
             <nav>
                 <button
@@ -177,7 +177,7 @@ export default function CreateTemplateDisplay({
                 </article>
             </section>
 
-            <footer className="flex items-center justify-between gap-4 border-t border-white/6 pt-4 pb-2">
+            <footer className="mt-auto flex items-center justify-between gap-4 border-t border-white/6 pt-4 pb-2">
                 <label className="flex cursor-pointer items-center gap-2">
                     <input
                         type="checkbox"

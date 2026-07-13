@@ -2,7 +2,6 @@
 import { useParams } from "next/navigation";
 import { motion } from "motion/react";
 import { MdLock } from "react-icons/md";
-import { cn } from "@/lib/utils";
 import { useGetDashboard } from "@/hooks/dashboard/useGetDashboard";
 import { useGetProject } from "@/hooks/project/useGetProject";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
@@ -105,10 +104,7 @@ export default function SettingsDisplay({ section }: { section?: ProjectSettings
                 initial={{ opacity: 0, y: 4 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.16, ease: [0.4, 0, 0.2, 1] }}
-                className={cn(
-                    "mx-auto w-full",
-                    activeSection === "templates" ? "max-w-200" : "max-w-2xl",
-                )}
+                className="mx-auto h-full w-full max-w-200"
             >
                 {renderContent()}
             </motion.div>
