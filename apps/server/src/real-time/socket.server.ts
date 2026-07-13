@@ -55,9 +55,8 @@ export default class SocketServer {
             try {
                 const message = JSON.parse(raw.toString()) as InboundSocketMessage;
                 switch (message.type) {
-                    case InboundSocketMessageType.ISSUE_CREATE:
-                        await this.handle_issue_create(project_id, user, message.payload);
-                        break;
+                    default: 
+                        return;
                 }
             } catch (error) {
                 console.error("Socket message handler error:", error);
@@ -70,71 +69,6 @@ export default class SocketServer {
         ws.on("error", (error: Error) => {
             console.error(`Connection error: ${error.message}`);
         });
-    }
-
-    private async handle_issue_create(
-        project_id: string,
-        user: AuthUser,
-        payload: { title: string; description: string; assigneeIds?: string[] },
-    ) {
-        const role = await Access.project(user.id, project_id);
-        if (!role || !Permissions.project(role, Action.project.create_issue)) {
-            return;
-        }
-
-        let issue: { id: string; status: IssueStatus } | undefined;
-        for (let attempt = 0; attempt < 5; attempt++) {
-            try {
-                issue = await prisma.$transaction(async (tx) => {
-                    const last_issue = await tx.issue.findFirst({
-                        where: { projectId: project_id },
-                        orderBy: { number: "desc" },
-                        select: { number: true },
-                    });
-                    return tx.issue.create({
-                        data: {
-                            title: payload.title,
-                            description: payload.description,
-                            projectId: project_id,
-                            createdById: user.id,
-                            status: IssueStatus.Todo,
-                            priority: 3,
-                            number: (last_issue?.number ?? 0) + 1,
-                        },
-                        select: { id: true, status: true },
-                    });
-                });
-                break;
-            } catch (error) {
-                if (
-                    error instanceof Prisma.PrismaClientKnownRequestError &&
-                    error.code === "P2002"
-                ) {
-                    continue;
-                }
-                throw error;
-            }
-        }
-
-        if (!issue) return;
-
-        const full_issue = await prisma.issue.findUniqueOrThrow({
-            where: { id: issue.id },
-            include: { creator: true, assignees: true },
-        });
-
-        const channel_name = server_services.publisher.get_channel_name(project_id);
-        const publishing_body = {
-            type: OutboundSocketMessageType.ISSUE_CREATED,
-            projectId: project_id,
-            payload: full_issue,
-        };
-        await server_services.publisher.publish_message(
-            channel_name,
-            JSON.stringify(publishing_body),
-        );
-
-        await server_services.queue.enqueue_project(project_id);
     }
 
     private broadcast_message(project_id: string, message: string) {
