@@ -36,7 +36,7 @@ export default function IssueChat({ issueId }: { issueId?: string }) {
     }
 
     return (
-        <section className="m-2.5 flex min-h-0 flex-1 flex-col rounded-[13px] bg-white/3 *:px-4 *:py-3">
+        <section className="m-2.5 flex min-h-0 min-w-0 flex-1 flex-col rounded-[13px] bg-white/3 *:px-4 *:py-3">
             <header className="text-sm font-medium text-neutral-100 flex items-center gap-x-3">
                 <BsChatRightTextFill />
                 <span>Comments and activity</span>
@@ -44,10 +44,10 @@ export default function IssueChat({ issueId }: { issueId?: string }) {
             <div
                 ref={scrollRef}
                 data-lenis-prevent
-                className="no-scrollbar flex-1 min-h-0 overflow-y-auto text-[13px] text-neutral-500"
+                className="no-scrollbar flex-1 min-h-0 min-w-0 overflow-y-auto text-[13px] text-neutral-500"
             >
                 {chats && chats.length > 0 ? (
-                    <ul className="flex flex-col">
+                    <ul className="flex min-w-0 flex-col">
                         {chats.map((chat, i) => (
                             <ChatMessage
                                 key={chat.id}
@@ -76,13 +76,14 @@ export default function IssueChat({ issueId }: { issueId?: string }) {
                         }
                     }}
                     disabled={!issueId}
-                    className="h-9 placeholder:text-[13px]!"
+                    className="h-9 min-w-0 flex-1 placeholder:text-[13px]!"
                 />
                 <Button
                     size="icon"
                     onClick={handleSend}
                     disabled={!issueId || !message.trim() || createChat.isPending}
                     aria-label="Send comment"
+                    className="shrink-0"
                 >
                     <IoIosSend />
                 </Button>

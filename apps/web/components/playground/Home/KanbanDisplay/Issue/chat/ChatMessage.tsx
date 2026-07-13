@@ -52,37 +52,43 @@ export default function ChatMessage({
                         src={chat.sender?.image ?? undefined}
                         tone={toneFor(chat.senderId ?? name)}
                         size="md"
-                        className="rounded-full"
+                        className="translate-y-1 rounded-full"
                     />
                 ) : (
                     <span className="size-5 shrink-0" aria-hidden />
                 ))}
-            <div className={cn("flex max-w-[80%] flex-col", isMine ? "items-end" : "items-start")}>
+            <div
+                className={cn(
+                    "flex min-w-0 max-w-[80%] flex-col",
+                    isMine ? "items-end" : "items-start",
+                )}
+            >
                 <div
                     className={cn(
-                        "relative flex flex-col rounded-[10px] px-3 py-2 text-[13px] leading-snug wrap-break-word",
-                        isMine
-                            ? "bg-indigo-500/85 text-white"
-                            : "rounded-bl-xs bg-white/6 text-neutral-200",
+                        "relative min-w-0 rounded-[10px] px-2.5 py-1.5 text-[13px] leading-snug wrap-anywhere",
+                        isMine ? "bg-indigo-500/85 text-white" : "bg-white/6 text-neutral-200",
+                        // Only the last bubble of a run gets the pointed tail corner.
+                        endsGroup && (isMine ? "rounded-br-xs" : "rounded-bl-xs"),
                     )}
                 >
                     {startsGroup && !isMine && (
                         <span
                             className={cn(
-                                "mb-0.5 text-[11px] font-medium",
+                                "mb-0.5 block text-[10.5px] font-medium",
                                 NAME_TONE_TEXT[toneFor(chat.senderId ?? name)],
                             )}
                         >
                             {name}
                         </span>
                     )}
-                    {/* Reserve last-line space so the time sits on the same row for a
-                        short message and drops to bottom-right when the text wraps. */}
-                    <span className="pr-12">{chat.message}</span>
+                    {chat.message}
+                    {/* Invisible spacer floated at the end so only the last line leaves
+                        room for the absolutely-placed time; earlier lines use full width. */}
+                    <span aria-hidden className="pointer-events-none float-right h-4 w-11" />
                     <span
                         className={cn(
-                            "absolute bottom-2 right-3 text-[10px] leading-none",
-                            isMine ? "text-white/60" : "text-neutral-500",
+                            "absolute bottom-1.5 right-2.5 text-[9px] leading-none",
+                            isMine ? "text-white/80" : "text-neutral-400",
                         )}
                     >
                         {formatChatTime(chat.createdAt)}
