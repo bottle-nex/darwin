@@ -13,6 +13,7 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog";
 import { useIssueDialog } from "@/components/playground/issue/useIssueDialog";
+import { useActiveProject } from "@/hooks/useActiveProject";
 import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
 import { CustomKanbanMappers } from "@/lib/kanban/CustomKanbanMappers";
 import { CARD_SHELL } from "../cardStyles";
@@ -28,7 +29,6 @@ const MAX_AVATARS = 3;
 type CustomKanbanCardProps = {
     card: CustomCard;
     onDelete?: () => void;
-    projectId?: string;
     onAssign?: (userId: string) => void;
     onUnassign?: (userId: string) => void;
 };
@@ -36,10 +36,10 @@ type CustomKanbanCardProps = {
 export default function CustomKanbanCard({
     card,
     onDelete,
-    projectId,
     onAssign,
     onUnassign,
 }: CustomKanbanCardProps) {
+    const projectId = useActiveProject()?.id;
     const preview = card.description ? CustomKanbanMappers.stripHtml(card.description) : "";
     const shownAssignees = card.assignees.slice(0, MAX_AVATARS);
     const overflowCount = card.assignees.length - shownAssignees.length;

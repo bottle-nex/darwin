@@ -1,11 +1,10 @@
 "use client";
+import { useCustomKanbanStore } from "@/store/kanban/useCustomKanbanStore";
 import AddListForm from "./AddListForm";
 import CustomKanbanColumn from "./CustomKanbanColumn";
 import type { CustomKanbanApi } from "@/hooks/kanban/useCustomKanban";
 
 export default function CustomKanbanBoard({
-    projectId,
-    columns,
     addColumn,
     removeColumn,
     renameColumn,
@@ -13,6 +12,8 @@ export default function CustomKanbanBoard({
     assignMember,
     unassignMember,
 }: CustomKanbanApi) {
+    const columns = useCustomKanbanStore((s) => s.columns);
+
     return (
         <>
             {columns.map((column) => (
@@ -22,7 +23,6 @@ export default function CustomKanbanBoard({
                     onDelete={() => removeColumn(column.id)}
                     onRename={(label) => renameColumn(column.id, label)}
                     onDeleteCard={removeCard}
-                    projectId={projectId}
                     onAssign={assignMember}
                     onUnassign={unassignMember}
                 />

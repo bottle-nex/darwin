@@ -1,60 +1,44 @@
 "use client";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect } from "react";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { useBoard } from "@/hooks/issues/useBoard";
-import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
-import type { BoardView, KanbanView } from "@/types/kanban";
-import { useKanbanBoard } from "./useKanbanBoard";
-import { useKanbanOptions } from "./useKanbanOptions";
+import { useKanbanBoardStore } from "@/store/kanban/useKanbanBoardStore";
+import { useCustomKanbanStore } from "@/store/kanban/useCustomKanbanStore";
+import { useKanbanOptionsStore } from "@/store/kanban/useKanbanOptionsStore";
 import { useCustomKanban } from "./useCustomKanban";
 
 /**
- * All the data, board hooks, and view state the Kanban pane needs — kept out of
- * the component so `KanbanDisplay` stays a thin layout. Resolves the active
- * project from the URL, wires the two boards together (a custom card can be filed
- * onto the LLM board and back), and exposes the filtered board plus the toolbar's
- * view toggles.
+ * Wires the Kanban pane's data sources together. Resolves the active project,
+ * fetches the board, and seeds the board/custom-column stores from it whenever
+ * fresh data arrives. Board/toolbar state itself lives in Zustand stores
+ * (`useKanbanBoardStore`, `useKanbanOptionsStore`, `useCustomKanbanStore`) —
+ * components read those directly instead of through this hook. All that's left
+ * here is the Custom Kanban's drag-and-drop orchestration (`useCustomKanban`,
+ * which needs React Query mutations and dnd-kit's sensors, so it can't be a
+ * plain store) and the cross-store guard that clears a stale focus filter.
  */
 export function useKanbanPane() {
     const activeProject = useActiveProject();
-
     const { data: board } = useBoard(activeProject?.id);
-    const kanban = useKanbanBoard({ board, projectName: activeProject?.name ?? "" });
-    const options = useKanbanOptions();
-    const custom = useCustomKanban({
-        projectId: activeProject?.id,
-        board,
-        onSendToBoard: kanban.addIssue,
-        getIssue: kanban.findIssue,
-        removeIssue: kanban.removeIssue,
-    });
+    const projectName = activeProject?.name ?? "";
 
-    // Which board(s) to show, and whether the LLM board is a grid or a list.
-    const [boardView, setBoardView] = useState<BoardView>("default");
-    const [kanbanView, setKanbanView] = useState<KanbanView>("board");
+    useEffect(() => {
+        if (!board) return;
+        useKanbanBoardStore.getState().seed(board, projectName);
+        useCustomKanbanStore.getState().seed(board);
+    }, [board, projectName]);
 
-    // Search + tag filters applied to the LLM board.
-    const filteredBoard = useMemo(
-        () => KanbanBoard.filterBoard(kanban.board, options.search, options.selectedTagIds),
-        [kanban.board, options.search, options.selectedTagIds],
-    );
+    const custom = useCustomKanban({ projectId: activeProject?.id });
 
     // If the focused custom column was deleted, drop the focus so the board returns.
-    const { filter, setFilter } = options;
+    const filter = useKanbanOptionsStore((s) => s.filter);
+    const setFilter = useKanbanOptionsStore((s) => s.setFilter);
+    const columns = useCustomKanbanStore((s) => s.columns);
     useEffect(() => {
-        if (filter.kind === "custom" && !custom.columns.some((c) => c.id === filter.columnId)) {
+        if (filter.kind === "custom" && !columns.some((c) => c.id === filter.columnId)) {
             setFilter({ kind: "default" });
         }
-    }, [filter, custom.columns, setFilter]);
+    }, [filter, columns, setFilter]);
 
-    return {
-        projectId: activeProject?.id,
-        options,
-        custom,
-        board: filteredBoard,
-        boardView,
-        setBoardView,
-        kanbanView,
-        setKanbanView,
-    };
+    return { custom };
 }

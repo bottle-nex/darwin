@@ -7,22 +7,32 @@ import GanttGrid from "./GanttGrid";
 import GanttSidebar from "./GanttSidebar";
 import GanttNowLine from "./GanttNowLine";
 import GanttIssueCard from "./GanttIssueCard";
-import { useGanttBoard } from "@/store/gantt/useGanttBoard";
+import { useGanttBoardStore } from "@/store/gantt/useGanttBoardStore";
 import { GanttTimeline } from "@/lib/gantt/GanttTimeline";
 
 /**
  * The per-project Gantt: a read-only live preview of the project's three workers
- * solving issues in parallel. Fills the Projects-surface pane; `useGanttBoard`
- * holds state, this component owns layout and scroll-to-now. The `dark` class
- * resolves the theme tokens to dark so it sits in the playground.
+ * solving issues in parallel. Fills the Projects-surface pane; `useGanttBoardStore`
+ * holds state, this component drives the clock tick and owns layout/scroll-to-now.
+ * The `dark` class resolves the theme tokens to dark so it sits in the playground.
  */
 export default function GanttBoard() {
-    const { selectedDate, setSelectedDate, isToday, nowMinute, issues, stepDay } = useGanttBoard();
+    const selectedDate = useGanttBoardStore((s) => s.selectedDate);
+    const nowMinute = useGanttBoardStore((s) => s.nowMinute);
+    const issues = useGanttBoardStore((s) => s.issues);
+    const setNowMinute = useGanttBoardStore((s) => s.setNowMinute);
     const trackRef = useRef<HTMLDivElement>(null);
+
+    const isToday = GanttTimeline.toDateKey(selectedDate) === GanttTimeline.toDateKey(new Date());
 
     const pausedWorkerIds = new Set(
         issues.filter((issue) => issue.pausedAt != null).map((issue) => issue.workerId),
     );
+
+    useEffect(() => {
+        const id = setInterval(() => setNowMinute(GanttTimeline.nowMinuteOfDay()), 1000);
+        return () => clearInterval(id);
+    }, [setNowMinute]);
 
     // Centre the scroll near "now"; past days have no live marker, so default to 09:00.
     useEffect(() => {

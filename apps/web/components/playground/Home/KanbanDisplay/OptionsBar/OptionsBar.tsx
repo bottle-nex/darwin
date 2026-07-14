@@ -17,8 +17,10 @@ import { DropdownMenu } from "radix-ui";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { TooltipComponent } from "@/components/ui/tooltip-component";
-import type { KanbanOptions } from "@/hooks/kanban/useKanbanOptions";
-import type { BoardView, KanbanView } from "@/types/kanban";
+import { useKanbanOptionsStore } from "@/store/kanban/useKanbanOptionsStore";
+import { useCustomKanbanStore } from "@/store/kanban/useCustomKanbanStore";
+import { useCreateOrEditIssueStore } from "@/store/issues/useCreateOrEditIssueStore";
+import type { BoardView } from "@/types/kanban";
 import OptionButton from "./KanbanOptionPanels/OptionButton";
 import FilterPanel from "./KanbanOptionPanels/FilterPanel";
 import TagPanel from "./KanbanOptionPanels/TagPanel";
@@ -37,28 +39,8 @@ const BOARD_VIEWS: { id: BoardView; label: string; icon: IconType }[] = [
     { id: "llm", label: "LLM Kanban", icon: MdAutoAwesome },
 ];
 
-type OptionsBarProps = {
-    options: KanbanOptions;
-    /** Custom columns, listed under the filter's "custom" group. */
-    customColumns: { id: string; title: string }[];
-    boardView: BoardView;
-    onBoardViewChange: (view: BoardView) => void;
-    kanbanView: KanbanView;
-    onKanbanViewChange: (view: KanbanView) => void;
-    /** Open the create-task modal (toolbar "Add Task" / "New issue"). */
-    onAddTask: () => void;
-};
-
 /** Board toolbar: the board switcher, search, tags, filters, Views, and +Task. */
-export default function OptionsBar({
-    options,
-    customColumns,
-    boardView,
-    onBoardViewChange,
-    kanbanView,
-    onKanbanViewChange,
-    onAddTask,
-}: OptionsBarProps) {
+export default function OptionsBar() {
     const {
         searchOpen,
         search,
@@ -71,7 +53,14 @@ export default function OptionsBar({
         clearTags,
         filter,
         setFilter,
-    } = options;
+        boardView,
+        setBoardView,
+        kanbanView,
+        setKanbanView,
+    } = useKanbanOptionsStore();
+    const customColumns = useCustomKanbanStore((s) => s.columns);
+    const openCreate = useCreateOrEditIssueStore((s) => s.openCreate);
+    const onAddTask = () => openCreate({ board: "llm" });
 
     return (
         <div className="flex h-10 shrink-0 items-center justify-between gap-2 border-b border-white/5 px-3">
@@ -81,7 +70,7 @@ export default function OptionsBar({
                         <button
                             key={v.id}
                             type="button"
-                            onClick={() => onBoardViewChange(v.id)}
+                            onClick={() => setBoardView(v.id)}
                             className={cn(
                                 "flex h-7 cursor-pointer items-center gap-1.5 rounded-md px-2 text-[12px] font-medium transition-colors",
                                 boardView === v.id
@@ -121,7 +110,7 @@ export default function OptionsBar({
                 <TooltipComponent content="Share" side="bottom">
                     <OptionButton label="Share" icon={MdShare} />
                 </TooltipComponent>
-                <ViewsPanel value={kanbanView} onChange={onKanbanViewChange} />
+                <ViewsPanel value={kanbanView} onChange={setKanbanView} />
                 <div className="mx-1 h-4 w-px bg-white/8" />
                 <TooltipComponent content="Settings" side="bottom">
                     <OptionButton label="Settings" icon={MdSettings} />

@@ -14,7 +14,7 @@ import { DropdownMenu } from "radix-ui";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import OptionButton from "@/components/playground/Home/KanbanDisplay/OptionsBar/KanbanOptionPanels/OptionButton";
-import type { TagSort, TagsOptions } from "./useTagsOptions";
+import { useTagsOptionsStore, type TagSort } from "@/store/tags/useTagsOptionsStore";
 
 const SORTS: { id: TagSort; label: string; icon: typeof MdSortByAlpha }[] = [
     { id: "name", label: "Name (A–Z)", icon: MdSortByAlpha },
@@ -22,7 +22,6 @@ const SORTS: { id: TagSort; label: string; icon: typeof MdSortByAlpha }[] = [
 ];
 
 type TagsOptionsBarProps = {
-    options: TagsOptions;
     /** Total number of tags in the project (before search). */
     count: number;
     /** Open the create-tag dialog. */
@@ -30,8 +29,9 @@ type TagsOptionsBarProps = {
 };
 
 /** Tags toolbar: count, slide-in search, sort menu, and the New tag button. */
-export default function TagsOptionsBar({ options, count, onCreate }: TagsOptionsBarProps) {
-    const { searchOpen, search, setSearch, openSearch, closeSearch, sort, setSort } = options;
+export default function TagsOptionsBar({ count, onCreate }: TagsOptionsBarProps) {
+    const { searchOpen, search, setSearch, openSearch, closeSearch, sort, setSort } =
+        useTagsOptionsStore();
 
     return (
         <div className="flex h-10 shrink-0 items-center justify-between gap-2 border-b border-white/5 px-3">

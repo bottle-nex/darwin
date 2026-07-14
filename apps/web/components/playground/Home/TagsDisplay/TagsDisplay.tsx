@@ -19,10 +19,10 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog";
 import type { Tag } from "@/types/tags";
+import { useTagsOptionsStore } from "@/store/tags/useTagsOptionsStore";
 import TagDisplay from "./TagDisplay";
 import TagFormDialog from "./TagFormDialog";
 import TagsOptionsBar from "./TagsOptionsBar";
-import { useTagsOptions } from "./useTagsOptions";
 
 export default function TagsDisplay() {
     const { orgSlug, projectSlug } = useParams<{ orgSlug: string; projectSlug?: string }>();
@@ -31,23 +31,24 @@ export default function TagsDisplay() {
 
     const { data: tags, isLoading, isError } = useListTags(activeProject?.id);
     const deleteTag = useDeleteTag();
-    const options = useTagsOptions();
+    const search = useTagsOptionsStore((s) => s.search);
+    const sort = useTagsOptionsStore((s) => s.sort);
 
     const [formOpen, setFormOpen] = useState(false);
     const [editingTag, setEditingTag] = useState<Tag | undefined>(undefined);
     const [deleteTarget, setDeleteTarget] = useState<Tag | null>(null);
 
     const visibleTags = useMemo(() => {
-        const query = options.search.trim().toLowerCase();
+        const query = search.trim().toLowerCase();
         const list = (tags ?? []).filter((tag) =>
             query ? tag.name.toLowerCase().includes(query) : true,
         );
         return list.sort((a, b) =>
-            options.sort === "name"
+            sort === "name"
                 ? a.name.localeCompare(b.name)
                 : new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
         );
-    }, [tags, options.search, options.sort]);
+    }, [tags, search, sort]);
 
     function openCreate() {
         setEditingTag(undefined);
@@ -75,7 +76,7 @@ export default function TagsDisplay() {
 
     return (
         <div className="flex min-h-0 flex-1 flex-col">
-            <TagsOptionsBar options={options} count={tags?.length ?? 0} onCreate={openCreate} />
+            <TagsOptionsBar count={tags?.length ?? 0} onCreate={openCreate} />
 
             <div
                 data-lenis-prevent

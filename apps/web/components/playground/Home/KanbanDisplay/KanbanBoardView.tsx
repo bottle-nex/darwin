@@ -24,6 +24,7 @@ type KanbanBoardViewProps = {
 export default function KanbanBoardView({ board, leading, startAligned }: KanbanBoardViewProps) {
     return (
         <div
+            data-kanban-scroll-row
             className={cn(
                 "flex min-h-0 flex-1 gap-4 overflow-x-auto px-3 pt-3 pb-3",
                 startAligned && "items-start",

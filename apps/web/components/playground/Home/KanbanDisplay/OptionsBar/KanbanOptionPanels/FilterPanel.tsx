@@ -9,7 +9,7 @@ import {
 } from "react-icons/md";
 import { DropdownMenu } from "radix-ui";
 import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
-import type { FilterValue } from "@/hooks/kanban/useKanbanOptions";
+import type { FilterValue } from "@/store/kanban/useKanbanOptionsStore";
 import OptionButton from "./OptionButton";
 import { PANEL_CONTENT, PANEL_ITEM, PANEL_LABEL } from "./panelStyles";
 import { TooltipComponent } from "@/components/ui/tooltip-component";

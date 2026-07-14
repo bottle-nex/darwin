@@ -16,7 +16,6 @@ type CustomKanbanColumnProps = {
     onDelete: () => void;
     onRename: (label: string) => void;
     onDeleteCard: (cardId: string) => void;
-    projectId?: string;
     onAssign: (cardId: string, userId: string) => void;
     onUnassign: (cardId: string, userId: string) => void;
 };
@@ -26,7 +25,6 @@ export default function CustomKanbanColumn({
     onDelete,
     onRename,
     onDeleteCard,
-    projectId,
     onAssign,
     onUnassign,
 }: CustomKanbanColumnProps) {
@@ -127,7 +125,6 @@ export default function CustomKanbanColumn({
                             key={card.id}
                             card={card}
                             onDelete={() => onDeleteCard(card.id)}
-                            projectId={projectId}
                             onAssign={(userId) => onAssign(card.id, userId)}
                             onUnassign={(userId) => onUnassign(card.id, userId)}
                         />
