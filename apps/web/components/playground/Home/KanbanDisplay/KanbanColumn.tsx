@@ -30,6 +30,7 @@ export default function KanbanColumn({
 
     return (
         <div
+            data-column-status={column.status}
             className={cn(
                 "group flex max-h-full min-h-0 flex-col rounded-xl bg-white/2.5 p-2 ring-1 transition-colors",
                 fullWidth ? "min-w-0 flex-1" : "w-72 shrink-0",
@@ -49,6 +50,7 @@ export default function KanbanColumn({
 
             <div
                 data-lenis-prevent
+                data-column-list={column.status}
                 ref={setNodeRef}
                 className={cn(
                     "min-h-0 flex-1 overflow-y-auto rounded-lg p-0.5 no-scrollbar",

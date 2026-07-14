@@ -1,7 +1,8 @@
 "use client";
 import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
 import type { BoardState } from "@/types/kanban";
-import type { FilterValue } from "@/hooks/kanban/useKanbanOptions";
+import type { FilterValue } from "@/store/kanban/useKanbanOptionsStore";
+import { useCustomKanbanStore } from "@/store/kanban/useCustomKanbanStore";
 import type { CustomKanbanApi } from "@/hooks/kanban/useCustomKanban";
 import KanbanColumn from "./KanbanColumn";
 import CustomKanbanColumn from "./customkanban/CustomKanbanColumn";
@@ -13,6 +14,8 @@ type KanbanFocusColumnProps = {
 };
 
 export default function KanbanFocusColumn({ filter, board, custom }: KanbanFocusColumnProps) {
+    const columns = useCustomKanbanStore((s) => s.columns);
+
     if (filter.kind === "llm") {
         const column = KanbanBoard.COLUMNS.find((c) => c.status === filter.status);
         if (!column) return null;
@@ -29,7 +32,7 @@ export default function KanbanFocusColumn({ filter, board, custom }: KanbanFocus
     }
 
     if (filter.kind === "custom") {
-        const column = custom.columns.find((c) => c.id === filter.columnId);
+        const column = columns.find((c) => c.id === filter.columnId);
         if (!column) return null;
         return (
             <CustomKanbanColumn
@@ -37,7 +40,6 @@ export default function KanbanFocusColumn({ filter, board, custom }: KanbanFocus
                 onDelete={() => custom.removeColumn(column.id)}
                 onRename={(label) => custom.renameColumn(column.id, label)}
                 onDeleteCard={custom.removeCard}
-                projectId={custom.projectId}
                 onAssign={custom.assignMember}
                 onUnassign={custom.unassignMember}
             />

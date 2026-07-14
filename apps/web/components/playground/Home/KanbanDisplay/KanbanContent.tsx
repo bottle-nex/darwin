@@ -1,6 +1,6 @@
 "use client";
-import type { BoardState, BoardView, KanbanView } from "@/types/kanban";
-import type { FilterValue } from "@/hooks/kanban/useKanbanOptions";
+import { useFilteredKanbanBoard } from "@/hooks/kanban/useFilteredKanbanBoard";
+import { useKanbanOptionsStore } from "@/store/kanban/useKanbanOptionsStore";
 import type { CustomKanbanApi } from "@/hooks/kanban/useCustomKanban";
 import KanbanBoardView from "./KanbanBoardView";
 import KanbanListView from "./KanbanListView";
@@ -9,11 +9,7 @@ import KanbanBothBoards from "./KanbanBothBoards";
 import CustomKanbanBoard from "./customkanban/CustomKanbanBoard";
 
 type KanbanContentProps = {
-    filter: FilterValue;
-    board: BoardState;
     custom: CustomKanbanApi;
-    boardView: BoardView;
-    kanbanView: KanbanView;
 };
 
 /**
@@ -21,13 +17,12 @@ type KanbanContentProps = {
  * otherwise the board switcher picks between the Custom board, the LLM board
  * (grid or list), or both together.
  */
-export default function KanbanContent({
-    filter,
-    board,
-    custom,
-    boardView,
-    kanbanView,
-}: KanbanContentProps) {
+export default function KanbanContent({ custom }: KanbanContentProps) {
+    const filter = useKanbanOptionsStore((s) => s.filter);
+    const boardView = useKanbanOptionsStore((s) => s.boardView);
+    const kanbanView = useKanbanOptionsStore((s) => s.kanbanView);
+    const board = useFilteredKanbanBoard();
+
     // A focused column takes precedence over the board switcher.
     if (filter.kind !== "default") {
         return (

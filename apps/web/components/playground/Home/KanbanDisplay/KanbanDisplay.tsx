@@ -4,31 +4,23 @@ import { useKanbanPane } from "@/hooks/kanban/useKanbanPane";
 import OptionsBar from "./OptionsBar/OptionsBar";
 import KanbanContent from "./KanbanContent";
 import KanbanDragOverlay from "./KanbanDragOverlay";
-import { useCreateOrEditIssueStore } from "@/store/issues/useCreateOrEditIssueStore";
+import IssueFlightTrigger from "./flight/IssueFlightTrigger";
+import IssueFlightOverlay from "./flight/IssueFlightOverlay";
 
 /**
  * The workspace's Kanban surface. Hosts two boards — the user-built Custom
  * Kanban and the agent-driven LLM Kanban — under one shared DndContext, so a
- * custom card can be dragged across to the LLM To Do column and back. The toolbar
- * picks which board(s) to show and the layout; `KanbanContent` renders the rest.
- * All the data and view state lives in `useKanbanPane`.
+ * custom card can be dragged across to the LLM To Do column and back. Board and
+ * toolbar data lives in Zustand stores (`store/kanban/`) that each component
+ * reads directly; `useKanbanPane` only wires the data sources (project, board
+ * query, store seeding) and the Custom Kanban's drag-and-drop actions.
  */
 export default function KanbanDisplay() {
-    const pane = useKanbanPane();
-    const { custom } = pane;
-    const openCreate = useCreateOrEditIssueStore((s) => s.openCreate);
+    const { custom } = useKanbanPane();
 
     return (
         <div className="flex min-h-0 flex-1 flex-col">
-            <OptionsBar
-                options={pane.options}
-                customColumns={custom.columns}
-                boardView={pane.boardView}
-                onBoardViewChange={pane.setBoardView}
-                kanbanView={pane.kanbanView}
-                onKanbanViewChange={pane.setKanbanView}
-                onAddTask={() => openCreate({ board: "llm" })}
-            />
+            <OptionsBar />
             <DndContext
                 sensors={custom.sensors}
                 collisionDetection={closestCorners}
@@ -36,15 +28,11 @@ export default function KanbanDisplay() {
                 onDragOver={custom.onDragOver}
                 onDragEnd={custom.onDragEnd}
             >
-                <KanbanContent
-                    filter={pane.options.filter}
-                    board={pane.board}
-                    custom={custom}
-                    boardView={pane.boardView}
-                    kanbanView={pane.kanbanView}
-                />
-                <KanbanDragOverlay activeItem={custom.activeItem} />
+                <KanbanContent custom={custom} />
+                <KanbanDragOverlay />
             </DndContext>
+            <IssueFlightTrigger />
+            <IssueFlightOverlay />
         </div>
     );
 }

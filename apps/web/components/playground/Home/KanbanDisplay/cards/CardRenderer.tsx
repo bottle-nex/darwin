@@ -41,6 +41,7 @@ export default function CardRenderer({ issue }: { issue: Issue }) {
         <div
             role="button"
             tabIndex={0}
+            data-issue-id={issue.id}
             className="cursor-pointer"
             onClick={() => openEdit(issue.id)}
             onKeyDown={(e) => {

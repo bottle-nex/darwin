@@ -8,7 +8,6 @@ import type { CustomCard } from "@/types/kanban-custom";
 type SortableCustomCardProps = {
     card: CustomCard;
     onDelete?: () => void;
-    projectId?: string;
     onAssign?: (userId: string) => void;
     onUnassign?: (userId: string) => void;
 };
@@ -16,7 +15,6 @@ type SortableCustomCardProps = {
 export default function SortableCustomCard({
     card,
     onDelete,
-    projectId,
     onAssign,
     onUnassign,
 }: SortableCustomCardProps) {
@@ -37,7 +35,6 @@ export default function SortableCustomCard({
             <CustomKanbanCard
                 card={card}
                 onDelete={onDelete}
-                projectId={projectId}
                 onAssign={onAssign}
                 onUnassign={onUnassign}
             />

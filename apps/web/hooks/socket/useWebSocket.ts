@@ -43,23 +43,9 @@ export function useWebSocket(project_id: string | undefined) {
         socket.current.unsubscribe(type, handler);
     }
 
-    function send_issue_create(payload: {
-        title: string;
-        description: string;
-        assigneeIds?: string[];
-    }) {
-        if (!project_id || !socket.current) return;
-        socket.current.send({
-            type: InboundSocketMessageType.ISSUE_CREATE,
-            projectId: project_id,
-            payload,
-        });
-    }
-
     return {
         is_connected,
         subscribe,
         unsubscribe,
-        send_issue_create,
     };
 }
