@@ -1,28 +1,36 @@
 "use client";
 
-import { useState } from "react";
-import { HiOutlineChevronDown, HiOutlineChevronRight } from "react-icons/hi2";
+import { Children, useState } from "react";
+import { motion, type Variants } from "motion/react";
+import { FaCaretDown, FaCaretRight } from "react-icons/fa";
 import { cn } from "@/lib/utils";
 
+const HEIGHT_SPRING = { type: "spring", stiffness: 800, damping: 48, mass: 0.6 } as const;
+
+const CONTAINER_VARIANTS: Variants = {
+    open: {
+        height: "auto",
+        transition: { ...HEIGHT_SPRING, staggerChildren: 0.018 },
+    },
+    closed: {
+        height: 0,
+        transition: { ...HEIGHT_SPRING, staggerChildren: 0.01, staggerDirection: -1 },
+    },
+};
+
+const ROW_VARIANTS: Variants = {
+    open: { opacity: 1, y: 0, transition: { duration: 0.13, ease: [0.4, 0, 0.2, 1] } },
+    closed: { opacity: 0, y: -4, transition: { duration: 0.08, ease: [0.4, 0, 0.2, 1] } },
+};
+
 type SectionProps = {
-    /** Heading text. */
     title: string;
-    /** Optional right-aligned action (e.g. "+" button). */
     action?: React.ReactNode;
-    /** Initial open state. */
     defaultOpen?: boolean;
-    /**
-     * "header" = small uppercase label (Projects, Teams).
-     * "inline" = lowercase title (Favorites style).
-     */
     variant?: "header" | "inline";
     children: React.ReactNode;
 };
 
-/**
- * Collapsible group used by every sidebar section. Variants tweak the visual
- * weight of the header without changing the behaviour.
- */
 export default function PlaygroundSidebarSection({
     title,
     action,
@@ -31,7 +39,7 @@ export default function PlaygroundSidebarSection({
     children,
 }: SectionProps) {
     const [open, setOpen] = useState(defaultOpen);
-    const Chevron = open ? HiOutlineChevronDown : HiOutlineChevronRight;
+    const Chevron = open ? FaCaretDown : FaCaretRight;
 
     return (
         <section className="flex flex-col">
@@ -40,22 +48,29 @@ export default function PlaygroundSidebarSection({
                     type="button"
                     onClick={() => setOpen((v) => !v)}
                     className={cn(
-                        "group flex flex-1 cursor-pointer items-center justify-between rounded-md py-1.5 text-left hover:bg-white/5",
+                        "group flex flex-1 cursor-pointer items-center gap-x-2 rounded-md py-1.5 text-left",
                         variant === "header"
-                            ? "px-2 text-[11px] font-medium tracking-wide text-neutral-500 uppercase"
+                            ? "px-2 text-[11px] font-medium text-neutral-500 capitalize"
                             : "px-2 text-[12px] font-medium text-neutral-400",
                     )}
                 >
                     <span>{title}</span>
-                    <Chevron
-                        className="size-3 text-neutral-500 opacity-0 transition-opacity duration-100 group-hover:opacity-100"
-                        aria-hidden
-                    />
+                    <Chevron className="size-3 text-neutral-500" aria-hidden />
                 </button>
                 {action && <span className="flex items-center">{action}</span>}
             </div>
 
-            {open && <div className="flex flex-col gap-0.5">{children}</div>}
+            <motion.div
+                initial={false}
+                animate={open ? "open" : "closed"}
+                variants={CONTAINER_VARIANTS}
+                className="flex flex-col gap-0.5 overflow-hidden"
+                aria-hidden={!open}
+            >
+                {Children.map(children, (child) => (
+                    <motion.div variants={ROW_VARIANTS}>{child}</motion.div>
+                ))}
+            </motion.div>
         </section>
     );
 }

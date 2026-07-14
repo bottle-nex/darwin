@@ -35,44 +35,42 @@ export default function PlaygroundSidebarTeamsSection() {
     }
 
     return (
-        <div className="mt-3">
-            <Section title="Teams">
-                {teams.map((t) => {
-                    const isActive = selectedTeam?.id === t.id;
-                    return (
-                        <div key={t.id} className="group relative">
-                            <Row
-                                label={t.name}
-                                leading={rowLeading({
-                                    kind: "avatar",
-                                    letter: t.name.trim().charAt(0).toUpperCase(),
-                                    tone: "indigo",
-                                })}
-                                active={isActive}
-                                onClick={() => openTeam(Surface.Home, t, projectSlug ?? "")}
-                            />
-                            <button
-                                type="button"
-                                aria-label={`Delete ${t.name}`}
-                                onClick={() => requestDelete(t)}
-                                className={cn(
-                                    "absolute top-1/2 right-2 size-6 -translate-y-1/2 items-center justify-center rounded text-neutral-400 hover:bg-neutral-700/50 hover:text-red-500 cursor-pointer",
-                                    isActive ? "flex" : "hidden group-hover:flex",
-                                )}
-                            >
-                                <HiOutlineTrash className="size-3.5" aria-hidden />
-                            </button>
-                        </div>
-                    );
-                })}
-                {isAdmin && (
-                    <Row
-                        label="Add team"
-                        leading={{ kind: "icon", icon: HiOutlinePlus }}
-                        onClick={openCreateTeam}
-                    />
-                )}
-            </Section>
-        </div>
+        <Section title="Teams">
+            {teams.map((t) => {
+                const isActive = selectedTeam?.id === t.id;
+                return (
+                    <div key={t.id} className="group relative">
+                        <Row
+                            label={t.name}
+                            leading={rowLeading({
+                                kind: "avatar",
+                                letter: t.name.trim().charAt(0).toUpperCase(),
+                                tone: "indigo",
+                            })}
+                            active={isActive}
+                            onClick={() => openTeam(Surface.Home, t, projectSlug ?? "")}
+                        />
+                        <button
+                            type="button"
+                            aria-label={`Delete ${t.name}`}
+                            onClick={() => requestDelete(t)}
+                            className={cn(
+                                "absolute top-1/2 right-2 size-6 -translate-y-1/2 items-center justify-center rounded text-neutral-400 hover:bg-neutral-700/50 hover:text-red-500 cursor-pointer",
+                                isActive ? "flex" : "hidden group-hover:flex",
+                            )}
+                        >
+                            <HiOutlineTrash className="size-3.5" aria-hidden />
+                        </button>
+                    </div>
+                );
+            })}
+            {isAdmin && (
+                <Row
+                    label="Add team"
+                    leading={{ kind: "icon", icon: HiOutlinePlus }}
+                    onClick={openCreateTeam}
+                />
+            )}
+        </Section>
     );
 }

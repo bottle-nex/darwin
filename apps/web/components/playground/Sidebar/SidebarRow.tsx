@@ -46,12 +46,12 @@ export default function PlaygroundSidebarRow({
             className={cn(
                 "group flex w-full cursor-pointer items-center gap-2 rounded-md py-1.5 pr-2 text-left text-[13px]",
                 active
-                    ? "bg-white/10 text-neutral-100"
-                    : "text-neutral-300 hover:bg-white/5 hover:text-neutral-100",
+                    ? "bg-white/10 text-neutral-200"
+                    : "text-neutral-400 hover:bg-white/5 hover:text-neutral-200",
             )}
             style={{ paddingLeft: 8 + indent * 16 }}
         >
-            <span className="flex size-5 shrink-0 items-center justify-center text-neutral-400">
+            <span className="flex size-5 shrink-0 items-center justify-center">
                 {Icon ? (
                     <Icon className={cn(size ? `size-${size}` : "size-3.75")} aria-hidden />
                 ) : leading?.kind === "node" ? (
