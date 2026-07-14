@@ -2,12 +2,12 @@
 import { useEffect, useRef } from "react";
 import { useParams } from "next/navigation";
 import type { ProjectTeam } from "@/types/project";
-import { RailSurface } from "@/components/playground/IconRail/railSurface";
+import { Surface } from "@/components/playground/Sidebar/surface";
 import { TEAM_DETAIL_TAB, usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
 
-const SURFACE_VALUES = new Set<string>(Object.values(RailSurface));
+const SURFACE_VALUES = new Set<string>(Object.values(Surface));
 
-function isRailSurface(value: string | null): value is RailSurface {
+function isSurface(value: string | null): value is Surface {
     return value !== null && SURFACE_VALUES.has(value);
 }
 
@@ -48,12 +48,12 @@ export function usePlaygroundUrlSync(teams: ProjectTeam[] | undefined) {
         if (hydratedRef.current) return;
         const params = new URLSearchParams(window.location.search);
         initialRef.current = {
-            surface: params.get("surface"), // icon rail tabs
-            tab: params.get("tab"), // inside icon rail -> HOME -> inbox, mentions, kanban, etc
+            surface: params.get("surface"), // top-level surface
+            tab: params.get("tab"), // inside a surface -> HOME -> inbox, mentions, kanban, etc
             team: params.get("team"), // team object
         };
         const { surface: surfaceParam, tab: tabParam } = initialRef.current;
-        if (isRailSurface(surfaceParam)) {
+        if (isSurface(surfaceParam)) {
             setSurface(surfaceParam);
             if (tabParam) setTab(surfaceParam, tabParam);
         }
@@ -65,7 +65,7 @@ export function usePlaygroundUrlSync(teams: ProjectTeam[] | undefined) {
     useEffect(() => {
         if (teamHydratedRef.current) return;
         const { surface: surfaceParam, tab: tabParam, team: teamParam } = initialRef.current;
-        if (!isRailSurface(surfaceParam) || tabParam !== TEAM_DETAIL_TAB || !teamParam) {
+        if (!isSurface(surfaceParam) || tabParam !== TEAM_DETAIL_TAB || !teamParam) {
             teamHydratedRef.current = true;
             return;
         }

@@ -5,7 +5,7 @@ import { MdLock } from "react-icons/md";
 import { useGetDashboard } from "@/hooks/dashboard/useGetDashboard";
 import { useGetProject } from "@/hooks/project/useGetProject";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
-import { RailSurface } from "../../IconRail/railSurface";
+import { Surface } from "../../Sidebar/surface";
 import { ProjectsTab } from "../../Projects/projectsTabs";
 import ProjectSettingsGeneralSection from "./ProjectSettingsGeneralSection";
 import ProjectSettingsTeamSection from "./ProjectSettingsTeamSection";
@@ -41,7 +41,7 @@ export default function SettingsDisplay({ section }: { section?: ProjectSettings
     const canManage = project?.viewerRole === "Admin" || project?.viewerRole === "Maintain";
     const isAdmin = project?.viewerRole === "Admin";
 
-    const tab = usePlaygroundNavStore((s) => s.tabBySurface[RailSurface.Projects]);
+    const tab = usePlaygroundNavStore((s) => s.tabBySurface[Surface.Projects]);
     const activeSection: ProjectSettingsSection =
         section ?? TAB_SECTION[tab as ProjectsTab] ?? "project";
 

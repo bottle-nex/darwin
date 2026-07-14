@@ -1,152 +1,69 @@
 "use client";
-import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { MdKeyboardDoubleArrowLeft, MdSearch } from "react-icons/md";
-import { RailSurface } from "../IconRail/railSurface";
+import { HiOutlineArrowUpCircle, HiOutlineUserPlus } from "react-icons/hi2";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
-import { getSurfaceNavRows, SURFACE_TITLES } from "./surfaceConfig";
-import type { SidebarSectionProps } from "./shared";
-import SidebarHeaderIcon from "./SidebarHeaderIcon";
-import SidebarSearch from "./SidebarSearch";
-import HomeSidebar from "../Home/HomeSidebar/HomeSidebar";
-import ProjectsSidebar from "../Projects/ProjectsSidebar/ProjectsSidebar";
-import PullRequestsSidebar from "../PullRequests/PullRequestsSidebar/PullRequestsSidebar";
-import AgentsSidebar from "../Agents/AgentsSidebar/AgentsSidebar";
-import WorkersSidebar from "../Workers/WorkersSidebar/WorkersSidebar";
-import MoreSidebar from "../More/MoreSidebar/MoreSidebar";
+import { HomeTab } from "../Home/homeTabs";
+import { Surface } from "./surface";
+import SidebarRow from "./SidebarRow";
+import PrimaryNavSection from "./PrimaryNavSection";
+import SettingsNavSection from "./SettingsNavSection";
+import TeamsSection from "./TeamsSection";
 
-type PlaygroundSidebarProps = {
-    surface: RailSurface;
-    onCollapse: () => void;
-};
-
-/** Renders the active surface's sidebar sections. */
-function SidebarRenderer({ surface, ...section }: { surface: RailSurface } & SidebarSectionProps) {
-    switch (surface) {
-        case RailSurface.Home:
-            return <HomeSidebar {...section} />;
-        case RailSurface.Projects:
-            return <ProjectsSidebar {...section} />;
-        case RailSurface.PullRequests:
-            return <PullRequestsSidebar {...section} />;
-        case RailSurface.Agents:
-            return <AgentsSidebar {...section} />;
-        case RailSurface.Workers:
-            return <WorkersSidebar {...section} />;
-        case RailSurface.More:
-            return <MoreSidebar />;
-    }
-}
+const SETTINGS_TABS: string[] = [
+    HomeTab.SettingsProject,
+    HomeTab.SettingsTemplates,
+    HomeTab.SettingsEnv,
+];
 
 /**
- * Shared sidebar shell: header (title, search, collapse) + the active surface's
- * sections. The committed active tab lives in the central nav store (so it is
- * remembered per surface); a transient `highlightId` drives keyboard search
- * navigation and only commits to the store on Enter or click.
+ * The workspace's left nav column, sitting on the page background beside the
+ * main pane's card.
+ *
+ * It has two faces, chosen by the committed tab: the main nav (with its Teams
+ * section), or — while a settings tab is active — the settings nav. Deriving
+ * the face from the tab keeps it in sync with deep links / refresh, and the
+ * cross-fade makes entering / leaving settings feel continuous.
  */
-export default function PlaygroundSidebar({ surface, onCollapse }: PlaygroundSidebarProps) {
-    const committedTab = usePlaygroundNavStore((s) => s.tabBySurface[surface]);
+export default function PlaygroundSidebar() {
+    const selectedRowId = usePlaygroundNavStore((s) => s.tabBySurface[Surface.Home]);
     const setTab = usePlaygroundNavStore((s) => s.setTab);
 
-    const [searchOpen, setSearchOpen] = useState<boolean>(false);
-    const [searchQuery, setSearchQuery] = useState<string>("");
-    const [highlightId, setHighlightId] = useState<string | null>(null);
-
-    const closeSearch = () => {
-        setSearchOpen(false);
-        setSearchQuery("");
-        setHighlightId(null);
-    };
-
-    // Flat list of rows matching the query in the active surface — drives
-    // arrow-key navigation through the filtered results.
-    const navRows = useMemo(() => getSurfaceNavRows(surface, searchQuery), [surface, searchQuery]);
-
-    // While searching, the highlight falls back to the first match so Enter
-    // always has a target. The active-row styling tracks the highlight during
-    // search and the committed tab otherwise.
-    const effectiveHighlight =
-        searchOpen && navRows.length > 0
-            ? navRows.some((r) => r.id === highlightId)
-                ? highlightId
-                : navRows[0].id
-            : null;
-    const activeRowId = effectiveHighlight ?? committedTab;
-
-    const moveHighlight = (delta: number) => {
-        if (navRows.length === 0) return;
-        const current = navRows.findIndex((r) => r.id === effectiveHighlight);
-        const next =
-            current === -1
-                ? delta > 0
-                    ? 0
-                    : navRows.length - 1
-                : Math.min(Math.max(current + delta, 0), navRows.length - 1);
-        setHighlightId(navRows[next].id);
-    };
-
-    const openHighlighted = () => {
-        if (effectiveHighlight) setTab(surface, effectiveHighlight);
-        closeSearch();
+    const inSettings = SETTINGS_TABS.includes(selectedRowId);
+    const section = {
+        selectedRowId,
+        onSelect: (id: string) => setTab(Surface.Home, id),
     };
 
     return (
         <aside
             data-lenis-prevent
-            className="flex h-full min-h-0 w-60 shrink-0 flex-col border-r border-white/5 overflow-y-auto"
+            aria-label="Sidebar"
+            className="flex h-full min-h-0 w-60 shrink-0 flex-col justify-between"
         >
-            <div className="relative flex h-12 items-center px-2">
-                <div className="flex w-full items-center justify-between gap-1">
-                    <h1 className="px-1 text-[14px] font-semibold text-neutral-100">
-                        {SURFACE_TITLES[surface]}
-                    </h1>
-                    <div className="flex items-center">
-                        <SidebarHeaderIcon label="Search" onClick={() => setSearchOpen(true)}>
-                            <MdSearch className="size-3.5" aria-hidden />
-                        </SidebarHeaderIcon>
-                        <SidebarHeaderIcon label="Collapse sidebar" onClick={onCollapse}>
-                            <MdKeyboardDoubleArrowLeft className="size-3.5" aria-hidden />
-                        </SidebarHeaderIcon>
-                    </div>
-                </div>
-
-                <AnimatePresence>
-                    {searchOpen && (
-                        <motion.div
-                            key="search"
-                            initial={{ opacity: 0, width: "20%" }}
-                            animate={{ opacity: 1, width: "calc(100% - 1rem)" }}
-                            exit={{ opacity: 0, width: "20%" }}
-                            transition={{ duration: 0.18, ease: [0.4, 0, 0.2, 1] }}
-                            className="absolute inset-y-0 right-2 z-10 flex items-center bg-charcoal"
-                        >
-                            <SidebarSearch
-                                value={searchQuery}
-                                onChange={setSearchQuery}
-                                onClose={closeSearch}
-                                onArrowDown={() => moveHighlight(1)}
-                                onArrowUp={() => moveHighlight(-1)}
-                                onEnter={openHighlighted}
-                            />
-                        </motion.div>
-                    )}
+            <div className="min-h-0 flex-1 overflow-y-auto px-1 pt-1">
+                <AnimatePresence mode="wait" initial={false}>
+                    <motion.div
+                        key={inSettings ? "settings" : "main"}
+                        initial={{ opacity: 0, x: inSettings ? 10 : -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: inSettings ? 10 : -10 }}
+                        transition={{ duration: 0.16, ease: [0.4, 0, 0.2, 1] }}
+                    >
+                        {inSettings ? (
+                            <SettingsNavSection {...section} />
+                        ) : (
+                            <>
+                                <PrimaryNavSection {...section} />
+                                <TeamsSection />
+                            </>
+                        )}
+                    </motion.div>
                 </AnimatePresence>
             </div>
 
-            <div className="min-h-0 flex-1 overflow-y-auto px-2 pb-3">
-                <div className="peer flex flex-col">
-                    <SidebarRenderer
-                        surface={surface}
-                        selectedRowId={activeRowId}
-                        onSelect={(id) => setTab(surface, id)}
-                        query={searchQuery}
-                    />
-                </div>
-                {searchQuery.trim() && (
-                    <p className="hidden truncate px-2 py-8 text-center text-[12px] text-neutral-500 peer-empty:block">
-                        No matches for &ldquo;{searchQuery.trim()}&rdquo;
-                    </p>
-                )}
+            <div className="flex flex-col gap-0.5 px-1 pb-1">
+                <SidebarRow label="Invite" leading={{ kind: "icon", icon: HiOutlineUserPlus }} />
+                <SidebarRow label="Pro" leading={{ kind: "icon", icon: HiOutlineArrowUpCircle }} />
             </div>
         </aside>
     );

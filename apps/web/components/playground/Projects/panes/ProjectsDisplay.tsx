@@ -2,7 +2,7 @@
 import { useParams } from "next/navigation";
 import { useGetDashboard } from "@/hooks/dashboard/useGetDashboard";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
-import { RailSurface } from "../../IconRail/railSurface";
+import { Surface } from "../../Sidebar/surface";
 import { ProjectsTab } from "../projectsTabs";
 import ProjectOverviewDisplay from "./ProjectOverviewDisplay";
 import KanbanDisplay from "../../Home/KanbanDisplay/KanbanDisplay";
@@ -11,7 +11,7 @@ import SettingsDisplay from "../../Home/SettingsDisplay/SettingsDisplay";
 import TeamDetailDisplay from "./TeamDetailDisplay";
 
 export default function ProjectsDisplay() {
-    const tab = usePlaygroundNavStore((s) => s.tabBySurface[RailSurface.Projects]);
+    const tab = usePlaygroundNavStore((s) => s.tabBySurface[Surface.Projects]);
     const { orgSlug, projectSlug } = useParams<{ orgSlug: string; projectSlug?: string }>();
     const { data: dashboard } = useGetDashboard(orgSlug);
     const activeProject = projectSlug

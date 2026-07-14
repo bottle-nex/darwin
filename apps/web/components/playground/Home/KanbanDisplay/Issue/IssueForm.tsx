@@ -110,7 +110,7 @@ export default function IssueForm({
     return (
         <IssueShell>
             <main className="flex h-full min-h-0 min-w-0 flex-row">
-                <div className="flex h-full min-h-0 min-w-0 flex-col justify-between *:px-6 *:py-4 w-[64%]">
+                <div className="flex h-full min-h-0 min-w-0 flex-col justify-between *:px-6 *:py-4 w-[62%]">
                     <section className="flex flex-col items-start gap-y-3 ">
                         <IssueTopper
                             target={target}

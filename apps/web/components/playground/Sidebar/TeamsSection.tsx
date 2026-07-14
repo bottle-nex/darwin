@@ -1,25 +1,19 @@
 "use client";
 
-import { MdAdd, MdDelete } from "react-icons/md";
+import { HiOutlinePlus, HiOutlineTrash } from "react-icons/hi2";
 import { useParams } from "next/navigation";
 import { cn } from "@/lib/utils";
-import Row from "../../Sidebar/SidebarRow";
-import Section from "../../Sidebar/SidebarSection";
+import Row from "./SidebarRow";
+import Section from "./SidebarSection";
 import { useGetDashboard } from "@/hooks/dashboard/useGetDashboard";
 import { useGetProject } from "@/hooks/project/useGetProject";
 import { useNewTeamStore } from "@/store/team/useNewTeamStore";
 import { useDeleteTeamStore } from "@/store/team/useDeleteTeamStore";
-import {
-    matchesQuery,
-    rowLeading,
-    type SidebarNavRow,
-    type SidebarSectionProps,
-} from "../../Sidebar/shared";
+import { rowLeading } from "./shared";
+import { Surface } from "./surface";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
 
-export const rows: SidebarNavRow[] = [];
-
-export default function PlaygroundSidebarTeamsSection({ query }: SidebarSectionProps) {
+export default function PlaygroundSidebarTeamsSection() {
     const { orgSlug, projectSlug } = useParams<{ orgSlug: string; projectSlug?: string }>();
     const { data: dashboard } = useGetDashboard(orgSlug);
     const activeProject = projectSlug
@@ -29,13 +23,10 @@ export default function PlaygroundSidebarTeamsSection({ query }: SidebarSectionP
     const { setOpen, setTargetProjectId } = useNewTeamStore();
     const requestDelete = useDeleteTeamStore((s) => s.requestDelete);
 
-    const searching = query.trim().length > 0;
     const isAdmin = project?.viewerRole === "Admin";
-    const surface = usePlaygroundNavStore((s) => s.surface);
     const selectedTeam = usePlaygroundNavStore((s) => s.selectedTeam);
     const openTeam = usePlaygroundNavStore((s) => s.openTeam);
-    const teams = (project?.teams ?? []).filter((t) => matchesQuery(t.name, query));
-    if (searching && teams.length === 0) return null;
+    const teams = project?.teams ?? [];
 
     function openCreateTeam() {
         if (!activeProject) return;
@@ -58,7 +49,7 @@ export default function PlaygroundSidebarTeamsSection({ query }: SidebarSectionP
                                     tone: "indigo",
                                 })}
                                 active={isActive}
-                                onClick={() => openTeam(surface, t, projectSlug ?? "")}
+                                onClick={() => openTeam(Surface.Home, t, projectSlug ?? "")}
                             />
                             <button
                                 type="button"
@@ -69,15 +60,15 @@ export default function PlaygroundSidebarTeamsSection({ query }: SidebarSectionP
                                     isActive ? "flex" : "hidden group-hover:flex",
                                 )}
                             >
-                                <MdDelete className="size-3.5" aria-hidden />
+                                <HiOutlineTrash className="size-3.5" aria-hidden />
                             </button>
                         </div>
                     );
                 })}
-                {!searching && isAdmin && (
+                {isAdmin && (
                     <Row
                         label="Add team"
-                        leading={{ kind: "icon", icon: MdAdd }}
+                        leading={{ kind: "icon", icon: HiOutlinePlus }}
                         onClick={openCreateTeam}
                     />
                 )}

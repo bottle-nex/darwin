@@ -1,10 +1,8 @@
 "use client";
-
 import { motion, useTransform, type MotionValue } from "motion/react";
 import { MdChatBubble } from "react-icons/md";
 import type { Issue } from "./types";
 import { PRIORITY_DOT } from "./data";
-import { AgentChip } from "./AgentChip";
 import { IssueStatus } from "./IssueStatus";
 
 export default function IssueCard({

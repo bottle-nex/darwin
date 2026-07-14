@@ -5,7 +5,7 @@ import { Popover } from "radix-ui";
 import { MdCheck, MdKeyboardArrowDown, MdFolder } from "react-icons/md";
 import { cn } from "@/lib/utils";
 import { useGetDashboard } from "@/hooks/dashboard/useGetDashboard";
-import SidebarSearch from "../../Sidebar/SidebarSearch";
+import PlaygroundSearchInput from "../components/PlaygroundSearchInput";
 
 const DEFAULT_FOLDER_COLOR = "#6366f1";
 
@@ -59,7 +59,7 @@ export default function PlaygroundProjectSwitcher() {
                     sideOffset={6}
                     className="z-50 w-72 origin-(--radix-popover-content-transform-origin) rounded-lg border border-neutral-800 bg-charcoal p-2 shadow-xl animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 "
                 >
-                    <SidebarSearch
+                    <PlaygroundSearchInput
                         value={query}
                         onChange={setQuery}
                         onClose={() => setOpen(false)}

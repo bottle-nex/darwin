@@ -1,6 +1,6 @@
 "use client";
 import { HomeTab } from "../homeTabs";
-import { RailSurface } from "../../IconRail/railSurface";
+import { Surface } from "../../Sidebar/surface";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
 import DraftsDisplay from "./DraftsDisplay";
 import TagsDisplay from "../TagsDisplay/TagsDisplay";
@@ -17,7 +17,7 @@ import AssignedToMeDisplay from "./AssignedToMeDisplay";
 
 /** Renders the Home surface's active tab. */
 export default function HomeDisplay() {
-    const tab = usePlaygroundNavStore((s) => s.tabBySurface[RailSurface.Home]);
+    const tab = usePlaygroundNavStore((s) => s.tabBySurface[Surface.Home]);
 
     switch (tab) {
         case HomeTab.Overview:

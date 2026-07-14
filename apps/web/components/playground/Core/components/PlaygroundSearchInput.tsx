@@ -3,30 +3,21 @@ import { Input } from "@/components/ui/input";
 import { useEffect, useRef } from "react";
 import { MdClose, MdSearch } from "react-icons/md";
 
-type SidebarSearchProps = {
+type PlaygroundSearchInputProps = {
     value: string;
     onChange: (value: string) => void;
-    /** Collapse the search back into the header. */
+    /** Dismiss the search — fired by the close button and by Escape. */
     onClose: () => void;
-    /** Move the highlighted result down/up through the filtered list. */
-    onArrowDown?: () => void;
-    onArrowUp?: () => void;
-    /** Open the highlighted result. */
-    onEnter?: () => void;
-    /** Override the input placeholder (defaults to the sidebar copy). */
-    placeholder?: string;
+    placeholder: string;
 };
 
-/** Full-width sidebar search field that the header expands into. */
-export default function SidebarSearch({
+/** Autofocusing, full-width search field with a clear affordance. */
+export default function PlaygroundSearchInput({
     value,
     onChange,
     onClose,
-    onArrowDown,
-    onArrowUp,
-    onEnter,
-    placeholder = "Search sidebar...",
-}: SidebarSearchProps) {
+    placeholder,
+}: PlaygroundSearchInputProps) {
     const inputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
@@ -34,23 +25,7 @@ export default function SidebarSearch({
     }, []);
 
     function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
-        switch (e.key) {
-            case "Escape":
-                onClose();
-                break;
-            case "ArrowDown":
-                e.preventDefault();
-                onArrowDown?.();
-                break;
-            case "ArrowUp":
-                e.preventDefault();
-                onArrowUp?.();
-                break;
-            case "Enter":
-                e.preventDefault();
-                onEnter?.();
-                break;
-        }
+        if (e.key === "Escape") onClose();
     }
 
     return (

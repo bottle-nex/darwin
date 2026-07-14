@@ -1,7 +1,7 @@
 "use client";
 
 import { type IconType } from "react-icons";
-import { MdAdd } from "react-icons/md";
+import { HiOutlinePlus } from "react-icons/hi2";
 import PlaygroundAvatar, {
     type AvatarTone,
 } from "@/components/playground/Core/components/PlaygroundAvatar";
@@ -23,21 +23,11 @@ export function rowLeading(spec: LeadingSpec) {
           } as const);
 }
 
-/** A navigable row, surfaced for keyboard search navigation. */
-export type SidebarNavRow = { id: string; label: string };
-
-/** Props threaded into every section by the sidebar shell. */
+/** Props threaded into every section by the sidebar. */
 export type SidebarSectionProps = {
     selectedRowId: string;
     onSelect: (id: string) => void;
-    /** Active search query; empty string when search is closed/idle. */
-    query: string;
 };
-
-/** Case-insensitive substring match used to filter rows by their label. */
-export function matchesQuery(label: string, query: string) {
-    return label.toLowerCase().includes(query.trim().toLowerCase());
-}
 
 /** Trailing hover action chip (e.g. the ellipsis / plus beside an agent). */
 export function PlaygroundSidebarRowAction({ children }: { children: React.ReactNode }) {
@@ -56,7 +46,7 @@ export function PlaygroundSidebarSectionAddButton({ label }: { label: string }) 
             aria-label={label}
             className="flex size-5 cursor-pointer items-center justify-center rounded text-neutral-400 hover:bg-white/5 hover:text-neutral-100"
         >
-            <MdAdd className="size-3.5" aria-hidden />
+            <HiOutlinePlus className="size-3.5" aria-hidden />
         </button>
     );
 }

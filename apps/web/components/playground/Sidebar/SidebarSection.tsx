@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { MdKeyboardArrowDown, MdKeyboardArrowRight } from "react-icons/md";
+import { HiOutlineChevronDown, HiOutlineChevronRight } from "react-icons/hi2";
 import { cn } from "@/lib/utils";
 
 type SectionProps = {
@@ -31,7 +31,7 @@ export default function PlaygroundSidebarSection({
     children,
 }: SectionProps) {
     const [open, setOpen] = useState(defaultOpen);
-    const Chevron = open ? MdKeyboardArrowDown : MdKeyboardArrowRight;
+    const Chevron = open ? HiOutlineChevronDown : HiOutlineChevronRight;
 
     return (
         <section className="flex flex-col">

@@ -1,18 +1,19 @@
 "use client";
 
-import { MdLock } from "react-icons/md";
+import { HiOutlineLockClosed } from "react-icons/hi2";
 import { cn } from "@/lib/utils";
 
 type RowProps = {
     /** Leading slot — supply either an icon or a fully-formed react node (e.g. an avatar). */
     leading?:
-        | { kind: "icon"; icon: React.ComponentType<React.SVGProps<SVGSVGElement>> }
-        | { kind: "node"; node: React.ReactNode };
+    | { kind: "icon"; icon: React.ComponentType<React.SVGProps<SVGSVGElement>> }
+    | { kind: "node"; node: React.ReactNode };
     label: string;
     /** Lighter trailing text that follows the label after a dash. */
     suffix?: string;
     badge?: number;
     indent?: number;
+    size?: number;
     active?: boolean;
     onClick?: () => void;
     /** Trailing actions revealed on hover (e.g. ellipsis + plus). */
@@ -29,6 +30,7 @@ export default function PlaygroundSidebarRow({
     label,
     suffix,
     badge,
+    size,
     indent = 0,
     active = false,
     onClick,
@@ -51,7 +53,7 @@ export default function PlaygroundSidebarRow({
         >
             <span className="flex size-5 shrink-0 items-center justify-center text-neutral-400">
                 {Icon ? (
-                    <Icon className="size-3.75" aria-hidden />
+                    <Icon className={cn(size ? `size-${size}` : "size-3.75")} aria-hidden />
                 ) : leading?.kind === "node" ? (
                     leading.node
                 ) : null}
@@ -77,7 +79,7 @@ export default function PlaygroundSidebarRow({
 
             {isLocked && (
                 <span className="flex size-5 shrink-0 items-center justify-center text-neutral-400 ">
-                    <MdLock className="size-3.5" />
+                    <HiOutlineLockClosed className="size-3.5" />
                 </span>
             )}
         </button>

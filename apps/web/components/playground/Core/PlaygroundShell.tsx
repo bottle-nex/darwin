@@ -1,18 +1,14 @@
 "use client";
-import { useState } from "react";
 import { useParams } from "next/navigation";
-import PlaygroundIconRail from "@/components/playground/IconRail/PlaygroundIconRail";
-import { RailSurface } from "@/components/playground/IconRail/railSurface";
-import { ProjectsTab } from "@/components/playground/Projects/projectsTabs";
 import PlaygroundTopBar from "@/components/playground/Core/TopBar/PlaygroundTopBar";
-import PlaygroundWorkspace from "@/components/playground/Core/PlaygroundWorkspace";
+import PlaygroundSidebar from "@/components/playground/Sidebar/PlaygroundSidebar";
+import PlaygroundDisplay from "@/components/playground/Core/PlaygroundDisplay";
 import CreateTeamDialog from "@/components/team/CreateTeamDialog";
 import DeleteTeamDialog from "@/components/team/DeleteTeamDialog";
 import CreateOrEditIssueDialog from "@/components/playground/Home/KanbanDisplay/Issue/CreateOrEditIssueDialog";
 import { useIssueDialog } from "@/components/playground/issue/useIssueDialog";
 import { useGetDashboard } from "@/hooks/dashboard/useGetDashboard";
 import { useGetProject } from "@/hooks/project/useGetProject";
-import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
 import { usePlaygroundUrlSync } from "./usePlaygroundUrlSync";
 import { useSubscribeEventHandlers } from "@/hooks/socket/useSubscribeEventHandlers";
 
@@ -28,22 +24,6 @@ export default function PlaygroundShell() {
         orgSlug: string;
         projectSlug?: string;
     }>();
-
-    const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(false);
-    const surface = usePlaygroundNavStore((s) => s.surface);
-    const setSurface = usePlaygroundNavStore((s) => s.setSurface);
-    const setTab = usePlaygroundNavStore((s) => s.setTab);
-    const setProjectsSidebarMode = usePlaygroundNavStore((s) => s.setProjectsSidebarMode);
-
-    // Tapping the Projects rail icon opens the active project's nav on its Overview.
-    // The project list is reachable from that nav's "Back to projects" row.
-    function selectSurface(next: RailSurface) {
-        setSurface(next);
-        if (next === RailSurface.Projects) {
-            setProjectsSidebarMode("nav");
-            setTab(RailSurface.Projects, ProjectsTab.Overview);
-        }
-    }
 
     const { data: dashboard } = useGetDashboard(orgSlug);
     const activeProject = projectSlug
@@ -64,17 +44,8 @@ export default function PlaygroundShell() {
         <main className="flex h-screen flex-col overflow-hidden text-neutral-100 pt-px select-none">
             <PlaygroundTopBar />
             <section className="flex flex-1 min-h-0 gap-2 p-2 pt-px">
-                <PlaygroundIconRail
-                    activeSurface={surface}
-                    onSelectSurface={selectSurface}
-                    sidebarCollapsed={sidebarCollapsed}
-                    onExpandSidebar={() => setSidebarCollapsed(false)}
-                />
-                <PlaygroundWorkspace
-                    surface={surface}
-                    sidebarCollapsed={sidebarCollapsed}
-                    onCollapseSidebar={() => setSidebarCollapsed(true)}
-                />
+                <PlaygroundSidebar />
+                <PlaygroundDisplay />
             </section>
             <CreateTeamDialog />
             <DeleteTeamDialog />

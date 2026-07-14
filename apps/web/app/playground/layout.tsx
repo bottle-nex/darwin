@@ -5,7 +5,7 @@ export default function PlaygroundLayout({ children }: { children: React.ReactNo
     return (
         <AccessControlProvider>
             <TooltipProvider>
-                <div className="h-dvh overflow-hidden overscroll-none bg-[#141414]">{children}</div>
+                <div className="h-dvh overflow-hidden overscroll-none bg-[#070707]">{children}</div>
             </TooltipProvider>
         </AccessControlProvider>
     );
