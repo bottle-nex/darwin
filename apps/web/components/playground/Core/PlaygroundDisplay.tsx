@@ -34,7 +34,7 @@ export default function PlaygroundDisplay() {
     const surface = usePlaygroundNavStore((s) => s.surface);
 
     return (
-        <main className="flex flex-1 min-w-0 flex-col overflow-hidden rounded-lg ring-1 ring-white/6 bg-cement/60 backdrop-blur-md">
+        <main className="flex flex-1 min-w-0 flex-col overflow-hidden rounded-lg ring-1 ring-white/6 bg-[#0c0c0d] backdrop-blur-md">
             <SurfacePane surface={surface} />
         </main>
     );

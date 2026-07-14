@@ -2,8 +2,16 @@ import { WebSocketServer, WebSocket } from "ws";
 import { IncomingMessage, Server } from "http";
 import SubscriberSystem from "./subscriber.system";
 import { verifySessionJwt } from "../services/service.jwt";
-import type { InboundSocketMessage } from "@trymatcha/types";
+import {
+    AppSocketCloseCode,
+    InboundSocketMessageType,
+    StandardSocketCloseCode,
+    type InboundSocketMessage,
+} from "@trymatcha/types";
+import { Action, Permissions } from "@trymatcha/access-control";
+import Access from "../access-control/access";
 import type { AuthUser } from "../types/express.d";
+import ChatSocketHandler from "./chat.handler";
 
 export default class SocketServer {
     private wss: WebSocketServer;
@@ -25,10 +33,22 @@ export default class SocketServer {
     }
 
     private init_connection() {
-        this.wss.on("connection", (ws: WebSocket, req: IncomingMessage) => {
+        this.wss.on("connection", async (ws: WebSocket, req: IncomingMessage) => {
             const { success, project_id, user } = this.validate_connection(req);
             if (!success || !user) {
-                return ws.close(1008, "Invalid connection");
+                return ws.close(AppSocketCloseCode.UNAUTHORIZED, "Invalid connection");
+            }
+            try {
+                const role = await Access.project(user.id, project_id);
+                if (!role || !Permissions.project(role, Action.project.read)) {
+                    return ws.close(
+                        AppSocketCloseCode.INVALID_PROJECT,
+                        "You dont have access to this project",
+                    );
+                }
+            } catch (error) {
+                console.error("Socket connection access check error:", error);
+                return ws.close(StandardSocketCloseCode.INTERNAL_ERROR, "Something went wrong");
             }
             let connections = this.project_connections.get(project_id);
             if (!connections) {
@@ -47,6 +67,9 @@ export default class SocketServer {
             try {
                 const message = JSON.parse(raw.toString()) as InboundSocketMessage;
                 switch (message.type) {
+                    case InboundSocketMessageType.CHAT_CREATE:
+                        await this.create_chat(ws, project_id, message);
+                        return;
                     default:
                         return;
                 }
@@ -72,6 +95,13 @@ export default class SocketServer {
                 }
             }
         }
+    }
+
+    private async create_chat(ws: WebSocket, project_id: string, message: InboundSocketMessage) {
+        const user = this.connection_users.get(ws);
+        if (!user) return;
+        await ChatSocketHandler.handle_chat_create(ws, user, project_id, message.payload);
+        return;
     }
 
     private remove_connection(ws: WebSocket, project_id: string) {

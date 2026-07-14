@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import WebSocketClient from "@/socket/socket.client";
 import { get_socket_client, close_socket_client } from "@/socket/singleton.socket";
 import { type MessageHandler } from "@/socket/socket.client";
-import { InboundSocketMessageType, OutboundSocketMessageType } from "@trymatcha/types";
+import { OutboundSocketMessageType } from "@trymatcha/types";
 import SessionServices from "@/lib/session";
 
 export function useWebSocket(project_id: string | undefined) {

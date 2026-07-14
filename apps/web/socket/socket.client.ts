@@ -59,8 +59,12 @@ export default class WebSocketClient {
                 this.reconnect_timeout = null;
             }
 
+            // app-level rejections (4xxx: unauthorized, no project access) are
+            // terminal — reconnecting would just get denied again.
             const should_reconnect =
-                !this.is_manually_closed && !is_intentional_closure(event.code);
+                !this.is_manually_closed &&
+                !is_intentional_closure(event.code) &&
+                event.code < 4000;
 
             if (should_reconnect) {
                 this.attempt_reconnect();

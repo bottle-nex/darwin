@@ -18,6 +18,8 @@ export function useSubscribeEventHandlers(project_id: string | undefined) {
                 SocketHandlers.handle_issue_created(queryClient, project_id),
             [OutboundSocketMessageType.CHAT_CREATED]: (message) =>
                 SocketHandlers.handle_chat_created(queryClient, message),
+            [OutboundSocketMessageType.CHAT_ERROR]: (message) =>
+                SocketHandlers.handle_chat_error(message),
         };
 
         Object.entries(handlers_map).forEach(([type, handler]) => {

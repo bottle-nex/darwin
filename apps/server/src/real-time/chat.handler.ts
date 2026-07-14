@@ -1,0 +1,76 @@
+import { WebSocket } from "ws";
+import z from "zod";
+import { prisma } from "@trymatcha/database";
+import Access from "../access-control/access";
+import { Action, Permissions } from "@trymatcha/access-control";
+import { server_services } from "..";
+import { OutboundSocketMessageType } from "@trymatcha/types";
+import type { AuthUser } from "../types/express.d";
+
+export default class ChatSocketHandler {
+    static payload_schema = z.object({
+        issueId: z.string().min(1),
+        message: z.string().trim().min(1).max(5000),
+    });
+
+    static async handle_chat_create(
+        ws: WebSocket,
+        user: AuthUser,
+        project_id: string,
+        raw_payload: unknown,
+    ) {
+        const parsed = ChatSocketHandler.payload_schema.safeParse(raw_payload);
+        if (!parsed.success) {
+            ChatSocketHandler.send_error(ws, "Invalid chat data provided");
+            return;
+        }
+        const { issueId, message } = parsed.data;
+
+        try {
+            const issue = await prisma.issue.findUnique({
+                where: { id: issueId },
+                select: { id: true, projectId: true },
+            });
+            if (!issue || issue.projectId !== project_id) {
+                ChatSocketHandler.send_error(ws, "Issue not found");
+                return;
+            }
+
+            const role = await Access.project(user.id, issue.projectId);
+            if (!role || !Permissions.project(role, Action.project.read)) {
+                ChatSocketHandler.send_error(ws, "You dont have access to this project");
+                return;
+            }
+
+            const chat = await prisma.chat.create({
+                data: {
+                    issueId: issue.id,
+                    senderId: user.id,
+                    message,
+                },
+                include: {
+                    sender: true,
+                },
+            });
+
+            const channel_name = server_services.publisher.get_channel_name(issue.projectId);
+            const publish_body = {
+                type: OutboundSocketMessageType.CHAT_CREATED,
+                projectId: issue.projectId,
+                payload: chat,
+            };
+            await server_services.publisher.publish_message(
+                channel_name,
+                JSON.stringify(publish_body),
+            );
+        } catch (error) {
+            console.error("ChatSocketHandler error: ", error);
+            ChatSocketHandler.send_error(ws, "Something went wrong");
+        }
+    }
+
+    private static send_error(ws: WebSocket, message: string) {
+        if (ws.readyState !== WebSocket.OPEN) return;
+        ws.send(JSON.stringify({ type: OutboundSocketMessageType.CHAT_ERROR, message }));
+    }
+}

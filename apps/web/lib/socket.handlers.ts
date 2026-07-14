@@ -1,5 +1,6 @@
 import type { QueryClient } from "@tanstack/react-query";
 import { OutboundSocketMessageType, type OutboundSocketMessage } from "@trymatcha/types";
+import { toast } from "sonner";
 import { BOARD_QUERY_KEY } from "@/hooks/issues/useBoard";
 import { upsert_chat } from "@/hooks/chats/useChats";
 
@@ -13,5 +14,11 @@ export class SocketHandlers {
     static handle_chat_created(queryClient: QueryClient, message: OutboundSocketMessage) {
         if (message.type !== OutboundSocketMessageType.CHAT_CREATED) return;
         upsert_chat(queryClient, message.payload);
+    }
+
+    /** the server rejected a comment we sent -> surface the reason. */
+    static handle_chat_error(message: OutboundSocketMessage) {
+        if (message.type !== OutboundSocketMessageType.CHAT_ERROR) return;
+        toast.error(message.message);
     }
 }

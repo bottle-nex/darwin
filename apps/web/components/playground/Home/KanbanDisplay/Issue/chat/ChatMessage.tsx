@@ -14,6 +14,29 @@ const NAME_TONE_TEXT: Record<AvatarTone, string> = {
     dark: "text-neutral-300",
 };
 
+/**
+ * Renders "@Full Name" mentions as pills. Matches against the project's member
+ * names (longest first, so "Piyush Raj" wins over "Piyush"); falls back to bare
+ * "@word" tokens while members are still loading.
+ */
+function renderWithMentions(text: string, mentionNames: string[]) {
+    const escaped = [...mentionNames]
+        .sort((a, b) => b.length - a.length)
+        .map((n) => n.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+    const pattern =
+        escaped.length > 0 ? new RegExp(`(@(?:${escaped.join("|")}))`, "gi") : /(@[^\s@]+)/g;
+    // With a single capture group, split() puts every matched mention at an odd index.
+    return text.split(pattern).map((part, i) =>
+        i % 2 === 1 ? (
+            <span key={i} className="mx-px rounded-[5px] px-1 py-px font-semibold text-white">
+                {part}
+            </span>
+        ) : (
+            part
+        ),
+    );
+}
+
 /** "12:02 AM" — local wall-clock time for a comment. */
 function formatChatTime(value: Date | string): string {
     return new Date(value).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
@@ -29,11 +52,13 @@ export default function ChatMessage({
     isMine,
     startsGroup,
     endsGroup,
+    mentionNames,
 }: {
     chat: Chat;
     isMine: boolean;
     startsGroup: boolean;
     endsGroup: boolean;
+    mentionNames: string[];
 }) {
     const name = chat.sender?.name ?? "Unknown";
     return (
@@ -81,7 +106,7 @@ export default function ChatMessage({
                             {name}
                         </span>
                     )}
-                    {chat.message}
+                    {renderWithMentions(chat.message, mentionNames)}
                     {/* Invisible spacer floated at the end so only the last line leaves
                         room for the absolutely-placed time; earlier lines use full width. */}
                     <span aria-hidden className="pointer-events-none float-right h-4 w-11" />

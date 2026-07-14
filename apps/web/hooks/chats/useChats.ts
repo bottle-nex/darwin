@@ -20,8 +20,7 @@ export function useChats(issueId: string | undefined) {
 
 /**
  * Append a chat into an issue's cached list, idempotently (by id).
- * Shared by the create-mutation and the socket handler so a comment that
- * arrives via both paths is never duplicated. No-ops if the issue's list
+ * Called by the socket CHAT_CREATED handler. No-ops if the issue's list
  * isn't loaded, it'll be fetched fresh when the issue is opened.
  */
 export function upsert_chat(queryClient: QueryClient, chat: Chat) {
