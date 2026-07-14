@@ -43,7 +43,6 @@ export function useWebSocket(project_id: string | undefined) {
         socket.current.unsubscribe(type, handler);
     }
 
-
     return {
         is_connected,
         subscribe,

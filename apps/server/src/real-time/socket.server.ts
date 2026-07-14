@@ -2,15 +2,7 @@ import { WebSocketServer, WebSocket } from "ws";
 import { IncomingMessage, Server } from "http";
 import SubscriberSystem from "./subscriber.system";
 import { verifySessionJwt } from "../services/service.jwt";
-import {
-    InboundSocketMessageType,
-    OutboundSocketMessageType,
-    type InboundSocketMessage,
-} from "@trymatcha/types";
-import { IssueStatus, Prisma, prisma } from "@trymatcha/database";
-import { Action, Permissions } from "@trymatcha/access-control";
-import Access from "../access-control/access";
-import { server_services } from "..";
+import type { InboundSocketMessage } from "@trymatcha/types";
 import type { AuthUser } from "../types/express.d";
 
 export default class SocketServer {
@@ -46,16 +38,16 @@ export default class SocketServer {
             }
             connections.add(ws);
             this.connection_users.set(ws, user);
-            this.add_listeners(ws, project_id, user);
+            this.add_listeners(ws, project_id);
         });
     }
 
-    private add_listeners(ws: WebSocket, project_id: string, user: AuthUser) {
+    private add_listeners(ws: WebSocket, project_id: string) {
         ws.on("message", async (raw: string) => {
             try {
                 const message = JSON.parse(raw.toString()) as InboundSocketMessage;
                 switch (message.type) {
-                    default: 
+                    default:
                         return;
                 }
             } catch (error) {
