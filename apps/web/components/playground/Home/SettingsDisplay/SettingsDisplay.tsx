@@ -4,9 +4,6 @@ import { motion } from "motion/react";
 import { MdLock } from "react-icons/md";
 import { useGetDashboard } from "@/hooks/dashboard/useGetDashboard";
 import { useGetProject } from "@/hooks/project/useGetProject";
-import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
-import { Surface } from "../../Sidebar/surface";
-import { ProjectsTab } from "../../Projects/projectsTabs";
 import ProjectSettingsGeneralSection from "./ProjectSettingsGeneralSection";
 import ProjectSettingsTeamSection from "./ProjectSettingsTeamSection";
 import ProjectSettingsMemberSection from "./ProjectSettingsMemberSection";
@@ -15,21 +12,12 @@ import IssueTemplatesDisplay from "./templates/IssueTemplatesDisplay";
 
 export type ProjectSettingsSection = "project" | "teams" | "members" | "env" | "templates";
 
-/** Maps a Projects settings tab to its section, for the store-driven fallback. */
-const TAB_SECTION: Partial<Record<ProjectsTab, ProjectSettingsSection>> = {
-    [ProjectsTab.SettingsTeams]: "teams",
-    [ProjectsTab.SettingsMembers]: "members",
-    [ProjectsTab.SettingsEnv]: "env",
-    [ProjectsTab.SettingsProject]: "project",
-};
-
 /**
  * Main pane for project settings. The section nav lives in the sidebar; this
- * view renders one section, gated on the viewer being able to manage the
- * project. The section is taken from the `section` prop when given (Home
- * surface), else derived from the active Projects tab.
+ * view renders the one `section` it's given, gated on the viewer being able to
+ * manage the project.
  */
-export default function SettingsDisplay({ section }: { section?: ProjectSettingsSection }) {
+export default function SettingsDisplay({ section }: { section: ProjectSettingsSection }) {
     const { orgSlug, projectSlug } = useParams<{ orgSlug: string; projectSlug?: string }>();
     const { data: dashboard } = useGetDashboard(orgSlug);
     const activeProject = projectSlug
@@ -41,9 +29,7 @@ export default function SettingsDisplay({ section }: { section?: ProjectSettings
     const canManage = project?.viewerRole === "Admin" || project?.viewerRole === "Maintain";
     const isAdmin = project?.viewerRole === "Admin";
 
-    const tab = usePlaygroundNavStore((s) => s.tabBySurface[Surface.Projects]);
-    const activeSection: ProjectSettingsSection =
-        section ?? TAB_SECTION[tab as ProjectsTab] ?? "project";
+    const activeSection = section;
 
     if (!project) {
         return <div className="flex-1" />;

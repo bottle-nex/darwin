@@ -10,7 +10,6 @@ import { useGetProject } from "@/hooks/project/useGetProject";
 import { useNewTeamStore } from "@/store/team/useNewTeamStore";
 import { useDeleteTeamStore } from "@/store/team/useDeleteTeamStore";
 import { rowLeading } from "./shared";
-import { Surface } from "./surface";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
 
 export default function PlaygroundSidebarTeamsSection() {
@@ -48,7 +47,7 @@ export default function PlaygroundSidebarTeamsSection() {
                                 tone: "indigo",
                             })}
                             active={isActive}
-                            onClick={() => openTeam(Surface.Home, t, projectSlug ?? "")}
+                            onClick={() => openTeam(t, projectSlug ?? "")}
                         />
                         <button
                             type="button"

@@ -14,7 +14,7 @@ import {
     CommandList,
 } from "@/components/ui/command";
 import { useProjectMembers, type ProjectMember } from "@/hooks/project/useProjectMembers";
-import ProjectRoleTicker from "@/components/playground/Projects/TeamView/ProjectRoleTicker";
+import ProjectRoleTicker from "@/components/playground/Team/TeamView/ProjectRoleTicker";
 import { CapsuleTrigger } from "./Capsule";
 
 // A small, fixed palette; the tone is picked deterministically from the user id

@@ -5,7 +5,7 @@ import PlaygroundAvatar, {
     initialOf,
     toneFor,
 } from "@/components/playground/Core/components/PlaygroundAvatar";
-import ProjectRoleTicker from "@/components/playground/Projects/TeamView/ProjectRoleTicker";
+import ProjectRoleTicker from "@/components/playground/Team/TeamView/ProjectRoleTicker";
 import type { OverviewMember } from "@/types/overview";
 import { SECTION_VARIANTS, SectionLabel } from "./overviewTheme";
 

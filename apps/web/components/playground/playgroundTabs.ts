@@ -1,9 +1,9 @@
 /**
- * Tabs for the Home surface. Each value is the id of the sidebar row that
- * selects it, so the active tab, row highlighting, and the main-pane switch all
- * key off the same string (see `usePlaygroundNavStore`).
+ * The playground's tabs. Each value is the id of the sidebar row that selects
+ * it, so the active tab, row highlighting, and the main-pane switch all key off
+ * the same string (see `usePlaygroundNavStore`).
  */
-export enum HomeTab {
+export enum PlaygroundTab {
     Inbox = "inbox",
     Kanban = "kanban",
     Overview = "overview",
@@ -15,11 +15,9 @@ export enum HomeTab {
     InProgress = "in-progress",
     Drafts = "drafts",
     TeamDetail = "team-detail",
-    // Settings sections — selecting any of these swaps the Home sidebar to its
-    // settings face (see `HomeSidebar` / `HomeSettingsNav`).
     SettingsProject = "settings-project",
     SettingsTemplates = "settings-templates",
     SettingsEnv = "settings-env",
 }
 
-export const HOME_DEFAULT_TAB: HomeTab = HomeTab.Inbox;
+export const PLAYGROUND_DEFAULT_TAB: PlaygroundTab = PlaygroundTab.Inbox;

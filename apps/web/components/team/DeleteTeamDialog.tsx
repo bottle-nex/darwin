@@ -15,7 +15,6 @@ import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore"
 
 export default function DeleteTeamDialog() {
     const { team, close } = useDeleteTeamStore();
-    const surface = usePlaygroundNavStore((s) => s.surface);
     const selectedTeam = usePlaygroundNavStore((s) => s.selectedTeam);
     const clearTeam = usePlaygroundNavStore((s) => s.clearTeam);
     const deleteTeam = useDeleteTeam();
@@ -38,7 +37,7 @@ export default function DeleteTeamDialog() {
         deleteTeam.mutate(team.id, {
             onSuccess: () => {
                 if (selectedTeam?.id === team.id) {
-                    clearTeam(surface);
+                    clearTeam();
                 }
                 close();
                 setConfirmText("");

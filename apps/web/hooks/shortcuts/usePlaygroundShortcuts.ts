@@ -1,32 +1,27 @@
 import { useEffect, useRef } from "react";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
-import { Surface } from "@/components/playground/Sidebar/surface";
-import { HomeTab } from "@/components/playground/Home/homeTabs";
+import { useShortcutSheetStore } from "@/store/playground/useShortcutSheetStore";
+import { PlaygroundTab } from "@/components/playground/playgroundTabs";
 
-interface Shortcut {
-    keys: string;
+interface Combination {
+    label: string;
     run: () => void;
 }
 
-function openHomeTab(tab: HomeTab) {
-    const { setSurface, setTab } = usePlaygroundNavStore.getState();
-    setSurface(Surface.Home);
-    setTab(Surface.Home, tab);
+function openTab(tab: PlaygroundTab) {
+    usePlaygroundNavStore.getState().setTab(tab);
 }
 
-const OPEN_TARGETS: Record<string, HomeTab> = {
-    i: HomeTab.Inbox,
-    k: HomeTab.Kanban,
-    o: HomeTab.Overview,
-    g: HomeTab.Gantt,
-    t: HomeTab.Tags,
-    m: HomeTab.Mentions,
+export const COMBINATIONS: Record<string, Combination> = {
+    "mod+/": { label: "Toggle shortcuts", run: () => useShortcutSheetStore.getState().open() },
+    "o i": { label: "Open Inbox", run: () => openTab(PlaygroundTab.Inbox) },
+    "o k": { label: "Open Kanban", run: () => openTab(PlaygroundTab.Kanban) },
+    "o o": { label: "Open Overview", run: () => openTab(PlaygroundTab.Overview) },
+    "o g": { label: "Open Gantt", run: () => openTab(PlaygroundTab.Gantt) },
+    "o t": { label: "Open Tags", run: () => openTab(PlaygroundTab.Tags) },
+    "o m": { label: "Open Mentions", run: () => openTab(PlaygroundTab.Mentions) },
+    "o r": { label: "Open Reviews", run: () => openTab(PlaygroundTab.Reviews) },
 };
-
-const SHORTCUTS: Shortcut[] = Object.entries(OPEN_TARGETS).map(([key, tab]) => ({
-    keys: `o ${key}`,
-    run: () => openHomeTab(tab),
-}));
 
 const SEQUENCE_TIMEOUT_MS = 800;
 
@@ -39,12 +34,12 @@ function isTyping(target: EventTarget | null): boolean {
 
 function matchKeys(keys: string[]): "matched" | "pending" | "none" {
     const sequence = keys.join(" ");
-    const exact = SHORTCUTS.find((shortcut) => shortcut.keys === sequence);
-    if (exact) {
-        exact.run();
+    const combination = COMBINATIONS[sequence];
+    if (combination) {
+        combination.run();
         return "matched";
     }
-    const isPrefix = SHORTCUTS.some((shortcut) => shortcut.keys.startsWith(`${sequence} `));
+    const isPrefix = Object.keys(COMBINATIONS).some((combo) => combo.startsWith(`${sequence} `));
     return isPrefix ? "pending" : "none";
 }
 
@@ -67,7 +62,6 @@ export default function usePlaygroundShortcuts() {
         }
 
         function handleKeys(keys: string[]): boolean {
-            console.log("handleKeys", keys);
             const outcome = matchKeys(keys);
             if (outcome === "matched") {
                 reset();
@@ -82,19 +76,20 @@ export default function usePlaygroundShortcuts() {
         }
 
         function handleKeyDown(event: KeyboardEvent) {
-            if (event.metaKey || event.ctrlKey || event.altKey) return;
+            if (event.altKey) return;
             if (isTyping(event.target)) return;
 
             const key = event.key.toLowerCase();
-            console.log("key at handle key down is ", key, pendingKeysRef.current);
             if (key.length !== 1) return;
 
-            if (handleKeys([...pendingKeysRef.current, key])) {
+            const token = event.metaKey || event.ctrlKey ? `mod+${key}` : key;
+
+            if (handleKeys([...pendingKeysRef.current, token])) {
                 event.preventDefault();
                 return;
             }
             reset();
-            if (handleKeys([key])) event.preventDefault();
+            if (handleKeys([token])) event.preventDefault();
         }
 
         window.addEventListener("keydown", handleKeyDown);

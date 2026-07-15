@@ -2,8 +2,8 @@
 import { AnimatePresence, motion } from "motion/react";
 import { HiOutlineArrowUpCircle, HiOutlineCog6Tooth, HiOutlineUserPlus } from "react-icons/hi2";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
-import { HomeTab } from "../Home/homeTabs";
-import { Surface } from "./surface";
+import { useSidebarWidthStore } from "@/store/playground/useSidebarWidthStore";
+import { PlaygroundTab } from "../playgroundTabs";
 import SidebarRow from "./SidebarRow";
 import BoardSection from "./BoardSection";
 import InboxSection from "./InboxSection";
@@ -11,26 +11,28 @@ import TeamsSection from "./TeamsSection";
 import SettingsNavSection from "./SettingsNavSection";
 
 const SETTINGS_TABS: string[] = [
-    HomeTab.SettingsProject,
-    HomeTab.SettingsTemplates,
-    HomeTab.SettingsEnv,
+    PlaygroundTab.SettingsProject,
+    PlaygroundTab.SettingsTemplates,
+    PlaygroundTab.SettingsEnv,
 ];
 
 export default function PlaygroundSidebar() {
-    const selectedRowId = usePlaygroundNavStore((s) => s.tabBySurface[Surface.Home]);
+    const selectedRowId = usePlaygroundNavStore((s) => s.tab);
     const setTab = usePlaygroundNavStore((s) => s.setTab);
+    const width = useSidebarWidthStore((s) => s.width);
 
     const inSettings = SETTINGS_TABS.includes(selectedRowId);
     const section = {
         selectedRowId,
-        onSelect: (id: string) => setTab(Surface.Home, id),
+        onSelect: (id: string) => setTab(id),
     };
 
     return (
         <aside
             data-lenis-prevent
             aria-label="Sidebar"
-            className="flex h-full min-h-0 w-60 shrink-0 flex-col justify-between"
+            style={{ width }}
+            className="flex h-full min-h-0 shrink-0 flex-col justify-between pr-2"
         >
             <div className="min-h-0 flex-1 overflow-y-auto px-1 pt-1">
                 <AnimatePresence mode="wait" initial={false}>
@@ -60,7 +62,7 @@ export default function PlaygroundSidebar() {
                     label="Settings"
                     leading={{ kind: "icon", icon: HiOutlineCog6Tooth }}
                     active={inSettings}
-                    onClick={() => section.onSelect(HomeTab.SettingsProject)}
+                    onClick={() => section.onSelect(PlaygroundTab.SettingsProject)}
                 />
                 <SidebarRow label="Invite" leading={{ kind: "icon", icon: HiOutlineUserPlus }} />
                 <SidebarRow label="Pro" leading={{ kind: "icon", icon: HiOutlineArrowUpCircle }} />

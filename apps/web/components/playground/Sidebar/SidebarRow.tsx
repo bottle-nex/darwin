@@ -4,27 +4,20 @@ import { HiOutlineLockClosed } from "react-icons/hi2";
 import { cn } from "@/lib/utils";
 
 type RowProps = {
-    /** Leading slot — supply either an icon or a fully-formed react node (e.g. an avatar). */
     leading?:
         | { kind: "icon"; icon: React.ComponentType<React.SVGProps<SVGSVGElement>> }
         | { kind: "node"; node: React.ReactNode };
     label: string;
-    /** Lighter trailing text that follows the label after a dash. */
     suffix?: string;
     badge?: number;
     indent?: number;
     size?: number;
     active?: boolean;
     onClick?: () => void;
-    /** Trailing actions revealed on hover (e.g. ellipsis + plus). */
     trailing?: React.ReactNode;
     isLocked?: boolean;
 };
 
-/**
- * Generic sidebar row. Used everywhere — primary nav, projects, teams, agents.
- * Keeps spacing/typography consistent without each section reimplementing it.
- */
 export default function PlaygroundSidebarRow({
     leading,
     label,
@@ -44,10 +37,10 @@ export default function PlaygroundSidebarRow({
             type="button"
             onClick={onClick}
             className={cn(
-                "group flex w-full cursor-pointer items-center gap-2 rounded-md py-1.5 pr-2 text-left text-[13px]",
+                "group flex w-full cursor-pointer items-center gap-2 rounded-md py-1 pr-2 text-left text-[13px]",
                 active
                     ? "bg-white/5 text-neutral-100"
-                    : "text-neutral-300 hover:bg-white/2.5 hover:text-neutral-100",
+                    : "text-neutral-400 hover:bg-white/2.5 hover:text-neutral-100",
             )}
             style={{ paddingLeft: 8 + indent * 16 }}
         >
@@ -60,7 +53,7 @@ export default function PlaygroundSidebarRow({
             </span>
 
             <span className="flex min-w-0 flex-1 items-baseline gap-1.5">
-                <span className="truncate text-[12.5px]">{label}</span>
+                <span className="truncate text-[13px]">{label}</span>
                 {suffix && (
                     <span className="truncate text-[10px] text-neutral-500">- {suffix}</span>
                 )}
