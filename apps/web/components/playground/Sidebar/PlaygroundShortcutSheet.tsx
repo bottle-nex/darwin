@@ -20,7 +20,10 @@ function KeyCombo({ keys }: { keys: string[] }) {
     return (
         <div className="flex items-center gap-1">
             {keys.map((key, index) => (
-                <kbd key={index} className="inline-flex min-w-6 items-center justify-center rounded border border-white/7 px-1.5 py-0.5 text-xs font-medium text-neutral-300 uppercase">
+                <kbd
+                    key={index}
+                    className="inline-flex min-w-6 items-center justify-center rounded border border-white/7 px-1.5 py-0.5 text-xs font-medium text-neutral-300 uppercase"
+                >
                     {key}
                 </kbd>
             ))}
