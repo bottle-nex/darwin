@@ -11,6 +11,7 @@ import { useGetDashboard } from "@/hooks/dashboard/useGetDashboard";
 import { useGetProject } from "@/hooks/project/useGetProject";
 import { usePlaygroundUrlSync } from "./usePlaygroundUrlSync";
 import { useSubscribeEventHandlers } from "@/hooks/socket/useSubscribeEventHandlers";
+import usePlaygroundShortcuts from "@/hooks/shortcuts/usePlaygroundShortcuts";
 
 /**
  * Shared playground workspace shell rendered by both the org route
@@ -39,6 +40,8 @@ export default function PlaygroundShell() {
     usePlaygroundUrlSync(project?.teams);
     // Open the issue dialog for a deep-linked `…/issue/<id>` and follow Back/Forward.
     useIssueDialog({ sync: true });
+    // Global keyboard shortcuts (e.g. `o` then `t` to open Tags).
+    usePlaygroundShortcuts();
 
     return (
         <main className="flex h-screen flex-col overflow-hidden text-neutral-100 pt-px select-none">
