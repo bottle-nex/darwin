@@ -17,6 +17,7 @@ export type InboundSocketMessage =
           payload: {
               issueId: string;
               message: string;
+              repliedToId?: string;
           };
       };
 

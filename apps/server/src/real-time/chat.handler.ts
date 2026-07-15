@@ -11,6 +11,7 @@ export default class ChatSocketHandler {
     static payload_schema = z.object({
         issueId: z.string().min(1),
         message: z.string().trim().min(1).max(5000),
+        repliedToId: z.string().min(1).optional(),
     });
 
     static async handle_chat_create(
@@ -24,7 +25,7 @@ export default class ChatSocketHandler {
             ChatSocketHandler.send_error(ws, "Invalid chat data provided");
             return;
         }
-        const { issueId, message } = parsed.data;
+        const { issueId, message, repliedToId } = parsed.data;
 
         try {
             const issue = await prisma.issue.findUnique({
@@ -42,14 +43,27 @@ export default class ChatSocketHandler {
                 return;
             }
 
+            if (repliedToId) {
+                const replied_to = await prisma.chat.findUnique({
+                    where: { id: repliedToId },
+                    select: { issueId: true },
+                });
+                if (!replied_to || replied_to.issueId !== issue.id) {
+                    ChatSocketHandler.send_error(ws, "Replied message not found");
+                    return;
+                }
+            }
+
             const chat = await prisma.chat.create({
                 data: {
                     issueId: issue.id,
                     senderId: user.id,
                     message,
+                    repliedToId,
                 },
                 include: {
                     sender: true,
+                    repliedTo: { include: { sender: true } },
                 },
             });
 

@@ -1,3 +1,4 @@
+import { BsReply } from "react-icons/bs";
 import { cn } from "@/lib/utils";
 import PlaygroundAvatar, {
     toneFor,
@@ -53,18 +54,26 @@ export default function ChatMessage({
     startsGroup,
     endsGroup,
     mentionNames,
+    viewerId,
+    onReply,
+    onQuoteClick,
 }: {
     chat: Chat;
     isMine: boolean;
     startsGroup: boolean;
     endsGroup: boolean;
     mentionNames: string[];
+    viewerId?: string;
+    onReply: (chat: Chat) => void;
+    onQuoteClick: (chatId: string) => void;
 }) {
     const name = chat.sender?.name ?? "Unknown";
+    const quote = chat.repliedTo;
     return (
         <li
+            id={`chat-${chat.id}`}
             className={cn(
-                "flex items-end gap-2",
+                "flex items-end gap-2 rounded-lg transition-colors duration-500",
                 isMine ? "flex-row-reverse" : "flex-row",
                 startsGroup ? "mt-4 first:mt-0" : "mt-1",
             )}
@@ -90,12 +99,24 @@ export default function ChatMessage({
             >
                 <div
                     className={cn(
-                        "relative min-w-0 rounded-[10px] px-2.5 py-1.5 text-[13px] leading-snug wrap-anywhere",
+                        "group/bubble relative min-w-0 max-w-full rounded-[10px] px-2.5 py-1.5 text-[13px] leading-snug wrap-anywhere",
                         isMine ? "bg-indigo-500/85 text-white" : "bg-white/6 text-neutral-200",
                         // Only the last bubble of a run gets the pointed tail corner.
                         endsGroup && (isMine ? "rounded-br-xs" : "rounded-bl-xs"),
                     )}
                 >
+                    <button
+                        type="button"
+                        onClick={() => onReply(chat)}
+                        aria-label="Reply"
+                        className={cn(
+                            "absolute top-1 z-10 rounded-md bg-neutral-800 p-1 text-neutral-300 opacity-0 transition-opacity hover:text-white group-hover/bubble:opacity-100 cursor-pointer",
+                            // Sits on the bubble corner facing the center of the thread.
+                            isMine ? "left-1" : "right-1",
+                        )}
+                    >
+                        <BsReply className="size-3.5" />
+                    </button>
                     {startsGroup && !isMine && (
                         <span
                             className={cn(
@@ -105,6 +126,48 @@ export default function ChatMessage({
                         >
                             {name}
                         </span>
+                    )}
+                    {chat.repliedToId && (
+                        <button
+                            type="button"
+                            onClick={() => quote && !quote.isDeleted && onQuoteClick(quote.id)}
+                            className={cn(
+                                "mb-1 flex w-full min-w-32 max-w-full flex-col overflow-hidden rounded-[7px] border-l-2 px-2 py-1 text-left",
+                                isMine
+                                    ? "border-white/60 bg-black/15"
+                                    : "border-indigo-400 bg-black/25",
+                            )}
+                        >
+                            {quote && !quote.isDeleted ? (
+                                <>
+                                    <span
+                                        className={cn(
+                                            "min-w-0 max-w-full truncate text-[10.5px] font-medium",
+                                            isMine
+                                                ? "text-white/90"
+                                                : NAME_TONE_TEXT[
+                                                      toneFor(
+                                                          quote.senderId ??
+                                                              quote.sender?.name ??
+                                                              "Unknown",
+                                                      )
+                                                  ],
+                                        )}
+                                    >
+                                        {quote.senderId && quote.senderId === viewerId
+                                            ? "You"
+                                            : (quote.sender?.name ?? "Unknown")}
+                                    </span>
+                                    <span className="min-w-0 max-w-full truncate text-[11.5px] opacity-70">
+                                        {quote.message}
+                                    </span>
+                                </>
+                            ) : (
+                                <span className="text-[11.5px] italic opacity-60">
+                                    {quote?.isDeleted ? "Message deleted" : "Message unavailable"}
+                                </span>
+                            )}
+                        </button>
                     )}
                     {renderWithMentions(chat.message, mentionNames)}
                     {/* Invisible spacer floated at the end so only the last line leaves

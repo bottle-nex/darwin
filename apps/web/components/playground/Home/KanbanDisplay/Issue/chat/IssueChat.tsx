@@ -2,7 +2,8 @@
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { BsChatRightTextFill } from "react-icons/bs";
-import { IoIosSend } from "react-icons/io";
+import { IoIosSend, IoMdClose } from "react-icons/io";
+import type { Chat } from "@trymatcha/types";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import PlaygroundAvatar, {
@@ -22,6 +23,7 @@ const MENTION_AT_CARET = /(?:^|\s)@([^\s@]*)$/;
 /** The "Comments and activity" panel for an issue. Disabled until the issue is saved. */
 export default function IssueChat({ issueId }: { issueId?: string }) {
     const [message, setMessage] = useState<string>("");
+    const [reply, setReply] = useState<{ issueId: string; chat: Chat } | null>(null);
     const [mentionQuery, setMentionQuery] = useState<string | null>(null);
     const [mentionIndex, setMentionIndex] = useState<number>(0);
     const { data: chats } = useChats(issueId);
@@ -35,6 +37,9 @@ export default function IssueChat({ issueId }: { issueId?: string }) {
         const el = scrollRef.current;
         if (el) el.scrollTop = el.scrollHeight;
     }, [chats?.length]);
+
+    // A pending reply belongs to one issue's thread; ignore it after switching issues.
+    const replyTo = reply && reply.issueId === issueId ? reply.chat : null;
 
     const mentionMatches =
         mentionQuery === null
@@ -76,13 +81,29 @@ export default function IssueChat({ issueId }: { issueId?: string }) {
         if (!trimmed || !issueId) return;
         const sent = send_socket_message({
             type: InboundSocketMessageType.CHAT_CREATE,
-            payload: { issueId, message: trimmed },
+            payload: { issueId, message: trimmed, repliedToId: replyTo?.id },
         });
         if (!sent) {
             toast.error("Couldn't add your comment.");
             return;
         }
         setMessage("");
+        setReply(null);
+    }
+
+    function startReply(chat: Chat) {
+        if (!issueId) return;
+        setReply({ issueId, chat });
+        inputRef.current?.focus();
+    }
+
+    /** Scroll a quoted original into view and flash it briefly. */
+    function jumpToChat(chatId: string) {
+        const el = document.getElementById(`chat-${chatId}`);
+        if (!el) return;
+        el.scrollIntoView({ behavior: "smooth", block: "center" });
+        el.classList.add("bg-white/10");
+        setTimeout(() => el.classList.remove("bg-white/10"), 900);
     }
 
     return (
@@ -106,6 +127,9 @@ export default function IssueChat({ issueId }: { issueId?: string }) {
                                 startsGroup={chats[i - 1]?.senderId !== chat.senderId}
                                 endsGroup={chats[i + 1]?.senderId !== chat.senderId}
                                 mentionNames={(members ?? []).map((m) => m.name ?? m.email)}
+                                viewerId={currentUserId ?? undefined}
+                                onReply={startReply}
+                                onQuoteClick={jumpToChat}
                             />
                         ))}
                     </ul>
@@ -115,7 +139,7 @@ export default function IssueChat({ issueId }: { issueId?: string }) {
                     </p>
                 )}
             </div>
-            <footer className="relative flex items-end gap-x-2">
+            <footer className="relative flex flex-col">
                 {mentionMatches.length > 0 && (
                     <ul className="absolute w-50 bottom-full left-4 right-4 z-10 max-h-48 overflow-y-auto rounded-[10px] border border-white/10 bg-neutral-900 p-1 shadow-lg">
                         {mentionMatches.map((member, i) => (
@@ -146,54 +170,83 @@ export default function IssueChat({ issueId }: { issueId?: string }) {
                         ))}
                     </ul>
                 )}
-                <Textarea
-                    ref={inputRef}
-                    placeholder="Leave a comment..."
-                    value={message}
-                    rows={1}
-                    data-lenis-prevent
-                    onChange={(e) => {
-                        setMessage(e.target.value);
-                        syncMention(e.target.value, e.target.selectionStart);
-                    }}
-                    onKeyDown={(e) => {
-                        if (mentionMatches.length > 0) {
-                            if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+                {replyTo && (
+                    <div className="mb-1.5 flex items-center gap-x-2 rounded-[9px] border-l-2 border-indigo-400 bg-white/4 px-2.5 py-1.5">
+                        <div className="min-w-0 flex-1">
+                            <span className="block text-[11px] font-medium text-indigo-300">
+                                Replying to{" "}
+                                {replyTo.senderId === currentUserId
+                                    ? "yourself"
+                                    : (replyTo.sender?.name ?? "Unknown")}
+                            </span>
+                            <span className="block truncate text-[12px] text-neutral-400">
+                                {replyTo.message}
+                            </span>
+                        </div>
+                        <button
+                            type="button"
+                            onClick={() => setReply(null)}
+                            aria-label="Cancel reply"
+                            className="shrink-0 rounded p-1 text-neutral-400 hover:text-neutral-100"
+                        >
+                            <IoMdClose className="size-4" />
+                        </button>
+                    </div>
+                )}
+                <div className="flex items-end gap-x-2">
+                    <Textarea
+                        ref={inputRef}
+                        placeholder="Leave a comment..."
+                        value={message}
+                        rows={1}
+                        data-lenis-prevent
+                        onChange={(e) => {
+                            setMessage(e.target.value);
+                            syncMention(e.target.value, e.target.selectionStart);
+                        }}
+                        onKeyDown={(e) => {
+                            if (mentionMatches.length > 0) {
+                                if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+                                    e.preventDefault();
+                                    const step = e.key === "ArrowDown" ? 1 : -1;
+                                    setMentionIndex(
+                                        (mentionIndex + step + mentionMatches.length) %
+                                            mentionMatches.length,
+                                    );
+                                    return;
+                                }
+                                if (e.key === "Enter" || e.key === "Tab") {
+                                    e.preventDefault();
+                                    insertMention(mentionMatches[mentionIndex]);
+                                    return;
+                                }
+                                if (e.key === "Escape") {
+                                    setMentionQuery(null);
+                                    return;
+                                }
+                            }
+                            if (e.key === "Escape" && replyTo) {
+                                setReply(null);
+                                return;
+                            }
+                            if (e.key === "Enter" && !e.shiftKey) {
                                 e.preventDefault();
-                                const step = e.key === "ArrowDown" ? 1 : -1;
-                                setMentionIndex(
-                                    (mentionIndex + step + mentionMatches.length) %
-                                        mentionMatches.length,
-                                );
-                                return;
+                                handleSend();
                             }
-                            if (e.key === "Enter" || e.key === "Tab") {
-                                e.preventDefault();
-                                insertMention(mentionMatches[mentionIndex]);
-                                return;
-                            }
-                            if (e.key === "Escape") {
-                                setMentionQuery(null);
-                                return;
-                            }
-                        }
-                        if (e.key === "Enter" && !e.shiftKey) {
-                            e.preventDefault();
-                            handleSend();
-                        }
-                    }}
-                    disabled={!issueId}
-                    className="no-scrollbar min-h-8 max-h-28 min-w-0 flex-1 resize-none overflow-y-auto border-neutral-500 py-1.75 text-[13px] leading-5 text-neutral-100 placeholder:text-[13px]!"
-                />
-                <Button
-                    size="icon"
-                    onClick={handleSend}
-                    disabled={!issueId || !message.trim()}
-                    aria-label="Send comment"
-                    className="shrink-0 h-9! w-9!"
-                >
-                    <IoIosSend className="size-4.5" />
-                </Button>
+                        }}
+                        disabled={!issueId}
+                        className="no-scrollbar min-h-8 max-h-28 min-w-0 flex-1 resize-none overflow-y-auto border-neutral-500 py-1.75 text-[13px] leading-5 text-neutral-100 placeholder:text-[13px]!"
+                    />
+                    <Button
+                        size="icon"
+                        onClick={handleSend}
+                        disabled={!issueId || !message.trim()}
+                        aria-label="Send comment"
+                        className="shrink-0 h-9! w-9!"
+                    >
+                        <IoIosSend className="size-4.5" />
+                    </Button>
+                </div>
             </footer>
         </section>
     );

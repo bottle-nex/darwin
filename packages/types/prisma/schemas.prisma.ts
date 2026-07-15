@@ -127,6 +127,10 @@ export interface Chat {
     senderId: string | null;
     sender: User | null;
 
+    repliedToId: string | null;
+    /** included one level deep on reads/broadcasts; absent on the nested quote itself. */
+    repliedTo?: Chat | null;
+
     createdAt: Date;
     updatedAt: Date;
 }
