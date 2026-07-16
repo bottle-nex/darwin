@@ -14,7 +14,7 @@ function openTab(tab: PlaygroundTab) {
 
 export const COMBINATIONS: Record<string, Combination> = {
     "mod+/": { label: "Toggle shortcuts", run: () => useShortcutSheetStore.getState().open() },
-    "o i": { label: "Open Inbox", run: () => openTab(PlaygroundTab.Inbox) },
+    "o i": { label: "Open Threads", run: () => openTab(PlaygroundTab.Threads) },
     "o k": { label: "Open Kanban", run: () => openTab(PlaygroundTab.Kanban) },
     "o o": { label: "Open Overview", run: () => openTab(PlaygroundTab.Overview) },
     "o g": { label: "Open Gantt", run: () => openTab(PlaygroundTab.Gantt) },

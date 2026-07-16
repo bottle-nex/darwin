@@ -13,7 +13,7 @@ type KanbanBothBoardsProps = {
 
 /** Thin vertical divider between the two boards. */
 function Divider() {
-    return <div className="w-px shrink-0 self-stretch bg-white/8" />;
+    return <div className="my-3 w-px shrink-0 self-stretch bg-white/8" />;
 }
 
 /**

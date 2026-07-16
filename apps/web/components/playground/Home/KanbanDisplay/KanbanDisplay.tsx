@@ -6,6 +6,7 @@ import KanbanContent from "./KanbanContent";
 import KanbanDragOverlay from "./KanbanDragOverlay";
 import IssueFlightTrigger from "./flight/IssueFlightTrigger";
 import IssueFlightOverlay from "./flight/IssueFlightOverlay";
+import AddCustomColumnDialog from "./customkanban/AddCustomColumnDialog";
 
 /**
  * The workspace's Kanban surface. Hosts two boards — the user-built Custom
@@ -33,6 +34,7 @@ export default function KanbanDisplay() {
             </DndContext>
             <IssueFlightTrigger />
             <IssueFlightOverlay />
+            <AddCustomColumnDialog onAdd={custom.addColumn} />
         </div>
     );
 }

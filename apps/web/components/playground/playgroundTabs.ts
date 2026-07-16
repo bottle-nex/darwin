@@ -4,7 +4,7 @@
  * the same string (see `usePlaygroundNavStore`).
  */
 export enum PlaygroundTab {
-    Inbox = "inbox",
+    Threads = "threads",
     Kanban = "kanban",
     Overview = "overview",
     Gantt = "gantt",
@@ -15,6 +15,7 @@ export enum PlaygroundTab {
     InProgress = "in-progress",
     Drafts = "drafts",
     TeamDetail = "team-detail",
+    ThreadDetail = "thread-detail",
     SettingsProject = "settings-project",
     SettingsTemplates = "settings-templates",
     SettingsEnv = "settings-env",

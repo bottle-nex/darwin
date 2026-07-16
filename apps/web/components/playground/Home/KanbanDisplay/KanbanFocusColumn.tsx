@@ -42,6 +42,7 @@ export default function KanbanFocusColumn({ filter, board, custom }: KanbanFocus
                 onDeleteCard={custom.removeCard}
                 onAssign={custom.assignMember}
                 onUnassign={custom.unassignMember}
+                draggable={false}
             />
         );
     }

@@ -4,7 +4,7 @@ import PlaygroundAvatar, {
     toneFor,
     type AvatarTone,
 } from "@/components/playground/Core/components/PlaygroundAvatar";
-import type { Chat } from "@trymatcha/types";
+import type { Chat, ProjectChat } from "@trymatcha/types";
 
 /** Per-sender name color inside the bubble, matched to their avatar tone (WhatsApp-style). */
 const NAME_TONE_TEXT: Record<AvatarTone, string> = {
@@ -58,13 +58,13 @@ export default function ChatMessage({
     onReply,
     onQuoteClick,
 }: {
-    chat: Chat;
+    chat: Chat | ProjectChat;
     isMine: boolean;
     startsGroup: boolean;
     endsGroup: boolean;
     mentionNames: string[];
     viewerId?: string;
-    onReply: (chat: Chat) => void;
+    onReply: (chat: Chat | ProjectChat) => void;
     onQuoteClick: (chatId: string) => void;
 }) {
     const name = chat.sender?.name ?? "Unknown";

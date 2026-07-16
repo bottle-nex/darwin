@@ -13,6 +13,7 @@ import PlaygroundShortcutSheet from "@/components/playground/Sidebar/PlaygroundS
 import { useIssueDialog } from "@/components/playground/issue/useIssueDialog";
 import { useGetDashboard } from "@/hooks/dashboard/useGetDashboard";
 import { useGetProject } from "@/hooks/project/useGetProject";
+import { useIssueThreads } from "@/hooks/chats/useIssueThreads";
 import { usePlaygroundUrlSync } from "./usePlaygroundUrlSync";
 import { useSubscribeEventHandlers } from "@/hooks/socket/useSubscribeEventHandlers";
 import usePlaygroundShortcuts from "@/hooks/shortcuts/usePlaygroundShortcuts";
@@ -29,10 +30,11 @@ export default function PlaygroundShell() {
         ? dashboard?.projects.find((p) => p.slug === projectSlug)
         : undefined;
     const { data: project, isPending: isProjectPending } = useGetProject(activeProject?.id);
+    const { data: issueThreads } = useIssueThreads(activeProject?.id);
 
     useSubscribeEventHandlers(activeProject?.id);
 
-    usePlaygroundUrlSync(project?.teams);
+    usePlaygroundUrlSync(project?.teams, issueThreads);
     useIssueDialog({ sync: true });
     usePlaygroundShortcuts();
     useLayoutEffect(() => {

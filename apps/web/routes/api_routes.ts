@@ -65,6 +65,7 @@ export const CREATE_COLUMN_URL = ISSUES_URL + "/columns";
 export const BOARD_URL = (project_id: string) => `${ISSUES_URL}/board/${project_id}`;
 export const ISSUE_URL = (id: string) => `${ISSUES_URL}/${id}`;
 export const COLUMN_URL = (id: string) => `${ISSUES_URL}/columns/${id}`;
+export const REORDER_COLUMNS_URL = ISSUES_URL + "/columns/reorder";
 export const ASSIGN_ISSUE_URL = (id: string) => `${ISSUES_URL}/${id}/assignees`;
 export const UNASSIGN_ISSUE_URL = (id: string, userId: string) =>
     `${ISSUES_URL}/${id}/assignees/${userId}`;
@@ -81,3 +82,8 @@ export const INVITES_PREVIEW_URL = (token: string) => `${INVITATIONS_URL}/${toke
 // <--------------------- CHAT ROUTES --------------------->
 export const CHATS_URL = API_URL + "/chats";
 export const CHAT_URL = (issue_id: string) => `${CHATS_URL}/${issue_id}`;
+export const ISSUE_THREADS_URL = (project_id: string) => `${CHATS_URL}/threads/${project_id}`;
+
+// <--------------------- PROJECT CHAT ROUTES --------------------->
+export const PROJECT_CHATS_URL = API_URL + "/project-chats";
+export const PROJECT_CHAT_URL = (project_id: string) => `${PROJECT_CHATS_URL}/${project_id}`;
