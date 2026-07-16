@@ -15,6 +15,7 @@ import { useUpdateIssue } from "@/hooks/issues/useUpdateIssue";
 import { useDeleteIssue } from "@/hooks/issues/useDeleteIssue";
 import { useUpdateColumn } from "@/hooks/issues/useUpdateColumn";
 import { useDeleteColumn } from "@/hooks/issues/useDeleteColumn";
+import { useReorderColumns } from "@/hooks/issues/useReorderColumns";
 import { useAssignIssue, useUnassignIssue } from "@/hooks/issues/useAssignIssue";
 import { findIssueInBoard, useKanbanBoardStore } from "@/store/kanban/useKanbanBoardStore";
 import {
@@ -47,6 +48,7 @@ export function useCustomKanban({ projectId }: UseCustomKanbanArgs) {
     const deleteIssue = useDeleteIssue();
     const updateColumn = useUpdateColumn();
     const deleteColumn = useDeleteColumn();
+    const reorderColumns = useReorderColumns();
     const assignIssue = useAssignIssue();
     const unassignIssue = useUnassignIssue();
 
@@ -120,12 +122,22 @@ export function useCustomKanban({ projectId }: UseCustomKanbanArgs) {
 
     function onDragStart(event: DragStartEvent) {
         const id = String(event.active.id);
-        const found = findCardInColumns(useCustomKanbanStore.getState().columns, id);
+        const columns = useCustomKanbanStore.getState().columns;
+
+        const found = findCardInColumns(columns, id);
         if (found) {
             useCustomKanbanStore.getState().setActiveItem({ kind: "custom", card: found.card });
             dragOriginColumn.current = found.columnId;
             return;
         }
+
+        const column = columns.find((c) => c.id === id);
+        if (column) {
+            useCustomKanbanStore.getState().setActiveItem({ kind: "column", column });
+            dragOriginColumn.current = null;
+            return;
+        }
+
         dragOriginColumn.current = null;
         const issue = findIssueInBoard(useKanbanBoardStore.getState().board, id);
         useCustomKanbanStore.getState().setActiveItem(issue ? { kind: "issue", issue } : null);
@@ -155,6 +167,17 @@ export function useCustomKanban({ projectId }: UseCustomKanbanArgs) {
         const overId = String(over.id);
 
         const columns = useCustomKanbanStore.getState().columns;
+
+        // Column-level reorder. `over` must resolve to a different custom column —
+        // dropping on empty space or an LLM/bridge column (they share this DndContext) is a no-op.
+        if (columns.some((c) => c.id === activeId)) {
+            const overColumnId = columnIdOfInColumns(columns, overId);
+            if (!overColumnId || overColumnId === activeId) return;
+            useCustomKanbanStore.getState().reorderColumn(activeId, overColumnId);
+            persistColumnOrder();
+            return;
+        }
+
         const fromCustom = findCardInColumns(columns, activeId);
         const toCustomColumn = columnIdOfInColumns(columns, overId);
 
@@ -206,6 +229,15 @@ export function useCustomKanban({ projectId }: UseCustomKanbanArgs) {
         updateIssue
             .mutateAsync({ id: cardId, project_id: projectId, custom_column_id: columnId })
             .catch(() => toast.error("Couldn't move the issue."));
+    }
+
+    /** Persist the custom columns' current order for this user. */
+    function persistColumnOrder() {
+        if (!projectId) return;
+        const columnIds = useCustomKanbanStore.getState().columns.map((c) => c.id);
+        reorderColumns
+            .mutateAsync({ project_id: projectId, column_ids: columnIds })
+            .catch(() => toast.error("Couldn't save the new column order."));
     }
 
     return {

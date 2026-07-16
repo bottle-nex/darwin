@@ -30,18 +30,19 @@ export class CustomKanbanMappers {
 
     /**
      * Build the Custom Kanban's columns from a board payload: columns left-to-right
-     * by `order`, each holding the issues parked in it (issues whose `customColumnId`
-     * matches). Issues arrive createdAt-ascending, so card order is insertion order.
+     * in the order the server returns them (the requesting user's personal order,
+     * falling back to the project's default `order` for columns they haven't
+     * pinned — see `controller.get_issues.ts`), each holding the issues parked in
+     * it (issues whose `customColumnId` matches). Issues arrive createdAt-ascending,
+     * so card order is insertion order.
      */
     static boardToColumns(board: BoardResponse): CustomColumn[] {
-        return [...board.columns]
-            .sort((a, b) => a.order - b.order)
-            .map((col) => ({
-                id: col.id,
-                title: col.label,
-                cards: board.issues
-                    .filter((issue) => issue.customColumnId === col.id)
-                    .map(CustomKanbanMappers.boardIssueToCard),
-            }));
+        return board.columns.map((col) => ({
+            id: col.id,
+            title: col.label,
+            cards: board.issues
+                .filter((issue) => issue.customColumnId === col.id)
+                .map(CustomKanbanMappers.boardIssueToCard),
+        }));
     }
 }

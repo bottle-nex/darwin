@@ -1,9 +1,9 @@
 "use client";
 import { useState } from "react";
-import { MdMoreHoriz, MdAdd, MdDelete, MdEdit } from "react-icons/md";
+import { MdMoreHoriz, MdAdd, MdDelete, MdEdit, MdDragIndicator } from "react-icons/md";
 import { DropdownMenu } from "radix-ui";
-import { useDroppable } from "@dnd-kit/core";
-import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import { SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { PANEL_CONTENT, PANEL_ITEM } from "../OptionsBar/KanbanOptionPanels/panelStyles";
@@ -18,6 +18,9 @@ type CustomKanbanColumnProps = {
     onDeleteCard: (cardId: string) => void;
     onAssign: (cardId: string, userId: string) => void;
     onUnassign: (cardId: string, userId: string) => void;
+    /** Whether this column can be drag-reordered. False in single-column focus view,
+     *  where there's no sibling `SortableContext` to reorder against. */
+    draggable?: boolean;
 };
 
 export default function CustomKanbanColumn({
@@ -27,12 +30,24 @@ export default function CustomKanbanColumn({
     onDeleteCard,
     onAssign,
     onUnassign,
+    draggable = true,
 }: CustomKanbanColumnProps) {
     const openCreate = useCreateOrEditIssueStore((s) => s.openCreate);
 
     const [renaming, setRenaming] = useState(false);
     const [draftTitle, setDraftTitle] = useState(column.title);
-    const { setNodeRef, isOver } = useDroppable({ id: column.id });
+    const {
+        attributes,
+        listeners,
+        setNodeRef,
+        setActivatorNodeRef,
+        transform,
+        transition,
+        isDragging,
+        isOver,
+    } = useSortable({ id: column.id });
+
+    const style = { transform: CSS.Transform.toString(transform), transition };
 
     const commitRename = () => {
         const next = draftTitle.trim();
@@ -42,12 +57,27 @@ export default function CustomKanbanColumn({
 
     return (
         <div
+            ref={setNodeRef}
+            style={style}
             className={cn(
                 "group flex max-h-full w-72 shrink-0 flex-col rounded-xl bg-white/2.5 p-1 ring-1 transition-colors",
                 isOver ? "ring-white/15" : "ring-white/5",
+                isDragging && "opacity-40",
             )}
         >
             <div className="mb-2 flex items-center justify-between gap-2 px-0.5">
+                {draggable && (
+                    <button
+                        type="button"
+                        ref={setActivatorNodeRef}
+                        {...attributes}
+                        {...listeners}
+                        aria-label={`Reorder ${column.title}`}
+                        className="flex size-6 shrink-0 cursor-grab touch-none items-center justify-center rounded text-neutral-500 opacity-0 transition-opacity hover:bg-white/10 hover:text-neutral-300 group-hover:opacity-100 active:cursor-grabbing"
+                    >
+                        <MdDragIndicator className="size-4" aria-hidden />
+                    </button>
+                )}
                 {renaming ? (
                     <Input
                         autoFocus
@@ -116,10 +146,7 @@ export default function CustomKanbanColumn({
                 items={column.cards.map((c) => c.id)}
                 strategy={verticalListSortingStrategy}
             >
-                <div
-                    ref={setNodeRef}
-                    className="flex min-h-10 flex-col gap-1.5 overflow-y-auto rounded-lg p-0.5"
-                >
+                <div className="flex min-h-10 flex-col gap-1.5 overflow-y-auto rounded-lg p-0.5">
                     {column.cards.map((card) => (
                         <SortableCustomCard
                             key={card.id}

@@ -6,8 +6,11 @@ import type { BoardResponse } from "@/types/board";
 import type { CustomCard, CustomColumn } from "@/types/kanban-custom";
 import type { Issue } from "@/types/kanban";
 
-/** The active drag — a custom card being moved, or an LLM issue dragged in. */
-export type ActiveItem = { kind: "custom"; card: CustomCard } | { kind: "issue"; issue: Issue };
+/** The active drag — a custom card being moved, an LLM issue dragged in, or a column being reordered. */
+export type ActiveItem =
+    | { kind: "custom"; card: CustomCard }
+    | { kind: "issue"; issue: Issue }
+    | { kind: "column"; column: CustomColumn };
 
 interface CustomKanbanState {
     columns: CustomColumn[];
@@ -31,6 +34,8 @@ interface CustomKanbanState {
     ) => void;
     /** Reorder a card within its own column. */
     reorderCard: (columnId: string, activeId: string, overId: string) => void;
+    /** Reorder a custom column among its siblings. */
+    reorderColumn: (activeId: string, overColumnId: string) => void;
 }
 
 /**
@@ -118,6 +123,14 @@ export const useCustomKanbanStore = create<CustomKanbanState>((set, get) => ({
                 return { ...col, cards: arrayMove(col.cards, oldIndex, newIndex) };
             }),
         })),
+
+    reorderColumn: (activeId, overColumnId) =>
+        set((s) => {
+            const oldIndex = s.columns.findIndex((c) => c.id === activeId);
+            const newIndex = s.columns.findIndex((c) => c.id === overColumnId);
+            if (oldIndex < 0 || newIndex < 0 || oldIndex === newIndex) return s;
+            return { columns: arrayMove(s.columns, oldIndex, newIndex) };
+        }),
 }));
 
 /** Locate a card (and the column holding it) by id. */

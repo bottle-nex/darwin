@@ -1,4 +1,5 @@
 "use client";
+import { SortableContext, horizontalListSortingStrategy } from "@dnd-kit/sortable";
 import { useCustomKanbanStore } from "@/store/kanban/useCustomKanbanStore";
 import AddListForm from "./AddListForm";
 import CustomKanbanColumn from "./CustomKanbanColumn";
@@ -16,17 +17,22 @@ export default function CustomKanbanBoard({
 
     return (
         <>
-            {columns.map((column) => (
-                <CustomKanbanColumn
-                    key={column.id}
-                    column={column}
-                    onDelete={() => removeColumn(column.id)}
-                    onRename={(label) => renameColumn(column.id, label)}
-                    onDeleteCard={removeCard}
-                    onAssign={assignMember}
-                    onUnassign={unassignMember}
-                />
-            ))}
+            <SortableContext
+                items={columns.map((c) => c.id)}
+                strategy={horizontalListSortingStrategy}
+            >
+                {columns.map((column) => (
+                    <CustomKanbanColumn
+                        key={column.id}
+                        column={column}
+                        onDelete={() => removeColumn(column.id)}
+                        onRename={(label) => renameColumn(column.id, label)}
+                        onDeleteCard={removeCard}
+                        onAssign={assignMember}
+                        onUnassign={unassignMember}
+                    />
+                ))}
+            </SortableContext>
             <AddListForm onAdd={addColumn} />
         </>
     );

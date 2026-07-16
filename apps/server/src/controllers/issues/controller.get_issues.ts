@@ -32,7 +32,7 @@ export default class IssueGetController {
         }
 
         try {
-            const [columns, issues] = await Promise.all([
+            const [columns, issues, personal_orders] = await Promise.all([
                 prisma.customColumn.findMany({
                     where: {
                         projectId: project_id,
@@ -82,9 +82,38 @@ export default class IssueGetController {
                         },
                     },
                 }),
+                prisma.customColumnOrder.findMany({
+                    where: {
+                        userId: user.id,
+                        projectId: project_id,
+                    },
+                    select: {
+                        columnId: true,
+                        order: true,
+                    },
+                }),
             ]);
 
-            ResponseWriter.success(res, { columns, issues }, "Issues fetched succesfully");
+            // Merge in the requesting user's personal column order: columns they've
+            // pinned come first (in their pinned order), everything else follows in
+            // the project's default order — so a new/unpinned column always lands last.
+            const personal_order_by_column = new Map(
+                personal_orders.map((p) => [p.columnId, p.order]),
+            );
+            const ordered_columns = [...columns].sort((a, b) => {
+                const a_pos = personal_order_by_column.get(a.id);
+                const b_pos = personal_order_by_column.get(b.id);
+                if (a_pos !== undefined && b_pos !== undefined) return a_pos - b_pos;
+                if (a_pos !== undefined) return -1;
+                if (b_pos !== undefined) return 1;
+                return a.order - b.order;
+            });
+
+            ResponseWriter.success(
+                res,
+                { columns: ordered_columns, issues },
+                "Issues fetched succesfully",
+            );
         } catch (err) {
             console.error("IssuesGetController error: ", err);
             ResponseWriter.system_error(res);

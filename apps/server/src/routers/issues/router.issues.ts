@@ -7,6 +7,7 @@ import IssueDeleteController from "../../controllers/issues/controller.delete_is
 import ColumnCreateController from "../../controllers/issues/controller.create_column";
 import ColumnUpdateController from "../../controllers/issues/controller.update_column";
 import ColumnDeleteController from "../../controllers/issues/controller.delete_column";
+import ColumnReorderController from "../../controllers/issues/controller.reorder_columns";
 import IssueAssignController from "../../controllers/issues/controller.assign_issue";
 import IssueUnassignController from "../../controllers/issues/controller.unassign_issue";
 
@@ -16,6 +17,7 @@ issues_router.post("/create", require_auth, IssueCreateController.process);
 issues_router.get("/board/:project_id", require_auth, IssueGetController.process);
 
 issues_router.post("/columns", require_auth, ColumnCreateController.process);
+issues_router.patch("/columns/reorder", require_auth, ColumnReorderController.process);
 issues_router.patch("/columns/:id", require_auth, ColumnUpdateController.process);
 issues_router.delete("/columns/:id", require_auth, ColumnDeleteController.process);
 
