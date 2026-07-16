@@ -4,6 +4,7 @@ import {
     MdAutoAwesome,
     MdGroup,
     MdKeyboardArrowDown,
+    MdPlaylistAdd,
     MdSearch,
     MdSettings,
     MdShare,
@@ -19,6 +20,7 @@ import { Button } from "@/components/ui/button";
 import { TooltipComponent } from "@/components/ui/tooltip-component";
 import { useKanbanOptionsStore } from "@/store/kanban/useKanbanOptionsStore";
 import { useCustomKanbanStore } from "@/store/kanban/useCustomKanbanStore";
+import { useAddCustomColumnStore } from "@/store/kanban/useAddCustomColumnStore";
 import { useCreateOrEditIssueStore } from "@/store/issues/useCreateOrEditIssueStore";
 import type { BoardView } from "@/types/kanban";
 import OptionButton from "./KanbanOptionPanels/OptionButton";
@@ -30,6 +32,7 @@ import ViewsPanel from "./KanbanOptionPanels/ViewsPanel";
 
 const TASK_OPTIONS = [
     { id: "issue", label: "New issue", icon: MdAdd },
+    { id: "custom_column", label: "Add custom col", icon: MdPlaylistAdd },
     { id: "import", label: "Import issues", icon: MdUpload },
 ];
 
@@ -60,7 +63,13 @@ export default function OptionsBar() {
     } = useKanbanOptionsStore();
     const customColumns = useCustomKanbanStore((s) => s.columns);
     const openCreate = useCreateOrEditIssueStore((s) => s.openCreate);
+    const setAddColumnOpen = useAddCustomColumnStore((s) => s.setOpen);
     const onAddTask = () => openCreate({ board: "llm" });
+
+    const TASK_OPTION_HANDLERS: Record<string, (() => void) | undefined> = {
+        issue: onAddTask,
+        custom_column: () => setAddColumnOpen(true),
+    };
 
     return (
         <div className="flex h-10 shrink-0 items-center justify-between gap-2 border-b border-white/5 px-3">
@@ -149,7 +158,7 @@ export default function OptionsBar() {
                                         <DropdownMenu.Item
                                             key={option.id}
                                             disabled={disabled}
-                                            onSelect={option.id === "issue" ? onAddTask : undefined}
+                                            onSelect={TASK_OPTION_HANDLERS[option.id]}
                                             className={cn(
                                                 "flex items-center gap-2 rounded-md px-2 py-1.5 text-[13px] text-neutral-300 outline-none select-none",
                                                 disabled
