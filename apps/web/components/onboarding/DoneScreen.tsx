@@ -60,7 +60,6 @@ export default function DoneScreen({
             </motion.div>
             <motion.div variants={stepItemVariants} className="mt-10">
                 <Button loading={loading} onClick={onFinish}>
-
                     <span>Open the board</span>
                     <MatchaLogo className="size-4.5" />
                 </Button>
