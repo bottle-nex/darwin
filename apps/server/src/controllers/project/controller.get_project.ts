@@ -37,10 +37,14 @@ export default async function get_project_controller(req: Request, res: Response
                 id: true,
                 name: true,
                 slug: true,
+                summary: true,
                 description: true,
+                githubRepoFullName: true,
+                githubRepoUrl: true,
                 color: true,
                 ownerId: true,
                 createdAt: true,
+                tourCompleted: true,
                 updatedAt: true,
                 teams: {
                     select: {

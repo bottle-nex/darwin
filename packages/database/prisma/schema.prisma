@@ -70,14 +70,16 @@ model OrgMember {
 }
 
 model Project {
-  id          String  @id @default(cuid())
-  orgId       String
-  name        String
-  slug        String
-  description String?
-  ownerId     String
-  createdById String?
-  color       String?
+  id            String  @id @default(cuid())
+  orgId         String
+  name          String
+  slug          String
+  summary       String?
+  description   String?
+  ownerId       String
+  createdById   String?
+  color         String?
+  tourCompleted Boolean @default(false)
 
   githubRepoId        BigInt?
   githubRepoFullName  String?
@@ -314,9 +316,9 @@ model Chat {
   isDeleted   Boolean @default(false)
   repliedToId String?
 
-  issue     Issue @relation(fields: [issueId], references: [id], onDelete: Cascade)
-  sender    User? @relation(fields: [senderId], references: [id], onDelete: SetNull)
-  repliedTo Chat? @relation("ChatReplies", fields: [repliedToId], references: [id], onDelete: SetNull)
+  issue     Issue  @relation(fields: [issueId], references: [id], onDelete: Cascade)
+  sender    User?  @relation(fields: [senderId], references: [id], onDelete: SetNull)
+  repliedTo Chat?  @relation("ChatReplies", fields: [repliedToId], references: [id], onDelete: SetNull)
   replies   Chat[] @relation("ChatReplies")
 
   createdAt DateTime @default(now())

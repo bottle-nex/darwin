@@ -23,13 +23,17 @@ export default function OverviewMasthead({ overview }: OverviewMastheadProps) {
                 </span>
             </div>
 
-            <p className="mt-2.5 max-w-[60ch] text-[15px] leading-[1.6] text-neutral-300">
-                {overview.purpose}
-            </p>
+            {overview.purpose && (
+                <p className="mt-2.5 max-w-[60ch] text-[15px] leading-[1.6] text-neutral-300">
+                    {overview.purpose}
+                </p>
+            )}
 
-            <p className="mt-5 max-w-[68ch] text-[13.5px] leading-[1.8] text-neutral-500">
-                {overview.description}
-            </p>
+            {overview.description && (
+                <p className="mt-5 max-w-[68ch] text-[13.5px] leading-[1.8] text-neutral-500">
+                    {overview.description}
+                </p>
+            )}
 
             <div className="mt-6 flex flex-wrap items-center gap-x-3 gap-y-2 text-[12px] text-neutral-500">
                 <span className="flex items-center gap-1.5">
@@ -37,8 +41,12 @@ export default function OverviewMasthead({ overview }: OverviewMastheadProps) {
                     <span className={cn("font-medium", status.text)}>{status.label}</span>
                 </span>
 
-                <MetaDot />
-                <span className="text-neutral-400">{overview.repo}</span>
+                {overview.repo && (
+                    <>
+                        <MetaDot />
+                        <span className="text-neutral-400">{overview.repo}</span>
+                    </>
+                )}
 
                 <MetaDot />
                 <span>Updated {format(new Date(overview.updatedAt), "MMM d, yyyy")}</span>

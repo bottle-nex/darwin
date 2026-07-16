@@ -10,7 +10,9 @@ export interface UpdateProjectInput {
     project_id: string;
     name?: string;
     slug?: string;
+    summary?: string;
     description?: string;
+    tour_completed?: boolean;
 }
 
 export function useUpdateProject() {

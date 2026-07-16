@@ -2,7 +2,11 @@
 import { useState } from "react";
 import { MotionConfig, motion } from "motion/react";
 import { toast } from "sonner";
+import { useActiveProject } from "@/hooks/useActiveProject";
+import { useGetProject } from "@/hooks/project/useGetProject";
+import { useProjectMembers } from "@/hooks/project/useProjectMembers";
 import { dummyProjectOverview } from "@/data/dummy-project-overview";
+import type { ProjectOverview } from "@/types/overview";
 import OverviewOptionsBar from "./OverviewOptionsBar";
 import OverviewMasthead from "./OverviewMasthead";
 import AgentBrief from "./AgentBrief";
@@ -10,9 +14,41 @@ import SurfaceLinks from "./SurfaceLinks";
 import TeamSection from "./TeamSection";
 import { STAGGER_VARIANTS } from "./overviewTheme";
 
+function projectKey(slug: string) {
+    return slug.replace(/-/g, "").slice(0, 3).toUpperCase();
+}
+
 export default function OverviewDisplay() {
-    const overview = dummyProjectOverview;
-    const [markdown, setMarkdown] = useState(overview.brief.markdown);
+    const activeProject = useActiveProject();
+    const { data: project } = useGetProject(activeProject?.id);
+    const { data: members } = useProjectMembers(activeProject?.id);
+    const [markdown, setMarkdown] = useState(dummyProjectOverview.brief.markdown);
+
+    if (!project) return null;
+
+    const overview: ProjectOverview = {
+        key: projectKey(project.slug),
+        repo: project.githubRepoFullName ?? "",
+        name: project.name,
+        purpose: project.summary ?? "",
+        description: project.description ?? "",
+        brief: { markdown, updatedAt: project.updatedAt },
+        links: project.githubRepoUrl
+            ? [
+                  {
+                      id: "repo",
+                      kind: "github",
+                      label: "Repository",
+                      url: project.githubRepoUrl,
+                  },
+              ]
+            : [],
+        leadId: project.ownerId,
+        team: members ?? [],
+        status: "active",
+        createdAt: project.createdAt,
+        updatedAt: project.updatedAt,
+    };
 
     function saveBrief(next: string) {
         setMarkdown(next);

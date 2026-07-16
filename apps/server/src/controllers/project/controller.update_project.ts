@@ -14,7 +14,9 @@ const body_schema = z.object({
         .max(50)
         .regex(/^[a-z0-9-]+$/, "Slug must be lowercase letters, numbers, and hyphens only")
         .optional(),
+    summary: z.string().optional(),
     description: z.string().optional(),
+    tour_completed: z.boolean().optional(),
 });
 
 export default async function update_project_controller(req: Request, res: Response) {
@@ -25,7 +27,7 @@ export default async function update_project_controller(req: Request, res: Respo
             return;
         }
 
-        const { project_id, name, slug, description } = parsed.data;
+        const { project_id, name, slug, summary, description, tour_completed } = parsed.data;
         const user_id = req.user.id;
 
         const project_role = await Access.project(user_id, project_id);
@@ -36,7 +38,7 @@ export default async function update_project_controller(req: Request, res: Respo
 
         await prisma.project.update({
             where: { id: project_id },
-            data: { name, slug, description },
+            data: { name, slug, summary, description, tourCompleted: tour_completed },
         });
 
         ResponseWriter.success(res, {}, "Project updated successfully");

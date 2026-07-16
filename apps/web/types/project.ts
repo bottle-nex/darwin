@@ -33,11 +33,15 @@ export interface ProjectDetail {
     id: string;
     name: string;
     slug: string;
+    summary: string | null;
     description: string | null;
+    githubRepoFullName: string | null;
+    githubRepoUrl: string | null;
     color: string | null;
     ownerId: string;
     createdAt: string;
     updatedAt: string;
+    tourCompleted: boolean;
     teams: ProjectTeam[];
     /** The requesting user's effective role in this project (highest of org/owner/team). */
     viewerRole: ProjectRole | null;
