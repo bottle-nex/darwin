@@ -3,6 +3,7 @@ import { OutboundSocketMessageType, type OutboundSocketMessage } from "@trymatch
 import { toast } from "sonner";
 import { BOARD_QUERY_KEY } from "@/hooks/issues/useBoard";
 import { upsert_chat } from "@/hooks/chats/useChats";
+import { upsert_project_chat } from "@/hooks/chats/useProjectChat";
 
 export class SocketHandlers {
     /** a new issue was created in the project -> refetch that project's board. */
@@ -20,5 +21,11 @@ export class SocketHandlers {
     static handle_chat_error(message: OutboundSocketMessage) {
         if (message.type !== OutboundSocketMessageType.CHAT_ERROR) return;
         toast.error(message.message);
+    }
+
+    /** a new project-chat message landed -> merge it into that project's cached chat list. */
+    static handle_project_chat_created(queryClient: QueryClient, message: OutboundSocketMessage) {
+        if (message.type !== OutboundSocketMessageType.PROJECT_CHAT_CREATED) return;
+        upsert_project_chat(queryClient, message.payload);
     }
 }

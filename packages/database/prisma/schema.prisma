@@ -31,9 +31,10 @@ model User {
   createdIssues  Issue[] @relation(name: "IssueCreator")
   assignedIssues Issue[] @relation(name: "IssueAssignees")
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  chats     Chat[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  chats        Chat[]
+  projectChats ProjectChat[]
 
   customColumnOrders CustomColumnOrder[]
 }
@@ -103,6 +104,7 @@ model Project {
 
   routingClaimedAt   DateTime?
   issues             Issue[]
+  projectChats       ProjectChat[]
   customColumns      CustomColumn[]
   customColumnOrders CustomColumnOrder[]
   setupSessions      SetupSession[]
@@ -328,6 +330,25 @@ model Chat {
   updatedAt DateTime @updatedAt
 
   @@index([issueId])
+}
+
+model ProjectChat {
+  id          String  @id @default(cuid())
+  projectId   String
+  senderId    String?
+  message     String  @db.Text
+  isDeleted   Boolean @default(false)
+  repliedToId String?
+
+  project   Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  sender    User?         @relation(fields: [senderId], references: [id], onDelete: SetNull)
+  repliedTo ProjectChat?  @relation("ProjectChatReplies", fields: [repliedToId], references: [id], onDelete: SetNull)
+  replies   ProjectChat[] @relation("ProjectChatReplies")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([projectId])
 }
 
 model CustomColumn {

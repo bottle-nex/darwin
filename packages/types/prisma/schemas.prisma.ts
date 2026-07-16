@@ -134,3 +134,20 @@ export interface Chat {
     createdAt: Date;
     updatedAt: Date;
 }
+
+export interface ProjectChat {
+    id: string;
+    projectId: string;
+    message: string;
+    isDeleted: boolean;
+
+    senderId: string | null;
+    sender: User | null;
+
+    repliedToId: string | null;
+    /** included one level deep on reads/broadcasts; absent on the nested quote itself. */
+    repliedTo?: ProjectChat | null;
+
+    createdAt: Date;
+    updatedAt: Date;
+}

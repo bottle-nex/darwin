@@ -8,6 +8,7 @@ import github_router from "../github/router.github";
 import project_router from "../project/router.project";
 import issues_router from "../issues/router.issues";
 import chats_router from "../chats/router.chats";
+import project_chats_router from "../projectChats/router.project-chats";
 
 const v1_router: Router = Router();
 
@@ -24,5 +25,6 @@ v1_router.use("/playground", playground_router);
 v1_router.use("/github", github_router);
 v1_router.use("/issues", issues_router);
 v1_router.use("/chats", chats_router);
+v1_router.use("/project-chats", project_chats_router);
 
 export default v1_router;

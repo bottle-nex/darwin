@@ -82,3 +82,8 @@ export const INVITES_PREVIEW_URL = (token: string) => `${INVITATIONS_URL}/${toke
 // <--------------------- CHAT ROUTES --------------------->
 export const CHATS_URL = API_URL + "/chats";
 export const CHAT_URL = (issue_id: string) => `${CHATS_URL}/${issue_id}`;
+export const ISSUE_THREADS_URL = (project_id: string) => `${CHATS_URL}/threads/${project_id}`;
+
+// <--------------------- PROJECT CHAT ROUTES --------------------->
+export const PROJECT_CHATS_URL = API_URL + "/project-chats";
+export const PROJECT_CHAT_URL = (project_id: string) => `${PROJECT_CHATS_URL}/${project_id}`;
