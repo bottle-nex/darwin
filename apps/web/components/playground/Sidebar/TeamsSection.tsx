@@ -54,7 +54,7 @@ export default function PlaygroundSidebarTeamsSection() {
                             aria-label={`Delete ${t.name}`}
                             onClick={() => requestDelete(t)}
                             className={cn(
-                                "absolute top-1/2 right-2 size-6 -translate-y-1/2 items-center justify-center rounded text-neutral-400 hover:bg-neutral-700/50 hover:text-red-500 cursor-pointer",
+                                "absolute top-1/2 right-2 size-6 -translate-y-1/2 items-center justify-center rounded text-neutral-400 hover:bg-neutral-700/50 hover:text-red-500 cursor-pointer ring-inset focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-hidden",
                                 isActive ? "flex" : "hidden group-hover:flex",
                             )}
                         >

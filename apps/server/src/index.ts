@@ -12,7 +12,10 @@ await RedisService.connect();
 
 const app = express();
 const server = http.createServer(app);
-
+app.use(async (_req, _res, next) => {
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    next();
+});
 app.use(
     cors({
         origin: ENV.SERVER_WEB_URL,

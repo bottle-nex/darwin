@@ -37,7 +37,7 @@ export default function PlaygroundSidebarRow({
             type="button"
             onClick={onClick}
             className={cn(
-                "group flex w-full cursor-pointer items-center gap-2 rounded-md py-1 pr-2 text-left text-[13px]",
+                "group flex w-full cursor-pointer items-center gap-2 rounded-md py-1 pr-2 text-left text-[13px] ring-inset focus-visible:ring-1 focus-visible:ring-primary focus-visible:outline-hidden",
                 active
                     ? "bg-white/5 text-neutral-100"
                     : "text-neutral-400 hover:bg-white/2.5 hover:text-neutral-100",

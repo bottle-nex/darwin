@@ -48,7 +48,7 @@ export default function PlaygroundSidebarSection({
                     type="button"
                     onClick={() => setOpen((v) => !v)}
                     className={cn(
-                        "group flex flex-1 cursor-pointer items-center gap-x-2 rounded-md py-1.5 text-left",
+                        "group flex flex-1 cursor-pointer items-center gap-x-2 rounded-md py-1.5 text-left ring-inset focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-hidden",
                         variant === "header"
                             ? "px-2 text-[11px] font-medium text-neutral-500 capitalize"
                             : "px-2 text-[12px] font-medium text-neutral-400",

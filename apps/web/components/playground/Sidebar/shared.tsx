@@ -44,7 +44,7 @@ export function PlaygroundSidebarSectionAddButton({ label }: { label: string }) 
         <button
             type="button"
             aria-label={label}
-            className="flex size-5 cursor-pointer items-center justify-center rounded text-neutral-400 hover:bg-white/5 hover:text-neutral-100"
+            className="flex size-5 cursor-pointer items-center justify-center rounded text-neutral-400 hover:bg-white/5 hover:text-neutral-100 ring-inset focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-hidden"
         >
             <HiOutlinePlus className="size-3.5" aria-hidden />
         </button>
