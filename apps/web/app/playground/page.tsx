@@ -8,8 +8,8 @@ import { Input } from "@/components/ui/input";
 import OrgList from "@/components/playground/landing/OrgList";
 import CreateOrganizationModal from "@/components/playground/landing/CreateOrganizationModal";
 import ProjectCard from "@/components/project/ProjectCard";
-import ProjectCardSkeleton from "@/components/project/ProjectCardSkeleton";
 import CreateProjectDialog from "@/components/project/CreateProjectDialog";
+import LogoLoader from "@/components/app/LogoLoader";
 import NoResource from "@/components/utility/NoResource";
 import ProjectsGlyph from "@/components/utility/ProjectsGlyph";
 import NoOrganization from "@/components/playground/root/NoOrganization";
@@ -106,11 +106,7 @@ function PlaygroundLanding() {
                     ) : (
                         <>
                             {projectsPending ? (
-                                <div className="grid grid-cols-1 gap-4.5 sm:grid-cols-2 xl:grid-cols-3">
-                                    {Array.from({ length: 6 }).map((_, i) => (
-                                        <ProjectCardSkeleton key={i} />
-                                    ))}
-                                </div>
+                                <LogoLoader className="py-24" />
                             ) : projectsError ? (
                                 <p className="text-sm text-red-400">Failed to load projects.</p>
                             ) : (dashboard?.projects.length ?? 0) === 0 ? (

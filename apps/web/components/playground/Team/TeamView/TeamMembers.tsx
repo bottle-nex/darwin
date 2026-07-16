@@ -1,5 +1,6 @@
 "use client";
 import { useGetTeamMembers } from "@/hooks/team/useGetTeamMembers";
+import LogoLoader from "@/components/app/LogoLoader";
 import PlaygroundTeamMemberRow from "./TeamMemberRow";
 import { TeamMembersData } from "@/types/team";
 
@@ -22,9 +23,7 @@ export default function PlaygroundTeamMembers({ teamId }: { teamId: string }) {
             {/* Table body */}
             <div className="flex flex-col gap-0.5 pt-1.5">
                 {isLoading ? (
-                    [0, 1, 2].map((i) => (
-                        <div key={i} className="h-12 animate-pulse rounded-md bg-white/5" />
-                    ))
+                    <LogoLoader size={32} className="py-16" />
                 ) : isError ? (
                     <p className="px-2.5 py-3 text-[12px] text-red-400">
                         Couldn&apos;t load members.
@@ -32,22 +31,28 @@ export default function PlaygroundTeamMembers({ teamId }: { teamId: string }) {
                 ) : !members?.length ? (
                     <p className="px-2.5 py-3 text-[12px] text-neutral-500">No members yet.</p>
                 ) : (
-                    <RenderMembers membersData={data} />
+                    <RenderMembers membersData={data} teamId={teamId} />
                 )}
             </div>
         </section>
     );
 }
 
-function RenderMembers({ membersData }: { membersData: NoInfer<TeamMembersData> | undefined }) {
+function RenderMembers({
+    membersData,
+    teamId,
+}: {
+    membersData: NoInfer<TeamMembersData> | undefined;
+    teamId: string;
+}) {
     return (
         <>
             {membersData?.members.map((member) => (
-                <PlaygroundTeamMemberRow teamMember={member} key={member.id} />
+                <PlaygroundTeamMemberRow teamMember={member} teamId={teamId} key={member.id} />
             ))}
 
             {membersData?.pendingInvites.map((invite) => (
-                <PlaygroundTeamMemberRow pendingMember={invite} key={invite.id} />
+                <PlaygroundTeamMemberRow pendingMember={invite} teamId={teamId} key={invite.id} />
             ))}
         </>
     );

@@ -1,5 +1,5 @@
 "use client";
-import { useEffect } from "react";
+import { useLayoutEffect } from "react";
 import { useParams } from "next/navigation";
 import PlaygroundTopBar from "@/components/playground/Core/TopBar/PlaygroundTopBar";
 import PlaygroundSidebar from "@/components/playground/Sidebar/PlaygroundSidebar";
@@ -23,20 +23,22 @@ export default function PlaygroundShell() {
         projectSlug?: string;
     }>();
 
-    const { data: dashboard } = useGetDashboard(orgSlug);
+    const { data: dashboard, isPending: isDashboardPending } = useGetDashboard(orgSlug);
     const activeProject = projectSlug
         ? dashboard?.projects.find((p) => p.slug === projectSlug)
         : undefined;
-    const { data: project } = useGetProject(activeProject?.id);
+    const { data: project, isPending: isProjectPending } = useGetProject(activeProject?.id);
 
     useSubscribeEventHandlers(activeProject?.id);
 
     usePlaygroundUrlSync(project?.teams);
     useIssueDialog({ sync: true });
     usePlaygroundShortcuts();
-    useEffect(() => {
+    useLayoutEffect(() => {
         useSidebarWidthStore.persist.rehydrate();
     }, []);
+
+    const loading = isDashboardPending || (activeProject ? isProjectPending : false);
 
     return (
         <main className="flex h-screen flex-col overflow-hidden text-neutral-100 pt-px select-none">
@@ -44,7 +46,7 @@ export default function PlaygroundShell() {
             <section className="flex flex-1 min-h-0 p-2 pt-px">
                 <PlaygroundSidebar />
                 <SidebarResizeHandle />
-                <PlaygroundDisplay />
+                <PlaygroundDisplay isLoading={loading} />
             </section>
             <CreateTeamDialog />
             <DeleteTeamDialog />

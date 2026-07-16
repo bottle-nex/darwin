@@ -7,6 +7,7 @@ import { useGetDashboard } from "@/hooks/dashboard/useGetDashboard";
 import { useProjectSecrets } from "@/hooks/project/useProjectSecrets";
 import { useSetProjectSecrets } from "@/hooks/project/useSetProjectSecrets";
 import { Button } from "@/components/ui/button";
+import LogoLoader from "@/components/app/LogoLoader";
 import ProjectEnvStep, { type EnvRow } from "@/components/project/ProjectEnvStep";
 import PaneEmptyState from "@/components/playground/Core/components/PaneEmptyState";
 import {
@@ -76,9 +77,7 @@ export default function EnvironmentDisplay() {
 
             <div className="h-full mt-5 flex flex-col gap-2.25">
                 {isLoading ? (
-                    [0, 1, 2].map((i) => (
-                        <div key={i} className="h-10.5 animate-pulse rounded-lg bg-white/5" />
-                    ))
+                    <LogoLoader size={32} className="py-16" />
                 ) : isError ? (
                     <p className="px-1 py-2 text-[12px] text-red-400">
                         Couldn&apos;t load environment variables.

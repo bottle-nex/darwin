@@ -2,7 +2,10 @@
 import { AnimatePresence, motion } from "motion/react";
 import { HiOutlineArrowUpCircle, HiOutlineCog6Tooth, HiOutlineUserPlus } from "react-icons/hi2";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
-import { useSidebarWidthStore } from "@/store/playground/useSidebarWidthStore";
+import {
+    SIDEBAR_DEFAULT_WIDTH,
+    SIDEBAR_WIDTH_CSS_VAR,
+} from "@/store/playground/useSidebarWidthStore";
 import { PlaygroundTab } from "../playgroundTabs";
 import SidebarRow from "./SidebarRow";
 import BoardSection from "./BoardSection";
@@ -19,7 +22,6 @@ const SETTINGS_TABS: string[] = [
 export default function PlaygroundSidebar() {
     const selectedRowId = usePlaygroundNavStore((s) => s.tab);
     const setTab = usePlaygroundNavStore((s) => s.setTab);
-    const width = useSidebarWidthStore((s) => s.width);
 
     const inSettings = SETTINGS_TABS.includes(selectedRowId);
     const section = {
@@ -31,7 +33,7 @@ export default function PlaygroundSidebar() {
         <aside
             data-lenis-prevent
             aria-label="Sidebar"
-            style={{ width }}
+            style={{ width: `var(${SIDEBAR_WIDTH_CSS_VAR}, ${SIDEBAR_DEFAULT_WIDTH}px)` }}
             className="flex h-full min-h-0 shrink-0 flex-col justify-between pr-2"
         >
             <div className="min-h-0 flex-1 overflow-y-auto px-1 pt-1">

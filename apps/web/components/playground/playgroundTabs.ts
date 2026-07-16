@@ -20,4 +20,4 @@ export enum PlaygroundTab {
     SettingsEnv = "settings-env",
 }
 
-export const PLAYGROUND_DEFAULT_TAB: PlaygroundTab = PlaygroundTab.Inbox;
+export const PLAYGROUND_DEFAULT_TAB: PlaygroundTab = PlaygroundTab.Overview;

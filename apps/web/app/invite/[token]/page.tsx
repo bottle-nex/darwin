@@ -4,6 +4,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
 import { signOut } from "next-auth/react";
 import { Button } from "@/components/ui/button";
+import LogoLoader from "@/components/app/LogoLoader";
 import { useUserSessionStore } from "@/store/user/useUserSessionStore";
 import useInvitationPreview from "@/hooks/invitations/useInvitationPreview";
 import useAcceptInvite from "@/hooks/invitations/useAcceptInvite";
@@ -76,9 +77,7 @@ export default function InvitePage() {
         return (
             <Shell>
                 <Brand />
-                <div className="h-5 w-2/3 animate-pulse rounded bg-secondary" />
-                <div className="mt-3 h-4 w-1/2 animate-pulse rounded bg-secondary" />
-                <div className="mt-6 h-10 w-full animate-pulse rounded bg-secondary" />
+                <LogoLoader size={36} className="py-10" />
             </Shell>
         );
     }

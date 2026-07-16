@@ -12,7 +12,8 @@ import AssignedToMeDisplay from "@/components/playground/Home/panes/AssignedToMe
 import InProgressDisplay from "@/components/playground/Home/panes/InProgressDisplay";
 import DraftsDisplay from "@/components/playground/Home/panes/DraftsDisplay";
 import SettingsDisplay from "@/components/playground/Home/SettingsDisplay/SettingsDisplay";
-import TeamDetailDisplay from "@/components/playground/Team/TeamDetailDisplay";
+import TeamDetailDisplay from "@/components/playground/Team/TeamDisplay";
+import LogoLoader from "@/components/app/LogoLoader";
 
 /** Picks the main pane for the active tab. */
 function TabPane({ tab }: { tab: string }) {
@@ -67,12 +68,12 @@ function TabPane({ tab }: { tab: string }) {
 }
 
 /** The playground's main pane: a shared card frame around the active tab. */
-export default function PlaygroundDisplay() {
+export default function PlaygroundDisplay({ isLoading }: { isLoading?: boolean }) {
     const tab = usePlaygroundNavStore((s) => s.tab);
 
     return (
-        <main className="flex flex-1 min-w-0 flex-col overflow-hidden rounded-lg ring-1 ring-white/6 bg-[#0c0c0d] backdrop-blur-md">
-            <TabPane tab={tab} />
+        <main className="flex flex-1 min-w-0 flex-col overflow-hidden rounded-lg ring-1 ring-white/6 bg-[#0F0F10] backdrop-blur-md">
+            {isLoading ? <LogoLoader className="h-full w-full" /> : <TabPane tab={tab} />}
         </main>
     );
 }

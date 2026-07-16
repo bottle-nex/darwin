@@ -7,6 +7,7 @@ import { useGetDashboard } from "@/hooks/dashboard/useGetDashboard";
 import { useListTags } from "@/hooks/tags/useListTags";
 import { useDeleteTag } from "@/hooks/tags/useDeleteTag";
 import { Button } from "@/components/ui/button";
+import LogoLoader from "@/components/app/LogoLoader";
 import PaneEmptyState from "@/components/playground/Core/components/PaneEmptyState";
 import NoResource from "@/components/utility/NoResource";
 import ProjectsGlyph from "@/components/utility/ProjectsGlyph";
@@ -83,9 +84,7 @@ export default function TagsDisplay() {
                 className="no-scrollbar mx-auto mt-5 flex min-h-0 w-full max-w-2xl flex-1 flex-col gap-2.25 overflow-y-auto px-5 pb-5"
             >
                 {isLoading ? (
-                    [0, 1, 2].map((i) => (
-                        <div key={i} className="h-10.5 animate-pulse rounded-lg bg-white/5" />
-                    ))
+                    <LogoLoader size={32} className="py-16" />
                 ) : isError ? (
                     <p className="px-1 py-2 text-[12px] text-red-400">Couldn&apos;t load tags.</p>
                 ) : !tags?.length ? (

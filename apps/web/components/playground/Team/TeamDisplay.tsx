@@ -10,7 +10,7 @@ import TeamViewMain from "./TeamView/TeamViewMain";
  * selected team belongs to a different project than the one currently open
  * (e.g. after navigating away).
  */
-export default function TeamDetailDisplay() {
+export default function TeamDisplay() {
     const { projectSlug } = useParams<{ projectSlug?: string }>();
     const selectedTeam = usePlaygroundNavStore((s) => s.selectedTeam);
     const selectedTeamProjectSlug = usePlaygroundNavStore((s) => s.selectedTeamProjectSlug);

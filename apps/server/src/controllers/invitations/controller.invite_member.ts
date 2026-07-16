@@ -78,7 +78,7 @@ export default class InviteMembersController {
             const user_by_email = new Map(users.map((u) => [u.email, u]));
             const user_ids = users.map((u) => u.id);
 
-            const [members, pending_invites] = await Promise.all([
+            const [members, existing_invites] = await Promise.all([
                 is_team_invite
                     ? prisma.teamMember.findMany({
                           where: { teamId: team!.id, userId: { in: user_ids } },
@@ -88,18 +88,16 @@ export default class InviteMembersController {
                           where: { orgId, userId: { in: user_ids } },
                           select: { userId: true },
                       }),
+                // Any status, not just Pending: a leftover Rejected/Accepted row for
+                // the same (email, orgId, teamId) tuple would collide on insert, so we
+                // resolve its id here and refresh it in place instead.
                 prisma.invitation.findMany({
-                    where: {
-                        orgId,
-                        teamId: teamId ?? null,
-                        status: InvitationStatus.Pending,
-                        email: { in: requested_emails },
-                    },
-                    select: { email: true },
+                    where: { orgId, teamId: teamId ?? null, email: { in: requested_emails } },
+                    select: { id: true, email: true },
                 }),
             ]);
             const member_ids = new Set(members.map((m) => m.userId));
-            const pending_emails = new Set(pending_invites.map((i) => i.email));
+            const existing_by_email = new Map(existing_invites.map((i) => [i.email, i]));
 
             const expires_at = new Date(
                 Date.now() + ENV.INVITATION_URL_TTL_DAYS * 24 * 60 * 60 * 1000,
@@ -110,15 +108,13 @@ export default class InviteMembersController {
             const to_process: {
                 email: string;
                 raw_token: string;
-                db_record: Prisma.InvitationCreateManyInput;
+                existingId: string | null;
+                db_record: Prisma.InvitationUncheckedCreateInput;
             }[] = [];
 
             for (const email of requested_emails) {
                 const user = user_by_email.get(email);
-                if (pending_emails.has(email)) {
-                    failed.push({ email, reason: "already_invited" });
-                    continue;
-                }
+                // An active membership always wins over a stale invite row.
                 if (user && member_ids.has(user.id)) {
                     failed.push({ email, reason: "already_member" });
                     continue;
@@ -126,14 +122,17 @@ export default class InviteMembersController {
 
                 const raw_token = randomBytes(32).toString("hex");
                 const token = createHash("sha256").update(raw_token).digest("hex");
+                const existing = existing_by_email.get(email);
 
                 to_process.push({
                     email,
                     raw_token,
+                    existingId: existing?.id ?? null,
                     db_record: {
                         email,
                         userId: user?.id ?? null,
                         token,
+                        status: InvitationStatus.Pending,
                         orgId,
                         projectId: projectId ?? null,
                         role: role ?? null,
@@ -158,20 +157,49 @@ export default class InviteMembersController {
                     ),
                 );
 
-                const to_create: Prisma.InvitationCreateManyInput[] = [];
+                // Persist one row at a time so a single collision can't abort the
+                // whole batch. Refresh an existing row in place, otherwise create.
+                const persisted = await Promise.all(
+                    email_results.map(async (result, i) => {
+                        const { email, existingId, db_record } = to_process[i];
+                        if (!(result.status === "fulfilled" && result.value)) {
+                            return { email, ok: false as const, reason: "email_failed" };
+                        }
+                        try {
+                            if (existingId) {
+                                await prisma.invitation.update({
+                                    where: { id: existingId },
+                                    data: {
+                                        token: db_record.token,
+                                        status: InvitationStatus.Pending,
+                                        expiresAt: db_record.expiresAt,
+                                        userId: db_record.userId,
+                                        invitedById,
+                                        projectId: db_record.projectId,
+                                        role: db_record.role,
+                                    },
+                                });
+                            } else {
+                                await prisma.invitation.create({ data: db_record });
+                            }
+                            return { email, ok: true as const };
+                        } catch (err) {
+                            if (err instanceof Prisma.PrismaClientKnownRequestError) {
+                                if (err.code === "P2002") {
+                                    return { email, ok: false as const, reason: "already_invited" };
+                                }
+                                if (err.code === "P2025") {
+                                    return { email, ok: false as const, reason: "persist_failed" };
+                                }
+                            }
+                            throw err;
+                        }
+                    }),
+                );
 
-                email_results.forEach((result, i) => {
-                    const { email, db_record } = to_process[i];
-                    if (result.status === "fulfilled" && result.value) {
-                        to_create.push(db_record);
-                        invited.push(email);
-                    } else {
-                        failed.push({ email, reason: "email_failed" });
-                    }
-                });
-
-                if (to_create.length > 0) {
-                    await prisma.invitation.createMany({ data: to_create });
+                for (const row of persisted) {
+                    if (row.ok) invited.push(row.email);
+                    else failed.push({ email: row.email, reason: row.reason });
                 }
             }
 

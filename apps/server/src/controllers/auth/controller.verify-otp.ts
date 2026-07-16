@@ -4,6 +4,7 @@ import { prisma } from "@trymatcha/database";
 import ResponseWriter from "../../services/service.response";
 import OtpService from "../../services/service.otp";
 import { signSessionJwt } from "../../services/service.jwt";
+import { get_username } from "../../utility/user.utility";
 
 const body_schema = z.object({
     email: z.email(),
@@ -56,10 +57,11 @@ export default class OtpVerifyController {
 
             const user = await prisma.user.upsert({
                 where: { email },
-                create: { email, emailVerified: new Date() },
+                create: { email, emailVerified: new Date(), name: get_username() },
                 update: { emailVerified: new Date() },
                 select: { id: true, email: true, name: true },
             });
+            console.log("user is : ", user);
 
             const token = signSessionJwt({ id: user.id, name: user.name ?? "", email: user.email });
 

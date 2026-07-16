@@ -1,5 +1,4 @@
 import { create } from "zustand";
-import { INITIAL_BOARD } from "@/data/dummy-kanban-issues";
 import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
 import { KanbanMappers } from "@/lib/kanban/KanbanMappers";
 import { KanbanStatus, type BoardState, type Issue } from "@/types/kanban";
@@ -27,7 +26,7 @@ interface KanbanBoardState {
 }
 
 export const useKanbanBoardStore = create<KanbanBoardState>((set, get) => ({
-    board: INITIAL_BOARD,
+    board: KanbanBoard.emptyBoard(),
     seededBoard: undefined,
     nextNumber: 500,
 

@@ -27,6 +27,7 @@ const AVATAR_TONE = {
 const AVATAR_SIZE = {
     sm: "size-4 text-[9px] rounded-[5px]",
     md: "size-5 text-[11px] rounded-[6px]",
+    lg: "size-6 text-[12px] rounded-[7px]",
     xl: "size-8 text-[14px] rounded-[8px]",
 } as const;
 
