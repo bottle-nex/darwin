@@ -93,7 +93,7 @@ export default function ChatMessage({
                 ))}
             <div
                 className={cn(
-                    "flex min-w-0 max-w-[80%] flex-col",
+                    "flex min-w-0 max-w-[65%] flex-col",
                     isMine ? "items-end" : "items-start",
                 )}
             >

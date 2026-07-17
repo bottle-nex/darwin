@@ -17,6 +17,7 @@ import { cn } from "@/lib/utils";
 import { useUpdateProject } from "@/hooks/project/useUpdateProject";
 import { useDeleteProject } from "@/hooks/project/useDeleteProject";
 import type { ProjectDetail } from "@/types/project";
+import { Textarea } from "@/components/ui/textarea";
 
 const FIELD =
     "border-white/10 bg-white/5 text-neutral-200 placeholder:text-neutral-500 focus-visible:border-[#9bc24f] focus-visible:ring-[#9bc24f]/30";
@@ -97,14 +98,11 @@ export default function ProjectSettingsGeneralSection({
 
             <div>
                 <label className="text-[11px] text-neutral-400">Description</label>
-                <textarea
+                <Textarea
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     maxLength={150}
-                    rows={3}
-                    className={cn(
-                        "mt-1.5 w-full resize-none rounded-lg bg-white/5 px-3 py-2 text-[13px] text-neutral-200 shadow-[inset_0_1px_0_0_#262626] outline-none placeholder:text-neutral-500 focus-visible:ring-[3px] focus-visible:ring-[#9bc24f]/30",
-                    )}
+                    rows={8}
                 />
             </div>
 

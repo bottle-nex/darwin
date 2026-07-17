@@ -180,7 +180,7 @@ export default function ChatThread({
                         </button>
                     </div>
                 )}
-                <div className="flex items-end gap-x-2">
+                <div className="relative">
                     <Textarea
                         ref={inputRef}
                         placeholder={placeholder}
@@ -222,16 +222,17 @@ export default function ChatThread({
                             }
                         }}
                         disabled={disabled}
-                        className="no-scrollbar min-h-8 max-h-28 min-w-0 flex-1 resize-none overflow-y-auto border-neutral-500 py-1.75 text-[13px] leading-5 text-neutral-100 placeholder:text-[13px]!"
+                        className="no-scrollbar min-h-9.5 max-h-28 w-full resize-none overflow-y-auto border-neutral-500 py-1.75 pr-11 text-[13px] leading-5 text-neutral-100 placeholder:text-[13px]!"
                     />
                     <Button
+                        variant="ghost"
                         size="icon"
                         onClick={handleSend}
                         disabled={disabled || !message.trim()}
                         aria-label="Send message"
-                        className="shrink-0 h-9! w-9!"
+                        className="absolute bottom-0.75 right-1.5 h-8! w-8! text-neutral-400 hover:bg-transparent hover:text-neutral-100 disabled:text-neutral-600"
                     >
-                        <IoIosSend className="size-4.5" />
+                        <IoIosSend className="size-5.5" />
                     </Button>
                 </div>
             </footer>

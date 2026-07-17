@@ -1,7 +1,6 @@
 "use client";
 import {
     MdAdd,
-    MdAutoAwesome,
     MdGroup,
     MdKeyboardArrowDown,
     MdPlaylistAdd,
@@ -14,6 +13,7 @@ import {
 } from "react-icons/md";
 import { type IconType } from "react-icons";
 import { AnimatePresence } from "motion/react";
+import HeroBuddy from "@/components/landing/v2/HeroBuddy";
 import { DropdownMenu } from "radix-ui";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -36,14 +36,14 @@ const TASK_OPTIONS = [
     { id: "import", label: "Import issues", icon: MdUpload },
 ];
 
-const BOARD_VIEWS: { id: BoardView; label: string; icon: IconType }[] = [
+const BOARD_VIEWS: { id: BoardView; label: string; icon?: IconType; mascot?: boolean }[] = [
     { id: "default", label: "Default", icon: MdViewColumn },
     { id: "custom", label: "Custom Kanban", icon: MdViewKanban },
-    { id: "llm", label: "LLM Kanban", icon: MdAutoAwesome },
+    { id: "llm", label: "LLM Kanban", mascot: true },
 ];
 
 /** Board toolbar: the board switcher, search, tags, filters, Views, and +Task. */
-export default function OptionsBar() {
+export default function KanbanOptionsBar() {
     const {
         searchOpen,
         search,
@@ -87,7 +87,11 @@ export default function OptionsBar() {
                                     : "text-neutral-400 hover:bg-white/5 hover:text-neutral-200",
                             )}
                         >
-                            <v.icon className="size-3.5" aria-hidden />
+                            {v.mascot ? (
+                                <HeroBuddy move={false} className="size-4" />
+                            ) : (
+                                v.icon && <v.icon className="size-3.5" aria-hidden />
+                            )}
                             {v.label}
                         </button>
                     ))}

@@ -1,7 +1,7 @@
 "use client";
 import { closestCorners, DndContext } from "@dnd-kit/core";
 import { useKanbanPane } from "@/hooks/kanban/useKanbanPane";
-import OptionsBar from "./OptionsBar/OptionsBar";
+import KanbanOptionsBar from "./OptionsBar/KanbanOptionsBar";
 import KanbanContent from "./KanbanContent";
 import KanbanDragOverlay from "./KanbanDragOverlay";
 import IssueFlightTrigger from "./flight/IssueFlightTrigger";
@@ -21,7 +21,7 @@ export default function KanbanDisplay() {
 
     return (
         <div className="flex min-h-0 flex-1 flex-col">
-            <OptionsBar />
+            <KanbanOptionsBar />
             <DndContext
                 sensors={custom.sensors}
                 collisionDetection={closestCorners}

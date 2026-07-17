@@ -13,8 +13,13 @@
 
 .buddy-trick {
     transform-box: view-box;
-    transform-origin: 8px 5.5px;
+    transform-origin: 9px 5.5px;
     animation: buddy-trick 32s step-end infinite;
+}
+
+.buddy-silk {
+    opacity: 0;
+    animation: buddy-silk 32s step-end infinite;
 }
 
 .buddy-cap {
@@ -63,6 +68,9 @@
 .buddy-anchored .buddy-sprite {
     width: 100%;
     height: 100%;
+    animation: none;
+}
+.buddy-anchored .buddy-silk {
     animation: none;
 }
 
@@ -260,6 +268,9 @@
 
 @keyframes buddy-arm-right {
     0%,
+    12.67%,
+    14%,
+    15.33%,
     15.5%,
     19.25%,
     22.5%,
@@ -272,6 +283,10 @@
     43.25%,
     44.75%,
     46.25%,
+    50.08%,
+    51.25%,
+    52.42%,
+    53%,
     100% {
         transform: translate(0, 0);
     }
@@ -288,13 +303,22 @@
     45.5% {
         transform: translate(0, -2px);
     }
-    25.25% {
+    12%,
+    13.33%,
+    14.67%,
+    25.25%,
+    49.5%,
+    50.67%,
+    51.83% {
         transform: translate(0, -1px);
     }
 }
 
 @keyframes buddy-arm-left {
     0%,
+    12.67%,
+    14%,
+    15.33%,
     22.5%,
     26%,
     27.25%,
@@ -305,6 +329,10 @@
     44%,
     45.5%,
     46.25%,
+    50.08%,
+    51.25%,
+    52.42%,
+    53%,
     100% {
         transform: translate(0, 0);
     }
@@ -318,16 +346,30 @@
     44.75% {
         transform: translate(0, -2px);
     }
-    25.25% {
+    12%,
+    13.33%,
+    14.67%,
+    25.25%,
+    49.5%,
+    50.67%,
+    51.83% {
         transform: translate(0, -1px);
     }
 }
 
 @keyframes buddy-leg-left {
     0%,
+    12%,
+    13.33%,
+    14.67%,
+    16%,
     36.5%,
     37.25%,
     38%,
+    49.5%,
+    50.67%,
+    51.83%,
+    53%,
     100% {
         transform: translateY(0);
     }
@@ -335,13 +377,29 @@
     37.75% {
         transform: translateY(1px);
     }
+    12.67%,
+    14%,
+    15.33%,
+    50.08%,
+    51.25%,
+    52.42% {
+        transform: translateY(-1px);
+    }
 }
 
 @keyframes buddy-leg-right {
     0%,
+    12%,
+    13.33%,
+    14.67%,
+    16%,
     36.25%,
     37%,
     38%,
+    49.5%,
+    50.67%,
+    51.83%,
+    53%,
     63.25%,
     64%,
     65%,
@@ -353,6 +411,12 @@
     37.5% {
         transform: translateY(1px);
     }
+    12.67%,
+    14%,
+    15.33%,
+    50.08%,
+    51.25%,
+    52.42%,
     63.5%,
     64.5%,
     65.5% {
@@ -410,6 +474,23 @@
     }
 }
 
+@keyframes buddy-silk {
+    0%,
+    7.75%,
+    12.5%,
+    59%,
+    62.5%,
+    100% {
+        opacity: 0;
+    }
+    8.25%,
+    12%,
+    59.5%,
+    62% {
+        opacity: 1;
+    }
+}
+
 @keyframes buddy-blink {
     0%,
     91%,
@@ -427,6 +508,7 @@
     .buddy-sprite,
     .buddy-figure,
     .buddy-trick,
+    .buddy-silk,
     .buddy-cap,
     .buddy-arm-r,
     .buddy-arm-l,

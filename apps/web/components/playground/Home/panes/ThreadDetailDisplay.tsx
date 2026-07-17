@@ -9,7 +9,7 @@ import { useChats } from "@/hooks/chats/useChats";
 import { useProjectChat } from "@/hooks/chats/useProjectChat";
 import { send_socket_message } from "@/socket/singleton.socket";
 import { InboundSocketMessageType } from "@trymatcha/types";
-import ChatThread from "@/components/playground/Home/chat/ChatThread";
+import ProjectChatThread from "@/components/playground/Home/chat/ProjectChatThread";
 import ThreadsDisplay from "./ThreadsDisplay";
 
 /**
@@ -63,7 +63,7 @@ export default function ThreadDetailDisplay() {
                 <h2 className="truncate text-[13px] font-semibold text-neutral-100">{title}</h2>
             </div>
             <div className="flex min-h-0 flex-1 flex-col *:px-4 *:py-3">
-                <ChatThread
+                <ProjectChatThread
                     key={
                         selectedThread.kind === "project"
                             ? "project"

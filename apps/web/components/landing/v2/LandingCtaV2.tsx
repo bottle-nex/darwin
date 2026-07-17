@@ -1,9 +1,9 @@
 import Link from "next/link";
-import { PiArrowRight } from "react-icons/pi";
 import { RiRocketFill, RiTeamFill } from "react-icons/ri";
 import { cn } from "@/lib/utils";
 import { azeretMono, Button } from "@/components/ui/button";
 import Reveal from "@/components/utility/Reveal";
+import HeroBuddy from "./HeroBuddy";
 
 const MICRO_LABELS = ["File the issue", "Agent ships the patch", "You review the PR"];
 
@@ -21,7 +21,7 @@ export default function LandingCtaV2() {
                         azeretMono.className,
                     )}
                 >
-                    <span className="size-1.5 rounded-full bg-[#AB9FF2]" />
+                    <HeroBuddy />
                     Start the loop
                 </div>
                 <h2 className="text-center text-4xl font-light leading-[1.08] tracking-tight text-neutral-900 sm:text-6xl sm:leading-[1.02] md:text-7xl">

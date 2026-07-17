@@ -6,7 +6,7 @@ import { useProjectMembers } from "@/hooks/project/useProjectMembers";
 import { useChats } from "@/hooks/chats/useChats";
 import { send_socket_message } from "@/socket/singleton.socket";
 import { InboundSocketMessageType } from "@trymatcha/types";
-import ChatThread from "@/components/playground/Home/chat/ChatThread";
+import ChatThread from "@/components/playground/Home/chat/ProjectChatThread";
 
 /** The "Comments and activity" panel for an issue. Disabled until the issue is saved. */
 export default function IssueChat({ issueId }: { issueId?: string }) {

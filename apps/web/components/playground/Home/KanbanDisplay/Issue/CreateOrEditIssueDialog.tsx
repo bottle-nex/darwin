@@ -44,6 +44,7 @@ function EditIssue({ issueId }: { issueId: string }) {
             initialDescription={issue.description}
         />
     ) : (
-        <LockedIssue key={issue.id} target={target} issue={issue} />
+        // <LockedIssue key={issue.id} target={target} issue={issue} />
+        <></>
     );
 }

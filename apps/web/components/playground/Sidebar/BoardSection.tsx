@@ -1,10 +1,7 @@
 "use client";
-import {
-    HiOutlineChartBarSquare,
-    HiOutlineSquares2X2,
-    HiOutlineTag,
-    HiOutlineViewColumns,
-} from "react-icons/hi2";
+import { HiMiniCubeTransparent, HiOutlineTag } from "react-icons/hi2";
+import { HiMenuAlt2 } from "react-icons/hi";
+import { PiColumnsLight } from "react-icons/pi";
 import Row from "./SidebarRow";
 import Section from "./SidebarSection";
 import { type SidebarSectionProps } from "./shared";
@@ -12,9 +9,9 @@ import { PlaygroundTab } from "../playgroundTabs";
 
 // The ways you look at the project's work — the board itself and its lenses.
 const BOARD_ROWS: { id: string; label: string; icon: React.ComponentType }[] = [
-    { id: PlaygroundTab.Overview, label: "Overview", icon: HiOutlineSquares2X2 },
-    { id: PlaygroundTab.Kanban, label: "Kanban", icon: HiOutlineViewColumns },
-    { id: PlaygroundTab.Gantt, label: "Gantt", icon: HiOutlineChartBarSquare },
+    { id: PlaygroundTab.Overview, label: "Overview", icon: HiMiniCubeTransparent },
+    { id: PlaygroundTab.Kanban, label: "Kanban", icon: PiColumnsLight },
+    { id: PlaygroundTab.Gantt, label: "Gantt", icon: HiMenuAlt2 },
     { id: PlaygroundTab.Tags, label: "Tags", icon: HiOutlineTag },
 ];
 
