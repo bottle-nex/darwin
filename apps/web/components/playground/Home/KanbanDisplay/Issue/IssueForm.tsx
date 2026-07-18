@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -46,6 +46,16 @@ export default function IssueForm({
     const [title, setTitle] = useState(issue?.title ?? "");
     const [summary, setSummary] = useState(issue?.summary ?? "");
     const body = useIssueDescription(initialDescription, initialTemplate);
+
+    // The default template can still be loading when this form first paints (the
+    // dialog no longer waits on it). Apply it once it arrives, as long as the
+    // body is still untouched — never clobber something the user already typed.
+    useEffect(() => {
+        if (!isEdit && initialTemplate && body.isEmpty && body.prompts === 0) {
+            body.pickTemplate(initialTemplate);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [initialTemplate]);
 
     const [priority, setPriority] = useState<Priority>(
         issue ? (KanbanMappers.NUMBER_TO_PRIORITY[issue.priority] ?? "normal") : "normal",

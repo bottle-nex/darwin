@@ -1,14 +1,15 @@
 import type { QueryClient } from "@tanstack/react-query";
 import { OutboundSocketMessageType, type OutboundSocketMessage } from "@trymatcha/types";
 import { toast } from "sonner";
-import { BOARD_QUERY_KEY } from "@/hooks/issues/useBoard";
+import { upsertBoardIssue } from "@/hooks/issues/useBoard";
 import { upsert_chat } from "@/hooks/chats/useChats";
 import { upsert_project_chat } from "@/hooks/chats/useProjectChat";
 
 export class SocketHandlers {
-    /** a new issue was created in the project -> refetch that project's board. */
-    static handle_issue_created(queryClient: QueryClient, projectId: string) {
-        queryClient.invalidateQueries({ queryKey: [...BOARD_QUERY_KEY, projectId] });
+    /** a new issue was created in the project -> merge it into the cached board directly. */
+    static handle_issue_created(queryClient: QueryClient, message: OutboundSocketMessage) {
+        if (message.type !== OutboundSocketMessageType.ISSUE_CREATED) return;
+        upsertBoardIssue(queryClient, message.projectId, message.payload);
     }
 
     /** a new comment landed -> merge it into that issue's cached chat list. */

@@ -2,6 +2,7 @@
 import { useEffect } from "react";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { useBoard } from "@/hooks/issues/useBoard";
+import { useListTemplates } from "@/hooks/templates/useListTemplates";
 import { useKanbanBoardStore } from "@/store/kanban/useKanbanBoardStore";
 import { useCustomKanbanStore } from "@/store/kanban/useCustomKanbanStore";
 import { useKanbanOptionsStore } from "@/store/kanban/useKanbanOptionsStore";
@@ -21,6 +22,10 @@ export function useKanbanPane() {
     const activeProject = useActiveProject();
     const { data: board } = useBoard(activeProject?.id);
     const projectName = activeProject?.name ?? "";
+
+    // Warms the templates cache while the board mounts, so opening the create-issue
+    // dialog later reads from cache instead of showing a loading state.
+    useListTemplates(activeProject?.id);
 
     useEffect(() => {
         if (!board) return;

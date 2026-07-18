@@ -1,10 +1,7 @@
 "use client";
 import { useParams } from "next/navigation";
-import {
-    HiOutlineAtSymbol,
-    HiOutlineChatBubbleLeftRight,
-    HiOutlineCheckCircle,
-} from "react-icons/hi2";
+import { HiOutlineAtSymbol, HiOutlineCheckCircle } from "react-icons/hi2";
+import { HiOutlineAnnotation } from "react-icons/hi";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
 import Row from "./SidebarRow";
 import Section from "./SidebarSection";
