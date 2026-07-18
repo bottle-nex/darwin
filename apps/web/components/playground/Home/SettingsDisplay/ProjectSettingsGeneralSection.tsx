@@ -16,8 +16,10 @@ import {
 import { cn } from "@/lib/utils";
 import { useUpdateProject } from "@/hooks/project/useUpdateProject";
 import { useDeleteProject } from "@/hooks/project/useDeleteProject";
-import type { ProjectDetail } from "@/types/project";
+import { useGetProjectConfig } from "@/hooks/project/useGetProjectConfig";
+import type { KanbanOptionView, ProjectDetail } from "@/types/project";
 import { Textarea } from "@/components/ui/textarea";
+import ProjectSettingsBoardSection from "./ProjectSettingsBoardSection";
 
 const FIELD =
     "border-white/10 bg-white/5 text-neutral-200 placeholder:text-neutral-500 focus-visible:border-[#9bc24f] focus-visible:ring-[#9bc24f]/30";
@@ -38,11 +40,18 @@ export default function ProjectSettingsGeneralSection({
     const [slug, setSlug] = useState(project.slug);
     const [description, setDescription] = useState(project.description ?? "");
     const [confirmOpen, setConfirmOpen] = useState(false);
+    const [optionsBarDraft, setOptionsBarDraft] = useState<KanbanOptionView | null>(null);
+
+    const { data: config } = useGetProjectConfig(project.id);
+    const savedOptionsBar = config?.kanbanOptionView ?? "FLAT";
+    const optionsBarView = optionsBarDraft ?? savedOptionsBar;
+    const optionsBarDirty = optionsBarDraft !== null && optionsBarDraft !== savedOptionsBar;
 
     const dirty =
         name.trim() !== project.name ||
         slug.trim() !== project.slug ||
-        description.trim() !== (project.description ?? "");
+        description.trim() !== (project.description ?? "") ||
+        optionsBarDirty;
     const canSave = name.trim().length > 0 && slug.trim().length > 0 && dirty && !update.isPending;
 
     const slugTaken =
@@ -55,6 +64,7 @@ export default function ProjectSettingsGeneralSection({
             name: name.trim(),
             slug: slug.trim(),
             description: description.trim(),
+            ...(optionsBarDirty && { kanban_option_view: optionsBarView }),
         });
     }
 
@@ -74,7 +84,7 @@ export default function ProjectSettingsGeneralSection({
             </div>
 
             <div>
-                <label className="text-[11px] text-neutral-400">Name</label>
+                <label className="text-[12px] text-neutral-300">Name</label>
                 <Input
                     value={name}
                     onChange={(e) => setName(e.target.value)}
@@ -83,7 +93,7 @@ export default function ProjectSettingsGeneralSection({
             </div>
 
             <div>
-                <label className="text-[11px] text-neutral-400">Slug</label>
+                <label className="text-[12px] text-neutral-300">Slug</label>
                 <Input
                     value={slug}
                     onChange={(e) =>
@@ -97,7 +107,7 @@ export default function ProjectSettingsGeneralSection({
             </div>
 
             <div>
-                <label className="text-[11px] text-neutral-400">Description</label>
+                <label className="text-[12px] text-neutral-300">Description</label>
                 <Textarea
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
@@ -105,6 +115,10 @@ export default function ProjectSettingsGeneralSection({
                     rows={8}
                 />
             </div>
+
+            <ProjectSettingsBoardSection value={optionsBarView} onChange={setOptionsBarDraft} />
+
+            <div className="h-px bg-white/5" />
 
             <div className="flex items-center gap-3">
                 <Button

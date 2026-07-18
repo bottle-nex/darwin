@@ -75,7 +75,7 @@ export default function PlaygroundDisplay({ isLoading }: { isLoading?: boolean }
     const tab = usePlaygroundNavStore((s) => s.tab);
 
     return (
-        <main className="flex flex-1 min-w-0 flex-col overflow-hidden rounded-lg ring-1 ring-white/6 bg-cement backdrop-blur-md">
+        <main className="flex flex-1 min-w-0 flex-col overflow-hidden rounded-lg ring-1 ring-white/6 bg-cement">
             {isLoading ? <LogoLoader className="h-full w-full" /> : <TabPane tab={tab} />}
         </main>
     );

@@ -17,6 +17,7 @@ const body_schema = z.object({
     summary: z.string().optional(),
     description: z.string().optional(),
     tour_completed: z.boolean().optional(),
+    kanban_option_view: z.enum(["FLAT", "GROUPED"]).optional(),
 });
 
 export default async function update_project_controller(req: Request, res: Response) {
@@ -27,7 +28,8 @@ export default async function update_project_controller(req: Request, res: Respo
             return;
         }
 
-        const { project_id, name, slug, summary, description, tour_completed } = parsed.data;
+        const { project_id, name, slug, summary, description, tour_completed, kanban_option_view } =
+            parsed.data;
         const user_id = req.user.id;
 
         const project_role = await Access.project(user_id, project_id);
@@ -38,7 +40,21 @@ export default async function update_project_controller(req: Request, res: Respo
 
         await prisma.project.update({
             where: { id: project_id },
-            data: { name, slug, summary, description, tourCompleted: tour_completed },
+            data: {
+                name,
+                slug,
+                summary,
+                description,
+                tourCompleted: tour_completed,
+                ...(kanban_option_view && {
+                    projectConfig: {
+                        upsert: {
+                            create: { kanbanOptionView: kanban_option_view },
+                            update: { kanbanOptionView: kanban_option_view },
+                        },
+                    },
+                }),
+            },
         });
 
         ResponseWriter.success(res, {}, "Project updated successfully");

@@ -5,6 +5,7 @@ import { UPDATE_PROJECT_URL } from "@/routes/api_routes";
 import { PROJECT_QUERY_KEY } from "./useGetProject";
 import { ORGANIZATIONS_QUERY_KEY } from "@/hooks/playground/useFetchOrganizations";
 import { DASHBOARD_QUERY_KEY } from "@/hooks/dashboard/useGetDashboard";
+import type { KanbanOptionView } from "@/types/project";
 
 export interface UpdateProjectInput {
     project_id: string;
@@ -13,6 +14,7 @@ export interface UpdateProjectInput {
     summary?: string;
     description?: string;
     tour_completed?: boolean;
+    kanban_option_view?: KanbanOptionView;
 }
 
 export function useUpdateProject() {
