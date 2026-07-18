@@ -9,11 +9,7 @@ const MICRO_LABELS = ["File the issue", "Agent ships the patch", "You review the
 
 export default function LandingCtaV2() {
     return (
-        <section className="relative overflow-hidden border-t border-neutral-200">
-            <div
-                aria-hidden
-                className="absolute inset-0 bg-[radial-gradient(circle,#d9d9d9_1px,transparent_1px)] bg-size-[28px_28px] mask-[radial-gradient(ellipse_at_bottom,black_20%,transparent_70%)]"
-            />
+        <section className="relative overflow-hidden">
             <Reveal className="relative mx-auto flex w-full max-w-7xl flex-col items-center gap-6 px-6 py-24 md:py-40">
                 <div
                     className={cn(

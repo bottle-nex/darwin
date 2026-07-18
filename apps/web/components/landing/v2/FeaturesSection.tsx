@@ -16,30 +16,30 @@ import AppLogo from "@/components/app/Applogo";
 
 export default function FeaturesSection() {
     return (
-        <main
-            className="relative mx-6 squircle rounded-[118px]"
-            style={{ background: "linear-gradient(180deg,#0a0a0a,#0F0F10),#101011" }}
-        >
+        <main className="relative mx-6 squircle rounded-[118px] bg-[#bcafff]">
             <section id="features" className="mx-auto max-w-332 scroll-mt-20 py-24">
                 <div className="mx-auto flex w-full max-w-332 flex-col gap-7 px-6">
                     <Reveal>
                         <div className="flex w-full justify-center">
-                            <AppLogo className="text-white" />
+                            <AppLogo className="text-neutral-900" />
                         </div>
                     </Reveal>
                     <Reveal delay={0.08}>
-                        <h2 className="text-4xl font-extralight leading-[1.05] text-neutral-100 sm:text-5xl md:text-6xl text-center">
+                        <h2 className="text-4xl font-extralight leading-[1.05] text-neutral-900 sm:text-5xl md:text-6xl text-center">
                             Everything between <br />{" "}
-                            <span className="text-neutral-400">issue and merge.</span>
+                            <span className="text-neutral-700">issue and merge.</span>
                         </h2>
                     </Reveal>
                 </div>
                 <div className="w-full flex justify-center items-center gap-3 my-12">
                     <Button variant="tertiary" className="flex items-center gap-2">
                         View on GitHub
-                        <RiGithubFill className="size-4 text-neutral-900!" />
+                        <RiGithubFill className="size-4" />
                     </Button>
-                    <Button className="flex items-center gap-2">
+                    <Button
+                        variant="secondary"
+                        className="flex items-center gap-2 dark:from-[#404040] dark:to-neutral-900 dark:text-white"
+                    >
                         Read Docs
                         <RiFilePaperFill className="size-4" />
                     </Button>
@@ -50,7 +50,7 @@ export default function FeaturesSection() {
                         icon={RiLayoutColumnFill}
                         tone="dark"
                         title="The board you already know"
-                        description="A Kanban canvas your whole team plans on — except the assignees are agents and the columns drain themselves."
+                        description="A Kanban canvas your whole team plans on, except the assignees are agents and the columns drain themselves."
                         preview={<BoardPreview />}
                         delay={0}
                     />
@@ -99,22 +99,22 @@ export default function FeaturesSection() {
                 <Reveal>
                     <div className="mt-16 flex flex-col gap-8 px-6 pt-12 sm:flex-row sm:items-center sm:justify-between sm:gap-12">
                         <div className="max-w-5xl">
-                            <h3 className="text-2xl font-extralight leading-snug text-neutral-100 sm:text-3xl">
+                            <h3 className="text-2xl font-extralight leading-snug text-neutral-900 sm:text-3xl">
                                 Hold your matcha.{" "}
-                                <span className="text-neutral-400">
+                                <span className="text-neutral-700">
                                     We&apos;ll bank the busywork.
                                 </span>
                             </h3>
-                            <p className="mt-4 leading-relaxed text-neutral-400">
+                            <p className="mt-4 leading-relaxed text-neutral-700">
                                 Pour a cup and step away from the backlog. Our agents claim your
                                 issues, ship the fix on real runners, and hand it back as a reviewed
-                                pull request — so your team keeps its hours for the work that grows
+                                pull request, so your team keeps its hours for the work that grows
                                 the business.
                             </p>
                         </div>
                         <Button variant="tertiary" className="shrink-0">
                             Read more
-                            <RiBookOpenFill className="size-4 text-neutral-800!" />
+                            <RiBookOpenFill className="size-4" />
                         </Button>
                     </div>
                 </Reveal>

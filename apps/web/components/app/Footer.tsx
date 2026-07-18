@@ -45,7 +45,7 @@ function FooterTopEdge({ isMarkettingPage = false }: { isMarkettingPage?: boolea
             >
                 <path
                     d={`${TOP_EDGE}v16H0z`}
-                    className={isMarkettingPage ? "fill-snow" : "fill-neutral-900"}
+                    className={isMarkettingPage ? "fill-snow" : "fill-ink"}
                 />
             </svg>
         </div>
@@ -56,7 +56,7 @@ export function Footer({ isMarkettingPage = false }: { isMarkettingPage?: boolea
     return (
         <footer className="relative">
             <FooterTopEdge isMarkettingPage={isMarkettingPage} />
-            <div className={cn("relative pb-6", isMarkettingPage ? "bg-snow" : "bg-neutral-900")}>
+            <div className={cn("relative pb-6", isMarkettingPage ? "bg-snow" : "bg-ink")}>
                 <div className="relative mx-auto max-w-7xl px-6 pt-10 sm:pt-14">
                     <div className="grid grid-cols-2 md:grid-cols-6 gap-x-6 gap-y-8">
                         <div className="col-span-2 md:col-span-2">
@@ -68,7 +68,7 @@ export function Footer({ isMarkettingPage = false }: { isMarkettingPage?: boolea
                             <p
                                 className={cn(
                                     "mt-3 text-sm text-pretty max-w-xs",
-                                    isMarkettingPage ? "text-neutral-600" : "text-neutral-400",
+                                    isMarkettingPage ? "text-neutral-600" : "text-white/80",
                                 )}
                             >
                                 The modern WhatsApp marketing platform for teams that want to grow.
@@ -79,7 +79,7 @@ export function Footer({ isMarkettingPage = false }: { isMarkettingPage?: boolea
                                 <div
                                     className={cn(
                                         "text-xs font-medium mb-3",
-                                        isMarkettingPage ? "text-neutral-700" : "text-neutral-100",
+                                        isMarkettingPage ? "text-neutral-700" : "text-white",
                                     )}
                                 >
                                     {heading}
@@ -93,7 +93,7 @@ export function Footer({ isMarkettingPage = false }: { isMarkettingPage?: boolea
                                                     "group inline-flex items-center gap-0.5 text-sm transition-colors",
                                                     isMarkettingPage
                                                         ? "text-neutral-500 hover:text-neutral-900"
-                                                        : "text-neutral-400 hover:text-white",
+                                                        : "text-white/80 hover:text-white",
                                                 )}
                                             >
                                                 {link.label}
@@ -110,7 +110,7 @@ export function Footer({ isMarkettingPage = false }: { isMarkettingPage?: boolea
                             "mt-12 flex flex-col sm:flex-row items-center justify-between gap-3 -mx-6 px-6",
                             "pt-6",
                             "text-xs",
-                            isMarkettingPage ? "text-neutral-500" : "text-neutral-400",
+                            isMarkettingPage ? "text-neutral-500" : "text-white/80",
                         )}
                     >
                         <div>© {new Date().getFullYear()} AIDM</div>

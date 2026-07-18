@@ -7,15 +7,10 @@
 
 @theme {
     --color-ink: #0a0a0a;
-    /* deepest dark — page base in dark mode */
     --color-charcoal: #101011;
-    /* lighter dark — cards/surfaces in dark mode */
     --color-cement: #0f0f10;
-    /* lighter dark — playground bg in dark mode */
     --color-snow: #ffffff;
-    /* lightest — page base in light mode */
     --color-mist: #f4f4f4;
-    /* off-white — cards/surfaces in light mode */
     --color-primary: #ab9ff2;
 }
 
@@ -65,9 +60,7 @@
     --destructive: #ff6467;
 
     --border: #ffffff1a;
-    /* white 10% */
     --input: #ffffff26;
-    /* white 15% */
     --ring: #525252;
 }
 
@@ -129,6 +122,20 @@
 
     .lenis.lenis-stopped {
         overflow: hidden;
+    }
+
+    /* The page scrolls the document root (Lenis drives <html>), so the visible
+       scrollbar belongs there — hiding it on a child that doesn't scroll has no
+       effect. Inner scroll panes opt in separately via `.no-scrollbar`. */
+    html,
+    body {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+
+    html::-webkit-scrollbar,
+    body::-webkit-scrollbar {
+        display: none;
     }
 }
 

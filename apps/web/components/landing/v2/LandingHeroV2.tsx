@@ -11,13 +11,13 @@ const MICRO_LABELS = ["Reads the repo", "Writes the patch", "Opens the PR"];
 
 export default function LandingHeroV2() {
     return (
-        <section className="bg-cement">
-            <div className="relative -mt-24 min-h-screen overflow-hidden bg-cement">
+        <section className="">
+            <div className="relative -mt-24 min-h-screen overflow-hidden">
                 <div className="relative z-50 mx-auto flex min-h-screen w-full max-w-7xl flex-col items-center justify-center gap-7 px-6 pt-34 pb-[25vh] text-center">
                     <Reveal immediate>
                         <div
                             className={cn(
-                                "buddy-zone flex items-center gap-2 rounded-full border border-neutral-800 bg-charcoal px-3 py-1.5 text-[11px] uppercase tracking-wide text-neutral-400 shadow-sm",
+                                "buddy-zone flex items-center gap-2 rounded-full border border-neutral-800 bg-charcoal px-3 py-1.5 text-[11px] uppercase tracking-wide text-neutral-400 shadow-sm bg-ink",
                                 azeretMono.className,
                             )}
                         >
@@ -34,14 +34,14 @@ export default function LandingHeroV2() {
                     </Reveal>
                     <Reveal immediate delay={0.16}>
                         <p className="max-w-2xl text-base leading-relaxed text-neutral-400 sm:text-lg">
-                            Drop an issue on the board and an agent takes it from there — it reads
-                            your repo, writes the patch, verifies it on a sandboxed runner, and
-                            {/* opens a pull request for your review. */}
+                            Drop an issue on the board and an agent takes it from there. It reads
+                            your repo, writes the patch, verifies it on a runner, and opens a pull
+                            request.
                         </p>
                     </Reveal>
                     <Reveal immediate delay={0.24}>
                         <div className="flex flex-col items-center gap-3 sm:flex-row sm:gap-x-4">
-                            <Button size="lg" variant="secondary">
+                            <Button size="lg" variant="tertiary">
                                 Get started
                                 <PiArrowRight className="h-3 w-3" />
                             </Button>

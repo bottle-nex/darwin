@@ -40,7 +40,7 @@ export default function PricingFreeCard() {
 
     return (
         <div
-            className="w-full lg:h-full lg:w-1/2 bg-[#0D0D0D] rounded-4xl relative overflow-hidden"
+            className="w-full lg:h-full lg:w-1/2 bg-snow rounded-4xl relative overflow-hidden"
             onMouseEnter={() => setHovered(true)}
             onMouseLeave={() => setHovered(false)}
         >
