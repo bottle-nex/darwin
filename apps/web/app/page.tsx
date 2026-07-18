@@ -8,7 +8,7 @@ import LandingCtaV2 from "@/components/landing/v2/LandingCtaV2";
 
 export default function Home() {
     return (
-        <main className="flex min-h-screen flex-col bg-snow pt-14">
+        <main className="flex min-h-screen flex-col bg-background pt-14">
             <NavBar />
             <LandingHeroV2 />
             <BoardShowcase />

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import AppLogo from "@/components/app/Applogo";
+import { ThemeToggle } from "@/components/nav/ThemeToggle";
 import { FaDiscord, FaPhoneAlt } from "react-icons/fa";
 import { useUserSessionStore } from "@/store/user/useUserSessionStore";
 import { PiArrowRight } from "react-icons/pi";
@@ -49,7 +50,7 @@ export function NavBar({ isMarkettingPage = false }: { isMarkettingPage?: boolea
                 scrolled
                     ? isMarkettingPage
                         ? "border-b border-neutral-800 h-15 bg-charcoal"
-                        : "border-b border-neutral-200 h-15 bg-snow"
+                        : "border-b border-neutral-200 h-15 bg-snow dark:border-neutral-800 dark:bg-ink"
                     : "border-b border-transparent h-17",
             )}
         >
@@ -87,6 +88,7 @@ export function NavBar({ isMarkettingPage = false }: { isMarkettingPage?: boolea
                 </nav>
 
                 <div className="flex items-center gap-2">
+                    <ThemeToggle isMarkettingPage={isMarkettingPage} />
                     <Button
                         variant={isMarkettingPage ? "tertiary" : "secondary"}
                         className="hidden lg:flex items-center justify-center"

@@ -74,7 +74,7 @@ export default function FeaturesSection() {
                         preview={<StackPreview />}
                         delay={0.14}
                     />
-                    <FeatureCard
+                    {/* <FeatureCard
                         index="04"
                         icon={RiGitPullRequestFill}
                         tone="ink"
@@ -97,7 +97,7 @@ export default function FeaturesSection() {
                         title="Pick the right agent"
                         description="Assign Opus to the gnarly refactor and Sonnet to the long tail of chores — per issue, straight from the card."
                         delay={0.14}
-                    />
+                    /> */}
                 </div>
                 <Reveal>
                     <div className="mt-16 flex flex-col gap-8 px-6 pt-12 sm:flex-row sm:items-center sm:justify-between sm:gap-12">

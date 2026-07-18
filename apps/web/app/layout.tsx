@@ -4,6 +4,7 @@ import "./globals.css";
 import LenisProvider from "@/providers/LenisProvider";
 import QueryProvider from "@/providers/QueryProvider";
 import SessionSetter from "@/components/utility/SessionSetter";
+import ThemeInitializer from "@/components/utility/ThemeInitializer";
 import { Toaster } from "@/components/ui/sonner";
 import { getServerSession } from "next-auth";
 import { authOption } from "./api/auth/[...nextauth]/options";
@@ -43,6 +44,7 @@ export default async function RootLayout({
                     <Toaster />
                 </body>
                 <SessionSetter session={session} />
+                <ThemeInitializer />
             </LenisProvider>
         </html>
     );
