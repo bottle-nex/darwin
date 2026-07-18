@@ -1,6 +1,6 @@
 "use client";
 import { SortableContext, horizontalListSortingStrategy } from "@dnd-kit/sortable";
-import { useCustomKanbanStore } from "@/store/kanban/useCustomKanbanStore";
+import { useFilteredCustomColumns } from "@/hooks/kanban/useFilteredCustomColumns";
 import CustomKanbanColumn from "./CustomKanbanColumn";
 import type { CustomKanbanApi } from "@/hooks/kanban/useCustomKanban";
 
@@ -11,7 +11,7 @@ export default function CustomKanbanBoard({
     assignMember,
     unassignMember,
 }: CustomKanbanApi) {
-    const columns = useCustomKanbanStore((s) => s.columns);
+    const columns = useFilteredCustomColumns();
 
     return (
         <SortableContext items={columns.map((c) => c.id)} strategy={horizontalListSortingStrategy}>

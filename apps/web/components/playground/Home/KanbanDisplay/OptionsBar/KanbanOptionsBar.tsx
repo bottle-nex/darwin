@@ -19,7 +19,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { TooltipComponent } from "@/components/ui/tooltip-component";
 import { useKanbanOptionsStore } from "@/store/kanban/useKanbanOptionsStore";
-import { useCustomKanbanStore } from "@/store/kanban/useCustomKanbanStore";
+import { useFilteredCustomColumns } from "@/hooks/kanban/useFilteredCustomColumns";
 import { useAddCustomColumnStore } from "@/store/kanban/useAddCustomColumnStore";
 import { useCreateOrEditIssueStore } from "@/store/issues/useCreateOrEditIssueStore";
 import type { BoardView } from "@/types/kanban";
@@ -61,7 +61,7 @@ export default function KanbanOptionsBar() {
         kanbanView,
         setKanbanView,
     } = useKanbanOptionsStore();
-    const customColumns = useCustomKanbanStore((s) => s.columns);
+    const customColumns = useFilteredCustomColumns();
     const openCreate = useCreateOrEditIssueStore((s) => s.openCreate);
     const setAddColumnOpen = useAddCustomColumnStore((s) => s.setOpen);
     const onAddTask = () => openCreate({ board: "llm" });

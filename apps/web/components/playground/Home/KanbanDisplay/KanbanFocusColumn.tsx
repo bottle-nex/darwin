@@ -2,7 +2,7 @@
 import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
 import type { BoardState } from "@/types/kanban";
 import type { FilterValue } from "@/store/kanban/useKanbanOptionsStore";
-import { useCustomKanbanStore } from "@/store/kanban/useCustomKanbanStore";
+import { useFilteredCustomColumns } from "@/hooks/kanban/useFilteredCustomColumns";
 import type { CustomKanbanApi } from "@/hooks/kanban/useCustomKanban";
 import KanbanColumn from "./KanbanColumn";
 import CustomKanbanColumn from "./customkanban/CustomKanbanColumn";
@@ -14,7 +14,7 @@ type KanbanFocusColumnProps = {
 };
 
 export default function KanbanFocusColumn({ filter, board, custom }: KanbanFocusColumnProps) {
-    const columns = useCustomKanbanStore((s) => s.columns);
+    const columns = useFilteredCustomColumns();
 
     if (filter.kind === "llm") {
         const column = KanbanBoard.COLUMNS.find((c) => c.status === filter.status);
