@@ -1,7 +1,7 @@
 "use client";
 import { useParams } from "next/navigation";
 import { toast } from "sonner";
-import { MdChat } from "react-icons/md";
+import { MdChat, MdFolder } from "react-icons/md";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { useProjectMembers } from "@/hooks/project/useProjectMembers";
@@ -10,6 +10,8 @@ import { useProjectChat } from "@/hooks/chats/useProjectChat";
 import { send_socket_message } from "@/socket/singleton.socket";
 import { InboundSocketMessageType } from "@trymatcha/types";
 import ProjectChatThread from "@/components/playground/Home/chat/ProjectChatThread";
+// import ChatThread from "@/components/playground/Home/chat/ChatThread";
+import { DEFAULT_FOLDER_COLOR } from "@/components/playground/Core/TopBar/PlaygroundProjectSwitcher";
 import ThreadsDisplay from "./ThreadsDisplay";
 
 /**
@@ -51,15 +53,26 @@ export default function ThreadDetailDisplay() {
         if (!sent) toast.error("Couldn't send your message.");
     }
 
-    const title =
-        selectedThread.kind === "project"
-            ? "Project chat"
-            : `#${selectedThread.issueNumber} ${selectedThread.issueTitle}`;
+    const isProjectThread = selectedThread.kind === "project";
+    const title = isProjectThread
+        ? (activeProject?.name ?? "Project chat")
+        : `#${selectedThread.issueNumber} ${selectedThread.issueTitle}`;
 
     return (
         <div className="flex min-h-0 flex-1 flex-col">
             <div className="flex h-10 shrink-0 items-center gap-2 border-b border-white/5 px-3">
-                <MdChat className="size-4 text-neutral-400" aria-hidden />
+                {isProjectThread ? (
+                    <MdFolder
+                        className="size-4 shrink-0"
+                        style={{
+                            color: activeProject?.color ?? DEFAULT_FOLDER_COLOR,
+                            fill: activeProject?.color ?? DEFAULT_FOLDER_COLOR,
+                        }}
+                        aria-hidden
+                    />
+                ) : (
+                    <MdChat className="size-4 shrink-0 text-neutral-400" aria-hidden />
+                )}
                 <h2 className="truncate text-[13px] font-semibold text-neutral-100">{title}</h2>
             </div>
             <div className="flex min-h-0 flex-1 flex-col *:px-4 *:py-3">

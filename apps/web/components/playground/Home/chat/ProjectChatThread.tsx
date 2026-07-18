@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { IoIosSend, IoMdClose } from "react-icons/io";
+import { MdChat } from "react-icons/md";
 import type { Chat, ProjectChat } from "@trymatcha/types";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -123,7 +124,15 @@ export default function ChatThread({
                         ))}
                     </ul>
                 ) : (
-                    <p className="text-[13px] text-neutral-600">{emptyMessage}</p>
+                    <div className="flex h-full flex-col items-center justify-center gap-y-3 text-center">
+                        <span
+                            className="flex size-11 items-center justify-center rounded-2xl bg-charcoal text-neutral-500 ring-1 ring-white/10"
+                            aria-hidden
+                        >
+                            <MdChat className="size-5" />
+                        </span>
+                        <p className="text-[13px] text-neutral-500">{emptyMessage}</p>
+                    </div>
                 )}
             </div>
             <footer className="relative flex flex-col">
