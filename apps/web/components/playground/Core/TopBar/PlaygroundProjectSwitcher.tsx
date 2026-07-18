@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 import { useGetDashboard } from "@/hooks/dashboard/useGetDashboard";
 import PlaygroundSearchInput from "../components/PlaygroundSearchInput";
 
-const DEFAULT_FOLDER_COLOR = "#6366f1";
+export const DEFAULT_FOLDER_COLOR = "#6366f1";
 
 /** Top-bar project switcher — shows the active project and lets you jump to another. */
 export default function PlaygroundProjectSwitcher() {

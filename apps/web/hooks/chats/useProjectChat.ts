@@ -20,10 +20,48 @@ export function useProjectChat(projectId: string | undefined) {
     });
 }
 
+/** Marks a chat as a local echo not yet confirmed by the PROJECT_CHAT_CREATED broadcast. */
+const OPTIMISTIC_ID_PREFIX = "optimistic:";
+
 /**
- * Append a chat into a project's cached list, idempotently (by id).
- * Called by the socket PROJECT_CHAT_CREATED handler. No-ops if the project's
- * list isn't loaded, it'll be fetched fresh when the project chat is opened.
+ * Builds the chat shown the instant the sender hits send, before the server
+ * confirms it. `sender` only needs the fields the chat bubble renders — the
+ * rest of `User` is stubbed since this row is replaced wholesale once the
+ * real broadcast lands.
+ */
+export function build_optimistic_project_chat(
+    projectId: string,
+    message: string,
+    repliedTo: ProjectChat | null,
+    sender: { id: string; name: string | null; email: string; image: string | null },
+): ProjectChat {
+    return {
+        id: `${OPTIMISTIC_ID_PREFIX}${crypto.randomUUID()}`,
+        projectId,
+        message,
+        isDeleted: false,
+        senderId: sender.id,
+        sender: sender as unknown as ProjectChat["sender"],
+        repliedToId: repliedTo?.id ?? null,
+        repliedTo: repliedTo ?? null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+    };
+}
+
+/** Appends the sender's own optimistic chat into the cached list right away. */
+export function add_project_chat(queryClient: QueryClient, chat: ProjectChat) {
+    queryClient.setQueryData<ProjectChat[]>([...PROJECT_CHATS_QUERY_KEY, chat.projectId], (prev) =>
+        prev ? [...prev, chat] : prev,
+    );
+}
+
+/**
+ * Append a chat into a project's cached list, idempotently (by id). Called by
+ * the socket PROJECT_CHAT_CREATED handler — replaces the sender's own pending
+ * optimistic echo (same sender + message) if one is waiting, otherwise just
+ * appends. No-ops if the project's list isn't loaded, it'll be fetched fresh
+ * when the project chat is opened.
  */
 export function upsert_project_chat(queryClient: QueryClient, chat: ProjectChat) {
     queryClient.setQueryData<ProjectChat[]>(
@@ -31,7 +69,16 @@ export function upsert_project_chat(queryClient: QueryClient, chat: ProjectChat)
         (prev) => {
             if (!prev) return prev;
             if (prev.some((existing) => existing.id === chat.id)) return prev;
-            return [...prev, chat];
+            const pendingIndex = prev.findIndex(
+                (existing) =>
+                    existing.id.startsWith(OPTIMISTIC_ID_PREFIX) &&
+                    existing.senderId === chat.senderId &&
+                    existing.message === chat.message,
+            );
+            if (pendingIndex === -1) return [...prev, chat];
+            const next = [...prev];
+            next[pendingIndex] = chat;
+            return next;
         },
     );
 }

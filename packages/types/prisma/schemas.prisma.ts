@@ -1,4 +1,4 @@
-import { OrgRole, ProjectRole, TeamRole } from "./enums.prisma";
+import { IssueStatus, OrgRole, ProjectRole, TeamRole } from "./enums.prisma";
 
 export interface User {
     id: string;
@@ -110,12 +110,32 @@ export interface ProjectMember {
 
 export interface Issue {
     id: string;
+    number: number;
     createdById: string;
     title: string;
+    summary: string | null;
     description: string;
+    status: IssueStatus;
+    priority: number;
+    customColumnId: string | null;
+    startDate: Date | null;
+    targetDate: Date | null;
 
     creator: User;
     assignees: User[];
+    tags: Tag[];
+
+    createdAt: Date;
+}
+
+export interface Tag {
+    id: string;
+    projectId: string;
+    name: string;
+    color: string;
+
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 export interface Chat {

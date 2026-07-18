@@ -189,7 +189,7 @@ export default class IssueCreateController {
                 console.log("queued to router");
             }
 
-            ResponseWriter.created(res, { issue_id: issue.id }, "Issue created successfully");
+            ResponseWriter.created(res, { issue: full_issue }, "Issue created successfully");
         } catch (err) {
             ResponseWriter.system_error(res);
         }

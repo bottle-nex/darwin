@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { IoIosSend, IoMdClose } from "react-icons/io";
+import { MdChat } from "react-icons/md";
 import type { Chat, ProjectChat } from "@trymatcha/types";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -9,6 +10,7 @@ import PlaygroundAvatar, {
 } from "@/components/playground/Core/components/PlaygroundAvatar";
 import SessionServices from "@/lib/session";
 import { type ProjectMember } from "@/hooks/project/useProjectMembers";
+import LogoLoader from "@/components/app/LogoLoader";
 import ChatMessage from "./ChatMessage";
 
 /** Matches an "@query" being typed at the caret (start of text or after whitespace). */
@@ -21,6 +23,8 @@ type ChatThreadProps = {
     emptyMessage: string;
     /** True while the underlying conversation isn't ready to receive messages yet. */
     disabled?: boolean;
+    /** True while the initial page of chats is still being fetched. */
+    loading?: boolean;
     onSend: (message: string, repliedToId?: string) => void;
 };
 
@@ -35,6 +39,7 @@ export default function ChatThread({
     placeholder = "Leave a comment...",
     emptyMessage,
     disabled,
+    loading,
     onSend,
 }: ChatThreadProps) {
     const [message, setMessage] = useState<string>("");
@@ -106,7 +111,9 @@ export default function ChatThread({
                 data-lenis-prevent
                 className="no-scrollbar flex-1 min-h-0 min-w-0 overflow-y-auto text-[13px] text-neutral-500"
             >
-                {chats && chats.length > 0 ? (
+                {loading ? (
+                    <LogoLoader size={32} className="h-full" />
+                ) : chats && chats.length > 0 ? (
                     <ul className="flex min-w-0 flex-col">
                         {chats.map((chat, i) => (
                             <ChatMessage
@@ -123,7 +130,15 @@ export default function ChatThread({
                         ))}
                     </ul>
                 ) : (
-                    <p className="text-[13px] text-neutral-600">{emptyMessage}</p>
+                    <div className="flex h-full flex-col items-center justify-center gap-y-3 text-center">
+                        <span
+                            className="flex size-11 items-center justify-center rounded-2xl bg-charcoal text-neutral-500 ring-1 ring-white/10"
+                            aria-hidden
+                        >
+                            <MdChat className="size-5" />
+                        </span>
+                        <p className="text-[13px] text-neutral-500">{emptyMessage}</p>
+                    </div>
                 )}
             </div>
             <footer className="relative flex flex-col">

@@ -1,8 +1,9 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/lib/axios";
 import { CREATE_ISSUE_URL } from "@/routes/api_routes";
-import { BOARD_QUERY_KEY } from "@/hooks/issues/useBoard";
+import { upsertBoardIssue } from "@/hooks/issues/useBoard";
 import type { ApiResponse } from "@/types/api";
+import type { Issue } from "@trymatcha/types";
 
 export interface CreateIssueInput {
     project_id: string;
@@ -20,7 +21,7 @@ export interface CreateIssueInput {
 }
 
 interface CreatedIssue {
-    issue_id: string;
+    issue: Issue;
 }
 
 export function useCreateIssue() {
@@ -30,10 +31,8 @@ export function useCreateIssue() {
             const res = await apiClient.post<ApiResponse<CreatedIssue>>(CREATE_ISSUE_URL, input);
             return res.data.data;
         },
-        onSuccess: (_data, variables) => {
-            queryClient.invalidateQueries({
-                queryKey: [...BOARD_QUERY_KEY, variables.project_id],
-            });
+        onSuccess: (data, variables) => {
+            upsertBoardIssue(queryClient, variables.project_id, data.issue);
         },
     });
 }

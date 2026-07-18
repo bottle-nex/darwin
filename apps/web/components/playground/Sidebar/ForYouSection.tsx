@@ -1,6 +1,8 @@
 "use client";
+import { useParams } from "next/navigation";
 import { HiOutlineAtSymbol, HiOutlineCheckCircle } from "react-icons/hi2";
 import { HiOutlineAnnotation } from "react-icons/hi";
+import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
 import Row from "./SidebarRow";
 import Section from "./SidebarSection";
 import { type SidebarSectionProps } from "./shared";
@@ -17,6 +19,9 @@ export default function PlaygroundSidebarForYouSection({
     selectedRowId,
     onSelect,
 }: SidebarSectionProps) {
+    const { projectSlug } = useParams<{ projectSlug?: string }>();
+    const openThread = usePlaygroundNavStore((s) => s.openThread);
+
     return (
         <Section title="For you">
             {FOR_YOU_ROWS.map((r) => (
@@ -25,7 +30,11 @@ export default function PlaygroundSidebarForYouSection({
                     label={r.label}
                     leading={{ kind: "icon", icon: r.icon }}
                     active={selectedRowId === r.id}
-                    onClick={() => onSelect(r.id)}
+                    onClick={() =>
+                        r.id === PlaygroundTab.Threads
+                            ? openThread({ kind: "project" }, projectSlug ?? "")
+                            : onSelect(r.id)
+                    }
                 />
             ))}
         </Section>
