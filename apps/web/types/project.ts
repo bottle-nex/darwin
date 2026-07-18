@@ -46,3 +46,9 @@ export interface ProjectDetail {
     /** The requesting user's effective role in this project (highest of org/owner/team). */
     viewerRole: ProjectRole | null;
 }
+
+export type KanbanOptionView = "FLAT" | "GROUPED";
+
+export interface ProjectConfig {
+    kanbanOptionView: KanbanOptionView;
+}

@@ -15,8 +15,6 @@ export default function PlaygroundTopBar() {
             <div className="flex items-center gap-1">
                 <PlaygroundProjectSwitcher />
             </div>
-
-            {/* search — absolutely centered so a long org name never shifts it */}
             <div className="absolute left-1/2 top-1/2 w-full max-w-md -translate-x-1/2 -translate-y-1/2">
                 <MdSearch
                     className="pointer-events-none absolute top-1/2 left-3 size-3.5 -translate-y-1/2 text-neutral-500"
@@ -24,7 +22,7 @@ export default function PlaygroundTopBar() {
                 />
                 <Input
                     placeholder="Search"
-                    className="h-7 w-full rounded-md border-white/5 bg-white/5 pl-8 pr-12 text-[12px] text-neutral-100 placeholder:text-neutral-500"
+                    className="h-7 w-full rounded-md border-white/5 pl-8 pr-12 text-[12px] text-neutral-100 placeholder:text-neutral-500"
                 />
                 <kbd className="pointer-events-none absolute top-1/2 right-2 -translate-y-1/2 flex items-center rounded bg-white/5 px-1.5 py-0.5 text-[11px] leading-none font-medium tracking-wide text-neutral-500">
                     ⌘K

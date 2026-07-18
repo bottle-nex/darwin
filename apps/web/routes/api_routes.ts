@@ -27,6 +27,9 @@ export const LIST_PROJECT_SECRETS_URL = (project_id: string) =>
     `${PROJECT_URL}/${project_id}/secrets`;
 export const DELETE_PROJECT_SECRET_URL = (project_id: string, key: string) =>
     `${PROJECT_URL}/${project_id}/secrets/${encodeURIComponent(key)}`;
+export const GET_PROJECT_CONFIG_URL = (project_id: string) => `${PROJECT_URL}/${project_id}/config`;
+export const UPDATE_PROJECT_CONFIG_URL = (project_id: string) =>
+    `${PROJECT_URL}/${project_id}/config`;
 
 // <--------------------- TAG ROUTES --------------------->
 export const LIST_TAGS_URL = (project_id: string) => `${PROJECT_URL}/${project_id}/tags`;

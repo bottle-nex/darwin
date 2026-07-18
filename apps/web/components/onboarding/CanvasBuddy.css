@@ -1,6 +1,6 @@
 .cb-figure {
     transform-box: view-box;
-    transform-origin: 8px 5.5px;
+    transform-origin: 9px 5.5px;
 }
 .cb-run .cb-figure {
     animation: cb-bob 0.45s step-end infinite;

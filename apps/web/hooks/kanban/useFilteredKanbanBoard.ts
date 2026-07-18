@@ -9,7 +9,7 @@ import { useKanbanOptionsStore } from "@/store/kanban/useKanbanOptionsStore";
 import type { BoardState } from "@/types/kanban";
 
 /**
- * The LLM board with the active search + tag filters applied.
+ * The LLM board with the active tag filter applied.
  *
  * `useKanbanBoardStore.board` is a mirror that `useKanbanPane` seeds from the
  * `useBoard` query in an effect — it also holds local-only edits (drag-and-drop
@@ -29,7 +29,6 @@ export function useFilteredKanbanBoard(): BoardState {
 
     const seededBoard = useKanbanBoardStore((s) => s.seededBoard);
     const mirroredBoard = useKanbanBoardStore((s) => s.board);
-    const search = useKanbanOptionsStore((s) => s.search);
     const selectedTagIds = useKanbanOptionsStore((s) => s.selectedTagIds);
 
     const board = useMemo(() => {
@@ -37,8 +36,5 @@ export function useFilteredKanbanBoard(): BoardState {
         return KanbanMappers.boardIssuesToLlmBoard(serverBoard, projectName);
     }, [serverBoard, seededBoard, mirroredBoard, projectName]);
 
-    return useMemo(
-        () => KanbanBoard.filterBoard(board, search, selectedTagIds),
-        [board, search, selectedTagIds],
-    );
+    return useMemo(() => KanbanBoard.filterBoard(board, selectedTagIds), [board, selectedTagIds]);
 }

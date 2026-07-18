@@ -54,7 +54,7 @@ function SheetContent({
             <SheetPrimitive.Content
                 data-slot="sheet-content"
                 className={cn(
-                    "fixed z-50 flex flex-col gap-4 bg-background shadow-lg transition ease-in-out data-[state=closed]:animate-out data-[state=closed]:duration-300 data-[state=open]:animate-in data-[state=open]:duration-500",
+                    "fixed z-50 flex flex-col gap-4 bg-cement shadow-lg transition ease-in-out data-[state=closed]:animate-out data-[state=closed]:duration-300 data-[state=open]:animate-in data-[state=open]:duration-500",
                     side === "right" &&
                         "top-0 right-0 bottom-0 h-full w-3/4 border-l data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right sm:max-w-sm",
                     side === "left" &&
@@ -69,7 +69,7 @@ function SheetContent({
             >
                 {children}
                 {showCloseButton && (
-                    <SheetPrimitive.Close className="absolute p-1 top-4 right-4 rounded-full opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-primary focus:outline-hidden disabled:pointer-events-none data-[state=open]:bg-secondary cursor-pointer">
+                    <SheetPrimitive.Close className="absolute p-1 top-4 right-4 rounded-full opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-primary focus:outline-hidden disabled:pointer-events-none data-[state=open]:bg-cement cursor-pointer">
                         <MdClose className="size-4" />
                         <span className="sr-only">Close</span>
                     </SheetPrimitive.Close>

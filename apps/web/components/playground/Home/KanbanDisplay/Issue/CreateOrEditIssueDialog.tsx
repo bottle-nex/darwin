@@ -5,7 +5,6 @@ import { useListTemplates } from "@/hooks/templates/useListTemplates";
 import { useIssueDialog } from "@/components/playground/issue/useIssueDialog";
 import type { IssueTarget } from "@/store/issues/useCreateOrEditIssueStore";
 import IssueForm from "./IssueForm";
-import LockedIssue from "./LockedIssue";
 import IssuePending from "./IssuePending";
 import { isEditable, targetForIssue } from "./issueHelpers";
 

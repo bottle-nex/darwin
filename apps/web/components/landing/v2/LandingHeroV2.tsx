@@ -13,71 +13,7 @@ const MICRO_LABELS = ["Reads the repo", "Writes the patch", "Opens the PR"];
 export default function LandingHeroV2() {
     return (
         <section className="bg-snow">
-            <div className="relative -mt-14 min-h-screen overflow-hidden bg-snow">
-                {/* Background — gradient + dials moved from the landing prototype */}
-                <Dial
-                    size={1300}
-                    color={"#fafafa"}
-                    tick={{
-                        size: 73,
-                        width: 2,
-                        color: "#1a1a1a",
-                        opacity: 0.3,
-                        count: 100,
-                    }}
-                    padding={32}
-                    className="absolute z-10 -bottom-150 -right-150 opacity-30"
-                    shadow={{ blur: 20, color: "#00000025" }}
-                    rotation={{
-                        angle: 6,
-                        interval: 2,
-                        direction: "clockwise",
-                    }}
-                />
-                <Dial
-                    size={1095}
-                    color={"#ab9ff2"}
-                    tick={{
-                        size: 43,
-                        width: 2,
-                        color: "#1a1a1a",
-                        opacity: 0.3,
-                        count: 100,
-                    }}
-                    className="absolute z-20 -bottom-130 -right-130 opacity-30"
-                    shadow={{ blur: 20, color: "#00000025" }}
-                    rotation={{
-                        angle: 6,
-                        interval: 2,
-                        direction: "counterclockwise",
-                        delay: 1,
-                    }}
-                />
-                <Dial
-                    size={900}
-                    color={"#ffffff"}
-                    tick={{
-                        size: 0,
-                        width: 0,
-                        color: "#ababab90",
-                        opacity: 0.3,
-                        count: 100,
-                    }}
-                    className="absolute z-30 -bottom-110 -right-110 opacity-30"
-                    shadow={{ blur: 20, color: "#00000025" }}
-                />
-
-                {/* Soft white glow behind the text — fades out toward the edges */}
-                <div
-                    aria-hidden
-                    className="pointer-events-none absolute inset-0 z-40"
-                    style={{
-                        background:
-                            "radial-gradient(45% 40% at 50% 50%, rgba(250,250,250,0.92) 0%, rgba(250,250,250,0.6) 40%, rgba(250,250,250,0) 72%)",
-                    }}
-                />
-
-                {/* Hero content (kept from the / page) */}
+            <div className="relative -mt-24 min-h-screen overflow-hidden bg-snow">
                 <div className="relative z-50 mx-auto flex min-h-screen w-full max-w-7xl flex-col items-center justify-center gap-7 px-6 pt-34 pb-[25vh] text-center">
                     <Reveal immediate>
                         <div
@@ -101,7 +37,7 @@ export default function LandingHeroV2() {
                         <p className="max-w-2xl text-base leading-relaxed text-neutral-600 sm:text-lg">
                             Drop an issue on the board and an agent takes it from there — it reads
                             your repo, writes the patch, verifies it on a sandboxed runner, and
-                            opens a pull request for your review.
+                            {/* opens a pull request for your review. */}
                         </p>
                     </Reveal>
                     <Reveal immediate delay={0.24}>

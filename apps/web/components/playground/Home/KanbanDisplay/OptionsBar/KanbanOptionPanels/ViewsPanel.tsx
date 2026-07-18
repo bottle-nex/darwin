@@ -17,6 +17,32 @@ type ViewsPanelProps = {
     onChange: (value: KanbanView) => void;
 };
 
+export const VIEWS_PANEL_WIDTH = "w-44";
+
+/** The menu rows on their own, so they can also be rendered inside a submenu. */
+export function ViewsPanelItems({ value, onChange }: ViewsPanelProps) {
+    return (
+        <>
+            <DropdownMenu.Label className={PANEL_LABEL}>Views</DropdownMenu.Label>
+            <DropdownMenu.RadioGroup value={value} onValueChange={(v) => onChange(v as KanbanView)}>
+                {OPTIONS.map((option) => (
+                    <DropdownMenu.RadioItem
+                        key={option.value}
+                        value={option.value}
+                        className={PANEL_ITEM}
+                    >
+                        <option.icon className="size-3.5 text-neutral-400" aria-hidden />
+                        <span className="flex-1">{option.label}</span>
+                        <DropdownMenu.ItemIndicator>
+                            <MdCheck className="size-3.5 text-neutral-300" aria-hidden />
+                        </DropdownMenu.ItemIndicator>
+                    </DropdownMenu.RadioItem>
+                ))}
+            </DropdownMenu.RadioGroup>
+        </>
+    );
+}
+
 /**
  * Views dropdown opened from the toolbar's sliders button: switch the LLM
  * Kanban between the board (column) layout and the compact list layout. The
@@ -34,27 +60,9 @@ export default function ViewsPanel({ value, onChange }: ViewsPanelProps) {
                 <DropdownMenu.Content
                     align="end"
                     sideOffset={6}
-                    className={`w-44 ${PANEL_CONTENT}`}
+                    className={`${VIEWS_PANEL_WIDTH} ${PANEL_CONTENT}`}
                 >
-                    <DropdownMenu.Label className={PANEL_LABEL}>Views</DropdownMenu.Label>
-                    <DropdownMenu.RadioGroup
-                        value={value}
-                        onValueChange={(v) => onChange(v as KanbanView)}
-                    >
-                        {OPTIONS.map((option) => (
-                            <DropdownMenu.RadioItem
-                                key={option.value}
-                                value={option.value}
-                                className={PANEL_ITEM}
-                            >
-                                <option.icon className="size-3.5 text-neutral-400" aria-hidden />
-                                <span className="flex-1">{option.label}</span>
-                                <DropdownMenu.ItemIndicator>
-                                    <MdCheck className="size-3.5 text-neutral-300" aria-hidden />
-                                </DropdownMenu.ItemIndicator>
-                            </DropdownMenu.RadioItem>
-                        ))}
-                    </DropdownMenu.RadioGroup>
+                    <ViewsPanelItems value={value} onChange={onChange} />
                 </DropdownMenu.Content>
             </DropdownMenu.Portal>
         </DropdownMenu.Root>

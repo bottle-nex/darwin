@@ -114,13 +114,25 @@ model Project {
   planMd             String?             @db.Text
   planStatus         PlanStatus          @default(Pending)
 
-  workers Worker[]
+  workers       Worker[]
+  projectConfig ProjectConfig?
 
   @@unique([orgId, slug])
   @@index([ownerId])
   @@index([githubInstallationId])
 }
 
+model ProjectConfig {
+  id        String  @id @default(cuid())
+  projectId String  @unique
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  kanbanOptionView KanbanOptionView @default(FLAT)
+}
+
+enum KanbanOptionView {
+  FLAT
+  GROUPED
+}
 model Tag {
   id    String @id @default(cuid())
   name  String

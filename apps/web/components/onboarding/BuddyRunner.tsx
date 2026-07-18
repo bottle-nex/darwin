@@ -36,7 +36,7 @@ export default function BuddyRunner({
     }, [jumpSignal, animate, scope, reduced]);
 
     return (
-        <div ref={scope} className="relative h-15.25 w-22 origin-bottom">
+        <div ref={scope} className="relative h-15.25 w-25 origin-bottom">
             {dustActive && !reduced && <DustTrail />}
             <CanvasBuddy pose={pose} className="h-full w-full" />
         </div>

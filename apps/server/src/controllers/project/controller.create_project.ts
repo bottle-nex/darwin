@@ -106,6 +106,9 @@ export default async function create_project_controller(req: Request, res: Respo
                 members: {
                     create: { userId: user_id, role: ProjectRole.Admin },
                 },
+                projectConfig: {
+                    create: {},
+                },
                 ...repo_fields,
             },
             select: { id: true, name: true, slug: true, color: true },
