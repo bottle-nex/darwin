@@ -1,4 +1,6 @@
 "use client";
+import { useEffect, useState } from "react";
+import { motion } from "motion/react";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
 import { PlaygroundTab } from "@/components/playground/playgroundTabs";
 import OverviewDisplay from "@/components/playground/Home/OverviewDisplay/OverviewDisplay";
@@ -73,10 +75,24 @@ function TabPane({ tab }: { tab: string }) {
 /** The playground's main pane: a shared card frame around the active tab. */
 export default function PlaygroundDisplay({ isLoading }: { isLoading?: boolean }) {
     const tab = usePlaygroundNavStore((s) => s.tab);
+    const [isSettled, setIsSettled] = useState(false);
+
+    useEffect(() => {
+        const frame = requestAnimationFrame(() => setIsSettled(true));
+        return () => cancelAnimationFrame(frame);
+    }, []);
 
     return (
-        <main className="relative z-10 flex flex-1 min-w-0 flex-col overflow-hidden rounded-lg ring-1 ring-white/6 bg-charcoal">
+        <motion.main
+            layout
+            transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+            className={
+                isSettled
+                    ? "relative z-0 flex flex-1 min-w-0 flex-col overflow-hidden rounded-lg ring-1 ring-white/6 bg-cement"
+                    : "fixed inset-0 z-999 flex flex-col overflow-hidden bg-cement"
+            }
+        >
             {isLoading ? <LogoLoader className="h-full w-full" /> : <TabPane tab={tab} />}
-        </main>
+        </motion.main>
     );
 }
