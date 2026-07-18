@@ -24,12 +24,12 @@ export default function LandingCtaV2() {
                     <HeroBuddy />
                     Start the loop
                 </div>
-                <h2 className="text-center text-4xl font-light leading-[1.08] tracking-tight text-neutral-900 dark:text-neutral-100 sm:text-6xl sm:leading-[1.02] md:text-7xl">
+                <h2 className="text-center text-4xl font-light leading-[1.08] tracking-tight text-neutral-100 sm:text-6xl sm:leading-[1.02] md:text-7xl">
                     The backlog won&apos;t wait.
                     <br className="hidden sm:inline" />{" "}
-                    <span className="text-neutral-400 dark:text-neutral-500 ">Neither do agents.</span>
+                    <span className="text-neutral-500">Neither do agents.</span>
                 </h2>
-                <p className="max-w-xl text-center leading-relaxed text-neutral-600 dark:text-neutral-300 ">
+                <p className="max-w-xl text-center leading-relaxed text-neutral-300">
                     File your first issue and watch it come back as a pull request.
                 </p>
                 <div className="flex flex-col items-center gap-3 pt-2 sm:flex-row sm:gap-x-4">
@@ -46,7 +46,7 @@ export default function LandingCtaV2() {
                 </div>
                 <div
                     className={cn(
-                        "flex flex-wrap items-center justify-center gap-3 pt-6 text-[12px] uppercase tracking-wide text-neutral-500 dark:text-neutral-400 sm:gap-4",
+                        "flex flex-wrap items-center justify-center gap-3 pt-6 text-[12px] uppercase tracking-wide text-neutral-400 sm:gap-4",
                         azeretMono.className,
                     )}
                 >

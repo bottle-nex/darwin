@@ -46,7 +46,7 @@
 }
 
 .dark {
-    --background: var(--color-ink);
+    --background: var(--color-cement);
     --foreground: #ededed;
     --surface: var(--color-charcoal);
     --card: var(--color-charcoal);

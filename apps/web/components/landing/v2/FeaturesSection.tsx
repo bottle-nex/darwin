@@ -2,13 +2,10 @@ import { Button } from "@/components/ui/button";
 import {
     RiBookOpenFill,
     RiFilePaperFill,
-    RiGitPullRequestFill,
     RiGithubFill,
     RiLayoutColumnFill,
-    RiRobot2Fill,
     RiSearchEyeFill,
     RiServerFill,
-    RiShieldCheckFill,
 } from "react-icons/ri";
 import Reveal from "@/components/utility/Reveal";
 import FeatureCard from "./features/FeatureCard";
@@ -21,7 +18,7 @@ export default function FeaturesSection() {
     return (
         <main
             className="relative mx-6 squircle rounded-[118px]"
-            style={{ background: "linear-gradient(180deg,#0f0f10,#1f1f21),#111113" }}
+            style={{ background: "linear-gradient(180deg,#0a0a0a,#0F0F10),#101011" }}
         >
             <section id="features" className="mx-auto max-w-332 scroll-mt-20 py-24">
                 <div className="mx-auto flex w-full max-w-332 flex-col gap-7 px-6">
