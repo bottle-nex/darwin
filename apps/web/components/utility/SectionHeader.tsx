@@ -26,7 +26,7 @@ export default function SectionHeader({
 
             <div
                 className={cn(
-                    "text-neutral-900 text-4xl sm:text-6xl md:text-7xl font-light tracking-tight leading-[1.08] sm:leading-[1.02] -mt-1",
+                    "text-neutral-900 dark:text-neutral-200 text-4xl sm:text-6xl md:text-7xl font-light tracking-tight leading-[1.08] sm:leading-[1.02] -mt-1",
                     centered ? "text-center" : "text-left",
                 )}
             >
