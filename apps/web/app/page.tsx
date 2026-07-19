@@ -5,6 +5,7 @@ import BoardShowcase from "@/components/landing/v2/BoardShowcase";
 import FeaturesSection from "@/components/landing/v2/FeaturesSection";
 import LandingPricingSection from "@/components/landing/LandingPricingComponent/LandingPricingSection";
 import LandingCta from "@/components/landing/v2/LandingCta";
+import StackCards from "@/components/landing/v2/StackCards";
 
 export default function Home() {
     return (
@@ -16,6 +17,7 @@ export default function Home() {
             <div id="pricing" className="scroll-mt-20">
                 <LandingPricingSection />
             </div>
+            <StackCards />
             <LandingCta />
             <Footer />
         </main>

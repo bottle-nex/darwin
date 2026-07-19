@@ -73,6 +73,26 @@
 .buddy-anchored .buddy-silk {
     animation: none;
 }
+.buddy-anchored .buddy-figure,
+.buddy-anchored .buddy-trick,
+.buddy-anchored .buddy-arm-l,
+.buddy-anchored .buddy-arm-r,
+.buddy-anchored .buddy-leg-l,
+.buddy-anchored .buddy-leg-r,
+.buddy-anchored .buddy-eyes,
+.buddy-anchored .buddy-cap {
+    animation: none;
+    transform: none;
+}
+.buddy-anchored .buddy-cap {
+    opacity: 1;
+}
+.buddy-anchored.buddy-capless .buddy-cap {
+    opacity: 0;
+}
+.buddy-anchored .buddy-eye-r {
+    animation: buddy-blink 5s step-end infinite;
+}
 
 @keyframes buddy-slot {
     0%,
