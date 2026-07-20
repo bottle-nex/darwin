@@ -3,9 +3,6 @@ import { gridConfig, specialCells } from "./data";
 
 const { columns: COLUMNS, rows: ROWS } = gridConfig;
 
-// Deterministic pseudo-random (seeded by cell index) instead of Math.random(),
-// so server and client render the same "random" pattern. A sin-based hash bands
-// visibly on small sequential integers, so this uses an integer bit-mixer instead.
 function pseudoRandom(seed: number) {
     let x = seed ^ 0x9e3779b9;
     x = Math.imul(x ^ (x >>> 16), 0x21f0aaad);

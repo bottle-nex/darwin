@@ -112,7 +112,7 @@ export function TagPanelItems({ selected, onToggle, onClear }: TagPanelProps) {
 export default function TagPanel({ selected, onToggle, onClear }: TagPanelProps) {
     return (
         <DropdownMenu.Root>
-            <TooltipComponent content="Tag" side="bottom">
+            <TooltipComponent delayDuration={1000} content="Tag" side="bottom">
                 <DropdownMenu.Trigger asChild>
                     <OptionButton label="Tag" icon={MdLabel} active={selected.length > 0} />
                 </DropdownMenu.Trigger>

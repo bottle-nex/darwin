@@ -4,7 +4,7 @@ import {
     MdKeyboardArrowDown,
     MdPlaylistAdd,
     MdUpload,
-    MdViewColumn,
+    MdVerticalSplit,
     MdViewKanban,
 } from "react-icons/md";
 import { type IconType } from "react-icons";
@@ -12,15 +12,22 @@ import HeroBuddy from "@/components/landing/v2/HeroBuddy";
 import { DropdownMenu } from "radix-ui";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { TooltipComponent } from "@/components/ui/tooltip-component";
 import { useKanbanOptionsStore } from "@/store/kanban/useKanbanOptionsStore";
 import { useAddCustomColumnStore } from "@/store/kanban/useAddCustomColumnStore";
 import { useCreateOrEditIssueStore } from "@/store/issues/useCreateOrEditIssueStore";
 import type { BoardView } from "@/types/kanban";
 
-const BOARD_VIEWS: { id: BoardView; label: string; icon?: IconType; mascot?: boolean }[] = [
-    { id: "default", label: "Default", icon: MdViewColumn },
-    { id: "custom", label: "Custom Kanban", icon: MdViewKanban },
-    { id: "llm", label: "LLM Kanban", mascot: true },
+const BOARD_VIEWS: {
+    id: BoardView;
+    label: string;
+    hint: string;
+    icon?: IconType;
+    mascot?: boolean;
+}[] = [
+    { id: "llm", label: "Agent", hint: "Columns run by the matcha agent", mascot: true },
+    { id: "custom", label: "My Board", hint: "Columns your team created", icon: MdViewKanban },
+    { id: "default", label: "Split", hint: "Both boards side by side", icon: MdVerticalSplit },
 ];
 
 const TASK_OPTIONS = [
@@ -45,24 +52,25 @@ export function BoardViewTabs() {
     return (
         <div className="flex shrink-0 items-center gap-0.5">
             {BOARD_VIEWS.map((v) => (
-                <button
-                    key={v.id}
-                    type="button"
-                    onClick={() => setBoardView(v.id)}
-                    className={cn(
-                        "flex h-7 cursor-pointer items-center gap-1.5 rounded-md px-2 text-[12px] font-medium transition-colors",
-                        boardView === v.id
-                            ? "bg-white/10 text-neutral-100"
-                            : "text-neutral-400 hover:bg-white/5 hover:text-neutral-200",
-                    )}
-                >
-                    {v.mascot ? (
-                        <HeroBuddy move={false} className="size-4" />
-                    ) : (
-                        v.icon && <v.icon className="size-3.5" aria-hidden />
-                    )}
-                    {v.label}
-                </button>
+                <TooltipComponent delayDuration={1000} key={v.id} content={v.hint} side="bottom">
+                    <button
+                        type="button"
+                        onClick={() => setBoardView(v.id)}
+                        className={cn(
+                            "flex h-7 cursor-pointer items-center gap-1.5 rounded-md px-2 text-[12px] font-medium transition-colors",
+                            boardView === v.id
+                                ? "bg-white/10 text-neutral-100"
+                                : "text-neutral-400 hover:bg-white/5 hover:text-neutral-200",
+                        )}
+                    >
+                        {v.mascot ? (
+                            <HeroBuddy move={false} className="size-4" />
+                        ) : (
+                            v.icon && <v.icon className="size-3.5" aria-hidden />
+                        )}
+                        {v.label}
+                    </button>
+                </TooltipComponent>
             ))}
         </div>
     );

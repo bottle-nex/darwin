@@ -112,10 +112,6 @@ export default function FeaturesSection() {
                                 the business.
                             </p>
                         </div>
-                        <Button variant="tertiary" className="shrink-0">
-                            Read more
-                            <RiBookOpenFill className="size-4" />
-                        </Button>
                     </div>
                 </Reveal>
             </section>

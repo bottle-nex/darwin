@@ -125,7 +125,7 @@ export function FilterPanelItems({ value, onChange, customColumns }: FilterPanel
 export default function FilterPanel({ value, onChange, customColumns }: FilterPanelProps) {
     return (
         <DropdownMenu.Root dir="rtl">
-            <TooltipComponent content="Filter" side="bottom">
+            <TooltipComponent delayDuration={1000} content="Filter" side="bottom">
                 <DropdownMenu.Trigger asChild>
                     <OptionButton
                         label="Filter"

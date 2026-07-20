@@ -34,15 +34,15 @@ export default function KanbanOptionsBarFlatKeys() {
             <div className="flex shrink-0 items-center gap-0.5">
                 <TagPanel selected={selectedTagIds} onToggle={toggleTag} onClear={clearTags} />
                 <FilterPanel value={filter} onChange={setFilter} customColumns={customColumns} />
-                <TooltipComponent content="Assignees" side="bottom">
+                <TooltipComponent delayDuration={1000} content="Assignees" side="bottom">
                     <OptionButton label="Assignees" icon={MdGroup} />
                 </TooltipComponent>
-                <TooltipComponent content="Share" side="bottom">
+                <TooltipComponent delayDuration={1000} content="Share" side="bottom">
                     <OptionButton label="Share" icon={MdShare} />
                 </TooltipComponent>
                 <ViewsPanel value={kanbanView} onChange={setKanbanView} />
                 <div className="mx-1 h-4 w-px bg-white/8" />
-                <TooltipComponent content="Settings" side="bottom">
+                <TooltipComponent delayDuration={1000} content="Settings" side="bottom">
                     <OptionButton label="Settings" icon={MdSettings} />
                 </TooltipComponent>
 

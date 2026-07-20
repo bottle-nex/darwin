@@ -51,7 +51,7 @@ export function ViewsPanelItems({ value, onChange }: ViewsPanelProps) {
 export default function ViewsPanel({ value, onChange }: ViewsPanelProps) {
     return (
         <DropdownMenu.Root>
-            <TooltipComponent content="Views" side="bottom">
+            <TooltipComponent delayDuration={1000} content="Views" side="bottom">
                 <DropdownMenu.Trigger asChild>
                     <OptionButton label="Views" icon={MdTune} active={value !== "board"} />
                 </DropdownMenu.Trigger>
