@@ -2,7 +2,6 @@ import { Sandbox } from "e2b";
 import { ENV } from "../configs/env";
 import GithubService from "./service.github";
 
-
 export default class RepoBrief {
     static readonly REPO_DIR = "/home/user/repo";
     public static async get_brief(
@@ -18,8 +17,14 @@ export default class RepoBrief {
                 { cwd: RepoBrief.REPO_DIR },
             );
 
-            const packageJson = await RepoBrief.read_if_exists(sandbox, `${RepoBrief.REPO_DIR}/package.json`);
-            const readme = await RepoBrief.read_if_exists(sandbox, `${RepoBrief.REPO_DIR}/README.md`);
+            const packageJson = await RepoBrief.read_if_exists(
+                sandbox,
+                `${RepoBrief.REPO_DIR}/package.json`,
+            );
+            const readme = await RepoBrief.read_if_exists(
+                sandbox,
+                `${RepoBrief.REPO_DIR}/README.md`,
+            );
 
             return {
                 owner,

@@ -1,4 +1,4 @@
-import { } from "node:events";
+import {} from "node:events";
 import { Request, Response } from "express";
 import ResponseWriter from "../../services/service.response";
 import z from "zod";

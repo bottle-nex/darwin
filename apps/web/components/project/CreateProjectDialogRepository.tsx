@@ -60,7 +60,11 @@ export default function CreateProjectDialogRepository({
         return names.length ? names : fallback ? [fallback] : [];
     }, [branches.data, selectedRepo?.defaultBranch]);
 
-    const repoState: RepoState = !org?.githubConnected ? "connect" : selectedRepo ? "selected" : "list";
+    const repoState: RepoState = !org?.githubConnected
+        ? "connect"
+        : selectedRepo
+          ? "selected"
+          : "list";
 
     function selectRepo(repo: GithubRepo) {
         setSelectedRepo(repo);

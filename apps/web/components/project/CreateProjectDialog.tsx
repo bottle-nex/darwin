@@ -32,7 +32,8 @@ export const SURFACE = "rounded-lg bg-white/5 shadow-[inset_0_1px_0_0_#262626]";
 const HEADER_COPY = {
     details: {
         title: "Create project",
-        description: "Projects hold the repos your runners clone and the issues your agents pick up.",
+        description:
+            "Projects hold the repos your runners clone and the issues your agents pick up.",
     },
     env: {
         title: "Environment variables",

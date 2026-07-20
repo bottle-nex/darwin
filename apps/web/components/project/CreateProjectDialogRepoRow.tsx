@@ -36,7 +36,9 @@ export default function CreateProjectDialogRepoRow({ repo, onImport }: Props) {
                         {repo.language && repo.updatedAt && (
                             <span className="text-neutral-700">·</span>
                         )}
-                        {repo.updatedAt && <span>Updated {formatRelativeTime(repo.updatedAt)}</span>}
+                        {repo.updatedAt && (
+                            <span>Updated {formatRelativeTime(repo.updatedAt)}</span>
+                        )}
                     </div>
                 )}
             </div>
