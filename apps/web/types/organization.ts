@@ -21,3 +21,7 @@ export interface GithubRepo {
     language: string | null;
     updatedAt: string | null;
 }
+
+export interface GithubBranch {
+    name: string;
+}

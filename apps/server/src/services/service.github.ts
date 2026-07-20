@@ -25,6 +25,10 @@ export interface RepoSummary {
     updatedAt: string | null;
 }
 
+export interface BranchSummary {
+    name: string;
+}
+
 /** Identity of the GitHub account that an installation belongs to. */
 export interface InstallationAccount {
     accountLogin: string;
@@ -206,5 +210,21 @@ export default class GithubService {
         const octokit = new Octokit({ auth: userToken });
         const { data } = await octokit.rest.users.getAuthenticated();
         return { id: data.id, login: data.login };
+    }
+
+    static async listRepoBranches(
+        installationId: number,
+        owner: string,
+        repo: string,
+    ): Promise<BranchSummary[]> {
+        const token = await this.getInstallationToken(installationId);
+        const octokit = new Octokit({ auth: token });
+        console.log("owner is : ", owner, "repo is : ", repo);
+        const branches = await octokit.paginate(octokit.rest.repos.listBranches, {
+            owner,
+            repo,
+            per_page: 100,
+        });
+        return branches.map((branch) => ({ name: branch.name }));
     }
 }

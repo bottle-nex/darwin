@@ -60,6 +60,8 @@ export const GITHUB_CONNECT_START = GITHUB_URL + "/connect/start";
 export const GITHUB_CONNECT_COMPLETE = GITHUB_URL + "/connect/complete";
 export const GITHUB_DISCONNECT = (orgId: string) => `${GITHUB_URL}/connect/${orgId}`;
 export const GITHUB_REPOS = (orgId: string) => `${GITHUB_URL}/installations/${orgId}/repos`;
+export const GITHUB_REPO_BRANCHES = (orgId: string, owner: string, repo: string) =>
+    `${GITHUB_URL}/installations/${orgId}/repos/${owner}/${repo}/branches`;
 
 // <--------------------- ISSUE ROUTES --------------------->
 export const ISSUES_URL = API_URL + "/issues";
