@@ -1,6 +1,5 @@
 import { Button } from "@/components/ui/button";
 import {
-    RiBookOpenFill,
     RiFilePaperFill,
     RiGithubFill,
     RiLayoutColumnFill,
@@ -16,7 +15,7 @@ import AppLogo from "@/components/app/Applogo";
 
 export default function FeaturesSection() {
     return (
-        <main className="relative mx-6 squircle rounded-[118px] bg-[#bcafff]">
+        <main className="relative mx-6 rounded-xl bg-[#bcafff]">
             <section id="features" className="mx-auto max-w-332 scroll-mt-20 py-24">
                 <div className="mx-auto flex w-full max-w-332 flex-col gap-7 px-6">
                     <Reveal>

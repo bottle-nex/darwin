@@ -9,8 +9,8 @@ const LOOP_LABELS = ["File the issue", "Agent ships the patch", "You review the 
 export default function LandingCta() {
     return (
         <section className="pb-14 pt-6">
-            <div className="mx-6">
-                <div className="relative mx-auto max-w-332 rounded-3xl bg-snow pb-50">
+            <div className="">
+                <div className="relative mx-auto max-w-7xl rounded-xl bg-snow pb-50">
                     <div className="px-6 pt-24 text-center">
                         <span
                             className={cn(
@@ -33,7 +33,7 @@ export default function LandingCta() {
                     </div>
                     <div
                         aria-hidden
-                        className="absolute inset-x-0 bottom-0 flex h-44 flex-col overflow-hidden rounded-b-3xl"
+                        className="absolute inset-x-0 bottom-0 flex h-44 flex-col overflow-hidden rounded-b-xl"
                     >
                         <div className="flex-1 bg-[#DFD9FF]" />
                         <div className="flex-1 bg-[#CFC6FF]" />
