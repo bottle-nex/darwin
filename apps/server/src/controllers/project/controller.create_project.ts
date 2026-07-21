@@ -1,11 +1,10 @@
-import {} from "node:events";
 import { Request, Response } from "express";
 import ResponseWriter from "../../services/service.response";
 import z from "zod";
 import { Action, Permissions } from "@trymatcha/access-control";
 import Access from "../../access-control/access";
 import { Prisma, prisma, ProjectRole } from "@trymatcha/database";
-import RepoBrief from "../../services/service.repo_brief";
+import E2B from "../../sandbox/e2b";
 
 const PROJECT_COLORS = [
     "#ef4444",
@@ -71,12 +70,8 @@ export default async function create_project_controller(req: Request, res: Respo
         }
 
         let repo_fields = {};
-        let brief_target: {
-            installationId: number;
-            owner: string;
-            repo: string;
-            branch: string;
-        } | null = null;
+        let onboarding_target: { installationId: number; repoUrl: string; branch: string } | null =
+            null;
 
         if (repo) {
             const installation = await prisma.githubInstallation.findUnique({
@@ -101,11 +96,9 @@ export default async function create_project_controller(req: Request, res: Respo
                 githubDefaultBranch: repo.defaultBranch,
             };
 
-            const [owner, repo_name] = repo.fullName.split("/");
-            brief_target = {
+            onboarding_target = {
                 installationId: Number(installation.installationId),
-                owner,
-                repo: repo_name,
+                repoUrl: repo.htmlUrl,
                 branch: repo.defaultBranch,
             };
         }
@@ -132,13 +125,20 @@ export default async function create_project_controller(req: Request, res: Respo
 
         ResponseWriter.created(res, project, "Project created successfully");
 
-        if (brief_target) {
-            void RepoBrief.get_brief(
-                brief_target.installationId,
-                brief_target.owner,
-                brief_target.repo,
-                brief_target.branch,
-            ).catch((error) => console.error("repo brief failed:", error));
+        if (onboarding_target) {
+            const session = await prisma.setupSession.create({
+                data: { projectId: project.id, status: "Pending", startedAt: new Date() },
+            });
+
+            console.log("session is : ", session);
+
+            // void E2B.run_onboarding_job(
+            //     session.id,
+            //     project.id,
+            //     onboarding_target.repoUrl,
+            //     onboarding_target.branch,
+            //     onboarding_target.installationId,
+            // );
         }
     } catch (error) {
         if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {

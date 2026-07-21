@@ -86,10 +86,11 @@ export default async function start_setup(req: Request, res: Response) {
 
         ResponseWriter.created(res, { project: updated_project, session });
 
-        E2B.run_setup_job(
+        E2B.run_onboarding_job(
             session.id,
             project_id,
             github_repo_url,
+            github_default_branch,
             Number(github_installation.installationId),
         );
     } catch (error) {

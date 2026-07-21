@@ -113,6 +113,8 @@ model Project {
   issueTemplates     IssueTemplate[]
   planMd             String?             @db.Text
   planStatus         PlanStatus          @default(Pending)
+  planCommitSha      String?
+  planGeneratedAt    DateTime?
 
   workers       Worker[]
   projectConfig ProjectConfig?
