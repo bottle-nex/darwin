@@ -4,7 +4,6 @@ import z from "zod";
 import { Action, Permissions } from "@trymatcha/access-control";
 import Access from "../../access-control/access";
 import { Prisma, prisma, ProjectRole } from "@trymatcha/database";
-import E2B from "../../sandbox/e2b";
 
 const PROJECT_COLORS = [
     "#ef4444",
