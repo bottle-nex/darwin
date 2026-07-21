@@ -43,7 +43,7 @@ export function AboutRevampNavBar() {
                 "fixed top-0 left-0 right-0 z-100",
                 "transition-[height,background-color,border-color] duration-300 ease-out",
                 scrolled
-                    ? "h-15 border-b border-neutral-200 bg-snow"
+                    ? "h-15 border-b border-white/10 bg-cement"
                     : "h-17 border-b border-transparent bg-transparent",
             )}
         >
@@ -56,10 +56,10 @@ export function AboutRevampNavBar() {
                     <section className="flex items-center gap-x-5 uppercase lg:gap-x-8">
                         {NAV_ITEMS.map((item, i) => (
                             <div key={item.label} className="flex items-center gap-x-5 lg:gap-x-8">
-                                {i > 0 && <span className="h-2.5 w-px bg-neutral-400" />}
+                                {i > 0 && <span className="h-2.5 w-px bg-neutral-700" />}
                                 <Link
                                     href={item.href}
-                                    className="flex items-center text-[13px] font-medium text-foreground transition-colors duration-200 hover:text-foreground/70"
+                                    className="flex items-center text-[13px] font-medium text-neutral-300 transition-colors duration-200 hover:text-neutral-100"
                                 >
                                     {item.label}
                                 </Link>

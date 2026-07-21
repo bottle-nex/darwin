@@ -9,13 +9,13 @@ import { founders } from "./data";
 
 export default function FoundersSection() {
     return (
-        <section className="border-t border-neutral-200">
+        <section className="border-t border-white/10 bg-cement">
             <div className="mx-auto flex w-full max-w-7xl flex-col gap-7 px-6 pt-24 pb-16">
                 <Reveal>
                     <Eyebrow text="The people" />
                 </Reveal>
                 <Reveal delay={0.08}>
-                    <h2 className="text-5xl font-extralight leading-[1.05] text-neutral-900 md:text-6xl">
+                    <h2 className="text-5xl font-extralight leading-[1.05] text-neutral-100 md:text-6xl">
                         Three people with strong opinions <br /> about who should type.
                     </h2>
                 </Reveal>
@@ -26,7 +26,7 @@ export default function FoundersSection() {
                     return (
                         <Reveal
                             key={founder.name}
-                            className="border-t border-neutral-200 py-16 first:border-t-0"
+                            className="border-t border-white/10 py-16 first:border-t-0"
                         >
                             <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-16">
                                 <div
@@ -35,7 +35,7 @@ export default function FoundersSection() {
                                         isReversed && "lg:order-last",
                                     )}
                                 >
-                                    <div className="relative aspect-4/5 max-w-md overflow-hidden rounded-sm border border-neutral-200">
+                                    <div className="relative aspect-4/5 max-w-md overflow-hidden rounded-sm border border-white/10">
                                         <Image
                                             src={founder.image}
                                             alt={founder.name}
@@ -55,8 +55,8 @@ export default function FoundersSection() {
                                     >
                                         {founder.role}
                                     </div>
-                                    <div className="text-3xl text-neutral-900">{founder.name}</div>
-                                    <div className="flex flex-col gap-4 leading-relaxed text-neutral-600">
+                                    <div className="text-3xl text-neutral-100">{founder.name}</div>
+                                    <div className="flex flex-col gap-4 leading-relaxed text-neutral-400">
                                         {founder.bio.map((paragraph) => (
                                             <p key={paragraph.slice(0, 32)}>{paragraph}</p>
                                         ))}
@@ -67,7 +67,7 @@ export default function FoundersSection() {
                                             target="_blank"
                                             rel="noopener noreferrer"
                                             aria-label={`${founder.name} on LinkedIn`}
-                                            className="text-neutral-400 transition-colors duration-200 hover:text-neutral-900"
+                                            className="text-neutral-500 transition-colors duration-200 hover:text-neutral-100"
                                         >
                                             <FaLinkedinIn className="size-4" />
                                         </Link>
@@ -76,7 +76,7 @@ export default function FoundersSection() {
                                             target="_blank"
                                             rel="noopener noreferrer"
                                             aria-label={`${founder.name} on X`}
-                                            className="text-neutral-400 transition-colors duration-200 hover:text-neutral-900"
+                                            className="text-neutral-500 transition-colors duration-200 hover:text-neutral-100"
                                         >
                                             <FaXTwitter className="size-4" />
                                         </Link>

@@ -4,7 +4,7 @@ import LandingHeroV2 from "@/components/landing/v2/LandingHeroV2";
 import BoardShowcase from "@/components/landing/v2/BoardShowcase";
 import FeaturesSection from "@/components/landing/v2/FeaturesSection";
 import LandingPricingSection from "@/components/landing/LandingPricingComponent/LandingPricingSection";
-import LandingCta from "@/components/landing/v2/LandingCta";
+import CtaSection from "@/components/app/CtaSection";
 import StackCards from "@/components/landing/v2/StackCards";
 
 export default function Home() {
@@ -18,7 +18,7 @@ export default function Home() {
                 <LandingPricingSection />
             </div>
             <StackCards />
-            <LandingCta />
+            <CtaSection />
             <Footer />
         </main>
     );

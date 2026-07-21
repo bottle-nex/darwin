@@ -4,7 +4,7 @@ import StorySection from "@/components/about/StorySection";
 import PrinciplesSection from "@/components/about/PrinciplesSection";
 import HowItWorksSection from "@/components/about/HowItWorksSection";
 import FoundersSection from "@/components/about/FoundersSection";
-import AboutCta from "@/components/about/AboutCta";
+import CtaSection from "@/components/app/CtaSection";
 import AboutRevampHero from "@/components/about-revamp/AboutRevampHero";
 import { AboutRevampNavBar } from "@/components/about-revamp/AboutRevampNavBar";
 
@@ -16,14 +16,14 @@ export const metadata: Metadata = {
 
 export default function AboutPage() {
     return (
-        <main className="flex min-h-screen flex-col bg-snow">
+        <main className="flex min-h-screen flex-col bg-cement">
             <AboutRevampNavBar />
             <AboutRevampHero />
             <StorySection />
             <PrinciplesSection />
             <HowItWorksSection />
             <FoundersSection />
-            <AboutCta />
+            <CtaSection />
             <Footer />
         </main>
     );

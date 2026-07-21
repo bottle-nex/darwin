@@ -43,7 +43,7 @@ export default function FloatingCard({
             >
                 <div
                     style={rotation ? { transform: rotation } : undefined}
-                    className="[filter:drop-shadow(0_20px_36px_rgba(15,23,42,0.12))]"
+                    className="[filter:drop-shadow(0_20px_36px_rgba(0,0,0,0.55))]"
                 >
                     {children}
                 </div>

@@ -4,6 +4,7 @@ import GithubService from "./service.github";
 
 export default class RepoBrief {
     static readonly REPO_DIR = "/home/user/repo";
+
     public static async get_brief(
         installation_id: number,
         owner: string,

@@ -5,6 +5,7 @@ import { PiArrowRight } from "react-icons/pi";
 import { MdArrowForward } from "react-icons/md";
 import { azeretMono, Button } from "@/components/ui/button";
 import { Footer } from "@/components/app/Footer";
+import CtaSection from "@/components/app/CtaSection";
 import { cn } from "@/lib/utils";
 import { cards, sections } from "@/components/why/data";
 import { HalftoneShape } from "@/lib/halftone/shape";
@@ -136,18 +137,7 @@ export default function WhyPage() {
                 </div>
             </div>
 
-            <div className="h-screen flex flex-col items-center justify-center text-secondary gap-5">
-                <div className="text-center text-7xl font-light">
-                    Hand your backlog <br /> to an agent.
-                </div>
-                <div className="text-neutral-300">
-                    Board in, PRs out. Agent-native, repo-aware, and built to ship.
-                </div>
-                <Button size={"lg"}>
-                    Get Started
-                    <MdArrowForward className="text-neutral-800!" />
-                </Button>
-            </div>
+            <CtaSection />
             <Footer isMarkettingPage={true} />
         </main>
     );

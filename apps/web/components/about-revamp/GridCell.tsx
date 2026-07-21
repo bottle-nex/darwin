@@ -21,12 +21,15 @@ export default function GridCell({ variant, imageSrc, imageAlt, darker }: GridCe
     if (variant === "logo") {
         return (
             <div className="flex aspect-square items-center justify-center">
-                <MatchaLogo className="h-8 w-auto text-neutral-900" />
+                <MatchaLogo className="h-8 w-auto text-neutral-100" />
             </div>
         );
     }
 
     return (
-        <div aria-hidden className={cn("aspect-square", darker ? "bg-neutral-200/50" : "bg-")} />
+        <div
+            aria-hidden
+            className={cn("aspect-square", darker ? "bg-white/4" : "bg-transparent")}
+        />
     );
 }

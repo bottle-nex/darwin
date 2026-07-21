@@ -2,13 +2,13 @@ import Link from "next/link";
 import { RiRocketFill, RiTeamFill } from "react-icons/ri";
 import { cn } from "@/lib/utils";
 import { azeretMono } from "@/components/ui/button";
-import HeroBuddy from "./HeroBuddy";
+import HeroBuddy from "@/components/landing/v2/HeroBuddy";
 
 const LOOP_LABELS = ["File the issue", "Agent ships the patch", "You review the PR"];
 
-export default function LandingCta() {
+export default function CtaSection() {
     return (
-        <section className="pb-14 pt-6">
+        <section className="bg-cement pb-14 pt-6">
             <div className="">
                 <div className="relative mx-auto max-w-7xl rounded-xl bg-snow pb-50">
                     <div className="px-6 pt-24 text-center">
