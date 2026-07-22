@@ -27,6 +27,22 @@ Terms that carry project-specific meaning, and what they refer to in the code.
 
 Rules: describe only what you verified by reading files — never guess at a command or a convention. Cite file paths so the agent can jump straight there. Be specific and dense; skip preamble and closing remarks. Output the markdown document and nothing else.`;
 
+interface AgentReport {
+    result?: string;
+    total_cost_usd: number;
+    duration_ms: number;
+    num_turns: number;
+}
+
+export interface BriefRun {
+    planMd: string;
+    model: string;
+    effort: string;
+    costUsd: number;
+    durationMs: number;
+    numTurns: number;
+}
+
 export default class PlanService {
     static async get_plan(project_id: string) {
         const project = await prisma.project.findUnique({
@@ -47,14 +63,15 @@ export default class PlanService {
         return { planMd: project.planMd };
     }
 
-    static async generate_plan(sandbox_id: string): Promise<string> {
+    static async generate_plan(sandbox_id: string): Promise<BriefRun> {
         const sandbox = await Sandbox.connect(sandbox_id, { apiKey: ENV.SERVER_E2B_API_KEY });
-
         await sandbox.files.write(PROMPT_PATH, BRIEF_PROMPT);
 
+        const model = ENV.SERVER_BRIEF_MODEL;
+        const effort = ENV.SERVER_BRIEF_EFFORT;
         const result = await sandbox.commands.run(
-            `claude -p "$(cat ${PROMPT_PATH})" --model claude-opus-4-8 --output-format text ` +
-                `--tools "Read,Glob,Grep,Bash" --permission-mode bypassPermissions`,
+            `claude -p "$(cat ${PROMPT_PATH})" --model ${model} --effort ${effort} ` +
+                `--output-format json --tools "Read,Glob,Grep,Bash" --permission-mode bypassPermissions`,
             {
                 cwd: REPO_DIR,
                 envs: { ANTHROPIC_API_KEY: ENV.SERVER_ANTHROPIC_API_KEY },
@@ -62,12 +79,26 @@ export default class PlanService {
             },
         );
 
-        const plan_md = result.stdout.trim();
+        let report: AgentReport;
+        try {
+            report = JSON.parse(result.stdout);
+        } catch {
+            throw new Error(`onboarding agent did not return JSON: ${result.stderr}`);
+        }
+
+        const plan_md = report.result?.trim();
         if (!plan_md) {
             throw new Error(`onboarding agent produced an empty brief: ${result.stderr}`);
         }
 
-        return plan_md;
+        return {
+            planMd: plan_md,
+            model,
+            effort,
+            costUsd: report.total_cost_usd,
+            durationMs: report.duration_ms,
+            numTurns: report.num_turns,
+        };
     }
 
     static async set_plan(project_id: string, plan_md: string, commit_sha: string) {

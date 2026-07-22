@@ -4,6 +4,7 @@ import z from "zod";
 import { Action, Permissions } from "@trymatcha/access-control";
 import Access from "../../access-control/access";
 import { Prisma, prisma, ProjectRole } from "@trymatcha/database";
+import E2B from "../../sandbox/e2b";
 
 const PROJECT_COLORS = [
     "#ef4444",
@@ -129,15 +130,13 @@ export default async function create_project_controller(req: Request, res: Respo
                 data: { projectId: project.id, status: "Pending", startedAt: new Date() },
             });
 
-            console.log("session is : ", session);
-
-            // void E2B.run_onboarding_job(
-            //     session.id,
-            //     project.id,
-            //     onboarding_target.repoUrl,
-            //     onboarding_target.branch,
-            //     onboarding_target.installationId,
-            // );
+            void E2B.run_onboarding_job(
+                session.id,
+                project.id,
+                onboarding_target.repoUrl,
+                onboarding_target.branch,
+                onboarding_target.installationId,
+            );
         }
     } catch (error) {
         if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {

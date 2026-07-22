@@ -28,28 +28,21 @@ export default class E2B {
             ]);
 
             sandbox_id = await E2B.create();
-            console.log("sand box id is : ", sandbox_id);
-
-            let session = await prisma.setupSession.update({
+            await prisma.setupSession.update({
                 where: { id: session_id },
                 data: { sandboxId: sandbox_id, status: "Cloning" },
             });
 
-            console.log("session is : ", session);
-
             await E2B.clone_repo(sandbox_id, github_repo_url, branch, installation_id, project_id);
             const commit_sha = await E2B.head_commit(sandbox_id);
-            console.log("commit sha is : ", commit_sha);
-            session = await prisma.setupSession.update({
+
+            await prisma.setupSession.update({
                 where: { id: session_id },
                 data: { status: "Detecting" },
             });
 
-            console.log("session is : ", session);
-
-            const plan_md = await PlanService.generate_plan(sandbox_id);
-            console.log("plan md is : ", plan_md);
-            await PlanService.set_plan(project_id, plan_md, commit_sha);
+            const brief = await PlanService.generate_plan(sandbox_id);
+            await PlanService.set_plan(project_id, brief.planMd, commit_sha);
 
             await prisma.setupSession.update({
                 where: { id: session_id },
@@ -102,10 +95,10 @@ export default class E2B {
         return result;
     }
 
-    public static async exec_js_code(sandbox_id: string, code: string) {
+    public static async exec_js_code(sandbox_id: string, code: string): Promise<string> {
         const sandbox = await Sandbox.connect(sandbox_id, { apiKey: ENV.SERVER_E2B_API_KEY });
         const result = await sandbox.commands.run(`node -e '${code}'`);
-        console.log(result.stdout);
+        return result.stdout;
     }
 
     public static async take_snapshot(sandbox_id: string): Promise<SnapshotInfo> {
@@ -146,10 +139,6 @@ export default class E2B {
 
         await sandbox.commands.run(
             `git clone --branch ${branch} --single-branch ${clone_url} ${REPO_DIR}`,
-            {
-                onStdout: (data) => console.log(data),
-                onStderr: (data) => console.error(data),
-            },
         );
 
         const env_file = Object.entries(secrets)
