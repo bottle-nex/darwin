@@ -3,6 +3,7 @@ import { useLayoutEffect } from "react";
 import { useParams } from "next/navigation";
 import PlaygroundTopBar from "@/components/playground/Core/TopBar/PlaygroundTopBar";
 import PlaygroundSidebar from "@/components/playground/Sidebar/PlaygroundSidebar";
+import PlaygroundSheetSidebar from "@/components/playground/Sidebar/PlaygroundSheetSidebar";
 import SidebarResizeHandle from "@/components/playground/Sidebar/SidebarResizeHandle";
 import PlaygroundDisplay from "@/components/playground/Core/PlaygroundDisplay";
 import OnboardingDisplay from "@/components/onboarding/OnboardingDisplay";
@@ -56,6 +57,7 @@ export default function PlaygroundShell() {
                     <PlaygroundDisplay isLoading={loading} />
                 )}
             </section>
+            <PlaygroundSheetSidebar />
             <CreateTeamDialog />
             <DeleteTeamDialog />
             <CreateOrEditIssueDialog />

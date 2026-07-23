@@ -1,26 +1,38 @@
 "use client";
 import { useRef } from "react";
-import { useSidebarWidthStore } from "@/store/playground/useSidebarWidthStore";
+import {
+    SIDEBAR_COLLAPSE_THRESHOLD,
+    useSidebarWidthStore,
+} from "@/store/playground/useSidebarWidthStore";
 
 export default function SidebarResizeHandle() {
     const setWidth = useSidebarWidthStore((s) => s.setWidth);
+    const collapse = useSidebarWidthStore((s) => s.collapse);
+    const setDragging = useSidebarWidthStore((s) => s.setDragging);
     const drag = useRef<{ startX: number; startWidth: number } | null>(null);
 
     const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
-        drag.current = {
-            startX: e.clientX,
-            startWidth: useSidebarWidthStore.getState().width,
-        };
+        const { width, collapsed } = useSidebarWidthStore.getState();
+        drag.current = { startX: e.clientX, startWidth: collapsed ? 0 : width };
+        setDragging(true);
         e.currentTarget.setPointerCapture(e.pointerId);
     };
 
     const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
         if (!drag.current) return;
-        setWidth(drag.current.startWidth + (e.clientX - drag.current.startX));
+        const next = drag.current.startWidth + (e.clientX - drag.current.startX);
+        if (next < SIDEBAR_COLLAPSE_THRESHOLD) {
+            drag.current = null;
+            setDragging(false);
+            collapse();
+            return;
+        }
+        setWidth(next);
     };
 
     const onPointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
         drag.current = null;
+        setDragging(false);
         e.currentTarget.releasePointerCapture(e.pointerId);
     };
 

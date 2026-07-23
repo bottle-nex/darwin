@@ -7,7 +7,7 @@ import {
     SIDEBAR_WIDTH_STORAGE_KEY,
 } from "@/store/playground/useSidebarWidthStore";
 
-const restoreSidebarWidthScript = `try{var w=JSON.parse(localStorage.getItem("${SIDEBAR_WIDTH_STORAGE_KEY}")).state.width;if(typeof w==="number")document.documentElement.style.setProperty("${SIDEBAR_WIDTH_CSS_VAR}",Math.min(${SIDEBAR_MAX_WIDTH},Math.max(${SIDEBAR_MIN_WIDTH},w))+"px")}catch(e){}`;
+const restoreSidebarWidthScript = `try{var s=JSON.parse(localStorage.getItem("${SIDEBAR_WIDTH_STORAGE_KEY}")).state;var w=s.collapsed?0:Math.min(${SIDEBAR_MAX_WIDTH},Math.max(${SIDEBAR_MIN_WIDTH},s.width));if(typeof w==="number")document.documentElement.style.setProperty("${SIDEBAR_WIDTH_CSS_VAR}",w+"px")}catch(e){}`;
 
 export default function PlaygroundLayout({ children }: { children: React.ReactNode }) {
     return (

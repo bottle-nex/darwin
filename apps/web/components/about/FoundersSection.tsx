@@ -35,7 +35,7 @@ export default function FoundersSection() {
                                         isReversed && "lg:order-last",
                                     )}
                                 >
-                                    <div className="relative aspect-4/5 max-w-md overflow-hidden rounded-sm border border-white/10">
+                                    <div className="relative aspect-4/5 max-w-md overflow-hidden rounded-xl border border-white/10">
                                         <Image
                                             src={founder.image}
                                             alt={founder.name}

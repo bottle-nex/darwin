@@ -1,12 +1,15 @@
+"use client";
 import Link from "next/link";
 import { RiRocketFill, RiTeamFill } from "react-icons/ri";
 import { cn } from "@/lib/utils";
 import { azeretMono } from "@/components/ui/button";
 import HeroBuddy from "@/components/landing/v2/HeroBuddy";
+import { useUserSessionStore } from "@/store/user/useUserSessionStore";
 
 const LOOP_LABELS = ["File the issue", "Agent ships the patch", "You review the PR"];
 
 export default function CtaSection() {
+    const { session } = useUserSessionStore();
     return (
         <section className="bg-cement pb-14 pt-6">
             <div className="">
@@ -57,7 +60,10 @@ export default function CtaSection() {
                         </svg>
                         <div className="relative rounded-[30px] bg-cement p-4.5">
                             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                                <div className="rounded-[14px] bg-snow p-5">
+                                <Link
+                                    href={session ? "/playground" : "/login"}
+                                    className="rounded-[14px] bg-snow p-5"
+                                >
                                     <RiRocketFill className="size-5 text-neutral-900" />
                                     <div className="mt-7 text-[15px] font-semibold text-neutral-900">
                                         Get started
@@ -65,7 +71,7 @@ export default function CtaSection() {
                                     <div className="mt-0.5 text-[13px] text-neutral-500">
                                         File your first issue
                                     </div>
-                                </div>
+                                </Link>
                                 <Link
                                     href="/about"
                                     className="rounded-[14px] bg-primary p-5 transition-colors hover:bg-[#BCAFFF]"

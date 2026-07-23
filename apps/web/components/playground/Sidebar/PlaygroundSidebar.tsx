@@ -1,80 +1,46 @@
 "use client";
-import { AnimatePresence, motion } from "motion/react";
-import { HiOutlineArrowUpCircle, HiOutlineCog6Tooth, HiOutlineUserPlus } from "react-icons/hi2";
-import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
+import { useEffect, useState } from "react";
+import { motion } from "motion/react";
+import { cn } from "@/lib/utils";
 import {
     SIDEBAR_DEFAULT_WIDTH,
     SIDEBAR_WIDTH_CSS_VAR,
+    useSidebarWidthStore,
 } from "@/store/playground/useSidebarWidthStore";
-import { PlaygroundTab } from "../playgroundTabs";
-import SidebarRow from "./SidebarRow";
-import BoardSection from "./BoardSection";
-import ForYouSection from "./ForYouSection";
-import TeamsSection from "./TeamsSection";
-import SettingsNavSection from "./SettingsNavSection";
-import ThreadsNavSection from "./ThreadsNavSection";
-
-const SETTINGS_TABS: string[] = [
-    PlaygroundTab.SettingsProject,
-    PlaygroundTab.SettingsTemplates,
-    PlaygroundTab.SettingsEnv,
-];
-
-const THREADS_TABS: string[] = [PlaygroundTab.Threads, PlaygroundTab.ThreadDetail];
+import SidebarContent from "./SidebarContent";
 
 export default function PlaygroundSidebar() {
-    const selectedRowId = usePlaygroundNavStore((s) => s.tab);
-    const setTab = usePlaygroundNavStore((s) => s.setTab);
+    const { width, collapsed, dragging } = useSidebarWidthStore();
+    const [hydrated, setHydrated] = useState(false);
 
-    const inSettings = SETTINGS_TABS.includes(selectedRowId);
-    const inThreads = THREADS_TABS.includes(selectedRowId);
-    const section = {
-        selectedRowId,
-        onSelect: (id: string) => setTab(id),
-    };
+    useEffect(() => {
+        const frame = requestAnimationFrame(() => setHydrated(true));
+        return () => cancelAnimationFrame(frame);
+    }, []);
+
+    const instant = dragging || !hydrated;
 
     return (
         <aside
             data-lenis-prevent
             aria-label="Sidebar"
             style={{ width: `var(${SIDEBAR_WIDTH_CSS_VAR}, ${SIDEBAR_DEFAULT_WIDTH}px)` }}
-            className="flex h-full min-h-0 shrink-0 flex-col justify-between pr-2"
+            className={cn(
+                "h-full min-h-0 shrink-0 overflow-visible perspective-distant",
+                instant
+                    ? "transition-none"
+                    : "transition-[width] duration-350 ease-[cubic-bezier(0.22,1,0.36,1)]",
+            )}
         >
-            <div className="min-h-0 flex-1 overflow-y-auto px-1 pt-1">
-                <AnimatePresence mode="wait" initial={false}>
-                    <motion.div
-                        key={inSettings ? "settings" : inThreads ? "threads" : "main"}
-                        initial={{ opacity: 0, x: inSettings || inThreads ? 10 : -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: inSettings || inThreads ? 10 : -10 }}
-                        transition={{ duration: 0.16, ease: [0.4, 0, 0.2, 1] }}
-                        className="flex flex-col gap-3"
-                    >
-                        {inSettings ? (
-                            <SettingsNavSection {...section} />
-                        ) : inThreads ? (
-                            <ThreadsNavSection {...section} />
-                        ) : (
-                            <>
-                                <BoardSection {...section} />
-                                <ForYouSection {...section} />
-                                <TeamsSection />
-                            </>
-                        )}
-                    </motion.div>
-                </AnimatePresence>
-            </div>
-
-            <div className="flex flex-col gap-0.5 px-1 pb-1">
-                <SidebarRow
-                    label="Settings"
-                    leading={{ kind: "icon", icon: HiOutlineCog6Tooth }}
-                    active={inSettings}
-                    onClick={() => section.onSelect(PlaygroundTab.SettingsProject)}
-                />
-                <SidebarRow label="Invite" leading={{ kind: "icon", icon: HiOutlineUserPlus }} />
-                <SidebarRow label="Pro" leading={{ kind: "icon", icon: HiOutlineArrowUpCircle }} />
-            </div>
+            <motion.div
+                initial={false}
+                animate={collapsed ? { rotateY: -32, scale: 0.9 } : { rotateY: 0, scale: 1 }}
+                transition={{ duration: instant ? 0 : 0.35, ease: [0.22, 1, 0.36, 1] }}
+                style={{ width, transformOrigin: "left center" }}
+                className={cn("h-full min-h-0", collapsed && "pointer-events-none")}
+            >
+                <SidebarContent />
+            </motion.div>
         </aside>
     );
 }

@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
 import { Footer } from "@/components/app/Footer";
-import StorySection from "@/components/about/StorySection";
-import PrinciplesSection from "@/components/about/PrinciplesSection";
 import HowItWorksSection from "@/components/about/HowItWorksSection";
 import FoundersSection from "@/components/about/FoundersSection";
 import CtaSection from "@/components/app/CtaSection";
@@ -19,8 +17,6 @@ export default function AboutPage() {
         <main className="flex min-h-screen flex-col bg-cement">
             <AboutRevampNavBar />
             <AboutRevampHero />
-            <StorySection />
-            <PrinciplesSection />
             <HowItWorksSection />
             <FoundersSection />
             <CtaSection />

@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
 import { useShortcutSheetStore } from "@/store/playground/useShortcutSheetStore";
 import { PlaygroundTab } from "@/components/playground/playgroundTabs";
+import { useSidebarWidthStore } from "@/store/playground/useSidebarWidthStore";
 
 interface Combination {
     label: string;
@@ -21,6 +22,7 @@ export const COMBINATIONS: Record<string, Combination> = {
     "o t": { label: "Open Tags", run: () => openTab(PlaygroundTab.Tags) },
     "o m": { label: "Open Mentions", run: () => openTab(PlaygroundTab.Mentions) },
     "o r": { label: "Open Reviews", run: () => openTab(PlaygroundTab.Reviews) },
+    "[": { label: "Toggle Sidebar", run: () => useSidebarWidthStore.getState().toggle() },
 };
 
 const SEQUENCE_TIMEOUT_MS = 800;

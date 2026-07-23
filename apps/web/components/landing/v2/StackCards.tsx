@@ -1,3 +1,5 @@
+"use client";
+import { MotionConfig, motion } from "framer-motion";
 import HeroBuddy from "./HeroBuddy";
 
 interface StackCardsProps {
@@ -18,7 +20,7 @@ export default function StackCards() {
         },
         {
             id: 3,
-            className: `${base} -translate-x-[calc(50%-17.5rem)] h-170 bg-[linear-gradient(150deg,#1a1a21_0%,#121216_50%,#0f0f10_100%)]`,
+            className: `${base} -translate-x-[calc(50%-17.5rem)] h-170 overflow-hidden bg-[linear-gradient(150deg,#1a1a21_0%,#121216_50%,#0f0f10_100%)]`,
         },
     ];
     return (
@@ -39,6 +41,25 @@ export default function StackCards() {
                 <section className="relative mt-24 h-202 w-full">
                     {cards.map((card) => (
                         <section key={card.id} className={card.className}>
+                            {card.id === cards.length && (
+                                <MotionConfig reducedMotion="user">
+                                    <motion.div
+                                        aria-hidden
+                                        className="pointer-events-none absolute inset-y-0 -left-full flex w-full justify-end gap-9"
+                                        style={{ skewX: -18, willChange: "transform" }}
+                                        animate={{ x: ["-30%", "180%"] }}
+                                        transition={{
+                                            duration: 1.4,
+                                            ease: "easeInOut",
+                                            repeat: Infinity,
+                                            repeatDelay: 2.5,
+                                        }}
+                                    >
+                                        <div className="h-full w-10 bg-white/12" />
+                                        <div className="h-full w-24 bg-white/10" />
+                                    </motion.div>
+                                </MotionConfig>
+                            )}
                             <div className="h-full w-full">
                                 <span className="relative flex items-center justify-start gap-2 text-neutral-500">
                                     <HeroBuddy move={false} className="size-6" />

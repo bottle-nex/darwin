@@ -48,7 +48,7 @@ export default function OnboardingDisplay({
     };
 
     return (
-        <main className="flex flex-1 min-w-0 flex-col overflow-hidden rounded-lg ring-1 ring-white/6 bg-[#0F0F10]">
+        <main className="relative z-10 flex flex-1 min-w-0 flex-col overflow-hidden rounded-lg ring-1 ring-white/6 bg-[#0F0F10]">
             <OnboardingCore
                 initialDraft={initialDraft}
                 repoFullName={project.githubRepoFullName}
