@@ -5,7 +5,8 @@ import chalk from "chalk";
 dotenv.config({ path: new URL("../../../.env", import.meta.url).pathname });
 
 const envSchema = z.object({
-    GUARD_DATABASE_URL: z.url(),
+    DATABASE_URL: z.url(),
+    SERVER_REDIS_URL: z.url(),
 });
 
 function parseEnv() {
