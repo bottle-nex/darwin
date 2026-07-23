@@ -25,4 +25,4 @@ export const routerPrompt = new PromptTemplate({
         "new_issues",
     ],
     templateFormat: "mustache",
-})
+});

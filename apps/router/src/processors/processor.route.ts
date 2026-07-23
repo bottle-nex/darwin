@@ -14,16 +14,17 @@ interface Assignment {
 }
 
 const ai_value = z.object({
-    assignments: z.array(z.object({
-        issueId: z.string().nonempty(),
-        workerId: z.string().nonempty(),
-        specialization: z.string().nonempty().describe("describe the issue is specialized for"),
-    })),
+    assignments: z.array(
+        z.object({
+            issueId: z.string().nonempty(),
+            workerId: z.string().nonempty(),
+            specialization: z.string().nonempty().describe("describe the issue is specialized for"),
+        }),
+    ),
 });
 
 export default class RouterProcessor {
     static async process_route_job(projectId: string, queue: QueueService) {
-
         console.log("fetching all the active workers and new issues");
         // get the new issues and active workers
         const [active_workers, todos] = await Promise.all([
@@ -43,7 +44,7 @@ export default class RouterProcessor {
                 orderBy: {
                     createdAt: "asc",
                 },
-            })
+            }),
         ]);
 
         console.log("workers: ", active_workers.length, "\nnew issues: ", todos.length);
@@ -67,7 +68,7 @@ export default class RouterProcessor {
                             assignerWorkerId: worker.id,
                         },
                         orderBy: {
-                            updatedAt: 'desc',
+                            updatedAt: "desc",
                         },
                         take: 5,
                     });
@@ -86,7 +87,7 @@ export default class RouterProcessor {
         if (!project?.planMd) {
             console.log(chalk.red("no plan was found in project"));
             return;
-        };
+        }
 
         const new_workers = await this.spin_up_workers(
             projectId,
@@ -138,7 +139,10 @@ export default class RouterProcessor {
     ): Promise<Worker[]> {
         // if the current worker count is greater than (or equal to) the count of issues
         // then no need of spinning new workers, and never exceed the project's maxWorkers cap
-        const workers_to_create = Math.max(0, Math.min(issue_count, maxWorkers) - active_worker_count);
+        const workers_to_create = Math.max(
+            0,
+            Math.min(issue_count, maxWorkers) - active_worker_count,
+        );
 
         const new_workers: Worker[] = [];
         for (let i = 0; i < workers_to_create; i++) {

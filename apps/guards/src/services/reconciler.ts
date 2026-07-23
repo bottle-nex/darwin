@@ -51,7 +51,7 @@ export default class Reconciler {
                 },
             });
             const project_ids = new Set(issues.map((i) => i.projectId));
-            console.log("found issues in projects: ", project_ids)
+            console.log("found issues in projects: ", project_ids);
             for (const projectId of project_ids) {
                 await guard_services.queue.enqueue_project(projectId);
             }

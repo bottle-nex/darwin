@@ -8,5 +8,5 @@ console.log("starting the reconciler service");
 Reconciler.start_sweeper();
 setInterval(() => {
     console.log("reconciler triggered");
-    Reconciler.start_sweeper()
+    Reconciler.start_sweeper();
 }, RECONCILE_INTERVAL_MS);

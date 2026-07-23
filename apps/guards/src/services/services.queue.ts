@@ -1,4 +1,3 @@
-
 import { Queue } from "bullmq";
 import queue_config from "../config/config.queue";
 
