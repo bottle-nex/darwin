@@ -9,7 +9,7 @@ import StackCards from "@/components/landing/v2/StackCards";
 
 export default function Home() {
     return (
-        <main className="flex min-h-screen flex-col bg-cement pt-14">
+        <main className="flex min-h-screen flex-col bg-ink pt-14">
             <NavBar isMarkettingPage />
             <LandingHeroV2 />
             <BoardShowcase />

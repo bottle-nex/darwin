@@ -37,7 +37,7 @@ export default function OrgListItem({
             type="button"
             onClick={onSelect}
             className={cn(
-                "flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left transition-colors",
+                "flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left transition-colors cursor-pointer",
                 selected ? "bg-white/8" : "hover:bg-white/5",
             )}
         >

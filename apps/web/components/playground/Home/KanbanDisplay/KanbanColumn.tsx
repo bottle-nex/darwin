@@ -2,6 +2,7 @@
 import { MdMoreHoriz } from "react-icons/md";
 import { useDroppable } from "@dnd-kit/core";
 import { cn } from "@/lib/utils";
+import { MatchaLogo } from "@/components/logo/MatchaLogo";
 import type { Issue, KanbanColumnDef } from "@/types/kanban";
 import CardRenderer from "./cards/CardRenderer";
 import DraggableIssue from "./DraggableIssue";
@@ -32,7 +33,7 @@ export default function KanbanColumn({
         <div
             data-column-status={column.status}
             className={cn(
-                "group flex max-h-full min-h-0 flex-col rounded-xl bg-[#141415] p-2 ring-1 transition-colors",
+                "group flex max-h-full min-h-0 flex-col self-stretch rounded-xl bg-cement p-2 ring-1 transition-colors",
                 fullWidth ? "min-w-0 flex-1" : "w-72 shrink-0",
                 droppable && isOver ? "ring-white/15" : "ring-white/5",
             )}
@@ -68,14 +69,15 @@ export default function KanbanColumn({
                 )}
 
                 {issues.length === 0 && (
-                    <p
+                    <div
                         className={cn(
-                            "text-center text-[12px] text-neutral-600",
-                            grid ? "col-span-full py-6" : "px-2 py-6",
+                            "flex flex-1 h-full flex-col items-center justify-center gap-2",
+                            grid ? "col-span-full" : "px-2",
                         )}
                     >
-                        No issues
-                    </p>
+                        <MatchaLogo className="h-6 w-auto text-neutral-800" />
+                        <p className="text-[12px] text-neutral-600">No issues currently</p>
+                    </div>
                 )}
             </div>
         </div>

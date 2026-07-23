@@ -6,6 +6,7 @@ import { SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-
 import { CSS } from "@dnd-kit/utilities";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
+import { MatchaLogo } from "@/components/logo/MatchaLogo";
 import { PANEL_CONTENT, PANEL_ITEM } from "../OptionsBar/KanbanOptionPanels/panelStyles";
 import { useCreateOrEditIssueStore } from "@/store/issues/useCreateOrEditIssueStore";
 import SortableCustomCard from "./SortableCustomCard";
@@ -60,7 +61,7 @@ export default function CustomKanbanColumn({
             ref={setNodeRef}
             style={style}
             className={cn(
-                "group flex max-h-full w-72 shrink-0 flex-col rounded-xl bg-white/2.5 p-1 ring-1 transition-colors",
+                "group flex max-h-full w-72 shrink-0 flex-col self-stretch rounded-xl bg-white/2.5 p-1 ring-1 transition-colors",
                 isOver ? "ring-white/15" : "ring-white/5",
                 isDragging && "opacity-40",
             )}
@@ -146,7 +147,7 @@ export default function CustomKanbanColumn({
                 items={column.cards.map((c) => c.id)}
                 strategy={verticalListSortingStrategy}
             >
-                <div className="flex min-h-10 flex-col gap-1.5 overflow-y-auto rounded-lg p-0.5">
+                <div className="flex min-h-0 flex-1 flex-col gap-1.5 overflow-y-auto rounded-lg p-0.5">
                     {column.cards.map((card) => (
                         <SortableCustomCard
                             key={card.id}
@@ -156,6 +157,13 @@ export default function CustomKanbanColumn({
                             onUnassign={(userId) => onUnassign(card.id, userId)}
                         />
                     ))}
+
+                    {column.cards.length === 0 && (
+                        <div className="flex h-full flex-col items-center justify-center gap-2 px-2">
+                            <MatchaLogo className="h-6 w-auto text-neutral-800" />
+                            <p className="text-[12px] text-neutral-600">No issues currently</p>
+                        </div>
+                    )}
                 </div>
             </SortableContext>
 
@@ -168,7 +176,7 @@ export default function CustomKanbanColumn({
                         columnTitle: column.title,
                     })
                 }
-                className="mt-2 flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-[12px] font-medium text-neutral-400 transition-colors hover:bg-white/5 hover:text-neutral-200 cursor-pointer"
+                className="mt-2 flex items-center justify-center gap-1.5 rounded-lg px-2 py-1.5 text-[13px] text-center font-medium text-neutral-400 transition-colors hover:bg-white/5 hover:text-neutral-200 cursor-pointer"
             >
                 <MdAdd className="size-3.5" aria-hidden />
                 Add a card

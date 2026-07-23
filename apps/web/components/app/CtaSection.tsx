@@ -11,7 +11,7 @@ const LOOP_LABELS = ["File the issue", "Agent ships the patch", "You review the 
 export default function CtaSection() {
     const { session } = useUserSessionStore();
     return (
-        <section className="bg-cement pb-14 pt-6">
+        <section className="pb-14 pt-6">
             <div className="">
                 <div className="relative mx-auto max-w-7xl rounded-xl bg-snow pb-50">
                     <div className="px-6 pt-24 text-center">

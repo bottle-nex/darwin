@@ -68,7 +68,7 @@ export default function StackCards() {
                             </div>
                         </section>
                     ))}
-                    <div className="pointer-events-none absolute bottom-32 left-0 h-48 w-full bg-linear-to-t from-cement to-transparent" />
+                    <div className="pointer-events-none absolute bottom-32 left-0 h-48 w-full bg-linear-to-t from-ink to-transparent" />
                 </section>
             </div>
         </main>

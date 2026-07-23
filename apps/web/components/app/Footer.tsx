@@ -45,7 +45,7 @@ function FooterTopEdge({ isMarkettingPage = false }: { isMarkettingPage?: boolea
             >
                 <path
                     d={`${TOP_EDGE}v16H0z`}
-                    className={isMarkettingPage ? "fill-snow" : "fill-ink"}
+                    className={isMarkettingPage ? "fill-snow" : "fill-cement"}
                 />
             </svg>
         </div>
@@ -56,7 +56,7 @@ export function Footer({ isMarkettingPage = false }: { isMarkettingPage?: boolea
     return (
         <footer className="relative">
             <FooterTopEdge isMarkettingPage={isMarkettingPage} />
-            <div className={cn("relative pb-6", isMarkettingPage ? "bg-snow" : "bg-ink")}>
+            <div className={cn("relative pb-6", isMarkettingPage ? "bg-snow" : "bg-cement")}>
                 <div className="relative mx-auto max-w-7xl px-6 pt-10 sm:pt-14">
                     <div className="grid grid-cols-2 md:grid-cols-6 gap-x-6 gap-y-8">
                         <div className="col-span-2 md:col-span-2">
