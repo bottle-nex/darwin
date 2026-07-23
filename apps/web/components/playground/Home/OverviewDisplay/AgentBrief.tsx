@@ -106,11 +106,6 @@ export default function AgentBrief({ markdown, updatedAt, onSave }: AgentBriefPr
                             animate={{ height: expanded ? "auto" : COLLAPSED_HEIGHT }}
                             transition={{ duration: 0.24, ease: EASE }}
                             className="overflow-hidden"
-                            style={
-                                expanded
-                                    ? undefined
-                                    : { maskImage: FADE_MASK, WebkitMaskImage: FADE_MASK }
-                            }
                         >
                             <Markdown className="px-4 py-3.5">{markdown}</Markdown>
                         </motion.div>

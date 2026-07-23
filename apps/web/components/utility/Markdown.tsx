@@ -53,11 +53,15 @@ const COMPONENTS: Components = {
     hr: () => <hr className="my-4 border-white/5" />,
     code: ({ className, children }) => {
         const isBlock = /language-/.test(className ?? "");
-        if (isBlock) {
-            return <code className="font-mono text-[12px] text-neutral-300">{children}</code>;
-        }
         return (
-            <code className="rounded bg-white/6 px-1.5 py-0.5 font-mono text-[12px] text-violet-200">
+            <code
+                className={cn(
+                    "font-mono text-[12px]",
+                    isBlock
+                        ? "text-neutral-300"
+                        : "rounded bg-white/6 px-1.5 py-0.5 text-violet-200",
+                )}
+            >
                 {children}
             </code>
         );
@@ -91,7 +95,7 @@ export default function Markdown({
     className?: string;
 }) {
     return (
-        <div className={cn("text-[13px] text-neutral-400", className)}>
+        <div className={cn("text-[13.25px] text-neutral-400", className)}>
             <ReactMarkdown remarkPlugins={[remarkGfm]} components={COMPONENTS}>
                 {children}
             </ReactMarkdown>
