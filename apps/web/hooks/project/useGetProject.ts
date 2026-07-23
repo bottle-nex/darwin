@@ -20,5 +20,6 @@ export function useGetProject(projectId: string | undefined) {
             const res = await apiClient.get<ApiResponse<ProjectDetail>>(GET_PROJECT(projectId!));
             return res.data.data;
         },
+        refetchInterval: (query) => (query.state.data?.planStatus === "Generating" ? 4000 : false),
     });
 }

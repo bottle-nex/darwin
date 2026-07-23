@@ -32,7 +32,7 @@ export default function OrgList({
     }, [orgs, search]);
 
     return (
-        <aside className="flex w-full shrink-0 flex-col gap-3 sm:w-64 py-8">
+        <aside className="flex min-h-0 w-full shrink-0 flex-col gap-3 sm:w-64 py-8">
             <div className="flex items-center justify-between">
                 <h2 className="text-[13px] font-semibold">Organizations</h2>
                 <Button variant="tertiary" onClick={onCreateOrg}>
@@ -51,7 +51,10 @@ export default function OrgList({
                 />
             </div>
 
-            <div className="flex flex-col gap-0.5">
+            <div
+                data-lenis-prevent
+                className="flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto"
+            >
                 {visible.length === 0 ? (
                     <p className="px-2.5 py-2 text-[12px] text-neutral-500">
                         {orgs.length === 0 ? "No organizations yet." : "No organizations match."}

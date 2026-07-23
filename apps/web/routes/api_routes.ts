@@ -18,6 +18,7 @@ export const DASHBOARD_URL = (orgSlug: string) => `${PLAYGROUND_URL}/dashboard/$
 export const PROJECT_URL = API_URL + "/project";
 export const CREATE_PROJECT = PROJECT_URL + "/create";
 export const GET_PROJECT = (projectId: string) => `${PROJECT_URL}/${projectId}`;
+export const START_PROJECT_SETUP_URL = (project_id: string) => `${PROJECT_URL}/${project_id}/setup`;
 export const UPDATE_PROJECT_URL = PROJECT_URL + "/update";
 export const DELETE_PROJECT_URL = PROJECT_URL + "/delete";
 export const LIST_PROJECT_MEMBERS_URL = (project_id: string) =>

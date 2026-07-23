@@ -1,5 +1,7 @@
 import { ProjectRole } from "@trymatcha/types";
 
+export type PlanStatus = "Pending" | "Generating" | "Ready" | "Failed";
+
 export interface Project {
     id: string;
     name: string;
@@ -37,11 +39,15 @@ export interface ProjectDetail {
     description: string | null;
     githubRepoFullName: string | null;
     githubRepoUrl: string | null;
+    githubDefaultBranch: string | null;
     color: string | null;
     ownerId: string;
     createdAt: string;
     updatedAt: string;
     tourCompleted: boolean;
+    planMd: string | null;
+    planStatus: PlanStatus;
+    planGeneratedAt: string | null;
     teams: ProjectTeam[];
     /** The requesting user's effective role in this project (highest of org/owner/team). */
     viewerRole: ProjectRole | null;

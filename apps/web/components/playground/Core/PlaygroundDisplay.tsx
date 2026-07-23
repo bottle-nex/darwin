@@ -55,7 +55,7 @@ function TabPane({ tab }: { tab: string }) {
             return <SettingsDisplay section="templates" />;
         case PlaygroundTab.SettingsEnv:
             return <SettingsDisplay section="env" />;
-        case PlaygroundTab.Threads:
+        case PlaygroundTab.Chats:
             return <ThreadsDisplay />;
         case PlaygroundTab.ThreadDetail:
             return <ThreadDetailDisplay />;
@@ -75,7 +75,7 @@ export default function PlaygroundDisplay({ isLoading }: { isLoading?: boolean }
     const tab = usePlaygroundNavStore((s) => s.tab);
 
     return (
-        <main className="relative z-10 flex flex-1 min-w-0 flex-col overflow-hidden rounded-lg ring-1 ring-white/6 bg-cement">
+        <main className="relative z-10 flex flex-1 min-w-0 flex-col overflow-hidden rounded-lg ring-1 ring-white/6 bg-charcoal">
             {isLoading ? <LogoLoader className="h-full w-full" /> : <TabPane tab={tab} />}
         </main>
     );

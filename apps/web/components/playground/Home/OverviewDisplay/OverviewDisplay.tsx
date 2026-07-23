@@ -1,15 +1,16 @@
 "use client";
-import { useState } from "react";
 import { MotionConfig, motion } from "motion/react";
 import { toast } from "sonner";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { useGetProject } from "@/hooks/project/useGetProject";
 import { useProjectMembers } from "@/hooks/project/useProjectMembers";
-import { dummyProjectOverview } from "@/data/dummy-project-overview";
+import { useUpdateProject } from "@/hooks/project/useUpdateProject";
+import { useStartSetup } from "@/hooks/project/useStartSetup";
 import type { ProjectOverview } from "@/types/overview";
 import OverviewOptionsBar from "./OverviewOptionsBar";
 import OverviewMasthead from "./OverviewMasthead";
 import AgentBrief from "./AgentBrief";
+import AgentBriefEmpty from "./AgentBriefEmpty";
 import SurfaceLinks from "./SurfaceLinks";
 import TeamSection from "./TeamSection";
 import { STAGGER_VARIANTS } from "./overviewTheme";
@@ -22,9 +23,13 @@ export default function OverviewDisplay() {
     const activeProject = useActiveProject();
     const { data: project } = useGetProject(activeProject?.id);
     const { data: members } = useProjectMembers(activeProject?.id);
-    const [markdown, setMarkdown] = useState(dummyProjectOverview.brief.markdown);
+    const updateProject = useUpdateProject();
+    const startSetup = useStartSetup();
 
     if (!project) return null;
+
+    const markdown = project.planMd ?? "";
+    const briefReady = project.planStatus === "Ready" && Boolean(project.planMd);
 
     const overview: ProjectOverview = {
         key: projectKey(project.slug),
@@ -32,7 +37,7 @@ export default function OverviewDisplay() {
         name: project.name,
         purpose: project.summary ?? "",
         description: project.description ?? "",
-        brief: { markdown, updatedAt: project.updatedAt },
+        brief: { markdown, updatedAt: project.planGeneratedAt ?? project.updatedAt },
         links: project.githubRepoUrl
             ? [
                   {
@@ -51,8 +56,16 @@ export default function OverviewDisplay() {
     };
 
     function saveBrief(next: string) {
-        setMarkdown(next);
-        toast.success("Brief updated.");
+        updateProject.mutate(
+            { project_id: project!.id, plan_md: next },
+            { onSuccess: () => toast.success("Brief updated.") },
+        );
+    }
+
+    function generateBrief() {
+        startSetup.mutate(project!.id, {
+            onError: () => toast.error("Couldn't start brief generation."),
+        });
     }
 
     return (
@@ -72,11 +85,21 @@ export default function OverviewDisplay() {
                             <OverviewMasthead overview={overview} />
                         </div>
 
-                        <AgentBrief
-                            markdown={markdown}
-                            updatedAt={overview.brief.updatedAt}
-                            onSave={saveBrief}
-                        />
+                        {briefReady ? (
+                            <AgentBrief
+                                markdown={markdown}
+                                updatedAt={overview.brief.updatedAt}
+                                onSave={saveBrief}
+                            />
+                        ) : (
+                            <AgentBriefEmpty
+                                status={project.planStatus}
+                                repoFullName={project.githubRepoFullName}
+                                branch={project.githubDefaultBranch}
+                                onGenerate={generateBrief}
+                                starting={startSetup.isPending}
+                            />
+                        )}
 
                         <TeamSection team={overview.team} leadId={overview.leadId} />
                     </motion.div>

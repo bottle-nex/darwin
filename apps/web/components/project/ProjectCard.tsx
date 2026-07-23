@@ -1,6 +1,5 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { motion } from "motion/react";
 import { FaCodeBranch, FaFolder, FaGithub } from "react-icons/fa6";
 import { formatRelativeTime } from "@/lib/format";
 import type { Project } from "@/types/project";
@@ -10,7 +9,6 @@ const DEFAULT_COLOR = "#6366f1";
 export default function ProjectCard({
     project,
     orgSlug,
-    index = 0,
 }: {
     project: Project;
     orgSlug: string;
@@ -22,14 +20,7 @@ export default function ProjectCard({
     const branch = project.githubDefaultBranch;
 
     return (
-        <motion.div
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: index * 0.05, ease: "easeOut" }}
-            whileHover={{ y: -1 }}
-            whileTap={{ scale: 0.99 }}
-            className="group relative flex w-full flex-col gap-4 rounded-[14px] bg-linear-to-b from-[#1a1a1a] to-neutral-900 p-5 text-left shadow-[inset_0_2px_0_0_#262626] focus-within:ring-2 focus-within:ring-white/20"
-        >
+        <div className="group relative flex w-full flex-col gap-4 rounded-[14px] bg-linear-to-b from-[#1a1a1a] to-neutral-900 p-5 text-left shadow-[inset_0_2px_0_0_#262626] focus-within:ring-2 focus-within:ring-white/20">
             <button
                 type="button"
                 aria-label={`Open ${name}`}
@@ -95,6 +86,6 @@ export default function ProjectCard({
                     )}
                 </div>
             </div>
-        </motion.div>
+        </div>
     );
 }

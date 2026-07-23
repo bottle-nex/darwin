@@ -35,7 +35,7 @@ export default function GanttIssueCard({ issue, now }: { issue: GanttIssue; now:
         <>
             <div
                 className={cn(
-                    "absolute inset-y-2 z-1 overflow-hidden rounded-md border bg-neutral-800 shadow-sm",
+                    "absolute inset-y-2 z-1 overflow-hidden rounded-md border bg-cement shadow-sm",
                     isQueued && "border-dashed opacity-70",
                     isDone && "opacity-90",
                 )}
@@ -61,7 +61,7 @@ export default function GanttIssueCard({ issue, now }: { issue: GanttIssue; now:
                                 )}
                             />
                             {issue.label && (
-                                <span className="truncate rounded-md bg-neutral-700 px-1.5 py-0.5 text-[10px] font-medium text-neutral-300">
+                                <span className="truncate rounded-md bg-graphite px-1.5 py-0.5 text-[10px] font-medium text-neutral-300">
                                     {issue.label}
                                 </span>
                             )}
@@ -95,7 +95,7 @@ export default function GanttIssueCard({ issue, now }: { issue: GanttIssue; now:
                         </div>
                     )}
 
-                    <div className="mt-auto flex items-center justify-between border-t border-neutral-700 pt-2">
+                    <div className="mt-auto flex items-center justify-between border-t border-graphite pt-2">
                         <span className="flex items-center gap-1 text-[11px] text-neutral-500">
                             <MdChat className="size-3" aria-hidden />
                             {issue.comments ? issue.comments : null}

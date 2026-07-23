@@ -137,12 +137,11 @@ function PlaygroundLanding() {
                                 </div>
                             ) : (
                                 <div className="grid grid-cols-1 gap-4.5 sm:grid-cols-2 xl:grid-cols-3">
-                                    {visibleProjects.map((project, i) => (
+                                    {visibleProjects.map((project) => (
                                         <ProjectCard
                                             key={project.id}
                                             project={project}
                                             orgSlug={selectedSlug}
-                                            index={i}
                                         />
                                     ))}
                                 </div>

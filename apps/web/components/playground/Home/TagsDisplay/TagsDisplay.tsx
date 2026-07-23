@@ -107,7 +107,7 @@ export default function TagsDisplay() {
                     visibleTags.map((tag) => (
                         <div
                             key={tag.id}
-                            className="group flex items-center justify-between gap-3 rounded-lg bg-white/3 px-3 py-2.5 shadow-[inset_0_1px_0_0_#262626]"
+                            className="group flex items-center justify-between gap-3 rounded-lg bg-cement px-3 py-2.5 shadow-[inset_0_1px_0_0_#212122]"
                         >
                             <TagDisplay name={tag.name} color={tag.color} />
 

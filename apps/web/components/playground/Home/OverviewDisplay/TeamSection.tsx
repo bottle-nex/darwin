@@ -27,7 +27,7 @@ export default function TeamSection({ team, leadId }: TeamSectionProps) {
                 {ordered.map((member) => (
                     <div
                         key={member.id}
-                        className="flex items-center gap-3 rounded-lg bg-white/3 px-3 py-2.5 shadow-[inset_0_1px_0_0_#262626]"
+                        className="flex items-center gap-3 rounded-lg bg-cement px-3 py-2.5"
                     >
                         <PlaygroundAvatar
                             letter={initialOf(member.name, member.email)}

@@ -13,6 +13,7 @@ export interface UpdateProjectInput {
     slug?: string;
     summary?: string;
     description?: string;
+    plan_md?: string;
     tour_completed?: boolean;
     kanban_option_view?: KanbanOptionView;
 }

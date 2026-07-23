@@ -2,20 +2,24 @@ import { Request, Response } from "express";
 import ResponseWriter from "../../services/service.response";
 import SecretService from "../../services/service.secret";
 import z from "zod";
-import { prisma } from "@trymatcha/database";
+import { PlanStatus, prisma } from "@trymatcha/database";
+import { Action, Permissions } from "@trymatcha/access-control";
+import Access from "../../access-control/access";
 import E2B from "../../sandbox/e2b";
 
 const body_schema = z.object({
-    github_repo_id: z.bigint(),
-    github_repo_full_name: z.string().nonempty(),
-    github_repo_url: z.string().nonempty(),
-    github_default_branch: z.string().default("main"),
-    envs: z.array(
-        z.object({
-            key: z.string().nonempty(),
-            value: z.string().nonempty(),
-        }),
-    ),
+    github_repo_id: z.bigint().optional(),
+    github_repo_full_name: z.string().nonempty().optional(),
+    github_repo_url: z.string().nonempty().optional(),
+    github_default_branch: z.string().optional(),
+    envs: z
+        .array(
+            z.object({
+                key: z.string().nonempty(),
+                value: z.string().nonempty(),
+            }),
+        )
+        .optional(),
     extra_context: z.string().optional(),
 });
 
@@ -25,7 +29,13 @@ const params_schema = z.object({
 
 export default async function start_setup(req: Request, res: Response) {
     try {
-        const parsed_body = body_schema.safeParse(req.body);
+        const user = req.user;
+        if (!user || !user.id) {
+            ResponseWriter.not_authorized(res);
+            return;
+        }
+
+        const parsed_body = body_schema.safeParse(req.body ?? {});
         const parsed_params = params_schema.safeParse(req.params);
 
         if (!parsed_body.success || !parsed_params.success) {
@@ -33,6 +43,7 @@ export default async function start_setup(req: Request, res: Response) {
             return;
         }
 
+        const { project_id } = parsed_params.data;
         const {
             github_repo_id,
             github_repo_full_name,
@@ -40,7 +51,12 @@ export default async function start_setup(req: Request, res: Response) {
             github_default_branch,
             envs,
         } = parsed_body.data;
-        const { project_id } = parsed_params.data;
+
+        const role = await Access.project(user.id, project_id);
+        if (!role || !Permissions.project(role, Action.project.update)) {
+            ResponseWriter.not_authorized(res, "You don't have permission to set up this project");
+            return;
+        }
 
         const project = await prisma.project.findUnique({
             where: { id: project_id },
@@ -49,6 +65,20 @@ export default async function start_setup(req: Request, res: Response) {
 
         if (!project) {
             ResponseWriter.not_found(res, "project not found");
+            return;
+        }
+
+        if (
+            project.planStatus === PlanStatus.Generating ||
+            project.planStatus === PlanStatus.Ready
+        ) {
+            ResponseWriter.custom(
+                res,
+                false,
+                "PLAN_ALREADY_STARTED",
+                "This project's brief has already been generated.",
+                409,
+            );
             return;
         }
 
@@ -64,33 +94,52 @@ export default async function start_setup(req: Request, res: Response) {
             return;
         }
 
-        const [updated_project, session] = await Promise.all([
-            prisma.project.update({
-                where: { id: project_id },
-                data: {
-                    githubRepoId: github_repo_id,
-                    githubRepoFullName: github_repo_full_name,
-                    githubRepoUrl: github_repo_url,
-                    githubDefaultBranch: github_default_branch,
-                    githubInstallationId: github_installation.id,
-                },
-            }),
+        const repo_url = github_repo_url ?? project.githubRepoUrl;
+        const branch = github_default_branch ?? project.githubDefaultBranch ?? "main";
+        if (!repo_url) {
+            ResponseWriter.custom(
+                res,
+                false,
+                "REPO_NOT_CONNECTED",
+                "No repository is connected to this project. Connect one before generating a brief.",
+                400,
+            );
+            return;
+        }
+
+        const has_repo_input = Boolean(github_repo_id && github_repo_full_name && github_repo_url);
+
+        const [, session] = await Promise.all([
+            has_repo_input
+                ? prisma.project.update({
+                      where: { id: project_id },
+                      data: {
+                          githubRepoId: github_repo_id,
+                          githubRepoFullName: github_repo_full_name,
+                          githubRepoUrl: github_repo_url,
+                          githubDefaultBranch: branch,
+                          githubInstallationId: github_installation.id,
+                      },
+                  })
+                : Promise.resolve(null),
             prisma.setupSession.create({
                 data: { projectId: project_id, status: "Pending", startedAt: new Date() },
             }),
         ]);
 
-        await Promise.all(
-            envs.map(({ key, value }) => SecretService.set_secret(project_id, key, value)),
-        );
+        if (envs && envs.length > 0) {
+            await Promise.all(
+                envs.map(({ key, value }) => SecretService.set_secret(project_id, key, value)),
+            );
+        }
 
-        ResponseWriter.created(res, { project: updated_project, session });
+        ResponseWriter.created(res, { session });
 
         E2B.run_onboarding_job(
             session.id,
             project_id,
-            github_repo_url,
-            github_default_branch,
+            repo_url,
+            branch,
             Number(github_installation.installationId),
         );
     } catch (error) {

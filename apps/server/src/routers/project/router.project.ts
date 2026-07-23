@@ -18,6 +18,7 @@ import update_template_controller from "../../controllers/project/controller.upd
 import delete_template_controller from "../../controllers/project/controller.delete_template";
 import get_project_config_controller from "../../controllers/project/controller.get_project_config";
 import update_project_config_controller from "../../controllers/project/controller.update_project_config";
+import start_setup from "../../controllers/setup/controller.start_setup";
 
 const project_router: Router = Router();
 
@@ -26,6 +27,7 @@ project_router.patch("/update", require_auth, update_project_controller);
 project_router.delete("/delete", require_auth, delete_project_controller);
 project_router.get("/:project_id", require_auth, get_project_controller);
 project_router.get("/:project_id/members", require_auth, list_members_controller);
+project_router.post("/:project_id/setup", require_auth, start_setup);
 project_router.get("/:project_id/config", require_auth, get_project_config_controller);
 project_router.patch("/:project_id/config", require_auth, update_project_config_controller);
 project_router.get("/:project_id/secrets", require_auth, list_secrets_controller);

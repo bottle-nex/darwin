@@ -7,9 +7,10 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import HeroBuddy from "@/components/landing/v2/HeroBuddy";
+import Markdown from "@/components/utility/Markdown";
 import { EASE, SECTION_VARIANTS, SectionLabel, approxTokensOf } from "./overviewTheme";
 
-const COLLAPSED_HEIGHT = 224;
+const COLLAPSED_HEIGHT = 424;
 
 const FADE_MASK = "linear-gradient(to bottom, #000 55%, transparent 100%)";
 
@@ -41,7 +42,7 @@ export default function AgentBrief({ markdown, updatedAt, onSave }: AgentBriefPr
         <motion.section variants={SECTION_VARIANTS}>
             <SectionLabel>Brief</SectionLabel>
 
-            <div className="relative mt-3 overflow-hidden rounded-lg bg-white/3 shadow-[inset_0_1px_0_0_#262626]">
+            <div className="relative mt-3 overflow-hidden rounded-lg bg-cement">
                 <div className="flex h-10 items-center justify-between gap-2 border-b border-white/5 pr-2 pl-4">
                     <div className="flex min-w-0 items-center gap-2">
                         <span className="truncate font-mono text-[12px] text-neutral-200">
@@ -111,9 +112,7 @@ export default function AgentBrief({ markdown, updatedAt, onSave }: AgentBriefPr
                                     : { maskImage: FADE_MASK, WebkitMaskImage: FADE_MASK }
                             }
                         >
-                            <pre className="px-4 py-3.5 font-mono text-[12px] leading-[1.75] whitespace-pre-wrap text-neutral-400">
-                                {markdown}
-                            </pre>
+                            <Markdown className="px-4 py-3.5">{markdown}</Markdown>
                         </motion.div>
 
                         <div className="flex items-center justify-between gap-2 border-t border-white/5 py-1.5 pr-2 pl-4">

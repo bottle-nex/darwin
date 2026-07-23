@@ -69,7 +69,7 @@ export default function TemplatePicker({ projectId, onPick }: TemplatePickerProp
                 className="w-44 border-white/10 bg-neutral-900 p-0.5"
             >
                 <Command className="bg-transparent">
-                    <CommandList className="max-h-64">
+                    <CommandList data-lenis-prevent className="no-scrollbar h-20 overflow-y-auto">
                         <CommandGroup className="p-0">
                             {[...projectTemplates, ...BUILTIN_ISSUE_TEMPLATES].map(row)}
                         </CommandGroup>

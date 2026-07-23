@@ -16,14 +16,14 @@ const SETTINGS_TABS: string[] = [
     PlaygroundTab.SettingsEnv,
 ];
 
-const THREADS_TABS: string[] = [PlaygroundTab.Threads, PlaygroundTab.ThreadDetail];
+const CHAT_TABS: string[] = [PlaygroundTab.Chats, PlaygroundTab.ThreadDetail];
 
 export default function SidebarContent() {
     const selectedRowId = usePlaygroundNavStore((s) => s.tab);
     const setTab = usePlaygroundNavStore((s) => s.setTab);
 
     const inSettings = SETTINGS_TABS.includes(selectedRowId);
-    const inThreads = THREADS_TABS.includes(selectedRowId);
+    const inChats = CHAT_TABS.includes(selectedRowId);
     const section = {
         selectedRowId,
         onSelect: (id: string) => setTab(id),
@@ -34,16 +34,16 @@ export default function SidebarContent() {
             <div className="min-h-0 flex-1 overflow-y-auto px-1 pt-1">
                 <AnimatePresence mode="wait" initial={false}>
                     <motion.div
-                        key={inSettings ? "settings" : inThreads ? "threads" : "main"}
-                        initial={{ opacity: 0, x: inSettings || inThreads ? 10 : -10 }}
+                        key={inSettings ? "settings" : inChats ? "chats" : "main"}
+                        initial={{ opacity: 0, x: inSettings || inChats ? 10 : -10 }}
                         animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: inSettings || inThreads ? 10 : -10 }}
+                        exit={{ opacity: 0, x: inSettings || inChats ? 10 : -10 }}
                         transition={{ duration: 0.16, ease: [0.4, 0, 0.2, 1] }}
                         className="flex flex-col gap-3"
                     >
                         {inSettings ? (
                             <SettingsNavSection {...section} />
-                        ) : inThreads ? (
+                        ) : inChats ? (
                             <ThreadsNavSection {...section} />
                         ) : (
                             <>

@@ -15,13 +15,14 @@ function openTab(tab: PlaygroundTab) {
 
 export const COMBINATIONS: Record<string, Combination> = {
     "mod+/": { label: "Toggle shortcuts", run: () => useShortcutSheetStore.getState().open() },
-    "o i": { label: "Open Threads", run: () => openTab(PlaygroundTab.Threads) },
+    "o c": { label: "Open Chats", run: () => openTab(PlaygroundTab.Chats) },
     "o k": { label: "Open Kanban", run: () => openTab(PlaygroundTab.Kanban) },
     "o o": { label: "Open Overview", run: () => openTab(PlaygroundTab.Overview) },
     "o g": { label: "Open Gantt", run: () => openTab(PlaygroundTab.Gantt) },
     "o t": { label: "Open Tags", run: () => openTab(PlaygroundTab.Tags) },
     "o m": { label: "Open Mentions", run: () => openTab(PlaygroundTab.Mentions) },
     "o r": { label: "Open Reviews", run: () => openTab(PlaygroundTab.Reviews) },
+    "o s": { label: "Open Settings", run: () => openTab(PlaygroundTab.SettingsProject) },
     "[": { label: "Toggle Sidebar", run: () => useSidebarWidthStore.getState().toggle() },
 };
 
