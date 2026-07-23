@@ -1,8 +1,6 @@
 import { Sandbox } from "e2b";
 import { PlanStatus, prisma } from "@trymatcha/database";
 import { ENV } from "../configs/env";
-import fs from "fs";
-import path from "path";
 
 const REPO_DIR = "/home/user/repo";
 // const PLAN_DUMP_PATH = path.join(import.meta.dirname, "../../plan.md");
