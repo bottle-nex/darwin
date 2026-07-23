@@ -56,7 +56,9 @@ export default class Reconciler {
         }
     }
 
-    static async ring(projectId: Project["id"]) {}
+    static async ring(projectId: Project["id"]) {
+        
+    }
 
     static async start_sweeper() {
         console.log("sweeping both orphan todos");

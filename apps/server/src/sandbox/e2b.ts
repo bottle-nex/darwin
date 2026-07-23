@@ -7,6 +7,8 @@ import { prisma } from "@trymatcha/database";
 
 const REPO_DIR = "/home/user/repo";
 const SAFE_BRANCH = /^[A-Za-z0-9._/-]+$/;
+const SANDBOX_TIMEOUT_MS = 15 * 60_000;
+const CLONE_TIMEOUT_MS = 10 * 60_000;
 
 export default class E2B {
     public static async run_onboarding_job(
@@ -17,7 +19,8 @@ export default class E2B {
         installation_id: number,
     ) {
         let sandbox_id: string | null = null;
-
+        console.log("github url is : ", github_repo_url);
+        console.log("branch is : ", branch);
         try {
             await Promise.all([
                 prisma.setupSession.update({
@@ -85,6 +88,7 @@ export default class E2B {
     public static async create(): Promise<string> {
         const sandbox = await Sandbox.create("node-py-claude-template", {
             apiKey: ENV.SERVER_E2B_API_KEY,
+            timeoutMs: SANDBOX_TIMEOUT_MS,
         });
         return sandbox.sandboxId;
     }
@@ -138,7 +142,8 @@ export default class E2B {
         const clone_url = repo_url.replace("https://", `https://x-access-token:${token}@`);
 
         await sandbox.commands.run(
-            `git clone --branch ${branch} --single-branch ${clone_url} ${REPO_DIR}`,
+            `git clone --depth 1 --branch ${branch} --single-branch ${clone_url} ${REPO_DIR}`,
+            { timeoutMs: CLONE_TIMEOUT_MS },
         );
 
         const env_file = Object.entries(secrets)

@@ -1,8 +1,11 @@
 import { Sandbox } from "e2b";
 import { PlanStatus, prisma } from "@trymatcha/database";
 import { ENV } from "../configs/env";
+import fs from "fs";
+import path from "path";
 
 const REPO_DIR = "/home/user/repo";
+// const PLAN_DUMP_PATH = path.join(import.meta.dirname, "../../plan.md");
 const PROMPT_PATH = "/home/user/brief_prompt.txt";
 const AGENT_TIMEOUT_MS = 10 * 60_000;
 
@@ -69,9 +72,10 @@ export default class PlanService {
 
         const model = ENV.SERVER_BRIEF_MODEL;
         const effort = ENV.SERVER_BRIEF_EFFORT;
+        console.log(`Generating plan with model ${model} and effort ${effort}`);
         const result = await sandbox.commands.run(
             `claude -p "$(cat ${PROMPT_PATH})" --model ${model} --effort ${effort} ` +
-                `--output-format json --tools "Read,Glob,Grep,Bash" --permission-mode bypassPermissions`,
+            `--output-format json --tools "Read,Glob,Grep,Bash" --permission-mode bypassPermissions`,
             {
                 cwd: REPO_DIR,
                 envs: { ANTHROPIC_API_KEY: ENV.SERVER_ANTHROPIC_API_KEY },
@@ -85,8 +89,9 @@ export default class PlanService {
         } catch {
             throw new Error(`onboarding agent did not return JSON: ${result.stderr}`);
         }
-
+        console.log("report is :  ", report);
         const plan_md = report.result?.trim();
+        // fs.writeFileSync(PLAN_DUMP_PATH, plan_md || "", "utf-8");
         if (!plan_md) {
             throw new Error(`onboarding agent produced an empty brief: ${result.stderr}`);
         }
