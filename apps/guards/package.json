@@ -3,6 +3,9 @@
     "module": "index.ts",
     "type": "module",
     "private": true,
+    "scripts": {
+        "dev": "bun run src/index.ts"
+    },
     "devDependencies": {
         "@types/bun": "latest"
     },
@@ -10,9 +13,10 @@
         "typescript": "^5"
     },
     "dependencies": {
+        "@trymatcha/database": "*",
+        "bullmq": "^5.81.0",
         "chalk": "^5.6.2",
         "dotenv": "^17.4.2",
-        "zod": "^4.4.3",
-        "@trymatcha/database": "*"
+        "zod": "^4.4.3"
     }
 }

@@ -1,4 +1,5 @@
-import { prisma, type Project } from "@trymatcha/database";
+import { IssueStatus, prisma, type Project } from "@trymatcha/database";
+import { guard_services } from "..";
 
 export const STUCK_CLAIM_SECONDS = 60_000;
 export const RECONCILE_INTERVAL_MS = 30_000;
@@ -28,7 +29,7 @@ export default class Reconciler {
                         routingClaimedAt: null,
                     },
                 });
-                await this.ring(p.id);
+                await guard_services.queue.enqueue_project(p.id);
             }
         } catch (err) {
             console.error("error while sweeping the stucked projects ", err);
@@ -40,7 +41,7 @@ export default class Reconciler {
             const cut_off = new Date(Date.now() - ORPHAN_TODO_MS);
             const issues = await prisma.issue.findMany({
                 where: {
-                    status: "Todo",
+                    status: IssueStatus.Todo,
                     createdAt: {
                         lt: cut_off,
                     },
@@ -50,13 +51,14 @@ export default class Reconciler {
                 },
             });
             const project_ids = new Set(issues.map((i) => i.projectId));
-            for (const projectId of project_ids) await this.ring(projectId);
+            console.log("found issues in projects: ", project_ids);
+            for (const projectId of project_ids) {
+                await guard_services.queue.enqueue_project(projectId);
+            }
         } catch (err) {
             console.error("error while sweeping orphan issues", err);
         }
     }
-
-    static async ring(projectId: Project["id"]) {}
 
     static async start_sweeper() {
         console.log("sweeping both orphan todos");

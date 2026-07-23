@@ -6,6 +6,7 @@ dotenv.config({ path: new URL("../../../../.env", import.meta.url).pathname });
 
 const envSchema = z.object({
     SERVER_REDIS_URL: z.url("Invalid Redis URL"),
+    SERVER_ANTHROPIC_API_KEY: z.string("Invalid Anthropic api key"),
 });
 
 function parseEnv() {

@@ -117,6 +117,8 @@ model Project {
   planGeneratedAt    DateTime?
 
   workers       Worker[]
+  maxWorkers    Int            @default(1)
+
   projectConfig ProjectConfig?
 
   @@unique([orgId, slug])
@@ -125,9 +127,9 @@ model Project {
 }
 
 model ProjectConfig {
-  id        String  @id @default(cuid())
-  projectId String  @unique
-  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  id               String           @id @default(cuid())
+  projectId        String           @unique
+  project          Project          @relation(fields: [projectId], references: [id], onDelete: Cascade)
   kanbanOptionView KanbanOptionView @default(FLAT)
 }
 
@@ -135,6 +137,7 @@ enum KanbanOptionView {
   FLAT
   GROUPED
 }
+
 model Tag {
   id    String @id @default(cuid())
   name  String
