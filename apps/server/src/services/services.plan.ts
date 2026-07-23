@@ -75,7 +75,7 @@ export default class PlanService {
         console.log(`Generating plan with model ${model} and effort ${effort}`);
         const result = await sandbox.commands.run(
             `claude -p "$(cat ${PROMPT_PATH})" --model ${model} --effort ${effort} ` +
-            `--output-format json --tools "Read,Glob,Grep,Bash" --permission-mode bypassPermissions`,
+                `--output-format json --tools "Read,Glob,Grep,Bash" --permission-mode bypassPermissions`,
             {
                 cwd: REPO_DIR,
                 envs: { ANTHROPIC_API_KEY: ENV.SERVER_ANTHROPIC_API_KEY },
