@@ -1,8 +1,9 @@
 import dotenv from "dotenv";
 import { z } from "zod";
 import chalk from "chalk";
+import path from "node:path";
 
-dotenv.config({ path: new URL("../../../../.env", import.meta.url).pathname });
+dotenv.config({ path: path.resolve(process.cwd(), "../../.env") });
 
 const envSchema = z.object({
     DATABASE_URL: z.url(),

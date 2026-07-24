@@ -88,7 +88,7 @@ export default function PlaygroundDisplay({ isLoading }: { isLoading?: boolean }
             transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
             className={
                 isSettled
-                    ? "relative z-0 flex flex-1 min-w-0 flex-col overflow-hidden rounded-lg ring-1 ring-white/6 bg-cement"
+                    ? "relative z-0 flex flex-1 min-w-0 flex-col overflow-hidden rounded-lg ring-1 ring-white/6 bg-charcoal"
                     : "fixed inset-0 z-999 flex flex-col overflow-hidden bg-cement"
             }
         >

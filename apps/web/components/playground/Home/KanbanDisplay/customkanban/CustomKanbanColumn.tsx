@@ -61,7 +61,7 @@ export default function CustomKanbanColumn({
             ref={setNodeRef}
             style={style}
             className={cn(
-                "group flex max-h-full w-72 shrink-0 flex-col self-stretch rounded-xl bg-white/2.5 p-1 ring-1 transition-colors",
+                "group flex max-h-full w-72 shrink-0 flex-col self-stretch rounded-xl p-1 ring-1 bg-cement",
                 isOver ? "ring-white/15" : "ring-white/5",
                 isDragging && "opacity-40",
             )}
