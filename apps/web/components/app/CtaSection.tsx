@@ -58,7 +58,7 @@ export default function CtaSection() {
                         >
                             <path d="M24 0A24 24 0 0 1 0 24H28V0Z" className="fill-cement" />
                         </svg>
-                        <div className="relative rounded-[30px] bg-cement p-4.5">
+                        <div className="relative rounded-[30px] bg-ink p-4.5">
                             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                                 <Link
                                     href={session ? "/playground" : "/login"}
