@@ -7,7 +7,7 @@ description: How to run and drive trymatcha locally to verify changes (server, s
 
 ## Infra
 
-- Postgres + Redis run via `docker-compose up -d`. **Container names are `nanbe-postgres` / `nanbe-redis` and the database is `nanbe`** (names reused from an older project — this IS trymatcha's data). Redis is on host port **6370**, Postgres on 5432.
+- Postgres + Redis run via `docker-compose up -d`. **Container names are `nanbe-postgres` / `nanbe-redis` and the database is `nanbe`** (names reused from an older project — this IS trymatcha's data). Redis is on host port **6370**, Postgres on 5433.
 - Query the DB directly: `docker exec nanbe-postgres psql -U user -d nanbe -tA -c "..."` (expect harmless collation-version warnings).
 - One `.env` at the repo root; server reads `SERVER_*` keys.
 

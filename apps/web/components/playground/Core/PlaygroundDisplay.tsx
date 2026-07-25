@@ -76,6 +76,7 @@ function TabPane({ tab }: { tab: string }) {
 export default function PlaygroundDisplay({ isLoading }: { isLoading?: boolean }) {
     const tab = usePlaygroundNavStore((s) => s.tab);
     const [isSettled, setIsSettled] = useState(false);
+    const [hasEnteredLayout, setHasEnteredLayout] = useState(false);
 
     useEffect(() => {
         const frame = requestAnimationFrame(() => setIsSettled(true));
@@ -84,7 +85,8 @@ export default function PlaygroundDisplay({ isLoading }: { isLoading?: boolean }
 
     return (
         <motion.main
-            layout
+            layout={!hasEnteredLayout}
+            onLayoutAnimationComplete={() => setHasEnteredLayout(true)}
             transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
             className={
                 isSettled

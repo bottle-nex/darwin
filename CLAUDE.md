@@ -26,7 +26,7 @@ Bun-managed Turborepo monorepo. `bun@1.3.2` is pinned via `packageManager`; use 
 - `packages/database` — Prisma schema + client. Prisma generates the client into `packages/database/generated/client` (gitignored). The package's `exports["."]` is `src/client.ts`, which re-exports everything from the generated client. Always import via `@trymatcha/database`, not from `../generated/client`.
 - `packages/config-eslint`, `packages/config-typescript` — shared configs (`@trymatcha/eslint-config`, `@trymatcha/typescript-config`).
 
-Local infra is `docker-compose up -d`: Postgres 16 on `:5432` and Redis 7 with `notify-keyspace-events Ex` on `:6379` (the Redis flag is required — OTP/expiry logic relies on it).
+Local infra is `docker-compose up -d`: Postgres 16 on `:5433` and Redis 7 with `notify-keyspace-events Ex` on `:6379` (the Redis flag is required — OTP/expiry logic relies on it).
 
 ## Environment
 
