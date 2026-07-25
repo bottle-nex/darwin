@@ -68,14 +68,15 @@ export default function StepFrame({
                     )}
                 </Button>
                 {step.id > 1 && (
-                    <button
+                    <Button
+                        variant="unstyled"
                         type="button"
                         onClick={onBack}
                         disabled={transitioning}
                         className="ml-auto cursor-pointer text-[13px] text-neutral-500 transition-colors hover:text-neutral-300 disabled:opacity-50"
                     >
                         Back
-                    </button>
+                    </Button>
                 )}
             </StepItem>
         </motion.div>

@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { forwardRef, useState } from "react";
 import { format } from "date-fns";
 import { MdCheck, MdCalendarMonth } from "react-icons/md";
@@ -24,7 +25,8 @@ export interface CapsuleOption {
 export const CapsuleTrigger = forwardRef<HTMLButtonElement, React.ComponentProps<"button">>(
     function CapsuleTrigger({ className, children, ...props }, ref) {
         return (
-            <button
+            <Button
+                variant="unstyled"
                 type="button"
                 ref={ref}
                 className={cn(
@@ -34,7 +36,7 @@ export const CapsuleTrigger = forwardRef<HTMLButtonElement, React.ComponentProps
                 {...props}
             >
                 {children}
-            </button>
+            </Button>
         );
     },
 );
@@ -51,7 +53,8 @@ function CapsuleOptionList({ options, value, onSelect }: CapsuleOptionListProps)
             {options.map((option) => {
                 const isSelected = option.value === value;
                 return (
-                    <button
+                    <Button
+                        variant="unstyled"
                         key={option.value}
                         type="button"
                         onClick={() => onSelect(option.value)}
@@ -67,7 +70,7 @@ function CapsuleOptionList({ options, value, onSelect }: CapsuleOptionListProps)
                             {option.label}
                         </span>
                         {isSelected && <MdCheck className="size-4 shrink-0 text-neutral-400" />}
-                    </button>
+                    </Button>
                 );
             })}
         </div>

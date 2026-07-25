@@ -160,7 +160,8 @@ export default function TagFormDialog({ open, onOpenChange, projectId, tag }: Ta
                             {TAG_COLORS.map((c) => {
                                 const selected = c === color;
                                 return (
-                                    <button
+                                    <Button
+                                        variant="unstyled"
                                         key={c}
                                         type="button"
                                         onClick={() => setValue("color", c)}
@@ -177,7 +178,7 @@ export default function TagFormDialog({ open, onOpenChange, projectId, tag }: Ta
                                         {selected && (
                                             <MdCheck className="size-3.5 text-neutral-900" />
                                         )}
-                                    </button>
+                                    </Button>
                                 );
                             })}
 
@@ -186,7 +187,8 @@ export default function TagFormDialog({ open, onOpenChange, projectId, tag }: Ta
                                 return (
                                     <Popover>
                                         <PopoverTrigger asChild>
-                                            <button
+                                            <Button
+                                                variant="unstyled"
                                                 type="button"
                                                 aria-label="Choose a custom color"
                                                 aria-pressed={customActive}
@@ -207,7 +209,7 @@ export default function TagFormDialog({ open, onOpenChange, projectId, tag }: Ta
                                                 ) : (
                                                     <MdColorize className="size-3.5 text-white drop-shadow" />
                                                 )}
-                                            </button>
+                                            </Button>
                                         </PopoverTrigger>
                                         <PopoverContent
                                             align="start"

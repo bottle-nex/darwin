@@ -1,4 +1,5 @@
 "use client";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { Organization, OrgRole } from "@/types/organization";
 import PlaygroundAvatar, {
@@ -33,7 +34,8 @@ export default function OrgListItem({
     const { name, slug, role } = org;
 
     return (
-        <button
+        <Button
+            variant="unstyled"
             type="button"
             onClick={onSelect}
             className={cn(
@@ -57,6 +59,6 @@ export default function OrgListItem({
                 aria-hidden
                 title={role}
             />
-        </button>
+        </Button>
     );
 }

@@ -34,7 +34,7 @@ export default function KanbanDisplay() {
             </DndContext>
             <IssueFlightTrigger />
             <IssueFlightOverlay />
-            <AddCustomColumnDialog onAdd={custom.addColumn} />
+            <AddCustomColumnDialog onAdd={custom.addColumn} adding={custom.addingColumn} />
         </div>
     );
 }

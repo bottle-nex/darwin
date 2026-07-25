@@ -112,6 +112,7 @@ export default function CreateTeamDialog() {
                             variant="tertiary"
                             size="sm"
                             onClick={() => handleOpenChange(false)}
+                            disabled={createTeam.isPending}
                         >
                             Cancel
                         </Button>

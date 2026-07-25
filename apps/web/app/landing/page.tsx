@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import Dial from "./dial";
 
 export default function Landing() {
@@ -28,12 +29,18 @@ export default function Landing() {
                     </p>
 
                     <div className="flex items-center gap-3">
-                        <button className="rounded-full bg-white text-neutral-900 text-sm font-medium px-5 py-2.5 hover:bg-white/90 transition-colors">
+                        <Button
+                            variant="unstyled"
+                            className="rounded-full bg-white text-neutral-900 text-sm font-medium px-5 py-2.5 hover:bg-white/90 transition-colors"
+                        >
                             See It in Action
-                        </button>
-                        <button className="flex items-center gap-2 rounded-full border border-white/20 bg-white/10 backdrop-blur-sm text-white text-sm font-medium px-5 py-2.5 hover:bg-white/20 transition-colors">
+                        </Button>
+                        <Button
+                            variant="unstyled"
+                            className="flex items-center gap-2 rounded-full border border-white/20 bg-white/10 backdrop-blur-sm text-white text-sm font-medium px-5 py-2.5 hover:bg-white/20 transition-colors"
+                        >
                             Demo <span className="text-xs">▶</span>
-                        </button>
+                        </Button>
                     </div>
                 </div>
 

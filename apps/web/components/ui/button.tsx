@@ -28,6 +28,7 @@ const buttonVariants = cva(
                     "bg-linear-to-b from-[#e84c4c] to-[#d83a3a] text-white shadow-[inset_0_1.5px_0_0_rgba(255,255,255,0.20),0_1px_2px_0_rgba(185,28,28,0.15)] outline-2 outline-offset-2 outline-[#d83a3a] outline-solid! hover:brightness-110 focus-visible:ring-destructive/40 dark:from-[#e04646] dark:to-[#cf3636] dark:shadow-[inset_0_1.5px_0_0_rgba(255,255,255,0.15)]",
                 ghost: "text-foreground",
                 link: "text-primary underline-offset-4 hover:underline",
+                unstyled: "",
             },
             size: {
                 default:
@@ -50,57 +51,109 @@ const buttonVariants = cva(
     },
 );
 
+const DISABLEABLE_ELEMENTS = new Set(["button", "fieldset", "input", "select", "textarea"]);
+
+type ButtonProps = React.ComponentProps<"button"> &
+    VariantProps<typeof buttonVariants> & {
+        asChild?: boolean;
+        loading?: boolean;
+        iconOnly?: boolean;
+    };
+
 export function Button({
     className,
     variant = "default",
     size = "default",
     asChild = false,
     loading = false,
+    iconOnly,
     disabled,
+    onClick,
     children,
     ...props
-}: React.ComponentProps<"button"> &
-    VariantProps<typeof buttonVariants> & {
-        asChild?: boolean;
-        loading?: boolean;
-    }) {
+}: ButtonProps) {
+    const unstyled = variant === "unstyled";
+    const isDisabled = loading || disabled;
+    const replacesChildren = iconOnly ?? (typeof size === "string" && size.startsWith("icon"));
+
+    const spinner = loading ? (
+        <RiLoader4Line aria-hidden className={cn("animate-spin", unstyled && "size-[1em]")} />
+    ) : null;
+
+    const rootClassName = unstyled
+        ? className
+        : cn(
+              buttonVariants({ variant, size, className }),
+              azeretMono.className,
+              "font-500 duration-150 ease-out active:scale-[0.99] uppercase cursor-pointer",
+          );
+
     if (asChild) {
+        const child = React.isValidElement<{ children?: React.ReactNode }>(children)
+            ? children
+            : null;
+        const forwardsDisabled =
+            Boolean(isDisabled) &&
+            typeof child?.type === "string" &&
+            DISABLEABLE_ELEMENTS.has(child.type);
+
         return (
             <Slot.Root
                 data-slot="button"
                 data-variant={variant}
                 data-size={size}
+                data-loading={loading || undefined}
+                data-disabled={isDisabled || undefined}
+                aria-busy={loading || undefined}
+                aria-disabled={isDisabled || undefined}
                 className={cn(
-                    buttonVariants({ variant, size, className }),
-                    azeretMono.className,
-                    "font-500 duration-150 ease-out active:scale-[0.99] cursor-pointer",
+                    rootClassName,
+                    isDisabled && "pointer-events-none",
+                    isDisabled && !unstyled && "opacity-70",
                 )}
+                onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
+                    if (isDisabled) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        return;
+                    }
+                    onClick?.(event);
+                }}
+                {...(forwardsDisabled ? { disabled: true } : {})}
                 {...props}
             >
-                {children}
+                {loading && child
+                    ? React.cloneElement(
+                          child,
+                          undefined,
+                          <>
+                              {spinner}
+                              {replacesChildren ? null : child.props.children}
+                          </>,
+                      )
+                    : children}
             </Slot.Root>
         );
     }
 
     return (
         <button
+            type="button"
             data-slot="button"
             data-variant={variant}
             data-size={size}
             data-loading={loading || undefined}
-            {...(loading ? { "aria-busy": true } : {})}
-            disabled={loading || disabled}
-            className={cn(
-                buttonVariants({ variant, size, className }),
-                azeretMono.className,
-                "font-500 duration-150 ease-out active:scale-[0.99] uppercase cursor-pointer",
-            )}
+            aria-busy={loading || undefined}
+            disabled={isDisabled}
+            className={rootClassName}
+            onClick={onClick}
             {...props}
         >
-            {loading && <RiLoader4Line className="animate-spin" />}
-            {children}
+            {spinner}
+            {loading && replacesChildren ? null : children}
         </button>
     );
 }
 
 export { buttonVariants };
+export type { ButtonProps };

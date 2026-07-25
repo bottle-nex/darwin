@@ -53,7 +53,8 @@ export function BoardViewTabs() {
         <div className="flex shrink-0 items-center gap-0.5">
             {BOARD_VIEWS.map((v) => (
                 <TooltipComponent delayDuration={1000} key={v.id} content={v.hint} side="bottom">
-                    <button
+                    <Button
+                        variant="unstyled"
                         type="button"
                         onClick={() => setBoardView(v.id)}
                         className={cn(
@@ -69,7 +70,7 @@ export function BoardViewTabs() {
                             v.icon && <v.icon className="size-3.5" aria-hidden />
                         )}
                         {v.label}
-                    </button>
+                    </Button>
                 </TooltipComponent>
             ))}
         </div>

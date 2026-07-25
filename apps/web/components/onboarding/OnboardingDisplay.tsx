@@ -16,8 +16,11 @@ export default function OnboardingDisplay({
     orgId: string;
 }) {
     const { mutate: updateProject, isPending: updating } = useUpdateProject();
-    const { mutate: createTeam } = useCreateTeam();
-    const { mutate: connectGithub, isPending: connecting } = useConnectGithub();
+    const { mutate: createTeam, isPending: creatingTeam } = useCreateTeam();
+    const { mutate: connectGithub, isPending: connectingGithub } = useConnectGithub();
+
+    const connecting = updating || connectingGithub;
+    const completing = updating || creatingTeam;
 
     const initialDraft: TourDraft = {
         title: project.name,
@@ -34,7 +37,7 @@ export default function OnboardingDisplay({
     });
 
     const handleComplete = (draft: TourDraft) => {
-        if (updating) return;
+        if (completing) return;
         updateProject({ ...draftFields(draft), tour_completed: true });
         const teamName = draft.teamName.trim();
         if (teamName) {
@@ -43,7 +46,7 @@ export default function OnboardingDisplay({
     };
 
     const handleConnectGithub = (draft: TourDraft) => {
-        if (updating || connecting) return;
+        if (connecting) return;
         updateProject(draftFields(draft), { onSuccess: () => connectGithub(orgId) });
     };
 
@@ -52,7 +55,7 @@ export default function OnboardingDisplay({
             <OnboardingCore
                 initialDraft={initialDraft}
                 repoFullName={project.githubRepoFullName}
-                completing={updating}
+                completing={completing}
                 connecting={connecting}
                 onComplete={handleComplete}
                 onConnectGithub={handleConnectGithub}

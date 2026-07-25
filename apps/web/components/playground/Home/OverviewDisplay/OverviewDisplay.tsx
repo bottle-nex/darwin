@@ -55,11 +55,15 @@ export default function OverviewDisplay() {
         updatedAt: project.updatedAt,
     };
 
-    function saveBrief(next: string) {
-        updateProject.mutate(
-            { project_id: project!.id, plan_md: next },
-            { onSuccess: () => toast.success("Brief updated.") },
-        );
+    async function saveBrief(next: string) {
+        try {
+            await updateProject.mutateAsync({ project_id: project!.id, plan_md: next });
+            toast.success("Brief updated.");
+            return true;
+        } catch {
+            toast.error("Couldn't save the brief.");
+            return false;
+        }
     }
 
     function generateBrief() {
@@ -89,6 +93,7 @@ export default function OverviewDisplay() {
                             <AgentBrief
                                 markdown={markdown}
                                 updatedAt={overview.brief.updatedAt}
+                                saving={updateProject.isPending}
                                 onSave={saveBrief}
                             />
                         ) : (

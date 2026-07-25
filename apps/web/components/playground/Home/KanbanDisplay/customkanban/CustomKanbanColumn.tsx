@@ -1,4 +1,5 @@
 "use client";
+import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { MdMoreHoriz, MdAdd, MdDelete, MdEdit, MdDragIndicator } from "react-icons/md";
 import { DropdownMenu } from "radix-ui";
@@ -19,6 +20,7 @@ type CustomKanbanColumnProps = {
     onDeleteCard: (cardId: string) => void;
     onAssign: (cardId: string, userId: string) => void;
     onUnassign: (cardId: string, userId: string) => void;
+    pendingAssigneeId: string | null;
     /** Whether this column can be drag-reordered. False in single-column focus view,
      *  where there's no sibling `SortableContext` to reorder against. */
     draggable?: boolean;
@@ -31,6 +33,7 @@ export default function CustomKanbanColumn({
     onDeleteCard,
     onAssign,
     onUnassign,
+    pendingAssigneeId,
     draggable = true,
 }: CustomKanbanColumnProps) {
     const openCreate = useCreateOrEditIssueStore((s) => s.openCreate);
@@ -68,7 +71,8 @@ export default function CustomKanbanColumn({
         >
             <div className="mb-2 flex items-center justify-between gap-2 px-0.5">
                 {draggable && (
-                    <button
+                    <Button
+                        variant="unstyled"
                         type="button"
                         ref={setActivatorNodeRef}
                         {...attributes}
@@ -77,7 +81,7 @@ export default function CustomKanbanColumn({
                         className="flex size-6 shrink-0 cursor-grab touch-none items-center justify-center rounded text-neutral-500 opacity-0 transition-opacity hover:bg-white/10 hover:text-neutral-300 group-hover:opacity-100 active:cursor-grabbing"
                     >
                         <MdDragIndicator className="size-4" aria-hidden />
-                    </button>
+                    </Button>
                 )}
                 {renaming ? (
                     <Input
@@ -106,13 +110,14 @@ export default function CustomKanbanColumn({
                 )}
                 <DropdownMenu.Root>
                     <DropdownMenu.Trigger asChild>
-                        <button
+                        <Button
+                            variant="unstyled"
                             type="button"
                             aria-label={`${column.title} options`}
                             className="flex size-6 cursor-pointer items-center justify-center rounded text-neutral-400 opacity-0 transition-opacity hover:bg-white/10 hover:text-neutral-200 focus-visible:opacity-100 group-hover:opacity-100 data-[state=open]:opacity-100"
                         >
                             <MdMoreHoriz className="size-4" aria-hidden />
-                        </button>
+                        </Button>
                     </DropdownMenu.Trigger>
                     <DropdownMenu.Portal>
                         <DropdownMenu.Content
@@ -155,6 +160,7 @@ export default function CustomKanbanColumn({
                             onDelete={() => onDeleteCard(card.id)}
                             onAssign={(userId) => onAssign(card.id, userId)}
                             onUnassign={(userId) => onUnassign(card.id, userId)}
+                            pendingAssigneeId={pendingAssigneeId}
                         />
                     ))}
 
@@ -167,7 +173,8 @@ export default function CustomKanbanColumn({
                 </div>
             </SortableContext>
 
-            <button
+            <Button
+                variant="unstyled"
                 type="button"
                 onClick={() =>
                     openCreate({
@@ -180,7 +187,7 @@ export default function CustomKanbanColumn({
             >
                 <MdAdd className="size-3.5" aria-hidden />
                 Add a card
-            </button>
+            </Button>
         </div>
     );
 }

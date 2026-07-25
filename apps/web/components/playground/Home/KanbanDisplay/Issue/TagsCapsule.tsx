@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { MdAdd, MdCheck, MdLabel } from "react-icons/md";
+import { RiLoader4Line } from "react-icons/ri";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
     Command,
@@ -136,7 +137,11 @@ export default function TagsCapsule({
                                     disabled={createTag.isPending}
                                     onSelect={handleCreate}
                                 >
-                                    <MdAdd className="size-4 shrink-0 text-neutral-400" />
+                                    {createTag.isPending ? (
+                                        <RiLoader4Line className="size-4 shrink-0 animate-spin text-neutral-400" />
+                                    ) : (
+                                        <MdAdd className="size-4 shrink-0 text-neutral-400" />
+                                    )}
                                     <span className="flex-1 truncate">
                                         Create &quot;{search.trim()}&quot;
                                     </span>

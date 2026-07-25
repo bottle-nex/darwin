@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { HiOutlineLockClosed } from "react-icons/hi2";
 import { cn } from "@/lib/utils";
 
@@ -33,7 +34,8 @@ export default function PlaygroundSidebarRow({
     const Icon = leading?.kind === "icon" ? leading.icon : null;
 
     return (
-        <button
+        <Button
+            variant="unstyled"
             type="button"
             onClick={onClick}
             className={cn(
@@ -75,6 +77,6 @@ export default function PlaygroundSidebarRow({
                     <HiOutlineLockClosed className="size-3.5" />
                 </span>
             )}
-        </button>
+        </Button>
     );
 }

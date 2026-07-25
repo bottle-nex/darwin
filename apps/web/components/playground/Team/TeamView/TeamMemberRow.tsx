@@ -6,6 +6,7 @@ import PlaygroundAvatar, {
     initialOf,
     toneFor,
 } from "@/components/playground/Core/components/PlaygroundAvatar";
+import { Button } from "@/components/ui/button";
 import ProjectRoleTicker from "./ProjectRoleTicker";
 import useRevokeInvite from "@/hooks/invitations/useRevokeInvite";
 import { cn } from "@/lib/utils";
@@ -98,13 +99,15 @@ function RevokeInviteMenu({ invitationId, teamId }: { invitationId: string; team
     return (
         <DropdownMenu.Root modal={false}>
             <DropdownMenu.Trigger asChild>
-                <button
-                    disabled={isPending}
-                    className="rounded-sm p-0.5 text-neutral-500 outline-none hover:text-neutral-200 disabled:opacity-50"
+                <Button
+                    variant="unstyled"
+                    loading={isPending}
+                    iconOnly
+                    className="rounded-sm p-0.5 text-neutral-500 outline-none hover:text-neutral-200 disabled:opacity-50 [&_svg]:size-4"
                     aria-label="Invite actions"
                 >
                     <PiDotsThreeOutlineVerticalLight size={16} />
-                </button>
+                </Button>
             </DropdownMenu.Trigger>
             <DropdownMenu.Portal>
                 <DropdownMenu.Content

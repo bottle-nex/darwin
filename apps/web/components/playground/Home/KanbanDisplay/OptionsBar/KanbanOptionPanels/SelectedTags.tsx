@@ -1,4 +1,5 @@
 "use client";
+import { Button } from "@/components/ui/button";
 import { MdClose } from "react-icons/md";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { useListTags } from "@/hooks/tags/useListTags";
@@ -24,14 +25,15 @@ export default function SelectedTags({ selected, onRemove }: SelectedTagsProps) 
                 return (
                     <span key={id} className="inline-flex shrink-0 items-center gap-1">
                         <TagDisplay name={tag.name} color={tag.color} />
-                        <button
+                        <Button
+                            variant="unstyled"
                             type="button"
                             onClick={() => onRemove(id)}
                             aria-label={`Remove ${tag.name} filter`}
                             className="cursor-pointer text-neutral-400 opacity-70 hover:opacity-100"
                         >
                             <MdClose className="size-2.5" aria-hidden />
-                        </button>
+                        </Button>
                     </span>
                 );
             })}

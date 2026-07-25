@@ -1,4 +1,5 @@
 "use client";
+import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import {
     motion,
@@ -126,7 +127,8 @@ export default function PricingProCard() {
             {/* Toggle */}
             <div className="flex items-center gap-4 text-white/95 text-base scale-105">
                 <span className={isYearly ? "" : "text-white/60"}>Pay yearly</span>
-                <button
+                <Button
+                    variant="unstyled"
                     type="button"
                     onClick={togglePlan}
                     className="relative w-14 h-7 rounded-full bg-[#0a0a0a]  cursor-pointer"
@@ -151,7 +153,7 @@ export default function PricingProCard() {
                             damping: 28,
                         }}
                     />
-                </button>
+                </Button>
                 <span className={isYearly ? "text-white/60" : ""}>monthly</span>
             </div>
 

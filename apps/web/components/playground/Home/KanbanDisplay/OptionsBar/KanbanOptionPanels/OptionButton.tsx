@@ -1,4 +1,5 @@
 "use client";
+import { Button } from "@/components/ui/button";
 import { forwardRef } from "react";
 import type { IconType } from "react-icons";
 import { cn } from "@/lib/utils";
@@ -18,7 +19,8 @@ type OptionButtonProps = {
  */
 const OptionButton = forwardRef<HTMLButtonElement, OptionButtonProps>(
     ({ label, icon: Icon, active, className, ...props }, ref) => (
-        <button
+        <Button
+            variant="unstyled"
             ref={ref}
             type="button"
             aria-label={label}
@@ -33,7 +35,7 @@ const OptionButton = forwardRef<HTMLButtonElement, OptionButtonProps>(
             {...props}
         >
             <Icon className="size-4" aria-hidden />
-        </button>
+        </Button>
     ),
 );
 OptionButton.displayName = "OptionButton";

@@ -1,4 +1,5 @@
 "use client";
+import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
@@ -110,22 +111,28 @@ export default function PlaygroundUserMenu() {
         <DropdownMenu.Root>
             <DropdownMenu.Trigger asChild>
                 {user?.image ? (
-                    <button
+                    <Button
+                        variant="unstyled"
                         type="button"
                         aria-label="Account menu"
                         className="relative size-7 cursor-pointer overflow-hidden rounded-full outline-none ring-1 ring-white/10 transition hover:ring-white/25 data-[state=open]:ring-white/30"
                     >
                         <Image src={user.image} alt="" fill unoptimized className="object-cover" />
-                    </button>
+                    </Button>
                 ) : (
-                    <button type="button" aria-label="Account menu" className="cursor-pointer">
+                    <Button
+                        variant="unstyled"
+                        type="button"
+                        aria-label="Account menu"
+                        className="cursor-pointer"
+                    >
                         <PlaygroundAvatar
                             size="sm"
                             tone="emerald"
                             letter={initial}
                             className="size-6.5 text-[12px]"
                         />
-                    </button>
+                    </Button>
                 )}
             </DropdownMenu.Trigger>
 

@@ -31,6 +31,7 @@ type CustomKanbanCardProps = {
     onDelete?: () => void;
     onAssign?: (userId: string) => void;
     onUnassign?: (userId: string) => void;
+    pendingAssigneeId?: string | null;
 };
 
 export default function CustomKanbanCard({
@@ -38,6 +39,7 @@ export default function CustomKanbanCard({
     onDelete,
     onAssign,
     onUnassign,
+    pendingAssigneeId = null,
 }: CustomKanbanCardProps) {
     const projectId = useActiveProject()?.id;
     const preview = card.description ? CustomKanbanMappers.stripHtml(card.description) : "";
@@ -53,14 +55,15 @@ export default function CustomKanbanCard({
             {(onDelete || canAssign) && (
                 <DropdownMenu.Root>
                     <DropdownMenu.Trigger asChild>
-                        <button
+                        <Button
+                            variant="unstyled"
                             type="button"
                             aria-label="Card options"
                             onPointerDown={(e) => e.stopPropagation()}
                             className="absolute top-1.5 right-1.5 flex size-6 cursor-pointer items-center justify-center rounded text-neutral-400 opacity-0 transition-opacity hover:bg-white/10 hover:text-neutral-200 focus-visible:opacity-100 group-hover/card:opacity-100 data-[state=open]:opacity-100"
                         >
                             <MdMoreHoriz className="size-4" aria-hidden />
-                        </button>
+                        </Button>
                     </DropdownMenu.Trigger>
                     <DropdownMenu.Portal>
                         <DropdownMenu.Content
@@ -189,6 +192,7 @@ export default function CustomKanbanCard({
                     assignees={card.assignees}
                     onAssign={onAssign}
                     onUnassign={onUnassign}
+                    pendingAssigneeId={pendingAssigneeId}
                 />
             )}
         </div>

@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { HiOutlinePlus, HiOutlineTrash } from "react-icons/hi2";
 import { useParams } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -49,7 +50,8 @@ export default function PlaygroundSidebarTeamsSection() {
                             active={isActive}
                             onClick={() => openTeam(t, projectSlug ?? "")}
                         />
-                        <button
+                        <Button
+                            variant="unstyled"
                             type="button"
                             aria-label={`Delete ${t.name}`}
                             onClick={() => requestDelete(t)}
@@ -59,7 +61,7 @@ export default function PlaygroundSidebarTeamsSection() {
                             )}
                         >
                             <HiOutlineTrash className="size-3.5" aria-hidden />
-                        </button>
+                        </Button>
                     </div>
                 );
             })}

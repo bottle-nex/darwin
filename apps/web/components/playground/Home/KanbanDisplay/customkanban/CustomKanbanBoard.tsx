@@ -10,6 +10,7 @@ export default function CustomKanbanBoard({
     removeCard,
     assignMember,
     unassignMember,
+    pendingAssigneeId,
 }: CustomKanbanApi) {
     const columns = useFilteredCustomColumns();
 
@@ -24,6 +25,7 @@ export default function CustomKanbanBoard({
                     onDeleteCard={removeCard}
                     onAssign={assignMember}
                     onUnassign={unassignMember}
+                    pendingAssigneeId={pendingAssigneeId}
                 />
             ))}
         </SortableContext>

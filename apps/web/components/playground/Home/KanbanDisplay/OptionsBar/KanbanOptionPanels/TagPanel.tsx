@@ -1,4 +1,5 @@
 "use client";
+import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { MdCheck, MdSearch, MdLabel } from "react-icons/md";
 import { DropdownMenu } from "radix-ui";
@@ -42,13 +43,14 @@ export function TagPanelItems({ selected, onToggle, onClear }: TagPanelProps) {
                         Filter by tag
                     </span>
                     {selected.length > 0 && (
-                        <button
+                        <Button
+                            variant="unstyled"
                             type="button"
                             onClick={onClear}
                             className="cursor-pointer bg-transparent text-[11px] font-medium text-neutral-400 hover:text-neutral-100"
                         >
                             Clear all
-                        </button>
+                        </Button>
                     )}
                 </div>
                 <div className="relative">

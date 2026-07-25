@@ -10,6 +10,7 @@ type SortableCustomCardProps = {
     onDelete?: () => void;
     onAssign?: (userId: string) => void;
     onUnassign?: (userId: string) => void;
+    pendingAssigneeId?: string | null;
 };
 
 export default function SortableCustomCard({
@@ -17,6 +18,7 @@ export default function SortableCustomCard({
     onDelete,
     onAssign,
     onUnassign,
+    pendingAssigneeId = null,
 }: SortableCustomCardProps) {
     const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
         id: card.id,
@@ -37,6 +39,7 @@ export default function SortableCustomCard({
                 onDelete={onDelete}
                 onAssign={onAssign}
                 onUnassign={onUnassign}
+                pendingAssigneeId={pendingAssigneeId}
             />
         </div>
     );

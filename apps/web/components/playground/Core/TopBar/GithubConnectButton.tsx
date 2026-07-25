@@ -28,7 +28,8 @@ export default function GithubConnectButton() {
 
     if (org.githubConnected) {
         return (
-            <button
+            <Button
+                variant="unstyled"
                 type="button"
                 onClick={() => {
                     if (
@@ -39,13 +40,14 @@ export default function GithubConnectButton() {
                         disconnect.mutate(org.id);
                     }
                 }}
-                disabled={disconnect.isPending}
+                loading={disconnect.isPending}
+                iconOnly
                 title="GitHub connected — click to disconnect"
                 className="flex h-6.75 cursor-pointer items-center gap-1 rounded-sm border border-white/10 bg-white/5 px-2.5 text-[11px] font-medium text-neutral-300 hover:bg-white/10"
             >
                 <FaGithub className="size-3.5" aria-hidden />
                 <FaCheck className="size-3 text-[#9bc24f]" aria-hidden />
-            </button>
+            </Button>
         );
     }
 

@@ -62,14 +62,15 @@ export default function ProjectSettingsTeamSection({
                                 {t.name}
                             </span>
                             {canManage && (
-                                <button
+                                <Button
+                                    variant="unstyled"
                                     type="button"
                                     aria-label={`Delete ${t.name}`}
                                     onClick={() => requestDelete(t)}
                                     className="flex size-6 shrink-0 cursor-pointer items-center justify-center rounded text-neutral-400 hover:bg-neutral-700/50 hover:text-red-500"
                                 >
                                     <MdDelete className="size-3" aria-hidden />
-                                </button>
+                                </Button>
                             )}
                         </div>
                     ))}

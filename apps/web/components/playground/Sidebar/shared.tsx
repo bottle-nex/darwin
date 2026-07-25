@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { type IconType } from "react-icons";
 import { HiOutlinePlus } from "react-icons/hi2";
 import PlaygroundAvatar, {
@@ -41,12 +42,13 @@ export function PlaygroundSidebarRowAction({ children }: { children: React.React
 /** Right-aligned "+" affordance rendered in a section header. */
 export function PlaygroundSidebarSectionAddButton({ label }: { label: string }) {
     return (
-        <button
+        <Button
+            variant="unstyled"
             type="button"
             aria-label={label}
             className="flex size-5 cursor-pointer items-center justify-center rounded text-neutral-400 hover:bg-white/5 hover:text-neutral-100 ring-inset focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-hidden"
         >
             <HiOutlinePlus className="size-3.5" aria-hidden />
-        </button>
+        </Button>
     );
 }

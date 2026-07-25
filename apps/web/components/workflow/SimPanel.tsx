@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import type { WorkerDef, PositionedNode } from "./types";
 
 interface SimPanelProps {
@@ -40,13 +41,14 @@ export default function SimPanel({
                 </p>
 
                 {!isStarted ? (
-                    <button
+                    <Button
+                        variant="unstyled"
                         onClick={onStart}
                         className="rounded-lg px-4 py-2 text-sm font-semibold text-white w-full"
                         style={{ background: "#16a34a" }}
                     >
                         Start all workers
-                    </button>
+                    </Button>
                 ) : (
                     <div className="flex flex-col gap-1.5">
                         {workers.map((worker) => {
@@ -101,7 +103,8 @@ export default function SimPanel({
                                     {running && (
                                         <>
                                             {/* Action required toggle */}
-                                            <button
+                                            <Button
+                                                variant="unstyled"
                                                 onClick={() => onActionToggle(worker.id)}
                                                 className="shrink-0 rounded-lg px-2 py-1.5 text-xs font-medium whitespace-nowrap"
                                                 style={{
@@ -119,10 +122,11 @@ export default function SimPanel({
                                                 }}
                                             >
                                                 {isResponding ? "● Stop" : "Action"}
-                                            </button>
+                                            </Button>
 
                                             {/* End node */}
-                                            <button
+                                            <Button
+                                                variant="unstyled"
                                                 onClick={() => onEndNode(worker.id)}
                                                 className="shrink-0 rounded-lg px-2 py-1.5 text-xs font-semibold text-white whitespace-nowrap"
                                                 style={{
@@ -131,7 +135,7 @@ export default function SimPanel({
                                                 }}
                                             >
                                                 End
-                                            </button>
+                                            </Button>
                                         </>
                                     )}
                                 </div>

@@ -58,14 +58,16 @@ export function useCustomKanban({ projectId }: UseCustomKanbanArgs) {
 
     const addColumn = async (title: string) => {
         const name = title.trim();
-        if (!name || !projectId) return;
+        if (!name || !projectId) return false;
         try {
             const column = await createColumn.mutateAsync({ project_id: projectId, label: name });
             useCustomKanbanStore
                 .getState()
                 .addColumnLocal({ id: column.id, title: column.label, cards: [] });
+            return true;
         } catch {
             toast.error("Couldn't create the list.");
+            return false;
         }
     };
 
@@ -240,6 +242,12 @@ export function useCustomKanban({ projectId }: UseCustomKanbanArgs) {
             .catch(() => toast.error("Couldn't save the new column order."));
     }
 
+    const pendingAssigneeId = assignIssue.isPending
+        ? (assignIssue.variables?.user_id ?? null)
+        : unassignIssue.isPending
+          ? (unassignIssue.variables?.user_id ?? null)
+          : null;
+
     return {
         addColumn,
         removeColumn,
@@ -247,6 +255,8 @@ export function useCustomKanban({ projectId }: UseCustomKanbanArgs) {
         removeCard,
         assignMember,
         unassignMember,
+        addingColumn: createColumn.isPending,
+        pendingAssigneeId,
         sensors,
         onDragStart,
         onDragOver,

@@ -1,4 +1,5 @@
 "use client";
+import { Button } from "@/components/ui/button";
 import {
     MdFilterAlt,
     MdGroup,
@@ -51,14 +52,15 @@ export default function KanbanOptionsBarGroupedKeys() {
             <div className="flex shrink-0 items-center gap-0.5">
                 <DropdownMenu.Root dir="rtl">
                     <DropdownMenu.Trigger asChild>
-                        <button
+                        <Button
+                            variant="unstyled"
                             type="button"
                             aria-label="Options"
                             className="flex h-7 cursor-pointer items-center gap-1 rounded-md px-2 text-[12px] font-medium text-neutral-400 transition-colors hover:bg-white/5 hover:text-neutral-200"
                         >
                             <MdTune className="size-3.5" aria-hidden />
                             Options
-                        </button>
+                        </Button>
                     </DropdownMenu.Trigger>
                     <DropdownMenu.Portal>
                         <DropdownMenu.Content

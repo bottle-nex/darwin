@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { Children, useState } from "react";
 import { motion, type Variants } from "motion/react";
 import { FaCaretDown, FaCaretRight } from "react-icons/fa";
@@ -44,7 +45,8 @@ export default function PlaygroundSidebarSection({
     return (
         <section className="flex flex-col">
             <div className="flex items-center justify-between gap-1 pr-1">
-                <button
+                <Button
+                    variant="unstyled"
                     type="button"
                     onClick={() => setOpen((v) => !v)}
                     className={cn(
@@ -56,7 +58,7 @@ export default function PlaygroundSidebarSection({
                 >
                     <span>{title}</span>
                     <Chevron className="size-3 text-neutral-500" aria-hidden />
-                </button>
+                </Button>
                 {action && <span className="flex items-center">{action}</span>}
             </div>
 

@@ -1,4 +1,5 @@
 "use client";
+import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { FaCodeBranch, FaFolder, FaGithub } from "react-icons/fa6";
 import { formatRelativeTime } from "@/lib/format";
@@ -21,7 +22,8 @@ export default function ProjectCard({
 
     return (
         <div className="group relative flex w-full flex-col gap-4 rounded-[14px] bg-linear-to-b from-[#1a1a1a] to-neutral-900 p-5 text-left shadow-[inset_0_2px_0_0_#262626] focus-within:ring-2 focus-within:ring-white/20">
-            <button
+            <Button
+                variant="unstyled"
                 type="button"
                 aria-label={`Open ${name}`}
                 onClick={() => router.push(`/playground/${orgSlug}/${slug}`)}

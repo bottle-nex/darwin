@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
 import { cn } from "@/lib/utils";
 import type { SlashCommandItem } from "./commandItems";
@@ -55,7 +56,8 @@ const SlashCommandList = forwardRef<SlashCommandListHandle, SlashCommandListProp
                 {items.map((item, index) => {
                     const Icon = item.icon;
                     return (
-                        <button
+                        <Button
+                            variant="unstyled"
                             key={item.title}
                             type="button"
                             onMouseDown={(event) => event.preventDefault()}
@@ -68,7 +70,7 @@ const SlashCommandList = forwardRef<SlashCommandListHandle, SlashCommandListProp
                         >
                             <Icon className="size-4 shrink-0 text-neutral-400" />
                             {item.title}
-                        </button>
+                        </Button>
                     );
                 })}
             </div>

@@ -1,4 +1,5 @@
 "use client";
+import { Button } from "@/components/ui/button";
 import { MdMoreHoriz } from "react-icons/md";
 import { useDroppable } from "@dnd-kit/core";
 import { cn } from "@/lib/utils";
@@ -40,13 +41,14 @@ export default function KanbanColumn({
         >
             <div className="mb-2 flex items-center justify-between gap-2 px-0.5">
                 <LLMIssueStatusTicker status={column.status} count={issues.length} />
-                <button
+                <Button
+                    variant="unstyled"
                     type="button"
                     aria-label={`${title} options`}
                     className="flex size-6 cursor-pointer items-center justify-center rounded text-neutral-400 opacity-0 transition-opacity hover:bg-white/10 hover:text-neutral-200 focus-visible:opacity-100 group-hover:opacity-100"
                 >
                     <MdMoreHoriz className="size-4" aria-hidden />
-                </button>
+                </Button>
             </div>
 
             <div

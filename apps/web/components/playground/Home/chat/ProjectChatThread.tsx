@@ -146,7 +146,8 @@ export default function ChatThread({
                     <ul className="absolute w-50 bottom-full left-4 right-4 z-10 max-h-48 overflow-y-auto rounded-[10px] border border-white/10 bg-neutral-900 p-1 shadow-lg">
                         {mentionMatches.map((member, i) => (
                             <li key={member.id}>
-                                <button
+                                <Button
+                                    variant="unstyled"
                                     type="button"
                                     onMouseDown={(e) => {
                                         e.preventDefault();
@@ -167,7 +168,7 @@ export default function ChatThread({
                                         className="rounded-full"
                                     />
                                     <span className="truncate">{member.name ?? member.email}</span>
-                                </button>
+                                </Button>
                             </li>
                         ))}
                     </ul>
@@ -185,14 +186,15 @@ export default function ChatThread({
                                 {replyTo.message}
                             </span>
                         </div>
-                        <button
+                        <Button
+                            variant="unstyled"
                             type="button"
                             onClick={() => setReplyTo(null)}
                             aria-label="Cancel reply"
                             className="shrink-0 rounded p-1 text-neutral-400 hover:text-neutral-100"
                         >
                             <IoMdClose className="size-4" />
-                        </button>
+                        </Button>
                     </div>
                 )}
                 <div className="relative">

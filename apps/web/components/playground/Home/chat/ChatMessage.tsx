@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import { BsReply } from "react-icons/bs";
 import { cn } from "@/lib/utils";
 import PlaygroundAvatar, {
@@ -105,7 +106,8 @@ export default function ChatMessage({
                         endsGroup && (isMine ? "rounded-br-xs" : "rounded-bl-xs"),
                     )}
                 >
-                    <button
+                    <Button
+                        variant="unstyled"
                         type="button"
                         onClick={() => onReply(chat)}
                         aria-label="Reply"
@@ -116,7 +118,7 @@ export default function ChatMessage({
                         )}
                     >
                         <BsReply className="size-3.5" />
-                    </button>
+                    </Button>
                     {startsGroup && !isMine && (
                         <span
                             className={cn(
@@ -128,7 +130,8 @@ export default function ChatMessage({
                         </span>
                     )}
                     {chat.repliedToId && (
-                        <button
+                        <Button
+                            variant="unstyled"
                             type="button"
                             onClick={() => quote && !quote.isDeleted && onQuoteClick(quote.id)}
                             className={cn(
@@ -167,7 +170,7 @@ export default function ChatMessage({
                                     {quote?.isDeleted ? "Message deleted" : "Message unavailable"}
                                 </span>
                             )}
-                        </button>
+                        </Button>
                     )}
                     {renderWithMentions(chat.message, mentionNames)}
                     {/* Invisible spacer floated at the end so only the last line leaves

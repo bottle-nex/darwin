@@ -118,7 +118,8 @@ export default function CreateProjectDialogRepository({
                     <Label className="text-xs text-neutral-400">Branch</Label>
                     <Popover open={branchOpen} onOpenChange={setBranchOpen} modal>
                         <PopoverTrigger asChild>
-                            <button
+                            <Button
+                                variant="unstyled"
                                 type="button"
                                 className="mt-1.5 flex w-full cursor-pointer items-center justify-between gap-2 rounded-lg bg-[#171717] px-3 py-2 font-mono text-xs text-neutral-200 shadow-[inset_0_2px_0_0_#262626] hover:bg-[#1c1c1c]"
                             >
@@ -133,7 +134,7 @@ export default function CreateProjectDialogRepository({
                                     className="size-4 shrink-0 text-neutral-500"
                                     aria-hidden
                                 />
-                            </button>
+                            </Button>
                         </PopoverTrigger>
                         <PopoverContent
                             align="start"
@@ -229,13 +230,14 @@ export default function CreateProjectDialogRepository({
                     <span className="ml-1 text-neutral-600">(optional)</span>
                 </Label>
                 {detailsReady && repoState === "selected" && (
-                    <button
+                    <Button
+                        variant="unstyled"
                         type="button"
                         onClick={clearRepo}
                         className="cursor-pointer text-[11px] text-neutral-500 hover:text-neutral-300"
                     >
                         Change
-                    </button>
+                    </Button>
                 )}
             </div>
 

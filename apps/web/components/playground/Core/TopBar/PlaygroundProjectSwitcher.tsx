@@ -1,4 +1,5 @@
 "use client";
+import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Popover } from "radix-ui";
@@ -39,7 +40,8 @@ export default function PlaygroundProjectSwitcher() {
             }}
         >
             <Popover.Trigger asChild>
-                <button
+                <Button
+                    variant="unstyled"
                     type="button"
                     className="flex h-7 cursor-pointer items-center gap-2 rounded-md bg-white/5 px-2 text-[13px] font-semibold text-neutral-100 outline-none hover:bg-white/10 data-[state=open]:bg-white/10 shadow-[inset_0_1px_0_0_#232323]"
                 >
@@ -50,7 +52,7 @@ export default function PlaygroundProjectSwitcher() {
                     />
                     <span className="max-w-60 truncate">{active?.name ?? "Select a project"}</span>
                     <MdKeyboardArrowDown className="size-3 text-neutral-500" aria-hidden />
-                </button>
+                </Button>
             </Popover.Trigger>
 
             <Popover.Portal>
@@ -75,7 +77,8 @@ export default function PlaygroundProjectSwitcher() {
                             </div>
                         ) : (
                             filtered.map((p) => (
-                                <button
+                                <Button
+                                    variant="unstyled"
                                     key={p.id}
                                     type="button"
                                     onClick={() => selectProject(p.slug)}
@@ -101,7 +104,7 @@ export default function PlaygroundProjectSwitcher() {
                                             aria-hidden
                                         />
                                     )}
-                                </button>
+                                </Button>
                             ))
                         )}
                     </div>

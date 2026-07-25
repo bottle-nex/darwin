@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { useEffect, useRef } from "react";
 import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
 import GanttRuler from "./GanttRuler";
@@ -49,13 +50,13 @@ export default function GanttBoard() {
         <div className="dark flex h-full min-h-0 w-full flex-col bg-ink text-foreground">
             {/* <header className="flex shrink-0 items-center justify-end border-b border-border px-6 py-4">
                 <div className="flex items-center gap-2">
-                    <button
+                    <Button variant="unstyled"
                         onClick={() => stepDay(-1)}
                         className="flex size-8 items-center justify-center rounded-md border border-border text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
                         aria-label="Previous day"
                     >
                         <MdKeyboardArrowLeft className="size-4" aria-hidden />
-                    </button>
+                    </Button>
                     <input
                         type="date"
                         value={toDateKey(selectedDate)}
@@ -65,13 +66,13 @@ export default function GanttBoard() {
                         }}
                         className="rounded-md border border-border bg-card px-3 py-1.5 font-mono text-sm text-foreground outline-none focus:ring-2 focus:ring-ring [&::-webkit-calendar-picker-indicator]:invert"
                     />
-                    <button
+                    <Button variant="unstyled"
                         onClick={() => stepDay(1)}
                         className="flex size-8 items-center justify-center rounded-md border border-border text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
                         aria-label="Next day"
                     >
                         <MdKeyboardArrowRight className="size-4" aria-hidden />
-                    </button>
+                    </Button>
                 </div>
             </header> */}
 

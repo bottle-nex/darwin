@@ -151,6 +151,7 @@ export default function CreateProjectDialog() {
                             variant="tertiary"
                             size="sm"
                             onClick={() => handleOpenChange(false)}
+                            disabled={createProject.isPending}
                         >
                             Cancel
                         </Button>

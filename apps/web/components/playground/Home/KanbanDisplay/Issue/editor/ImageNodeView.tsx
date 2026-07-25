@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { NodeViewWrapper, type ReactNodeViewProps } from "@tiptap/react";
 import { MdClose, MdZoomOutMap } from "react-icons/md";
@@ -22,7 +23,8 @@ export default function ImageNodeView({ node, deleteNode, selected }: ReactNodeV
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={src} alt={alt} className="block h-auto w-full rounded-lg" />
             <span className="absolute top-1.5 right-1.5 flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
-                <button
+                <Button
+                    variant="unstyled"
                     type="button"
                     onMouseDown={(event) => event.stopPropagation()}
                     onClick={() => setZoomOpen(true)}
@@ -30,8 +32,9 @@ export default function ImageNodeView({ node, deleteNode, selected }: ReactNodeV
                     className="flex size-6 cursor-pointer items-center justify-center rounded-md bg-black/60 text-white hover:bg-black/80"
                 >
                     <MdZoomOutMap className="size-3.5" />
-                </button>
-                <button
+                </Button>
+                <Button
+                    variant="unstyled"
                     type="button"
                     onMouseDown={(event) => event.stopPropagation()}
                     onClick={() => deleteNode()}
@@ -39,7 +42,7 @@ export default function ImageNodeView({ node, deleteNode, selected }: ReactNodeV
                     className="flex size-6 cursor-pointer items-center justify-center rounded-md bg-black/60 text-white hover:bg-rose-500/80"
                 >
                     <MdClose className="size-3.5" />
-                </button>
+                </Button>
             </span>
             <Dialog open={zoomOpen} onOpenChange={setZoomOpen}>
                 <DialogContent

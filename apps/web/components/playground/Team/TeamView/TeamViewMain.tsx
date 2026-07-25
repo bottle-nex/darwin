@@ -68,14 +68,15 @@ export default function PlaygroundTeamViewMain({ team }: PlaygroundTeamViewProps
                     )}
 
                     <TooltipComponent content="Delete team">
-                        <button
+                        <Button
+                            variant="unstyled"
                             type="button"
                             onClick={() => requestDelete(team)}
                             aria-label="Delete team"
                             className="flex size-7 cursor-pointer items-center justify-center rounded-md text-neutral-400 hover:bg-white/5 hover:text-rose-300"
                         >
                             <MdDelete className="size-4" aria-hidden />
-                        </button>
+                        </Button>
                     </TooltipComponent>
                 </div>
             </div>

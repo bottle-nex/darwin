@@ -225,14 +225,15 @@ export default function InviteToTeamDialog({
                                     className="flex items-center gap-1 rounded-md bg-white/5 py-1 pl-2 pr-1 text-[12px] text-neutral-200"
                                 >
                                     {email}
-                                    <button
+                                    <Button
+                                        variant="unstyled"
                                         type="button"
                                         onClick={() => removeEmail(email)}
                                         aria-label={`Remove ${email}`}
                                         className="flex size-4 cursor-pointer items-center justify-center rounded text-neutral-400 hover:bg-white/10 hover:text-neutral-100"
                                     >
                                         <MdClose className="size-3" />
-                                    </button>
+                                    </Button>
                                 </span>
                             ))}
                             <input
@@ -314,6 +315,7 @@ export default function InviteToTeamDialog({
                         variant="ghost"
                         size="sm"
                         onClick={() => handleOpenChange(false)}
+                        disabled={isPending}
                         className="h-8 cursor-pointer text-[12px] text-neutral-400 hover:bg-white/5 hover:text-neutral-100"
                     >
                         Cancel
@@ -321,10 +323,11 @@ export default function InviteToTeamDialog({
                     <Button
                         size="sm"
                         onClick={handleSubmit}
+                        loading={isPending}
                         disabled={!canSubmit}
                         className="h-8 cursor-pointer rounded-md bg-neutral-100 px-3 text-[12px] font-medium text-neutral-900 hover:bg-white disabled:opacity-50"
                     >
-                        {isPending ? "Sending…" : "Send invites"}
+                        Send invites
                     </Button>
                 </div>
             </DialogContent>

@@ -64,7 +64,8 @@ export default function ProjectEnvStep({
                     <span className="ml-1 text-neutral-600">(optional)</span>
                 </Label>
                 <div className="flex items-center gap-2">
-                    <button
+                    <Button
+                        variant="unstyled"
                         type="button"
                         onClick={() => setReveal((value) => !value)}
                         className="flex items-center gap-1.5 text-[11px] text-neutral-500 hover:text-neutral-300 cursor-pointer"
@@ -75,15 +76,16 @@ export default function ProjectEnvStep({
                             <FaEye className="size-3" aria-hidden />
                         )}
                         {reveal ? "Hide values" : "Show values"}
-                    </button>
-                    <button
+                    </Button>
+                    <Button
+                        variant="unstyled"
                         type="button"
                         onClick={() => fileRef.current?.click()}
                         className="flex items-center gap-1.5 text-[11px] text-neutral-500 hover:text-neutral-300 cursor-pointer"
                     >
                         <FaFileArrowUp className="size-3" aria-hidden />
                         Import .env
-                    </button>
+                    </Button>
                     <input
                         ref={fileRef}
                         type="file"

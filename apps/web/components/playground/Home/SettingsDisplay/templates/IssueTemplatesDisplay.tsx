@@ -107,6 +107,9 @@ export default function IssueTemplatesDisplay({ projectId }: { projectId: string
                             const deleting =
                                 deleteTemplate.isPending &&
                                 deleteTemplate.variables?.templateId === template.id;
+                            const defaulting =
+                                updateTemplate.isPending &&
+                                updateTemplate.variables?.templateId === template.id;
                             return (
                                 <li
                                     key={template.id}
@@ -138,36 +141,42 @@ export default function IssueTemplatesDisplay({ projectId }: { projectId: string
                                         <menu className="flex shrink-0 items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100 focus-within:opacity-100">
                                             {!template.isDefault && (
                                                 <TooltipComponent content="Make default">
-                                                    <button
+                                                    <Button
+                                                        variant="unstyled"
                                                         type="button"
                                                         aria-label={`Make ${template.name} the default`}
+                                                        loading={defaulting}
+                                                        iconOnly
                                                         onClick={() => makeDefault(template)}
-                                                        className="flex size-6 cursor-pointer items-center justify-center rounded text-neutral-400 hover:bg-neutral-700/50 hover:text-[#9bc24f]"
+                                                        className="flex size-6 cursor-pointer items-center justify-center rounded text-neutral-400 hover:bg-neutral-700/50 hover:text-[#9bc24f] disabled:opacity-40 [&_svg]:size-3"
                                                     >
                                                         <MdStarOutline
                                                             className="size-3"
                                                             aria-hidden
                                                         />
-                                                    </button>
+                                                    </Button>
                                                 </TooltipComponent>
                                             )}
-                                            <button
+                                            <Button
+                                                variant="unstyled"
                                                 type="button"
                                                 aria-label={`Edit ${template.name}`}
                                                 onClick={() => setView({ kind: "edit", template })}
                                                 className="flex size-6 cursor-pointer items-center justify-center rounded text-neutral-400 hover:bg-neutral-700/50 hover:text-neutral-200"
                                             >
                                                 <MdEdit className="size-3" aria-hidden />
-                                            </button>
-                                            <button
+                                            </Button>
+                                            <Button
+                                                variant="unstyled"
                                                 type="button"
                                                 aria-label={`Delete ${template.name}`}
-                                                disabled={deleting}
+                                                loading={deleting}
+                                                iconOnly
                                                 onClick={() => setConfirmDelete(template)}
-                                                className="flex size-6 cursor-pointer items-center justify-center rounded text-neutral-400 hover:bg-neutral-700/50 hover:text-red-500 disabled:opacity-40"
+                                                className="flex size-6 cursor-pointer items-center justify-center rounded text-neutral-400 hover:bg-neutral-700/50 hover:text-red-500 disabled:opacity-40 [&_svg]:size-3"
                                             >
                                                 <MdDelete className="size-3" aria-hidden />
-                                            </button>
+                                            </Button>
                                         </menu>
                                     </article>
                                     {template.summary && (

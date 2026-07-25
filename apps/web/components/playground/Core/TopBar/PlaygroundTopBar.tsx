@@ -18,14 +18,15 @@ export default function PlaygroundTopBar() {
         <header className="relative flex h-11 shrink-0 items-center justify-between gap-4 px-2">
             <div className="flex items-center gap-1">
                 {collapsed && (
-                    <button
+                    <Button
+                        variant="unstyled"
                         type="button"
                         onClick={toggle}
                         aria-label="Expand sidebar"
                         className="flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-md text-neutral-400 transition-colors hover:bg-white/5 hover:text-neutral-100"
                     >
                         <TbLayoutSidebarFilled className="size-4" aria-hidden />
-                    </button>
+                    </Button>
                 )}
                 <PlaygroundProjectSwitcher />
             </div>

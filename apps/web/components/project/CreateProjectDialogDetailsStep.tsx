@@ -1,4 +1,5 @@
 "use client";
+import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import {
     useWatch,
@@ -78,7 +79,8 @@ export default function CreateProjectDialogDetailsStep({
                             onOpenChange={setIconPickerOpen}
                             onSelect={setIcon}
                         >
-                            <button
+                            <Button
+                                variant="unstyled"
                                 type="button"
                                 aria-label="Pick project icon"
                                 className={cn(
@@ -91,7 +93,7 @@ export default function CreateProjectDialogDetailsStep({
                                 ) : (
                                     <PiSmileyFill className="size-5 text-neutral-500" aria-hidden />
                                 )}
-                            </button>
+                            </Button>
                         </IconPicker>
                         <Input
                             id="project-name"

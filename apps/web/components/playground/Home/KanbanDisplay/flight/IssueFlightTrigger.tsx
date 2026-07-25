@@ -119,7 +119,8 @@ export default function IssueFlightTrigger() {
                             <Label className="text-neutral-300">Issue</Label>
                             <Popover open={issueSearchOpen} onOpenChange={setIssueSearchOpen}>
                                 <PopoverTrigger asChild>
-                                    <button
+                                    <Button
+                                        variant="unstyled"
                                         type="button"
                                         className="mt-1.5 flex w-full cursor-pointer items-center justify-between rounded-lg bg-[#171717] px-3 py-2 text-left text-sm text-neutral-200 shadow-[inset_0_2px_0_0_#262626] hover:bg-[#1c1c1c]"
                                     >
@@ -130,7 +131,7 @@ export default function IssueFlightTrigger() {
                                         ) : (
                                             <span className="text-neutral-500">Search issues…</span>
                                         )}
-                                    </button>
+                                    </Button>
                                 </PopoverTrigger>
                                 <PopoverContent
                                     align="start"

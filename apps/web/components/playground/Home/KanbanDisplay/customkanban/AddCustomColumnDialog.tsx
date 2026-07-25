@@ -6,7 +6,13 @@ import { Input } from "@/components/ui/input";
 import { useAddCustomColumnStore } from "@/store/kanban/useAddCustomColumnStore";
 
 /** Names and creates a new custom Kanban column, opened from the Add Task menu. */
-export default function AddCustomColumnDialog({ onAdd }: { onAdd: (title: string) => void }) {
+export default function AddCustomColumnDialog({
+    onAdd,
+    adding,
+}: {
+    onAdd: (title: string) => Promise<boolean>;
+    adding: boolean;
+}) {
     const { open, setOpen } = useAddCustomColumnStore();
     const [title, setTitle] = useState("");
 
@@ -15,11 +21,11 @@ export default function AddCustomColumnDialog({ onAdd }: { onAdd: (title: string
         if (!next) setTitle("");
     }
 
-    function submit() {
+    async function submit() {
         const name = title.trim();
         if (!name) return;
-        onAdd(name);
-        handleOpenChange(false);
+        const added = await onAdd(name);
+        if (added) handleOpenChange(false);
     }
 
     return (
@@ -48,10 +54,15 @@ export default function AddCustomColumnDialog({ onAdd }: { onAdd: (title: string
                 />
 
                 <div className="mt-2 flex justify-end gap-2">
-                    <Button variant="tertiary" size="sm" onClick={() => handleOpenChange(false)}>
+                    <Button
+                        variant="tertiary"
+                        size="sm"
+                        disabled={adding}
+                        onClick={() => handleOpenChange(false)}
+                    >
                         Cancel
                     </Button>
-                    <Button size="sm" disabled={!title.trim()} onClick={submit}>
+                    <Button size="sm" loading={adding} disabled={!title.trim()} onClick={submit}>
                         Add list
                     </Button>
                 </div>

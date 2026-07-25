@@ -1,6 +1,8 @@
 "use client";
 import { MdCheck } from "react-icons/md";
+import { RiLoader4Line } from "react-icons/ri";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import {
     Dialog,
     DialogContent,
@@ -22,6 +24,7 @@ type AssigneePickerProps = {
     assignees: Assignee[];
     onAssign: (userId: string) => void;
     onUnassign: (userId: string) => void;
+    pendingAssigneeId: string | null;
 };
 
 /**
@@ -37,6 +40,7 @@ export default function AssigneePicker({
     assignees,
     onAssign,
     onUnassign,
+    pendingAssigneeId,
 }: AssigneePickerProps) {
     const { data: members, isLoading } = useProjectMembers(projectId);
     const assignedIds = new Set(assignees.map((a) => a.id));
@@ -60,14 +64,16 @@ export default function AssigneePicker({
                         members.map((member) => {
                             const assigned = assignedIds.has(member.id);
                             return (
-                                <button
+                                <Button
                                     key={member.id}
+                                    variant="unstyled"
                                     type="button"
+                                    disabled={pendingAssigneeId !== null}
                                     onClick={() =>
                                         assigned ? onUnassign(member.id) : onAssign(member.id)
                                     }
                                     className={cn(
-                                        "flex items-center justify-between gap-3 rounded-lg px-3 py-2 text-left transition-colors cursor-pointer",
+                                        "flex items-center justify-between gap-3 rounded-lg px-3 py-2 text-left transition-colors cursor-pointer disabled:opacity-60",
                                         assigned ? "bg-white/8" : "hover:bg-white/5",
                                     )}
                                 >
@@ -87,13 +93,20 @@ export default function AssigneePicker({
                                             </span>
                                         </span>
                                     </span>
-                                    {assigned && (
-                                        <MdCheck
-                                            className="size-4 shrink-0 text-emerald-300"
+                                    {pendingAssigneeId === member.id ? (
+                                        <RiLoader4Line
+                                            className="size-4 shrink-0 animate-spin text-neutral-400"
                                             aria-hidden
                                         />
+                                    ) : (
+                                        assigned && (
+                                            <MdCheck
+                                                className="size-4 shrink-0 text-emerald-300"
+                                                aria-hidden
+                                            />
+                                        )
                                     )}
-                                </button>
+                                </Button>
                             );
                         })
                     )}

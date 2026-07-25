@@ -7,10 +7,12 @@ import { useRouter } from "next/navigation";
 import axios from "axios";
 import AppLogo from "@/components/app/Applogo";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
+import { Button } from "@/components/ui/button";
 import { REQUEST_OTP_URL } from "@/routes/api_routes";
 import { cn } from "@/lib/utils";
 
 type Step = "options" | "email" | "otp";
+type OauthProvider = (typeof oauth_options)[number]["type"];
 
 interface LoginFormProps {
     // Where to land after signing in. The invite page passes its own URL so the
@@ -29,10 +31,16 @@ export default function LoginForm({ callbackUrl = "/" }: LoginFormProps) {
     const [email, setEmail] = useState("");
     const [otp, setOtp] = useState("");
     const [loading, setLoading] = useState(false);
+    const [oauthPending, setOauthPending] = useState<OauthProvider | null>(null);
     const [error, setError] = useState("");
 
-    function handleOauth(type: "github" | "google") {
-        signIn(type, { callbackUrl });
+    function handleOauth(type: OauthProvider) {
+        setOauthPending(type);
+        setError("");
+        signIn(type, { callbackUrl }).catch(() => {
+            setOauthPending(null);
+            setError("Couldn't reach the provider. Please try again.");
+        });
     }
 
     async function handleSendOtp() {
@@ -53,13 +61,18 @@ export default function LoginForm({ callbackUrl = "/" }: LoginFormProps) {
         if (otp.length !== 6) return;
         setLoading(true);
         setError("");
-        const result = await signIn("email-otp", { email, otp, redirect: false });
-        setLoading(false);
-        if (result?.ok) {
-            router.push(callbackUrl);
-            router.refresh();
-        } else {
+        try {
+            const result = await signIn("email-otp", { email, otp, redirect: false });
+            if (result?.ok) {
+                router.push(callbackUrl);
+                router.refresh();
+                return;
+            }
             setError("Invalid or expired OTP. Please try again.");
+        } catch {
+            setError("Something went wrong. Please try again.");
+        } finally {
+            setLoading(false);
         }
     }
 
@@ -80,32 +93,38 @@ export default function LoginForm({ callbackUrl = "/" }: LoginFormProps) {
                     {step === "options" && (
                         <>
                             {oauth_options.map((option) => (
-                                <button
+                                <Button
                                     key={option.type}
+                                    variant="unstyled"
                                     type="button"
                                     onClick={() => handleOauth(option.type)}
-                                    className="flex h-12 items-center justify-center gap-x-2.5 rounded-full bg-white/6 text-sm font-medium transition-colors hover:bg-white/10 active:scale-[.99] cursor-pointer"
+                                    loading={oauthPending === option.type}
+                                    disabled={oauthPending !== null}
+                                    className="flex h-12 items-center justify-center gap-x-2.5 rounded-full bg-white/6 text-sm font-medium transition-colors hover:bg-white/10 active:scale-[.99] cursor-pointer disabled:opacity-60"
                                 >
-                                    <Image
-                                        src={option.image}
-                                        alt=""
-                                        width={18}
-                                        height={18}
-                                        className={cn(
-                                            "shrink-0",
-                                            option.type === "github" && "invert",
-                                        )}
-                                    />
+                                    {oauthPending !== option.type && (
+                                        <Image
+                                            src={option.image}
+                                            alt=""
+                                            width={18}
+                                            height={18}
+                                            className={cn(
+                                                "shrink-0",
+                                                option.type === "github" && "invert",
+                                            )}
+                                        />
+                                    )}
                                     {option.label}
-                                </button>
+                                </Button>
                             ))}
-                            <button
+                            <Button
+                                variant="unstyled"
                                 type="button"
                                 onClick={() => setStep("email")}
                                 className="flex h-12 items-center justify-center rounded-full bg-white/6 text-sm font-medium transition-colors hover:bg-white/10 active:scale-[.99] cursor-pointer"
                             >
                                 Continue with email
-                            </button>
+                            </Button>
                         </>
                     )}
 
@@ -120,15 +139,18 @@ export default function LoginForm({ callbackUrl = "/" }: LoginFormProps) {
                                 onKeyDown={(e) => e.key === "Enter" && handleSendOtp()}
                                 className="h-12 w-full rounded-full border border-white/15 bg-white/5 px-5 text-sm text-white placeholder:text-white/40 outline-none focus:border-[#8B77EC]"
                             />
-                            <button
+                            <Button
+                                variant="unstyled"
                                 type="button"
                                 onClick={handleSendOtp}
-                                disabled={loading || !email}
-                                className="flex h-12 items-center justify-center rounded-full bg-[#8B77EC] text-sm font-medium text-white transition-colors hover:bg-[#7c67e3] active:scale-[.99] disabled:opacity-60"
+                                loading={loading}
+                                disabled={!email}
+                                className="flex h-12 items-center justify-center gap-x-2 rounded-full bg-[#8B77EC] text-sm font-medium text-white transition-colors hover:bg-[#7c67e3] active:scale-[.99] disabled:opacity-60"
                             >
-                                {loading ? "Sending..." : "Continue with email"}
-                            </button>
-                            <button
+                                Continue with email
+                            </Button>
+                            <Button
+                                variant="unstyled"
                                 type="button"
                                 onClick={() => {
                                     setStep("options");
@@ -137,7 +159,7 @@ export default function LoginForm({ callbackUrl = "/" }: LoginFormProps) {
                                 className="text-sm text-white/50 transition-colors hover:text-white/80"
                             >
                                 Back to all options
-                            </button>
+                            </Button>
                         </div>
                     )}
 
@@ -160,15 +182,18 @@ export default function LoginForm({ callbackUrl = "/" }: LoginFormProps) {
                                     ))}
                                 </InputOTPGroup>
                             </InputOTP>
-                            <button
+                            <Button
+                                variant="unstyled"
                                 type="button"
                                 onClick={handleVerifyOtp}
-                                disabled={loading || otp.length !== 6}
-                                className="flex h-12 items-center justify-center rounded-full bg-[#8B77EC] text-sm font-medium text-white transition-colors hover:bg-[#7c67e3] active:scale-[.99] disabled:opacity-60"
+                                loading={loading}
+                                disabled={otp.length !== 6}
+                                className="flex h-12 items-center justify-center gap-x-2 rounded-full bg-[#8B77EC] text-sm font-medium text-white transition-colors hover:bg-[#7c67e3] active:scale-[.99] disabled:opacity-60"
                             >
-                                {loading ? "Verifying..." : "Sign in"}
-                            </button>
-                            <button
+                                Sign in
+                            </Button>
+                            <Button
+                                variant="unstyled"
                                 type="button"
                                 onClick={() => {
                                     setStep("email");
@@ -178,7 +203,7 @@ export default function LoginForm({ callbackUrl = "/" }: LoginFormProps) {
                                 className="text-sm text-white/50 transition-colors hover:text-white/80"
                             >
                                 Change email
-                            </button>
+                            </Button>
                         </div>
                     )}
 

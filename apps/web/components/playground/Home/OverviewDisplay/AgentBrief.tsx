@@ -19,10 +19,11 @@ const PLAIN_BUTTON = "font-sans normal-case";
 type AgentBriefProps = {
     markdown: string;
     updatedAt: string;
-    onSave: (markdown: string) => void;
+    saving: boolean;
+    onSave: (markdown: string) => Promise<boolean>;
 };
 
-export default function AgentBrief({ markdown, updatedAt, onSave }: AgentBriefProps) {
+export default function AgentBrief({ markdown, updatedAt, saving, onSave }: AgentBriefProps) {
     const [expanded, setExpanded] = useState(false);
     const [draft, setDraft] = useState<string | null>(null);
 
@@ -33,9 +34,10 @@ export default function AgentBrief({ markdown, updatedAt, onSave }: AgentBriefPr
         setExpanded(true);
     }
 
-    function save() {
-        if (draft !== null) onSave(draft);
-        setDraft(null);
+    async function save() {
+        if (draft === null) return;
+        const saved = await onSave(draft);
+        if (saved) setDraft(null);
     }
 
     return (
@@ -90,11 +92,18 @@ export default function AgentBrief({ markdown, updatedAt, onSave }: AgentBriefPr
                                 variant="tertiary"
                                 size="sm"
                                 onClick={() => setDraft(null)}
+                                disabled={saving}
                                 className={PLAIN_BUTTON}
                             >
                                 Cancel
                             </Button>
-                            <Button type="button" size="sm" onClick={save} className={PLAIN_BUTTON}>
+                            <Button
+                                type="button"
+                                size="sm"
+                                onClick={save}
+                                loading={saving}
+                                className={PLAIN_BUTTON}
+                            >
                                 Save brief
                             </Button>
                         </div>

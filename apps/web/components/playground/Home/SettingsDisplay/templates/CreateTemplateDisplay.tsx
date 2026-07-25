@@ -97,14 +97,15 @@ export default function CreateTemplateDisplay({
             className="flex flex-col gap-6 h-full"
         >
             <nav>
-                <button
+                <Button
+                    variant="unstyled"
                     type="button"
                     onClick={onDone}
                     className="flex w-fit cursor-pointer items-center gap-0.5 text-[12px] text-neutral-500 hover:text-neutral-300"
                 >
                     <MdChevronLeft className="size-4" aria-hidden />
                     Issue templates
-                </button>
+                </Button>
             </nav>
 
             <header className="flex flex-col gap-1">
@@ -115,7 +116,8 @@ export default function CreateTemplateDisplay({
                         onSelect={setIcon}
                         align="start"
                     >
-                        <button
+                        <Button
+                            variant="unstyled"
                             type="button"
                             aria-label="Pick a template icon"
                             className="flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-lg bg-white/5 ring-1 ring-white/8 hover:bg-white/10"
@@ -125,7 +127,7 @@ export default function CreateTemplateDisplay({
                             ) : (
                                 <MdDescription className="size-5 text-white/40" aria-hidden />
                             )}
-                        </button>
+                        </Button>
                     </IconPicker>
                     <input
                         autoFocus

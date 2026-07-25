@@ -83,7 +83,8 @@ export default function ProjectSettingsEnvSection({
                     type="button"
                     size="sm"
                     variant="tertiary"
-                    disabled={!projectId || setSecrets.isPending}
+                    loading={setSecrets.isPending}
+                    disabled={!projectId}
                     onClick={() => fileRef.current?.click()}
                 >
                     <MdUpload className="size-3" aria-hidden />
@@ -138,7 +139,8 @@ export default function ProjectSettingsEnvSection({
                                     !reveal && "[-webkit-text-security:disc]",
                                 )}
                             />
-                            <button
+                            <Button
+                                variant="unstyled"
                                 type="button"
                                 onClick={() => setReveal((v) => !v)}
                                 aria-label={reveal ? "Hide value" : "Show value"}
@@ -149,7 +151,7 @@ export default function ProjectSettingsEnvSection({
                                 ) : (
                                     <MdVisibility className="size-3" aria-hidden />
                                 )}
-                            </button>
+                            </Button>
                         </div>
                     </div>
                     <Button
@@ -211,18 +213,20 @@ export default function ProjectSettingsEnvSection({
                                         <span className="shrink-0 text-[10px] text-neutral-600">
                                             Updated {formatRelativeTime(s.updatedAt)}
                                         </span>
-                                        <button
+                                        <Button
+                                            variant="unstyled"
                                             type="button"
                                             aria-label={`Delete ${s.key}`}
-                                            disabled={deleting}
+                                            loading={deleting}
+                                            iconOnly
                                             onClick={() =>
                                                 projectId &&
                                                 deleteSecret.mutate({ projectId, key: s.key })
                                             }
-                                            className="flex size-6 shrink-0 cursor-pointer items-center justify-center rounded text-neutral-400 hover:bg-neutral-700/50 hover:text-red-500 disabled:opacity-40"
+                                            className="flex size-6 shrink-0 cursor-pointer items-center justify-center rounded text-neutral-400 hover:bg-neutral-700/50 hover:text-red-500 disabled:opacity-40 [&_svg]:size-3"
                                         >
                                             <MdDelete className="size-3" aria-hidden />
-                                        </button>
+                                        </Button>
                                     </section>
                                 </div>
                             );
