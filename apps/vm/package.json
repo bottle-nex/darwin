@@ -1,0 +1,31 @@
+{
+    "name": "@trymatcha/vm",
+    "version": "1.0.0",
+    "private": true,
+    "type": "module",
+    "main": "index.ts",
+    "scripts": {
+        "dev": "bun run --watch index.ts",
+        "start": "bun run index.ts",
+        "lint": "eslint . --max-warnings 0",
+        "typecheck": "tsc --noEmit"
+    },
+    "dependencies": {
+        "bullmq": "^5.81.2",
+        "chalk": "^5.6.2",
+        "dotenv": "^17.4.2",
+        "zod": "^4.4.3"
+    },
+    "devDependencies": {
+        "@trymatcha/eslint-config": "*",
+        "@trymatcha/typescript-config": "*",
+        "@types/bun": "latest",
+        "@typescript-eslint/parser": "^7.1.0",
+        "eslint": "^8.57.0",
+        "eslint-config-prettier": "^9.1.0",
+        "eslint-config-turbo": "^2.0.0",
+        "eslint-plugin-only-warn": "^1.1.0",
+        "eslint-plugin-turbo": "^2.0.0",
+        "typescript": "5.5.4"
+    }
+}
