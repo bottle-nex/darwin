@@ -1,14 +1,14 @@
 import { IssueStatus, prisma, type Project } from "@trymatcha/database";
 import { guard_services } from "..";
 
-export const STUCK_CLAIM_SECONDS = 60_000;
+export const STUCK_CLAIM_MS = 60_000;
 export const RECONCILE_INTERVAL_MS = 30_000;
 export const ORPHAN_TODO_MS = 30_000;
 
 export default class Reconciler {
     static async sweep_stuck_routed_claims() {
         try {
-            const cut_off = new Date(Date.now() - STUCK_CLAIM_SECONDS);
+            const cut_off = new Date(Date.now() - STUCK_CLAIM_MS);
             const projects = await prisma.project.findMany({
                 where: {
                     routingClaimedAt: {

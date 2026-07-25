@@ -4,7 +4,8 @@
     "type": "module",
     "private": true,
     "scripts": {
-        "dev": "bun run src/index.ts"
+        "dev": "bun run src/index.ts",
+        "typecheck": "tsc --noEmit"
     },
     "devDependencies": {
         "@types/bun": "latest"
@@ -14,6 +15,7 @@
     },
     "dependencies": {
         "@trymatcha/database": "*",
+        "@trymatcha/types": "*",
         "bullmq": "^5.81.0",
         "chalk": "^5.6.2",
         "dotenv": "^17.4.2",

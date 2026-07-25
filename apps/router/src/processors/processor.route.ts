@@ -25,6 +25,36 @@ const ai_value = z.object({
 
 export default class RouterProcessor {
     static async process_route_job(projectId: string, queue: QueueService) {
+        const claimed_at = new Date();
+        const claim = await prisma.project.updateMany({
+            where: { id: projectId, routingClaimedAt: null },
+            data: { routingClaimedAt: claimed_at },
+        });
+
+        if (claim.count === 0) {
+            console.log(`project ${projectId} is already being routed, skipping`);
+            return;
+        }
+
+        try {
+            await this.route_project(projectId, queue);
+        } finally {
+            await this.release_claim(projectId, claimed_at);
+        }
+    }
+
+    static async release_claim(projectId: string, claimed_at: Date) {
+        try {
+            await prisma.project.updateMany({
+                where: { id: projectId, routingClaimedAt: claimed_at },
+                data: { routingClaimedAt: null },
+            });
+        } catch (err) {
+            console.error(`failed to release routing claim on ${projectId}`, err);
+        }
+    }
+
+    static async route_project(projectId: string, queue: QueueService) {
         console.log("fetching all the active workers and new issues");
         // get the new issues and active workers
         const [active_workers, todos] = await Promise.all([
@@ -99,14 +129,13 @@ export default class RouterProcessor {
         console.log("new workers spinned up: ", new_workers.length);
 
         const assignment_data = {
-            projectId,
             plan_md: project.planMd,
             history,
             active_workers,
             new_workers,
             new_issues: todos,
         };
-        const assignments = await this.route_issues(assignment_data);
+        const assignments: Assignment[] = await this.route_issues(assignment_data);
 
         await prisma.$transaction(async (tx) => {
             for (const a of assignments) {
@@ -160,7 +189,6 @@ export default class RouterProcessor {
     }
 
     static async route_issues(data: {
-        projectId: string;
         plan_md: string;
         history: Map<string, Issue[]>;
         active_workers: Worker[];
@@ -213,15 +241,6 @@ export default class RouterProcessor {
             new_worker_count: new_workers_view.length,
             new_workers: JSON.stringify(new_workers_view),
             new_issues: JSON.stringify(new_issues_view),
-        });
-
-        await prisma.project.update({
-            where: {
-                id: data.projectId,
-            },
-            data: {
-                routingClaimedAt: null,
-            },
         });
 
         return result.assignments;

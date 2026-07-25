@@ -1,12 +1,12 @@
 import { Queue } from "bullmq";
 import queue_config from "../config/config.queue";
+import { QueueName, type RouteJobData } from "@trymatcha/types";
 
 export default class QueueService {
-    private SR_QUEUE: string = "issue.router"; // server-router queue
-    private queue: Queue;
+    private queue: Queue<RouteJobData>;
 
     constructor() {
-        this.queue = new Queue(this.SR_QUEUE, queue_config);
+        this.queue = new Queue(QueueName.IssueRouter, queue_config);
     }
 
     async enqueue_project(project_id: string) {

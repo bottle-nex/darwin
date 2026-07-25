@@ -1,29 +1,20 @@
 import { Queue } from "bullmq";
 import queue_config from "../configs/config.queue";
-
-export interface OnboardJobData {
-    session_id: string;
-    project_id: string;
-    repo_url: string;
-    branch: string;
-    installation_id: number;
-}
+import { QueueName, type OnboardJobData, type RouteJobData } from "@trymatcha/types";
 
 export default class QueueService {
-    private SR_QUEUE: string = "issue.route"; // server-router-queue
-    private ONBOARD_QUEUE: string = "project.onboard"; // server-vm queue
-    private queue: Queue;
-    private onboard_queue: Queue;
+    private queue: Queue<RouteJobData>;
+    private onboard_queue: Queue<OnboardJobData>;
 
     constructor() {
-        this.queue = new Queue(this.SR_QUEUE, queue_config);
-        this.onboard_queue = new Queue(this.ONBOARD_QUEUE, queue_config);
+        this.queue = new Queue(QueueName.IssueRouter, queue_config);
+        this.onboard_queue = new Queue(QueueName.ProjectOnboard, queue_config);
     }
 
     async enqueue_project(project_id: string) {
         await this.queue.add(
             "route",
-            { project_id },
+            { projectId: project_id },
             {
                 jobId: `route-${project_id}`,
                 removeOnComplete: true,
