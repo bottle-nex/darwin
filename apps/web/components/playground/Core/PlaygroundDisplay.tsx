@@ -73,7 +73,11 @@ export default function PlaygroundDisplay({ isLoading }: { isLoading?: boolean }
     const tab = usePlaygroundNavStore((s) => s.tab);
 
     return (
-        <main className="relative z-0 flex flex-1 min-w-0 flex-col overflow-hidden rounded-lg ring-1 ring-graphite/90 bg-charcoal">
+        <main
+            className={
+                "relative z-0 flex flex-1 min-w-0 flex-col overflow-hidden rounded-lg ring-1 ring-white/6 bg-charcoal"
+            }
+        >
             {isLoading ? <LogoLoader className="h-full w-full" /> : <TabPane tab={tab} />}
         </main>
     );
