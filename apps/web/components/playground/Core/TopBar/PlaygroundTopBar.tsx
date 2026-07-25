@@ -8,6 +8,7 @@ import { useSidebarWidthStore } from "@/store/playground/useSidebarWidthStore";
 import CreateProjectDialog from "@/components/project/CreateProjectDialog";
 import PlaygroundProjectSwitcher from "./PlaygroundProjectSwitcher";
 import GithubConnectButton from "./GithubConnectButton";
+import NotificationsBellButton from "./NotificationsBellButton";
 import PlaygroundUserMenu from "./PlaygroundUserMenu";
 export default function PlaygroundTopBar() {
     const { setOpen } = useNewProjectStore();
@@ -46,6 +47,7 @@ export default function PlaygroundTopBar() {
 
             {/* right side icons */}
             <div className="flex items-center gap-2.5">
+                <NotificationsBellButton />
                 <GithubConnectButton />
                 <Button
                     onClick={() => setOpen(true)}
