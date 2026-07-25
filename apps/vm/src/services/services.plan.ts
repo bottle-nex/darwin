@@ -1,9 +1,8 @@
 import { Sandbox } from "e2b";
 import { PlanStatus, prisma } from "@trymatcha/database";
-import { ENV } from "../configs/env";
+import { ENV } from "../conf/config.env";
 
 const REPO_DIR = "/home/user/repo";
-// const PLAN_DUMP_PATH = path.join(import.meta.dirname, "../../plan.md");
 const PROMPT_PATH = "/home/user/brief_prompt.txt";
 const AGENT_TIMEOUT_MS = 10 * 60_000;
 
@@ -45,25 +44,6 @@ export interface BriefRun {
 }
 
 export default class PlanService {
-    static async get_plan(project_id: string) {
-        const project = await prisma.project.findUnique({
-            where: { id: project_id },
-            select: { planMd: true, planStatus: true },
-        });
-
-        if (!project) {
-            console.error("Project not found");
-            return;
-        }
-
-        if (!project.planMd || project.planStatus !== PlanStatus.Ready) {
-            console.error("Plan not found or is not ready.");
-            return;
-        }
-
-        return { planMd: project.planMd };
-    }
-
     static async generate_plan(sandbox_id: string): Promise<BriefRun> {
         const sandbox = await Sandbox.connect(sandbox_id, { apiKey: ENV.SERVER_E2B_API_KEY });
         await sandbox.files.write(PROMPT_PATH, BRIEF_PROMPT);
@@ -89,7 +69,6 @@ export default class PlanService {
         }
         console.log("report is :  ", report);
         const plan_md = report.result?.trim();
-        // fs.writeFileSync(PLAN_DUMP_PATH, plan_md || "", "utf-8");
         if (!plan_md) {
             throw new Error(`onboarding agent produced an empty brief: ${result.stderr}`);
         }

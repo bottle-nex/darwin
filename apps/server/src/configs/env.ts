@@ -32,10 +32,6 @@ const envSchema = z.object({
         .string()
         .min(1, "GitHub App private key (base64-encoded PEM) is required"),
     SERVER_GITHUB_APP_WEBHOOK_SECRET: z.string().optional(),
-    SERVER_E2B_API_KEY: z.string(),
-    SERVER_ANTHROPIC_API_KEY: z.string().min(1, "Anthropic API key is required"),
-    SERVER_BRIEF_MODEL: z.string().default("claude-sonnet-5"),
-    SERVER_BRIEF_EFFORT: z.enum(["low", "medium", "high", "xhigh", "max"]).default("low"),
     OPENROUTER_API_KEY: z.string().min(1, "Open router API key is required"),
 });
 

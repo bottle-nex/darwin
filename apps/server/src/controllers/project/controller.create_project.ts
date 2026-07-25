@@ -4,7 +4,7 @@ import z from "zod";
 import { Action, Permissions } from "@trymatcha/access-control";
 import Access from "../../access-control/access";
 import { Prisma, prisma, ProjectRole } from "@trymatcha/database";
-import E2B from "../../sandbox/e2b";
+import { server_services } from "../..";
 
 const PROJECT_COLORS = [
     "#ef4444",
@@ -130,13 +130,25 @@ export default async function create_project_controller(req: Request, res: Respo
                 data: { projectId: project.id, status: "Pending", startedAt: new Date() },
             });
 
-            void E2B.run_onboarding_job(
-                session.id,
-                project.id,
-                onboarding_target.repoUrl,
-                onboarding_target.branch,
-                onboarding_target.installationId,
-            );
+            try {
+                await server_services.queue.enqueue_onboarding({
+                    session_id: session.id,
+                    project_id: project.id,
+                    repo_url: onboarding_target.repoUrl,
+                    branch: onboarding_target.branch,
+                    installation_id: onboarding_target.installationId,
+                });
+            } catch (error) {
+                console.error("failed to enqueue onboarding job: ", error);
+                await prisma.setupSession.update({
+                    where: { id: session.id },
+                    data: {
+                        status: "Failed",
+                        error: "could not queue the onboarding job",
+                        finishedAt: new Date(),
+                    },
+                });
+            }
         }
     } catch (error) {
         if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {

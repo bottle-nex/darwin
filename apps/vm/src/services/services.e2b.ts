@@ -1,8 +1,8 @@
 import { CommandResult, Sandbox, SnapshotInfo } from "e2b";
-import { ENV } from "../configs/env";
-import GithubService from "../services/service.github";
-import SecretService from "../services/service.secret";
-import PlanService from "../services/services.plan";
+import { ENV } from "../conf/config.env";
+import GithubService from "./service.github";
+import SecretService from "./service.secret";
+import PlanService from "./services.plan";
 import { prisma } from "@trymatcha/database";
 
 const REPO_DIR = "/home/user/repo";

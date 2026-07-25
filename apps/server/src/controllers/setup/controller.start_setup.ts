@@ -5,7 +5,7 @@ import z from "zod";
 import { PlanStatus, prisma } from "@trymatcha/database";
 import { Action, Permissions } from "@trymatcha/access-control";
 import Access from "../../access-control/access";
-import E2B from "../../sandbox/e2b";
+import { server_services } from "../..";
 
 const body_schema = z.object({
     github_repo_id: z.bigint().optional(),
@@ -135,13 +135,25 @@ export default async function start_setup(req: Request, res: Response) {
 
         ResponseWriter.created(res, { session });
 
-        E2B.run_onboarding_job(
-            session.id,
-            project_id,
-            repo_url,
-            branch,
-            Number(github_installation.installationId),
-        );
+        try {
+            await server_services.queue.enqueue_onboarding({
+                session_id: session.id,
+                project_id,
+                repo_url,
+                branch,
+                installation_id: Number(github_installation.installationId),
+            });
+        } catch (error) {
+            console.error("failed to enqueue onboarding job: ", error);
+            await prisma.setupSession.update({
+                where: { id: session.id },
+                data: {
+                    status: "Failed",
+                    error: "could not queue the onboarding job",
+                    finishedAt: new Date(),
+                },
+            });
+        }
     } catch (error) {
         console.error("error in start setup controller: ", error);
         ResponseWriter.system_error(res);
