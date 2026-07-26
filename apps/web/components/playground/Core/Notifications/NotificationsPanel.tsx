@@ -1,16 +1,15 @@
 "use client";
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { HiOutlineMagnifyingGlass, HiPlusSmall } from "react-icons/hi2";
+import { HiOutlineMagnifyingGlass } from "react-icons/hi2";
 import { Input } from "@/components/ui/input";
 import { useNotificationsPanelStore } from "@/store/playground/useNotificationsPanelStore";
-import { Button } from "@/components/ui/button";
 import { AiFillNotification } from "react-icons/ai";
 
 const PANEL_WIDTH = 320;
 
 export default function NotificationsPanel() {
-    const { isOpen, close } = useNotificationsPanelStore();
+    const { isOpen } = useNotificationsPanelStore();
     const [query, setQuery] = useState<string>("");
 
     return (
@@ -29,18 +28,6 @@ export default function NotificationsPanel() {
                         className="ml-2 flex h-full flex-col rounded-lg border border-white/5 bg-charcoal"
                     >
                         <div className="flex flex-col gap-3 p-3">
-                            <div className="flex items-center justify-between">
-                                <h2 className="text-[13px] font-semibold text-neutral-100">
-                                    Notifications
-                                </h2>
-                                <Button
-                                    onClick={close}
-                                    variant={"unstyled"}
-                                    className="flex items-center gap-2"
-                                >
-                                    <HiPlusSmall className="rotate-45 cursor-pointer" />
-                                </Button>
-                            </div>
                             <div className="relative">
                                 <HiOutlineMagnifyingGlass className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-neutral-500" />
                                 <Input
