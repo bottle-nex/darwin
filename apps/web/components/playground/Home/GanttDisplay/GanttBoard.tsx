@@ -1,8 +1,5 @@
 "use client";
-
-import { Button } from "@/components/ui/button";
 import { useEffect, useRef } from "react";
-import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
 import GanttRuler from "./GanttRuler";
 import GanttGrid from "./GanttGrid";
 import GanttSidebar from "./GanttSidebar";
@@ -47,7 +44,7 @@ export default function GanttBoard() {
     }, [isToday, GanttTimeline.toDateKey(selectedDate)]);
 
     return (
-        <div className="dark flex h-full min-h-0 w-full flex-col bg-ink text-foreground">
+        <div className="dark flex h-full min-h-0 w-full flex-col bg-charcoal text-foreground">
             {/* <header className="flex shrink-0 items-center justify-end border-b border-border px-6 py-4">
                 <div className="flex items-center gap-2">
                     <Button variant="unstyled"

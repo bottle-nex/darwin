@@ -3,6 +3,7 @@ import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore"
 import { useShortcutSheetStore } from "@/store/playground/useShortcutSheetStore";
 import { PlaygroundTab } from "@/components/playground/playgroundTabs";
 import { useSidebarWidthStore } from "@/store/playground/useSidebarWidthStore";
+import { useNotificationsPanelStore } from "@/store/playground/useNotificationsPanelStore";
 
 interface Combination {
     label: string;
@@ -24,6 +25,10 @@ export const COMBINATIONS: Record<string, Combination> = {
     "o r": { label: "Open Reviews", run: () => openTab(PlaygroundTab.Reviews) },
     "o s": { label: "Open Settings", run: () => openTab(PlaygroundTab.SettingsProject) },
     "[": { label: "Toggle Sidebar", run: () => useSidebarWidthStore.getState().toggle() },
+    "]": {
+        label: "Toggle Notifications",
+        run: () => useNotificationsPanelStore.getState().toggle(),
+    },
 };
 
 const SEQUENCE_TIMEOUT_MS = 800;

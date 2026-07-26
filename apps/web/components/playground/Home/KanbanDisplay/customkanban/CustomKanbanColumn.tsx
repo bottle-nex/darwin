@@ -98,7 +98,7 @@ export default function CustomKanbanColumn({
                                 setRenaming(false);
                             }
                         }}
-                        className="h-7 text-[12px]"
+                        className="h-7 text-[12px] bg-charcoal hover:bg-charcoal rounded-sm shadow-none!"
                     />
                 ) : (
                     <div className="flex items-center gap-1.5 rounded-md px-2 py-1 text-[12px] font-semibold text-neutral-200">

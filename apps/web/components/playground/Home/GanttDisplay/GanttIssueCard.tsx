@@ -3,11 +3,6 @@ import { cn } from "@/lib/utils";
 import { GanttTimeline } from "@/lib/gantt/GanttTimeline";
 import type { GanttIssue } from "@/types/gantt";
 
-/**
- * An issue card in a worker lane, positioned by time and sized to its duration.
- * Reads by status via a coloured strip, border, and label: queued (violet),
- * solving (blue), paused (amber), done (green). Read-only.
- */
 export default function GanttIssueCard({ issue, now }: { issue: GanttIssue; now: number }) {
     const { left, width } = GanttTimeline.barGeometry(issue, now);
     const isSolving = issue.status === "solving";
@@ -24,7 +19,6 @@ export default function GanttIssueCard({ issue, now }: { issue: GanttIssue; now:
             ? "In progress"
             : "Queued";
 
-    // Paused: a live amber line extends from the frozen bar to "now", counter ticking up.
     const pausedMinutes = isPaused ? Math.max(0, Math.round(now - issue.pausedAt!)) : 0;
     const pauseLineWidth = isPaused
         ? Math.max(0, (now - issue.pausedAt!) * GanttTimeline.MINUTE_WIDTH)
@@ -35,21 +29,15 @@ export default function GanttIssueCard({ issue, now }: { issue: GanttIssue; now:
         <>
             <div
                 className={cn(
-                    "absolute inset-y-2 z-1 overflow-hidden rounded-md border bg-cement shadow-sm",
-                    isQueued && "border-dashed opacity-70",
-                    isDone && "opacity-90",
+                    "absolute inset-y-2 z-1 overflow-hidden rounded-md border border-zinc-800/80 bg-cement",
+                    isQueued && "border-dashed",
                 )}
                 style={{
                     left,
                     width,
-                    borderColor: accent + (isQueued ? "40" : "59"),
-                    boxShadow:
-                        isSolving && !isPaused ? "0 0 14px rgba(255,255,255,0.06)" : undefined,
                 }}
                 title={`${issue.number} · ${issue.title}`}
             >
-                <span className="absolute inset-y-0 left-0 w-0.75" style={{ background: accent }} />
-
                 <div className="flex h-full flex-col py-2.5 pl-3 pr-2.5">
                     <div className="flex items-center justify-between gap-2">
                         <div className="flex min-w-0 items-center gap-1.5">
@@ -100,15 +88,6 @@ export default function GanttIssueCard({ issue, now }: { issue: GanttIssue; now:
                             <MdChat className="size-3" aria-hidden />
                             {issue.comments ? issue.comments : null}
                         </span>
-                        {issue.agent && (
-                            <span
-                                className="inline-flex shrink-0 items-center gap-1 rounded-full px-1.5 py-0.5 text-[10px] font-medium text-white"
-                                style={{ background: "#D97757" }}
-                            >
-                                <span className="size-1.5 rounded-full bg-white/90" />
-                                {issue.agent}
-                            </span>
-                        )}
                     </div>
                 </div>
             </div>

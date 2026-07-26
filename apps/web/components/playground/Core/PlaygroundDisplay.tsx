@@ -1,6 +1,5 @@
 "use client";
 import { useEffect, useState } from "react";
-import { motion } from "motion/react";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
 import { PlaygroundTab } from "@/components/playground/playgroundTabs";
 import OverviewDisplay from "@/components/playground/Home/OverviewDisplay/OverviewDisplay";
@@ -18,7 +17,6 @@ import SettingsDisplay from "@/components/playground/Home/SettingsDisplay/Settin
 import TeamDetailDisplay from "@/components/playground/Team/TeamDisplay";
 import LogoLoader from "@/components/app/LogoLoader";
 
-/** Picks the main pane for the active tab. */
 function TabPane({ tab }: { tab: string }) {
     switch (tab) {
         case PlaygroundTab.Overview:
@@ -72,11 +70,9 @@ function TabPane({ tab }: { tab: string }) {
     }
 }
 
-/** The playground's main pane: a shared card frame around the active tab. */
 export default function PlaygroundDisplay({ isLoading }: { isLoading?: boolean }) {
     const tab = usePlaygroundNavStore((s) => s.tab);
     const [isSettled, setIsSettled] = useState(false);
-    const [hasEnteredLayout, setHasEnteredLayout] = useState(false);
 
     useEffect(() => {
         const frame = requestAnimationFrame(() => setIsSettled(true));
@@ -84,10 +80,7 @@ export default function PlaygroundDisplay({ isLoading }: { isLoading?: boolean }
     }, []);
 
     return (
-        <motion.main
-            layout={!hasEnteredLayout}
-            onLayoutAnimationComplete={() => setHasEnteredLayout(true)}
-            transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+        <main
             className={
                 isSettled
                     ? "relative z-0 flex flex-1 min-w-0 flex-col overflow-hidden rounded-lg ring-1 ring-white/6 bg-charcoal"
@@ -95,6 +88,6 @@ export default function PlaygroundDisplay({ isLoading }: { isLoading?: boolean }
             }
         >
             {isLoading ? <LogoLoader className="h-full w-full" /> : <TabPane tab={tab} />}
-        </motion.main>
+        </main>
     );
 }

@@ -1,17 +1,17 @@
 "use client";
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { HiOutlineMagnifyingGlass } from "react-icons/hi2";
+import { HiOutlineMagnifyingGlass, HiPlusSmall } from "react-icons/hi2";
 import { Input } from "@/components/ui/input";
-import { Switch } from "@/components/ui/switch";
 import { useNotificationsPanelStore } from "@/store/playground/useNotificationsPanelStore";
+import { Button } from "@/components/ui/button";
+import { AiFillNotification } from "react-icons/ai";
 
 const PANEL_WIDTH = 320;
 
 export default function NotificationsPanel() {
-    const isOpen = useNotificationsPanelStore((s) => s.isOpen);
+    const { isOpen, close } = useNotificationsPanelStore();
     const [query, setQuery] = useState<string>("");
-    const [soundEnabled, setSoundEnabled] = useState<boolean>(false);
 
     return (
         <AnimatePresence>
@@ -33,13 +33,13 @@ export default function NotificationsPanel() {
                                 <h2 className="text-[13px] font-semibold text-neutral-100">
                                     Notifications
                                 </h2>
-                                <div className="flex items-center gap-2">
-                                    <span className="text-[12px] text-neutral-400">Sound</span>
-                                    <Switch
-                                        checked={soundEnabled}
-                                        onCheckedChange={setSoundEnabled}
-                                    />
-                                </div>
+                                <Button
+                                    onClick={close}
+                                    variant={"unstyled"}
+                                    className="flex items-center gap-2"
+                                >
+                                    <HiPlusSmall className="rotate-45 cursor-pointer" />
+                                </Button>
                             </div>
                             <div className="relative">
                                 <HiOutlineMagnifyingGlass className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-neutral-500" />
@@ -51,7 +51,8 @@ export default function NotificationsPanel() {
                                 />
                             </div>
                         </div>
-                        <div className="flex flex-1 items-center justify-center px-4 text-center text-[13px] text-neutral-500">
+                        <div className="flex flex-col flex-1 items-center justify-center gap-y-3 px-4 text-center text-[13px] text-neutral-500">
+                            <AiFillNotification size={44} />
                             No notifications yet
                         </div>
                     </div>

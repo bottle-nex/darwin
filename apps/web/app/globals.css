@@ -7,7 +7,7 @@
 
 @theme {
     --color-ink: #0a0a0a;
-    --color-charcoal: #0F0F0F;
+    --color-charcoal: #0f0f0f;
     --color-cement: #141415;
     --color-graphite: #1b1b1d;
     --color-snow: #ffffff;
@@ -123,6 +123,29 @@
 
     .lenis.lenis-stopped {
         overflow: hidden;
+    }
+
+    /* Only the thumb is ever painted. WebKit otherwise fills the track with a
+       light band on hover, which reads as a stripe running the length of every
+       scroll pane. */
+    * {
+        scrollbar-width: thin;
+        scrollbar-color: color-mix(in oklab, var(--foreground) 22%, transparent) transparent;
+    }
+
+    *::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+
+    *::-webkit-scrollbar-track,
+    *::-webkit-scrollbar-corner {
+        background: transparent;
+    }
+
+    *::-webkit-scrollbar-thumb {
+        border-radius: 9999px;
+        background-color: color-mix(in oklab, var(--foreground) 22%, transparent);
     }
 
     /* The page scrolls the document root (Lenis drives <html>), so the visible

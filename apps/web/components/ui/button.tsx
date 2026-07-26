@@ -28,7 +28,7 @@ const buttonVariants = cva(
                     "bg-linear-to-b from-[#e84c4c] to-[#d83a3a] text-white shadow-[inset_0_1.5px_0_0_rgba(255,255,255,0.20),0_1px_2px_0_rgba(185,28,28,0.15)] outline-2 outline-offset-2 outline-[#d83a3a] outline-solid! hover:brightness-110 focus-visible:ring-destructive/40 dark:from-[#e04646] dark:to-[#cf3636] dark:shadow-[inset_0_1.5px_0_0_rgba(255,255,255,0.15)]",
                 ghost: "text-foreground",
                 link: "text-primary underline-offset-4 hover:underline",
-                unstyled: "",
+                unstyled: "cursor-pointer",
             },
             size: {
                 default:
