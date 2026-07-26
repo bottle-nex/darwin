@@ -3,7 +3,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { BsChatRightTextFill } from "react-icons/bs";
 import { useActiveProject } from "@/hooks/useActiveProject";
-import { useProjectMembers } from "@/hooks/project/useProjectMembers";
+import type { ProjectMember } from "@/hooks/project/useProjectMembers";
 import {
     useChats,
     add_chat,
@@ -19,7 +19,7 @@ import ChatThread from "@/components/playground/Home/chat/ProjectChatThread";
 export default function IssueChat({ issueId }: { issueId?: string }) {
     const queryClient = useQueryClient();
     const { data: chats, isLoading } = useChats(issueId);
-    const { data: members } = useProjectMembers(useActiveProject()?.id);
+    const projectId = useActiveProject()?.id;
 
     /**
      * Asks the server to soft-delete the comment, flagging it locally right
@@ -43,11 +43,16 @@ export default function IssueChat({ issueId }: { issueId?: string }) {
      * local cache right away — the CHAT_CREATED broadcast reconciles it when
      * it round-trips (CHAT_ERROR surfaces via toast).
      */
-    function handleSend(message: string, repliedToId?: string) {
+    function handleSend(message: string, mentionedMembers: ProjectMember[], repliedToId?: string) {
         if (!issueId) return;
         const sent = send_socket_message({
             type: InboundSocketMessageType.CHAT_CREATE,
-            payload: { issueId, message, repliedToId },
+            payload: {
+                issueId,
+                message,
+                mentionedMemberIds: mentionedMembers.map((m) => m.memberId),
+                repliedToId,
+            },
         });
         if (!sent) {
             toast.error("Couldn't add your comment.");
@@ -59,12 +64,18 @@ export default function IssueChat({ issueId }: { issueId?: string }) {
         const repliedTo = repliedToId ? (chats?.find((c) => c.id === repliedToId) ?? null) : null;
         add_chat(
             queryClient,
-            build_optimistic_chat(issueId, message, repliedTo, {
-                id: currentUser.id,
-                name: currentUser.name ?? null,
-                email: currentUser.email,
-                image: currentUser.image ?? null,
-            }),
+            build_optimistic_chat(
+                issueId,
+                message,
+                repliedTo,
+                {
+                    id: currentUser.id,
+                    name: currentUser.name ?? null,
+                    email: currentUser.email,
+                    image: currentUser.image ?? null,
+                },
+                mentionedMembers,
+            ),
         );
     }
 
@@ -77,7 +88,7 @@ export default function IssueChat({ issueId }: { issueId?: string }) {
             <ChatThread
                 key={issueId ?? "unsaved"}
                 chats={chats}
-                members={members}
+                projectId={projectId}
                 loading={isLoading}
                 emptyMessage={
                     issueId ? "No comments yet." : "Save the issue to start the conversation."

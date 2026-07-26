@@ -20,6 +20,7 @@ export type InboundSocketMessage =
           payload: {
               issueId: string;
               message: string;
+              mentionedMemberIds?: string[];
               repliedToId?: string;
           };
       }
@@ -33,6 +34,7 @@ export type InboundSocketMessage =
           type: InboundSocketMessageType.PROJECT_CHAT_CREATE;
           payload: {
               message: string;
+              mentionedMemberIds?: string[];
               repliedToId?: string;
           };
       }

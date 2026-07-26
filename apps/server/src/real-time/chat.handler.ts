@@ -11,6 +11,7 @@ export default class ChatSocketHandler {
     static payload_schema = z.object({
         issueId: z.string().min(1),
         message: z.string().trim().min(1).max(5000),
+        mentionedMemberIds: z.array(z.string().min(1)).max(20).optional(),
         repliedToId: z.string().min(1).optional(),
     });
 
@@ -96,7 +97,7 @@ export default class ChatSocketHandler {
             ChatSocketHandler.send_error(ws, "Invalid chat data provided");
             return;
         }
-        const { issueId, message, repliedToId } = parsed.data;
+        const { issueId, message, mentionedMemberIds, repliedToId } = parsed.data;
 
         try {
             const issue = await prisma.issue.findUnique({
@@ -125,16 +126,29 @@ export default class ChatSocketHandler {
                 }
             }
 
+            // Mentions are scoped to ProjectMember, so a tagged id only sticks if it's
+            // actually a member of this issue's project — silently drop the rest.
+            const mention_ids = mentionedMemberIds?.length
+                ? (
+                      await prisma.projectMember.findMany({
+                          where: { id: { in: mentionedMemberIds }, projectId: issue.projectId },
+                          select: { id: true },
+                      })
+                  ).map((member) => member.id)
+                : [];
+
             const chat = await prisma.chat.create({
                 data: {
                     issueId: issue.id,
                     senderId: user.id,
                     message,
                     repliedToId,
+                    mentions: { create: mention_ids.map((memberId) => ({ memberId })) },
                 },
                 include: {
                     sender: true,
                     repliedTo: { include: { sender: true } },
+                    mentions: { include: { member: { include: { user: true } } } },
                 },
             });
 

@@ -21,8 +21,8 @@ export const GET_PROJECT = (projectId: string) => `${PROJECT_URL}/${projectId}`;
 export const START_PROJECT_SETUP_URL = (project_id: string) => `${PROJECT_URL}/${project_id}/setup`;
 export const UPDATE_PROJECT_URL = PROJECT_URL + "/update";
 export const DELETE_PROJECT_URL = PROJECT_URL + "/delete";
-export const LIST_PROJECT_MEMBERS_URL = (project_id: string) =>
-    `${PROJECT_URL}/${project_id}/members`;
+export const LIST_PROJECT_MEMBERS_URL = (project_id: string, query?: string) =>
+    `${PROJECT_URL}/${project_id}/members${query !== undefined ? `?q=${encodeURIComponent(query)}` : ""}`;
 export const SET_PROJECT_SECRET = (project_id: string) => `${PROJECT_URL}/${project_id}/secrets`;
 export const LIST_PROJECT_SECRETS_URL = (project_id: string) =>
     `${PROJECT_URL}/${project_id}/secrets`;

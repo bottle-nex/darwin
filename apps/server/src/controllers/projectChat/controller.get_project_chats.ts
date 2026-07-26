@@ -33,7 +33,11 @@ export default class ProjectChatGetController {
             const chats = await prisma.projectChat.findMany({
                 where: { projectId: data.projectId },
                 orderBy: { createdAt: "asc" },
-                include: { sender: true, repliedTo: { include: { sender: true } } },
+                include: {
+                    sender: true,
+                    repliedTo: { include: { sender: true } },
+                    mentions: { include: { member: { include: { user: true } } } },
+                },
             });
 
             ResponseWriter.success(res, { chats }, "Project chats fetched successfully");

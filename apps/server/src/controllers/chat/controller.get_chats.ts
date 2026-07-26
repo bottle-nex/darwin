@@ -42,7 +42,11 @@ export default class ChatGetController {
             const chats = await prisma.chat.findMany({
                 where: { issueId: issue.id },
                 orderBy: { createdAt: "asc" },
-                include: { sender: true, repliedTo: { include: { sender: true } } },
+                include: {
+                    sender: true,
+                    repliedTo: { include: { sender: true } },
+                    mentions: { include: { member: { include: { user: true } } } },
+                },
             });
 
             ResponseWriter.success(res, { chats }, "Comments fetched successfully");

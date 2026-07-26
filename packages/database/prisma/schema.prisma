@@ -200,6 +200,9 @@ model ProjectMember {
   project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
   user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  chatMentions        ChatMention[]
+  projectChatMentions ProjectChatMention[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -338,15 +341,33 @@ model Chat {
   isDeleted   Boolean @default(false)
   repliedToId String?
 
-  issue     Issue  @relation(fields: [issueId], references: [id], onDelete: Cascade)
-  sender    User?  @relation(fields: [senderId], references: [id], onDelete: SetNull)
-  repliedTo Chat?  @relation("ChatReplies", fields: [repliedToId], references: [id], onDelete: SetNull)
-  replies   Chat[] @relation("ChatReplies")
+  issue     Issue         @relation(fields: [issueId], references: [id], onDelete: Cascade)
+  sender    User?         @relation(fields: [senderId], references: [id], onDelete: SetNull)
+  repliedTo Chat?         @relation("ChatReplies", fields: [repliedToId], references: [id], onDelete: SetNull)
+  replies   Chat[]        @relation("ChatReplies")
+  mentions  ChatMention[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([issueId])
+}
+
+/// A user @-tagged in a Chat message. References the ProjectMember (not User
+/// directly) so a mention is always scoped to someone who actually has access
+/// to the project the chat belongs to.
+model ChatMention {
+  id       String @id @default(cuid())
+  chatId   String
+  memberId String
+
+  chat   Chat          @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  member ProjectMember @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([chatId, memberId])
+  @@index([memberId])
 }
 
 model ProjectChat {
@@ -357,15 +378,33 @@ model ProjectChat {
   isDeleted   Boolean @default(false)
   repliedToId String?
 
-  project   Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  sender    User?         @relation(fields: [senderId], references: [id], onDelete: SetNull)
-  repliedTo ProjectChat?  @relation("ProjectChatReplies", fields: [repliedToId], references: [id], onDelete: SetNull)
-  replies   ProjectChat[] @relation("ProjectChatReplies")
+  project   Project              @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  sender    User?                @relation(fields: [senderId], references: [id], onDelete: SetNull)
+  repliedTo ProjectChat?         @relation("ProjectChatReplies", fields: [repliedToId], references: [id], onDelete: SetNull)
+  replies   ProjectChat[]        @relation("ProjectChatReplies")
+  mentions  ProjectChatMention[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([projectId])
+}
+
+/// A user @-tagged in a ProjectChat message. References the ProjectMember (not
+/// User directly) so a mention is always scoped to someone who actually has
+/// access to the project the chat belongs to.
+model ProjectChatMention {
+  id            String @id @default(cuid())
+  projectChatId String
+  memberId      String
+
+  projectChat ProjectChat   @relation(fields: [projectChatId], references: [id], onDelete: Cascade)
+  member      ProjectMember @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([projectChatId, memberId])
+  @@index([memberId])
 }
 
 model CustomColumn {

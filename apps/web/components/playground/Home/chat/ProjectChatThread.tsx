@@ -10,27 +10,45 @@ import PlaygroundAvatar, {
     toneFor,
 } from "@/components/playground/Core/components/PlaygroundAvatar";
 import SessionServices from "@/lib/session";
-import { type ProjectMember } from "@/hooks/project/useProjectMembers";
+import { useProjectMembers, type ProjectMember } from "@/hooks/project/useProjectMembers";
 import { OPTIMISTIC_ID_PREFIX } from "@/hooks/chats/useChats";
 import LogoLoader from "@/components/app/LogoLoader";
 import ChatMessage from "./ChatMessage";
 
+/** Matches an "@query" being typed at the caret (start of text or after whitespace). */
 const MENTION_AT_CARET = /(?:^|\s)@([^\s@]*)$/;
+
+/** Tiny debounce so the mention search doesn't fire on every keystroke. */
+function useDebouncedValue<T>(value: T, delayMs: number) {
+    const [debounced, setDebounced] = useState(value);
+    useEffect(() => {
+        const id = setTimeout(() => setDebounced(value), delayMs);
+        return () => clearTimeout(id);
+    }, [value, delayMs]);
+    return debounced;
+}
 
 type ChatThreadProps = {
     chats: (Chat | ProjectChat)[] | undefined;
-    members: ProjectMember[] | undefined;
+    projectId: string | undefined;
     placeholder?: string;
     emptyMessage: string;
+    /** True while the underlying conversation isn't ready to receive messages yet. */
     disabled?: boolean;
+    /** True while the initial page of chats is still being fetched. */
     loading?: boolean;
-    onSend: (message: string, repliedToId?: string) => void;
+    onSend: (message: string, mentionedMembers: ProjectMember[], repliedToId?: string) => void;
     onDelete: (chat: Chat | ProjectChat) => void;
 };
 
+/**
+ * The scrollable message list + composer shared by every chat surface (issue
+ * comments, project chat). Callers own the outer frame/header and pass a `key`
+ * that changes with the conversation, so switching threads resets the draft.
+ */
 export default function ChatThread({
     chats,
-    members,
+    projectId,
     placeholder = "Leave a comment...",
     emptyMessage,
     disabled,
@@ -42,7 +60,11 @@ export default function ChatThread({
     const [replyTo, setReplyTo] = useState<Chat | ProjectChat | null>(null);
     const [mentionQuery, setMentionQuery] = useState<string | null>(null);
     const [mentionIndex, setMentionIndex] = useState<number>(0);
+    // Members tagged in the draft, keyed by the "@Name " text that was inserted for
+    // them — lets handleSend tell whether that mention is still in the message.
+    const [mentionedMembers, setMentionedMembers] = useState<Map<string, ProjectMember>>(new Map());
     const currentUserId = SessionServices.get_user()?.id;
+    const { data: members } = useProjectMembers(projectId);
     const viewerIsAdmin =
         members?.some((m) => m.id === currentUserId && m.role === ProjectRole.Admin) ?? false;
     const activeReplyTo =
@@ -50,6 +72,17 @@ export default function ChatThread({
     const scrollRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLTextAreaElement>(null);
 
+    // Composing a mention: search the project's members server-side (capped,
+    // debounced) instead of loading the whole project roster into the browser.
+    const isComposingMention = mentionQuery !== null;
+    const debouncedMentionQuery = useDebouncedValue(mentionQuery, 200);
+    const { data: mentionResults } = useProjectMembers(
+        isComposingMention ? projectId : undefined,
+        debouncedMentionQuery ?? "",
+    );
+    const mentionMatches = isComposingMention ? (mentionResults ?? []) : [];
+
+    // Pin the thread to the newest message whenever the list grows.
     useEffect(() => {
         const el = scrollRef.current;
         if (!el) return;
@@ -73,19 +106,14 @@ export default function ChatThread({
         }
     }, [replyTo]);
 
-    const mentionMatches =
-        mentionQuery === null
-            ? []
-            : (members ?? []).filter((m) =>
-                  (m.name ?? m.email).toLowerCase().includes(mentionQuery.toLowerCase()),
-              );
-
+    /** Re-derive the mention popup from the text before the caret. */
     function syncMention(value: string, caret: number) {
         const match = MENTION_AT_CARET.exec(value.slice(0, caret));
         setMentionQuery(match ? match[1] : null);
         setMentionIndex(0);
     }
 
+    /** Replace the "@query" before the caret with "@Name " and remember who was tagged. */
     function insertMention(member: ProjectMember) {
         const el = inputRef.current;
         if (!el) return;
@@ -93,9 +121,11 @@ export default function ChatThread({
         const before = message
             .slice(0, caret)
             .replace(MENTION_AT_CARET, (m) => (m.startsWith("@") ? "" : m[0]));
-        const inserted = `${before}@${member.name ?? member.email} `;
+        const mentionText = `@${member.name ?? member.email}`;
+        const inserted = `${before}${mentionText} `;
         setMessage(inserted + message.slice(caret));
         setMentionQuery(null);
+        setMentionedMembers((prev) => new Map(prev).set(mentionText, member));
         requestAnimationFrame(() => {
             el.focus();
             el.setSelectionRange(inserted.length, inserted.length);
@@ -105,11 +135,18 @@ export default function ChatThread({
     function handleSend() {
         const trimmed = message.trim();
         if (!trimmed || disabled) return;
-        onSend(trimmed, activeReplyTo?.id);
+        // Only keep mentions whose "@Name " text is still present — covers the
+        // case where the tag was inserted then edited or deleted before sending.
+        const stillTagged = Array.from(mentionedMembers.entries())
+            .filter(([mentionText]) => trimmed.includes(mentionText))
+            .map(([, member]) => member);
+        onSend(trimmed, stillTagged, activeReplyTo?.id);
         setMessage("");
         setReplyTo(null);
+        setMentionedMembers(new Map());
     }
 
+    /** Scroll a quoted original into view and flash it briefly. */
     function jumpToChat(chatId: string) {
         const el = document.getElementById(`chat-${chatId}`);
         if (!el) return;
@@ -136,7 +173,6 @@ export default function ChatThread({
                                 isMine={Boolean(currentUserId) && chat.senderId === currentUserId}
                                 startsGroup={chats[i - 1]?.senderId !== chat.senderId}
                                 endsGroup={chats[i + 1]?.senderId !== chat.senderId}
-                                mentionNames={(members ?? []).map((m) => m.name ?? m.email)}
                                 viewerId={currentUserId ?? undefined}
                                 canDelete={
                                     Boolean(currentUserId) &&
