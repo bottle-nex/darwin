@@ -11,7 +11,7 @@ export default class QueueService {
     constructor() {
         this.init_onboard_consumer();
         this.init_dispatch_consumer();
-    };
+    }
 
     private init_onboard_consumer() {
         this.onboard_consumer = new Worker<OnboardJobData>(
@@ -31,7 +31,7 @@ export default class QueueService {
                 concurrency: 1,
             },
         );
-    };
+    }
 
     private init_dispatch_consumer() {
         this.dispatch_consumer = new Worker<DispatchJobData>(
@@ -52,12 +52,12 @@ export default class QueueService {
         this.dispatch_consumer.on("failed", (job, err) => {
             console.error(`failed to dispatch worker ${job?.data.workerId}: ${err.message}`);
         });
-    };
+    }
 
     async close() {
         await this.onboard_consumer?.close();
         await this.dispatch_consumer?.close();
         this.onboard_consumer = null;
         this.dispatch_consumer = null;
-    };
+    }
 }
