@@ -15,7 +15,7 @@ export default function HowItWorksSection() {
     });
 
     return (
-        <section className="bg-cement">
+        <section className="">
             <div className="mx-auto flex w-full max-w-7xl flex-col gap-7 px-6 py-24">
                 <Reveal>
                     <Eyebrow text="The loop" />

@@ -1,10 +1,11 @@
 "use client";
-import { MdAdd, MdSearch } from "react-icons/md";
-import { TbLayoutSidebarFilled } from "react-icons/tb";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { MdAdd, MdSearch } from "react-icons/md";
+import { TooltipComponent } from "@/components/ui/tooltip-component";
 import { useNewProjectStore } from "@/store/project/useNewProjectStore";
 import { useSidebarWidthStore } from "@/store/playground/useSidebarWidthStore";
+import { TbLayoutSidebarFilled } from "react-icons/tb";
 import CreateProjectDialog from "@/components/project/CreateProjectDialog";
 import PlaygroundProjectSwitcher from "./PlaygroundProjectSwitcher";
 import GithubConnectButton from "./GithubConnectButton";
@@ -19,15 +20,17 @@ export default function PlaygroundTopBar() {
         <header className="relative flex h-11 shrink-0 items-center justify-between gap-4 px-2">
             <div className="flex items-center gap-1">
                 {collapsed && (
-                    <Button
-                        variant="unstyled"
-                        type="button"
-                        onClick={toggle}
-                        aria-label="Expand sidebar"
-                        className="flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-md text-neutral-400 transition-colors hover:bg-white/5 hover:text-neutral-100"
-                    >
-                        <TbLayoutSidebarFilled className="size-4" aria-hidden />
-                    </Button>
+                    <TooltipComponent content="Expand sidebar" side="bottom" delayDuration={500}>
+                        <Button
+                            variant="unstyled"
+                            type="button"
+                            onClick={toggle}
+                            aria-label="Expand sidebar"
+                            className="flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-md text-neutral-400 transition-colors hover:bg-white/5 hover:text-neutral-100"
+                        >
+                            <TbLayoutSidebarFilled className="size-4" aria-hidden />
+                        </Button>
+                    </TooltipComponent>
                 )}
                 <PlaygroundProjectSwitcher />
             </div>

@@ -4,7 +4,7 @@ import HowItWorksSection from "@/components/about/HowItWorksSection";
 import FoundersSection from "@/components/about/FoundersSection";
 import CtaSection from "@/components/app/CtaSection";
 import AboutRevampHero from "@/components/about-revamp/AboutRevampHero";
-import { AboutRevampNavBar } from "@/components/about-revamp/AboutRevampNavBar";
+import { NavBar } from "@/components/nav/Navbar";
 
 export const metadata: Metadata = {
     title: "About matcha",
@@ -14,8 +14,8 @@ export const metadata: Metadata = {
 
 export default function AboutPage() {
     return (
-        <main className="flex min-h-screen flex-col bg-cement">
-            <AboutRevampNavBar />
+        <main className="flex min-h-screen flex-col bg-ink">
+            <NavBar isMarkettingPage />
             <AboutRevampHero />
             <HowItWorksSection />
             <FoundersSection />

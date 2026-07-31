@@ -9,7 +9,7 @@ import GridBackdrop from "./GridBackdrop";
 
 export default function AboutRevampHero() {
     return (
-        <section className="relative min-h-screen overflow-hidden bg-cement">
+        <section className="relative min-h-screen overflow-hidden bg-ink">
             <GridBackdrop />
 
             <div className="relative z-30 mx-auto flex min-h-screen w-full max-w-7xl flex-col justify-between px-6 pt-28 pb-12">

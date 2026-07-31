@@ -131,13 +131,13 @@ export default async function create_project_controller(req: Request, res: Respo
             });
 
             try {
-                await server_services.queue.enqueue_onboarding({
-                    session_id: session.id,
-                    project_id: project.id,
-                    repo_url: onboarding_target.repoUrl,
-                    branch: onboarding_target.branch,
-                    installation_id: onboarding_target.installationId,
-                });
+                // await server_services.queue.enqueue_onboarding({
+                //     session_id: session.id,
+                //     project_id: project.id,
+                //     repo_url: onboarding_target.repoUrl,
+                //     branch: onboarding_target.branch,
+                //     installation_id: onboarding_target.installationId,
+                // });
             } catch (error) {
                 console.error("failed to enqueue onboarding job: ", error);
                 await prisma.setupSession.update({

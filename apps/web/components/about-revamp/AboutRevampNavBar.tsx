@@ -43,7 +43,7 @@ export function AboutRevampNavBar() {
                 "fixed top-0 left-0 right-0 z-100",
                 "transition-[height,background-color,border-color] duration-300 ease-out",
                 scrolled
-                    ? "h-15 border-b border-white/10 bg-cement"
+                    ? "h-15 border-b border-white/10 bg-ink"
                     : "h-17 border-b border-transparent bg-transparent",
             )}
         >

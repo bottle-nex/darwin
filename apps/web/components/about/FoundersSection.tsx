@@ -9,7 +9,7 @@ import { founders } from "./data";
 
 export default function FoundersSection() {
     return (
-        <section className="border-t border-white/10 bg-cement">
+        <section className="border-t border-white/10">
             <div className="mx-auto flex w-full max-w-7xl flex-col gap-7 px-6 pt-24 pb-16">
                 <Reveal>
                     <Eyebrow text="The people" />

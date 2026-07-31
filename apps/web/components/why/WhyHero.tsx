@@ -1,113 +1,62 @@
 "use client";
-import { motion } from "motion/react";
-import { PiArrowRight } from "react-icons/pi";
-import { MdArrowForward } from "react-icons/md";
-import { azeretMono } from "@/components/ui/button";
+import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { MatchaLogo } from "@/components/logo/MatchaLogo";
+import { azeretMono, Button } from "@/components/ui/button";
+import Reveal from "@/components/utility/Reveal";
+import { FolderBox, type BoxFolder } from "./FolderBox";
 
-const HERO_CHAMFER =
-    "polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px)";
-
-const HERO_TICKER_ITEMS = ["Reads the repo", "Writes the patch", "Opens the PR"];
-// Repeated enough times that a single copy is wider than any realistic viewport,
-// so the seamless 0% -> -50% loop never runs out of text mid-scroll.
-const HERO_TICKER_COPY = Array.from({ length: 8 }, () => HERO_TICKER_ITEMS).flat();
-
-// A few brief, gentle position/opacity flickers per 4s loop, with long calm
-// holds in between — most of the timeline sits at rest (x:0, y:0, opacity:.08).
-const WATERMARK_GLITCH_TIMES = [
-    0, 0.02, 0.04, 0.05, 0.15, 0.155, 0.16, 0.17, 0.18, 0.4, 0.403, 0.406, 0.41, 0.415, 0.65, 0.652,
-    0.655, 0.66, 0.665, 1,
+const heroDrawerFolders: BoxFolder[] = [
+    { label: "BACKLOG", tint: "cement", decay: 0 },
+    { label: "SPRINT 14", tint: "snow", decay: 0 },
+    { label: "AGENT QUEUE", tint: "lavender", decay: 0 },
+    { label: "IN REVIEW", tint: "snow", decay: 0 },
+    { label: "DONE", tint: "cement", decay: 0 },
 ];
-const WATERMARK_GLITCH = {
-    x: [0, 3, -2, 0, 0, -3, 2, -1, 0, 0, 4, -3, 1, 0, 0, -2, 3, -1, 0, 0],
-    y: [0, -1, 1, 0, 0, 0, -1, 0.5, 0, 0, 0, 1, -0.5, 0, 0, -1.5, 1, 0, 0, 0],
-    opacity: [
-        0.08, 0.1, 0.06, 0.08, 0.08, 0.11, 0.09, 0.1, 0.08, 0.08, 0.12, 0.06, 0.09, 0.08, 0.08,
-        0.13, 0.05, 0.09, 0.08, 0.08,
-    ],
-};
 
-function HeroButton({
-    variant,
-    children,
-}: {
-    variant: "solid" | "outline";
-    children: React.ReactNode;
-}) {
-    return (
-        <button
-            type="button"
-            style={{ clipPath: HERO_CHAMFER }}
-            className={cn(
-                "inline-flex cursor-pointer items-center gap-2 px-8 py-4 text-[13.6px] font-bold transition-opacity hover:opacity-80",
-                azeretMono.className,
-                variant === "solid"
-                    ? "bg-ink text-white"
-                    : "border-2 border-ink/30 bg-transparent text-ink",
-            )}
-        >
-            {children}
-        </button>
-    );
-}
+const heroParagraph =
+    "Every tracker ends up the same way: a drawer of well-written issues waiting for an engineer with a free afternoon. matcha hands each parked folder to an agent — it claims the card off your board, works the fix inside a sandboxed runner, and refiles the folder as a pull request.";
 
 export function WhyHero() {
     return (
-        <div className="relative flex h-[calc(100vh-4.25rem)] w-screen flex-col overflow-hidden bg-[#ab9ff2]">
-            <div className="pointer-events-none absolute top-1/2 right-[-8%] w-[50%] -translate-y-1/2">
-                <motion.div
-                    animate={WATERMARK_GLITCH}
-                    transition={{
-                        duration: 4,
-                        repeat: Infinity,
-                        ease: "linear",
-                        times: WATERMARK_GLITCH_TIMES,
-                    }}
-                >
-                    <MatchaLogo className="text-ink" />
-                </motion.div>
-            </div>
-
-            <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-1 flex-col items-start justify-center gap-8 px-12 py-28">
-                <h1 className="max-w-4xl text-[clamp(3rem,7vw,7rem)] leading-[0.88] font-bold tracking-[-0.04em] text-ink">
-                    Ship the backlog, not the burnout
-                </h1>
-                <div className="max-w-xl text-lg leading-relaxed font-semibold text-ink/85">
-                    Issues used to wait for an engineer with a free afternoon. Now you assign them
-                    to an agent that reads the repo, writes the patch, and opens a PR, you review
-                    the diff instead of writing it.
-                </div>
-                <div className="flex flex-wrap items-center gap-4">
-                    <HeroButton variant="solid">
-                        Get started
-                        <PiArrowRight className="h-3 w-3" />
-                    </HeroButton>
-                    <HeroButton variant="outline">
-                        See how it works
-                        <MdArrowForward />
-                    </HeroButton>
-                </div>
-            </div>
-
-            <div className="relative z-10 overflow-hidden border-t border-ink/15 py-3">
-                <motion.div
-                    animate={{ x: ["0%", "-50%"] }}
-                    transition={{ duration: 60, ease: "linear", repeat: Infinity }}
-                    className={cn(
-                        "flex w-max gap-16 text-[12.8px] tracking-widest text-ink/70 uppercase",
-                        azeretMono.className,
-                    )}
-                >
-                    {[...HERO_TICKER_COPY, ...HERO_TICKER_COPY].map((item, i) => (
-                        <span key={i} className="flex items-center gap-16 whitespace-nowrap">
-                            {item}
-                            <span aria-hidden>•</span>
+        <section className="relative flex min-h-screen flex-col overflow-hidden border-b border-white/10 bg-ink">
+            <div
+                aria-hidden
+                className="pointer-events-none absolute bottom-0 left-1/2 h-[320px] w-[720px] -translate-x-1/2 bg-[radial-gradient(circle,rgba(171,159,242,0.2)_1px,transparent_1.5px)] bg-[size:10px_10px] [mask-image:radial-gradient(ellipse_at_center,black_20%,transparent_70%)]"
+            />
+            <div className="relative mx-auto flex w-full max-w-7xl flex-1 flex-col items-center px-6 pt-32 text-center">
+                <Reveal immediate>
+                    <h1 className="text-[clamp(3rem,6.5vw,6rem)] font-extralight leading-[1.02] tracking-tight text-neutral-100">
+                        Issues go in.
+                        <br />
+                        <span className="sm:whitespace-nowrap">
+                            <span className="text-primary">Pull requests</span> come out.
                         </span>
-                    ))}
-                </motion.div>
+                    </h1>
+                </Reveal>
+                <Reveal immediate delay={0.08}>
+                    <p
+                        className={cn(
+                            "mx-auto mt-10 max-w-2xl text-[11px] leading-relaxed text-neutral-500",
+                            azeretMono.className,
+                        )}
+                    >
+                        {heroParagraph}
+                    </p>
+                </Reveal>
+                <Reveal immediate delay={0.16}>
+                    <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
+                        <Button size="lg" asChild>
+                            <Link href="/login">Open the board</Link>
+                        </Button>
+                        <Button size="lg" variant="tertiary" asChild>
+                            <Link href="#agents">How it works</Link>
+                        </Button>
+                    </div>
+                </Reveal>
             </div>
-        </div>
+            <Reveal immediate delay={0.24} className="mx-auto mt-14 w-full max-w-6xl px-6">
+                <FolderBox folders={heroDrawerFolders} raisedIndex={2} />
+            </Reveal>
+        </section>
     );
 }

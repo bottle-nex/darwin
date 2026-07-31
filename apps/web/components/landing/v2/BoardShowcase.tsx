@@ -1,19 +1,24 @@
+"use client";
 import {
-    MdViewKanban,
-    MdLayers,
-    MdList,
-    MdSearch,
+    MdFilterAlt,
+    MdGroup,
+    MdKeyboardArrowDown,
+    MdLabel,
     MdSettings,
     MdShare,
-    MdGroup,
+    MdTune,
+    MdVerticalSplit,
+    MdViewKanban,
 } from "react-icons/md";
 import { cn } from "@/lib/utils";
 import { INITIAL_BOARD } from "@/data/dummy-kanban-issues";
 import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
 import { HiPlusSmall } from "react-icons/hi2";
-import { KanbanStatus, type KanbanColumnDef } from "@/types/kanban";
-import CardRenderer from "@/components/playground/Home/KanbanDisplay/cards/CardRenderer";
-import { Button } from "@/components/ui/button";
+import { KanbanStatus } from "@/types/kanban";
+import KanbanColumn from "@/components/playground/Home/KanbanDisplay/KanbanColumn";
+import OptionButton from "@/components/playground/Home/KanbanDisplay/OptionsBar/KanbanOptionPanels/OptionButton";
+import { OPTIONS_BAR_SHELL } from "@/components/playground/Home/KanbanDisplay/OptionsBar/KanbanOptionsBarParts";
+import HeroBuddy from "@/components/landing/v2/HeroBuddy";
 
 const CARDS_PER_COLUMN: Partial<Record<KanbanStatus, number>> = {
     [KanbanStatus.Todo]: 3,
@@ -26,81 +31,59 @@ const CARDS_PER_COLUMN: Partial<Record<KanbanStatus, number>> = {
 };
 const DEFAULT_CARDS_PER_COLUMN = 3;
 
-function ShowcaseTopbar() {
-    return (
-        <div className="flex h-11 shrink-0 items-center justify-between gap-3 border-b border-white/5 px-3">
-            <div className="flex items-center gap-3">
-                <h3 className="text-[14px] font-semibold text-neutral-100">Issues</h3>
-                <div className="flex items-center gap-0.5">
-                    <span className="flex h-7 items-center gap-1.5 rounded-md bg-white/10 px-2 text-[12px] font-medium text-neutral-100">
-                        <MdViewKanban className="size-3.5" aria-hidden />
-                        Board
-                    </span>
-                    <span className="flex h-7 items-center gap-1.5 rounded-md px-2 text-[12px] font-medium text-neutral-400">
-                        <MdList className="size-3.5" aria-hidden />
-                        List
-                    </span>
-                </div>
-            </div>
-            <span className="flex h-7 items-center gap-1.5 rounded-md px-2.5 text-[12px] font-medium text-neutral-300">
-                <MdShare className="size-3.5" aria-hidden />
-                Share
-            </span>
-        </div>
-    );
-}
+const BOARD_VIEW_TABS = [
+    { label: "Agent", mascot: true, active: true },
+    { label: "My Board", icon: MdViewKanban },
+    { label: "Split", icon: MdVerticalSplit },
+];
 
+const OPTION_ICONS = [
+    { label: "Tag", icon: MdLabel },
+    { label: "Filter", icon: MdFilterAlt },
+    { label: "Assignees", icon: MdGroup },
+    { label: "Share", icon: MdShare },
+    { label: "Views", icon: MdTune },
+];
+
+/** Static mirror of the playground's Kanban options bar — same shell, no state. */
 function ShowcaseOptionsBar() {
     return (
-        <div className="flex h-10 shrink-0 items-center justify-between gap-2 border-b border-white/5 px-3">
-            <span className="flex h-7 items-center gap-1.5 rounded-md bg-white/5 px-2 text-[12px] font-medium text-neutral-200 ring-1 ring-white/10">
-                <MdLayers className="size-3.5 text-violet-300" aria-hidden />
-                Group: Status
-            </span>
-            <div className="flex items-center gap-0.5 text-neutral-400">
-                {[MdGroup, MdSearch, MdSettings].map((Icon, i) => (
-                    <span key={i} className="flex size-7 items-center justify-center rounded-md">
-                        <Icon className="size-3.5" aria-hidden />
-                    </span>
-                ))}
-                <Button
-                    variant={"tertiary"}
-                    className="ml-1 flex h-6 items-center rounded-sm bg-neutral-100 px-2 text-[11.5px] font-medium text-neutral-900"
-                >
-                    Add Task
-                </Button>
-            </div>
-        </div>
-    );
-}
-
-function ShowcaseColumn({ column }: { column: KanbanColumnDef }) {
-    const { icon: Icon, title, titleBox, status } = column;
-    const issues = INITIAL_BOARD[status].slice(
-        0,
-        CARDS_PER_COLUMN[status] ?? DEFAULT_CARDS_PER_COLUMN,
-    );
-
-    return (
-        <div className="flex w-72 min-w-72 flex-none flex-col rounded-xl bg-white/2.5 p-2 ring-1 ring-white/5">
-            <div className="mb-2 flex items-center justify-between gap-2 px-0.5">
-                <div
-                    className={cn(
-                        "flex items-center gap-1.5 rounded-md px-2 py-1 text-[12px] font-semibold",
-                        titleBox,
-                    )}
-                >
-                    <Icon className="size-3.5" aria-hidden />
-                    <span>{title}</span>
-                    <span className="text-[11px] font-medium opacity-60">
-                        {INITIAL_BOARD[status].length}
-                    </span>
+        <div className={OPTIONS_BAR_SHELL}>
+            <div className="flex min-w-0 items-center gap-1.5">
+                <div className="flex shrink-0 items-center gap-0.5">
+                    {BOARD_VIEW_TABS.map((tab) => (
+                        <span
+                            key={tab.label}
+                            className={cn(
+                                "flex h-7 items-center gap-1.5 rounded-md px-2 text-[12px] font-medium",
+                                tab.active ? "bg-white/10 text-neutral-100" : "text-neutral-400",
+                            )}
+                        >
+                            {tab.mascot ? (
+                                <HeroBuddy move={false} className="size-4" />
+                            ) : (
+                                tab.icon && <tab.icon className="size-3.5" aria-hidden />
+                            )}
+                            {tab.label}
+                        </span>
+                    ))}
                 </div>
             </div>
-            <div className="flex flex-col gap-2 p-0.5">
-                {issues.map((issue) => (
-                    <CardRenderer key={issue.id} issue={issue} />
+
+            <div className="flex shrink-0 items-center gap-0.5">
+                {OPTION_ICONS.map((option) => (
+                    <OptionButton key={option.label} label={option.label} icon={option.icon} />
                 ))}
+                <div className="mx-1 h-4 w-px bg-white/8" />
+                <OptionButton label="Settings" icon={MdSettings} />
+                <div className="ml-1 flex items-center overflow-hidden rounded-sm bg-neutral-100 text-neutral-900">
+                    <span className="flex h-6 items-center px-2 text-[11.5px] font-medium">
+                        Add Task
+                    </span>
+                    <span className="flex h-6 items-center px-1">
+                        <MdKeyboardArrowDown className="size-3.5" aria-hidden />
+                    </span>
+                </div>
             </div>
         </div>
     );
@@ -121,12 +104,19 @@ export default function BoardShowcase() {
                                 <span>app.trymatcha.com</span>
                             </div>
                         </div>
-                        <ShowcaseTopbar />
                         <ShowcaseOptionsBar />
                         <div className="relative">
                             <div className="flex min-h-120 gap-4 overflow-x-auto px-3 pt-3 pb-3">
                                 {KanbanBoard.COLUMNS.map((column) => (
-                                    <ShowcaseColumn key={column.status} column={column} />
+                                    <KanbanColumn
+                                        key={column.status}
+                                        column={column}
+                                        issues={INITIAL_BOARD[column.status].slice(
+                                            0,
+                                            CARDS_PER_COLUMN[column.status] ??
+                                                DEFAULT_CARDS_PER_COLUMN,
+                                        )}
+                                    />
                                 ))}
                             </div>
                             <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-linear-to-t from-charcoal to-transparent" />
