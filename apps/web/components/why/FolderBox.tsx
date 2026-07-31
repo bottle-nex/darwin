@@ -62,7 +62,7 @@ export function FolderBox({
                     </div>
                 );
             })}
-            <div className="absolute inset-x-0 bottom-0 z-40 h-[150px] rounded-t-sm border border-white/15 border-b-0 bg-ink">
+            <div className="absolute inset-x-0 bottom-0 z-40 h-[150px] rounded-t-sm border border-white/15 border-b-0 bg-charcoal">
                 <div className="absolute left-1/2 top-1/2 h-8 w-32 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/15 bg-ink/40" />
             </div>
         </div>
