@@ -86,7 +86,7 @@ export default function PlaygroundShortcutSheet() {
                             value={query}
                             onChange={(e) => setQuery(e.target.value)}
                             placeholder="Search shortcuts"
-                            className="h-10 pl-9 text-[13px] outline-solid! outline-1! outline-primary!"
+                            className="h-9 pl-9 text-[13px] bg-cement shadow-none"
                         />
                     </div>
                 </SheetHeader>

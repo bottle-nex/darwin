@@ -16,8 +16,8 @@ export default function WhyPage() {
         <main className="flex min-h-screen flex-col bg-ink">
             <NavBar isMarkettingPage />
             <WhyHero />
-            <ManualGruntSection />
             <AgentsSection />
+            <ManualGruntSection />
             <CtaSection />
             <Footer />
         </main>

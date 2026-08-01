@@ -7,12 +7,10 @@ import { MdClose, MdSearch } from "react-icons/md";
 type PlaygroundSearchInputProps = {
     value: string;
     onChange: (value: string) => void;
-    /** Dismiss the search — fired by the close button and by Escape. */
     onClose: () => void;
     placeholder: string;
 };
 
-/** Autofocusing, full-width search field with a clear affordance. */
 export default function PlaygroundSearchInput({
     value,
     onChange,
@@ -41,7 +39,7 @@ export default function PlaygroundSearchInput({
                 onChange={(e) => onChange(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder={placeholder}
-                className="h-7 w-full rounded-md pr-9 pl-8 text-[12px] text-neutral-100 placeholder:text-neutral-500 focus:border-white/25 focus:outline-none"
+                className="h-7 w-full rounded-md pr-9 pl-8 text-[12px] text-neutral-100 placeholder:text-neutral-500 focus:border-white/25 focus:outline-none shadow-none"
             />
             <Button
                 variant="unstyled"

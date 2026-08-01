@@ -1,22 +1,16 @@
 "use client";
-import {
-    MdAdd,
-    MdKeyboardArrowDown,
-    MdPlaylistAdd,
-    MdUpload,
-    MdVerticalSplit,
-    MdViewKanban,
-} from "react-icons/md";
+import { MdAdd, MdPlaylistAdd, MdUpload, MdVerticalSplit, MdViewKanban } from "react-icons/md";
 import { type IconType } from "react-icons";
 import HeroBuddy from "@/components/landing/v2/HeroBuddy";
-import { DropdownMenu } from "radix-ui";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { TooltipComponent } from "@/components/ui/tooltip-component";
+import OptionButton from "./KanbanOptionPanels/OptionButton";
 import { useKanbanOptionsStore } from "@/store/kanban/useKanbanOptionsStore";
 import { useAddCustomColumnStore } from "@/store/kanban/useAddCustomColumnStore";
 import { useCreateOrEditIssueStore } from "@/store/issues/useCreateOrEditIssueStore";
 import type { BoardView } from "@/types/kanban";
+import { RiEdit2Fill } from "react-icons/ri";
 
 const BOARD_VIEWS: {
     id: BoardView;
@@ -77,7 +71,6 @@ export function BoardViewTabs() {
     );
 }
 
-/** Split button: primary "Add Task" + a chevron that opens a menu. */
 export function AddTaskButton() {
     const openCreate = useCreateOrEditIssueStore((s) => s.openCreate);
     const setAddColumnOpen = useAddCustomColumnStore((s) => s.setOpen);
@@ -89,16 +82,11 @@ export function AddTaskButton() {
     };
 
     return (
-        <div className="ml-1 flex items-center overflow-hidden rounded-sm bg-neutral-100 text-neutral-900">
-            <Button
-                variant="tertiary"
-                type="button"
-                onClick={onAddTask}
-                className="flex h-6 cursor-pointer items-center px-2 text-[11.5px] font-medium hover:bg-black/5 rounded-l-[1px] rounded-r-none"
-            >
-                Add Task
-            </Button>
-            <DropdownMenu.Root>
+        <div className="flex items-center">
+            <TooltipComponent delayDuration={1000} content="New issue" side="bottom">
+                <OptionButton label="New issue" icon={RiEdit2Fill} onClick={onAddTask} />
+            </TooltipComponent>
+            {/* <DropdownMenu.Root>
                 <DropdownMenu.Trigger asChild>
                     <Button
                         variant="tertiary"
@@ -140,7 +128,7 @@ export function AddTaskButton() {
                         })}
                     </DropdownMenu.Content>
                 </DropdownMenu.Portal>
-            </DropdownMenu.Root>
+            </DropdownMenu.Root> */}
         </div>
     );
 }

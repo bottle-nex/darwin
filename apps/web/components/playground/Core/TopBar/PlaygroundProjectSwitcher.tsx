@@ -3,14 +3,14 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Popover } from "radix-ui";
-import { MdCheck, MdKeyboardArrowDown, MdFolder } from "react-icons/md";
+import { MdCheck, MdKeyboardArrowDown } from "react-icons/md";
 import { cn } from "@/lib/utils";
 import { useGetDashboard } from "@/hooks/dashboard/useGetDashboard";
 import PlaygroundSearchInput from "../components/PlaygroundSearchInput";
+import PlaygroundAvatar from "../components/PlaygroundAvatar";
 
 export const DEFAULT_FOLDER_COLOR = "#6366f1";
 
-/** Top-bar project switcher — shows the active project and lets you jump to another. */
 export default function PlaygroundProjectSwitcher() {
     const router = useRouter();
     const { orgSlug, projectSlug } = useParams<{ orgSlug: string; projectSlug?: string }>();
@@ -20,7 +20,6 @@ export default function PlaygroundProjectSwitcher() {
 
     const projects = dashboard?.projects ?? [];
     const active = projects.find((p) => p.slug === projectSlug);
-    const activeColor = active?.color ?? DEFAULT_FOLDER_COLOR;
     const filtered = projects.filter((p) =>
         p.name.toLowerCase().includes(query.trim().toLowerCase()),
     );
@@ -43,15 +42,14 @@ export default function PlaygroundProjectSwitcher() {
                 <Button
                     variant="unstyled"
                     type="button"
-                    className="flex h-7 cursor-pointer items-center gap-2 rounded-md bg-white/5 px-2 text-[13px] font-semibold text-neutral-100 outline-none hover:bg-white/10 data-[state=open]:bg-white/10 shadow-[inset_0_1px_0_0_#232323]"
+                    className="flex h-7 cursor-pointer items-center gap-1.5 text-[13px] font-semibold text-neutral-100 hover:bg-cement rounded-sm px-2"
                 >
-                    <MdFolder
-                        className="size-3.5 shrink-0"
-                        style={{ color: activeColor, fill: activeColor }}
-                        aria-hidden
+                    <PlaygroundAvatar
+                        tone="indigo"
+                        letter={active?.name.slice(0, 2).toUpperCase() ?? "?"}
                     />
                     <span className="max-w-60 truncate">{active?.name ?? "Select a project"}</span>
-                    <MdKeyboardArrowDown className="size-3 text-neutral-500" aria-hidden />
+                    <MdKeyboardArrowDown className="size-4 text-neutral-500" aria-hidden />
                 </Button>
             </Popover.Trigger>
 
@@ -59,7 +57,7 @@ export default function PlaygroundProjectSwitcher() {
                 <Popover.Content
                     align="start"
                     sideOffset={6}
-                    className="z-50 w-72 origin-(--radix-popover-content-transform-origin) rounded-lg border border-neutral-800 bg-charcoal p-2 shadow-xl animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 "
+                    className="z-50 w-72 origin-(--radix-popover-content-transform-origin) rounded-lg border border-graphite bg-ink p-2 shadow-xl animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95"
                 >
                     <PlaygroundSearchInput
                         value={query}
@@ -83,19 +81,15 @@ export default function PlaygroundProjectSwitcher() {
                                     type="button"
                                     onClick={() => selectProject(p.slug)}
                                     className={cn(
-                                        "flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 text-left text-[13px] outline-none",
+                                        "flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 text-left text-[13px] outline-none hover:bg-charcoal",
                                         p.slug === projectSlug
-                                            ? "bg-white/10 text-neutral-100"
-                                            : "text-neutral-300 hover:bg-white/5 hover:text-neutral-100",
+                                            ? "text-neutral-100 bg-cement"
+                                            : "text-neutral-300 hover:bg-graphite hover:text-neutral-100",
                                     )}
                                 >
-                                    <MdFolder
-                                        className="size-3.5 shrink-0"
-                                        style={{
-                                            color: p.color ?? DEFAULT_FOLDER_COLOR,
-                                            fill: p.color ?? DEFAULT_FOLDER_COLOR,
-                                        }}
-                                        aria-hidden
+                                    <PlaygroundAvatar
+                                        tone="indigo"
+                                        letter={p.name.slice(0, 2).toUpperCase()}
                                     />
                                     <span className="min-w-0 flex-1 truncate">{p.name}</span>
                                     {p.slug === projectSlug && (

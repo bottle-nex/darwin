@@ -6,11 +6,11 @@ import Reveal from "@/components/utility/Reveal";
 import { FolderBox, type BoxFolder } from "./FolderBox";
 
 const heroDrawerFolders: BoxFolder[] = [
-    { label: "BACKLOG", tint: "cement", decay: 0 },
-    { label: "SPRINT 14", tint: "snow", decay: 0 },
-    { label: "AGENT QUEUE", tint: "lavender", decay: 0 },
-    { label: "IN REVIEW", tint: "snow", decay: 0 },
-    { label: "DONE", tint: "cement", decay: 0 },
+    { label: "Backlog", tint: "cement", decay: 0 },
+    { label: "Sprint 14", tint: "snow", decay: 0 },
+    { label: "Agent queue", tint: "lavender", decay: 0 },
+    { label: "In review", tint: "snow", decay: 0 },
+    { label: "Done", tint: "cement", decay: 0 },
 ];
 
 const heroParagraph =
@@ -18,11 +18,7 @@ const heroParagraph =
 
 export function WhyHero() {
     return (
-        <section className="relative flex min-h-screen flex-col overflow-hidden border-b border-white/10 bg-ink">
-            <div
-                aria-hidden
-                className="pointer-events-none absolute bottom-0 left-1/2 h-[320px] w-[720px] -translate-x-1/2 bg-[radial-gradient(circle,rgba(171,159,242,0.2)_1px,transparent_1.5px)] bg-[size:10px_10px] [mask-image:radial-gradient(ellipse_at_center,black_20%,transparent_70%)]"
-            />
+        <section className="relative flex min-h-screen flex-col overflow-hidden bg-ink">
             <div className="relative mx-auto flex w-full max-w-7xl flex-1 flex-col items-center px-6 pt-32 text-center">
                 <Reveal immediate>
                     <h1 className="text-[clamp(3rem,6.5vw,6rem)] font-extralight leading-[1.02] tracking-tight text-neutral-100">
@@ -45,17 +41,17 @@ export function WhyHero() {
                 </Reveal>
                 <Reveal immediate delay={0.16}>
                     <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
-                        <Button size="lg" asChild>
+                        <Button size="sm" asChild>
                             <Link href="/login">Open the board</Link>
                         </Button>
-                        <Button size="lg" variant="tertiary" asChild>
+                        <Button size="sm" variant="tertiary" asChild>
                             <Link href="#agents">How it works</Link>
                         </Button>
                     </div>
                 </Reveal>
             </div>
-            <Reveal immediate delay={0.24} className="mx-auto mt-14 w-full max-w-6xl px-6">
-                <FolderBox folders={heroDrawerFolders} raisedIndex={2} />
+            <Reveal immediate delay={0.24} className="mx-auto mt-14 w-full max-w-6xl px-6 -mb-12">
+                <FolderBox showBase={false} folders={heroDrawerFolders} raisedIndex={2} />
             </Reveal>
         </section>
     );

@@ -9,18 +9,10 @@ import IssueTags from "../IssueTags";
 
 type BaseCardProps = {
     issue: Issue;
-    /** Status-specific content rendered between the title and the footer. */
     children?: ReactNode;
     className?: string;
 };
 
-/**
- * Reusable, presentational card shell shared by every column — priority + label
- * + number header, title, a `children` slot for status-specific details, and a
- * footer with comment count, project, and assignee avatars. Drag behaviour lives
- * in `SortableIssue`, which wraps this; the same shell is reused in the drag
- * overlay so the lifted card looks identical to the resting one.
- */
 export default function BaseCard({ issue, children, className }: BaseCardProps) {
     const issue_assignees_length = issue.assignees.length;
     return (

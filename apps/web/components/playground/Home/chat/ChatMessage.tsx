@@ -7,7 +7,8 @@ import PlaygroundAvatar, {
 } from "@/components/playground/Core/components/PlaygroundAvatar";
 import type { Chat, ProjectChat } from "@trymatcha/types";
 
-/** Per-sender name color inside the bubble, matched to their avatar tone (WhatsApp-style). */
+type AnyChat = Chat | ProjectChat;
+
 const NAME_TONE_TEXT: Record<AvatarTone, string> = {
     indigo: "text-indigo-300",
     purple: "text-violet-300",
@@ -16,21 +17,35 @@ const NAME_TONE_TEXT: Record<AvatarTone, string> = {
     dark: "text-neutral-300",
 };
 
-/**
- * Renders "@Full Name" mentions as pills. Matches against the project's member
- * names (longest first, so "Piyush Raj" wins over "Piyush"); falls back to bare
- * "@word" tokens while members are still loading.
- */
+const NAME_TONE_RULE: Record<AvatarTone, string> = {
+    indigo: "bg-indigo-400",
+    purple: "bg-violet-400",
+    blue: "bg-sky-400",
+    emerald: "bg-emerald-400",
+    dark: "bg-neutral-400",
+};
+
+function senderName(chat: AnyChat): string {
+    return chat.sender?.name ?? "Unknown";
+}
+
+function senderTone(chat: AnyChat): AvatarTone {
+    return toneFor(chat.senderId ?? senderName(chat));
+}
+
+function senderToneText(chat: AnyChat): string {
+    return NAME_TONE_TEXT[senderTone(chat)];
+}
+
 function renderWithMentions(text: string, mentionNames: string[]) {
     const escaped = [...mentionNames]
         .sort((a, b) => b.length - a.length)
         .map((n) => n.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
     const pattern =
         escaped.length > 0 ? new RegExp(`(@(?:${escaped.join("|")}))`, "gi") : /(@[^\s@]+)/g;
-    // With a single capture group, split() puts every matched mention at an odd index.
     return text.split(pattern).map((part, i) =>
         i % 2 === 1 ? (
-            <span key={i} className="mx-px rounded-[5px] px-1 py-px font-semibold text-white">
+            <span key={i} className="mx-px px-1 font-semibold text-white">
                 {part}
             </span>
         ) : (
@@ -39,16 +54,73 @@ function renderWithMentions(text: string, mentionNames: string[]) {
     );
 }
 
-/** "12:02 AM" — local wall-clock time for a comment. */
-function formatChatTime(value: Date | string): string {
-    return new Date(value).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+function QuotedMessage({
+    quote,
+    isMine,
+    viewerId,
+    onQuoteClick,
+}: {
+    quote: AnyChat | null | undefined;
+    isMine: boolean;
+    viewerId?: string;
+    onQuoteClick: (chatId: string) => void;
+}) {
+    const readable = quote && !quote.isDeleted;
+    return (
+        <Button
+            variant="unstyled"
+            type="button"
+            onClick={() => readable && onQuoteClick(quote.id)}
+            className={cn(
+                "mb-1.5 flex w-full max-w-full items-stretch gap-x-2 overflow-hidden rounded-[4px] py-1.5 pr-2 text-left transition-colors",
+                isMine ? "bg-black/15 hover:bg-black/25" : "bg-black/20 hover:bg-black/30",
+                readable ? "cursor-pointer" : "cursor-default",
+            )}
+        >
+            <span
+                className={cn(
+                    "w-0.5 shrink-0",
+                    !readable
+                        ? "bg-white/20"
+                        : isMine
+                          ? "bg-white/60"
+                          : NAME_TONE_RULE[senderTone(quote)],
+                )}
+                aria-hidden
+            />
+            {readable ? (
+                <span className="flex min-w-0 flex-1 flex-col">
+                    <cite
+                        className={cn(
+                            "truncate text-[11px] leading-4 font-medium not-italic",
+                            isMine ? "text-white" : senderToneText(quote),
+                        )}
+                    >
+                        {viewerId && quote.senderId === viewerId ? "You" : senderName(quote)}
+                    </cite>
+                    <span
+                        className={cn(
+                            "truncate text-[12px] leading-4",
+                            isMine ? "text-white/65" : "text-neutral-400",
+                        )}
+                    >
+                        {quote.message}
+                    </span>
+                </span>
+            ) : (
+                <span
+                    className={cn(
+                        "min-w-0 flex-1 truncate text-[12px] leading-4",
+                        isMine ? "text-white/55" : "text-neutral-500",
+                    )}
+                >
+                    {quote?.isDeleted ? "Message deleted" : "Message unavailable"}
+                </span>
+            )}
+        </Button>
+    );
 }
 
-/**
- * One comment row. Consecutive messages from the same sender are grouped:
- * incoming runs show the name on the first bubble and the avatar on the last;
- * the current user's own messages are bare bubbles on the right (no avatar).
- */
 export default function ChatMessage({
     chat,
     isMine,
@@ -59,133 +131,79 @@ export default function ChatMessage({
     onReply,
     onQuoteClick,
 }: {
-    chat: Chat | ProjectChat;
+    chat: AnyChat;
     isMine: boolean;
     startsGroup: boolean;
     endsGroup: boolean;
     mentionNames: string[];
     viewerId?: string;
-    onReply: (chat: Chat | ProjectChat) => void;
+    onReply: (chat: AnyChat) => void;
     onQuoteClick: (chatId: string) => void;
 }) {
-    const name = chat.sender?.name ?? "Unknown";
-    const quote = chat.repliedTo;
+    const name = senderName(chat);
+    const sentAt = new Date(chat.createdAt);
+    console.log("chat is : ", chat);
     return (
         <li
             id={`chat-${chat.id}`}
             className={cn(
-                "flex items-end gap-2 rounded-lg transition-colors duration-500",
+                "flex items-end gap-2 rounded-lg transition-colors duration-500 relative",
                 isMine ? "flex-row-reverse" : "flex-row",
                 startsGroup ? "mt-4 first:mt-0" : "mt-1",
             )}
         >
-            {/* Avatar gutter, incoming only — filled on the last of a run, else a spacer to keep bubbles aligned. */}
-            {!isMine &&
-                (endsGroup ? (
-                    <PlaygroundAvatar
-                        letter={name.charAt(0).toUpperCase()}
-                        src={chat.sender?.image ?? undefined}
-                        tone={toneFor(chat.senderId ?? name)}
-                        size="md"
-                        className="translate-y-1 rounded-full"
-                    />
-                ) : (
-                    <span className="size-5 shrink-0" aria-hidden />
-                ))}
-            <div
+            <PlaygroundAvatar
+                letter={name.charAt(0).toUpperCase()}
+                src={chat.sender?.image ?? undefined}
+                tone={toneFor(chat.senderId ?? name)}
+                size="lg"
+                className={cn("rounded-full", !endsGroup && "invisible")}
+            />
+            <article
                 className={cn(
-                    "flex min-w-0 max-w-[65%] flex-col",
-                    isMine ? "items-end" : "items-start",
+                    "group/bubble relative min-w-0 max-w-[65%] rounded-[7px] px-2.5 py-1.5 text-[13px] leading-snug wrap-anywhere",
+                    isMine ? "bg-indigo-500/85 text-white" : "bg-white/6 text-neutral-200",
+                    endsGroup && (isMine ? "rounded-br-xs" : "rounded-bl-xs"),
                 )}
             >
-                <div
+                <Button
+                    variant="unstyled"
+                    type="button"
+                    onClick={() => onReply(chat)}
+                    aria-label="Reply"
                     className={cn(
-                        "group/bubble relative min-w-0 max-w-full rounded-[10px] px-2.5 py-1.5 text-[13px] leading-snug wrap-anywhere",
-                        isMine ? "bg-indigo-500/85 text-white" : "bg-white/6 text-neutral-200",
-                        // Only the last bubble of a run gets the pointed tail corner.
-                        endsGroup && (isMine ? "rounded-br-xs" : "rounded-bl-xs"),
+                        "absolute top-1 z-10 cursor-pointer rounded-md bg-neutral-800 p-1 text-neutral-300 opacity-0 transition-opacity hover:text-white group-hover/bubble:opacity-100",
+                        isMine ? "-left-7" : "right-7",
                     )}
                 >
-                    <Button
-                        variant="unstyled"
-                        type="button"
-                        onClick={() => onReply(chat)}
-                        aria-label="Reply"
-                        className={cn(
-                            "absolute top-1 z-10 rounded-md bg-neutral-800 p-1 text-neutral-300 opacity-0 transition-opacity hover:text-white group-hover/bubble:opacity-100 cursor-pointer",
-                            // Sits on the bubble corner facing the center of the thread.
-                            isMine ? "left-1" : "right-1",
-                        )}
+                    <BsReply className="size-3.5" />
+                </Button>
+                {startsGroup && !isMine && (
+                    <header
+                        className={cn("mb-0.5 text-[10.5px] font-medium", senderToneText(chat))}
                     >
-                        <BsReply className="size-3.5" />
-                    </Button>
-                    {startsGroup && !isMine && (
-                        <span
-                            className={cn(
-                                "mb-0.5 block text-[10.5px] font-medium",
-                                NAME_TONE_TEXT[toneFor(chat.senderId ?? name)],
-                            )}
-                        >
-                            {name}
-                        </span>
+                        {name}
+                    </header>
+                )}
+                {chat.repliedToId && (
+                    <QuotedMessage
+                        quote={chat.repliedTo}
+                        isMine={isMine}
+                        viewerId={viewerId}
+                        onQuoteClick={onQuoteClick}
+                    />
+                )}
+                {renderWithMentions(chat.message, mentionNames)}
+                <time
+                    dateTime={sentAt.toISOString()}
+                    className={cn(
+                        "float-right ml-2 mt-1.5 text-[9px] leading-none",
+                        isMine ? "text-white/80" : "text-neutral-400",
                     )}
-                    {chat.repliedToId && (
-                        <Button
-                            variant="unstyled"
-                            type="button"
-                            onClick={() => quote && !quote.isDeleted && onQuoteClick(quote.id)}
-                            className={cn(
-                                "mb-1 flex w-full min-w-32 max-w-full flex-col overflow-hidden rounded-[7px] border-l-2 px-2 py-1 text-left",
-                                isMine
-                                    ? "border-white/60 bg-black/15"
-                                    : "border-indigo-400 bg-black/25",
-                            )}
-                        >
-                            {quote && !quote.isDeleted ? (
-                                <>
-                                    <span
-                                        className={cn(
-                                            "min-w-0 max-w-full truncate text-[10.5px] font-medium",
-                                            isMine
-                                                ? "text-white/90"
-                                                : NAME_TONE_TEXT[
-                                                      toneFor(
-                                                          quote.senderId ??
-                                                              quote.sender?.name ??
-                                                              "Unknown",
-                                                      )
-                                                  ],
-                                        )}
-                                    >
-                                        {quote.senderId && quote.senderId === viewerId
-                                            ? "You"
-                                            : (quote.sender?.name ?? "Unknown")}
-                                    </span>
-                                    <span className="min-w-0 max-w-full truncate text-[11.5px] opacity-70">
-                                        {quote.message}
-                                    </span>
-                                </>
-                            ) : (
-                                <span className="text-[11.5px] italic opacity-60">
-                                    {quote?.isDeleted ? "Message deleted" : "Message unavailable"}
-                                </span>
-                            )}
-                        </Button>
-                    )}
-                    {renderWithMentions(chat.message, mentionNames)}
-                    {/* Invisible spacer floated at the end so only the last line leaves
-                        room for the absolutely-placed time; earlier lines use full width. */}
-                    <span aria-hidden className="pointer-events-none float-right h-4 w-11" />
-                    <span
-                        className={cn(
-                            "absolute bottom-1.5 right-2.5 text-[9px] leading-none",
-                            isMine ? "text-white/80" : "text-neutral-400",
-                        )}
-                    >
-                        {formatChatTime(chat.createdAt)}
-                    </span>
-                </div>
-            </div>
+                >
+                    {sentAt.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}
+                </time>
+            </article>
         </li>
     );
 }

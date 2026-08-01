@@ -1,5 +1,4 @@
 "use client";
-import { useEffect, useState } from "react";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
 import { PlaygroundTab } from "@/components/playground/playgroundTabs";
 import OverviewDisplay from "@/components/playground/Home/OverviewDisplay/OverviewDisplay";
@@ -72,21 +71,9 @@ function TabPane({ tab }: { tab: string }) {
 
 export default function PlaygroundDisplay({ isLoading }: { isLoading?: boolean }) {
     const tab = usePlaygroundNavStore((s) => s.tab);
-    const [isSettled, setIsSettled] = useState(false);
-
-    useEffect(() => {
-        const frame = requestAnimationFrame(() => setIsSettled(true));
-        return () => cancelAnimationFrame(frame);
-    }, []);
 
     return (
-        <main
-            className={
-                isSettled
-                    ? "relative z-0 flex flex-1 min-w-0 flex-col overflow-hidden rounded-lg ring-1 ring-white/6 bg-charcoal"
-                    : "fixed inset-0 z-999 flex flex-col overflow-hidden bg-cement"
-            }
-        >
+        <main className="relative z-0 flex flex-1 min-w-0 flex-col overflow-hidden rounded-lg ring-1 ring-graphite/90 bg-charcoal">
             {isLoading ? <LogoLoader className="h-full w-full" /> : <TabPane tab={tab} />}
         </main>
     );

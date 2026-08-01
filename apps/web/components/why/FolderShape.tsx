@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
-import { azeretMono } from "@/components/ui/button";
 
 const TAB_HEIGHT = 26;
 const SLANT = 12;
@@ -118,8 +117,7 @@ export function FolderShape({
             <span
                 style={{ left: tabLeft, width, height: TAB_HEIGHT }}
                 className={cn(
-                    "absolute top-0 flex items-center justify-center overflow-hidden whitespace-nowrap px-3 text-[10px] uppercase tracking-widest",
-                    azeretMono.className,
+                    "absolute top-0 flex items-center justify-center overflow-hidden whitespace-nowrap px-3 text-[11px] font-light",
                     labelClassName,
                 )}
             >

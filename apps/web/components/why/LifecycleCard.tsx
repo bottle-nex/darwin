@@ -1,5 +1,4 @@
 import { cn } from "@/lib/utils";
-import { azeretMono } from "@/components/ui/button";
 import { FolderShape } from "./FolderShape";
 
 export type LifecycleStage = {
@@ -53,13 +52,8 @@ export function LifecycleCard({ stage }: { stage: LifecycleStage }) {
                     {stage.description}
                 </p>
                 {stage.accent && (
-                    <span
-                        className={cn(
-                            "w-fit rounded-full bg-primary/15 px-3 py-1 text-[10px] tracking-widest text-[#6C55DE]",
-                            azeretMono.className,
-                        )}
-                    >
-                        PR #214 OPEN
+                    <span className="w-fit rounded-full bg-primary/15 px-3 py-1 text-xs font-light text-[#6C55DE]">
+                        PR #214 open
                     </span>
                 )}
             </div>

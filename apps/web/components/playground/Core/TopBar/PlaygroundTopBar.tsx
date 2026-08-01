@@ -11,6 +11,8 @@ import PlaygroundProjectSwitcher from "./PlaygroundProjectSwitcher";
 import GithubConnectButton from "./GithubConnectButton";
 import NotificationsBellButton from "./NotificationsBellButton";
 import PlaygroundUserMenu from "./PlaygroundUserMenu";
+import OfflineTicker from "./OfflineTicker";
+
 export default function PlaygroundTopBar() {
     const { setOpen } = useNewProjectStore();
     const collapsed = useSidebarWidthStore((s) => s.collapsed);
@@ -33,6 +35,7 @@ export default function PlaygroundTopBar() {
                     </TooltipComponent>
                 )}
                 <PlaygroundProjectSwitcher />
+                <OfflineTicker />
             </div>
             <div className="absolute left-1/2 top-1/2 w-full max-w-md -translate-x-1/2 -translate-y-1/2">
                 <MdSearch
@@ -41,7 +44,7 @@ export default function PlaygroundTopBar() {
                 />
                 <Input
                     placeholder="Search"
-                    className="h-7 w-full rounded-md border-white/5 pl-8 pr-12 text-[12px] text-neutral-100 placeholder:text-neutral-500"
+                    className="h-7 w-full rounded-md pl-8 pr-12 text-[12px] text-neutral-100 placeholder:text-neutral-500 shadow-none"
                 />
                 <kbd className="pointer-events-none absolute top-1/2 right-2 -translate-y-1/2 flex items-center rounded bg-cement px-1.5 py-0.5 text-[11px] leading-none font-medium tracking-wide text-neutral-500">
                     ⌘K
@@ -50,7 +53,9 @@ export default function PlaygroundTopBar() {
 
             {/* right side icons */}
             <div className="flex items-center gap-2.5">
-                <NotificationsBellButton />
+                <TooltipComponent content="Toggle notifications" side="bottom" delayDuration={500}>
+                    <NotificationsBellButton />
+                </TooltipComponent>
                 <GithubConnectButton />
                 <Button
                     onClick={() => setOpen(true)}

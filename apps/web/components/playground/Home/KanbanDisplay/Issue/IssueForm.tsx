@@ -25,7 +25,6 @@ import IssueTopper from "./IssueTopper";
 import IssueChat from "./chat/IssueChat";
 import { PRIORITY_OPTIONS } from "./issueHelpers";
 
-/** Create or edit an issue: the left editing pane plus the right-hand comments panel. */
 export default function IssueForm({
     target,
     issue,
@@ -47,9 +46,6 @@ export default function IssueForm({
     const [summary, setSummary] = useState(issue?.summary ?? "");
     const body = useIssueDescription(initialDescription, initialTemplate);
 
-    // The default template can still be loading when this form first paints (the
-    // dialog no longer waits on it). Apply it once it arrives, as long as the
-    // body is still untouched — never clobber something the user already typed.
     useEffect(() => {
         if (!isEdit && initialTemplate && body.isEmpty && body.prompts === 0) {
             body.pickTemplate(initialTemplate);

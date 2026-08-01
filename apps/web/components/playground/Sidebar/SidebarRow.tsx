@@ -39,10 +39,10 @@ export default function PlaygroundSidebarRow({
             type="button"
             onClick={onClick}
             className={cn(
-                "group flex w-full cursor-pointer items-center gap-1 rounded-md py-1 pr-2 text-left text-[13.5px] ring-inset focus-visible:ring-1 focus-visible:ring-primary focus-visible:outline-hidden",
+                "group flex w-full cursor-pointer items-center gap-1 rounded-md py-1 pr-2 text-left text-[13.25px] font-medium ring-inset focus-visible:ring-1 focus-visible:ring-primary focus-visible:outline-hidden",
                 active
-                    ? "bg-white/5 text-neutral-100"
-                    : "text-neutral-400 hover:bg-white/2.5 hover:text-neutral-100",
+                    ? "bg-cement text-neutral-100"
+                    : "text-neutral-400 hover:bg-charcoal hover:text-neutral-100",
             )}
             style={{ paddingLeft: 8 + indent * 16 }}
         >

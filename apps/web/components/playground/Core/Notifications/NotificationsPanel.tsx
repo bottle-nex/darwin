@@ -34,7 +34,7 @@ export default function NotificationsPanel() {
                                     value={query}
                                     onChange={(e) => setQuery(e.target.value)}
                                     placeholder="Search notifications"
-                                    className="h-9 pl-9 text-[13px]"
+                                    className="h-9 pl-9 text-[13px] shadow-none bg-cement"
                                 />
                             </div>
                         </div>

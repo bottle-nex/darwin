@@ -3,7 +3,6 @@ import { useState } from "react";
 import { useParams } from "next/navigation";
 import { toast } from "sonner";
 import { MdDelete } from "react-icons/md";
-import { IoPersonAddOutline } from "react-icons/io5";
 import type { ProjectTeam } from "@/types/project";
 import { useDeleteTeamStore } from "@/store/team/useDeleteTeamStore";
 import { useGetDashboard } from "@/hooks/dashboard/useGetDashboard";
@@ -15,6 +14,8 @@ import { TooltipComponent } from "@/components/ui/tooltip-component";
 import PlaygroundAvatar from "@/components/playground/Core/components/PlaygroundAvatar";
 import PlaygroundTeamMembers from "./TeamMembers";
 import { Button } from "@/components/ui/button";
+import { HiUserAdd } from "react-icons/hi";
+import OptionButton from "../../Home/KanbanDisplay/OptionsBar/KanbanOptionPanels/OptionButton";
 
 type PlaygroundTeamViewProps = {
     team: ProjectTeam;
@@ -55,16 +56,11 @@ export default function PlaygroundTeamViewMain({ team }: PlaygroundTeamViewProps
 
                 <div className="flex shrink-0 items-center gap-1.5">
                     {isAdmin && (
-                        <Button
-                            type="button"
-                            size={"xs"}
-                            variant={"tertiary"}
-                            className="flex h-6 cursor-pointer items-center px-2 text-[11.5px] font-medium hover:bg-black/5"
+                        <OptionButton
+                            icon={HiUserAdd}
+                            label="add user"
                             onClick={() => setInviteOpen(true)}
-                        >
-                            <IoPersonAddOutline strokeWidth="3" />
-                            Invite members
-                        </Button>
+                        />
                     )}
 
                     <TooltipComponent content="Delete team">

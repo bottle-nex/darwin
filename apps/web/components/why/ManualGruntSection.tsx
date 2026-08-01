@@ -1,23 +1,21 @@
-import { cn } from "@/lib/utils";
-import { azeretMono } from "@/components/ui/button";
 import Reveal from "@/components/utility/Reveal";
 import { ArchiveSectionHeader } from "./ArchiveSectionHeader";
 import { FolderBox, type BoxFolder } from "./FolderBox";
 
 const backlogFolders: BoxFolder[] = [
-    { label: "SPRINT 12", tint: "cement", decay: 0 },
-    { label: "BACKLOG", tint: "cement", decay: 1 },
-    { label: "Q3 GOALS", tint: "cement", decay: 2 },
-    { label: "SOMEDAY", tint: "cement", decay: 3 },
-    { label: "ICEBOX", tint: "cement", decay: 3 },
+    { label: "Sprint 12", tint: "cement", decay: 0 },
+    { label: "Backlog", tint: "cement", decay: 1 },
+    { label: "Q3 goals", tint: "cement", decay: 2 },
+    { label: "Someday", tint: "cement", decay: 3 },
+    { label: "Icebox", tint: "cement", decay: 3 },
 ];
 
 const manualSteps = [
-    { step: "READ THE TICKET, FIND THE OWNER", cost: "1 STANDUP" },
-    { step: "GATHER CONTEXT ACROSS THE REPO", cost: "2 HRS" },
-    { step: "BRANCH, FIX, PUSH", cost: "1 AFTERNOON" },
-    { step: "REVIEW PING-PONG", cost: "3 ROUND TRIPS" },
-    { step: "REBASE, RE-REVIEW, MERGE", cost: "1 MORE DAY" },
+    { step: "Read the ticket, find the owner", cost: "one standup" },
+    { step: "Gather context across the repo", cost: "two hours" },
+    { step: "Branch, fix, push", cost: "an afternoon" },
+    { step: "Review ping-pong", cost: "three round trips" },
+    { step: "Rebase, re-review, merge", cost: "one more day" },
 ];
 
 export function ManualGruntSection() {
@@ -40,42 +38,33 @@ export function ManualGruntSection() {
                                 queue. That is what turns a two-hour fix into a two-week card.
                             </p>
                         </Reveal>
-                        <div className="mt-8">
+                        <div className="mt-8 max-w-md divide-y divide-white/10">
                             {manualSteps.map((item, i) => (
                                 <Reveal key={item.step} delay={i * 0.05}>
-                                    <div className="flex items-baseline justify-between gap-4 border-b border-dotted border-white/15 py-3">
-                                        <span
-                                            className={cn(
-                                                "text-[11px] uppercase tracking-widest text-neutral-300",
-                                                azeretMono.className,
-                                            )}
-                                        >
+                                    <div className="flex items-baseline justify-between gap-6 py-3">
+                                        <span className="text-[15px] font-light text-neutral-300">
                                             {item.step}
                                         </span>
-                                        <span
-                                            className={cn(
-                                                "shrink-0 text-[11px] uppercase tracking-widest text-neutral-600",
-                                                azeretMono.className,
-                                            )}
-                                        >
+                                        <span className="shrink-0 text-sm font-light text-neutral-500">
                                             {item.cost}
                                         </span>
                                     </div>
                                 </Reveal>
                             ))}
+                            <Reveal delay={0.3}>
+                                <div className="flex items-baseline justify-between gap-6 py-3">
+                                    <span className="text-[15px] text-neutral-100">
+                                        Door to merge
+                                    </span>
+                                    <span className="shrink-0 text-sm text-neutral-100">
+                                        about two weeks
+                                    </span>
+                                </div>
+                            </Reveal>
                         </div>
                     </div>
                     <Reveal className="relative">
-                        <div
-                            className={cn(
-                                "flex items-center justify-between text-[10px] uppercase tracking-widest text-neutral-600",
-                                azeretMono.className,
-                            )}
-                        >
-                            <span>DRAWER 03 / OPEN ITEMS</span>
-                            <span>CAPACITY EXCEEDED</span>
-                        </div>
-                        <FolderBox folders={backlogFolders} className="mt-4" />
+                        <FolderBox folders={backlogFolders} showBase={false} />
                     </Reveal>
                 </div>
             </div>

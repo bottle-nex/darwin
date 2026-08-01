@@ -15,16 +15,15 @@ export default function IssueTopper({
 }) {
     return (
         <section className="flex items-center justify-between w-full">
-            <div className="flex w-full items-center gap-2">
+            <div className="flex w-full items-center gap-2 text-neutral-500 font-mono text-[11px]">
                 <TaskTargetBadge
+                    newIssue={!issue}
                     kind={target.board}
                     columnTitle={target.board === "custom" ? target.columnTitle : undefined}
                 />
                 {issue && (
                     <div className="ml-auto flex items-center gap-2">
-                        <span className="font-mono text-[11px] text-neutral-500">
-                            #{issue.number}
-                        </span>
+                        <span className="">#{issue.number}</span>
                         <LLMIssueStatusTicker status={issue.status} size="sm" showIcon={false} />
                     </div>
                 )}

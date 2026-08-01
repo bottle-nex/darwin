@@ -13,7 +13,6 @@ import { type ProjectMember } from "@/hooks/project/useProjectMembers";
 import LogoLoader from "@/components/app/LogoLoader";
 import ChatMessage from "./ChatMessage";
 
-/** Matches an "@query" being typed at the caret (start of text or after whitespace). */
 const MENTION_AT_CARET = /(?:^|\s)@([^\s@]*)$/;
 
 type ChatThreadProps = {
@@ -21,18 +20,11 @@ type ChatThreadProps = {
     members: ProjectMember[] | undefined;
     placeholder?: string;
     emptyMessage: string;
-    /** True while the underlying conversation isn't ready to receive messages yet. */
     disabled?: boolean;
-    /** True while the initial page of chats is still being fetched. */
     loading?: boolean;
     onSend: (message: string, repliedToId?: string) => void;
 };
 
-/**
- * The scrollable message list + composer shared by every chat surface (issue
- * comments, project chat). Callers own the outer frame/header and pass a `key`
- * that changes with the conversation, so switching threads resets the draft.
- */
 export default function ChatThread({
     chats,
     members,
@@ -50,11 +42,16 @@ export default function ChatThread({
     const scrollRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLTextAreaElement>(null);
 
-    // Pin the thread to the newest message whenever the list grows.
     useEffect(() => {
         const el = scrollRef.current;
         if (el) el.scrollTop = el.scrollHeight;
     }, [chats?.length]);
+
+    useEffect(() => {
+        if (replyTo) {
+            inputRef.current?.focus();
+        }
+    }, [replyTo]);
 
     const mentionMatches =
         mentionQuery === null
@@ -63,14 +60,12 @@ export default function ChatThread({
                   (m.name ?? m.email).toLowerCase().includes(mentionQuery.toLowerCase()),
               );
 
-    /** Re-derive the mention popup from the text before the caret. */
     function syncMention(value: string, caret: number) {
         const match = MENTION_AT_CARET.exec(value.slice(0, caret));
         setMentionQuery(match ? match[1] : null);
         setMentionIndex(0);
     }
 
-    /** Replace the "@query" before the caret with "@Name " and refocus. */
     function insertMention(member: ProjectMember) {
         const el = inputRef.current;
         if (!el) return;
@@ -95,7 +90,6 @@ export default function ChatThread({
         setReplyTo(null);
     }
 
-    /** Scroll a quoted original into view and flash it briefly. */
     function jumpToChat(chatId: string) {
         const el = document.getElementById(`chat-${chatId}`);
         if (!el) return;
@@ -114,7 +108,7 @@ export default function ChatThread({
                 {loading ? (
                     <LogoLoader size={32} className="h-full" />
                 ) : chats && chats.length > 0 ? (
-                    <ul className="flex min-w-0 flex-col">
+                    <ul className="flex min-w-0 flex-col gap-y-0.25">
                         {chats.map((chat, i) => (
                             <ChatMessage
                                 key={chat.id}
@@ -173,84 +167,90 @@ export default function ChatThread({
                         ))}
                     </ul>
                 )}
-                {replyTo && (
-                    <div className="mb-1.5 flex items-center gap-x-2 rounded-[9px] border-l-2 border-indigo-400 bg-white/4 px-2.5 py-1.5">
-                        <div className="min-w-0 flex-1">
-                            <span className="block text-[11px] font-medium text-indigo-300">
-                                Replying to{" "}
-                                {replyTo.senderId === currentUserId
-                                    ? "yourself"
-                                    : (replyTo.sender?.name ?? "Unknown")}
-                            </span>
-                            <span className="block truncate text-[12px] text-neutral-400">
-                                {replyTo.message}
-                            </span>
+                <div className="rounded-lg bg-[#1a1a1a] shadow-[inset_0_1px_0_0_#262626]">
+                    {replyTo && (
+                        <div className="flex items-center gap-x-2.5 border-b border-white/6 px-2.5 py-2">
+                            <span
+                                className="w-px shrink-0 self-stretch rounded-full bg-neutral-600"
+                                aria-hidden
+                            />
+                            <div className="min-w-0 flex-1">
+                                <span className="block text-[11px] leading-4 font-medium text-neutral-300">
+                                    Replying to{" "}
+                                    {replyTo.senderId === currentUserId
+                                        ? "yourself"
+                                        : (replyTo.sender?.name ?? "Unknown")}
+                                </span>
+                                <span className="block truncate text-[12px] leading-4 text-neutral-500">
+                                    {replyTo.message}
+                                </span>
+                            </div>
+                            <Button
+                                variant="unstyled"
+                                type="button"
+                                onClick={() => setReplyTo(null)}
+                                aria-label="Cancel reply"
+                                className="flex size-6 shrink-0 cursor-pointer items-center justify-center rounded-md text-neutral-500 transition-colors hover:bg-white/6 hover:text-neutral-200"
+                            >
+                                <IoMdClose className="size-3.5" />
+                            </Button>
                         </div>
+                    )}
+                    <div className="relative">
+                        <Textarea
+                            ref={inputRef}
+                            placeholder={placeholder}
+                            value={message}
+                            rows={1}
+                            data-lenis-prevent
+                            onChange={(e) => {
+                                setMessage(e.target.value);
+                                syncMention(e.target.value, e.target.selectionStart);
+                            }}
+                            onKeyDown={(e) => {
+                                if (mentionMatches.length > 0) {
+                                    if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+                                        e.preventDefault();
+                                        const step = e.key === "ArrowDown" ? 1 : -1;
+                                        setMentionIndex(
+                                            (mentionIndex + step + mentionMatches.length) %
+                                                mentionMatches.length,
+                                        );
+                                        return;
+                                    }
+                                    if (e.key === "Enter" || e.key === "Tab") {
+                                        e.preventDefault();
+                                        insertMention(mentionMatches[mentionIndex]);
+                                        return;
+                                    }
+                                    if (e.key === "Escape") {
+                                        setMentionQuery(null);
+                                        return;
+                                    }
+                                }
+                                if (e.key === "Escape" && replyTo) {
+                                    setReplyTo(null);
+                                    return;
+                                }
+                                if (e.key === "Enter" && !e.shiftKey) {
+                                    e.preventDefault();
+                                    handleSend();
+                                }
+                            }}
+                            disabled={disabled}
+                            className="no-scrollbar min-h-9.5 max-h-28 w-full resize-none overflow-y-auto bg-transparent py-1.75 pr-11 text-[13px] leading-5 text-neutral-100 shadow-none hover:bg-transparent placeholder:text-[13px]!"
+                        />
                         <Button
-                            variant="unstyled"
-                            type="button"
-                            onClick={() => setReplyTo(null)}
-                            aria-label="Cancel reply"
-                            className="shrink-0 rounded p-1 text-neutral-400 hover:text-neutral-100"
+                            variant="ghost"
+                            size="icon"
+                            onClick={handleSend}
+                            disabled={disabled || !message.trim()}
+                            aria-label="Send message"
+                            className="absolute bottom-0.75 right-1.5 h-8! w-8! text-neutral-400 hover:bg-transparent hover:text-neutral-100 disabled:text-neutral-600"
                         >
-                            <IoMdClose className="size-4" />
+                            <IoIosSend className="size-5.5" />
                         </Button>
                     </div>
-                )}
-                <div className="relative">
-                    <Textarea
-                        ref={inputRef}
-                        placeholder={placeholder}
-                        value={message}
-                        rows={1}
-                        data-lenis-prevent
-                        onChange={(e) => {
-                            setMessage(e.target.value);
-                            syncMention(e.target.value, e.target.selectionStart);
-                        }}
-                        onKeyDown={(e) => {
-                            if (mentionMatches.length > 0) {
-                                if (e.key === "ArrowDown" || e.key === "ArrowUp") {
-                                    e.preventDefault();
-                                    const step = e.key === "ArrowDown" ? 1 : -1;
-                                    setMentionIndex(
-                                        (mentionIndex + step + mentionMatches.length) %
-                                            mentionMatches.length,
-                                    );
-                                    return;
-                                }
-                                if (e.key === "Enter" || e.key === "Tab") {
-                                    e.preventDefault();
-                                    insertMention(mentionMatches[mentionIndex]);
-                                    return;
-                                }
-                                if (e.key === "Escape") {
-                                    setMentionQuery(null);
-                                    return;
-                                }
-                            }
-                            if (e.key === "Escape" && replyTo) {
-                                setReplyTo(null);
-                                return;
-                            }
-                            if (e.key === "Enter" && !e.shiftKey) {
-                                e.preventDefault();
-                                handleSend();
-                            }
-                        }}
-                        disabled={disabled}
-                        className="no-scrollbar min-h-9.5 max-h-28 w-full resize-none overflow-y-auto border-neutral-500 py-1.75 pr-11 text-[13px] leading-5 text-neutral-100 placeholder:text-[13px]!"
-                    />
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={handleSend}
-                        disabled={disabled || !message.trim()}
-                        aria-label="Send message"
-                        className="absolute bottom-0.75 right-1.5 h-8! w-8! text-neutral-400 hover:bg-transparent hover:text-neutral-100 disabled:text-neutral-600"
-                    >
-                        <IoIosSend className="size-5.5" />
-                    </Button>
                 </div>
             </footer>
         </>
