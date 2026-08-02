@@ -1,4 +1,4 @@
-import { IssueStatus, OrgRole, ProjectRole, TeamRole } from "./enums.prisma";
+import { IssueStatus, NotificationType, OrgRole, ProjectRole, TeamRole } from "./enums.prisma";
 
 export interface User {
     id: string;
@@ -192,6 +192,16 @@ export interface ProjectChatMention {
     projectChatId: string;
     memberId: string;
     member?: ProjectMember;
+
+    createdAt: Date;
+}
+
+export interface Notification {
+    id: string;
+    userId: string;
+    type: NotificationType;
+    payload: Record<string, unknown>;
+    readAt: Date | null;
 
     createdAt: Date;
 }

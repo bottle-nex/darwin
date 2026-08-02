@@ -37,6 +37,7 @@ model User {
   projectChats ProjectChat[]
 
   customColumnOrders CustomColumnOrder[]
+  notifications      Notification[]
 }
 
 model Organization {
@@ -462,6 +463,19 @@ model CodeEmbedding {
   @@map("code_embeddings")
 }
 
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  type      NotificationType
+  payload   Json
+  readAt    DateTime?
+  createdAt DateTime         @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, readAt])
+}
+
 model SetupSession {
   id        String  @id @default(cuid())
   projectId String
@@ -636,6 +650,13 @@ enum ProjectRole {
   Write
   Triage
   Read
+}
+
+enum NotificationType {
+  IssueAssigned
+  IssueUnassigned
+  ChatMention
+  ProjectChatMention
 }
 
 enum TeamRole {

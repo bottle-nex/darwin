@@ -4,6 +4,7 @@ import { prisma } from "@trymatcha/database";
 import { Action, Permissions } from "@trymatcha/access-control";
 import ResponseWriter from "../../services/service.response";
 import Access from "../../access-control/access";
+import { server_services } from "../..";
 
 export default class IssueUnassignController {
     // Both ids come from the URL: /issues/:id/assignees/:user_id
@@ -74,6 +75,16 @@ export default class IssueUnassignController {
                     tags: { select: { id: true, name: true, color: true } },
                 },
             });
+
+            // Dropping yourself doesn't need to notify yourself.
+            if (target_user_id !== user.id) {
+                await server_services.notifications.enqueue({
+                    action: "issue.unassigned",
+                    issueId: issue_id,
+                    assigneeId: target_user_id,
+                    actorId: user.id,
+                });
+            }
 
             ResponseWriter.success(res, { issue: updated }, "Issue unassigned");
         } catch (error) {

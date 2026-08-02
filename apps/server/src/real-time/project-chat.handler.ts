@@ -152,6 +152,20 @@ export default class ProjectChatSocketHandler {
                 channel_name,
                 JSON.stringify(publish_body),
             );
+
+            // Notify tagged members, excluding whoever mentioned themselves.
+            await Promise.all(
+                chat.mentions
+                    .filter((mention) => mention.member.userId !== user.id)
+                    .map((mention) =>
+                        server_services.notifications.enqueue({
+                            action: "project_chat.mention",
+                            projectChatId: chat.id,
+                            memberId: mention.memberId,
+                            mentionedById: user.id,
+                        }),
+                    ),
+            );
         } catch (error) {
             console.error("ProjectChatSocketHandler error: ", error);
             ProjectChatSocketHandler.send_error(ws, "Something went wrong");

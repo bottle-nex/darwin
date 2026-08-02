@@ -162,6 +162,20 @@ export default class ChatSocketHandler {
                 channel_name,
                 JSON.stringify(publish_body),
             );
+
+            // Notify tagged members, excluding whoever mentioned themselves.
+            await Promise.all(
+                chat.mentions
+                    .filter((mention) => mention.member.userId !== user.id)
+                    .map((mention) =>
+                        server_services.notifications.enqueue({
+                            action: "chat.mention",
+                            chatId: chat.id,
+                            memberId: mention.memberId,
+                            mentionedById: user.id,
+                        }),
+                    ),
+            );
         } catch (error) {
             console.error("ChatSocketHandler error: ", error);
             ChatSocketHandler.send_error(ws, "Something went wrong");
