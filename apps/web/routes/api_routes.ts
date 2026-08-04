@@ -93,3 +93,6 @@ export const ISSUE_THREADS_URL = (project_id: string) => `${CHATS_URL}/threads/$
 // <--------------------- PROJECT CHAT ROUTES --------------------->
 export const PROJECT_CHATS_URL = API_URL + "/project-chats";
 export const PROJECT_CHAT_URL = (project_id: string) => `${PROJECT_CHATS_URL}/${project_id}`;
+
+// <--------------------- NOTIFICATION ROUTES --------------------->
+export const NOTIFICATIONS_URL = API_URL + "/notifications";

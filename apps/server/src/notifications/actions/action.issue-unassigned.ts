@@ -13,7 +13,12 @@ export default class IssueUnassignedNotification {
     static async handle(data: IssueUnassignedJobData) {
         const issue = await prisma.issue.findUnique({
             where: { id: data.issueId },
-            select: { title: true, projectId: true },
+            select: {
+                title: true,
+                number: true,
+                projectId: true,
+                project: { select: { slug: true, organization: { select: { slug: true } } } },
+            },
         });
         if (!issue) return;
 
@@ -32,7 +37,10 @@ export default class IssueUnassignedNotification {
                 payload: {
                     issueId: data.issueId,
                     issueTitle: issue.title,
+                    issueNumber: issue.number,
                     projectId: issue.projectId,
+                    projectSlug: issue.project.slug,
+                    orgSlug: issue.project.organization.slug,
                     actorId: data.actorId,
                     actorName,
                 },

@@ -10,7 +10,11 @@ export default class ProjectChatMentionNotification {
     static async handle(data: ProjectChatMentionJobData) {
         const chat = await prisma.projectChat.findUnique({
             where: { id: data.projectChatId },
-            select: { message: true, projectId: true },
+            select: {
+                message: true,
+                projectId: true,
+                project: { select: { slug: true, organization: { select: { slug: true } } } },
+            },
         });
         if (!chat) return;
 
@@ -27,7 +31,9 @@ export default class ProjectChatMentionNotification {
         if (!member || !sender) return;
 
         const senderName = sender.name ?? sender.email;
-        const url = `${ENV.SERVER_WEB_URL}/playground/${chat.projectId}`;
+        const orgSlug = chat.project.organization.slug;
+        const projectSlug = chat.project.slug;
+        const url = `${ENV.SERVER_WEB_URL}/playground/${orgSlug}/${projectSlug}?tab=thread-detail&thread=project`;
 
         const notification = await prisma.notification.create({
             data: {
@@ -36,6 +42,8 @@ export default class ProjectChatMentionNotification {
                 payload: {
                     projectChatId: data.projectChatId,
                     projectId: chat.projectId,
+                    projectSlug,
+                    orgSlug,
                     senderId: data.mentionedById,
                     senderName,
                     message: chat.message,
