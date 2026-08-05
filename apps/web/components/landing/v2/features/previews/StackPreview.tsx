@@ -22,13 +22,10 @@ const CARDS: Mini[] = [
 
 export default function StackPreview() {
     return (
-        // Negative bottom margin lets the stack reach + bleed past the card's
-        // padded edge; the card's overflow-hidden crops it like the real app.
         <div className="relative -mb-8 mt-1 sm:-mb-10">
-            {/* Solid receding panels behind the front card → paper-stack depth. */}
             <div className="mx-auto h-5 w-[74%] rounded-t-xl bg-white/75" />
             <div className="mx-auto -mt-2 h-5 w-[87%] rounded-t-xl bg-white/90" />
-            <div className="relative -mt-2 rounded-xl bg-white p-3 shadow-[0_-2px_28px_rgba(28,18,70,0.22)] ring-1 ring-black/5 transition-transform duration-300 ease-out group-hover:-translate-y-1.5 motion-reduce:transform-none">
+            <div className="relative -mt-2 rounded-t-xl bg-white p-3 shadow-[0_-2px_28px_rgba(28,18,70,0.22)] ring-1 ring-black/5 transition-transform duration-300 ease-out group-hover:-translate-y-1.5 motion-reduce:transform-none">
                 <div className="mb-2.5 flex items-center gap-1.5 text-[10px] font-medium text-neutral-500">
                     <span className="relative flex size-1.5">
                         <span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-400/70 motion-reduce:hidden" />

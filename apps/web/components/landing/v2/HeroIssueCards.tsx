@@ -78,7 +78,6 @@ export default function HeroIssueCards() {
                     </div>
                 </FloatingCard>
 
-                {/* Dark — agent mid-flight */}
                 <FloatingCard rotate={5} delay={0.65} className="top-[34%] -right-4 2xl:right-2">
                     <div className="rounded-xl bg-charcoal p-3 shadow-[0_16px_40px_-16px_rgba(15,23,42,0.55)] ring-1 ring-white/10">
                         <div className="flex items-center justify-between gap-2">

@@ -3,9 +3,9 @@ import { NavBar } from "@/components/nav/Navbar";
 import LandingHeroV2 from "@/components/landing/v2/LandingHeroV2";
 import BoardShowcase from "@/components/landing/v2/BoardShowcase";
 import FeaturesSection from "@/components/landing/v2/FeaturesSection";
-import LandingPricingSection from "@/components/landing/LandingPricingComponent/LandingPricingSection";
 import CtaSection from "@/components/app/CtaSection";
 import StackCards from "@/components/landing/v2/StackCards";
+import IntegrationsSection from "@/components/landing/v2/IntegrationsSection";
 
 export default function Home() {
     return (
@@ -14,9 +14,7 @@ export default function Home() {
             <LandingHeroV2 />
             <BoardShowcase />
             <FeaturesSection />
-            <div id="pricing" className="scroll-mt-20">
-                <LandingPricingSection />
-            </div>
+            <IntegrationsSection />
             <StackCards />
             <CtaSection />
             <Footer />
