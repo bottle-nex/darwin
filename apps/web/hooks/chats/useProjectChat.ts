@@ -63,6 +63,23 @@ export function add_project_chat(queryClient: QueryClient, chat: ProjectChat) {
  * appends. No-ops if the project's list isn't loaded, it'll be fetched fresh
  * when the project chat is opened.
  */
+/**
+ * Flags a project chat as deleted in place and flips the embedded quote copy
+ * on any replies to it, so quotes switch to the "Message deleted" rendering.
+ * Shared by the deleter's optimistic update and the PROJECT_CHAT_DELETED
+ * broadcast handler — idempotent, so running both is fine.
+ */
+export function mark_project_chat_deleted(queryClient: QueryClient, chat: ProjectChat) {
+    queryClient.setQueryData<ProjectChat[]>([...PROJECT_CHATS_QUERY_KEY, chat.projectId], (prev) =>
+        prev?.map((existing) => {
+            const next = existing.id === chat.id ? { ...existing, isDeleted: true } : existing;
+            return next.repliedToId === chat.id && next.repliedTo
+                ? { ...next, repliedTo: { ...next.repliedTo, isDeleted: true } }
+                : next;
+        }),
+    );
+}
+
 export function upsert_project_chat(queryClient: QueryClient, chat: ProjectChat) {
     queryClient.setQueryData<ProjectChat[]>(
         [...PROJECT_CHATS_QUERY_KEY, chat.projectId],

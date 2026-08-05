@@ -6,14 +6,20 @@ import { MdChat, MdFolder } from "react-icons/md";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { useProjectMembers } from "@/hooks/project/useProjectMembers";
-import { useChats, add_chat, build_optimistic_chat } from "@/hooks/chats/useChats";
+import {
+    useChats,
+    add_chat,
+    build_optimistic_chat,
+    mark_chat_deleted,
+} from "@/hooks/chats/useChats";
 import {
     useProjectChat,
     add_project_chat,
     build_optimistic_project_chat,
+    mark_project_chat_deleted,
 } from "@/hooks/chats/useProjectChat";
-import { send_socket_message } from "@/socket/singleton.socket";
-import { InboundSocketMessageType } from "@trymatcha/types";
+import { send_socket_message } from "@/hooks/socket/useWebSocket";
+import { InboundSocketMessageType, type Chat, type ProjectChat } from "@trymatcha/types";
 import SessionServices from "@/lib/session";
 import ProjectChatThread from "@/components/playground/Home/chat/ProjectChatThread";
 import { DEFAULT_FOLDER_COLOR } from "@/components/playground/Core/TopBar/PlaygroundProjectSwitcher";
@@ -90,6 +96,30 @@ export default function ThreadDetailDisplay() {
         }
     }
 
+    function handleDelete(chat: Chat | ProjectChat) {
+        if (!selectedThread) return;
+        const sent =
+            selectedThread.kind === "project"
+                ? send_socket_message({
+                      type: InboundSocketMessageType.PROJECT_CHAT_DELETE,
+                      payload: { chatId: chat.id },
+                  })
+                : send_socket_message({
+                      type: InboundSocketMessageType.CHAT_DELETE,
+                      payload: { chatId: chat.id },
+                  });
+        if (!sent) {
+            toast.error("Couldn't delete the message.");
+            return;
+        }
+
+        if (selectedThread.kind === "project") {
+            mark_project_chat_deleted(queryClient, chat as ProjectChat);
+        } else {
+            mark_chat_deleted(queryClient, chat as Chat);
+        }
+    }
+
     const isProjectThread = selectedThread.kind === "project";
     const title = isProjectThread
         ? (activeProject?.name ?? "Project chat")
@@ -135,6 +165,7 @@ export default function ThreadDetailDisplay() {
                         selectedThread.kind === "project" ? "No messages yet." : "No comments yet."
                     }
                     onSend={handleSend}
+                    onDelete={handleDelete}
                 />
             </div>
         </div>

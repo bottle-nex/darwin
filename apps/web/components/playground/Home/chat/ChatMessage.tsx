@@ -1,4 +1,13 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { motion } from "motion/react";
+import { MdContentCopy, MdDelete, MdKeyboardArrowDown } from "react-icons/md";
 import { BsReply } from "react-icons/bs";
 import { cn } from "@/lib/utils";
 import PlaygroundAvatar, {
@@ -128,7 +137,9 @@ export default function ChatMessage({
     endsGroup,
     mentionNames,
     viewerId,
+    canDelete,
     onReply,
+    onDelete,
     onQuoteClick,
 }: {
     chat: AnyChat;
@@ -137,47 +148,57 @@ export default function ChatMessage({
     endsGroup: boolean;
     mentionNames: string[];
     viewerId?: string;
+    canDelete: boolean;
     onReply: (chat: AnyChat) => void;
+    onDelete: (chat: AnyChat) => void;
     onQuoteClick: (chatId: string) => void;
 }) {
     const name = senderName(chat);
     const sentAt = new Date(chat.createdAt);
-    console.log("chat is : ", chat);
+    const [isFresh] = useState(() => Date.now() - sentAt.getTime() < 3000);
     return (
-        <li
+        <motion.li
             id={`chat-${chat.id}`}
+            initial={isFresh ? { opacity: 0, x: isMine ? 32 : -32, scale: 0.6 } : false}
+            animate={{ opacity: 1, x: 0, scale: 1 }}
+            transition={{ type: "spring", stiffness: 400, damping: 26 }}
+            style={{ transformOrigin: isMine ? "bottom right" : "bottom left" }}
             className={cn(
                 "flex items-end gap-2 rounded-lg transition-colors duration-500 relative",
                 isMine ? "flex-row-reverse" : "flex-row",
                 startsGroup ? "mt-4 first:mt-0" : "mt-1",
             )}
         >
-            <PlaygroundAvatar
-                letter={name.charAt(0).toUpperCase()}
-                src={chat.sender?.image ?? undefined}
-                tone={toneFor(chat.senderId ?? name)}
-                size="lg"
-                className={cn("rounded-full", !endsGroup && "invisible")}
-            />
+            {!isMine && (
+                <PlaygroundAvatar
+                    letter={name.charAt(0).toUpperCase()}
+                    src={chat.sender?.image ?? undefined}
+                    tone={toneFor(chat.senderId ?? name)}
+                    size="lg"
+                    className={cn("rounded-full", !endsGroup && "invisible")}
+                />
+            )}
             <article
                 className={cn(
-                    "group/bubble relative min-w-0 max-w-[65%] rounded-[7px] px-2.5 py-1.5 text-[13px] leading-snug wrap-anywhere",
+                    "group/bubble relative min-w-0 max-w-[65%] rounded-[5px] px-2.5 py-1.5 text-[13px] leading-snug wrap-anywhere",
                     isMine ? "bg-indigo-500/85 text-white" : "bg-white/6 text-neutral-200",
                     endsGroup && (isMine ? "rounded-br-xs" : "rounded-bl-xs"),
                 )}
             >
-                <Button
-                    variant="unstyled"
-                    type="button"
-                    onClick={() => onReply(chat)}
-                    aria-label="Reply"
-                    className={cn(
-                        "absolute top-1 z-10 cursor-pointer rounded-md bg-neutral-800 p-1 text-neutral-300 opacity-0 transition-opacity hover:text-white group-hover/bubble:opacity-100",
-                        isMine ? "-left-7" : "right-7",
-                    )}
-                >
-                    <BsReply className="size-3.5" />
-                </Button>
+                {!chat.isDeleted && (
+                    <Button
+                        variant="unstyled"
+                        type="button"
+                        onClick={() => onReply(chat)}
+                        aria-label="Reply"
+                        className={cn(
+                            "absolute top-1 z-10 cursor-pointer rounded-md bg-neutral-800 p-1 text-neutral-300 opacity-0 transition-opacity hover:text-white group-hover/bubble:opacity-100",
+                            isMine ? "-left-7" : "-right-7",
+                        )}
+                    >
+                        <BsReply className="size-3.5" />
+                    </Button>
+                )}
                 {startsGroup && !isMine && (
                     <header
                         className={cn("mb-0.5 text-[10.5px] font-medium", senderToneText(chat))}
@@ -185,7 +206,7 @@ export default function ChatMessage({
                         {name}
                     </header>
                 )}
-                {chat.repliedToId && (
+                {!chat.isDeleted && chat.repliedToId && (
                     <QuotedMessage
                         quote={chat.repliedTo}
                         isMine={isMine}
@@ -193,17 +214,58 @@ export default function ChatMessage({
                         onQuoteClick={onQuoteClick}
                     />
                 )}
-                {renderWithMentions(chat.message, mentionNames)}
-                <time
-                    dateTime={sentAt.toISOString()}
-                    className={cn(
-                        "float-right ml-2 mt-1.5 text-[9px] leading-none",
-                        isMine ? "text-white/80" : "text-neutral-400",
+                {chat.isDeleted ? (
+                    <span className={cn("italic", isMine ? "text-white/60" : "text-neutral-500")}>
+                        Message deleted
+                    </span>
+                ) : (
+                    renderWithMentions(chat.message, mentionNames)
+                )}
+                <span className="relative float-right ml-2 mt-1.5 flex items-center">
+                    {!chat.isDeleted && (
+                        <DropdownMenu modal={false}>
+                            <DropdownMenuTrigger className="cursor-pointer" asChild>
+                                <Button
+                                    type="button"
+                                    variant="unstyled"
+                                    aria-label="Message options"
+                                    className={cn(
+                                        "p-0.5 bg-charcoal rounded-sm aspect-square peer absolute inset-x-0 bottom-0 mx-auto w-fit flex cursor-pointer items-center justify-center opacity-0 transition-opacity group-hover/bubble:opacity-100 data-[state=open]:opacity-100 before:absolute before:-inset-x-3 before:-inset-y-2",
+                                        isMine
+                                            ? "text-white/80 hover:text-white"
+                                            : "text-neutral-400 hover:text-neutral-200",
+                                    )}
+                                >
+                                    <MdKeyboardArrowDown className="size-3.75" />
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" sideOffset={6} className="w-32">
+                                <DropdownMenuItem
+                                    onSelect={() => navigator.clipboard.writeText(chat.message)}
+                                >
+                                    <MdContentCopy className="size-3.5" />
+                                    Copy
+                                </DropdownMenuItem>
+                                {canDelete && (
+                                    <DropdownMenuItem onSelect={() => onDelete(chat)}>
+                                        <MdDelete className="size-3.5" />
+                                        Delete
+                                    </DropdownMenuItem>
+                                )}
+                            </DropdownMenuContent>
+                        </DropdownMenu>
                     )}
-                >
-                    {sentAt.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}
-                </time>
+                    <time
+                        dateTime={sentAt.toISOString()}
+                        className={cn(
+                            "text-[9px] leading-none transition-opacity group-hover/bubble:opacity-0 peer-data-[state=open]:opacity-0",
+                            isMine ? "text-white/80" : "text-neutral-400",
+                        )}
+                    >
+                        {sentAt.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}
+                    </time>
+                </span>
             </article>
-        </li>
+        </motion.li>
     );
 }

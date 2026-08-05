@@ -41,6 +41,7 @@ const PROJECT_PERMISSIONS: Record<ProjectRole, Set<ProjectAction>> = {
         Action.project.triage_issue,
         Action.project.close_issue,
         Action.project.assign_issue,
+        Action.project.delete_any_chat,
         Action.project.manage_columns,
         Action.project.manage_tags,
         Action.project.manage_templates,

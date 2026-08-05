@@ -26,7 +26,7 @@ const OptionButton = forwardRef<HTMLButtonElement, OptionButtonProps>(
             aria-label={label}
             aria-pressed={active}
             className={cn(
-                "flex size-7 cursor-pointer items-center justify-center rounded-md transition-colors",
+                "flex size-7 cursor-pointer items-center justify-center rounded-[5px] transition-colors",
                 active
                     ? "bg-white/5 text-neutral-200"
                     : "text-neutral-400 hover:bg-white/5 hover:text-neutral-200",

@@ -71,8 +71,14 @@ export default class SocketServer {
                     case InboundSocketMessageType.CHAT_CREATE:
                         await this.create_chat(ws, project_id, message);
                         return;
+                    case InboundSocketMessageType.CHAT_DELETE:
+                        await this.delete_chat(ws, project_id, message);
+                        return;
                     case InboundSocketMessageType.PROJECT_CHAT_CREATE:
                         await this.create_project_chat(ws, project_id, message);
+                        return;
+                    case InboundSocketMessageType.PROJECT_CHAT_DELETE:
+                        await this.delete_project_chat(ws, project_id, message);
                         return;
                     default:
                         return;
@@ -99,6 +105,29 @@ export default class SocketServer {
                 }
             }
         }
+    }
+
+    private async delete_chat(ws: WebSocket, project_id: string, message: InboundSocketMessage) {
+        const user = this.connection_users.get(ws);
+        if (!user) return;
+        await ChatSocketHandler.handle_chat_delete(ws, user, project_id, message.payload);
+        return;
+    }
+
+    private async delete_project_chat(
+        ws: WebSocket,
+        project_id: string,
+        message: InboundSocketMessage,
+    ) {
+        const user = this.connection_users.get(ws);
+        if (!user) return;
+        await ProjectChatSocketHandler.handle_project_chat_delete(
+            ws,
+            user,
+            project_id,
+            message.payload,
+        );
+        return;
     }
 
     private async create_chat(ws: WebSocket, project_id: string, message: InboundSocketMessage) {

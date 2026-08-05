@@ -1,10 +1,26 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import WebSocketClient from "@/socket/socket.client";
-import { get_socket_client, close_socket_client } from "@/socket/singleton.socket";
+import {
+    get_socket_client,
+    get_active_socket_client,
+    close_socket_client,
+} from "@/socket/singleton.socket";
 import { type MessageHandler } from "@/socket/socket.client";
-import { OutboundSocketMessageType } from "@trymatcha/types";
+import { type InboundSocketMessage, OutboundSocketMessageType } from "@trymatcha/types";
 import SessionServices from "@/lib/session";
+
+/**
+ * Send through the active project connection. Returns false when no connection
+ * has been opened yet; if the socket is mid-reconnect the client queues the
+ * message and flushes it once reconnected.
+ */
+export function send_socket_message(message: InboundSocketMessage): boolean {
+    const client = get_active_socket_client();
+    if (!client) return false;
+    client.send(message);
+    return true;
+}
 
 export function useWebSocket(project_id: string | undefined) {
     const socket = useRef<WebSocketClient | null>(null);

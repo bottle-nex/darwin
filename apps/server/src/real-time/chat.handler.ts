@@ -14,6 +14,77 @@ export default class ChatSocketHandler {
         repliedToId: z.string().min(1).optional(),
     });
 
+    static delete_payload_schema = z.object({
+        chatId: z.string().min(1),
+    });
+
+    static async handle_chat_delete(
+        ws: WebSocket,
+        user: AuthUser,
+        project_id: string,
+        raw_payload: unknown,
+    ) {
+        const parsed = ChatSocketHandler.delete_payload_schema.safeParse(raw_payload);
+        if (!parsed.success) {
+            ChatSocketHandler.send_error(ws, "Invalid chat data provided");
+            return;
+        }
+        const { chatId } = parsed.data;
+
+        try {
+            const chat = await prisma.chat.findUnique({
+                where: { id: chatId },
+                select: {
+                    id: true,
+                    senderId: true,
+                    isDeleted: true,
+                    issue: { select: { projectId: true } },
+                },
+            });
+            if (!chat || chat.issue.projectId !== project_id) {
+                ChatSocketHandler.send_error(ws, "Message not found");
+                return;
+            }
+
+            const role = await Access.project(user.id, project_id);
+            if (!role || !Permissions.project(role, Action.project.read)) {
+                ChatSocketHandler.send_error(ws, "You dont have access to this project");
+                return;
+            }
+
+            const is_author = chat.senderId !== null && chat.senderId === user.id;
+            if (!is_author && !Permissions.project(role, Action.project.delete_any_chat)) {
+                ChatSocketHandler.send_error(ws, "You cannot delete this message");
+                return;
+            }
+
+            if (chat.isDeleted) return;
+
+            const deleted = await prisma.chat.update({
+                where: { id: chat.id },
+                data: { isDeleted: true },
+                include: {
+                    sender: true,
+                    repliedTo: { include: { sender: true } },
+                },
+            });
+
+            const channel_name = server_services.publisher.get_channel_name(project_id);
+            const publish_body = {
+                type: OutboundSocketMessageType.CHAT_DELETED,
+                projectId: project_id,
+                payload: deleted,
+            };
+            await server_services.publisher.publish_message(
+                channel_name,
+                JSON.stringify(publish_body),
+            );
+        } catch (error) {
+            console.error("ChatSocketHandler error: ", error);
+            ChatSocketHandler.send_error(ws, "Something went wrong");
+        }
+    }
+
     static async handle_chat_create(
         ws: WebSocket,
         user: AuthUser,

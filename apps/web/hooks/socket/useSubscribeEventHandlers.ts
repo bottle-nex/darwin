@@ -18,10 +18,14 @@ export function useSubscribeEventHandlers(project_id: string | undefined) {
                 SocketHandlers.handle_issue_created(queryClient, message),
             [OutboundSocketMessageType.CHAT_CREATED]: (message) =>
                 SocketHandlers.handle_chat_created(queryClient, message),
+            [OutboundSocketMessageType.CHAT_DELETED]: (message) =>
+                SocketHandlers.handle_chat_deleted(queryClient, message),
             [OutboundSocketMessageType.CHAT_ERROR]: (message) =>
                 SocketHandlers.handle_chat_error(message),
             [OutboundSocketMessageType.PROJECT_CHAT_CREATED]: (message) =>
                 SocketHandlers.handle_project_chat_created(queryClient, message),
+            [OutboundSocketMessageType.PROJECT_CHAT_DELETED]: (message) =>
+                SocketHandlers.handle_project_chat_deleted(queryClient, message),
         };
 
         Object.entries(handlers_map).forEach(([type, handler]) => {

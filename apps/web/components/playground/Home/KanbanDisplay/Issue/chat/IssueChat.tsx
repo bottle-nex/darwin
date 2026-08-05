@@ -4,9 +4,14 @@ import { toast } from "sonner";
 import { BsChatRightTextFill } from "react-icons/bs";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { useProjectMembers } from "@/hooks/project/useProjectMembers";
-import { useChats, add_chat, build_optimistic_chat } from "@/hooks/chats/useChats";
-import { send_socket_message } from "@/socket/singleton.socket";
-import { InboundSocketMessageType } from "@trymatcha/types";
+import {
+    useChats,
+    add_chat,
+    build_optimistic_chat,
+    mark_chat_deleted,
+} from "@/hooks/chats/useChats";
+import { send_socket_message } from "@/hooks/socket/useWebSocket";
+import { InboundSocketMessageType, type Chat, type ProjectChat } from "@trymatcha/types";
 import SessionServices from "@/lib/session";
 import ChatThread from "@/components/playground/Home/chat/ProjectChatThread";
 
@@ -15,6 +20,23 @@ export default function IssueChat({ issueId }: { issueId?: string }) {
     const queryClient = useQueryClient();
     const { data: chats, isLoading } = useChats(issueId);
     const { data: members } = useProjectMembers(useActiveProject()?.id);
+
+    /**
+     * Asks the server to soft-delete the comment, flagging it locally right
+     * away — the CHAT_DELETED broadcast reconciles it when it round-trips
+     * (CHAT_ERROR surfaces via toast).
+     */
+    function handleDelete(chat: Chat | ProjectChat) {
+        const sent = send_socket_message({
+            type: InboundSocketMessageType.CHAT_DELETE,
+            payload: { chatId: chat.id },
+        });
+        if (!sent) {
+            toast.error("Couldn't delete the message.");
+            return;
+        }
+        mark_chat_deleted(queryClient, chat as Chat);
+    }
 
     /**
      * Sends the comment over the project socket, then echoes it into the
@@ -47,7 +69,7 @@ export default function IssueChat({ issueId }: { issueId?: string }) {
     }
 
     return (
-        <section className="m-2.5 flex min-h-0 min-w-0 flex-1 flex-col rounded-[13px] bg-white/3 *:px-4 *:py-3">
+        <section className="m-2.5 flex min-h-0 min-w-0 flex-1 flex-col rounded-[8px] bg-graphite *:px-4 *:py-3">
             <header className="text-sm font-medium text-neutral-100 flex items-center gap-x-3">
                 <BsChatRightTextFill />
                 <span>Comments and activity</span>
@@ -62,6 +84,7 @@ export default function IssueChat({ issueId }: { issueId?: string }) {
                 }
                 disabled={!issueId}
                 onSend={handleSend}
+                onDelete={handleDelete}
             />
         </section>
     );

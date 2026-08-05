@@ -21,6 +21,7 @@ const Action = {
         create_issue: "create_issue",
         triage_issue: "triage_issue",
         close_issue: "close_issue",
+        delete_any_chat: "delete_any_chat",
         assign_issue: "assign_issue",
         manage_columns: "manage_columns",
         manage_tags: "manage_tags",

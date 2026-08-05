@@ -4,7 +4,9 @@ import type { Chat, Issue, ProjectChat } from "../prisma/schemas.prisma";
 export enum InboundSocketMessageType {
     ISSUE_CREATE = "ISSUE_CREATE",
     CHAT_CREATE = "CHAT_CREATE",
+    CHAT_DELETE = "CHAT_DELETE",
     PROJECT_CHAT_CREATE = "PROJECT_CHAT_CREATE",
+    PROJECT_CHAT_DELETE = "PROJECT_CHAT_DELETE",
 }
 
 export type InboundSocketMessage =
@@ -22,10 +24,22 @@ export type InboundSocketMessage =
           };
       }
     | {
+          type: InboundSocketMessageType.CHAT_DELETE;
+          payload: {
+              chatId: string;
+          };
+      }
+    | {
           type: InboundSocketMessageType.PROJECT_CHAT_CREATE;
           payload: {
               message: string;
               repliedToId?: string;
+          };
+      }
+    | {
+          type: InboundSocketMessageType.PROJECT_CHAT_DELETE;
+          payload: {
+              chatId: string;
           };
       };
 
@@ -33,8 +47,10 @@ export type InboundSocketMessage =
 export enum OutboundSocketMessageType {
     ISSUE_CREATED = "ISSUE_CREATED",
     CHAT_CREATED = "CHAT_CREATED",
+    CHAT_DELETED = "CHAT_DELETED",
     CHAT_ERROR = "CHAT_ERROR",
     PROJECT_CHAT_CREATED = "PROJECT_CHAT_CREATED",
+    PROJECT_CHAT_DELETED = "PROJECT_CHAT_DELETED",
 }
 
 export type OutboundSocketMessage =
@@ -53,7 +69,17 @@ export type OutboundSocketMessage =
           message: string;
       }
     | {
+          type: OutboundSocketMessageType.CHAT_DELETED;
+          projectId: string;
+          payload: Chat;
+      }
+    | {
           type: OutboundSocketMessageType.PROJECT_CHAT_CREATED;
+          projectId: string;
+          payload: ProjectChat;
+      }
+    | {
+          type: OutboundSocketMessageType.PROJECT_CHAT_DELETED;
           projectId: string;
           payload: ProjectChat;
       };

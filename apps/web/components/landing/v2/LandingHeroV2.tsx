@@ -17,7 +17,7 @@ export default function LandingHeroV2() {
                     <Reveal immediate>
                         <div
                             className={cn(
-                                "buddy-zone flex items-center gap-2 rounded-full border border-neutral-800 bg-charcoal px-3 py-1.5 text-[11px] uppercase tracking-wide text-neutral-400 shadow-sm bg-ink",
+                                "buddy-zone flex items-center gap-2 rounded-full border border-neutral-800 px-3 py-1.5 text-[11px] uppercase tracking-wide text-neutral-400 shadow-sm bg-ink",
                                 azeretMono.className,
                             )}
                         >
@@ -41,11 +41,11 @@ export default function LandingHeroV2() {
                     </Reveal>
                     <Reveal immediate delay={0.24}>
                         <div className="flex flex-col items-center gap-3 sm:flex-row sm:gap-x-4">
-                            <Button size="lg" variant="tertiary">
+                            <Button variant="tertiary">
                                 Get started
                                 <PiArrowRight className="h-3 w-3" />
                             </Button>
-                            <Button size="lg" asChild>
+                            <Button asChild>
                                 <Link href="/why" className="uppercase">
                                     Why matcha
                                     <MdArrowForward />

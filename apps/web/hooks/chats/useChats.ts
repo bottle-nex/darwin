@@ -19,7 +19,7 @@ export function useChats(issueId: string | undefined) {
 }
 
 /** Marks a chat as a local echo not yet confirmed by the CHAT_CREATED broadcast. */
-const OPTIMISTIC_ID_PREFIX = "optimistic:";
+export const OPTIMISTIC_ID_PREFIX = "optimistic:";
 
 /**
  * Builds the chat shown the instant the commenter hits send, before the
@@ -61,6 +61,23 @@ export function add_chat(queryClient: QueryClient, chat: Chat) {
  * appends. No-ops if the issue's list isn't loaded, it'll be fetched fresh
  * when the issue is opened.
  */
+/**
+ * Flags a chat as deleted in place and flips the embedded quote copy on any
+ * replies to it, so quotes switch to the "Message deleted" rendering. Shared
+ * by the deleter's optimistic update and the CHAT_DELETED broadcast handler —
+ * idempotent, so running both is fine.
+ */
+export function mark_chat_deleted(queryClient: QueryClient, chat: Chat) {
+    queryClient.setQueryData<Chat[]>([...CHATS_QUERY_KEY, chat.issueId], (prev) =>
+        prev?.map((existing) => {
+            const next = existing.id === chat.id ? { ...existing, isDeleted: true } : existing;
+            return next.repliedToId === chat.id && next.repliedTo
+                ? { ...next, repliedTo: { ...next.repliedTo, isDeleted: true } }
+                : next;
+        }),
+    );
+}
+
 export function upsert_chat(queryClient: QueryClient, chat: Chat) {
     queryClient.setQueryData<Chat[]>([...CHATS_QUERY_KEY, chat.issueId], (prev) => {
         if (!prev) return prev;

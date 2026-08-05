@@ -1,8 +1,9 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import { animate } from "motion/react";
 import { IoIosSend, IoMdClose } from "react-icons/io";
 import { MdChat } from "react-icons/md";
-import type { Chat, ProjectChat } from "@trymatcha/types";
+import { ProjectRole, type Chat, type ProjectChat } from "@trymatcha/types";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import PlaygroundAvatar, {
@@ -10,6 +11,7 @@ import PlaygroundAvatar, {
 } from "@/components/playground/Core/components/PlaygroundAvatar";
 import SessionServices from "@/lib/session";
 import { type ProjectMember } from "@/hooks/project/useProjectMembers";
+import { OPTIMISTIC_ID_PREFIX } from "@/hooks/chats/useChats";
 import LogoLoader from "@/components/app/LogoLoader";
 import ChatMessage from "./ChatMessage";
 
@@ -23,6 +25,7 @@ type ChatThreadProps = {
     disabled?: boolean;
     loading?: boolean;
     onSend: (message: string, repliedToId?: string) => void;
+    onDelete: (chat: Chat | ProjectChat) => void;
 };
 
 export default function ChatThread({
@@ -33,18 +36,35 @@ export default function ChatThread({
     disabled,
     loading,
     onSend,
+    onDelete,
 }: ChatThreadProps) {
     const [message, setMessage] = useState<string>("");
     const [replyTo, setReplyTo] = useState<Chat | ProjectChat | null>(null);
     const [mentionQuery, setMentionQuery] = useState<string | null>(null);
     const [mentionIndex, setMentionIndex] = useState<number>(0);
     const currentUserId = SessionServices.get_user()?.id;
+    const viewerIsAdmin =
+        members?.some((m) => m.id === currentUserId && m.role === ProjectRole.Admin) ?? false;
+    const activeReplyTo =
+        replyTo && !chats?.some((c) => c.id === replyTo.id && c.isDeleted) ? replyTo : null;
     const scrollRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLTextAreaElement>(null);
 
     useEffect(() => {
         const el = scrollRef.current;
-        if (el) el.scrollTop = el.scrollHeight;
+        if (!el) return;
+        if (el.scrollTop === 0) {
+            el.scrollTop = el.scrollHeight;
+            return;
+        }
+        const animation = animate(el.scrollTop, el.scrollHeight - el.clientHeight, {
+            duration: 0.6,
+            ease: [0.25, 1, 0.35, 1],
+            onUpdate: (top) => {
+                el.scrollTop = top;
+            },
+        });
+        return () => animation.stop();
     }, [chats?.length]);
 
     useEffect(() => {
@@ -85,7 +105,7 @@ export default function ChatThread({
     function handleSend() {
         const trimmed = message.trim();
         if (!trimmed || disabled) return;
-        onSend(trimmed, replyTo?.id);
+        onSend(trimmed, activeReplyTo?.id);
         setMessage("");
         setReplyTo(null);
     }
@@ -108,7 +128,7 @@ export default function ChatThread({
                 {loading ? (
                     <LogoLoader size={32} className="h-full" />
                 ) : chats && chats.length > 0 ? (
-                    <ul className="flex min-w-0 flex-col gap-y-0.25">
+                    <ul className="flex min-w-0 flex-col gap-y-px">
                         {chats.map((chat, i) => (
                             <ChatMessage
                                 key={chat.id}
@@ -118,7 +138,14 @@ export default function ChatThread({
                                 endsGroup={chats[i + 1]?.senderId !== chat.senderId}
                                 mentionNames={(members ?? []).map((m) => m.name ?? m.email)}
                                 viewerId={currentUserId ?? undefined}
+                                canDelete={
+                                    Boolean(currentUserId) &&
+                                    !chat.id.startsWith(OPTIMISTIC_ID_PREFIX) &&
+                                    !chat.isDeleted &&
+                                    (chat.senderId === currentUserId || viewerIsAdmin)
+                                }
                                 onReply={setReplyTo}
+                                onDelete={onDelete}
                                 onQuoteClick={jumpToChat}
                             />
                         ))}
@@ -168,7 +195,7 @@ export default function ChatThread({
                     </ul>
                 )}
                 <div className="rounded-lg bg-[#1a1a1a] shadow-[inset_0_1px_0_0_#262626]">
-                    {replyTo && (
+                    {activeReplyTo && (
                         <div className="flex items-center gap-x-2.5 border-b border-white/6 px-2.5 py-2">
                             <span
                                 className="w-px shrink-0 self-stretch rounded-full bg-neutral-600"
@@ -177,12 +204,12 @@ export default function ChatThread({
                             <div className="min-w-0 flex-1">
                                 <span className="block text-[11px] leading-4 font-medium text-neutral-300">
                                     Replying to{" "}
-                                    {replyTo.senderId === currentUserId
+                                    {activeReplyTo.senderId === currentUserId
                                         ? "yourself"
-                                        : (replyTo.sender?.name ?? "Unknown")}
+                                        : (activeReplyTo.sender?.name ?? "Unknown")}
                                 </span>
                                 <span className="block truncate text-[12px] leading-4 text-neutral-500">
-                                    {replyTo.message}
+                                    {activeReplyTo.message}
                                 </span>
                             </div>
                             <Button
@@ -228,7 +255,7 @@ export default function ChatThread({
                                         return;
                                     }
                                 }
-                                if (e.key === "Escape" && replyTo) {
+                                if (e.key === "Escape" && activeReplyTo) {
                                     setReplyTo(null);
                                     return;
                                 }

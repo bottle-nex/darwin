@@ -64,7 +64,7 @@ export default function CustomKanbanColumn({
             ref={setNodeRef}
             style={style}
             className={cn(
-                "group flex max-h-full w-72 shrink-0 flex-col self-stretch rounded-xl p-1 ring-1 bg-cement",
+                "group flex max-h-full w-72 shrink-0 flex-col self-stretch rounded-[7px] p-1 ring-1 bg-cement",
                 isOver ? "ring-white/15" : "ring-white/5",
                 isDragging && "opacity-40",
             )}
@@ -183,7 +183,7 @@ export default function CustomKanbanColumn({
                         columnTitle: column.title,
                     })
                 }
-                className="mt-2 flex items-center justify-center gap-1.5 rounded-lg px-2 py-1.5 text-[13px] text-center font-medium text-neutral-400 transition-colors hover:bg-white/5 hover:text-neutral-200 cursor-pointer"
+                className="mt-2 flex items-center justify-center gap-1.5 rounded-[9px] px-2 py-1.5 text-[13px] text-center font-medium text-neutral-400 transition-colors hover:bg-white/5 hover:text-neutral-200 cursor-pointer"
             >
                 <MdAdd className="size-3.5" aria-hidden />
                 Add a card

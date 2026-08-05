@@ -52,7 +52,7 @@ export function BoardViewTabs() {
                         type="button"
                         onClick={() => setBoardView(v.id)}
                         className={cn(
-                            "flex h-7 cursor-pointer items-center gap-1.5 rounded-md px-2 text-[12px] font-medium transition-colors",
+                            "flex h-7 cursor-pointer items-center gap-1.5 rounded-[5px] px-2 text-[12px] font-medium transition-colors",
                             boardView === v.id
                                 ? "bg-white/10 text-neutral-100"
                                 : "text-neutral-400 hover:bg-white/5 hover:text-neutral-200",

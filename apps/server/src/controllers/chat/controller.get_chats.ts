@@ -40,7 +40,7 @@ export default class ChatGetController {
             }
 
             const chats = await prisma.chat.findMany({
-                where: { issueId: issue.id, isDeleted: false },
+                where: { issueId: issue.id },
                 orderBy: { createdAt: "asc" },
                 include: { sender: true, repliedTo: { include: { sender: true } } },
             });
