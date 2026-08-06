@@ -97,7 +97,7 @@ export default function CtaSection() {
             >
                 {LOOP_LABELS.map((label, i) => (
                     <div key={label} className="flex items-center gap-4">
-                        {i > 0 && <span className="h-2.5 w-px bg-neutral-700" />}
+                        {i > 0 && <span className="h-2.5 w-px bg-graphite" />}
                         <span>{label}</span>
                     </div>
                 ))}
