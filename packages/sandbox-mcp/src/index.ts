@@ -2,32 +2,33 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
 
-const SETUP_STATUS = [
-    "Cloning",
-    "InstallingDeps",
-    "BootingServices",
-    "Verifying",
-    "Ready",
-    "Failed",
-] as const;
+enum SetupStatus {
+    PENDING = "Pending",
+    PROVISIONING = "Provisioning",
+    CLONING = "Cloning",
+    DETECTING = "Detecting",
+    INSTALLING_DEPS = "InstallingDeps",
+    BOOTING_SERVICES = "BootingServices",
+    WAITING_ON_USER = "WaitingOnUser",
+    VERIFYING = "Verifying",
+    READY = "Ready",
+    FAILED = "Failed",
+}
 
-const QUESTION_TYPE = [
-    "NeedSecret",
-    "NeedValue",
-    "NeedChoice",
-    "Confirm",
-    "NeedFile",
-    "NeedAccess",
-    "DefineSuccess",
-    "Clarify",
-    "ApproveCost",
-] as const;
-
-type SetupStatus = (typeof SETUP_STATUS)[number];
-type QuestionType = (typeof QUESTION_TYPE)[number];
+enum SetupQuestionType {
+    NEED_SECRET = "NeedSecret",
+    NEED_VALUE = "NeedValue",
+    NEED_CHOICE = "NeedChoice",
+    CONFIRM = "Confirm",
+    NEED_FILE = "NeedFile",
+    NEED_ACCESS = "NeedAccess",
+    DEFINE_SUCCESS = "DefineSuccess",
+    CLARIFY = "Clarify",
+    APPROVE_COST = "ApproveCost",
+}
 
 type AskArgs = {
-    type: QuestionType;
+    type: SetupQuestionType;
     key: string;
     prompt: string;
     options?: string[];
@@ -52,7 +53,7 @@ export class McpServerService {
         this.mcp_server.tool(
             "update_status",
             "Report the current setup phase.",
-            { status: z.enum(SETUP_STATUS) },
+            { status: z.enum(SetupStatus) },
             this.update_status.bind(this),
         );
 
@@ -60,7 +61,7 @@ export class McpServerService {
             "ask_user",
             "Ask the user for input you cannot derive (secret, choice, confirm). Blocks until answered.",
             {
-                type: z.enum(QUESTION_TYPE),
+                type: z.enum(SetupQuestionType),
                 key: z.string(),
                 prompt: z.string(),
                 options: z.array(z.string()).optional(),
@@ -98,11 +99,12 @@ export class McpServerService {
         for (;;) {
             const res = await this.api(`/sandbox/answer?key=${encodeURIComponent(args.key)}`);
             if (res.status === 200) {
-                const { value, provided } = (await res.json()) as {
-                    value?: string;
-                    provided?: boolean;
+                const { data } = (await res.json()) as {
+                    data?: { value?: string; provided?: boolean };
                 };
-                return this.text(provided ? "provided (set as env var, retry now)" : String(value));
+                return this.text(
+                    data?.provided ? "provided (set as env var, retry now)" : String(data?.value),
+                );
             }
             await this.sleep(McpServerService.POLL_INTERVAL_MS);
         }
