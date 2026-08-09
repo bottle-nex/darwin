@@ -25,17 +25,6 @@ export const TeamRole = {
 } as const;
 export type TeamRole = (typeof TeamRole)[keyof typeof TeamRole];
 
-export const Chunk = {
-    Imports: "Imports",
-    Function: "Function",
-    Class: "Class",
-    Interface: "Interface",
-    Type: "Type",
-    Variable: "Variable",
-    Block: "Block",
-} as const;
-export type Chunk = (typeof Chunk)[keyof typeof Chunk];
-
 export const IssueStatus = {
     Todo: "Todo",
     Queued: "Queued",

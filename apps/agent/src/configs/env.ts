@@ -10,7 +10,6 @@ const envSchema = z.object({
         .default("8080")
         .transform((val) => parseInt(val, 10)),
     AGENT_NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
-    AGENT_VOYAGE_API_KEY: z.string(),
 });
 
 function parseEnv() {

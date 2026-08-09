@@ -121,10 +121,10 @@ export default class IssueCreateController {
                                 number: (last_issue?.number ?? 0) + 1,
                                 assignees: parsed_body.data.assignee_ids?.length
                                     ? {
-                                        connect: parsed_body.data.assignee_ids.map((id) => ({
-                                            id,
-                                        })),
-                                    }
+                                          connect: parsed_body.data.assignee_ids.map((id) => ({
+                                              id,
+                                          })),
+                                      }
                                     : undefined,
                                 tags: parsed_body.data.tag_ids?.length
                                     ? { connect: parsed_body.data.tag_ids.map((id) => ({ id })) }
@@ -155,7 +155,6 @@ export default class IssueCreateController {
 
             console.log("full body is : ", parsed_body.data);
             console.log("full issue is : ", issue);
-
 
             const full_issue = await prisma.issue.findUniqueOrThrow({
                 where: { id: issue.id },

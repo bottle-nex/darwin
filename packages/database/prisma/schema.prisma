@@ -1,12 +1,10 @@
 datasource db {
-  provider   = "postgresql"
-  extensions = [vector]
+  provider = "postgresql"
 }
 
 generator client {
-  provider        = "prisma-client-js"
-  output          = "../generated/client"
-  previewFeatures = ["postgresqlExtensions"]
+  provider = "prisma-client-js"
+  output   = "../generated/client"
 }
 
 model User {
@@ -99,7 +97,6 @@ model Project {
 
   githubInstallationId String?
   githubInstallation   GithubInstallation? @relation(fields: [githubInstallationId], references: [id], onDelete: SetNull)
-  codeEmbeddings       CodeEmbedding[]
   createdAt            DateTime            @default(now())
   updatedAt            DateTime            @updatedAt
 
@@ -445,24 +442,6 @@ model CustomColumnOrder {
   @@index([userId, projectId])
 }
 
-model CodeEmbedding {
-  id        String                      @id
-  projectId String
-  filePath  String
-  chunkText String
-  chunkType Chunk
-  startLine Int
-  endLinTe  Int
-  embedding Unsupported("vector(1536)")
-  createdAt DateTime                    @default(now())
-  updatedAt DateTime                    @updatedAt
-
-  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
-
-  @@index([projectId])
-  @@map("code_embeddings")
-}
-
 model Notification {
   id        String           @id @default(cuid())
   userId    String
@@ -608,16 +587,6 @@ enum SetupQuestionStatus {
   Waiting
   Answered
   Cancelled
-}
-
-enum Chunk {
-  Imports
-  Function
-  Class
-  Interface
-  Type
-  Variable
-  Block
 }
 
 enum InvitationStatus {

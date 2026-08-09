@@ -2,82 +2,16 @@
 import { useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "motion/react";
-import { formatDistanceToNow } from "date-fns";
-import { HiOutlineMagnifyingGlass } from "react-icons/hi2";
+import { HiOutlineBell, HiOutlineMagnifyingGlass, HiXMark } from "react-icons/hi2";
 import { Input } from "@/components/ui/input";
 import { useNotificationsPanelStore } from "@/store/playground/useNotificationsPanelStore";
 import { useNotifications } from "@/hooks/notifications/useNotifications";
-import {
-    usePlaygroundNavStore,
-    type SelectedThread,
-} from "@/store/playground/usePlaygroundNavStore";
-import { AiFillNotification } from "react-icons/ai";
-import { NotificationType, type Notification } from "@trymatcha/types";
+import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
+import type { Notification } from "@trymatcha/types";
+import NotificationRow from "./NotificationRow";
+import { group_by_day, notification_target, notification_view } from "./notificationView";
 
-const PANEL_WIDTH = 320;
-
-/** Each NotificationType stores a different payload shape (see the server's action classes). */
-function describe_notification(notification: Notification): {
-    title: string;
-    description: string;
-} {
-    const payload = notification.payload as Record<string, string | number>;
-    switch (notification.type) {
-        case NotificationType.IssueAssigned:
-            return {
-                title: `${payload.actorName} assigned you #${payload.issueNumber}`,
-                description: String(payload.issueTitle),
-            };
-        case NotificationType.IssueUnassigned:
-            return {
-                title: `${payload.actorName} unassigned you from #${payload.issueNumber}`,
-                description: String(payload.issueTitle),
-            };
-        case NotificationType.ChatMention:
-            return {
-                title: `${payload.senderName} mentioned you in #${payload.issueNumber} ${payload.issueTitle}`,
-                description: String(payload.message),
-            };
-        case NotificationType.ProjectChatMention:
-            return {
-                title: `${payload.senderName} mentioned you in Project chat`,
-                description: String(payload.message),
-            };
-        default:
-            return { title: "New notification", description: "" };
-    }
-}
-
-/** Where clicking a notification should land — the chat thread it came from. `null` if the payload can't place it anywhere (e.g. an older notification from before this field existed). */
-function notification_target(
-    notification: Notification,
-): { orgSlug: string; projectSlug: string; thread: SelectedThread } | null {
-    const payload = notification.payload as Record<string, string | number>;
-    if (!payload.orgSlug || !payload.projectSlug) return null;
-    const orgSlug = String(payload.orgSlug);
-    const projectSlug = String(payload.projectSlug);
-
-    switch (notification.type) {
-        case NotificationType.IssueAssigned:
-        case NotificationType.IssueUnassigned:
-        case NotificationType.ChatMention:
-            if (!payload.issueId) return null;
-            return {
-                orgSlug,
-                projectSlug,
-                thread: {
-                    kind: "issue",
-                    issueId: String(payload.issueId),
-                    issueNumber: Number(payload.issueNumber),
-                    issueTitle: String(payload.issueTitle),
-                },
-            };
-        case NotificationType.ProjectChatMention:
-            return { orgSlug, projectSlug, thread: { kind: "project" } };
-        default:
-            return null;
-    }
-}
+const PANEL_WIDTH = 352;
 
 export default function NotificationsPanel() {
     const { isOpen, close } = useNotificationsPanelStore();
@@ -90,16 +24,23 @@ export default function NotificationsPanel() {
     }>();
     const openThread = usePlaygroundNavStore((s) => s.openThread);
 
-    const filtered = useMemo(() => {
+    const groups = useMemo(() => {
         const q = query.trim().toLowerCase();
-        if (!q) return notifications;
-        return notifications.filter((notification) => {
-            const { title, description } = describe_notification(notification);
-            return `${title} ${description}`.toLowerCase().includes(q);
-        });
+        const matched = !q
+            ? notifications
+            : notifications.filter((notification) => {
+                  const { actorName, action, body, issueRef, projectSlug } =
+                      notification_view(notification);
+                  return `${actorName} ${action} ${body} ${issueRef ?? ""} ${projectSlug ?? ""}`
+                      .toLowerCase()
+                      .includes(q);
+              });
+        return group_by_day(matched);
     }, [notifications, query]);
 
-    function handle_click(notification: Notification) {
+    const isEmpty = groups.length === 0;
+
+    function handle_select(notification: Notification) {
         const target = notification_target(notification);
         if (!target) return;
 
@@ -129,58 +70,97 @@ export default function NotificationsPanel() {
                         style={{ width: PANEL_WIDTH - 8 }}
                         className="ml-2 flex h-full flex-col rounded-lg border border-white/5 bg-charcoal"
                     >
-                        <div className="flex flex-col gap-3 p-3">
+                        <header className="flex h-11 shrink-0 items-center gap-2 border-b border-white/5 pr-1.5 pl-3">
+                            <h2 className="text-[13px] font-medium text-neutral-200">
+                                Notifications
+                            </h2>
+                            {notifications.length > 0 && (
+                                <span className="rounded-full bg-white/[0.06] px-1.5 py-0.5 text-[10px] font-medium text-neutral-400 tabular-nums">
+                                    {notifications.length}
+                                </span>
+                            )}
+                            <button
+                                type="button"
+                                onClick={close}
+                                aria-label="Close notifications"
+                                className="ml-auto flex size-7 cursor-pointer items-center justify-center rounded-md text-neutral-500 transition-colors hover:bg-white/5 hover:text-neutral-100"
+                            >
+                                <HiXMark className="size-4" aria-hidden />
+                            </button>
+                        </header>
+
+                        <div className="shrink-0 p-2">
                             <div className="relative">
-                                <HiOutlineMagnifyingGlass className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-neutral-500" />
+                                <HiOutlineMagnifyingGlass
+                                    className="pointer-events-none absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-neutral-500"
+                                    aria-hidden
+                                />
                                 <Input
                                     value={query}
                                     onChange={(e) => setQuery(e.target.value)}
                                     placeholder="Search notifications"
-                                    className="h-9 pl-9 text-[13px] shadow-none bg-cement"
+                                    className="h-8 rounded-md bg-cement pr-8 pl-8 text-[12.5px] shadow-none hover:bg-graphite"
                                 />
+                                {query && (
+                                    <button
+                                        type="button"
+                                        onClick={() => setQuery("")}
+                                        aria-label="Clear search"
+                                        className="absolute top-1/2 right-2 flex size-4 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-white/10 text-neutral-400 transition-colors hover:bg-white/20 hover:text-neutral-100"
+                                    >
+                                        <HiXMark className="size-2.5" aria-hidden />
+                                    </button>
+                                )}
                             </div>
                         </div>
-                        {filtered.length === 0 ? (
-                            <div className="flex flex-col flex-1 items-center justify-center gap-y-3 px-4 text-center text-[13px] text-neutral-500">
-                                <AiFillNotification size={44} />
-                                No notifications yet
-                            </div>
+
+                        {isEmpty ? (
+                            <EmptyState query={query.trim()} />
                         ) : (
-                            <div className="flex flex-1 flex-col gap-0.5 overflow-y-auto px-2 pb-2">
-                                {filtered.map((notification) => {
-                                    const { title, description } =
-                                        describe_notification(notification);
-                                    const clickable = notification_target(notification) !== null;
-                                    return (
-                                        <button
-                                            key={notification.id}
-                                            type="button"
-                                            disabled={!clickable}
-                                            onClick={() => handle_click(notification)}
-                                            className="rounded-md px-2 py-2 text-left text-[13px] transition-colors hover:bg-white/5 disabled:cursor-default disabled:hover:bg-transparent"
-                                        >
-                                            <p className="text-neutral-100">{title}</p>
-                                            {description && (
-                                                <p className="mt-0.5 line-clamp-2 text-neutral-500">
-                                                    {description}
-                                                </p>
-                                            )}
-                                            <p className="mt-1 text-[11px] text-neutral-600">
-                                                {formatDistanceToNow(
-                                                    new Date(notification.createdAt),
-                                                    {
-                                                        addSuffix: true,
-                                                    },
-                                                )}
-                                            </p>
-                                        </button>
-                                    );
-                                })}
+                            <div className="flex-1 overflow-y-auto overscroll-contain px-1.5 pb-2">
+                                {groups.map((group) => (
+                                    <section key={group.label}>
+                                        <h3 className="sticky top-0 z-10 bg-charcoal/95 px-2 py-1.5 text-[10px] font-medium tracking-[0.08em] text-neutral-600 uppercase backdrop-blur-sm">
+                                            {group.label}
+                                        </h3>
+                                        {group.items.map((notification) => (
+                                            <NotificationRow
+                                                key={notification.id}
+                                                notification={notification}
+                                                clickable={
+                                                    notification_target(notification) !== null
+                                                }
+                                                onSelect={() => handle_select(notification)}
+                                            />
+                                        ))}
+                                    </section>
+                                ))}
                             </div>
                         )}
                     </div>
                 </motion.aside>
             )}
         </AnimatePresence>
+    );
+}
+
+function EmptyState({ query }: { query: string }) {
+    return (
+        <div className="flex flex-1 flex-col items-center justify-center px-6 pb-10 text-center">
+            <span
+                className="flex size-11 items-center justify-center rounded-xl bg-cement text-neutral-500 ring-1 ring-white/10"
+                aria-hidden
+            >
+                <HiOutlineBell className="size-5" />
+            </span>
+            <p className="mt-3 text-[13px] font-medium text-neutral-300">
+                {query ? "No matches" : "You're all caught up"}
+            </p>
+            <p className="mt-1 text-[12px] text-neutral-500">
+                {query
+                    ? `Nothing matches “${query}”.`
+                    : "Assignments and mentions will show up here."}
+            </p>
+        </div>
     );
 }

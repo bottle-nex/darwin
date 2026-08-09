@@ -24,6 +24,10 @@ export const COMBINATIONS: Record<string, Combination> = {
     "o m": { label: "Open Mentions", run: () => openTab(PlaygroundTab.Mentions) },
     "o r": { label: "Open Reviews", run: () => openTab(PlaygroundTab.Reviews) },
     "o s": { label: "Open Settings", run: () => openTab(PlaygroundTab.SettingsProject) },
+    "o n": {
+        label: "Open Notifications",
+        run: () => useNotificationsPanelStore.getState().toggle(),
+    },
     "[": { label: "Toggle Sidebar", run: () => useSidebarWidthStore.getState().toggle() },
     "]": {
         label: "Toggle Notifications",
