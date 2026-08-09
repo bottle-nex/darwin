@@ -35,16 +35,16 @@ export default function LandingHero() {
             >
                 Issues that implement themselves
             </div>
-            <div className="pt-6 text-[1.09rem] text-foreground/55 w-140 text-center flex justify-center leading-[1.2]">
+            <div className="pt-4 text-[1.09rem] text-foreground/55 w-140 text-center flex justify-center leading-[1.2]">
                 Agents claim work off your board, run your codebase <br /> in a sandbox, and ship a
                 PR.
             </div>
 
             <div className="flex gap-3 pt-8">
-                <button className="bg-[#8E81F2] text-[#f5f3f8] px-4 py-2 font-medium rounded-lg cursor-pointer text-[15px]">
+                <button className="bg-[#8E81F2] text-[#f5f3f8] px-4 py-2 font-medium rounded-md cursor-pointer text-[15px]">
                     Get Started
                 </button>
-                <button className="bg-[#f1efff] text-[#8173f0] px-4 py-2 font-medium rounded-lg cursor-pointer text-[15px] flex items-center gap-1.5">
+                <button className="bg-[#f1efff] text-[#8173f0] px-4 py-2 font-medium rounded-md cursor-pointer text-[15px] flex items-center gap-1.5">
                     How it works
                     <IoIosPlayCircle className="text-[#6c60c8] size-4.5" />
                 </button>
@@ -61,7 +61,7 @@ export default function LandingHero() {
             {/* Fixed height and pinned to the bottom, so a taller viewport adds space above the
                 window instead of stretching it. */}
             <div className="w-full h-full flex justify-center items-end">
-                <div className="h-95 shrink-0 mt-3 w-5xl border-t border-l border-r border-black/8 shadow-sm shadow-black/5 rounded-t-3xl flex flex-col px-6 py-4 bg-white">
+                <div className="h-95 shrink-0 mt-3 w-5xl border-t border-l border-r border-black/8 shadow-sm shadow-black/5 rounded-t-2xl flex flex-col px-6 py-4 bg-white">
                     <div className="w-full flex justify-between items-center">
                         {/* action buttons */}
                         <div className="flex gap-1 items-center">

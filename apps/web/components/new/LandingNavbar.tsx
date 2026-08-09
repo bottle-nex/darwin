@@ -2,11 +2,8 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
 import AppLogo from "@/components/app/Applogo";
-import { FaDiscord, FaPhoneAlt } from "react-icons/fa";
 import { useUserSessionStore } from "@/store/user/useUserSessionStore";
-import { PiArrowRight } from "react-icons/pi";
 import { useRouter } from "next/navigation";
 
 const NAV_ITEMS = [
@@ -77,7 +74,7 @@ export function LandingNavbar({ isMarkettingPage = false }: { isMarkettingPage?:
                         ))}
                     </nav>
 
-                    <button className="bg-[#1e1c28] text-[#f0eff8] px-4 py-1.75 font-medium rounded-lg cursor-pointer text-[13px]">
+                    <button className="bg-[#1e1c28] text-[#f0eff8] px-4 py-1.75 font-medium rounded-md cursor-pointer text-[13px]">
                         Get Started
                     </button>
                 </div>

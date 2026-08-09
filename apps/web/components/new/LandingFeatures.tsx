@@ -1,11 +1,5 @@
 import { Button } from "@/components/ui/button";
-import {
-    RiFilePaperFill,
-    RiGithubFill,
-    RiLayoutColumnFill,
-    RiSearchEyeFill,
-    RiServerFill,
-} from "react-icons/ri";
+import { RiLayoutColumnFill, RiSearchEyeFill, RiServerFill } from "react-icons/ri";
 import FeatureCard from "../landing/v2/features/FeatureCard";
 import BoardPreview from "../landing/v2/features/previews/BoardPreview";
 import RepoPreview from "../landing/v2/features/previews/RepoPreview";
@@ -14,7 +8,7 @@ import { cn } from "@/lib/utils";
 
 export default function LandingFeatures() {
     return (
-        <main className="relative mx-6 rounded-4xl bg-linear-to-b from-transparent to-primary/60 mt-8">
+        <main className="relative mx-6 rounded-xl bg-linear-to-b from-transparent to-primary/60 mt-8 mb-20">
             <section
                 id="features"
                 className="mx-auto w-full max-w-7xl flex flex-col items-center py-24"
