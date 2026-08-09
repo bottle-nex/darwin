@@ -2,10 +2,10 @@ import { prisma, NotificationType } from "@trymatcha/database";
 import { OutboundSocketMessageType, type NotificationJobData } from "@trymatcha/types";
 import { server_services } from "../..";
 
-type IssueUnassignedJobData = Extract<NotificationJobData, { action: "issue.unassigned" }>;
+type IssueMovedJobData = Extract<NotificationJobData, { action: "issue.moved" }>;
 
-export default class IssueUnassignedNotification {
-    static async handle(data: IssueUnassignedJobData) {
+export default class IssueMovedNotification {
+    static async handle(data: IssueMovedJobData) {
         const issue = await prisma.issue.findUnique({
             where: { id: data.issueId },
             select: {
@@ -23,12 +23,17 @@ export default class IssueUnassignedNotification {
         });
         if (!actor) return;
 
-        const actorName = actor.name ?? actor.email;
+        const column = data.toColumnId
+            ? await prisma.customColumn.findUnique({
+                  where: { id: data.toColumnId },
+                  select: { label: true },
+              })
+            : null;
 
         const notification = await prisma.notification.create({
             data: {
-                userId: data.assigneeId,
-                type: NotificationType.IssueUnassigned,
+                userId: data.recipientId,
+                type: NotificationType.IssueMoved,
                 payload: {
                     issueId: data.issueId,
                     issueTitle: issue.title,
@@ -37,7 +42,8 @@ export default class IssueUnassignedNotification {
                     projectSlug: issue.project.slug,
                     orgSlug: issue.project.organization.slug,
                     actorId: data.actorId,
-                    actorName,
+                    actorName: actor.name ?? actor.email,
+                    toColumnLabel: column?.label ?? null,
                 },
             },
         });

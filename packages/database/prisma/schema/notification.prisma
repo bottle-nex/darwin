@@ -1,0 +1,30 @@
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  type      NotificationType
+  payload   Json
+  readAt    DateTime?
+  createdAt DateTime         @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, readAt])
+}
+
+enum NotificationType {
+  IssueAssigned
+  IssueUnassigned
+  ChatMention
+  ProjectChatMention
+  IssueStatusChanged
+  IssuePriorityChanged
+  IssueMoved
+  IssueCommented
+  IssueDeleted
+  InviteAccepted
+  AddedToProject
+  AddedToTeam
+  RemovedFromTeam
+  RemovedFromOrg
+  RoleChanged
+}

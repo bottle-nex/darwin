@@ -1,28 +1,24 @@
 "use client";
 import { useMemo, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "motion/react";
 import { HiOutlineBell, HiOutlineMagnifyingGlass, HiXMark } from "react-icons/hi2";
 import { Input } from "@/components/ui/input";
 import { useNotificationsPanelStore } from "@/store/playground/useNotificationsPanelStore";
-import { useNotifications } from "@/hooks/notifications/useNotifications";
-import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
-import type { Notification } from "@trymatcha/types";
+import { useMarkNotificationsRead, useNotifications } from "@/hooks/notifications/useNotifications";
 import NotificationRow from "./NotificationRow";
 import { group_by_day, notification_target, notification_view } from "./notificationView";
+import { useSelectNotification } from "./useSelectNotification";
 
 const PANEL_WIDTH = 352;
 
 export default function NotificationsPanel() {
     const { isOpen, close } = useNotificationsPanelStore();
     const [query, setQuery] = useState<string>("");
-    const { data: notifications = [] } = useNotifications();
-    const router = useRouter();
-    const { orgSlug: currentOrgSlug, projectSlug: currentProjectSlug } = useParams<{
-        orgSlug?: string;
-        projectSlug?: string;
-    }>();
-    const openThread = usePlaygroundNavStore((s) => s.openThread);
+    const { data } = useNotifications();
+    const notifications = useMemo(() => data?.notifications ?? [], [data]);
+    const unreadCount = data?.unreadCount ?? 0;
+    const { mutate: mark_read } = useMarkNotificationsRead();
+    const select = useSelectNotification();
 
     const groups = useMemo(() => {
         const q = query.trim().toLowerCase();
@@ -39,21 +35,6 @@ export default function NotificationsPanel() {
     }, [notifications, query]);
 
     const isEmpty = groups.length === 0;
-
-    function handle_select(notification: Notification) {
-        const target = notification_target(notification);
-        if (!target) return;
-
-        close();
-        if (target.orgSlug === currentOrgSlug && target.projectSlug === currentProjectSlug) {
-            openThread(target.thread, target.projectSlug);
-            return;
-        }
-        const thread_param = target.thread.kind === "project" ? "project" : target.thread.issueId;
-        router.push(
-            `/playground/${target.orgSlug}/${target.projectSlug}?tab=thread-detail&thread=${thread_param}`,
-        );
-    }
 
     return (
         <AnimatePresence>
@@ -74,19 +55,30 @@ export default function NotificationsPanel() {
                             <h2 className="text-[13px] font-medium text-neutral-200">
                                 Notifications
                             </h2>
-                            {notifications.length > 0 && (
-                                <span className="rounded-full bg-white/[0.06] px-1.5 py-0.5 text-[10px] font-medium text-neutral-400 tabular-nums">
-                                    {notifications.length}
+                            {unreadCount > 0 && (
+                                <span className="rounded-full bg-white/6 px-1.5 py-0.5 text-[10px] font-medium text-neutral-400 tabular-nums">
+                                    {unreadCount}
                                 </span>
                             )}
-                            <button
-                                type="button"
-                                onClick={close}
-                                aria-label="Close notifications"
-                                className="ml-auto flex size-7 cursor-pointer items-center justify-center rounded-md text-neutral-500 transition-colors hover:bg-white/5 hover:text-neutral-100"
-                            >
-                                <HiXMark className="size-4" aria-hidden />
-                            </button>
+                            <div className="ml-auto flex items-center gap-0.5">
+                                {unreadCount > 0 && (
+                                    <button
+                                        type="button"
+                                        onClick={() => mark_read({})}
+                                        className="cursor-pointer rounded-md px-1.5 py-1 text-[11px] text-neutral-500 transition-colors hover:bg-white/5 hover:text-neutral-200"
+                                    >
+                                        Mark all read
+                                    </button>
+                                )}
+                                <button
+                                    type="button"
+                                    onClick={close}
+                                    aria-label="Close notifications"
+                                    className="flex size-7 cursor-pointer items-center justify-center rounded-md text-neutral-500 transition-colors hover:bg-white/5 hover:text-neutral-100"
+                                >
+                                    <HiXMark className="size-4" aria-hidden />
+                                </button>
+                            </div>
                         </header>
 
                         <div className="shrink-0 p-2">
@@ -119,7 +111,7 @@ export default function NotificationsPanel() {
                         ) : (
                             <div className="flex-1 overflow-y-auto overscroll-contain px-1.5 pb-2">
                                 {groups.map((group) => (
-                                    <section key={group.label}>
+                                    <section key={group.label} className="">
                                         <h3 className="sticky top-0 z-10 bg-charcoal/95 px-2 py-1.5 text-[10px] font-medium tracking-[0.08em] text-neutral-600 uppercase backdrop-blur-sm">
                                             {group.label}
                                         </h3>
@@ -130,7 +122,7 @@ export default function NotificationsPanel() {
                                                 clickable={
                                                     notification_target(notification) !== null
                                                 }
-                                                onSelect={() => handle_select(notification)}
+                                                onSelect={() => select(notification)}
                                             />
                                         ))}
                                     </section>

@@ -10,7 +10,7 @@
         "packages/*"
     ],
     "prisma": {
-        "schema": "packages/database/prisma/schema.prisma",
+        "schema": "packages/database/prisma/schema",
         "seed": "tsx packages/database/src/seed.ts"
     },
     "scripts": {

@@ -1,0 +1,97 @@
+model Organization {
+  id          String  @id @default(cuid())
+  createdById String
+  name        String
+  slug        String  @unique
+  description String?
+
+  members            OrgMember[]
+  projects           Project[]
+  invitations        Invitation[]
+  createdBy          User                @relation("OrgCreator", fields: [createdById], references: [id])
+  githubInstallation GithubInstallation?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model OrgMember {
+  id     String  @id @default(cuid())
+  orgId  String
+  userId String
+  role   OrgRole
+
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([orgId, userId])
+  @@index([userId])
+}
+
+model Invitation {
+  id        String           @id @default(cuid())
+  email     String
+  // Null until the invited email has a matching account: invites are bound to an
+  // email so they can be sent before the recipient signs up, and userId is stamped
+  // when the invite is accepted (or when the account already exists at send time).
+  token     String           @unique @default(cuid())
+  status    InvitationStatus @default(Pending)
+  expiresAt DateTime
+
+  userId String?
+  user   User?   @relation("InviteRecipient", fields: [userId], references: [id], onDelete: SetNull)
+
+  invitedById String
+  invitedBy   User   @relation("InviteSender", fields: [invitedById], references: [id], onDelete: Cascade)
+
+  orgId        String
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  projectId String?
+  project   Project?     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  role      ProjectRole?
+
+  teamId String?
+  team   Team?   @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([email, orgId, teamId])
+  @@index([email, status])
+}
+
+model GithubInstallation {
+  id             String @id @default(cuid())
+  orgId          String @unique
+  installationId BigInt @unique
+  accountLogin   String
+  accountType    String
+  accountId      BigInt
+  connectedById  String
+
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  connectedBy  User         @relation("GithubInstallationConnector", fields: [connectedById], references: [id], onDelete: Restrict)
+  projects     Project[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([connectedById])
+}
+
+enum OrgRole {
+  Owner
+  Admin
+  Member
+  Billing
+}
+
+enum InvitationStatus {
+  Pending
+  Accepted
+  Rejected
+}

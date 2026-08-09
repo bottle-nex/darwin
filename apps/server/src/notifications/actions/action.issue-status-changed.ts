@@ -1,13 +1,13 @@
-import { prisma, NotificationType } from "@trymatcha/database";
+import { prisma, NotificationType, IssueStatus } from "@trymatcha/database";
 import { OutboundSocketMessageType, type NotificationJobData } from "@trymatcha/types";
 import { ENV } from "../../configs/env";
-import { sendIssueAssignedEmail } from "../../services/service.email";
+import { sendIssueFailedEmail } from "../../services/service.email";
 import { server_services } from "../..";
 
-type IssueAssignedJobData = Extract<NotificationJobData, { action: "issue.assigned" }>;
+type IssueStatusChangedJobData = Extract<NotificationJobData, { action: "issue.status_changed" }>;
 
-export default class IssueAssignedNotification {
-    static async handle(data: IssueAssignedJobData) {
+export default class IssueStatusChangedNotification {
+    static async handle(data: IssueStatusChangedJobData) {
         const issue = await prisma.issue.findUnique({
             where: { id: data.issueId },
             select: {
@@ -21,27 +21,26 @@ export default class IssueAssignedNotification {
         });
         if (!issue) return;
 
-        const [actor, assignee] = await Promise.all([
+        const [actor, recipient] = await Promise.all([
             prisma.user.findUnique({
                 where: { id: data.actorId },
                 select: { name: true, email: true },
             }),
             prisma.user.findUnique({
-                where: { id: data.assigneeId },
-                select: { name: true, email: true },
+                where: { id: data.recipientId },
+                select: { email: true },
             }),
         ]);
-        if (!actor || !assignee) return;
+        if (!actor || !recipient) return;
 
         const actorName = actor.name ?? actor.email;
         const orgSlug = issue.project.organization.slug;
         const projectSlug = issue.project.slug;
-        const url = `${ENV.SERVER_WEB_URL}/playground/${orgSlug}/${projectSlug}?tab=thread-detail&thread=${data.issueId}`;
 
         const notification = await prisma.notification.create({
             data: {
-                userId: data.assigneeId,
-                type: NotificationType.IssueAssigned,
+                userId: data.recipientId,
+                type: NotificationType.IssueStatusChanged,
                 payload: {
                     issueId: data.issueId,
                     issueTitle: issue.title,
@@ -51,6 +50,8 @@ export default class IssueAssignedNotification {
                     orgSlug,
                     actorId: data.actorId,
                     actorName,
+                    fromStatus: data.fromStatus,
+                    toStatus: data.toStatus,
                 },
             },
         });
@@ -63,8 +64,10 @@ export default class IssueAssignedNotification {
             }),
         );
 
-        await sendIssueAssignedEmail(assignee.email, {
-            actorName,
+        if (data.toStatus !== IssueStatus.Failed) return;
+
+        const url = `${ENV.SERVER_WEB_URL}/playground/${orgSlug}/${projectSlug}?tab=thread-detail&thread=${data.issueId}`;
+        await sendIssueFailedEmail(recipient.email, {
             issueTitle: issue.title,
             projectName: issue.project.name,
             url,

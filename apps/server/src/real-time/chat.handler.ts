@@ -5,6 +5,7 @@ import Access from "../access-control/access";
 import { Action, Permissions } from "@trymatcha/access-control";
 import { server_services } from "..";
 import { OutboundSocketMessageType } from "@trymatcha/types";
+import { issue_recipients } from "../notifications/recipients";
 import type { AuthUser } from "../types/express.d";
 
 export default class ChatSocketHandler {
@@ -102,7 +103,12 @@ export default class ChatSocketHandler {
         try {
             const issue = await prisma.issue.findUnique({
                 where: { id: issueId },
-                select: { id: true, projectId: true },
+                select: {
+                    id: true,
+                    projectId: true,
+                    createdById: true,
+                    assignees: { select: { id: true } },
+                },
             });
             if (!issue || issue.projectId !== project_id) {
                 ChatSocketHandler.send_error(ws, "Issue not found");
@@ -126,8 +132,6 @@ export default class ChatSocketHandler {
                 }
             }
 
-            // Mentions are scoped to ProjectMember, so a tagged id only sticks if it's
-            // actually a member of this issue's project — silently drop the rest.
             const mention_ids = mentionedMemberIds?.length
                 ? (
                       await prisma.projectMember.findMany({
@@ -163,7 +167,6 @@ export default class ChatSocketHandler {
                 JSON.stringify(publish_body),
             );
 
-            // Notify tagged members, excluding whoever mentioned themselves.
             await Promise.all(
                 chat.mentions
                     .filter((mention) => mention.member.userId !== user.id)
@@ -175,6 +178,21 @@ export default class ChatSocketHandler {
                             mentionedById: user.id,
                         }),
                     ),
+            );
+
+            await Promise.all(
+                issue_recipients({
+                    assigneeIds: issue.assignees.map((assignee) => assignee.id),
+                    creatorId: issue.createdById,
+                    exclude: [user.id, ...chat.mentions.map((mention) => mention.member.userId)],
+                }).map((recipientId) =>
+                    server_services.notifications.enqueue({
+                        action: "issue.commented",
+                        chatId: chat.id,
+                        recipientId,
+                        senderId: user.id,
+                    }),
+                ),
             );
         } catch (error) {
             console.error("ChatSocketHandler error: ", error);

@@ -1,3 +1,5 @@
+import type { IssueStatus, ProjectRole, TeamRole } from "../prisma/enums.prisma";
+
 export const QueueName = {
     IssueRouter: "issue.router",
     IssueVm: "issue.vm",
@@ -31,4 +33,57 @@ export type NotificationJobData =
           projectChatId: string;
           memberId: string;
           mentionedById: string;
+      }
+    | {
+          action: "issue.status_changed";
+          issueId: string;
+          recipientId: string;
+          actorId: string;
+          fromStatus: IssueStatus;
+          toStatus: IssueStatus;
+      }
+    | {
+          action: "issue.priority_changed";
+          issueId: string;
+          recipientId: string;
+          actorId: string;
+          priority: number;
+      }
+    | {
+          action: "issue.moved";
+          issueId: string;
+          recipientId: string;
+          actorId: string;
+          toColumnId: string | null;
+      }
+    | { action: "issue.commented"; chatId: string; recipientId: string; senderId: string }
+    | {
+          action: "issue.deleted";
+          issueId: string;
+          recipientId: string;
+          actorId: string;
+          issueNumber: number;
+          issueTitle: string;
+          projectId: string;
+          projectSlug: string;
+          orgSlug: string;
+      }
+    | { action: "invite.accepted"; invitationId: string; recipientId: string; accepterId: string }
+    | {
+          action: "member.added_to_project";
+          projectId: string;
+          recipientId: string;
+          actorId: string;
+          role: ProjectRole;
+      }
+    | { action: "member.added_to_team"; teamId: string; recipientId: string; actorId: string }
+    | { action: "member.removed_from_team"; teamId: string; recipientId: string; actorId: string }
+    | { action: "member.removed_from_org"; orgId: string; recipientId: string; actorId: string }
+    | {
+          action: "member.role_changed";
+          teamId: string;
+          recipientId: string;
+          actorId: string;
+          role: TeamRole;
+          previousRole: TeamRole;
       };

@@ -5,12 +5,6 @@ import chalk from "chalk";
 
 let _resend: Resend | null = null;
 
-/**
- * Lazily construct and memoize the Resend client.
- *
- * Deferring construction until first use keeps module import side-effect free and
- * avoids instantiating the client in code paths (e.g. tests) that never send mail.
- */
 function client(): Resend {
     if (!_resend) {
         _resend = new Resend(ENV.SERVER_RESEND_API_KEY);
@@ -18,13 +12,6 @@ function client(): Resend {
     return _resend;
 }
 
-/**
- * Send a sign-in OTP code to `to` via Resend.
- *
- * The message states the expiry derived from `SERVER_OTP_TTL_SECONDS`. Resend reports
- * failures in the response body rather than throwing, so this normalizes that into a
- * thrown error for callers to catch.
- */
 export async function sendOtpEmail(to: string, code: string) {
     const { subject, html, text } = EmailTemplate.otp({
         code,
@@ -44,22 +31,9 @@ export async function sendOtpEmail(to: string, code: string) {
     }
 }
 
-/**
- * Context for an invite email. A team always belongs to an org, so a team invite
- * carries both names; an org invite carries only the org name. Modeling this as a
- * discriminated union lets the compiler enforce the right fields per invite type.
- */
 type InviteContext =
     { type: "org"; orgName: string } | { type: "team"; teamName: string; orgName: string };
 
-/**
- * Send a team or organization invite link to `to` via Resend.
- *
- * `invite` selects the target name; `url` is the accept-invite link. `opts.inviter` is the
- * human-readable sender shown as social proof and `opts.message` is an optional note from the
- * inviter. Like {@link sendOtpEmail}, Resend reports failures in the response body, so this
- * normalizes them into a thrown error for callers to catch.
- */
 export async function inviteMember(
     to: string,
     url: string,
@@ -91,13 +65,6 @@ export async function inviteMember(
     return true;
 }
 
-/**
- * Send an "issue assigned" notification email to `to` via Resend.
- *
- * Like {@link inviteMember}, Resend reports failures in the response body rather than
- * throwing, so failures are logged and reported back to the caller as `false` instead of
- * bubbling up — a failed notification email shouldn't fail the assignment itself.
- */
 export async function sendIssueAssignedEmail(
     to: string,
     data: { actorName: string; issueTitle: string; projectName: string; url: string },
@@ -119,15 +86,53 @@ export async function sendIssueAssignedEmail(
     return true;
 }
 
-/**
- * Send a "mentioned in chat" notification email to `to` via Resend. Shared by issue chat
- * and project chat mentions, which only differ in how the caller builds `url`.
- */
 export async function sendMentionEmail(
     to: string,
     data: { senderName: string; message: string; url: string },
 ): Promise<boolean> {
     const { subject, html, text } = EmailTemplate.mention(data);
+
+    const { error } = await client().emails.send({
+        from: ENV.SERVER_EMAIL_FROM,
+        to,
+        subject,
+        html,
+        text,
+    });
+
+    if (error) {
+        console.error(chalk.red("resend send failed: "), error?.message);
+        return false;
+    }
+    return true;
+}
+
+export async function sendRemovedFromScopeEmail(
+    to: string,
+    data: { actorName: string; scopeType: "team" | "organization"; scopeName: string },
+): Promise<boolean> {
+    const { subject, html, text } = EmailTemplate.removedFromScope(data);
+
+    const { error } = await client().emails.send({
+        from: ENV.SERVER_EMAIL_FROM,
+        to,
+        subject,
+        html,
+        text,
+    });
+
+    if (error) {
+        console.error(chalk.red("resend send failed: "), error?.message);
+        return false;
+    }
+    return true;
+}
+
+export async function sendIssueFailedEmail(
+    to: string,
+    data: { issueTitle: string; projectName: string; url: string },
+): Promise<boolean> {
+    const { subject, html, text } = EmailTemplate.issueFailed(data);
 
     const { error } = await client().emails.send({
         from: ENV.SERVER_EMAIL_FROM,

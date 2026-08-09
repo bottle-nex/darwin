@@ -5,6 +5,7 @@ import { TeamRole } from "@trymatcha/types";
 import { Action, Permissions } from "@trymatcha/access-control";
 import ResponseWriter from "../../services/service.response";
 import Access from "../../access-control/access";
+import { server_services } from "../..";
 
 const body_schema = z.object({
     teamId: z.string().nonempty(),
@@ -59,7 +60,7 @@ export default class ChangeMemberAuthority {
 
             const target = await prisma.teamMember.findUnique({
                 where: { teamId_userId: { teamId, userId: memberId } },
-                select: { id: true },
+                select: { id: true, role: true },
             });
             if (!target) {
                 return ResponseWriter.not_found(res, "member not found in team");
@@ -69,6 +70,17 @@ export default class ChangeMemberAuthority {
                 where: { teamId_userId: { teamId, userId: memberId } },
                 data: { role: role as TeamRole },
             });
+
+            if (target.role !== role) {
+                await server_services.notifications.enqueue({
+                    action: "member.role_changed",
+                    teamId,
+                    recipientId: memberId,
+                    actorId: req.user.id,
+                    role: role as TeamRole,
+                    previousRole: target.role,
+                });
+            }
 
             return ResponseWriter.success(res, { memberId, role }, "member role updated");
         } catch (error) {

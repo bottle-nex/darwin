@@ -18,11 +18,11 @@ export default function NotificationRow({
     clickable,
     onSelect,
 }: NotificationRowProps) {
-    console.log("notification is : ", notification);
     const { actorId, actorName, action, body, issueRef, projectSlug } =
         notification_view(notification);
     const { icon: Icon, tint } = theme_of(notification);
     const createdAt = new Date(notification.createdAt);
+    const is_unread = !notification.readAt;
 
     return (
         <button
@@ -59,10 +59,16 @@ export default function NotificationRow({
                         <span className="font-medium text-neutral-100">{actorName}</span> {action}
                     </span>
                     <span
-                        className="shrink-0 text-[11px] tabular-nums text-neutral-600"
+                        className="flex shrink-0 items-center gap-1.5 text-[11px] tabular-nums text-neutral-600"
                         title={format(createdAt, "PPpp")}
                     >
                         {short_age(createdAt)}
+                        {is_unread && (
+                            <span
+                                className="size-1.5 shrink-0 rounded-full bg-violet-400"
+                                aria-hidden
+                            />
+                        )}
                     </span>
                 </span>
 

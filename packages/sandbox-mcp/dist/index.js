@@ -2,25 +2,31 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
-var SETUP_STATUS = [
-  "Cloning",
-  "InstallingDeps",
-  "BootingServices",
-  "Verifying",
-  "Ready",
-  "Failed"
-];
-var QUESTION_TYPE = [
-  "NeedSecret",
-  "NeedValue",
-  "NeedChoice",
-  "Confirm",
-  "NeedFile",
-  "NeedAccess",
-  "DefineSuccess",
-  "Clarify",
-  "ApproveCost"
-];
+var SetupStatus = /* @__PURE__ */ ((SetupStatus2) => {
+  SetupStatus2["PENDING"] = "Pending";
+  SetupStatus2["PROVISIONING"] = "Provisioning";
+  SetupStatus2["CLONING"] = "Cloning";
+  SetupStatus2["DETECTING"] = "Detecting";
+  SetupStatus2["INSTALLING_DEPS"] = "InstallingDeps";
+  SetupStatus2["BOOTING_SERVICES"] = "BootingServices";
+  SetupStatus2["WAITING_ON_USER"] = "WaitingOnUser";
+  SetupStatus2["VERIFYING"] = "Verifying";
+  SetupStatus2["READY"] = "Ready";
+  SetupStatus2["FAILED"] = "Failed";
+  return SetupStatus2;
+})(SetupStatus || {});
+var SetupQuestionType = /* @__PURE__ */ ((SetupQuestionType2) => {
+  SetupQuestionType2["NEED_SECRET"] = "NeedSecret";
+  SetupQuestionType2["NEED_VALUE"] = "NeedValue";
+  SetupQuestionType2["NEED_CHOICE"] = "NeedChoice";
+  SetupQuestionType2["CONFIRM"] = "Confirm";
+  SetupQuestionType2["NEED_FILE"] = "NeedFile";
+  SetupQuestionType2["NEED_ACCESS"] = "NeedAccess";
+  SetupQuestionType2["DEFINE_SUCCESS"] = "DefineSuccess";
+  SetupQuestionType2["CLARIFY"] = "Clarify";
+  SetupQuestionType2["APPROVE_COST"] = "ApproveCost";
+  return SetupQuestionType2;
+})(SetupQuestionType || {});
 var McpServerService = class _McpServerService {
   mcp_server;
   static SERVER = process.env.MATCHA_SERVER_URL;
@@ -38,14 +44,14 @@ var McpServerService = class _McpServerService {
     this.mcp_server.tool(
       "update_status",
       "Report the current setup phase.",
-      { status: z.enum(SETUP_STATUS) },
+      { status: z.enum(SetupStatus) },
       this.update_status.bind(this)
     );
     this.mcp_server.tool(
       "ask_user",
       "Ask the user for input you cannot derive (secret, choice, confirm). Blocks until answered.",
       {
-        type: z.enum(QUESTION_TYPE),
+        type: z.enum(SetupQuestionType),
         key: z.string(),
         prompt: z.string(),
         options: z.array(z.string()).optional()
@@ -79,8 +85,10 @@ var McpServerService = class _McpServerService {
     for (; ; ) {
       const res = await this.api(`/sandbox/answer?key=${encodeURIComponent(args.key)}`);
       if (res.status === 200) {
-        const { value, provided } = await res.json();
-        return this.text(provided ? "provided (set as env var, retry now)" : String(value));
+        const { data } = await res.json();
+        return this.text(
+          data?.provided ? "provided (set as env var, retry now)" : String(data?.value)
+        );
       }
       await this.sleep(_McpServerService.POLL_INTERVAL_MS);
     }

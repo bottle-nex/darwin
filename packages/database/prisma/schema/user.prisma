@@ -1,0 +1,46 @@
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  image         String?
+  emailVerified DateTime?
+  setupComplete Boolean   @default(false)
+
+  orgMemberships       OrgMember[]
+  teamMemberships      TeamMember[]
+  projectMemberships   ProjectMember[]
+  ownedProjects        Project[]            @relation("ProjectOwner")
+  createdProjects      Project[]            @relation("ProjectCreator")
+  createdOrganizations Organization[]       @relation("OrgCreator")
+  invitations          Invitation[]         @relation("InviteRecipient")
+  sentInvitations      Invitation[]         @relation("InviteSender")
+  githubAccount        GithubAccount?
+  githubInstallations  GithubInstallation[] @relation("GithubInstallationConnector")
+
+  createdIssues  Issue[] @relation(name: "IssueCreator")
+  assignedIssues Issue[] @relation(name: "IssueAssignees")
+
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  chats        Chat[]
+  projectChats ProjectChat[]
+
+  customColumnOrders CustomColumnOrder[]
+  notifications      Notification[]
+}
+
+model GithubAccount {
+  id           String    @id @default(cuid())
+  userId       String    @unique
+  githubUserId BigInt    @unique
+  githubLogin  String
+  accessToken  String
+  refreshToken String?
+  expiresAt    DateTime?
+  scope        String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

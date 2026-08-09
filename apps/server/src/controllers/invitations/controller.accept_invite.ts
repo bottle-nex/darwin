@@ -3,6 +3,7 @@ import { z } from "zod";
 import { createHash } from "crypto";
 import { InvitationStatus, OrgRole, prisma, TeamRole } from "@trymatcha/database";
 import ResponseWriter from "../../services/service.response";
+import { server_services } from "../..";
 
 const body_schema = z.object({
     token: z.string().min(1),
@@ -32,6 +33,7 @@ export default class AcceptInviteController {
                     teamId: true,
                     status: true,
                     expiresAt: true,
+                    invitedById: true,
                 },
             });
 
@@ -39,9 +41,6 @@ export default class AcceptInviteController {
                 return ResponseWriter.not_found(res, "invitation not found");
             }
 
-            // The invite is bound to an email (the recipient may not have had an
-            // account when it was sent), so authorize on the accepting user's
-            // verified email rather than a pre-assigned userId.
             if (invitation.email.toLowerCase() !== userEmail) {
                 return ResponseWriter.not_authorized(res, "this invitation is not for you");
             }
@@ -54,7 +53,6 @@ export default class AcceptInviteController {
                     409,
                 );
             }
-            // Expiry is enforced at read time, not by a background job.
             if (invitation.expiresAt.getTime() <= Date.now()) {
                 return ResponseWriter.custom(
                     res,
@@ -65,11 +63,7 @@ export default class AcceptInviteController {
                 );
             }
 
-            // Create the membership and consume the invite atomically. upsert keeps it
-            // idempotent if the user somehow already holds the membership.
             await prisma.$transaction(async (tx) => {
-                // Org membership is the umbrella: a team member must also be an org
-                // member, so ensure the OrgMember row exists for either invite type.
                 await tx.orgMember.upsert({
                     where: { orgId_userId: { orgId: invitation.orgId, userId } },
                     create: { orgId: invitation.orgId, userId, role: OrgRole.Member },
@@ -100,11 +94,37 @@ export default class AcceptInviteController {
 
                 await tx.invitation.update({
                     where: { id: invitation.id },
-                    // Stamp the now-known account onto the invite (it may have been
-                    // sent before the recipient signed up).
                     data: { status: InvitationStatus.Accepted, userId },
                 });
             });
+
+            if (invitation.invitedById !== userId) {
+                await server_services.notifications.enqueue({
+                    action: "invite.accepted",
+                    invitationId: invitation.id,
+                    recipientId: invitation.invitedById,
+                    accepterId: userId,
+                });
+            }
+
+            if (invitation.projectId && invitation.role) {
+                await server_services.notifications.enqueue({
+                    action: "member.added_to_project",
+                    projectId: invitation.projectId,
+                    recipientId: userId,
+                    actorId: invitation.invitedById,
+                    role: invitation.role,
+                });
+            }
+
+            if (invitation.teamId) {
+                await server_services.notifications.enqueue({
+                    action: "member.added_to_team",
+                    teamId: invitation.teamId,
+                    recipientId: userId,
+                    actorId: invitation.invitedById,
+                });
+            }
 
             return ResponseWriter.success(
                 res,

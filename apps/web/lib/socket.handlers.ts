@@ -5,6 +5,8 @@ import { upsertBoardIssue } from "@/hooks/issues/useBoard";
 import { upsert_chat, mark_chat_deleted } from "@/hooks/chats/useChats";
 import { upsert_project_chat, mark_project_chat_deleted } from "@/hooks/chats/useProjectChat";
 import { upsert_notification } from "@/hooks/notifications/useNotifications";
+import { useNotificationsPanelStore } from "@/store/playground/useNotificationsPanelStore";
+import { useFloatNotificationsStore } from "@/store/playground/useFloatNotificationsStore";
 
 export class SocketHandlers {
     static handle_issue_created(queryClient: QueryClient, message: OutboundSocketMessage) {
@@ -37,19 +39,11 @@ export class SocketHandlers {
         mark_project_chat_deleted(queryClient, message.payload);
     }
 
-    /**
-     * A notification was pushed on the project channel -> merge it into the cache, but only
-     * if it's addressed to the current user. Delivery reuses the project-wide pubsub channel
-     * (same as chat), so every connected member's socket receives every member's
-     * notifications; the client is what scopes it down to "mine".
-     */
-    static handle_notification_created(
-        queryClient: QueryClient,
-        message: OutboundSocketMessage,
-        current_user_id: string | undefined,
-    ) {
+    static handle_notification_created(queryClient: QueryClient, message: OutboundSocketMessage) {
         if (message.type !== OutboundSocketMessageType.NOTIFICATION_CREATED) return;
-        if (!current_user_id || message.payload.userId !== current_user_id) return;
         upsert_notification(queryClient, message.payload);
+        if (!useNotificationsPanelStore.getState().isOpen) {
+            useFloatNotificationsStore.getState().push(message.payload);
+        }
     }
 }

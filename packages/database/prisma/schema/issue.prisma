@@ -1,0 +1,122 @@
+model Issue {
+  id          String      @id @default(cuid())
+  projectId   String
+  number      Int
+  createdById String
+  title       String
+  summary     String?
+  description String      @db.Text
+  status      IssueStatus @default(Todo)
+  priority    Int         @default(3) // 1=Urgent 2=High 3=Normal 4=Low
+  startDate   DateTime?
+  targetDate  DateTime?
+
+  customColumnId String? // non-null = parked in a user column
+
+  project      Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  creator      User          @relation(name: "IssueCreator", fields: [createdById], references: [id], onDelete: Cascade)
+  assignees    User[]        @relation(name: "IssueAssignees")
+  tags         Tag[]
+  customColumn CustomColumn? @relation(fields: [customColumnId], references: [id], onDelete: Cascade)
+
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  resolvedAt DateTime?
+  chats      Chat[]
+
+  assignerWorkerId String?
+  assignedWorker   Worker? @relation(fields: [assignerWorkerId], references: [id], onDelete: Cascade)
+
+  queuePosition  Int?
+  specialization String?
+
+  @@unique([projectId, number])
+  @@index([projectId, status])
+  @@index([projectId, customColumnId])
+  @@index([status, createdAt])
+  @@index([assignerWorkerId, status, queuePosition])
+}
+
+model Tag {
+  id    String @id @default(cuid())
+  name  String
+  color String
+
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  issues    Issue[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([projectId, name])
+}
+
+/// A pre-written issue body. Same rich-text HTML an issue description is stored in, because
+/// a template is exactly that — an issue somebody already wrote, saved and reused.
+model IssueTemplate {
+  id          String  @id @default(cuid())
+  name        String
+  summary     String?
+  description String  @db.Text
+  /// An `IconPick`: a named icon with a colour, or an emoji. Null falls back to a document glyph.
+  icon        Json?
+  isDefault   Boolean @default(false)
+
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([projectId, name])
+  @@index([projectId])
+}
+
+model CustomColumn {
+  id        String @id @default(cuid())
+  projectId String
+  label     String
+  order     Int
+
+  project    Project             @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  issues     Issue[]
+  userOrders CustomColumnOrder[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([projectId])
+}
+
+/// A user's personal position for a custom column within a project. Only
+/// pinned (reordered) columns get a row here — columns without one fall back
+/// to `CustomColumn.order`, sorted after every pinned column for that user.
+model CustomColumnOrder {
+  id        String @id @default(cuid())
+  userId    String
+  projectId String
+  columnId  String
+  order     Int
+
+  user    User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  project Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  column  CustomColumn @relation(fields: [columnId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, columnId])
+  @@index([userId, projectId])
+}
+
+enum IssueStatus {
+  Todo
+  Queued
+  InProgress
+  InReview
+  Done
+  Failed
+  Cancelled
+  Parked
+}

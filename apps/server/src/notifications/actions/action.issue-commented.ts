@@ -1,18 +1,17 @@
 import { prisma, NotificationType } from "@trymatcha/database";
 import { OutboundSocketMessageType, type NotificationJobData } from "@trymatcha/types";
-import { ENV } from "../../configs/env";
-import { sendMentionEmail } from "../../services/service.email";
 import { server_services } from "../..";
 
-type ChatMentionJobData = Extract<NotificationJobData, { action: "chat.mention" }>;
+type IssueCommentedJobData = Extract<NotificationJobData, { action: "issue.commented" }>;
 
-export default class ChatMentionNotification {
-    static async handle(data: ChatMentionJobData) {
+export default class IssueCommentedNotification {
+    static async handle(data: IssueCommentedJobData) {
         const chat = await prisma.chat.findUnique({
             where: { id: data.chatId },
             select: {
                 message: true,
                 issueId: true,
+                isDeleted: true,
                 issue: {
                     select: {
                         title: true,
@@ -25,40 +24,28 @@ export default class ChatMentionNotification {
                 },
             },
         });
-        if (!chat) return;
+        if (!chat || chat.isDeleted) return;
 
-        const [member, sender] = await Promise.all([
-            prisma.projectMember.findUnique({
-                where: { id: data.memberId },
-                select: { userId: true, user: { select: { email: true } } },
-            }),
-            prisma.user.findUnique({
-                where: { id: data.mentionedById },
-                select: { name: true, email: true },
-            }),
-        ]);
-        if (!member || !sender) return;
-
-        const senderName = sender.name ?? sender.email;
-        const projectId = chat.issue.projectId;
-        const orgSlug = chat.issue.project.organization.slug;
-        const projectSlug = chat.issue.project.slug;
-        const url = `${ENV.SERVER_WEB_URL}/playground/${orgSlug}/${projectSlug}?tab=thread-detail&thread=${chat.issueId}`;
+        const sender = await prisma.user.findUnique({
+            where: { id: data.senderId },
+            select: { name: true, email: true },
+        });
+        if (!sender) return;
 
         const notification = await prisma.notification.create({
             data: {
-                userId: member.userId,
-                type: NotificationType.ChatMention,
+                userId: data.recipientId,
+                type: NotificationType.IssueCommented,
                 payload: {
                     chatId: data.chatId,
                     issueId: chat.issueId,
                     issueTitle: chat.issue.title,
                     issueNumber: chat.issue.number,
-                    projectId,
-                    projectSlug,
-                    orgSlug,
-                    senderId: data.mentionedById,
-                    senderName,
+                    projectId: chat.issue.projectId,
+                    projectSlug: chat.issue.project.slug,
+                    orgSlug: chat.issue.project.organization.slug,
+                    senderId: data.senderId,
+                    senderName: sender.name ?? sender.email,
                     message: chat.message,
                 },
             },
@@ -71,7 +58,5 @@ export default class ChatMentionNotification {
                 payload: notification,
             }),
         );
-
-        await sendMentionEmail(member.user.email, { senderName, message: chat.message, url });
     }
 }

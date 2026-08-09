@@ -1,0 +1,32 @@
+// the actual VM
+model Worker {
+  id String @id @default(cuid())
+
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  specialization String?
+  status         WorkerStatus
+
+  sandboxId      String?
+  contextSummary Json? // this will contain queuedCount, currentSpecialization, recentFilesEdited, lastIssue fixed, etc... -> basically for routing decisions
+  contextBlobUrl String? // this willl contain transcripts, logs, etc. vm-worker will read it before dispatching the project's issues to a worker, so it can rehydrate the worker/ VM, or else every issue will start fresh, no previous state known
+
+  nextQueuePos   Int       @default(1)
+  leaseExpiresAt DateTime?
+
+  issues Issue[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([projectId, status])
+  @@index([projectId, specialization])
+}
+
+enum WorkerStatus {
+  Booting
+  Idle
+  Busy
+  Dead
+}

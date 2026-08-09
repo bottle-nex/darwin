@@ -4,6 +4,8 @@ import z from "zod";
 import ResponseWriter from "../../services/service.response";
 import Access from "../../access-control/access";
 import { Action, Permissions } from "@trymatcha/access-control";
+import { issue_recipients } from "../../notifications/recipients";
+import { server_services } from "../..";
 
 export default class IssueUpdateController {
     static body_scheam = z.object({
@@ -13,11 +15,8 @@ export default class IssueUpdateController {
         priority: z.number().int().min(1).max(4).optional(),
         status: z.enum(IssueStatus).optional(),
         custom_column_id: z.string().nullable().optional(),
-        // Omit to leave untouched; an empty array clears them.
         tag_ids: z.array(z.string()).max(20).optional(),
         assignee_ids: z.array(z.string()).max(20).optional(),
-        // `null` before `coerce.date()` — otherwise `new Date(null)` silently
-        // coerces a clear into the 1970 epoch. Omit to leave untouched.
         start_date: z.union([z.null(), z.coerce.date()]).optional(),
         target_date: z.union([z.null(), z.coerce.date()]).optional(),
     });
@@ -57,7 +56,10 @@ export default class IssueUpdateController {
                 select: {
                     projectId: true,
                     status: true,
+                    priority: true,
                     customColumnId: true,
+                    createdById: true,
+                    assignees: { select: { id: true } },
                 },
             });
             if (!issue) {
@@ -91,7 +93,6 @@ export default class IssueUpdateController {
                 }
             }
 
-            // Every assignee must themselves be a member of this project.
             if (body_data.assignee_ids?.length) {
                 const assignee_roles = await Promise.all(
                     body_data.assignee_ids.map((id) => Access.project(id, issue.projectId)),
@@ -132,8 +133,6 @@ export default class IssueUpdateController {
                     customColumnId: next_column_id,
                     startDate: body_data.start_date,
                     targetDate: body_data.target_date,
-                    // `set` replaces; `connect` would only ever append, so a
-                    // removed tag or assignee could never actually be removed.
                     tags: body_data.tag_ids
                         ? { set: body_data.tag_ids.map((id) => ({ id })) }
                         : undefined,
@@ -158,9 +157,99 @@ export default class IssueUpdateController {
                 },
             });
 
+            await IssueUpdateController.notify(
+                user.id,
+                issue,
+                updated,
+                next_status,
+                next_column_id,
+            );
+
             ResponseWriter.success(res, { issue: updated }, "Issue updated");
         } catch (error) {
+            console.error("IssueUpdateController error: ", error);
             ResponseWriter.system_error(res);
+        }
+    }
+
+    private static async notify(
+        actor_id: string,
+        before: {
+            status: IssueStatus;
+            priority: number;
+            customColumnId: string | null;
+            createdById: string;
+            assignees: { id: string }[];
+        },
+        after: { id: string; priority: number; assignees: { id: string }[] },
+        next_status: IssueStatus,
+        next_column_id: string | null,
+    ) {
+        const before_assignees = new Set(before.assignees.map((assignee) => assignee.id));
+        const after_assignees = new Set(after.assignees.map((assignee) => assignee.id));
+
+        for (const assignee_id of after_assignees) {
+            if (assignee_id === actor_id || before_assignees.has(assignee_id)) continue;
+            await server_services.notifications.enqueue({
+                action: "issue.assigned",
+                issueId: after.id,
+                assigneeId: assignee_id,
+                actorId: actor_id,
+            });
+        }
+
+        for (const assignee_id of before_assignees) {
+            if (assignee_id === actor_id || after_assignees.has(assignee_id)) continue;
+            await server_services.notifications.enqueue({
+                action: "issue.unassigned",
+                issueId: after.id,
+                assigneeId: assignee_id,
+                actorId: actor_id,
+            });
+        }
+
+        const recipients = issue_recipients({
+            assigneeIds: [...after_assignees],
+            creatorId: before.createdById,
+            exclude: [actor_id],
+        });
+
+        const column_changed = next_column_id !== before.customColumnId;
+
+        if (column_changed) {
+            for (const recipient_id of recipients) {
+                await server_services.notifications.enqueue({
+                    action: "issue.moved",
+                    issueId: after.id,
+                    recipientId: recipient_id,
+                    actorId: actor_id,
+                    toColumnId: next_column_id,
+                });
+            }
+        } else if (next_status !== before.status) {
+            for (const recipient_id of recipients) {
+                await server_services.notifications.enqueue({
+                    action: "issue.status_changed",
+                    issueId: after.id,
+                    recipientId: recipient_id,
+                    actorId: actor_id,
+                    fromStatus: before.status,
+                    toStatus: next_status,
+                });
+            }
+        }
+
+        if (after.priority === 1 && before.priority !== 1) {
+            for (const assignee_id of after_assignees) {
+                if (assignee_id === actor_id) continue;
+                await server_services.notifications.enqueue({
+                    action: "issue.priority_changed",
+                    issueId: after.id,
+                    recipientId: assignee_id,
+                    actorId: actor_id,
+                    priority: after.priority,
+                });
+            }
         }
     }
 }

@@ -17,6 +17,7 @@ import ProjectChatSocketHandler from "./project-chat.handler";
 export default class SocketServer {
     private wss: WebSocketServer;
     private project_connections: Map<string, Set<WebSocket>> = new Map();
+    private user_connections: Map<string, Set<WebSocket>> = new Map();
     private connection_users: Map<WebSocket, AuthUser> = new Map();
     private subscriber_system: SubscriberSystem;
 
@@ -28,8 +29,9 @@ export default class SocketServer {
     }
 
     private start_listening() {
-        this.subscriber_system.on_message((project_id, message) => {
-            this.broadcast_message(project_id, message);
+        this.subscriber_system.on_message((channel, message) => {
+            if (channel.scope === "project") this.broadcast_message(channel.id, message);
+            else this.send_to_user(channel.id, message);
         });
     }
 
@@ -55,9 +57,18 @@ export default class SocketServer {
             if (!connections) {
                 connections = new Set();
                 this.project_connections.set(project_id, connections);
-                this.subscriber_system.subscribe(project_id);
+                this.subscriber_system.subscribe_project(project_id);
             }
             connections.add(ws);
+
+            let user_sockets = this.user_connections.get(user.id);
+            if (!user_sockets) {
+                user_sockets = new Set();
+                this.user_connections.set(user.id, user_sockets);
+                this.subscriber_system.subscribe_user(user.id);
+            }
+            user_sockets.add(ws);
+
             this.connection_users.set(ws, user);
             this.add_listeners(ws, project_id);
         });
@@ -98,6 +109,17 @@ export default class SocketServer {
 
     private broadcast_message(project_id: string, message: string) {
         const connections = this.project_connections.get(project_id);
+        if (connections) {
+            for (const ws of connections) {
+                if (ws.readyState === WebSocket.OPEN) {
+                    ws.send(message);
+                }
+            }
+        }
+    }
+
+    private send_to_user(user_id: string, message: string) {
+        const connections = this.user_connections.get(user_id);
         if (connections) {
             for (const ws of connections) {
                 if (ws.readyState === WebSocket.OPEN) {
@@ -154,13 +176,25 @@ export default class SocketServer {
     }
 
     private remove_connection(ws: WebSocket, project_id: string) {
+        const user = this.connection_users.get(ws);
         this.connection_users.delete(ws);
+
         const connections = this.project_connections.get(project_id);
         if (connections) {
             connections.delete(ws);
             if (connections.size === 0) {
                 this.project_connections.delete(project_id);
-                this.subscriber_system.unsubscribe(project_id);
+                this.subscriber_system.unsubscribe_project(project_id);
+            }
+        }
+
+        if (!user) return;
+        const user_sockets = this.user_connections.get(user.id);
+        if (user_sockets) {
+            user_sockets.delete(ws);
+            if (user_sockets.size === 0) {
+                this.user_connections.delete(user.id);
+                this.subscriber_system.unsubscribe_user(user.id);
             }
         }
     }

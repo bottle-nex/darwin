@@ -7,7 +7,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 config({ path: resolve(__dirname, "../../.env") });
 
 export default defineConfig({
-    schema: "prisma/schema.prisma",
+    schema: "prisma/schema",
     migrations: {
         path: "prisma/migrations",
     },

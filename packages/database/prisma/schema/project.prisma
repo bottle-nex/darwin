@@ -1,0 +1,136 @@
+model Project {
+  id            String  @id @default(cuid())
+  orgId         String
+  name          String
+  slug          String
+  summary       String?
+  description   String?
+  ownerId       String
+  createdById   String?
+  color         String?
+  tourCompleted Boolean @default(false)
+
+  githubRepoId        BigInt?
+  githubRepoFullName  String?
+  githubRepoUrl       String?
+  githubDefaultBranch String?
+
+  organization Organization    @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  owner        User            @relation("ProjectOwner", fields: [ownerId], references: [id], onDelete: Restrict)
+  createdBy    User?           @relation("ProjectCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  teams        Team[]
+  members      ProjectMember[]
+  invitations  Invitation[]
+
+  githubInstallationId String?
+  githubInstallation   GithubInstallation? @relation(fields: [githubInstallationId], references: [id], onDelete: SetNull)
+  createdAt            DateTime            @default(now())
+  updatedAt            DateTime            @updatedAt
+
+  routingClaimedAt   DateTime?
+  issues             Issue[]
+  projectChats       ProjectChat[]
+  customColumns      CustomColumn[]
+  customColumnOrders CustomColumnOrder[]
+  setupSessions      SetupSession[]
+  secrets            ProjectSecret[]
+  tags               Tag[]
+  issueTemplates     IssueTemplate[]
+  planMd             String?             @db.Text
+  planStatus         PlanStatus          @default(Pending)
+  planCommitSha      String?
+  planGeneratedAt    DateTime?
+
+  workers    Worker[]
+  maxWorkers Int      @default(1)
+
+  projectConfig ProjectConfig?
+
+  @@unique([orgId, slug])
+  @@index([ownerId])
+  @@index([githubInstallationId])
+}
+
+model ProjectConfig {
+  id               String           @id @default(cuid())
+  projectId        String           @unique
+  project          Project          @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  kanbanOptionView KanbanOptionView @default(FLAT)
+}
+
+model ProjectMember {
+  id        String      @id @default(cuid())
+  projectId String
+  userId    String
+  role      ProjectRole
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  chatMentions        ChatMention[]
+  projectChatMentions ProjectChatMention[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([projectId, userId])
+  @@index([userId])
+}
+
+model Team {
+  id          String  @id @default(cuid())
+  projectId   String
+  name        String
+  slug        String
+  description String?
+
+  project     Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  members     TeamMember[]
+  invitations Invitation[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([projectId, slug])
+}
+
+model TeamMember {
+  id     String   @id @default(cuid())
+  teamId String
+  userId String
+  role   TeamRole
+
+  team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([teamId, userId])
+  @@index([userId])
+}
+
+enum KanbanOptionView {
+  FLAT
+  GROUPED
+}
+
+enum PlanStatus {
+  Pending
+  Generating
+  Ready
+  Failed
+}
+
+enum ProjectRole {
+  Admin
+  Maintain
+  Write
+  Triage
+  Read
+}
+
+enum TeamRole {
+  Maintainer
+  Member
+}

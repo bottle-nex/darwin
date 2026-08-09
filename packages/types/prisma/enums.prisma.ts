@@ -1,7 +1,3 @@
-// Mirrors the Prisma-generated enums (const object + string-literal union) so that
-// values returned from the Prisma client are structurally assignable to these types.
-// Keep in sync with the enums in packages/database/prisma/schema.prisma.
-
 export const OrgRole = {
     Owner: "Owner",
     Admin: "Admin",
@@ -42,5 +38,16 @@ export const NotificationType = {
     IssueUnassigned: "IssueUnassigned",
     ChatMention: "ChatMention",
     ProjectChatMention: "ProjectChatMention",
+    IssueStatusChanged: "IssueStatusChanged",
+    IssuePriorityChanged: "IssuePriorityChanged",
+    IssueMoved: "IssueMoved",
+    IssueCommented: "IssueCommented",
+    IssueDeleted: "IssueDeleted",
+    InviteAccepted: "InviteAccepted",
+    AddedToProject: "AddedToProject",
+    AddedToTeam: "AddedToTeam",
+    RemovedFromTeam: "RemovedFromTeam",
+    RemovedFromOrg: "RemovedFromOrg",
+    RoleChanged: "RoleChanged",
 } as const;
 export type NotificationType = (typeof NotificationType)[keyof typeof NotificationType];

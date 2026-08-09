@@ -4,13 +4,11 @@ import { useQueryClient } from "@tanstack/react-query";
 import { OutboundSocketMessageType } from "@trymatcha/types";
 import { SocketHandlers } from "@/lib/socket.handlers";
 import { useWebSocket } from "./useWebSocket";
-import { useUserSessionStore } from "@/store/user/useUserSessionStore";
 import type { MessageHandler } from "@/socket/socket.client";
 
 export function useSubscribeEventHandlers(project_id: string | undefined) {
     const { subscribe, unsubscribe } = useWebSocket(project_id);
     const queryClient = useQueryClient();
-    const current_user_id = useUserSessionStore((s) => s.session?.user?.id ?? undefined);
 
     useEffect(() => {
         if (!project_id) return;
@@ -29,7 +27,7 @@ export function useSubscribeEventHandlers(project_id: string | undefined) {
             [OutboundSocketMessageType.PROJECT_CHAT_DELETED]: (message) =>
                 SocketHandlers.handle_project_chat_deleted(queryClient, message),
             [OutboundSocketMessageType.NOTIFICATION_CREATED]: (message) =>
-                SocketHandlers.handle_notification_created(queryClient, message, current_user_id),
+                SocketHandlers.handle_notification_created(queryClient, message),
         };
 
         Object.entries(handlers_map).forEach(([type, handler]) => {
@@ -41,5 +39,5 @@ export function useSubscribeEventHandlers(project_id: string | undefined) {
                 unsubscribe(type as OutboundSocketMessageType, handler);
             });
         };
-    }, [subscribe, unsubscribe, queryClient, project_id, current_user_id]);
+    }, [subscribe, unsubscribe, queryClient, project_id]);
 }

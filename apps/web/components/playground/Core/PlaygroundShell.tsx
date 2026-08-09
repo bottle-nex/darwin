@@ -12,6 +12,7 @@ import DeleteTeamDialog from "@/components/team/DeleteTeamDialog";
 import CreateOrEditIssueDialog from "@/components/playground/Home/KanbanDisplay/Issue/CreateOrEditIssueDialog";
 import PlaygroundShortcutSheet from "@/components/playground/Sidebar/PlaygroundShortcutSheet";
 import NotificationsPanel from "@/components/playground/Core/Notifications/NotificationsPanel";
+import FloatNotifications from "@/components/playground/Core/Notifications/FloatNotifications";
 import { useIssueDialog } from "@/components/playground/issue/useIssueDialog";
 import { useGetDashboard } from "@/hooks/dashboard/useGetDashboard";
 import { useGetProject } from "@/hooks/project/useGetProject";
@@ -64,6 +65,7 @@ export default function PlaygroundShell() {
             <DeleteTeamDialog />
             <CreateOrEditIssueDialog />
             <PlaygroundShortcutSheet />
+            <FloatNotifications />
         </main>
     );
 }

@@ -2,20 +2,19 @@ import { prisma, NotificationType } from "@trymatcha/database";
 import { OutboundSocketMessageType, type NotificationJobData } from "@trymatcha/types";
 import { server_services } from "../..";
 
-type IssueUnassignedJobData = Extract<NotificationJobData, { action: "issue.unassigned" }>;
+type RoleChangedJobData = Extract<NotificationJobData, { action: "member.role_changed" }>;
 
-export default class IssueUnassignedNotification {
-    static async handle(data: IssueUnassignedJobData) {
-        const issue = await prisma.issue.findUnique({
-            where: { id: data.issueId },
+export default class RoleChangedNotification {
+    static async handle(data: RoleChangedJobData) {
+        const team = await prisma.team.findUnique({
+            where: { id: data.teamId },
             select: {
-                title: true,
-                number: true,
+                name: true,
                 projectId: true,
                 project: { select: { slug: true, organization: { select: { slug: true } } } },
             },
         });
-        if (!issue) return;
+        if (!team) return;
 
         const actor = await prisma.user.findUnique({
             where: { id: data.actorId },
@@ -23,21 +22,20 @@ export default class IssueUnassignedNotification {
         });
         if (!actor) return;
 
-        const actorName = actor.name ?? actor.email;
-
         const notification = await prisma.notification.create({
             data: {
-                userId: data.assigneeId,
-                type: NotificationType.IssueUnassigned,
+                userId: data.recipientId,
+                type: NotificationType.RoleChanged,
                 payload: {
-                    issueId: data.issueId,
-                    issueTitle: issue.title,
-                    issueNumber: issue.number,
-                    projectId: issue.projectId,
-                    projectSlug: issue.project.slug,
-                    orgSlug: issue.project.organization.slug,
+                    teamId: data.teamId,
+                    teamName: team.name,
+                    projectId: team.projectId,
+                    projectSlug: team.project.slug,
+                    orgSlug: team.project.organization.slug,
+                    role: data.role,
+                    previousRole: data.previousRole,
                     actorId: data.actorId,
-                    actorName,
+                    actorName: actor.name ?? actor.email,
                 },
             },
         });

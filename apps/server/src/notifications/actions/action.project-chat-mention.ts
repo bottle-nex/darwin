@@ -52,10 +52,9 @@ export default class ProjectChatMentionNotification {
         });
 
         await server_services.publisher.publish_message(
-            server_services.publisher.get_channel_name(chat.projectId),
+            server_services.publisher.get_user_channel_name(notification.userId),
             JSON.stringify({
                 type: OutboundSocketMessageType.NOTIFICATION_CREATED,
-                projectId: chat.projectId,
                 payload: notification,
             }),
         );

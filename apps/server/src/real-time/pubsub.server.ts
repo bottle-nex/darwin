@@ -1,19 +1,40 @@
 import { Redis } from "ioredis";
 import { ENV } from "../configs/env";
 
+export type ChannelScope = "project" | "user";
+
+export type ParsedChannel = { scope: ChannelScope; id: string };
+
 export default abstract class PubSubSystem {
     protected redis: Redis;
-    private static readonly CHANNEL_PREFIX = "project:";
+    private static readonly PROJECT_CHANNEL_PREFIX = "project:";
+    private static readonly USER_CHANNEL_PREFIX = "user:";
 
     constructor() {
         this.redis = new Redis(ENV.SERVER_REDIS_URL);
     }
 
     public get_channel_name(project_id: string) {
-        return `${PubSubSystem.CHANNEL_PREFIX}${project_id}`;
+        return `${PubSubSystem.PROJECT_CHANNEL_PREFIX}${project_id}`;
     }
 
-    public get_project_id(channel_name: string) {
-        return channel_name.slice(PubSubSystem.CHANNEL_PREFIX.length);
+    public get_user_channel_name(user_id: string) {
+        return `${PubSubSystem.USER_CHANNEL_PREFIX}${user_id}`;
+    }
+
+    public parse_channel(channel_name: string): ParsedChannel | null {
+        if (channel_name.startsWith(PubSubSystem.PROJECT_CHANNEL_PREFIX)) {
+            return {
+                scope: "project",
+                id: channel_name.slice(PubSubSystem.PROJECT_CHANNEL_PREFIX.length),
+            };
+        }
+        if (channel_name.startsWith(PubSubSystem.USER_CHANNEL_PREFIX)) {
+            return {
+                scope: "user",
+                id: channel_name.slice(PubSubSystem.USER_CHANNEL_PREFIX.length),
+            };
+        }
+        return null;
     }
 }

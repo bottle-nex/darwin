@@ -5,16 +5,18 @@ import IssueAssignedNotification from "./actions/action.issue-assigned";
 import IssueUnassignedNotification from "./actions/action.issue-unassigned";
 import ChatMentionNotification from "./actions/action.chat-mention";
 import ProjectChatMentionNotification from "./actions/action.project-chat-mention";
+import IssueStatusChangedNotification from "./actions/action.issue-status-changed";
+import IssuePriorityChangedNotification from "./actions/action.issue-priority-changed";
+import IssueMovedNotification from "./actions/action.issue-moved";
+import IssueCommentedNotification from "./actions/action.issue-commented";
+import IssueDeletedNotification from "./actions/action.issue-deleted";
+import InviteAcceptedNotification from "./actions/action.invite-accepted";
+import AddedToProjectNotification from "./actions/action.added-to-project";
+import AddedToTeamNotification from "./actions/action.added-to-team";
+import RemovedFromTeamNotification from "./actions/action.removed-from-team";
+import RemovedFromOrgNotification from "./actions/action.removed-from-org";
+import RoleChangedNotification from "./actions/action.role-changed";
 
-/**
- * Producer + consumer for the notification dispatch queue.
- *
- * The consumer runs in-process for now, but the only thing anything else in the app ever
- * touches is {@link enqueue} — the queue itself is the seam. If this ever needs to become
- * its own deployable (mirroring how `apps/router` consumes `QueueName.IssueRouter`), the
- * `actions/` classes and the worker registration below are what move; no producer call site
- * changes.
- */
 export default class NotificationQueueService {
     private queue: Queue<NotificationJobData>;
     private worker: Worker<NotificationJobData>;
@@ -41,7 +43,6 @@ export default class NotificationQueueService {
         });
     }
 
-    /** One class per action — this just routes the job to the right one. */
     private static async dispatch(data: NotificationJobData) {
         switch (data.action) {
             case "issue.assigned":
@@ -52,20 +53,41 @@ export default class NotificationQueueService {
                 return ChatMentionNotification.handle(data);
             case "project_chat.mention":
                 return ProjectChatMentionNotification.handle(data);
+            case "issue.status_changed":
+                return IssueStatusChangedNotification.handle(data);
+            case "issue.priority_changed":
+                return IssuePriorityChangedNotification.handle(data);
+            case "issue.moved":
+                return IssueMovedNotification.handle(data);
+            case "issue.commented":
+                return IssueCommentedNotification.handle(data);
+            case "issue.deleted":
+                return IssueDeletedNotification.handle(data);
+            case "invite.accepted":
+                return InviteAcceptedNotification.handle(data);
+            case "member.added_to_project":
+                return AddedToProjectNotification.handle(data);
+            case "member.added_to_team":
+                return AddedToTeamNotification.handle(data);
+            case "member.removed_from_team":
+                return RemovedFromTeamNotification.handle(data);
+            case "member.removed_from_org":
+                return RemovedFromOrgNotification.handle(data);
+            case "member.role_changed":
+                return RoleChangedNotification.handle(data);
         }
     }
 
-    /**
-     * Enqueue a notification job. `jobId` is deterministic per action + target so retries
-     * (BullMQ's default 3 attempts, see `configs/config.queue.ts`) and rapid duplicate
-     * triggers (e.g. re-assigning the same user twice) dedupe instead of double-firing.
-     */
     async enqueue(data: NotificationJobData) {
-        await this.queue.add(data.action, data, {
-            jobId: NotificationQueueService.job_id(data),
-            removeOnComplete: true,
-            removeOnFail: 100,
-        });
+        try {
+            await this.queue.add(data.action, data, {
+                jobId: NotificationQueueService.job_id(data),
+                removeOnComplete: true,
+                removeOnFail: { count: 100, age: 3600 },
+            });
+        } catch (error) {
+            console.error(`failed to enqueue notification ${data.action}:`, error);
+        }
     }
 
     private static job_id(data: NotificationJobData): string {
@@ -77,6 +99,27 @@ export default class NotificationQueueService {
                 return `${data.action}:${data.chatId}:${data.memberId}`;
             case "project_chat.mention":
                 return `${data.action}:${data.projectChatId}:${data.memberId}`;
+            case "issue.status_changed":
+                return `${data.action}:${data.issueId}:${data.recipientId}~${data.toStatus}`;
+            case "issue.priority_changed":
+                return `${data.action}:${data.issueId}:${data.recipientId}~${data.priority}`;
+            case "issue.moved":
+                return `${data.action}:${data.issueId}:${data.recipientId}~${data.toColumnId ?? "board"}`;
+            case "issue.commented":
+                return `${data.action}:${data.chatId}:${data.recipientId}`;
+            case "issue.deleted":
+                return `${data.action}:${data.issueId}:${data.recipientId}`;
+            case "invite.accepted":
+                return `${data.action}:${data.invitationId}:${data.recipientId}`;
+            case "member.added_to_project":
+                return `${data.action}:${data.projectId}:${data.recipientId}`;
+            case "member.added_to_team":
+            case "member.removed_from_team":
+                return `${data.action}:${data.teamId}:${data.recipientId}`;
+            case "member.removed_from_org":
+                return `${data.action}:${data.orgId}:${data.recipientId}`;
+            case "member.role_changed":
+                return `${data.action}:${data.teamId}:${data.recipientId}~${data.role}`;
         }
     }
 

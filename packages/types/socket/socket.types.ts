@@ -1,6 +1,5 @@
 import type { Chat, Issue, Notification, ProjectChat } from "../prisma/schemas.prisma";
 
-// Client -> Server
 export enum InboundSocketMessageType {
     ISSUE_CREATE = "ISSUE_CREATE",
     CHAT_CREATE = "CHAT_CREATE",
@@ -45,7 +44,6 @@ export type InboundSocketMessage =
           };
       };
 
-// Server -> Client
 export enum OutboundSocketMessageType {
     ISSUE_CREATED = "ISSUE_CREATED",
     CHAT_CREATED = "CHAT_CREATED",
@@ -88,6 +86,5 @@ export type OutboundSocketMessage =
       }
     | {
           type: OutboundSocketMessageType.NOTIFICATION_CREATED;
-          projectId: string;
           payload: Notification;
       };

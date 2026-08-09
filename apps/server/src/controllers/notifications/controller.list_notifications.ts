@@ -11,13 +11,22 @@ export default class ListNotificationsController {
         }
 
         try {
-            const notifications = await prisma.notification.findMany({
-                where: { userId: user.id },
-                orderBy: { createdAt: "desc" },
-                take: 50,
-            });
+            const [notifications, unreadCount] = await Promise.all([
+                prisma.notification.findMany({
+                    where: { userId: user.id },
+                    orderBy: { createdAt: "desc" },
+                    take: 50,
+                }),
+                prisma.notification.count({
+                    where: { userId: user.id, readAt: null },
+                }),
+            ]);
 
-            ResponseWriter.success(res, { notifications }, "Notifications fetched successfully");
+            ResponseWriter.success(
+                res,
+                { notifications, unreadCount },
+                "Notifications fetched successfully",
+            );
         } catch (error) {
             console.error("ListNotificationsController error: ", error);
             ResponseWriter.system_error(res);
