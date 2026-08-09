@@ -49,7 +49,7 @@ export default function FeatureCard({
     return (
         <div
             className={cn(
-                "relative overflow-hidden rounded-lg transition-all duration-300 ease-out hover:z-10 hover:shadow-sm hover:shadow-neutral-800 border border-neutral-200",
+                "relative overflow-hidden rounded-4xl transition-all duration-300 ease-out hover:z-10 hover:shadow-sm hover:shadow-neutral-800 border border-neutral-200",
                 dark && "border-white/10 hover:border-white/20 hover:shadow-black/50 border-none",
                 primary &&
                     "border-transparent hover:border-white/30 hover:shadow-[#AB9FF2]/40 border-none",
@@ -115,7 +115,7 @@ export default function FeatureCard({
                 >
                     {description}
                 </p>
-                {preview && <div className="mt-auto pt-2">{preview}</div>}
+                {preview && <div className="mt-auto">{preview}</div>}
             </Reveal>
         </div>
     );
