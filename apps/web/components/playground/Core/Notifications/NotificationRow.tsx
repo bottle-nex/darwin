@@ -32,7 +32,7 @@ export default function NotificationRow({
             className={cn(
                 "flex w-full items-start gap-2.5 rounded-lg px-2 py-2.5 text-left transition-colors duration-150",
                 clickable
-                    ? "cursor-pointer hover:bg-white/[0.04] focus-visible:bg-white/[0.04] focus-visible:outline-none"
+                    ? "cursor-pointer hover:bg-white/4 focus-visible:bg-white/4 focus-visible:outline-none"
                     : "cursor-default",
             )}
         >
@@ -44,7 +44,7 @@ export default function NotificationRow({
                 />
                 <span
                     className={cn(
-                        "absolute -right-1 -bottom-1 flex size-3.5 items-center justify-center rounded-full bg-graphite ring-2 ring-charcoal",
+                        "absolute -right-1 -bottom-1 flex size-3.5 items-center justify-center rounded-full bg-charcoal ring-2 ring-charcoal",
                         tint,
                     )}
                     aria-hidden

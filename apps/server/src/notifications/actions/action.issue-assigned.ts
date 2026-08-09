@@ -8,6 +8,7 @@ type IssueAssignedJobData = Extract<NotificationJobData, { action: "issue.assign
 
 export default class IssueAssignedNotification {
     static async handle(data: IssueAssignedJobData) {
+        console.log("data recieved is : ", data);
         const issue = await prisma.issue.findUnique({
             where: { id: data.issueId },
             select: {

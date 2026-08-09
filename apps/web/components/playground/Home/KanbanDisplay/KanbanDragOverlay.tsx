@@ -8,8 +8,6 @@ import CardRenderer from "./cards/CardRenderer";
 
 const emptySubscribe = () => () => {};
 
-// Returns false during SSR and the first hydration pass, true once on the client.
-// Guards createPortal, which needs document.body, without setState-in-effect.
 function useIsClient() {
     return useSyncExternalStore(
         emptySubscribe,
@@ -18,16 +16,6 @@ function useIsClient() {
     );
 }
 
-/**
- * The card that follows the cursor while dragging. It reuses the real card
- * components so the lifted card looks identical to the resting one — a custom
- * card or an LLM issue depending on what's being dragged.
- *
- * Portaled to `document.body`: `DragOverlay` positions itself with `position:
- * fixed` relative to the viewport, but `PlaygroundDisplay`'s `backdrop-blur-md`
- * ancestor establishes a CSS containing block for fixed descendants, which
- * would otherwise throw the overlay's position off from the cursor.
- */
 export default function KanbanDragOverlay() {
     const activeItem = useCustomKanbanStore((s) => s.activeItem);
     const isClient = useIsClient();
@@ -51,7 +39,7 @@ export default function KanbanDragOverlay() {
                 ) : (
                     <div className="w-72 rotate-2 cursor-grabbing shadow-2xl">
                         {activeItem.kind === "custom" ? (
-                            <CustomKanbanCard card={activeItem.card} />
+                            <CustomKanbanCard card={activeItem.card} preview />
                         ) : (
                             <CardRenderer issue={activeItem.issue} />
                         )}

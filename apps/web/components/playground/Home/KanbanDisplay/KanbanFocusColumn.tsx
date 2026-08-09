@@ -3,17 +3,15 @@ import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
 import type { BoardState } from "@/types/kanban";
 import type { FilterValue } from "@/store/kanban/useKanbanOptionsStore";
 import { useFilteredCustomColumns } from "@/hooks/kanban/useFilteredCustomColumns";
-import type { CustomKanbanApi } from "@/hooks/kanban/useCustomKanban";
 import KanbanColumn from "./KanbanColumn";
 import CustomKanbanColumn from "./customkanban/CustomKanbanColumn";
 
 type KanbanFocusColumnProps = {
     filter: FilterValue;
     board: BoardState;
-    custom: CustomKanbanApi;
 };
 
-export default function KanbanFocusColumn({ filter, board, custom }: KanbanFocusColumnProps) {
+export default function KanbanFocusColumn({ filter, board }: KanbanFocusColumnProps) {
     const columns = useFilteredCustomColumns();
 
     if (filter.kind === "llm") {
@@ -34,18 +32,7 @@ export default function KanbanFocusColumn({ filter, board, custom }: KanbanFocus
     if (filter.kind === "custom") {
         const column = columns.find((c) => c.id === filter.columnId);
         if (!column) return null;
-        return (
-            <CustomKanbanColumn
-                column={column}
-                onDelete={() => custom.removeColumn(column.id)}
-                onRename={(label) => custom.renameColumn(column.id, label)}
-                onDeleteCard={custom.removeCard}
-                onAssign={custom.assignMember}
-                onUnassign={custom.unassignMember}
-                pendingAssigneeId={custom.pendingAssigneeId}
-                draggable={false}
-            />
-        );
+        return <CustomKanbanColumn column={column} draggable={false} />;
     }
 
     return null;

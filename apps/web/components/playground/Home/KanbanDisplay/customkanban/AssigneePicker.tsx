@@ -27,12 +27,6 @@ type AssigneePickerProps = {
     pendingAssigneeId: string | null;
 };
 
-/**
- * A dialog listing the project's members; clicking a row toggles whether that
- * person is assigned to the issue (assign / unassign). The assigned rows are
- * highlighted with a check. Mutations fire immediately; the board refetch keeps
- * the card's avatars in sync.
- */
 export default function AssigneePicker({
     open,
     onOpenChange,

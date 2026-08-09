@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/dialog";
 import { useIssueDialog } from "@/components/playground/issue/useIssueDialog";
 import { useActiveProject } from "@/hooks/useActiveProject";
+import { useCustomCardActions } from "@/hooks/kanban/useCustomCardActions";
 import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
 import { CustomKanbanMappers } from "@/lib/kanban/CustomKanbanMappers";
 import { CARD_SHELL } from "../cardStyles";
@@ -23,36 +24,31 @@ import AssigneePicker from "./AssigneePicker";
 import type { CustomCard } from "@/types/kanban-custom";
 import PlaygroundAvatar from "@/components/playground/Core/components/PlaygroundAvatar";
 
-/** Cards are narrow; anything past this collapses into a `+N`. */
 const MAX_AVATARS = 3;
 
 type CustomKanbanCardProps = {
     card: CustomCard;
-    onDelete?: () => void;
-    onAssign?: (userId: string) => void;
-    onUnassign?: (userId: string) => void;
-    pendingAssigneeId?: string | null;
+    preview?: boolean;
 };
 
-export default function CustomKanbanCard({
-    card,
-    onDelete,
-    onAssign,
-    onUnassign,
-    pendingAssigneeId = null,
-}: CustomKanbanCardProps) {
+export default function CustomKanbanCard({ card, preview = false }: CustomKanbanCardProps) {
     const projectId = useActiveProject()?.id;
-    const preview = card.description ? CustomKanbanMappers.stripHtml(card.description) : "";
+    const { removeCard, assignMember, unassignMember, pendingAssigneeId } = useCustomCardActions(
+        card.id,
+    );
+    const descriptionPreview = card.description
+        ? CustomKanbanMappers.stripHtml(card.description)
+        : "";
     const shownAssignees = card.assignees.slice(0, MAX_AVATARS);
     const overflowCount = card.assignees.length - shownAssignees.length;
     const [confirmOpen, setConfirmOpen] = useState(false);
     const [assignOpen, setAssignOpen] = useState(false);
-    const canAssign = Boolean(projectId && onAssign && onUnassign);
+    const canAssign = Boolean(projectId) && !preview;
     const { openEdit } = useIssueDialog();
 
     return (
         <div className={cn(CARD_SHELL, "group/card relative")}>
-            {(onDelete || canAssign) && (
+            {!preview && (
                 <DropdownMenu.Root>
                     <DropdownMenu.Trigger asChild>
                         <Button
@@ -80,15 +76,13 @@ export default function CustomKanbanCard({
                                     <span className="flex-1">Assignees</span>
                                 </DropdownMenu.Item>
                             )}
-                            {onDelete && (
-                                <DropdownMenu.Item
-                                    onSelect={() => setConfirmOpen(true)}
-                                    className={`${PANEL_ITEM} text-rose-300 data-highlighted:text-rose-200`}
-                                >
-                                    <MdDelete className="size-3.5" aria-hidden />
-                                    <span className="flex-1">Delete</span>
-                                </DropdownMenu.Item>
-                            )}
+                            <DropdownMenu.Item
+                                onSelect={() => setConfirmOpen(true)}
+                                className={`${PANEL_ITEM} text-rose-300 data-highlighted:text-rose-200`}
+                            >
+                                <MdDelete className="size-3.5" aria-hidden />
+                                <span className="flex-1">Delete</span>
+                            </DropdownMenu.Item>
                         </DropdownMenu.Content>
                     </DropdownMenu.Portal>
                 </DropdownMenu.Root>
@@ -126,14 +120,21 @@ export default function CustomKanbanCard({
                     {card.title}
                 </p>
 
-                {preview && (
+                {descriptionPreview && (
                     <p className="mt-1.5 line-clamp-2 text-[12px] leading-snug text-neutral-400">
-                        {preview}
+                        {descriptionPreview}
                     </p>
                 )}
 
                 <div className="mt-3 flex items-center justify-end border-t border-white/5 pt-2.5">
-                    <div className="flex shrink-0 items-center -space-x-1">
+                    <button
+                        onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setAssignOpen(true);
+                        }}
+                        className="flex shrink-0 items-center -space-x-1 cursor-pointer"
+                    >
                         {shownAssignees.map((a, index) => (
                             <PlaygroundAvatar
                                 key={a.id}
@@ -150,7 +151,7 @@ export default function CustomKanbanCard({
                                 +{overflowCount}
                             </span>
                         )}
-                    </div>
+                    </button>
                 </div>
             </div>
 
@@ -175,7 +176,7 @@ export default function CustomKanbanCard({
                             variant="destructive"
                             onClick={() => {
                                 setConfirmOpen(false);
-                                onDelete?.();
+                                removeCard();
                             }}
                         >
                             Delete
@@ -184,14 +185,14 @@ export default function CustomKanbanCard({
                 </DialogContent>
             </Dialog>
 
-            {canAssign && projectId && onAssign && onUnassign && (
+            {canAssign && projectId && (
                 <AssigneePicker
                     open={assignOpen}
                     onOpenChange={setAssignOpen}
                     projectId={projectId}
                     assignees={card.assignees}
-                    onAssign={onAssign}
-                    onUnassign={onUnassign}
+                    onAssign={assignMember}
+                    onUnassign={unassignMember}
                     pendingAssigneeId={pendingAssigneeId}
                 />
             )}

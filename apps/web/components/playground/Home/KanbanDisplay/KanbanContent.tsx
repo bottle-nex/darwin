@@ -1,33 +1,22 @@
 "use client";
 import { useFilteredKanbanBoard } from "@/hooks/kanban/useFilteredKanbanBoard";
 import { useKanbanOptionsStore } from "@/store/kanban/useKanbanOptionsStore";
-import type { CustomKanbanApi } from "@/hooks/kanban/useCustomKanban";
 import KanbanBoardView from "./KanbanBoardView";
 import KanbanListView from "./KanbanListView";
 import KanbanFocusColumn from "./KanbanFocusColumn";
 import KanbanBothBoards from "./KanbanBothBoards";
 import CustomKanbanBoard from "./customkanban/CustomKanbanBoard";
 
-type KanbanContentProps = {
-    custom: CustomKanbanApi;
-};
-
-/**
- * Decides what to render inside the board area. A focus filter always wins;
- * otherwise the board switcher picks between the Custom board, the LLM board
- * (grid or list), or both together.
- */
-export default function KanbanContent({ custom }: KanbanContentProps) {
+export default function KanbanContent() {
     const filter = useKanbanOptionsStore((s) => s.filter);
     const boardView = useKanbanOptionsStore((s) => s.boardView);
     const kanbanView = useKanbanOptionsStore((s) => s.kanbanView);
     const board = useFilteredKanbanBoard();
 
-    // A focused column takes precedence over the board switcher.
     if (filter.kind !== "default") {
         return (
             <div className="flex min-h-0 flex-1 items-start overflow-hidden px-3 pt-3 pb-3">
-                <KanbanFocusColumn filter={filter} board={board} custom={custom} />
+                <KanbanFocusColumn filter={filter} board={board} />
             </div>
         );
     }
@@ -36,7 +25,7 @@ export default function KanbanContent({ custom }: KanbanContentProps) {
         case "custom":
             return (
                 <div className="flex min-h-0 flex-1 items-start gap-4 overflow-x-auto px-3 pt-3 pb-3">
-                    <CustomKanbanBoard {...custom} />
+                    <CustomKanbanBoard />
                 </div>
             );
         case "llm":
@@ -46,6 +35,6 @@ export default function KanbanContent({ custom }: KanbanContentProps) {
                 <KanbanBoardView board={board} />
             );
         case "default":
-            return <KanbanBothBoards board={board} custom={custom} kanbanView={kanbanView} />;
+            return <KanbanBothBoards board={board} kanbanView={kanbanView} />;
     }
 }

@@ -10,33 +10,18 @@ import { Input } from "@/components/ui/input";
 import { MatchaLogo } from "@/components/logo/MatchaLogo";
 import { PANEL_CONTENT, PANEL_ITEM } from "../OptionsBar/KanbanOptionPanels/panelStyles";
 import { useCreateOrEditIssueStore } from "@/store/issues/useCreateOrEditIssueStore";
+import { useCustomColumnActions } from "@/hooks/kanban/useCustomColumnActions";
 import SortableCustomCard from "./SortableCustomCard";
 import type { CustomColumn } from "@/types/kanban-custom";
 
 type CustomKanbanColumnProps = {
     column: CustomColumn;
-    onDelete: () => void;
-    onRename: (label: string) => void;
-    onDeleteCard: (cardId: string) => void;
-    onAssign: (cardId: string, userId: string) => void;
-    onUnassign: (cardId: string, userId: string) => void;
-    pendingAssigneeId: string | null;
-    /** Whether this column can be drag-reordered. False in single-column focus view,
-     *  where there's no sibling `SortableContext` to reorder against. */
     draggable?: boolean;
 };
 
-export default function CustomKanbanColumn({
-    column,
-    onDelete,
-    onRename,
-    onDeleteCard,
-    onAssign,
-    onUnassign,
-    pendingAssigneeId,
-    draggable = true,
-}: CustomKanbanColumnProps) {
+export default function CustomKanbanColumn({ column, draggable = true }: CustomKanbanColumnProps) {
     const openCreate = useCreateOrEditIssueStore((s) => s.openCreate);
+    const { removeColumn, renameColumn } = useCustomColumnActions();
 
     const [renaming, setRenaming] = useState(false);
     const [draftTitle, setDraftTitle] = useState(column.title);
@@ -55,7 +40,7 @@ export default function CustomKanbanColumn({
 
     const commitRename = () => {
         const next = draftTitle.trim();
-        if (next && next !== column.title) onRename(next);
+        if (next && next !== column.title) renameColumn(column.id, next);
         setRenaming(false);
     };
 
@@ -137,7 +122,7 @@ export default function CustomKanbanColumn({
                             </DropdownMenu.Item>
 
                             <DropdownMenu.Item
-                                onSelect={onDelete}
+                                onSelect={() => removeColumn(column.id)}
                                 className={`${PANEL_ITEM} text-rose-300 data-highlighted:text-rose-200`}
                             >
                                 <MdDelete className="size-3.5" aria-hidden />
@@ -154,14 +139,7 @@ export default function CustomKanbanColumn({
             >
                 <div className="flex min-h-0 flex-1 flex-col gap-1.5 overflow-y-auto rounded-lg p-0.5">
                     {column.cards.map((card) => (
-                        <SortableCustomCard
-                            key={card.id}
-                            card={card}
-                            onDelete={() => onDeleteCard(card.id)}
-                            onAssign={(userId) => onAssign(card.id, userId)}
-                            onUnassign={(userId) => onUnassign(card.id, userId)}
-                            pendingAssigneeId={pendingAssigneeId}
-                        />
+                        <SortableCustomCard key={card.id} card={card} />
                     ))}
 
                     {column.cards.length === 0 && (

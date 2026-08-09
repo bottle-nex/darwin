@@ -6,25 +6,13 @@ import { useListTemplates } from "@/hooks/templates/useListTemplates";
 import { useKanbanBoardStore } from "@/store/kanban/useKanbanBoardStore";
 import { useCustomKanbanStore } from "@/store/kanban/useCustomKanbanStore";
 import { useKanbanOptionsStore } from "@/store/kanban/useKanbanOptionsStore";
-import { useCustomKanban } from "./useCustomKanban";
+import { useCustomKanbanDnd } from "./useCustomKanbanDnd";
 
-/**
- * Wires the Kanban pane's data sources together. Resolves the active project,
- * fetches the board, and seeds the board/custom-column stores from it whenever
- * fresh data arrives. Board/toolbar state itself lives in Zustand stores
- * (`useKanbanBoardStore`, `useKanbanOptionsStore`, `useCustomKanbanStore`) —
- * components read those directly instead of through this hook. All that's left
- * here is the Custom Kanban's drag-and-drop orchestration (`useCustomKanban`,
- * which needs React Query mutations and dnd-kit's sensors, so it can't be a
- * plain store) and the cross-store guard that clears a stale focus filter.
- */
 export function useKanbanPane() {
     const activeProject = useActiveProject();
     const { data: board } = useBoard(activeProject?.id);
     const projectName = activeProject?.name ?? "";
 
-    // Warms the templates cache while the board mounts, so opening the create-issue
-    // dialog later reads from cache instead of showing a loading state.
     useListTemplates(activeProject?.id);
 
     useEffect(() => {
@@ -33,9 +21,8 @@ export function useKanbanPane() {
         useCustomKanbanStore.getState().seed(board);
     }, [board, projectName]);
 
-    const custom = useCustomKanban({ projectId: activeProject?.id });
+    const dnd = useCustomKanbanDnd();
 
-    // If the focused custom column was deleted, drop the focus so the board returns.
     const filter = useKanbanOptionsStore((s) => s.filter);
     const setFilter = useKanbanOptionsStore((s) => s.setFilter);
     const columns = useCustomKanbanStore((s) => s.columns);
@@ -45,5 +32,5 @@ export function useKanbanPane() {
         }
     }, [filter, columns, setFilter]);
 
-    return { custom };
+    return { dnd };
 }

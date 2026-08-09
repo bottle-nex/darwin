@@ -7,19 +7,9 @@ import type { CustomCard } from "@/types/kanban-custom";
 
 type SortableCustomCardProps = {
     card: CustomCard;
-    onDelete?: () => void;
-    onAssign?: (userId: string) => void;
-    onUnassign?: (userId: string) => void;
-    pendingAssigneeId?: string | null;
 };
 
-export default function SortableCustomCard({
-    card,
-    onDelete,
-    onAssign,
-    onUnassign,
-    pendingAssigneeId = null,
-}: SortableCustomCardProps) {
+export default function SortableCustomCard({ card }: SortableCustomCardProps) {
     const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
         id: card.id,
     });
@@ -34,13 +24,7 @@ export default function SortableCustomCard({
             {...listeners}
             className={cn("cursor-grab touch-none", isDragging && "opacity-40")}
         >
-            <CustomKanbanCard
-                card={card}
-                onDelete={onDelete}
-                onAssign={onAssign}
-                onUnassign={onUnassign}
-                pendingAssigneeId={pendingAssigneeId}
-            />
+            <CustomKanbanCard card={card} />
         </div>
     );
 }

@@ -153,9 +153,6 @@ export default class IssueCreateController {
                 return;
             }
 
-            console.log("full body is : ", parsed_body.data);
-            console.log("full issue is : ", issue);
-
             const full_issue = await prisma.issue.findUniqueOrThrow({
                 where: { id: issue.id },
                 include: { creator: true, assignees: true, tags: true },

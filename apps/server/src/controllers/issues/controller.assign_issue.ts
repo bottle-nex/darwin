@@ -96,8 +96,7 @@ export default class IssueAssignController {
                     tags: { select: { id: true, name: true, color: true } },
                 },
             });
-
-            // Self-assignment (picking a todo) doesn't need to notify yourself.
+            console.log("Iam here ");
             if (target_user_id !== user.id) {
                 await server_services.notifications.enqueue({
                     action: "issue.assigned",

@@ -7,7 +7,6 @@ import Access from "../../access-control/access";
 import { server_services } from "../..";
 
 export default class IssueUnassignController {
-    // Both ids come from the URL: /issues/:id/assignees/:user_id
     static params_schema = z.object({
         id: z.string().min(1),
         user_id: z.string().min(1),
