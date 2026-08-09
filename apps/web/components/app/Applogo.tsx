@@ -13,7 +13,7 @@ export default function AppLogo({ iconOnly = false, className = "", size = 24 }:
             {!iconOnly && (
                 <span className="text-xl font-semibold leading-none tracking-tight">
                     <span className="font-normal opacity-55">try</span>matcha
-                    <span className="text-[#8B77EC]">.</span>
+                    <span className="text-primary">.</span>
                 </span>
             )}
         </div>
