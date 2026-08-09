@@ -7,7 +7,7 @@ import { azeretMono, Button } from "@/components/ui/button";
 import Reveal from "@/components/utility/Reveal";
 import HeroBuddy from "@/components/landing/v2/HeroBuddy";
 
-const MICRO_LABELS = ["Reads the repo", "Writes the patch", "Opens the PR"];
+const MICRO_LABELS = ["Reads the repo", "Writes the patch", "Opens the PR"] as const;
 
 export default function LandingHeroV2() {
     return (
@@ -17,7 +17,7 @@ export default function LandingHeroV2() {
                     <Reveal immediate>
                         <div
                             className={cn(
-                                "buddy-zone flex items-center gap-2 rounded-full border border-neutral-800 px-3 py-1.5 text-[11px] uppercase tracking-wide text-neutral-400 shadow-sm bg-ink",
+                                "buddy-zone flex items-center gap-2 rounded-full border border-neutral-800 px-3 py-1.5 text-[11px] uppercase tracking-wide text-neutral-400 shadow-sm bg-charcoal",
                                 azeretMono.className,
                             )}
                         >

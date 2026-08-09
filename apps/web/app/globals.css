@@ -104,10 +104,6 @@
         @apply bg-snow text-foreground;
     }
 
-    /* Lenis (root smooth scroll). When Lenis is active it adds `.lenis` to
-       <html>; the scroll container is then <html>, so it must size to its
-       content. Without this, a fixed `height: 100%` on <html>/<body> clamps the
-       measured scroll limit and the page stops scrolling before the real bottom. */
     html.lenis,
     html.lenis body {
         height: auto;

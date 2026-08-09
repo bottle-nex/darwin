@@ -1,6 +1,6 @@
+import { prisma } from "@trymatcha/database";
 import { Request, Response } from "express";
 import ResponseWriter from "../../services/service.response";
-import { prisma } from "@trymatcha/database";
 
 export default class GetPreloadPgController {
     static async process(req: Request, res: Response) {

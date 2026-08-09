@@ -8,18 +8,11 @@ import { server_services } from "../..";
 import { OutboundSocketMessageType } from "@trymatcha/types";
 
 export default class IssueCreateController {
-    // Custom-column cards (`custom_column_id` set) are parked, personal board
-    // items — the agent never picks them up, so description/assignee stay
-    // optional there. Real To-Do issues (no `custom_column_id`) go straight to
-    // the agent, so title, description, and at least one assignee are required.
     static body_schema = z
         .object({
             project_id: z.string().min(1),
             title: z.string().min(1).max(80),
             summary: z.string().max(255).optional(),
-            // Stored as rendered HTML from the rich-text editor, which enforces
-            // a 2500-character *content* limit — capped higher here to leave
-            // room for markup overhead without changing the user-facing limit.
             description: z.string().max(20000),
             priority: z.number().int().min(1).max(4).optional(),
             custom_column_id: z.string().optional(),
@@ -59,7 +52,6 @@ export default class IssueCreateController {
                 return;
             }
 
-            // If the issue is being filed into a custom column, that column must belong to this same project
             if (parsed_body.data.custom_column_id) {
                 const column = await prisma.customColumn.findFirst({
                     where: {
@@ -74,7 +66,6 @@ export default class IssueCreateController {
                 }
             }
 
-            // Every assignee must themselves be a member of this project.
             if (parsed_body.data.assignee_ids?.length) {
                 const assignee_roles = await Promise.all(
                     parsed_body.data.assignee_ids.map((id) =>
@@ -90,7 +81,6 @@ export default class IssueCreateController {
                 }
             }
 
-            // Every tag must belong to this same project.
             if (parsed_body.data.tag_ids?.length) {
                 const tag_count = await prisma.tag.count({
                     where: {
@@ -131,10 +121,10 @@ export default class IssueCreateController {
                                 number: (last_issue?.number ?? 0) + 1,
                                 assignees: parsed_body.data.assignee_ids?.length
                                     ? {
-                                          connect: parsed_body.data.assignee_ids.map((id) => ({
-                                              id,
-                                          })),
-                                      }
+                                        connect: parsed_body.data.assignee_ids.map((id) => ({
+                                            id,
+                                        })),
+                                    }
                                     : undefined,
                                 tags: parsed_body.data.tag_ids?.length
                                     ? { connect: parsed_body.data.tag_ids.map((id) => ({ id })) }
@@ -163,6 +153,10 @@ export default class IssueCreateController {
                 return;
             }
 
+            console.log("full body is : ", parsed_body.data);
+            console.log("full issue is : ", issue);
+
+
             const full_issue = await prisma.issue.findUniqueOrThrow({
                 where: { id: issue.id },
                 include: { creator: true, assignees: true, tags: true },
@@ -184,7 +178,6 @@ export default class IssueCreateController {
             );
 
             if (!parsed_body.data.custom_column_id || issue.status === IssueStatus.Todo) {
-                // add to queue, server -> router
                 await server_services.queue.enqueue_project(parsed_body.data.project_id);
                 console.log("queued to router");
             }
