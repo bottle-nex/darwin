@@ -6,9 +6,10 @@ import { Footer } from "react-day-picker";
 
 export default function New() {
     return (
-        <div 
-        data-lenis-prevent
-        className="relative min-h-screen w-screen flex flex-col bg-primary/5">
+        <div
+            data-lenis-prevent
+            className="relative min-h-screen w-screen flex flex-col bg-primary/5"
+        >
             <AmbientDotField
                 className="h-screen"
                 color="#6d5ad6"
@@ -22,9 +23,9 @@ export default function New() {
                 capStrength={0.4}
                 capReach={0.11}
             />
-            <LandingNavbar/>
+            <LandingNavbar />
             <LandingHero />
-            <LandingFeatures/>
+            <LandingFeatures />
             <Footer />
         </div>
     );

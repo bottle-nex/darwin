@@ -13,9 +13,11 @@ const sourceSerif4 = Source_Serif_4({
 
 export default function LandingHero() {
     return (
-        <div className={cn(
-            "relative h-screen w-screen max-w-7xl mx-auto bg-transparent flex flex-col items-center pt-[11%] select-none border-b overflow-hidden",
-            )}>
+        <div
+            className={cn(
+                "relative h-screen w-screen max-w-7xl mx-auto bg-transparent flex flex-col items-center pt-[11%] select-none border-b overflow-hidden",
+            )}
+        >
             <div
                 className={cn(
                     "buddy-zone flex items-center gap-2 rounded-full border border-primary/15 px-3 py-1 text-[10px] uppercase tracking-wide text-[#434512] shadow-sm bg-white",
@@ -34,26 +36,23 @@ export default function LandingHero() {
                 Issues that implement themselves
             </div>
             <div className="pt-6 text-[1.09rem] text-foreground/55 w-140 text-center flex justify-center leading-[1.2]">
-                Agents claim work off your board, run your codebase <br/> in a sandbox, and ship a PR.
+                Agents claim work off your board, run your codebase <br /> in a sandbox, and ship a
+                PR.
             </div>
 
             <div className="flex gap-3 pt-8">
-                <button
-                    className="bg-[#8E81F2] text-[#f5f3f8] px-4 py-2 font-medium rounded-lg cursor-pointer text-[15px]"
-                >
+                <button className="bg-[#8E81F2] text-[#f5f3f8] px-4 py-2 font-medium rounded-lg cursor-pointer text-[15px]">
                     Get Started
                 </button>
-                <button
-                    className="bg-[#f1efff] text-[#8173f0] px-4 py-2 font-medium rounded-lg cursor-pointer text-[15px] flex items-center gap-1.5"
-                >
+                <button className="bg-[#f1efff] text-[#8173f0] px-4 py-2 font-medium rounded-lg cursor-pointer text-[15px] flex items-center gap-1.5">
                     How it works
-                    <IoIosPlayCircle className="text-[#6c60c8] size-4.5"/>
+                    <IoIosPlayCircle className="text-[#6c60c8] size-4.5" />
                 </button>
             </div>
 
             <div className="pt-12 flex flex-col w-full items-center">
                 <div className="h-6 px-3 flex gap-1.25 items-center text-xs font-medium text-[#434152] bg-white ring-1 ring-primary/20 rounded-md shadow-xs shadow-black/5">
-                    <SiGithub/>
+                    <SiGithub />
                     github.com/bottle-nex/trymatcha
                 </div>
             </div>
@@ -76,13 +75,11 @@ export default function LandingHero() {
                             <div className="px-3 bg-white rounded-full py-1 tracking-tight">
                                 Issues
                             </div>
-                            <div className="px-3 py-1 text-[#726a9f] tracking-tight">
-                                Review
-                            </div>
+                            <div className="px-3 py-1 text-[#726a9f] tracking-tight">Review</div>
                         </div>
 
                         {/* matcha logo */}
-                        <AppLogo iconOnly size={15}/> 
+                        <AppLogo iconOnly size={15} />
                     </div>
 
                     <div className="w-full h-full flex flex-col pt-6 px-4">
@@ -91,7 +88,7 @@ export default function LandingHero() {
                         </div>
 
                         <div className="flex gap-2 items-center text-[13px] mt-2 px-1">
-                            <RiProgress3Line className="text-primary size-4"/>
+                            <RiProgress3Line className="text-primary size-4" />
                             OTP verify returns 500 when the attempts key expires
                             <span className="text-xs pt-px font-medium text-[#928eac]">#231</span>
                         </div>
@@ -137,9 +134,8 @@ export default function LandingHero() {
                             <span className="text-xs pt-px font-medium text-[#928eac]">#212</span>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>
-    )
+    );
 }

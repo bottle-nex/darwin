@@ -15,10 +15,11 @@ import { cn } from "@/lib/utils";
 export default function LandingFeatures() {
     return (
         <main className="relative mx-6 rounded-4xl bg-linear-to-b from-transparent to-primary/60 mt-8">
-            <section id="features" className="mx-auto w-full max-w-7xl flex flex-col items-center py-24">
-                <button
-                    className="mt-8 bg-[#edeaff] text-[#675cb7] px-3 py-1.5 font-medium rounded-[7px] cursor-pointer tracking-tight text-[13px] flex items-center gap-1.5"
-                >
+            <section
+                id="features"
+                className="mx-auto w-full max-w-7xl flex flex-col items-center py-24"
+            >
+                <button className="mt-8 bg-[#edeaff] text-[#675cb7] px-3 py-1.5 font-medium rounded-[7px] cursor-pointer tracking-tight text-[13px] flex items-center gap-1.5">
                     How it works
                 </button>
                 <div
