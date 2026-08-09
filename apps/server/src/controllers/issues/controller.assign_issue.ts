@@ -4,6 +4,7 @@ import { IssueStatus, prisma } from "@trymatcha/database";
 import { Action, Permissions } from "@trymatcha/access-control";
 import ResponseWriter from "../../services/service.response";
 import Access from "../../access-control/access";
+import { server_services } from "../..";
 
 export default class IssueAssignController {
     static params_schema = z.object({
@@ -95,6 +96,16 @@ export default class IssueAssignController {
                     tags: { select: { id: true, name: true, color: true } },
                 },
             });
+
+            // Self-assignment (picking a todo) doesn't need to notify yourself.
+            if (target_user_id !== user.id) {
+                await server_services.notifications.enqueue({
+                    action: "issue.assigned",
+                    issueId: issue_id,
+                    assigneeId: target_user_id,
+                    actorId: user.id,
+                });
+            }
 
             ResponseWriter.success(res, { issue: updated }, "Issue assigned");
         } catch (error) {

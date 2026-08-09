@@ -232,4 +232,95 @@ export default class EmailTemplate {
 It expires in ${expiryMinutes} minutes. If you didn't request this, you can ignore this email.`,
         };
     }
+
+    /**
+     * Build the branded "issue assigned" notification email.
+     *
+     * `actorName` is whoever performed the assignment; `issueTitle`/`projectName` identify what
+     * changed; `url` deep-links to the issue.
+     */
+    static issueAssigned({
+        actorName,
+        issueTitle,
+        projectName,
+        url,
+    }: {
+        actorName: string;
+        issueTitle: string;
+        projectName: string;
+        url: string;
+    }): { subject: string; html: string; text: string } {
+        const c = this.COLORS;
+        const subject = `${actorName} assigned you an issue in ${projectName}`;
+
+        const bodyHtml = `
+        <h1 class="mc-text" style="margin:0 0 8px;font-family:${this.FONT_SANS};font-size:18px;font-weight:600;color:${c.text};">
+            You've been assigned an issue
+        </h1>
+        <p class="mc-muted" style="margin:0 0 24px;font-family:${this.FONT_SANS};font-size:14px;line-height:21px;color:${c.muted};">
+            ${this.escape_html(actorName)} assigned you <strong style="color:${c.text};">${this.escape_html(issueTitle)}</strong> in ${this.escape_html(projectName)}.
+        </p>
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+            <tr>
+                <td>${this.action_button({ href: url, label: "View issue" })}</td>
+            </tr>
+        </table>`;
+
+        const text = `${actorName} assigned you "${issueTitle}" in ${projectName}.\n\nView it here: ${url}`;
+
+        return {
+            subject,
+            html: this.layout({ preheader: `${actorName} assigned you ${issueTitle}`, bodyHtml }),
+            text,
+        };
+    }
+
+    /**
+     * Build the branded "mentioned in chat" notification email, shared by issue chat and
+     * project chat mentions since both are just a message someone tagged you in.
+     *
+     * `message` is the chat text the recipient was tagged in; `url` deep-links to the thread.
+     */
+    static mention({
+        senderName,
+        message,
+        url,
+    }: {
+        senderName: string;
+        message: string;
+        url: string;
+    }): { subject: string; html: string; text: string } {
+        const c = this.COLORS;
+        const subject = `${senderName} mentioned you on matcha`;
+
+        const bodyHtml = `
+        <h1 class="mc-text" style="margin:0 0 8px;font-family:${this.FONT_SANS};font-size:18px;font-weight:600;color:${c.text};">
+            You were mentioned
+        </h1>
+        <p class="mc-muted" style="margin:0 0 24px;font-family:${this.FONT_SANS};font-size:14px;line-height:21px;color:${c.muted};">
+            ${this.escape_html(senderName)} mentioned you:
+        </p>
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 24px;">
+            <tr>
+                <td style="border-left:3px solid ${c.accent};padding:4px 0 4px 14px;">
+                    <p class="mc-muted" style="margin:0;font-family:${this.FONT_SANS};font-size:14px;line-height:21px;font-style:italic;color:${c.muted};">
+                        ${this.escape_html(message)}
+                    </p>
+                </td>
+            </tr>
+        </table>
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+            <tr>
+                <td>${this.action_button({ href: url, label: "View message" })}</td>
+            </tr>
+        </table>`;
+
+        const text = `${senderName} mentioned you: "${message}"\n\nView it here: ${url}`;
+
+        return {
+            subject,
+            html: this.layout({ preheader: `${senderName} mentioned you`, bodyHtml }),
+            text,
+        };
+    }
 }

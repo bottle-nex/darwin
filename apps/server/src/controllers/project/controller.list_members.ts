@@ -24,17 +24,35 @@ export default async function list_members_controller(req: Request, res: Respons
             return;
         }
 
+        // `q` (even empty) signals a search-driven caller, e.g. an @-mention picker —
+        // those get a capped, server-filtered batch instead of the full member list.
+        const has_query = typeof req.query.q === "string";
+        const query = has_query ? (req.query.q as string).trim() : "";
+
         const project_members = await prisma.projectMember.findMany({
-            where: { projectId: project_id },
+            where: {
+                projectId: project_id,
+                ...(query && {
+                    user: {
+                        OR: [
+                            { name: { contains: query, mode: "insensitive" } },
+                            { email: { contains: query, mode: "insensitive" } },
+                        ],
+                    },
+                }),
+            },
             select: {
+                id: true,
                 role: true,
                 user: { select: { id: true, name: true, email: true, image: true } },
             },
             orderBy: { createdAt: "asc" },
+            ...(has_query && { take: 8 }),
         });
 
         const members = project_members.map((m) => ({
             id: m.user.id,
+            memberId: m.id,
             name: m.user.name,
             email: m.user.email,
             image: m.user.image,

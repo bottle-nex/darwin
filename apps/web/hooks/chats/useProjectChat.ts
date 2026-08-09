@@ -3,6 +3,7 @@ import { apiClient } from "@/lib/axios";
 import { PROJECT_CHAT_URL } from "@/routes/api_routes";
 import type { ApiResponse } from "@/types/api";
 import type { ProjectChat } from "@trymatcha/types";
+import type { ProjectMember } from "@/hooks/project/useProjectMembers";
 
 export const PROJECT_CHATS_QUERY_KEY = ["project-chats"] as const;
 
@@ -34,6 +35,7 @@ export function build_optimistic_project_chat(
     message: string,
     repliedTo: ProjectChat | null,
     sender: { id: string; name: string | null; email: string; image: string | null },
+    mentionedMembers: ProjectMember[] = [],
 ): ProjectChat {
     return {
         id: `${OPTIMISTIC_ID_PREFIX}${crypto.randomUUID()}`,
@@ -44,6 +46,13 @@ export function build_optimistic_project_chat(
         sender: sender as unknown as ProjectChat["sender"],
         repliedToId: repliedTo?.id ?? null,
         repliedTo: repliedTo ?? null,
+        mentions: mentionedMembers.map((member) => ({
+            id: `${OPTIMISTIC_ID_PREFIX}${member.memberId}`,
+            projectChatId: projectId,
+            memberId: member.memberId,
+            member: { id: member.memberId, user: member },
+            createdAt: new Date(),
+        })) as unknown as ProjectChat["mentions"],
         createdAt: new Date(),
         updatedAt: new Date(),
     };

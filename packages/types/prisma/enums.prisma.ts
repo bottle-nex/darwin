@@ -47,3 +47,11 @@ export const IssueStatus = {
     Parked: "Parked",
 } as const;
 export type IssueStatus = (typeof IssueStatus)[keyof typeof IssueStatus];
+
+export const NotificationType = {
+    IssueAssigned: "IssueAssigned",
+    IssueUnassigned: "IssueUnassigned",
+    ChatMention: "ChatMention",
+    ProjectChatMention: "ProjectChatMention",
+} as const;
+export type NotificationType = (typeof NotificationType)[keyof typeof NotificationType];

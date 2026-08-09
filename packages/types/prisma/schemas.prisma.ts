@@ -1,4 +1,4 @@
-import { IssueStatus, OrgRole, ProjectRole, TeamRole } from "./enums.prisma";
+import { IssueStatus, NotificationType, OrgRole, ProjectRole, TeamRole } from "./enums.prisma";
 
 export interface User {
     id: string;
@@ -151,8 +151,20 @@ export interface Chat {
     /** included one level deep on reads/broadcasts; absent on the nested quote itself. */
     repliedTo?: Chat | null;
 
+    mentions: ChatMention[];
+
     createdAt: Date;
     updatedAt: Date;
+}
+
+/** A user @-tagged in a Chat message, scoped to their ProjectMember row. */
+export interface ChatMention {
+    id: string;
+    chatId: string;
+    memberId: string;
+    member?: ProjectMember;
+
+    createdAt: Date;
 }
 
 export interface ProjectChat {
@@ -168,6 +180,28 @@ export interface ProjectChat {
     /** included one level deep on reads/broadcasts; absent on the nested quote itself. */
     repliedTo?: ProjectChat | null;
 
+    mentions: ProjectChatMention[];
+
     createdAt: Date;
     updatedAt: Date;
+}
+
+/** A user @-tagged in a ProjectChat message, scoped to their ProjectMember row. */
+export interface ProjectChatMention {
+    id: string;
+    projectChatId: string;
+    memberId: string;
+    member?: ProjectMember;
+
+    createdAt: Date;
+}
+
+export interface Notification {
+    id: string;
+    userId: string;
+    type: NotificationType;
+    payload: Record<string, unknown>;
+    readAt: Date | null;
+
+    createdAt: Date;
 }

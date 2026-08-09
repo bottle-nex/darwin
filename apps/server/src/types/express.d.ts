@@ -8,6 +8,7 @@ declare global {
     namespace Express {
         interface Request {
             user: AuthUser;
+            sandbox_session_id?: string;
         }
     }
 }

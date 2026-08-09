@@ -90,3 +90,56 @@ export async function inviteMember(
     }
     return true;
 }
+
+/**
+ * Send an "issue assigned" notification email to `to` via Resend.
+ *
+ * Like {@link inviteMember}, Resend reports failures in the response body rather than
+ * throwing, so failures are logged and reported back to the caller as `false` instead of
+ * bubbling up — a failed notification email shouldn't fail the assignment itself.
+ */
+export async function sendIssueAssignedEmail(
+    to: string,
+    data: { actorName: string; issueTitle: string; projectName: string; url: string },
+): Promise<boolean> {
+    const { subject, html, text } = EmailTemplate.issueAssigned(data);
+
+    const { error } = await client().emails.send({
+        from: ENV.SERVER_EMAIL_FROM,
+        to,
+        subject,
+        html,
+        text,
+    });
+
+    if (error) {
+        console.error(chalk.red("resend send failed: "), error?.message);
+        return false;
+    }
+    return true;
+}
+
+/**
+ * Send a "mentioned in chat" notification email to `to` via Resend. Shared by issue chat
+ * and project chat mentions, which only differ in how the caller builds `url`.
+ */
+export async function sendMentionEmail(
+    to: string,
+    data: { senderName: string; message: string; url: string },
+): Promise<boolean> {
+    const { subject, html, text } = EmailTemplate.mention(data);
+
+    const { error } = await client().emails.send({
+        from: ENV.SERVER_EMAIL_FROM,
+        to,
+        subject,
+        html,
+        text,
+    });
+
+    if (error) {
+        console.error(chalk.red("resend send failed: "), error?.message);
+        return false;
+    }
+    return true;
+}

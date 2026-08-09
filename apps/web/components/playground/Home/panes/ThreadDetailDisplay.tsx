@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { MdChat, MdFolder } from "react-icons/md";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
 import { useActiveProject } from "@/hooks/useActiveProject";
-import { useProjectMembers } from "@/hooks/project/useProjectMembers";
+import type { ProjectMember } from "@/hooks/project/useProjectMembers";
 import {
     useChats,
     add_chat,
@@ -37,7 +37,6 @@ export default function ThreadDetailDisplay() {
     const selectedThread = usePlaygroundNavStore((s) => s.selectedThread);
     const selectedThreadProjectSlug = usePlaygroundNavStore((s) => s.selectedThreadProjectSlug);
     const activeProject = useActiveProject();
-    const { data: members } = useProjectMembers(activeProject?.id);
 
     const { data: projectChats, isLoading: isProjectChatLoading } = useProjectChat(
         selectedThread?.kind === "project" ? activeProject?.id : undefined,
@@ -50,17 +49,23 @@ export default function ThreadDetailDisplay() {
         return <ThreadsDisplay />;
     }
 
-    function handleSend(message: string, repliedToId?: string) {
+    function handleSend(message: string, mentionedMembers: ProjectMember[], repliedToId?: string) {
         if (!selectedThread) return;
+        const mentionedMemberIds = mentionedMembers.map((m) => m.memberId);
         const sent =
             selectedThread.kind === "project"
                 ? send_socket_message({
                       type: InboundSocketMessageType.PROJECT_CHAT_CREATE,
-                      payload: { message, repliedToId },
+                      payload: { message, mentionedMemberIds, repliedToId },
                   })
                 : send_socket_message({
                       type: InboundSocketMessageType.CHAT_CREATE,
-                      payload: { issueId: selectedThread.issueId, message, repliedToId },
+                      payload: {
+                          issueId: selectedThread.issueId,
+                          message,
+                          mentionedMemberIds,
+                          repliedToId,
+                      },
                   });
         if (!sent) {
             toast.error("Couldn't send your message.");
@@ -83,7 +88,13 @@ export default function ThreadDetailDisplay() {
                 : null;
             add_project_chat(
                 queryClient,
-                build_optimistic_project_chat(activeProject.id, message, repliedTo, sender),
+                build_optimistic_project_chat(
+                    activeProject.id,
+                    message,
+                    repliedTo,
+                    sender,
+                    mentionedMembers,
+                ),
             );
         } else if (selectedThread.kind === "issue") {
             const repliedTo = repliedToId
@@ -91,7 +102,13 @@ export default function ThreadDetailDisplay() {
                 : null;
             add_chat(
                 queryClient,
-                build_optimistic_chat(selectedThread.issueId, message, repliedTo, sender),
+                build_optimistic_chat(
+                    selectedThread.issueId,
+                    message,
+                    repliedTo,
+                    sender,
+                    mentionedMembers,
+                ),
             );
         }
     }
@@ -150,7 +167,7 @@ export default function ThreadDetailDisplay() {
                             : `issue-${selectedThread.issueId}`
                     }
                     chats={selectedThread.kind === "project" ? projectChats : issueChats}
-                    members={members}
+                    projectId={activeProject?.id}
                     loading={
                         selectedThread.kind === "project"
                             ? isProjectChatLoading
