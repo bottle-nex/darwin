@@ -27,7 +27,7 @@ export default function FloatNotifications() {
     return (
         <div
             aria-live="polite"
-            className="pointer-events-none fixed top-12 right-2 z-50 flex w-86 flex-col gap-x-2"
+            className="pointer-events-none fixed top-12 right-2 z-50 flex w-86 flex-col gap-x-2 gap-y-2"
         >
             <AnimatePresence mode="popLayout" initial={false}>
                 {items.map((notification) => (
@@ -75,7 +75,7 @@ function FloatNotificationCard({ notification, onSelect }: FloatNotificationCard
             onMouseLeave={() => setPaused(false)}
             onFocusCapture={() => setPaused(true)}
             onBlurCapture={() => setPaused(false)}
-            className="group pointer-events-auto relative overflow-hidden rounded-xl border border-graphite bg-graphite backdrop-blur-lg shadow-lg"
+            className="group pointer-events-auto relative overflow-hidden rounded-xl gradient-border before:z-10 bg-graphite backdrop-blur-lg shadow-lg"
         >
             {clickable && (
                 <button

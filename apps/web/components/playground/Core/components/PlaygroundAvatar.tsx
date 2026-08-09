@@ -1,4 +1,6 @@
+"use client";
 import Image from "next/image";
+import { useState } from "react";
 import { cn } from "@/lib/utils";
 
 const AVATAR_TONE = {
@@ -76,14 +78,23 @@ export default function PlaygroundAvatar({
     className,
 }: PlaygroundAvatarProps) {
     const { bg, glow } = AVATAR_TONE[tone];
+    const [failedSrc, setFailedSrc] = useState<string | null>(null);
+    const photoSrc = src && src !== failedSrc ? src : null;
 
     return (
         <span
-            className={cn(BASE, AVATAR_SIZE[size], bg, !src && [SHEEN, glow], className)}
+            className={cn(BASE, AVATAR_SIZE[size], bg, !photoSrc && [SHEEN, glow], className)}
             aria-hidden
         >
-            {src ? (
-                <Image src={src} alt="" fill unoptimized className="object-cover" />
+            {photoSrc ? (
+                <Image
+                    src={photoSrc}
+                    alt=""
+                    fill
+                    sizes="32px"
+                    onError={() => setFailedSrc(photoSrc)}
+                    className="object-cover"
+                />
             ) : (
                 <span className="relative drop-shadow-[0_1px_1px_rgba(0,0,0,0.25)]">{letter}</span>
             )}

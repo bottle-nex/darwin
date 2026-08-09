@@ -117,7 +117,7 @@ export default function PlaygroundUserMenu() {
                         aria-label="Account menu"
                         className="relative size-7 cursor-pointer overflow-hidden rounded-full outline-none ring-1 ring-white/10 transition hover:ring-white/25 data-[state=open]:ring-white/30"
                     >
-                        <Image src={user.image} alt="" fill unoptimized className="object-cover" />
+                        <Image src={user.image} alt="" fill sizes="28px" className="object-cover" />
                     </Button>
                 ) : (
                     <Button
@@ -145,7 +145,7 @@ export default function PlaygroundUserMenu() {
                                     src={user.image}
                                     alt=""
                                     fill
-                                    unoptimized
+                                    sizes="36px"
                                     className="object-cover"
                                 />
                             </span>
