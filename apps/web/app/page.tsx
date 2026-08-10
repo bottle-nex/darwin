@@ -31,7 +31,6 @@
 //     );
 // }
 
-
 import { Footer } from "@/components/app/Footer";
 import { NavBar } from "@/components/nav/Navbar";
 import LandingHeroV2 from "@/components/landing/v2/LandingHeroV2";
