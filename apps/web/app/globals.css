@@ -9,10 +9,10 @@
     --color-ink: #0a0a0a;
     --color-charcoal: #121213;
     --color-cement: #181819;
-    --color-graphite: #1D1D1E;
+    --color-graphite: #1d1d1e;
     --color-snow: #ffffff;
     --color-mist: #f4f4f4;
-    --color-primary: #ab9ff2;
+    --color-primary: #AB9FF1;
 }
 
 :root {
@@ -26,7 +26,7 @@
     --popover: #ffffff;
     --popover-foreground: #171717;
 
-    --primary: #bcafff;
+    --primary: #AB9FF1;
     --primary-foreground: var(--color-snow);
     --secondary: var(--color-mist);
     --secondary-foreground: #171717;
@@ -50,7 +50,7 @@
     --popover: var(--color-charcoal);
     --popover-foreground: #ededed;
 
-    --primary: #ededed;
+    --primary: #AB9FF1;
     --primary-foreground: #171717;
     --secondary: var(--color-charcoal);
     --secondary-foreground: #ededed;

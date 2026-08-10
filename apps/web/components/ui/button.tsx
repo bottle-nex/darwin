@@ -17,15 +17,15 @@ const buttonVariants = cva(
         variants: {
             variant: {
                 default:
-                    "bg-linear-to-b from-[#CFC6FF] to-[#BCAFFF] text-neutral-900 shadow-[inset_0_2px_0_0_rgba(255,255,255,0.55),0_1px_2px_0_rgba(15,23,42,0.12),0_1px_3px_0_rgba(15,23,42,0.10)] hover:from-[#C4BAFF] hover:to-[#B0A2FF] focus-visible:border-ring",
+                    "bg-primary text-[#3B315C] shadow-[0_1px_2px_0_rgba(15,23,42,0.12),0_1px_3px_0_rgba(15,23,42,0.10)] hover:from-[#C4BAFF] hover:to-[#B0A2FF] focus-visible:border-ring",
                 secondary:
-                    "bg-linear-to-b from-[#404040] to-neutral-900 text-white shadow-[inset_0_2px_0_0_#606060,0_1px_2px_0_rgba(15,23,42,0.12),0_1px_3px_0_rgba(15,23,42,0.14)] hover:from-neutral-600 hover:to-neutral-800 focus-visible:border-ring dark:from-neutral-200 dark:to-neutral-200 dark:text-neutral-950 dark:shadow-[inset_0_1.5px_0_0_rgba(255,255,255,0.9),0_1px_2px_0_rgba(0,0,0,0.25)] dark:hover:from-neutral-200 dark:hover:to-neutral-300",
+                    "bg-linear-to-b from-[#404040] to-neutral-900 text-white shadow-[0_1px_2px_0_rgba(15,23,42,0.12),0_1px_3px_0_rgba(15,23,42,0.14)] hover:from-neutral-600 hover:to-neutral-800 focus-visible:border-ring dark:from-neutral-200 dark:to-neutral-200 dark:text-neutral-950 dark:shadow-[0_1px_2px_0_rgba(0,0,0,0.25)] dark:hover:from-neutral-200 dark:hover:to-neutral-300",
                 tertiary:
-                    "bg-linear-to-b from-[#E3E3E3] to-neutral-200 text-neutral-900 shadow-[inset_0_2px_0_0_#ffffff,0_1px_2px_0_rgba(15,23,42,0.05)] hover:bg-neutral-50 focus-visible:border-ring [&_svg]:text-neutral-400 hover:[&_svg]:text-neutral-600 dark:from-neutral-700 dark:to-neutral-800 dark:text-neutral-100 dark:border-neutral-600 dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08),0_1px_2px_0_rgba(0,0,0,0.2)] dark:hover:from-neutral-600 dark:hover:to-neutral-700 dark:[&_svg]:text-neutral-400",
+                    "bg-linear-to-b from-[#E3E3E3] to-neutral-200 text-neutral-900 shadow-[0_1px_2px_0_rgba(15,23,42,0.05)] hover:bg-neutral-50 focus-visible:border-ring [&_svg]:text-neutral-400 hover:[&_svg]:text-neutral-600 dark:from-neutral-700 dark:to-neutral-800 dark:text-neutral-100 dark:border-neutral-600 dark:shadow-[0_1px_2px_0_rgba(0,0,0,0.2)] dark:hover:from-neutral-600 dark:hover:to-neutral-700 dark:[&_svg]:text-neutral-400",
                 outline:
-                    "bg-linear-to-b from-white to-neutral-50 text-foreground border border-neutral-200 shadow-[inset_0_1px_0_0_rgba(255,255,255,1),0_1px_2px_0_rgba(15,23,42,0.04)] hover:bg-neutral-50 focus-visible:border-ring aria-expanded:bg-neutral-50 dark:from-neutral-800 dark:to-neutral-800 dark:border-neutral-600 dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05)] dark:hover:from-neutral-700 dark:hover:to-neutral-700 dark:aria-expanded:from-neutral-700",
+                    "bg-linear-to-b from-white to-neutral-50 text-foreground border border-neutral-200 shadow-[0_1px_2px_0_rgba(15,23,42,0.04)] hover:bg-neutral-50 focus-visible:border-ring aria-expanded:bg-neutral-50 dark:from-neutral-800 dark:to-neutral-800 dark:border-neutral-600 dark:hover:from-neutral-700 dark:hover:to-neutral-700 dark:aria-expanded:from-neutral-700",
                 destructive:
-                    "bg-linear-to-b from-[#e84c4c] to-[#d83a3a] text-white shadow-[inset_0_1.5px_0_0_rgba(255,255,255,0.20),0_1px_2px_0_rgba(185,28,28,0.15)] outline-2 outline-offset-2 outline-[#d83a3a] outline-solid! hover:brightness-110 focus-visible:ring-destructive/40 dark:from-[#e04646] dark:to-[#cf3636] dark:shadow-[inset_0_1.5px_0_0_rgba(255,255,255,0.15)]",
+                    "bg-linear-to-b from-[#e84c4c] to-[#d83a3a] text-white shadow-[0_1px_2px_0_rgba(185,28,28,0.15)] outline-2 outline-offset-2 outline-[#d83a3a] outline-solid! hover:brightness-110 focus-visible:ring-destructive/40 dark:from-[#e04646] dark:to-[#cf3636]",
                 ghost: "text-foreground",
                 link: "text-primary underline-offset-4 hover:underline",
                 unstyled: "cursor-pointer",
@@ -83,10 +83,10 @@ export function Button({
     const rootClassName = unstyled
         ? className
         : cn(
-              buttonVariants({ variant, size, className }),
-              azeretMono.className,
-              "font-500 duration-150 ease-out active:scale-[0.99] uppercase cursor-pointer",
-          );
+            buttonVariants({ variant, size, className }),
+            azeretMono.className,
+            "font-500 duration-150 ease-out active:scale-[0.99] uppercase cursor-pointer",
+        );
 
     if (asChild) {
         const child = React.isValidElement<{ children?: React.ReactNode }>(children)
@@ -124,13 +124,13 @@ export function Button({
             >
                 {loading && child
                     ? React.cloneElement(
-                          child,
-                          undefined,
-                          <>
-                              {spinner}
-                              {replacesChildren ? null : child.props.children}
-                          </>,
-                      )
+                        child,
+                        undefined,
+                        <>
+                            {spinner}
+                            {replacesChildren ? null : child.props.children}
+                        </>,
+                    )
                     : children}
             </Slot.Root>
         );

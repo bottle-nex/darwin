@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import AppLogo from "@/components/app/Applogo";
 import { useUserSessionStore } from "@/store/user/useUserSessionStore";
 import { useRouter } from "next/navigation";
+import { Button } from "../ui/button";
 
 const NAV_ITEMS = [
     { label: "Why", href: "/why" },
@@ -74,12 +75,13 @@ export function LandingNavbar({ isMarkettingPage = false }: { isMarkettingPage?:
                         ))}
                     </nav>
 
-                    <button
-                        className="bg-[#1e1c28] text-[#f0eff8] px-4 py-1.75 font-medium rounded-md cursor-pointer text-[13px]"
+                    <Button
+                        variant={'secondary'}
+                        className="text-white"
                         onClick={session ? handleRedirect : handleSignin}
                     >
                         {session ? "Get Started" : "Sign in"}
-                    </button>
+                    </Button>
                 </div>
             </div>
         </header>

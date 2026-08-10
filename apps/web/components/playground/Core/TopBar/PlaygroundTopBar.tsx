@@ -60,7 +60,7 @@ export default function PlaygroundTopBar() {
                 <Button
                     onClick={() => setOpen(true)}
                     size="sm"
-                    className="h-6.75 cursor-pointer gap-1 bg-neutral-100 px-2.5 text-[11px] font-medium text-neutral-900 hover:bg-white"
+                    className="h-6.75 cursor-pointer gap-1 px-2.5 text-[11px] font-medium text-[#3B315C]"
                 >
                     <MdAdd className="size-3.5" aria-hidden />
                     Create Project

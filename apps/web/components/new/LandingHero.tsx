@@ -15,7 +15,7 @@ export default function LandingHero() {
     return (
         <div
             className={cn(
-                "relative h-screen w-screen max-w-7xl mx-auto bg-transparent flex flex-col items-center pt-[11%] select-none border-b overflow-hidden",
+                "relative h-screen w-screen max-w-7xl mx-auto bg-transparent flex flex-col items-center pt-[11%] border-b overflow-hidden",
             )}
         >
             <div
@@ -30,7 +30,7 @@ export default function LandingHero() {
             <div
                 className={cn(
                     // sourceSerif4.className,
-                    "pt-8 text-[2.6rem] text-[#434152] tracking-tight font-medium w-full text-center flex justify-center leading-none",
+                    "pt-8 text-6xl text-[#434152] tracking-tight font-medium w-full text-center flex justify-center leading-none",
                 )}
             >
                 Issues that implement themselves

@@ -38,7 +38,7 @@ export default function NotificationsBellButton({
             <HiOutlineBell className="size-4" aria-hidden />
             {unreadCount > 0 && (
                 <span
-                    className="absolute -top-0.5 -right-0.5 flex h-3.5 min-w-3.5 items-center justify-center rounded-full bg-primary px-1 text-[9px] leading-none font-medium text-ink tabular-nums ring-2 ring-charcoal"
+                    className="absolute -top-0.5 -right-0.5 flex h-3.5 min-w-3.5 items-center justify-center rounded-full bg-primary px-1 text-[9px] leading-none font-medium tabular-nums ring-2 ring-charcoal"
                     aria-hidden
                 >
                     {unreadCount > 9 ? "9+" : unreadCount}
