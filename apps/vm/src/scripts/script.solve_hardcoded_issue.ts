@@ -1,25 +1,33 @@
 import "../conf/config.env";
 import chalk from "chalk";
-import { prisma, WorkerStatus } from "@trymatcha/database";
+import { prisma, IssueStatus, WorkerStatus } from "@trymatcha/database";
 import E2B from "../services/services.e2b";
 
 /**
- * One-off entrypoint that bypasses the reconciler/router/dispatch pipeline entirely:
- * pass a projectId, get a hardcoded issue solved and a PR opened. Exists to prove the
- * sandbox -> Claude Code -> sandbox-mcp -> server loop end to end before that pipeline
- * is wired up to drive it for real. Run with: bun run solve <projectId> ["issue text"]
+ * Manual test entrypoint that bypasses the router's LLM assignment step, but otherwise
+ * drives the exact same path a real dispatch does: create a Worker + a Queued Issue by
+ * hand, then call E2B.run_worker_loop like the dispatch consumer would. Useful for
+ * exercising the sandbox -> Claude Code -> sandbox-mcp -> server loop against one issue
+ * without waiting on routing. Run with: bun run solve <projectId> ["issue description"]
  */
-const HARDCODED_ISSUE = `Title: Fix the typo in the root README
-
-The project's root README.md has a typo in its first heading or intro line.
-Find it and correct it. Keep the change minimal and scoped to that one fix.`;
+const HARDCODED_ISSUE = {
+    title: "Fix the typo in the root README",
+    description: `The project's root README.md has a typo in its first heading or intro line.
+Find it and correct it. Keep the change minimal and scoped to that one fix.`,
+};
 
 async function main() {
     const project_id = process.argv[2];
-    const issue_text = process.argv[3] ?? HARDCODED_ISSUE;
+    const override_description = process.argv[3];
+    const issue = override_description
+        ? {
+              title: override_description.slice(0, 77).trim() + "...",
+              description: override_description,
+          }
+        : HARDCODED_ISSUE;
 
     if (!project_id) {
-        console.error(chalk.red('usage: bun run solve <projectId> ["issue text"]'));
+        console.error(chalk.red('usage: bun run solve <projectId> ["issue description"]'));
         process.exit(1);
     }
 
@@ -28,6 +36,7 @@ async function main() {
         where: { id: project_id },
         select: {
             id: true,
+            ownerId: true,
             githubRepoUrl: true,
             githubDefaultBranch: true,
             githubInstallation: { select: { installationId: true } },
@@ -48,7 +57,7 @@ async function main() {
     }
 
     console.log(chalk.cyan(`[solve] project resolved: ${project.githubRepoUrl}`));
-    console.log(chalk.cyan(`[solve] issue:\n${issue_text}`));
+    console.log(chalk.cyan(`[solve] issue: ${issue.title}\n${issue.description}`));
 
     console.log(chalk.cyan("[solve] creating worker row (writing to db)"));
     const worker = await prisma.worker.create({
@@ -56,14 +65,29 @@ async function main() {
     });
     console.log(chalk.green(`[solve] worker created: ${worker.id}`));
 
-    await E2B.run_issue_job(
-        worker.id,
-        project.id,
-        project.githubRepoUrl,
-        project.githubDefaultBranch,
-        Number(project.githubInstallation.installationId),
-        issue_text,
+    console.log(chalk.cyan("[solve] creating queued issue row (writing to db)"));
+    const last_issue = await prisma.issue.findFirst({
+        where: { projectId: project.id },
+        orderBy: { number: "desc" },
+        select: { number: true },
+    });
+    const created_issue = await prisma.issue.create({
+        data: {
+            projectId: project.id,
+            createdById: project.ownerId,
+            number: (last_issue?.number ?? 0) + 1,
+            title: issue.title,
+            description: issue.description,
+            status: IssueStatus.Queued,
+            assignerWorkerId: worker.id,
+            queuePosition: 1,
+        },
+    });
+    console.log(
+        chalk.green(`[solve] issue created: #${created_issue.number} (${created_issue.id})`),
     );
+
+    await E2B.run_worker_loop(worker.id);
 
     console.log(chalk.green(`[solve] done — check worker ${worker.id} for final status/PR info`));
     await prisma.$disconnect();

@@ -37,6 +37,7 @@ export type BoardIssue = {
     createdAt: string;
     startDate: string | null;
     targetDate: string | null;
+    prUrl: string | null;
     assignees: BoardAssignee[];
     tags: BoardTag[];
 };

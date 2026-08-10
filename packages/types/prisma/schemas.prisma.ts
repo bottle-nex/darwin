@@ -120,6 +120,7 @@ export interface Issue {
     customColumnId: string | null;
     startDate: Date | null;
     targetDate: Date | null;
+    prUrl: string | null;
 
     creator: User;
     assignees: User[];

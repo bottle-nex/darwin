@@ -174,8 +174,10 @@ export default class IssueCreateController {
             );
 
             if (!parsed_body.data.custom_column_id || issue.status === IssueStatus.Todo) {
+                console.log(
+                    `[issue:${issue.id}] created as Todo in project ${parsed_body.data.project_id}, queueing project for routing`,
+                );
                 await server_services.queue.enqueue_project(parsed_body.data.project_id);
-                console.log("queued to router");
             }
 
             ResponseWriter.created(res, { issue: full_issue }, "Issue created successfully");

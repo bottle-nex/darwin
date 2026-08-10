@@ -147,6 +147,7 @@ enum WorkerRuntimeStatus {
 }
 
 type PrOpenedArgs = {
+    issue_id: string;
     pr_url: string;
     branch: string;
     summary: string;
@@ -181,8 +182,9 @@ export class WorkerMcpServerService {
 
         this.mcp_server.tool(
             "report_pr_opened",
-            "Report the PR you just opened for the issue you solved: its URL, the branch it was raised from, and a short summary of the change.",
+            "Report the PR you just opened for the issue you solved: the issue's id (given to you at the start of this task), the PR URL, the branch it was raised from, and a short summary of the change.",
             {
+                issue_id: z.string(),
                 pr_url: z.string(),
                 branch: z.string(),
                 summary: z.string(),

@@ -16,6 +16,8 @@ export function useSubscribeEventHandlers(project_id: string | undefined) {
         const handlers_map: Record<OutboundSocketMessageType, MessageHandler> = {
             [OutboundSocketMessageType.ISSUE_CREATED]: (message) =>
                 SocketHandlers.handle_issue_created(queryClient, message),
+            [OutboundSocketMessageType.ISSUE_UPDATED]: (message) =>
+                SocketHandlers.handle_issue_updated(queryClient, message),
             [OutboundSocketMessageType.CHAT_CREATED]: (message) =>
                 SocketHandlers.handle_chat_created(queryClient, message),
             [OutboundSocketMessageType.CHAT_DELETED]: (message) =>

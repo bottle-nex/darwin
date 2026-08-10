@@ -13,6 +13,7 @@ const envSchema = z.object({
     SERVER_BRIEF_EFFORT: z.enum(["low", "medium", "high", "xhigh", "max"]).default("low"),
     SERVER_SOLVE_MODEL: z.string().default("claude-sonnet-5"),
     SERVER_SOLVE_EFFORT: z.enum(["low", "medium", "high", "xhigh", "max"]).default("high"),
+    SERVER_VM_DISPATCH_CONCURRENCY: z.coerce.number().int().min(1).default(10),
     SERVER_SECRET_ENCRYPTION_KEY: z
         .string()
         .regex(/^[0-9a-fA-F]{64}$/, "Must be a 64-character hex string (32 bytes for AES-256)"),

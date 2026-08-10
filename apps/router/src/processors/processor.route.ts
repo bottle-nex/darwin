@@ -5,7 +5,6 @@ import { ENV } from "../config/config.env";
 import z from "zod";
 import { RunnableSequence } from "@langchain/core/runnables";
 import { routerPrompt } from "../prompts/prompt.router";
-import chalk from "chalk";
 
 interface Assignment {
     issueId: string;
@@ -114,10 +113,17 @@ export default class RouterProcessor {
 
         console.log("history: ", history.size);
 
-        if (!project?.planMd) {
-            console.log(chalk.red("no plan was found in project"));
-            return;
-        }
+        let plan_md =
+            project?.planMd ||
+            "no need to see the plan, just map this single issue with the worker";
+
+        if (!project) return;
+
+        // if (!project?.planMd) {
+        //     console.log(chalk.red("no plan was found in project"));
+        //     plan_md = "no need to see the plan, just map this single issue with the worker";
+        //     return;
+        // }
 
         const new_workers = await this.spin_up_workers(
             projectId,
@@ -129,13 +135,16 @@ export default class RouterProcessor {
         console.log("new workers spinned up: ", new_workers.length);
 
         const assignment_data = {
-            plan_md: project.planMd,
+            plan_md: plan_md,
             history,
             active_workers,
             new_workers,
             new_issues: todos,
         };
         const assignments: Assignment[] = await this.route_issues(assignment_data);
+        console.log(
+            `[router] got ${assignments.length} assignment(s) back from the model for project ${projectId}`,
+        );
 
         await prisma.$transaction(async (tx) => {
             for (const a of assignments) {
@@ -157,7 +166,12 @@ export default class RouterProcessor {
         });
 
         const worker_ids = [...new Set(assignments.map((a) => a.workerId))];
+        console.log(
+            `[router] project ${projectId}: queued ${assignments.length} issue(s) across ` +
+                `${worker_ids.length} worker(s), dispatching each now`,
+        );
         await Promise.all(worker_ids.map((id) => queue.enqueue_dispatch(id)));
+        console.log(`[router] project ${projectId}: routing complete`);
     }
 
     static async spin_up_workers(
@@ -199,7 +213,7 @@ export default class RouterProcessor {
         console.log("creating model");
         const model = new ChatAnthropic({
             apiKey: ENV.SERVER_ANTHROPIC_API_KEY,
-            model: "claude-3-haiku-20240307",
+            model: "claude-haiku-4-5-20251001",
         });
 
         console.log("creating chain");
