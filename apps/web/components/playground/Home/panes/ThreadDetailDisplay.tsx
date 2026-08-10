@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { MdChat, MdFolder } from "react-icons/md";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
 import { useActiveProject } from "@/hooks/useActiveProject";
+import { useIssueDialog } from "@/components/playground/issue/useIssueDialog";
 import type { ProjectMember } from "@/hooks/project/useProjectMembers";
 import {
     useChats,
@@ -37,6 +38,7 @@ export default function ThreadDetailDisplay() {
     const selectedThread = usePlaygroundNavStore((s) => s.selectedThread);
     const selectedThreadProjectSlug = usePlaygroundNavStore((s) => s.selectedThreadProjectSlug);
     const activeProject = useActiveProject();
+    const { openEdit } = useIssueDialog();
 
     const { data: projectChats, isLoading: isProjectChatLoading } = useProjectChat(
         selectedThread?.kind === "project" ? activeProject?.id : undefined,
@@ -157,7 +159,26 @@ export default function ThreadDetailDisplay() {
                 ) : (
                     <MdChat className="size-4 shrink-0 text-neutral-400" aria-hidden />
                 )}
-                <h2 className="truncate text-[13px] font-semibold text-neutral-100">{title}</h2>
+                {isProjectThread ? (
+                    <h2 className="truncate text-[13px] font-semibold text-neutral-100">
+                        {title}
+                    </h2>
+                ) : (
+                    <h2
+                        role="button"
+                        tabIndex={0}
+                        className="cursor-pointer truncate text-[13px] font-semibold text-neutral-100"
+                        onClick={() => openEdit(selectedThread.issueId)}
+                        onKeyDown={(e) => {
+                            if (e.key === "Enter" || e.key === " ") {
+                                e.preventDefault();
+                                openEdit(selectedThread.issueId);
+                            }
+                        }}
+                    >
+                        {title}
+                    </h2>
+                )}
             </div>
             <div className="flex min-h-0 flex-1 flex-col *:px-4 *:py-3">
                 <ProjectChatThread

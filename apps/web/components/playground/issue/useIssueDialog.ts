@@ -12,12 +12,6 @@ function basePath(pathname: string): string {
     return pathname.replace(ISSUE_SEGMENT, "");
 }
 
-/**
- * The issue dialog, plus the `…/issue/<id>` deep link that mirrors it. Opening an
- * issue for edit is shareable and survives Back/Forward; creating is transient and
- * never touches the URL. Pass `sync` once, high in the tree, to adopt the id from
- * a pasted link and to follow history navigation.
- */
 export function useIssueDialog({ sync = false }: { sync?: boolean } = {}) {
     const mode = useCreateOrEditIssueStore((s) => s.mode);
     const openCreate = useCreateOrEditIssueStore((s) => s.openCreate);

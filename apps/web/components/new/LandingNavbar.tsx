@@ -74,8 +74,11 @@ export function LandingNavbar({ isMarkettingPage = false }: { isMarkettingPage?:
                         ))}
                     </nav>
 
-                    <button className="bg-[#1e1c28] text-[#f0eff8] px-4 py-1.75 font-medium rounded-md cursor-pointer text-[13px]">
-                        Get Started
+                    <button
+                        className="bg-[#1e1c28] text-[#f0eff8] px-4 py-1.75 font-medium rounded-md cursor-pointer text-[13px]"
+                        onClick={session ? handleRedirect : handleSignin}
+                    >
+                        {session ? "Get Started" : "Sign in"}
                     </button>
                 </div>
             </div>
