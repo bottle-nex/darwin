@@ -16,6 +16,7 @@ const envSchema = z.object({
         .regex(/^[0-9a-fA-F]{64}$/, "Must be a 64-character hex string (32 bytes for AES-256)"),
     SERVER_JWT_TOKEN_TTL: z.string().default("7d"),
     SERVER_SANDBOX_JWT_TTL: z.string().default("20m"),
+    SERVER_WORKER_JWT_TTL: z.string().default("90m"),
     SERVER_REDIS_URL: z.url("Invalid Redis URL"),
     INVITATION_URL_TTL_DAYS: z.coerce.number().default(7),
     SERVER_OTP_TTL_SECONDS: z.coerce.number().default(600),

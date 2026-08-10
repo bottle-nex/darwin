@@ -11,6 +11,7 @@ import chats_router from "../chats/router.chats";
 import project_chats_router from "../projectChats/router.project-chats";
 import notifications_router from "../notifications/router.notifications";
 import mcp_router from "../mcp/router.mcp";
+import worker_router from "../worker/router.worker";
 
 const v1_router: Router = Router();
 
@@ -30,5 +31,6 @@ v1_router.use("/chats", chats_router);
 v1_router.use("/project-chats", project_chats_router);
 v1_router.use("/notifications", notifications_router);
 v1_router.use("/setup", mcp_router);
+v1_router.use("/worker", worker_router);
 
 export default v1_router;

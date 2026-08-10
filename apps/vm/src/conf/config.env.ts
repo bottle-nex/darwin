@@ -11,6 +11,8 @@ const envSchema = z.object({
     SERVER_ANTHROPIC_API_KEY: z.string().min(1, "Anthropic API key is required"),
     SERVER_BRIEF_MODEL: z.string().default("claude-sonnet-5"),
     SERVER_BRIEF_EFFORT: z.enum(["low", "medium", "high", "xhigh", "max"]).default("low"),
+    SERVER_SOLVE_MODEL: z.string().default("claude-sonnet-5"),
+    SERVER_SOLVE_EFFORT: z.enum(["low", "medium", "high", "xhigh", "max"]).default("high"),
     SERVER_SECRET_ENCRYPTION_KEY: z
         .string()
         .regex(/^[0-9a-fA-F]{64}$/, "Must be a 64-character hex string (32 bytes for AES-256)"),
@@ -20,6 +22,11 @@ const envSchema = z.object({
     SERVER_GITHUB_APP_PRIVATE_KEY: z
         .string()
         .min(1, "GitHub App private key (base64-encoded PEM) is required"),
+    SERVER_JWT_SECRET: z.string().min(32),
+    SERVER_WORKER_JWT_TTL: z.string().default("90m"),
+    SERVER_PUBLIC_API_URL: z
+        .string()
+        .min(1, "Public API URL is required — the sandbox calls back to this"),
 });
 
 function parseEnv() {
