@@ -9,6 +9,7 @@ declare global {
         interface Request {
             user: AuthUser;
             sandbox_session_id?: string;
+            worker_id?: string;
         }
     }
 }

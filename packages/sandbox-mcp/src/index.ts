@@ -141,4 +141,114 @@ export class McpServerService {
     }
 }
 
-await new McpServerService().start();
+enum WorkerRuntimeStatus {
+    BUSY = "Busy",
+    IDLE = "Idle",
+}
+
+type PrOpenedArgs = {
+    issue_id: string;
+    pr_url: string;
+    branch: string;
+    summary: string;
+};
+
+/**
+ * MCP surface for the issue-solving flow: a worker-scoped sandbox reports its
+ * Busy/Idle status and the outcome of a PR it opened. Mirrors McpServerService's
+ * shape but talks to /api/v1/worker instead of /api/v1/setup.
+ */
+export class WorkerMcpServerService {
+    private mcp_server: McpServer;
+
+    private static readonly SERVER = process.env.MATCHA_SERVER_URL!;
+    private static readonly TOKEN = process.env.MATCHA_SANDBOX_TOKEN!; // per-worker token
+
+    constructor() {
+        this.mcp_server = new McpServer({
+            name: "matcha-worker-mcp",
+            version: "0.1.0",
+        });
+        this.register_tools();
+    }
+
+    public register_tools() {
+        this.mcp_server.tool(
+            "report_status",
+            "Report whether this worker is Busy (actively solving an issue) or Idle (nothing left to work on). Call this before opening a PR once there is no more queued work.",
+            { status: z.enum(WorkerRuntimeStatus) },
+            this.report_status.bind(this),
+        );
+
+        this.mcp_server.tool(
+            "report_pr_opened",
+            "Report the PR you just opened for the issue you solved: the issue's id (given to you at the start of this task), the PR URL, the branch it was raised from, and a short summary of the change.",
+            {
+                issue_id: z.string(),
+                pr_url: z.string(),
+                branch: z.string(),
+                summary: z.string(),
+            },
+            this.report_pr_opened.bind(this),
+        );
+    }
+
+    private async report_status({ status }: { status: WorkerRuntimeStatus }) {
+        console.error(`[sandbox-mcp:worker] report_status(${status}) — about to notify server`);
+        try {
+            await this.api("/status", {
+                method: "POST",
+                body: JSON.stringify({ status }),
+            });
+            console.error(`[sandbox-mcp:worker] report_status(${status}) — server acknowledged`);
+            return this.text("ok");
+        } catch (err) {
+            console.error(`[sandbox-mcp:worker] report_status(${status}) — failed:`, err);
+            return this.text("error reporting status");
+        }
+    }
+
+    private async report_pr_opened(args: PrOpenedArgs) {
+        console.error(
+            `[sandbox-mcp:worker] report_pr_opened(branch=${args.branch}, pr_url=${args.pr_url}) — about to notify server`,
+        );
+        try {
+            await this.api("/pr-opened", {
+                method: "POST",
+                body: JSON.stringify(args),
+            });
+            console.error(`[sandbox-mcp:worker] report_pr_opened — server acknowledged`);
+            return this.text("ok");
+        } catch (err) {
+            console.error(`[sandbox-mcp:worker] report_pr_opened — failed:`, err);
+            return this.text("error reporting PR outcome");
+        }
+    }
+
+    private api(path: string, init?: RequestInit) {
+        return fetch(`${WorkerMcpServerService.SERVER}/api/v1/worker${path}`, {
+            ...init,
+            headers: {
+                authorization: `Bearer ${WorkerMcpServerService.TOKEN}`,
+                "content-type": "application/json",
+            },
+        });
+    }
+
+    private text(text: string) {
+        return { content: [{ type: "text" as const, text }] };
+    }
+
+    public async start() {
+        await this.mcp_server.connect(new StdioServerTransport());
+    }
+}
+
+const session_kind = process.env.MATCHA_SESSION_KIND ?? "setup";
+console.error(`[sandbox-mcp] starting in "${session_kind}" mode`);
+
+if (session_kind === "worker") {
+    await new WorkerMcpServerService().start();
+} else {
+    await new McpServerService().start();
+}

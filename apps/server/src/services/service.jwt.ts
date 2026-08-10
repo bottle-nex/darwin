@@ -69,3 +69,35 @@ export function verifySandboxJwt(token: string): SandboxClaims {
 
     return { session_id };
 }
+
+export interface WorkerClaims {
+    worker_id: string;
+}
+
+/**
+ * Sign a short-lived JWT scoped to one Worker — handed to the E2B sandbox as
+ * MATCHA_SANDBOX_TOKEN so sandbox-mcp can report status/PR outcome without a user session.
+ */
+export function signWorkerJwt(worker_id: string): string {
+    return jwt.sign({ worker_id } satisfies WorkerClaims, ENV.SERVER_JWT_SECRET, {
+        algorithm: "HS256",
+        expiresIn: ENV.SERVER_WORKER_JWT_TTL as SignOptions["expiresIn"],
+    });
+}
+
+export function verifyWorkerJwt(token: string): WorkerClaims {
+    const payload = jwt.verify(token, ENV.SERVER_JWT_SECRET, {
+        algorithms: ["HS256"],
+    });
+
+    if (typeof payload !== "object" || payload === null) {
+        throw new Error("invalid token payload");
+    }
+
+    const { worker_id } = payload as Record<string, unknown>;
+    if (typeof worker_id !== "string") {
+        throw new Error("missing worker_id claim");
+    }
+
+    return { worker_id };
+}

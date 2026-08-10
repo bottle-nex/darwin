@@ -1,7 +1,7 @@
 import type { QueryClient } from "@tanstack/react-query";
 import { OutboundSocketMessageType, type OutboundSocketMessage } from "@trymatcha/types";
 import { toast } from "sonner";
-import { upsertBoardIssue } from "@/hooks/issues/useBoard";
+import { upsertBoardIssue, updateBoardIssue } from "@/hooks/issues/useBoard";
 import { upsert_chat, mark_chat_deleted } from "@/hooks/chats/useChats";
 import { upsert_project_chat, mark_project_chat_deleted } from "@/hooks/chats/useProjectChat";
 import { upsert_notification } from "@/hooks/notifications/useNotifications";
@@ -12,6 +12,11 @@ export class SocketHandlers {
     static handle_issue_created(queryClient: QueryClient, message: OutboundSocketMessage) {
         if (message.type !== OutboundSocketMessageType.ISSUE_CREATED) return;
         upsertBoardIssue(queryClient, message.projectId, message.payload);
+    }
+
+    static handle_issue_updated(queryClient: QueryClient, message: OutboundSocketMessage) {
+        if (message.type !== OutboundSocketMessageType.ISSUE_UPDATED) return;
+        updateBoardIssue(queryClient, message.projectId, message.payload);
     }
 
     static handle_chat_created(queryClient: QueryClient, message: OutboundSocketMessage) {

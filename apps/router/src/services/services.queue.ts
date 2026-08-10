@@ -16,6 +16,7 @@ export default class QueueService {
         this.consumer = new Worker<RouteJobData>(
             QueueName.IssueRouter,
             async (job: Job<RouteJobData>) => {
+                console.log(`[queue] received route job for project ${job.data.projectId}`);
                 await RouterProcessor.process_route_job(job.data.projectId, this);
             },
             {
@@ -34,11 +35,16 @@ export default class QueueService {
     }
 
     async enqueue_dispatch(worker_id: string) {
+        console.log(`[queue] enqueueing dispatch for worker ${worker_id}`);
         await this.producer.add(
             "dispatch",
             { workerId: worker_id },
-            { jobId: `dispatch:${worker_id}`, removeOnComplete: true },
+            // BullMQ rejects a custom jobId containing ":" unless it splits into exactly 3
+            // parts (its own reserved format) — hyphen avoids that entirely, matching
+            // route-${project_id} / onboard-${session_id} elsewhere.
+            { jobId: `dispatch-${worker_id}`, removeOnComplete: true },
         );
+        console.log(`[queue] dispatch enqueued for worker ${worker_id}`);
     }
 
     async shutdown() {

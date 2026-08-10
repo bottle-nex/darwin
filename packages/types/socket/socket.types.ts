@@ -46,6 +46,7 @@ export type InboundSocketMessage =
 
 export enum OutboundSocketMessageType {
     ISSUE_CREATED = "ISSUE_CREATED",
+    ISSUE_UPDATED = "ISSUE_UPDATED",
     CHAT_CREATED = "CHAT_CREATED",
     CHAT_DELETED = "CHAT_DELETED",
     CHAT_ERROR = "CHAT_ERROR",
@@ -57,6 +58,11 @@ export enum OutboundSocketMessageType {
 export type OutboundSocketMessage =
     | {
           type: OutboundSocketMessageType.ISSUE_CREATED;
+          projectId: string;
+          payload: Issue;
+      }
+    | {
+          type: OutboundSocketMessageType.ISSUE_UPDATED;
           projectId: string;
           payload: Issue;
       }

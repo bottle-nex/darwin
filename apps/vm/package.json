@@ -7,6 +7,7 @@
     "scripts": {
         "dev": "bun run --watch index.ts",
         "start": "bun run index.ts",
+        "solve": "bun run src/scripts/script.solve_hardcoded_issue.ts",
         "lint": "eslint . --max-warnings 0",
         "typecheck": "tsc --noEmit"
     },
@@ -18,12 +19,14 @@
         "chalk": "^5.6.2",
         "dotenv": "^17.4.2",
         "e2b": "^2.36.0",
+        "jsonwebtoken": "^9.0.3",
         "zod": "^4.4.3"
     },
     "devDependencies": {
         "@trymatcha/eslint-config": "*",
         "@trymatcha/typescript-config": "*",
         "@types/bun": "latest",
+        "@types/jsonwebtoken": "^9.0.10",
         "@typescript-eslint/parser": "^7.1.0",
         "eslint": "^8.57.0",
         "eslint-config-prettier": "^9.1.0",

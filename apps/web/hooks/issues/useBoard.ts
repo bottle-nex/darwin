@@ -33,6 +33,7 @@ function toBoardIssue(issue: Issue): BoardIssue {
         createdAt: new Date(issue.createdAt).toISOString(),
         startDate: issue.startDate ? new Date(issue.startDate).toISOString() : null,
         targetDate: issue.targetDate ? new Date(issue.targetDate).toISOString() : null,
+        prUrl: issue.prUrl,
         assignees: issue.assignees,
         tags: issue.tags,
     };
@@ -49,5 +50,24 @@ export function upsertBoardIssue(queryClient: QueryClient, projectId: string, is
         if (!prev) return prev;
         if (prev.issues.some((existing) => existing.id === issue.id)) return prev;
         return { ...prev, issues: [...prev.issues, toBoardIssue(issue)] };
+    });
+}
+
+/**
+ * Replace an issue already on the board with its latest server state — status,
+ * prUrl, etc. changing after creation (e.g. a worker opening a PR). No-ops if the
+ * issue isn't cached yet; there's nothing to replace and a stale board shouldn't
+ * conjure a row a fresh fetch hasn't produced.
+ */
+export function updateBoardIssue(queryClient: QueryClient, projectId: string, issue: Issue) {
+    queryClient.setQueryData<BoardResponse>([...BOARD_QUERY_KEY, projectId], (prev) => {
+        if (!prev) return prev;
+        if (!prev.issues.some((existing) => existing.id === issue.id)) return prev;
+        return {
+            ...prev,
+            issues: prev.issues.map((existing) =>
+                existing.id === issue.id ? toBoardIssue(issue) : existing,
+            ),
+        };
     });
 }

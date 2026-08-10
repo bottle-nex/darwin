@@ -12,6 +12,7 @@ export default class QueueService {
     }
 
     async enqueue_project(project_id: string) {
+        console.log(`[queue] enqueueing project ${project_id} for routing`);
         await this.queue.add(
             "route",
             { projectId: project_id },
@@ -21,14 +22,19 @@ export default class QueueService {
                 removeOnFail: 100,
             },
         );
+        console.log(`[queue] project ${project_id} enqueued for routing`);
     }
 
     /** Hand a setup session to the vm worker, which owns the E2B sandbox run. */
     async enqueue_onboarding(data: OnboardJobData) {
+        console.log(
+            `[queue] enqueueing onboarding session ${data.session_id} (project ${data.project_id})`,
+        );
         await this.onboard_queue.add("onboard", data, {
             jobId: `onboard-${data.session_id}`,
             removeOnComplete: true,
             removeOnFail: 100,
         });
+        console.log(`[queue] onboarding session ${data.session_id} enqueued`);
     }
 }
