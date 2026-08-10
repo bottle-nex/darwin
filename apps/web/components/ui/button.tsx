@@ -83,10 +83,10 @@ export function Button({
     const rootClassName = unstyled
         ? className
         : cn(
-            buttonVariants({ variant, size, className }),
-            azeretMono.className,
-            "font-500 duration-150 ease-out active:scale-[0.99] uppercase cursor-pointer",
-        );
+              buttonVariants({ variant, size, className }),
+              azeretMono.className,
+              "font-500 duration-150 ease-out active:scale-[0.99] uppercase cursor-pointer",
+          );
 
     if (asChild) {
         const child = React.isValidElement<{ children?: React.ReactNode }>(children)
@@ -124,13 +124,13 @@ export function Button({
             >
                 {loading && child
                     ? React.cloneElement(
-                        child,
-                        undefined,
-                        <>
-                            {spinner}
-                            {replacesChildren ? null : child.props.children}
-                        </>,
-                    )
+                          child,
+                          undefined,
+                          <>
+                              {spinner}
+                              {replacesChildren ? null : child.props.children}
+                          </>,
+                      )
                     : children}
             </Slot.Root>
         );

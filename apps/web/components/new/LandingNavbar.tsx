@@ -76,7 +76,7 @@ export function LandingNavbar({ isMarkettingPage = false }: { isMarkettingPage?:
                     </nav>
 
                     <Button
-                        variant={'secondary'}
+                        variant={"secondary"}
                         className="text-white"
                         onClick={session ? handleRedirect : handleSignin}
                     >
