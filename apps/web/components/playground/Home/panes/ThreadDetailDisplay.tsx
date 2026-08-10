@@ -160,9 +160,7 @@ export default function ThreadDetailDisplay() {
                     <MdChat className="size-4 shrink-0 text-neutral-400" aria-hidden />
                 )}
                 {isProjectThread ? (
-                    <h2 className="truncate text-[13px] font-semibold text-neutral-100">
-                        {title}
-                    </h2>
+                    <h2 className="truncate text-[13px] font-semibold text-neutral-100">{title}</h2>
                 ) : (
                     <h2
                         role="button"
