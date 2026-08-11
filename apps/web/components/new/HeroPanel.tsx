@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { sourceSerif4 } from "@/lib/fonts";
 import ParticleField from "./ParticleField";
 import { Button } from "../ui/button";
+import { DottedArrowRight } from "@/lib/svgs/svgs";
 
 const SCROLL_SPRING = { stiffness: 700, damping: 16, mass: 0.15 };
 
@@ -60,24 +61,23 @@ export default function HeroPanel() {
 
                 <h2
                     className={cn(
-                        "max-w-200 font-medium text-white text-[3.5rem] leading-[1.1]",
+                        "max-w-200 font-medium text-[#fffcf6] text-[3.5rem] leading-[1.1] tracking-tight",
                         sourceSerif4.className,
                     )}
                 >
                     Every issue on your board is already being worked on.
                 </h2>
 
-                <p className="max-w-2xl text-[#f0eff8] text-[1.2rem]">
+                <p className="max-w-2xl text-[#fbf5ea] text-[1.2rem]">
                     Drop the work on the board and walk away. Issues get claimed, implemented, and
                     verified, you come back to PRs.
                 </p>
-
-                <Button
-                    variant={"tertiary"}
-                    className="bg-[#f0eff8] text-[#141413] px-4 py-1.75 font-medium rounded-md cursor-pointer text-[14px] shadow-xs shadow-black/5"
-                >
+                <button className="flex items-center gap-1.75 bg-[#fffcf6] text-[#2A2524] pr-3.5 pl-1 py-1 font-medium rounded-sm cursor-pointer text-[13px] shadow-xs shadow-black/5">
+                    <div className="h-7 w-7 bg-primary rounded-[3px] flex justify-center items-center">
+                        <DottedArrowRight color="#FCF8F0" size={20} />
+                    </div>
                     Get Started
-                </Button>
+                </button>
             </motion.div>
         </div>
     );

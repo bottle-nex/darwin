@@ -13,7 +13,7 @@
     --color-snow: #ffffff;
     --color-mist: #f4f4f4;
     --color-primary: #ab9ff2;
-    --color-background: #FFF8ED
+    --color-background: #fff8ed;
 }
 
 :root {
@@ -27,7 +27,7 @@
     --popover: #ffffff;
     --popover-foreground: #171717;
 
-    --primary: #AB9FF1;
+    --primary: #ab9ff1;
     --primary-foreground: var(--color-snow);
     --secondary: var(--color-mist);
     --secondary-foreground: #171717;
@@ -51,7 +51,7 @@
     --popover: var(--color-charcoal);
     --popover-foreground: #ededed;
 
-    --primary: #AB9FF1;
+    --primary: #ab9ff1;
     --primary-foreground: #171717;
     --secondary: var(--color-charcoal);
     --secondary-foreground: #ededed;
@@ -160,38 +160,43 @@
     }
 }
 
+/* Scroll-driven grow-to-viewport panel — see components/new/HeroPanel.tsx, which
+   drives --squeeze from 1 (resting in its slot) to 0 (covering the screen) as the
+   page scrolls.
+
+   The panel is absolutely positioned, so its containing block is the parent slot:
+   percentages in left/right resolve against the slot's width and percentages in
+   top/bottom against its height. Growing each edge by (100vw - 100%) / 2 therefore
+   lands the panel at exactly 100vw x 100vh without this rule ever needing to know
+   the column's size. Being out of flow also means none of this reflows the page —
+   only the panel's own subtree.
+
+   --squeeze defaults to 1 so the pre-hydration paint is the resting state; Motion
+   then overrides it inline, and the clamp keeps a spring that overshoots either end
+   from inverting the geometry.
+
+   Deliberately NOT inside @layer utilities: Tailwind treats hand-written classes in
+   that layer as candidates and drops any it cannot find in the scanned source, so
+   this rule silently vanished once the component that used to reference it was
+   renamed. Unlayered, it is always emitted. It also outranks Tailwind's utilities,
+   so position/inset/rounded-* classes on the panel itself won't take effect. */
+.expanding-panel {
+    --squeeze: 1;
+    --panel-squeeze: clamp(0, var(--squeeze), 1);
+    /* rounded-3xl at rest, square once it owns the screen. */
+    --panel-radius: 1.5rem;
+    --panel-grow-x: calc((1 - var(--panel-squeeze)) * (100vw - 100%) / 2);
+    --panel-grow-y: calc((1 - var(--panel-squeeze)) * (100vh - 100%) / 2);
+
+    position: absolute;
+    left: calc(-1 * var(--panel-grow-x));
+    right: calc(-1 * var(--panel-grow-x));
+    top: calc(-1 * var(--panel-grow-y));
+    bottom: calc(-1 * var(--panel-grow-y));
+    border-radius: calc(var(--panel-squeeze) * var(--panel-radius));
+}
+
 @layer utilities {
-    /* Scroll-driven grow-to-viewport panel — see components/new/ExpandingPanel.tsx,
-       which drives --squeeze from 1 (resting in its slot) to 0 (covering the
-       screen) as the page scrolls.
-
-       The panel is absolutely positioned, so its containing block is the parent
-       slot: percentages in left/right resolve against the slot's width and
-       percentages in top/bottom against its height. Growing each edge by
-       (100vw - 100%) / 2 therefore lands the panel at exactly 100vw x 100vh
-       without this rule ever needing to know the column's size. Being
-       out of flow also means none of this reflows the page — only the panel's
-       own subtree.
-
-       --squeeze defaults to 1 so the pre-hydration paint is the resting state;
-       Motion then overrides it inline, and the clamp keeps a spring that
-       overshoots either end from inverting the geometry. */
-    .expanding-panel {
-        --squeeze: 1;
-        --panel-squeeze: clamp(0, var(--squeeze), 1);
-        /* rounded-3xl at rest, square once it owns the screen. */
-        --panel-radius: 1.5rem;
-        --panel-grow-x: calc((1 - var(--panel-squeeze)) * (100vw - 100%) / 2);
-        --panel-grow-y: calc((1 - var(--panel-squeeze)) * (100vh - 100%) / 2);
-
-        position: absolute;
-        left: calc(-1 * var(--panel-grow-x));
-        right: calc(-1 * var(--panel-grow-x));
-        top: calc(-1 * var(--panel-grow-y));
-        bottom: calc(-1 * var(--panel-grow-y));
-        border-radius: calc(var(--panel-squeeze) * var(--panel-radius));
-    }
-
     .grain {
         background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='linear' slope='0.12'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
         background-repeat: repeat;
