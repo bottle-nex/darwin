@@ -5,7 +5,6 @@ import { cn } from "@/lib/utils";
 import AppLogo from "@/components/app/Applogo";
 import { useUserSessionStore } from "@/store/user/useUserSessionStore";
 import { useRouter } from "next/navigation";
-import { Button } from "../ui/button";
 
 const NAV_ITEMS = [
     { label: "Why", href: "/why" },
@@ -16,7 +15,6 @@ const NAV_ITEMS = [
 
 export function LandingNavbar({ isMarkettingPage = false }: { isMarkettingPage?: boolean }) {
     const router = useRouter();
-    const session = useUserSessionStore((s) => s.session);
     const [scrolled, setScrolled] = useState(false);
     const headerRef = useRef<HTMLElement>(null);
 
@@ -47,11 +45,11 @@ export function LandingNavbar({ isMarkettingPage = false }: { isMarkettingPage?:
                 scrolled
                     ? isMarkettingPage
                         ? "border-b border-neutral-800 h-15 bg-ink"
-                        : "border-b border-neutral-200 h-15 bg-snow"
+                        : "border-b border-neutral-200 h-15 bg-[#FFF8ED]"
                     : "border-b border-transparent h-17",
             )}
         >
-            <div className="mx-auto max-w-5xl flex h-full items-center justify-between">
+            <div className="mx-auto max-w-7xl flex h-full items-center justify-between">
                 <Link href="/" aria-label="try matcha home">
                     <AppLogo
                         size={20}
@@ -75,13 +73,9 @@ export function LandingNavbar({ isMarkettingPage = false }: { isMarkettingPage?:
                         ))}
                     </nav>
 
-                    <Button
-                        variant={"secondary"}
-                        className="text-white"
-                        onClick={session ? handleRedirect : handleSignin}
-                    >
-                        {session ? "Get Started" : "Sign in"}
-                    </Button>
+                    <button className="bg-[#2A2524] text-[#f0eff8] px-4 py-1.75 font-medium rounded-md cursor-pointer text-[13px] shadow-xs shadow-black/5">
+                        Get Started
+                    </button>
                 </div>
             </div>
         </header>
