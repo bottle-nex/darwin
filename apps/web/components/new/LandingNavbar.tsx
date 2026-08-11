@@ -6,7 +6,7 @@ import AppLogo from "@/components/app/Applogo";
 import { useUserSessionStore } from "@/store/user/useUserSessionStore";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { PiArrowRight, PiCaretDownBold } from "react-icons/pi";
+import { PiCaretDownBold } from "react-icons/pi";
 import {
     BriefcaseIcon,
     ChecklistIcon,
@@ -14,6 +14,7 @@ import {
     PeopleIcon,
     type AnimatedIcon,
 } from "@/components/icons/AnimatedIcons";
+import { DottedArrowRight } from "@/lib/svgs/svgs";
 
 const MotionLink = motion.create(Link);
 
@@ -100,7 +101,9 @@ export function LandingNavbar() {
                 "fixed top-0 left-0 right-0 z-50",
                 "transition-[height,border-color] duration-300 ease-out z-100",
                 scrolled ? "h-15" : "h-17",
-                scrolled ? "border-b border-neutral-200 bg-snow" : "border-b border-transparent",
+                scrolled
+                    ? "border-b border-neutral-200 bg-[#FCF8F0]"
+                    : "border-b border-transparent",
             )}
         >
             <div className="mx-auto max-w-7xl flex h-full items-center justify-between">
@@ -207,10 +210,12 @@ export function LandingNavbar() {
 
                     <button
                         onClick={session ? handleRedirect : handleSignin}
-                        className="flex items-center gap-1.5 bg-[#2A2524] text-[#f0eff8] px-4 py-1.75 font-medium rounded-md cursor-pointer text-[13px] shadow-xs shadow-black/5"
+                        className="flex items-center gap-1.75 bg-[#2A2524] text-[#f0eff8] pr-3.5 pl-1 py-1 font-medium rounded-sm cursor-pointer text-[13px] shadow-xs shadow-black/5"
                     >
+                        <div className="h-7 w-7 bg-primary rounded-[3px] flex justify-center items-center">
+                            <DottedArrowRight size={20} />
+                        </div>
                         Get Started
-                        <PiArrowRight className="size-3" />
                     </button>
                 </div>
             </div>

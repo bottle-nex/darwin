@@ -5,12 +5,12 @@ import { cn } from "@/lib/utils";
 import { sourceSerif4 } from "@/lib/fonts";
 import HeroPanel from "./HeroPanel";
 
-const HEADLINE: { text: string; emphasis?: boolean; delay: number }[] = [
+const HEADLINE: { text: string; emphasis?: boolean; delay: number; breakAfter?: boolean }[] = [
     { text: "Where", delay: 0.3 },
     { text: "issues", emphasis: true, delay: 0.06 },
     { text: "become", delay: 0.48 },
     { text: "pull requests", emphasis: true, delay: 0.18 },
-    { text: "without", delay: 0.54 },
+    { text: "without", delay: 0.54, breakAfter: true },
     { text: "anyone", delay: 0 },
     { text: "picking", delay: 0.36 },
     { text: "up", delay: 0.12 },
@@ -39,32 +39,34 @@ export default function LandingNewHero() {
                     initial="initial"
                     animate="animate"
                     className={cn(
-                        "text-6xl font-medium text-[#2a2524] tracking-tight leading-[1.1] max-w-2xl",
+                        "text-5xl font-medium text-[#2a2524] tracking-tight leading-[1.1] max-w-[45rem]",
                     )}
                 >
                     {HEADLINE.map((part) => {
                         const Word = part.emphasis ? motion.em : motion.span;
 
                         return (
-                            <Word
-                                key={part.text}
-                                variants={RISE}
-                                custom={part.delay}
-                                className={cn(
-                                    "inline-block mr-[0.24em]",
-                                    part.emphasis &&
-                                        "font-bold underline decoration-1 underline-offset-8",
-                                )}
-                            >
-                                {part.text}
-                            </Word>
+                            <span key={part.text}>
+                                <Word
+                                    variants={RISE}
+                                    custom={part.delay}
+                                    className={cn(
+                                        "inline-block mr-[0.24em]",
+                                        part.emphasis &&
+                                            "font-bold underline decoration-1 underline-offset-8",
+                                    )}
+                                >
+                                    {part.text}
+                                </Word>
+                                {part.breakAfter && <br />}
+                            </span>
                         );
                     })}
                 </motion.div>
 
                 <div
                     className={cn(
-                        "text-[1.5rem] leading-[1.3] text-[#2a2524] tracking-tight max-w-md ",
+                        "text-[1.5rem] leading-[1.2] text-[#2a2524] tracking-tight max-w-md ",
                         sourceSerif4.className,
                     )}
                 >
