@@ -564,35 +564,3 @@ function easeInBackOut(u: number): number {
     const c3 = c1 + 1;
     return 1 - (c3 * u * u * u - c1 * u * u);
 }
-
-function DotText({ text }: { text: string }) {
-    return (
-        <h2
-            className="relative text-center font-black select-none"
-            style={{
-                fontSize: 90,
-                lineHeight: 1,
-                letterSpacing: "0.08em",
-                color: "transparent",
-                backgroundImage: "radial-gradient(circle, #1d0f0f 2px, transparent 2.5px)",
-                backgroundSize: "10px 10px",
-                WebkitBackgroundClip: "text",
-                backgroundClip: "text",
-                fontFamily: "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace",
-            }}
-        >
-            {text}
-        </h2>
-    );
-}
-
-function Logo() {
-    return (
-        <svg viewBox="0 0 100 100" className="w-[88px] h-[88px]" fill="#0a0a0a">
-            <rect x="30" y="4" width="40" height="36" rx="6" />
-            <rect x="30" y="60" width="40" height="36" rx="6" />
-            <rect x="4" y="30" width="36" height="40" rx="6" />
-            <rect x="60" y="30" width="36" height="40" rx="6" />
-        </svg>
-    );
-}

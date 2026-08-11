@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import { RiLayoutColumnFill, RiSearchEyeFill, RiServerFill } from "react-icons/ri";
 import FeatureCard from "../landing/v2/features/FeatureCard";
 import BoardPreview from "../landing/v2/features/previews/BoardPreview";
