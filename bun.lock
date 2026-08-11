@@ -64,6 +64,7 @@
       "name": "guards",
       "dependencies": {
         "@trymatcha/database": "*",
+        "@trymatcha/logger": "*",
         "@trymatcha/types": "*",
         "bullmq": "^5.81.0",
         "chalk": "^5.6.2",
@@ -83,6 +84,7 @@
         "@langchain/anthropic": "^1.5.1",
         "@langchain/core": "^1.2.3",
         "@trymatcha/database": "*",
+        "@trymatcha/logger": "*",
         "@trymatcha/types": "*",
         "bullmq": "^5.79.1",
         "chalk": "^5.6.2",
@@ -144,6 +146,7 @@
       "dependencies": {
         "@octokit/auth-app": "^8.2.0",
         "@trymatcha/database": "*",
+        "@trymatcha/logger": "*",
         "@trymatcha/types": "*",
         "bullmq": "^5.81.2",
         "chalk": "^5.6.2",
@@ -266,6 +269,18 @@
         "tsup": "^8.0.2",
         "tsx": "4.21.0",
         "typescript": "5.5.4",
+      },
+    },
+    "packages/logger": {
+      "name": "@trymatcha/logger",
+      "dependencies": {
+        "chalk": "^5.6.2",
+      },
+      "devDependencies": {
+        "@types/bun": "latest",
+      },
+      "peerDependencies": {
+        "typescript": "^5",
       },
     },
     "packages/sandbox-mcp": {
@@ -949,6 +964,8 @@
     "@trymatcha/database": ["@trymatcha/database@workspace:packages/database"],
 
     "@trymatcha/eslint-config": ["@trymatcha/eslint-config@workspace:packages/config-eslint"],
+
+    "@trymatcha/logger": ["@trymatcha/logger@workspace:packages/logger"],
 
     "@trymatcha/sandbox-mcp": ["@trymatcha/sandbox-mcp@workspace:packages/sandbox-mcp"],
 

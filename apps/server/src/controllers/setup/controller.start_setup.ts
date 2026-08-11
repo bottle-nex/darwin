@@ -6,6 +6,7 @@ import { PlanStatus, prisma } from "@trymatcha/database";
 import { Action, Permissions } from "@trymatcha/access-control";
 import Access from "../../access-control/access";
 import { server_services } from "../..";
+import chalk from "chalk";
 
 const body_schema = z.object({
     github_repo_id: z.bigint().optional(),
@@ -134,7 +135,7 @@ export default async function start_setup(req: Request, res: Response) {
         }
 
         ResponseWriter.created(res, { session });
-
+        console.log(chalk.bgYellowBright("starting the plan md generation"));
         try {
             await server_services.queue.enqueue_onboarding({
                 session_id: session.id,

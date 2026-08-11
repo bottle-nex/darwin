@@ -1,6 +1,9 @@
 import { Sandbox } from "e2b";
 import { PlanStatus, prisma } from "@trymatcha/database";
 import { ENV } from "../conf/config.env";
+import Logger, { format_duration } from "@trymatcha/logger";
+
+const log = Logger.scope("plan");
 
 const REPO_DIR = "/home/user/repo";
 const PROMPT_PATH = "/home/user/brief_prompt.txt";
@@ -50,7 +53,7 @@ export default class PlanService {
 
         const model = ENV.SERVER_BRIEF_MODEL;
         const effort = ENV.SERVER_BRIEF_EFFORT;
-        console.log(`Generating plan with model ${model} and effort ${effort}`);
+        log.step("generating project brief", { model, effort });
         const result = await sandbox.commands.run(
             `claude -p "$(cat ${PROMPT_PATH})" --model ${model} --effort ${effort} ` +
                 `--output-format json --tools "Read,Glob,Grep,Bash" --permission-mode bypassPermissions`,
@@ -67,11 +70,17 @@ export default class PlanService {
         } catch {
             throw new Error(`onboarding agent did not return JSON: ${result.stderr}`);
         }
-        console.log("report is :  ", report);
+        log.success("brief generated", {
+            turns: report.num_turns,
+            cost_usd: report.total_cost_usd.toFixed(4),
+            duration: format_duration(report.duration_ms),
+        });
+
         const plan_md = report.result?.trim();
         if (!plan_md) {
             throw new Error(`onboarding agent produced an empty brief: ${result.stderr}`);
         }
+        log.block("project brief", plan_md);
 
         return {
             planMd: plan_md,

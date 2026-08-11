@@ -1,3 +1,4 @@
+import Logger from "@trymatcha/logger";
 import { IssueStatus, prisma, WorkerStatus, type Issue, type Worker } from "@trymatcha/database";
 import type QueueService from "../services/services.queue";
 import { ChatAnthropic } from "@langchain/anthropic";
@@ -5,6 +6,8 @@ import { ENV } from "../config/config.env";
 import z from "zod";
 import { RunnableSequence } from "@langchain/core/runnables";
 import { routerPrompt } from "../prompts/prompt.router";
+
+const log = Logger.scope("route");
 
 interface Assignment {
     issueId: string;
@@ -31,7 +34,7 @@ export default class RouterProcessor {
         });
 
         if (claim.count === 0) {
-            console.log(`project ${projectId} is already being routed, skipping`);
+            log.info("already being routed elsewhere — skipping", { project: projectId });
             return;
         }
 
@@ -49,13 +52,12 @@ export default class RouterProcessor {
                 data: { routingClaimedAt: null },
             });
         } catch (err) {
-            console.error(`failed to release routing claim on ${projectId}`, err);
+            log.error("failed to release routing claim", err, { project: projectId });
         }
     }
 
     static async route_project(projectId: string, queue: QueueService) {
-        console.log("fetching all the active workers and new issues");
-        // get the new issues and active workers
+        log.step("fetching active workers and new issues", { project: projectId });
         const [active_workers, todos] = await Promise.all([
             prisma.worker.findMany({
                 where: {
@@ -76,19 +78,16 @@ export default class RouterProcessor {
             }),
         ]);
 
-        console.log("workers: ", active_workers.length, "\nnew issues: ", todos.length);
-
-        // check if there is some issue available
         if (todos.length === 0) {
-            console.log("No issues found");
+            log.info("no Todo issues to route", { workers: active_workers.length });
             return;
         }
 
-        console.log("getting history and project's plan.md");
-        // get the history issues and plan_md
+        log.info("fetched", { workers: active_workers.length, issues: todos.length });
+
+        log.step("loading worker history and project brief");
         const [history, project] = await Promise.all([
             prisma.$transaction(async (tx) => {
-                // history will look like { worker_id: issue1, issue2 }[]
                 const history = new Map<string, Issue[]>();
                 for (const worker of active_workers) {
                     const issues = await tx.issue.findMany({
@@ -111,19 +110,13 @@ export default class RouterProcessor {
             }),
         ]);
 
-        console.log("history: ", history.size);
-
         let plan_md =
             project?.planMd ||
             "no need to see the plan, just map this single issue with the worker";
 
         if (!project) return;
 
-        // if (!project?.planMd) {
-        //     console.log(chalk.red("no plan was found in project"));
-        //     plan_md = "no need to see the plan, just map this single issue with the worker";
-        //     return;
-        // }
+        log.info("loaded context", { history: history.size, brief: project.planMd ? "yes" : "no" });
 
         const new_workers = await this.spin_up_workers(
             projectId,
@@ -131,8 +124,6 @@ export default class RouterProcessor {
             todos.length,
             project.maxWorkers,
         );
-
-        console.log("new workers spinned up: ", new_workers.length);
 
         const assignment_data = {
             plan_md: plan_md,
@@ -142,9 +133,7 @@ export default class RouterProcessor {
             new_issues: todos,
         };
         const assignments: Assignment[] = await this.route_issues(assignment_data);
-        console.log(
-            `[router] got ${assignments.length} assignment(s) back from the model for project ${projectId}`,
-        );
+        log.info("model returned assignments", { count: assignments.length });
 
         await prisma.$transaction(async (tx) => {
             for (const a of assignments) {
@@ -166,12 +155,12 @@ export default class RouterProcessor {
         });
 
         const worker_ids = [...new Set(assignments.map((a) => a.workerId))];
-        console.log(
-            `[router] project ${projectId}: queued ${assignments.length} issue(s) across ` +
-                `${worker_ids.length} worker(s), dispatching each now`,
-        );
         await Promise.all(worker_ids.map((id) => queue.enqueue_dispatch(id)));
-        console.log(`[router] project ${projectId}: routing complete`);
+        log.success("routing complete", {
+            project: projectId,
+            queued: assignments.length,
+            workers: worker_ids.length,
+        });
     }
 
     static async spin_up_workers(
@@ -180,8 +169,6 @@ export default class RouterProcessor {
         issue_count: number,
         maxWorkers: number,
     ): Promise<Worker[]> {
-        // if the current worker count is greater than (or equal to) the count of issues
-        // then no need of spinning new workers, and never exceed the project's maxWorkers cap
         const workers_to_create = Math.max(
             0,
             Math.min(issue_count, maxWorkers) - active_worker_count,
@@ -189,7 +176,6 @@ export default class RouterProcessor {
 
         const new_workers: Worker[] = [];
         for (let i = 0; i < workers_to_create; i++) {
-            console.log("worker should be created here");
             const worker = await prisma.worker.create({
                 data: {
                     projectId,
@@ -197,6 +183,10 @@ export default class RouterProcessor {
                 },
             });
             new_workers.push(worker);
+        }
+
+        if (new_workers.length > 0) {
+            log.info("spun up new workers", { count: new_workers.length });
         }
 
         return new_workers;
@@ -209,20 +199,16 @@ export default class RouterProcessor {
         new_workers: Worker[];
         new_issues: Issue[];
     }): Promise<Assignment[]> {
-        // call Haiku with the old and new issues and with the workers
-        console.log("creating model");
         const model = new ChatAnthropic({
             apiKey: ENV.SERVER_ANTHROPIC_API_KEY,
             model: "claude-haiku-4-5-20251001",
         });
 
-        console.log("creating chain");
         const chain = RunnableSequence.from([
             routerPrompt,
             model.withStructuredOutput(ai_value, { strict: true }),
         ]);
 
-        console.log("shaping active workers");
         const active_workers_view = data.active_workers.map((worker) => ({
             id: worker.id,
             specialization: worker.specialization,
@@ -234,7 +220,6 @@ export default class RouterProcessor {
             })),
         }));
 
-        console.log("shaping new workers");
         const new_workers_view = data.new_workers.map((worker) => ({
             id: worker.id,
             status: worker.status,
@@ -247,7 +232,10 @@ export default class RouterProcessor {
             priority: issue.priority,
         }));
 
-        console.log("this will fail as api key is wrong");
+        log.step("asking the model to assign issues", {
+            workers: active_workers_view.length + new_workers_view.length,
+            issues: new_issues_view.length,
+        });
         const result = await chain.invoke({
             plan_md: data.plan_md,
             active_worker_count: active_workers_view.length,

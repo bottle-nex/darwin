@@ -5,6 +5,7 @@ import SecretService from "./service.secret";
 import PlanService from "./services.plan";
 import { sign_worker_jwt } from "./service.jwt";
 import IssueSolver, { type ClaimedIssue } from "./service.issue_solver";
+import Logger, { format_duration } from "@trymatcha/logger";
 import { prisma, WorkerStatus } from "@trymatcha/database";
 
 const REPO_DIR = "/home/user/repo";
@@ -37,9 +38,13 @@ export default class E2B {
         branch: string,
         installation_id: number,
     ) {
+        const log = Logger.scope("onboard");
         let sandbox_id: string | null = null;
-        console.log("github url is : ", github_repo_url);
-        console.log("branch is : ", branch);
+        log.step("onboarding started", {
+            session: session_id,
+            repo: github_repo_url,
+            branch,
+        });
         try {
             await Promise.all([
                 prisma.setupSession.update({
@@ -50,6 +55,7 @@ export default class E2B {
             ]);
 
             sandbox_id = await E2B.create();
+            log.info("sandbox created", { sandbox: sandbox_id });
             await prisma.setupSession.update({
                 where: { id: session_id },
                 data: { sandboxId: sandbox_id, status: "Cloning" },
@@ -57,6 +63,7 @@ export default class E2B {
 
             await E2B.clone_repo(sandbox_id, github_repo_url, branch, installation_id, project_id);
             const commit_sha = await E2B.head_commit(sandbox_id);
+            log.info("repo cloned", { commit: commit_sha.slice(0, 7) });
 
             await prisma.setupSession.update({
                 where: { id: session_id },
@@ -70,8 +77,9 @@ export default class E2B {
                 where: { id: session_id },
                 data: { status: "Ready", finishedAt: new Date() },
             });
+            log.success("onboarding ready", { session: session_id });
         } catch (error) {
-            console.error(`[onboarding] session ${session_id} failed:`, error);
+            log.error("onboarding failed", error, { session: session_id });
             try {
                 await Promise.all([
                     prisma.setupSession.update({
@@ -85,14 +93,15 @@ export default class E2B {
                     PlanService.mark_failed(project_id),
                 ]);
             } catch (e) {
-                console.error(`[onboarding] failed to mark session as Failed:`, e);
+                log.error("could not mark session Failed", e, { session: session_id });
             }
         } finally {
             if (sandbox_id) {
                 try {
                     await E2B.destroy(sandbox_id);
+                    log.info("sandbox destroyed", { sandbox: sandbox_id });
                 } catch (e) {
-                    console.error(`[onboarding] failed to tear down sandbox ${sandbox_id}:`, e);
+                    log.error("sandbox teardown failed", e, { sandbox: sandbox_id });
                 }
             }
         }
@@ -118,16 +127,20 @@ export default class E2B {
      * `take_snapshot`/`pause` below, but isn't wired up yet.
      */
     public static async run_worker_loop(worker_id: string): Promise<void> {
+        const log = Logger.scope(`vm:${worker_id.slice(-8)}`);
         const worker = await prisma.worker.findUniqueOrThrow({
             where: { id: worker_id },
             include: { project: { include: { githubInstallation: true } } },
         });
 
+        console.log("worker found is : ", worker);
+
         const { project } = worker;
         if (!project.githubRepoUrl || !project.githubDefaultBranch || !project.githubInstallation) {
-            console.error(
-                `[vm:${worker_id}] project ${project.id} is missing repo url / default branch / ` +
-                    `github installation — cannot run (writing worker Dead to db)`,
+            log.error(
+                "project is missing repo url / default branch / github installation — marking worker Dead",
+                undefined,
+                { worker: worker_id, project: project.id },
             );
             await prisma.worker.update({
                 where: { id: worker_id },
@@ -141,23 +154,23 @@ export default class E2B {
         const installation_id = Number(project.githubInstallation.installationId);
 
         let sandbox_id = worker.sandboxId;
-        console.log(`[vm:${worker_id}] starting worker loop for project ${project.id}`);
+        log.step("worker loop starting", { worker: worker_id, project: project.id, branch });
 
         try {
             if (!sandbox_id) {
-                console.log(`[vm:${worker_id}] no live sandbox — creating one`);
+                log.info("no live sandbox — creating one");
                 sandbox_id = await E2B.create(WORKER_SANDBOX_TIMEOUT_MS);
-                console.log(`[vm:${worker_id}] sandbox created: ${sandbox_id} (writing to db)`);
+                log.info("sandbox created", { sandbox: sandbox_id });
                 await prisma.worker.update({
                     where: { id: worker_id },
                     data: { sandboxId: sandbox_id },
                 });
 
-                console.log(`[vm:${worker_id}] cloning repo into sandbox...`);
+                log.info("cloning repo into sandbox", { repo: repo_url });
                 await E2B.clone_repo(sandbox_id, repo_url, branch, installation_id, project.id);
-                console.log(`[vm:${worker_id}] clone complete`);
+                log.info("clone complete");
             } else {
-                console.log(`[vm:${worker_id}] reusing live sandbox ${sandbox_id}`);
+                log.info("reusing live sandbox", { sandbox: sandbox_id });
             }
 
             const sandbox = await Sandbox.connect(sandbox_id, { apiKey: ENV.SERVER_E2B_API_KEY });
@@ -166,7 +179,7 @@ export default class E2B {
                 GithubService.getInstallationToken(installation_id),
                 Promise.resolve(sign_worker_jwt(worker_id)),
             ]);
-            console.log(`[vm:${worker_id}] minted github + worker tokens for the sandbox`);
+            log.info("minted github + worker tokens for the sandbox");
 
             const mcp_config = {
                 mcpServers: {
@@ -182,9 +195,9 @@ export default class E2B {
                 },
             };
             await sandbox.files.write(MCP_CONFIG_PATH, JSON.stringify(mcp_config, null, 2));
-            console.log(`[vm:${worker_id}] wrote mcp config into sandbox`);
+            log.info("wrote mcp config into sandbox");
 
-            console.log(`[vm:${worker_id}] marking worker Busy (writing to db)`);
+            log.info("worker marked Busy");
             await prisma.worker.update({
                 where: { id: worker_id },
                 data: { status: WorkerStatus.Busy },
@@ -194,27 +207,20 @@ export default class E2B {
             const effort = ENV.SERVER_SOLVE_EFFORT;
             let solved_count = 0;
 
-            for (;;) {
-                const issue = await IssueSolver.claim_next_issue(worker_id);
+            for (; ;) {
+                const issue = await IssueSolver.claim_next_issue(worker_id, log);
                 if (!issue) {
-                    console.log(
-                        `[vm:${worker_id}] queue empty after ${solved_count} issue(s) — stopping loop`,
-                    );
+                    log.success("queue empty — stopping loop", { solved: solved_count });
                     break;
                 }
 
-                console.log(
-                    `[vm:${worker_id}] pushing issue #${issue.number} "${issue.title}" into sandbox`,
-                );
+                log.step(`issue #${issue.number} pushed into sandbox`, { title: issue.title });
                 await sandbox.files.write(ISSUE_PROMPT_PATH, E2B.build_issue_prompt(issue, branch));
 
-                console.log(
-                    `[vm:${worker_id}] invoking claude for issue #${issue.number} ` +
-                        `(model=${model}, effort=${effort})...`,
-                );
+                log.info(`invoking claude for issue #${issue.number}`, { model, effort });
                 const result = await sandbox.commands.run(
                     `claude -p "$(cat ${ISSUE_PROMPT_PATH})" --model ${model} --effort ${effort} ` +
-                        `--mcp-config ${MCP_CONFIG_PATH} --output-format json --permission-mode bypassPermissions`,
+                    `--mcp-config ${MCP_CONFIG_PATH} --output-format json --permission-mode bypassPermissions`,
                     {
                         cwd: REPO_DIR,
                         envs: {
@@ -234,25 +240,23 @@ export default class E2B {
                     );
                 }
 
-                console.log(
-                    `[vm:${worker_id}] issue #${issue.number} run finished — turns=${report.num_turns} ` +
-                        `cost_usd=${report.total_cost_usd} duration_ms=${report.duration_ms}`,
-                );
-                console.log(
-                    `[vm:${worker_id}] final message from claude:\n${report.result ?? "(empty)"}`,
-                );
+                log.success(`issue #${issue.number} run finished`, {
+                    turns: report.num_turns,
+                    cost_usd: report.total_cost_usd.toFixed(4),
+                    duration: format_duration(report.duration_ms),
+                });
+                log.block("final message from claude", report.result ?? "(empty)");
                 solved_count++;
             }
 
-            console.log(`[vm:${worker_id}] marking worker Idle (writing to db)`);
+            log.info("worker marked Idle");
             await prisma.worker.update({
                 where: { id: worker_id },
                 data: { status: WorkerStatus.Idle },
             });
         } catch (error) {
-            console.error(`[vm:${worker_id}] worker loop failed:`, error);
+            log.error("worker loop failed", error, { worker: worker_id });
             try {
-                console.log(`[vm:${worker_id}] marking worker Dead after failure (writing to db)`);
                 await prisma.worker.update({
                     where: { id: worker_id },
                     data: {
@@ -263,24 +267,22 @@ export default class E2B {
                         },
                     },
                 });
+                log.warn("worker marked Dead after failure");
             } catch (e) {
-                console.error(`[vm:${worker_id}] failed to mark worker Dead:`, e);
+                log.error("could not mark worker Dead", e, { worker: worker_id });
             }
         } finally {
             if (sandbox_id) {
-                console.log(`[vm:${worker_id}] tearing down sandbox ${sandbox_id}`);
+                log.info("tearing down sandbox", { sandbox: sandbox_id });
                 try {
                     await E2B.destroy(sandbox_id);
                     await prisma.worker.update({
                         where: { id: worker_id },
                         data: { sandboxId: null },
                     });
-                    console.log(`[vm:${worker_id}] sandbox destroyed`);
+                    log.info("sandbox destroyed");
                 } catch (e) {
-                    console.error(
-                        `[vm:${worker_id}] failed to tear down sandbox ${sandbox_id}:`,
-                        e,
-                    );
+                    log.error("sandbox teardown failed", e, { sandbox: sandbox_id });
                 }
             }
         }

@@ -1,6 +1,9 @@
+import Logger from "@trymatcha/logger";
 import { Queue } from "bullmq";
 import queue_config from "../config/config.queue";
 import { QueueName, type RouteJobData, type DispatchJobData } from "@trymatcha/types";
+
+const log = Logger.scope("queue");
 
 export default class QueueService {
     private queue: Queue<RouteJobData>;
@@ -12,20 +15,18 @@ export default class QueueService {
     }
 
     async enqueue_project(project_id: string) {
-        console.log(`[queue] enqueueing project ${project_id} for routing (reconciler sweep)`);
         await this.queue.add(
             "route",
             { projectId: project_id },
             {
                 jobId: `route-${project_id}`,
                 removeOnComplete: true,
-                removeOnFail: 100,
+                removeOnFail: true,
             },
         );
-        console.log(`[queue] project ${project_id} enqueued for routing (reconciler sweep)`);
+        log.info("queued project for routing", { project: project_id });
     }
 
-    /** True if a dispatch job for this worker is currently waiting, active, or delayed. */
     async has_active_dispatch(worker_id: string): Promise<boolean> {
         const job = await this.dispatch_queue.getJob(`dispatch-${worker_id}`);
         if (!job) return false;
@@ -34,12 +35,11 @@ export default class QueueService {
     }
 
     async enqueue_dispatch(worker_id: string) {
-        console.log(`[queue] enqueueing dispatch for worker ${worker_id} (reconciler sweep)`);
         await this.dispatch_queue.add(
             "dispatch",
             { workerId: worker_id },
-            { jobId: `dispatch-${worker_id}`, removeOnComplete: true },
+            { jobId: `dispatch-${worker_id}`, removeOnComplete: true, removeOnFail: true },
         );
-        console.log(`[queue] dispatch enqueued for worker ${worker_id} (reconciler sweep)`);
+        log.info("queued dispatch for worker", { worker: worker_id });
     }
 }

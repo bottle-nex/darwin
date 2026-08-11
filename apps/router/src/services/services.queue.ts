@@ -1,11 +1,14 @@
+import Logger from "@trymatcha/logger";
 import { Queue, Worker, type Job } from "bullmq";
 import queue_config from "../config/config.queue";
 import RouterProcessor from "../processors/processor.route";
 import { QueueName, type DispatchJobData, type RouteJobData } from "@trymatcha/types";
 
+const log = Logger.scope("queue");
+
 export default class QueueService {
-    private producer: Queue<DispatchJobData>; // pushes from router to vm
-    private consumer!: Worker<RouteJobData>; // consumer from server
+    private producer: Queue<DispatchJobData>;
+    private consumer!: Worker<RouteJobData>;
 
     constructor() {
         this.producer = new Queue(QueueName.IssueVm, queue_config);
@@ -16,7 +19,7 @@ export default class QueueService {
         this.consumer = new Worker<RouteJobData>(
             QueueName.IssueRouter,
             async (job: Job<RouteJobData>) => {
-                console.log(`[queue] received route job for project ${job.data.projectId}`);
+                log.step("route job received", { project: job.data.projectId });
                 await RouterProcessor.process_route_job(job.data.projectId, this);
             },
             {
@@ -26,25 +29,21 @@ export default class QueueService {
         );
 
         this.consumer.on("completed", (job) => {
-            console.log(`routed project ${job.data.projectId}`);
+            log.success("route job completed", { project: job.data.projectId });
         });
 
         this.consumer.on("failed", (job, err) => {
-            console.error(`failed to route project ${job?.data.projectId}: ${err.message}`);
+            log.error("route job failed", err, { project: job?.data.projectId });
         });
     }
 
     async enqueue_dispatch(worker_id: string) {
-        console.log(`[queue] enqueueing dispatch for worker ${worker_id}`);
         await this.producer.add(
             "dispatch",
             { workerId: worker_id },
-            // BullMQ rejects a custom jobId containing ":" unless it splits into exactly 3
-            // parts (its own reserved format) — hyphen avoids that entirely, matching
-            // route-${project_id} / onboard-${session_id} elsewhere.
-            { jobId: `dispatch-${worker_id}`, removeOnComplete: true },
+            { jobId: `dispatch-${worker_id}`, removeOnComplete: true, removeOnFail: true },
         );
-        console.log(`[queue] dispatch enqueued for worker ${worker_id}`);
+        log.info("dispatch enqueued", { worker: worker_id });
     }
 
     async shutdown() {

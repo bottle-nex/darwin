@@ -1,7 +1,9 @@
 import "../conf/config.env";
-import chalk from "chalk";
 import { prisma, IssueStatus, WorkerStatus } from "@trymatcha/database";
 import E2B from "../services/services.e2b";
+import Logger from "@trymatcha/logger";
+
+const log = Logger.scope("solve");
 
 /**
  * Manual test entrypoint that bypasses the router's LLM assignment step, but otherwise
@@ -27,11 +29,11 @@ async function main() {
         : HARDCODED_ISSUE;
 
     if (!project_id) {
-        console.error(chalk.red('usage: bun run solve <projectId> ["issue description"]'));
+        log.error('usage: bun run solve <projectId> ["issue description"]');
         process.exit(1);
     }
 
-    console.log(chalk.cyan(`[solve] looking up project ${project_id}`));
+    log.step("looking up project", { project: project_id });
     const project = await prisma.project.findUnique({
         where: { id: project_id },
         select: {
@@ -44,28 +46,27 @@ async function main() {
     });
 
     if (!project) {
-        console.error(chalk.red(`[solve] no project found with id ${project_id}`));
+        log.error("no project found", undefined, { project: project_id });
         process.exit(1);
     }
     if (!project.githubRepoUrl || !project.githubDefaultBranch || !project.githubInstallation) {
-        console.error(
-            chalk.red(
-                `[solve] project ${project_id} is missing repo url / default branch / github installation`,
-            ),
-        );
+        log.error("project is missing repo url / default branch / github installation", undefined, {
+            project: project_id,
+        });
         process.exit(1);
     }
 
-    console.log(chalk.cyan(`[solve] project resolved: ${project.githubRepoUrl}`));
-    console.log(chalk.cyan(`[solve] issue: ${issue.title}\n${issue.description}`));
+    log.info("project resolved", {
+        repo: project.githubRepoUrl,
+        branch: project.githubDefaultBranch,
+    });
+    log.block(`issue: ${issue.title}`, issue.description);
 
-    console.log(chalk.cyan("[solve] creating worker row (writing to db)"));
     const worker = await prisma.worker.create({
         data: { projectId: project.id, status: WorkerStatus.Booting },
     });
-    console.log(chalk.green(`[solve] worker created: ${worker.id}`));
+    log.success("worker created", { worker: worker.id });
 
-    console.log(chalk.cyan("[solve] creating queued issue row (writing to db)"));
     const last_issue = await prisma.issue.findFirst({
         where: { projectId: project.id },
         orderBy: { number: "desc" },
@@ -83,18 +84,16 @@ async function main() {
             queuePosition: 1,
         },
     });
-    console.log(
-        chalk.green(`[solve] issue created: #${created_issue.number} (${created_issue.id})`),
-    );
+    log.success("issue queued", { number: `#${created_issue.number}`, issue: created_issue.id });
 
     await E2B.run_worker_loop(worker.id);
 
-    console.log(chalk.green(`[solve] done — check worker ${worker.id} for final status/PR info`));
+    log.success("done — check the worker for final status / PR info", { worker: worker.id });
     await prisma.$disconnect();
 }
 
 main().catch(async (err) => {
-    console.error(chalk.red("[solve] fatal error:"), err);
+    log.error("fatal error", err);
     await prisma.$disconnect();
     process.exit(1);
 });

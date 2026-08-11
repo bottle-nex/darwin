@@ -1,4 +1,5 @@
 import { IssueStatus, prisma } from "@trymatcha/database";
+import type Logger from "@trymatcha/logger";
 
 export interface ClaimedIssue {
     id: string;
@@ -13,7 +14,10 @@ export default class IssueSolver {
      * by queuePosition. Returns null once there's nothing left — the loop-ending signal
      * E2B.run_worker_loop uses to know it's done.
      */
-    public static async claim_next_issue(worker_id: string): Promise<ClaimedIssue | null> {
+    public static async claim_next_issue(
+        worker_id: string,
+        log: Logger,
+    ): Promise<ClaimedIssue | null> {
         const issue = await prisma.issue.findFirst({
             where: { assignerWorkerId: worker_id, status: IssueStatus.Queued },
             orderBy: { queuePosition: "asc" },
@@ -21,7 +25,7 @@ export default class IssueSolver {
         });
 
         if (!issue) {
-            console.log(`[vm] no queued issue for worker ${worker_id}`);
+            log.info("no queued issue left for this worker");
             return null;
         }
 
@@ -31,11 +35,11 @@ export default class IssueSolver {
         });
 
         if (claim.count === 0) {
-            console.log(`[vm] issue ${issue.id} was already claimed by another run, skipping`);
+            log.warn("issue already claimed by another run — skipping", { issue: issue.id });
             return null;
         }
 
-        console.log(`[vm] worker ${worker_id} claimed issue #${issue.number}: ${issue.title}`);
+        log.step(`claimed issue #${issue.number}`, { title: issue.title });
         return issue;
     }
 }
