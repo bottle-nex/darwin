@@ -1,7 +1,31 @@
+"use client";
+
+import { motion } from "motion/react";
 import { cn } from "@/lib/utils";
 import { sourceSerif4 } from "@/lib/fonts";
-import ExpandingPanel from "./ExpandingPanel";
-import PanelContentBefore from "./PanelContentBefore";
+import HeroPanel from "./HeroPanel";
+
+const HEADLINE: { text: string; emphasis?: boolean; delay: number }[] = [
+    { text: "Where", delay: 0.3 },
+    { text: "issues", emphasis: true, delay: 0.06 },
+    { text: "become", delay: 0.48 },
+    { text: "pull requests", emphasis: true, delay: 0.18 },
+    { text: "without", delay: 0.54 },
+    { text: "anyone", delay: 0 },
+    { text: "picking", delay: 0.36 },
+    { text: "up", delay: 0.12 },
+    { text: "the", delay: 0.42 },
+    { text: "ticket.", delay: 0.24 },
+];
+
+const RISE = {
+    initial: { y: "0.4em", opacity: 0 },
+    animate: (delay: number) => ({
+        y: 0,
+        opacity: 1,
+        transition: { duration: 0.7, delay, ease: [0.22, 1, 0.36, 1] as const },
+    }),
+};
 
 export default function LandingNewHero() {
     return (
@@ -10,19 +34,37 @@ export default function LandingNewHero() {
                 "relative min-h-screen w-screen max-w-7xl mx-auto bg-transparent flex flex-col items-center pt-[11%] border-b",
             )}
         >
-            {/* text header */}
             <div className="flex w-full items-end justify-between pt-15">
-                <div
+                <motion.div
+                    initial="initial"
+                    animate="animate"
                     className={cn(
-                        "text-5xl font-semibold text-[#2a2524] tracking-tight leading-[1.1] max-w-2xl",
+                        "text-6xl font-medium text-[#2a2524] tracking-tight leading-[1.1] max-w-2xl",
                     )}
                 >
-                    Where issues become pull requests without anyone picking up the ticket.
-                </div>
+                    {HEADLINE.map((part) => {
+                        const Word = part.emphasis ? motion.em : motion.span;
+
+                        return (
+                            <Word
+                                key={part.text}
+                                variants={RISE}
+                                custom={part.delay}
+                                className={cn(
+                                    "inline-block mr-[0.24em]",
+                                    part.emphasis &&
+                                        "font-bold underline decoration-1 underline-offset-8",
+                                )}
+                            >
+                                {part.text}
+                            </Word>
+                        );
+                    })}
+                </motion.div>
 
                 <div
                     className={cn(
-                        "text-[1.4rem] leading-[1.3] text-[#2a2524] tracking-tight max-w-md ",
+                        "text-[1.5rem] leading-[1.3] text-[#2a2524] tracking-tight max-w-md ",
                         sourceSerif4.className,
                     )}
                 >
@@ -30,46 +72,7 @@ export default function LandingNewHero() {
                     verified, you come back to pull requests waiting on your review.
                 </div>
             </div>
-            {/* <div
-                className={cn(
-                    "buddy-zone flex items-center gap-2 rounded-full border border-primary/15 px-3 py-1 text-[10px] uppercase tracking-wide text-[#434512] shadow-sm bg-white",
-                )}
-            >
-                <HeroBuddy className="size-6 -my-1" />
-                The agent-native board
-            </div>
-
-            <div
-                className={cn(
-                    sourceSerif4.className,
-                    "pt-8 text-[3.5rem] text-[#2A2524] tracking-tight font-medium w-full text-center flex justify-center leading-none",
-                )}
-            >
-                Issues that implement themselves
-            </div>
-            <div className="pt-4 text-[1.09rem] text-[#2A252490] w-140 text-center flex justify-center leading-[1.2]">
-                Agents claim work off your board, run your codebase <br /> in a sandbox, and ship a
-                PR.
-            </div>
-
-            <div className="flex gap-3 pt-8">
-                <button className="bg-[#2A2524] text-[#f5f3f8] px-4 py-2 font-medium rounded-md cursor-pointer text-[15px]">
-                    Get Started
-                </button>
-                <button className="bg-[#F4EDE3] text-[#2A2524] px-4 py-2 font-medium rounded-md cursor-pointer text-[15px] flex items-center gap-1.5">
-                    How it works
-                    <IoIosPlayCircle className="text-[#2a2524] size-4.5" />
-                </button>
-            </div> */}
-
-            {/* Resting slot: the space the panel occupies before it grows out of it. */}
-            <div className="relative w-full h-[90vh] mt-15">
-                <ExpandingPanel className="bg-[#141413]">
-                    <div className="w-full h-full flex items-center justify-center">
-                        <PanelContentBefore />
-                    </div>
-                </ExpandingPanel>
-            </div>
+            <HeroPanel />
         </div>
     );
 }

@@ -33,7 +33,6 @@
 
 import { Footer } from "@/components/app/Footer";
 import LandingFeatures from "@/components/new/LandingFeatures";
-import LandingHero from "@/components/new/LandingHero";
 import { LandingNavbar } from "@/components/new/LandingNavbar";
 import LandingNewHero from "@/components/new/LandingNewHero";
 
@@ -41,7 +40,7 @@ export default function Home() {
     return (
         <div
             data-lenis-prevent
-            className="relative min-h-screen w-screen flex flex-col bg-[#FFF8ED]"
+            className="relative min-h-screen w-screen flex flex-col bg-snow"
         >
             {/* <AmbientDotField
                 className="h-screen"

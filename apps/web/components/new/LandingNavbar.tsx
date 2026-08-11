@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import AppLogo from "@/components/app/Applogo";
 import { useUserSessionStore } from "@/store/user/useUserSessionStore";
 import { useRouter } from "next/navigation";
+import { PiArrowRight } from "react-icons/pi";
 
 const NAV_ITEMS = [
     { label: "Why", href: "/why" },
@@ -15,6 +16,7 @@ const NAV_ITEMS = [
 
 export function LandingNavbar({ isMarkettingPage = false }: { isMarkettingPage?: boolean }) {
     const router = useRouter();
+    const session = useUserSessionStore((s) => s.session);
     const [scrolled, setScrolled] = useState(false);
     const headerRef = useRef<HTMLElement>(null);
 
@@ -45,7 +47,7 @@ export function LandingNavbar({ isMarkettingPage = false }: { isMarkettingPage?:
                 scrolled
                     ? isMarkettingPage
                         ? "border-b border-neutral-800 h-15 bg-ink"
-                        : "border-b border-neutral-200 h-15 bg-[#FFF8ED]"
+                        : "border-b border-neutral-200 h-15 bg-snow"
                     : "border-b border-transparent h-17",
             )}
         >
@@ -59,13 +61,13 @@ export function LandingNavbar({ isMarkettingPage = false }: { isMarkettingPage?:
                 </Link>
 
                 <div className="flex items-center gap-x-6 lg:gap-x-8">
-                    <nav className="hidden md:flex items-center gap-x-6 lg:gap-x-10">
+                    <nav className="hidden md:flex items-center gap-x-6 lg:gap-x-8">
                         {NAV_ITEMS.map((item) => (
                             <Link
                                 key={item.label}
                                 href={item.href}
                                 className={cn(
-                                    "text-[13px] font-medium text-foreground/65 hover:text-foreground transition-colors duration-200",
+                                    "text-[15px] font-normal text-foreground hover:text-foreground transition-colors duration-200",
                                 )}
                             >
                                 {item.label}
@@ -73,8 +75,12 @@ export function LandingNavbar({ isMarkettingPage = false }: { isMarkettingPage?:
                         ))}
                     </nav>
 
-                    <button className="bg-[#2A2524] text-[#f0eff8] px-4 py-1.75 font-medium rounded-md cursor-pointer text-[13px] shadow-xs shadow-black/5">
+                    <button
+                        onClick={session ? handleRedirect : handleSignin}
+                        className="flex items-center gap-1.5 bg-[#2A2524] text-[#f0eff8] px-4 py-1.75 font-medium rounded-md cursor-pointer text-[13px] shadow-xs shadow-black/5"
+                    >
                         Get Started
+                        <PiArrowRight className="size-3" />
                     </button>
                 </div>
             </div>

@@ -2,8 +2,7 @@ import { cn } from "@/lib/utils";
 import HeroBuddy from "../landing/v2/HeroBuddy";
 import { Source_Serif_4 } from "next/font/google";
 import { IoIosPlayCircle } from "react-icons/io";
-import ExpandingPanel from "./ExpandingPanel";
-import PanelContentBefore from "./PanelContentBefore";
+import HeroPanel from "./HeroPanel";
 
 const sourceSerif4 = Source_Serif_4({
     subsets: ["latin"],
@@ -122,13 +121,7 @@ export default function LandingHero() {
                     </div>
                 </div>
             </div> */}
-            <div className="relative w-full h-[90vh] mt-25">
-                <ExpandingPanel className="bg-[#141413] h-[110vh]">
-                    <div className="w-full h-full flex items-center justify-center">
-                        <PanelContentBefore />
-                    </div>
-                </ExpandingPanel>
-            </div>
+            <HeroPanel />
         </div>
     );
 }
