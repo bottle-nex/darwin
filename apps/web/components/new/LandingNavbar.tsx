@@ -5,20 +5,73 @@ import { cn } from "@/lib/utils";
 import AppLogo from "@/components/app/Applogo";
 import { useUserSessionStore } from "@/store/user/useUserSessionStore";
 import { useRouter } from "next/navigation";
-import { PiArrowRight } from "react-icons/pi";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { PiArrowRight, PiCaretDownBold } from "react-icons/pi";
+import {
+    BriefcaseIcon,
+    ChecklistIcon,
+    NoteIcon,
+    PeopleIcon,
+    type AnimatedIcon,
+} from "@/components/icons/AnimatedIcons";
 
-const NAV_ITEMS = [
+const MotionLink = motion.create(Link);
+
+type NavLink = { label: string; href: string };
+type NavMenuLink = NavLink & { description: string; icon: AnimatedIcon };
+type NavMenu = { label: string; links: NavMenuLink[] };
+type NavItem = NavLink | NavMenu;
+
+function isNavMenu(item: NavItem): item is NavMenu {
+    return "links" in item;
+}
+
+const NAV_ITEMS: NavItem[] = [
     { label: "Why", href: "/why" },
     { label: "Features", href: "/#features" },
     { label: "Pricing", href: "/#pricing" },
-    { label: "About", href: "/about" },
+    {
+        label: "Resources",
+        links: [
+            {
+                label: "About",
+                href: "/about",
+                description: "The team building matcha",
+                icon: PeopleIcon,
+            },
+            {
+                label: "Blog",
+                href: "#",
+                description: "Notes on agents and shipping",
+                icon: NoteIcon,
+            },
+            {
+                label: "Changelog",
+                href: "#",
+                description: "What shipped, week by week",
+                icon: ChecklistIcon,
+            },
+            {
+                label: "Careers",
+                href: "#",
+                description: "Build the agent with us",
+                icon: BriefcaseIcon,
+            },
+        ],
+    },
 ];
 
-export function LandingNavbar({ isMarkettingPage = false }: { isMarkettingPage?: boolean }) {
+const NAV_LINK_CLASS =
+    "text-[15px] font-normal text-foreground hover:text-foreground transition-colors duration-200";
+
+export function LandingNavbar() {
     const router = useRouter();
     const session = useUserSessionStore((s) => s.session);
     const [scrolled, setScrolled] = useState(false);
+    const [openMenu, setOpenMenu] = useState<string | null>(null);
+    const [hoveredLink, setHoveredLink] = useState<string | null>(null);
     const headerRef = useRef<HTMLElement>(null);
+    const reduceMotion = useReducedMotion();
 
     useEffect(() => {
         function onScroll() {
@@ -41,38 +94,115 @@ export function LandingNavbar({ isMarkettingPage = false }: { isMarkettingPage?:
     return (
         <header
             ref={headerRef}
+            onMouseLeave={() => setOpenMenu(null)}
+            onKeyDown={(e) => e.key === "Escape" && setOpenMenu(null)}
             className={cn(
                 "fixed top-0 left-0 right-0 z-50",
                 "transition-[height,border-color] duration-300 ease-out z-100",
-                scrolled
-                    ? isMarkettingPage
-                        ? "border-b border-neutral-800 h-15 bg-ink"
-                        : "border-b border-neutral-200 h-15 bg-snow"
-                    : "border-b border-transparent h-17",
+                scrolled ? "h-15" : "h-17",
+                scrolled ? "border-b border-neutral-200 bg-snow" : "border-b border-transparent",
             )}
         >
             <div className="mx-auto max-w-7xl flex h-full items-center justify-between">
                 <Link href="/" aria-label="try matcha home">
-                    <AppLogo
-                        size={20}
-                        iconOnly
-                        className={isMarkettingPage ? "text-neutral-100" : ""}
-                    />
+                    <AppLogo size={20} iconOnly />
                 </Link>
 
                 <div className="flex items-center gap-x-6 lg:gap-x-8">
                     <nav className="hidden md:flex items-center gap-x-6 lg:gap-x-8">
-                        {NAV_ITEMS.map((item) => (
-                            <Link
-                                key={item.label}
-                                href={item.href}
-                                className={cn(
-                                    "text-[15px] font-normal text-foreground hover:text-foreground transition-colors duration-200",
-                                )}
-                            >
-                                {item.label}
-                            </Link>
-                        ))}
+                        {NAV_ITEMS.map((item) =>
+                            isNavMenu(item) ? (
+                                <div key={item.label} className="relative">
+                                    <button
+                                        type="button"
+                                        aria-haspopup="true"
+                                        aria-expanded={openMenu === item.label}
+                                        onMouseEnter={() => setOpenMenu(item.label)}
+                                        onFocus={() => setOpenMenu(item.label)}
+                                        onClick={() =>
+                                            setOpenMenu(openMenu === item.label ? null : item.label)
+                                        }
+                                        className={cn(
+                                            NAV_LINK_CLASS,
+                                            "flex items-center gap-x-1.5 cursor-pointer rounded-full px-3 py-1.5 -mx-3",
+                                            openMenu === item.label && "bg-mist",
+                                        )}
+                                    >
+                                        {item.label}
+                                        <PiCaretDownBold
+                                            className={cn(
+                                                "size-2.5 transition-transform duration-200 motion-reduce:transition-none",
+                                                openMenu === item.label && "rotate-180",
+                                            )}
+                                        />
+                                    </button>
+
+                                    <AnimatePresence initial={false}>
+                                        {openMenu === item.label && (
+                                            <motion.div
+                                                initial={{ opacity: 0, y: -6, scale: 0.98 }}
+                                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                                exit={{ opacity: 0, y: -6, scale: 0.98 }}
+                                                transition={{
+                                                    duration: reduceMotion ? 0 : 0.18,
+                                                    ease: [0.22, 1, 0.36, 1],
+                                                }}
+                                                onMouseLeave={() => setHoveredLink(null)}
+                                                className="absolute right-0 top-full mt-3 grid w-115 grid-cols-2 gap-1 origin-top rounded-sm bg-snow p-1.5 shadow-lg shadow-black/5  border border-neutral-100"
+                                            >
+                                                {item.links.map((link) => (
+                                                    <MotionLink
+                                                        key={link.label}
+                                                        href={link.href}
+                                                        onClick={() => setOpenMenu(null)}
+                                                        onMouseEnter={() =>
+                                                            setHoveredLink(link.label)
+                                                        }
+                                                        onFocus={() => setHoveredLink(link.label)}
+                                                        initial="rest"
+                                                        whileHover="hover"
+                                                        className="group relative flex items-start gap-x-3 rounded-[8px] p-2.5"
+                                                    >
+                                                        {hoveredLink === link.label && (
+                                                            <motion.span
+                                                                layoutId="nav-menu-hover"
+                                                                transition={{
+                                                                    duration: reduceMotion
+                                                                        ? 0
+                                                                        : 0.22,
+                                                                    ease: [0.22, 1, 0.36, 1],
+                                                                }}
+                                                                className="absolute inset-0 rounded-[5px] bg-mist"
+                                                            />
+                                                        )}
+                                                        <span className="relative flex size-9 shrink-0 items-center justify-center rounded-lg bg-mist text-neutral-400 transition-colors duration-200 group-hover:bg-primary/15 group-hover:text-primary">
+                                                            <link.icon className="size-5" />
+                                                        </span>
+                                                        <span className="relative flex flex-col gap-y-0.5">
+                                                            <span className="text-[14px] font-medium text-ink">
+                                                                {link.label}
+                                                            </span>
+                                                            <span className="text-[12.5px] leading-snug text-neutral-500">
+                                                                {link.description}
+                                                            </span>
+                                                        </span>
+                                                    </MotionLink>
+                                                ))}
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
+                                </div>
+                            ) : (
+                                <Link
+                                    key={item.label}
+                                    href={item.href}
+                                    onMouseEnter={() => setOpenMenu(null)}
+                                    className={NAV_LINK_CLASS}
+                                >
+                                    {item.label}
+                                </Link>
+                            ),
+                        )}
                     </nav>
 
                     <button
