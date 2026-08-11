@@ -38,10 +38,7 @@ import LandingNewHero from "@/components/new/LandingNewHero";
 
 export default function Home() {
     return (
-        <div
-            data-lenis-prevent
-            className="relative min-h-screen w-screen flex flex-col bg-snow"
-        >
+        <div data-lenis-prevent className="relative min-h-screen w-screen flex flex-col bg-snow">
             {/* <AmbientDotField
                 className="h-screen"
                 color="#6d5ad6"

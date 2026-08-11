@@ -31,7 +31,7 @@ export default class IssueCreateController {
         });
 
     static async process(req: Request, res: Response) {
-        console.log("[issue:create] received request to create issue")
+        console.log("[issue:create] received request to create issue");
         try {
             const user = req.user;
             if (!user || !user.id) {
@@ -122,10 +122,10 @@ export default class IssueCreateController {
                                 number: (last_issue?.number ?? 0) + 1,
                                 assignees: parsed_body.data.assignee_ids?.length
                                     ? {
-                                        connect: parsed_body.data.assignee_ids.map((id) => ({
-                                            id,
-                                        })),
-                                    }
+                                          connect: parsed_body.data.assignee_ids.map((id) => ({
+                                              id,
+                                          })),
+                                      }
                                     : undefined,
                                 tags: parsed_body.data.tag_ids?.length
                                     ? { connect: parsed_body.data.tag_ids.map((id) => ({ id })) }

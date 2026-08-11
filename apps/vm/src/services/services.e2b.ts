@@ -207,7 +207,7 @@ export default class E2B {
             const effort = ENV.SERVER_SOLVE_EFFORT;
             let solved_count = 0;
 
-            for (; ;) {
+            for (;;) {
                 const issue = await IssueSolver.claim_next_issue(worker_id, log);
                 if (!issue) {
                     log.success("queue empty — stopping loop", { solved: solved_count });
@@ -220,7 +220,7 @@ export default class E2B {
                 log.info(`invoking claude for issue #${issue.number}`, { model, effort });
                 const result = await sandbox.commands.run(
                     `claude -p "$(cat ${ISSUE_PROMPT_PATH})" --model ${model} --effort ${effort} ` +
-                    `--mcp-config ${MCP_CONFIG_PATH} --output-format json --permission-mode bypassPermissions`,
+                        `--mcp-config ${MCP_CONFIG_PATH} --output-format json --permission-mode bypassPermissions`,
                     {
                         cwd: REPO_DIR,
                         envs: {

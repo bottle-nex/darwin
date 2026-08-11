@@ -72,7 +72,10 @@ export default function HeroPanel() {
                     verified, you come back to PRs.
                 </p>
 
-                <Button variant={'tertiary'} className="bg-[#f0eff8] text-[#141413] px-4 py-1.75 font-medium rounded-md cursor-pointer text-[14px] shadow-xs shadow-black/5">
+                <Button
+                    variant={"tertiary"}
+                    className="bg-[#f0eff8] text-[#141413] px-4 py-1.75 font-medium rounded-md cursor-pointer text-[14px] shadow-xs shadow-black/5"
+                >
                     Get Started
                 </Button>
             </motion.div>
