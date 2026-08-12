@@ -208,7 +208,7 @@ export function LandingNavbar() {
                     </nav>
 
                     <Button
-                        variant={'tertiary'}
+                        variant={"tertiary"}
                         onClick={session ? handleRedirect : handleSignin}
                         className="rounded-full"
                     >
