@@ -37,7 +37,7 @@ export default function IntegrationsSection(): JSX.Element {
     return (
         <main className="w-full py-24">
             <section
-                className="border-graphite/50 mx-auto grid w-full max-w-7xl overflow-hidden rounded-[20px] border"
+                className="mx-auto grid w-full max-w-7xl overflow-hidden rounded-[20px] border border-neutral-200"
                 style={{ gridTemplateColumns: `repeat(${GRID_COLS}, minmax(0, 1fr))` }}
             >
                 {Array.from({ length: GRID_ROWS * GRID_COLS }).map((_, index) => {
@@ -47,7 +47,7 @@ export default function IntegrationsSection(): JSX.Element {
                         <div
                             key={index}
                             className={cn(
-                                "border-graphite/50 aspect-square",
+                                "aspect-square border-neutral-200",
                                 col < GRID_COLS && "border-r",
                                 row < GRID_ROWS && "border-b",
                             )}
@@ -63,7 +63,7 @@ export default function IntegrationsSection(): JSX.Element {
                         style={{ gridRow: integration.row, gridColumn: integration.col }}
                     >
                         <motion.div
-                            className="bg-linear-to-b from-ink/20 via-cement/30 to-graphite/10 border-graphite/50 flex h-full w-full origin-center items-center justify-center rounded-xl border"
+                            className="bg-linear-to-b from-snow to-mist flex h-full w-full origin-center items-center justify-center rounded-xl border border-neutral-200 shadow-sm shadow-black/5"
                             initial={{ scale: 0 }}
                             whileInView={{ scale: 1 }}
                             viewport={{ once: true, amount: 0.4 }}
@@ -87,7 +87,7 @@ export default function IntegrationsSection(): JSX.Element {
                 ))}
 
                 <div
-                    className="bg-ink border-graphite/50 flex flex-col justify-center gap-8 border-r p-8"
+                    className="bg-snow flex flex-col justify-center gap-8 border-r border-neutral-200 p-8"
                     style={{ gridRow: "3 / span 3", gridColumn: "1 / span 4" }}
                 >
                     <span className="w-fit rounded-full border border-neutral-800 px-3 py-1 font-mono text-[11px] tracking-widest text-neutral-400 uppercase flex items-center gap-x-2">

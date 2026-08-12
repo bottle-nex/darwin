@@ -63,7 +63,7 @@ const NAV_ITEMS: NavItem[] = [
 ];
 
 const NAV_LINK_CLASS =
-    "text-[15px] font-normal text-foreground hover:text-foreground transition-colors duration-200";
+    "text-[15px] font-normal text-mist/60 hover:text-snow transition-colors duration-200";
 
 export function LandingNavbar() {
     const router = useRouter();
@@ -101,13 +101,11 @@ export function LandingNavbar() {
                 "fixed top-0 left-0 right-0 z-50",
                 "transition-[height,border-color] duration-300 ease-out z-100",
                 scrolled ? "h-15" : "h-17",
-                scrolled
-                    ? "border-b border-neutral-200 bg-[#FCF8F0]"
-                    : "border-b border-transparent",
+                scrolled ? "border-b border-graphite bg-ink" : "border-b border-transparent",
             )}
         >
             <div className="mx-auto max-w-7xl flex h-full items-center justify-between">
-                <Link href="/" aria-label="try matcha home">
+                <Link href="/" aria-label="try matcha home" className="text-snow">
                     <AppLogo size={20} iconOnly />
                 </Link>
 
@@ -128,7 +126,7 @@ export function LandingNavbar() {
                                         className={cn(
                                             NAV_LINK_CLASS,
                                             "flex items-center gap-x-1.5 cursor-pointer rounded-full px-3 py-1.5 -mx-3",
-                                            openMenu === item.label && "bg-mist",
+                                            openMenu === item.label && "bg-graphite text-snow",
                                         )}
                                     >
                                         {item.label}
@@ -147,11 +145,11 @@ export function LandingNavbar() {
                                                 animate={{ opacity: 1, y: 0, scale: 1 }}
                                                 exit={{ opacity: 0, y: -6, scale: 0.98 }}
                                                 transition={{
-                                                    duration: reduceMotion ? 0 : 0.18,
+                                                    duration: reduceMotion ? 0.9 : 0.5,
                                                     ease: [0.22, 1, 0.36, 1],
                                                 }}
                                                 onMouseLeave={() => setHoveredLink(null)}
-                                                className="absolute right-0 top-full mt-3 grid w-115 grid-cols-2 gap-1 origin-top rounded-sm bg-snow p-1.5 shadow-lg shadow-black/5  border border-neutral-100"
+                                                className="absolute right-0 top-full mt-3 grid w-115 grid-cols-2 gap-1 origin-top rounded-sm bg-charcoal p-1.5 shadow-lg shadow-black/40  border border-graphite"
                                             >
                                                 {item.links.map((link) => (
                                                     <MotionLink
@@ -172,20 +170,20 @@ export function LandingNavbar() {
                                                                 transition={{
                                                                     duration: reduceMotion
                                                                         ? 0
-                                                                        : 0.22,
+                                                                        : 0.62,
                                                                     ease: [0.22, 1, 0.36, 1],
                                                                 }}
-                                                                className="absolute inset-0 rounded-[5px] bg-mist"
+                                                                className="absolute inset-0 rounded-[5px] bg-graphite"
                                                             />
                                                         )}
-                                                        <span className="relative flex size-9 shrink-0 items-center justify-center rounded-lg bg-mist text-neutral-400 transition-colors duration-200 group-hover:bg-primary/15 group-hover:text-primary">
+                                                        <span className="relative flex size-9 shrink-0 items-center justify-center rounded-lg bg-graphite text-mist/50 transition-colors duration-200 group-hover:bg-primary/15 group-hover:text-primary">
                                                             <link.icon className="size-5" />
                                                         </span>
                                                         <span className="relative flex flex-col gap-y-0.5">
-                                                            <span className="text-[14px] font-medium text-ink">
+                                                            <span className="text-[14px] font-medium text-snow">
                                                                 {link.label}
                                                             </span>
-                                                            <span className="text-[12.5px] leading-snug text-neutral-500">
+                                                            <span className="text-[12.5px] leading-snug text-mist/50">
                                                                 {link.description}
                                                             </span>
                                                         </span>

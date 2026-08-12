@@ -94,6 +94,7 @@
 
     --font-sans: var(--font-poppins);
     --font-mono: var(--font-geist-mono);
+    --font-display: var(--font-tektur);
 }
 
 @layer base {
@@ -102,7 +103,7 @@
     }
 
     body {
-        @apply bg-snow text-foreground;
+        @apply bg-ink text-foreground;
     }
 
     html.lenis,

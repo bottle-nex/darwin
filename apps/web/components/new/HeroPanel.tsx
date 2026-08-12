@@ -50,7 +50,7 @@ export default function HeroPanel() {
     return (
         <div ref={slotRef} className="relative w-full h-[90vh] mt-15">
             <motion.div
-                className="expanding-panel isolate overflow-hidden bg-[#141413] flex flex-col items-center justify-center gap-6 text-center"
+                className="expanding-panel isolate overflow-hidden bg-black/50 flex flex-col items-center justify-center gap-6 text-center border border-graphite"
                 style={
                     {
                         "--squeeze": prefersReducedMotion ? 1 : smoothSqueeze,
@@ -61,20 +61,20 @@ export default function HeroPanel() {
 
                 <h2
                     className={cn(
-                        "max-w-200 font-medium text-[#fffcf6] text-[3.5rem] leading-[1.1] tracking-tight",
+                        "max-w-200 font-medium text-snow text-[3.5rem] leading-[1.1] tracking-tight",
                         sourceSerif4.className,
                     )}
                 >
                     Every issue on your board is already being worked on.
                 </h2>
 
-                <p className="max-w-2xl text-[#fbf5ea] text-[1.2rem]">
+                <p className="max-w-2xl text-mist/70 text-[1.2rem]">
                     Drop the work on the board and walk away. Issues get claimed, implemented, and
                     verified, you come back to PRs.
                 </p>
-                <button className="flex items-center gap-1.75 bg-[#fffcf6] text-[#2A2524] pr-3.5 pl-1 py-1 font-medium rounded-sm cursor-pointer text-[13px] shadow-xs shadow-black/5">
+                <button className="flex items-center gap-1.75 bg-snow text-ink pr-3.5 pl-1 py-1 font-medium rounded-sm cursor-pointer text-[13px] shadow-xs shadow-black/5">
                     <div className="h-7 w-7 bg-primary rounded-[3px] flex justify-center items-center">
-                        <DottedArrowRight color="#FCF8F0" size={20} />
+                        <DottedArrowRight size={20} />
                     </div>
                     Get Started
                 </button>

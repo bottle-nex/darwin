@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist_Mono, Poppins } from "next/font/google";
+import { Geist_Mono, Poppins, Tektur } from "next/font/google";
 import "./globals.css";
 import LenisProvider from "@/providers/LenisProvider";
 import QueryProvider from "@/providers/QueryProvider";
@@ -19,6 +19,11 @@ const geistMono = Geist_Mono({
     subsets: ["latin"],
 });
 
+const tektur = Tektur({
+    variable: "--font-tektur",
+    subsets: ["latin"],
+});
+
 export const metadata: Metadata = {
     title: "Matcha",
     description: "The modern WhatsApp marketing platform for teams that want to grow.",
@@ -35,7 +40,7 @@ export default async function RootLayout({
         <html
             lang="en"
             suppressHydrationWarning
-            className={`${poppins.variable} ${geistMono.variable} h-full antialiased`}
+            className={`${poppins.variable} ${geistMono.variable} ${tektur.variable} h-full antialiased`}
         >
             <LenisProvider>
                 <body className="min-h-full flex flex-col">

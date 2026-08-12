@@ -31,7 +31,7 @@ export default function LandingNewHero() {
     return (
         <div
             className={cn(
-                "relative min-h-screen w-screen max-w-7xl mx-auto bg-transparent flex flex-col items-center pt-[11%] border-b",
+                "relative min-h-screen w-screen max-w-7xl mx-auto bg-transparent flex flex-col items-center pt-[11%]",
             )}
         >
             <div className="flex w-full items-end justify-between pt-15">
@@ -39,7 +39,7 @@ export default function LandingNewHero() {
                     initial="initial"
                     animate="animate"
                     className={cn(
-                        "text-5xl font-medium text-[#2a2524] tracking-tight leading-[1.1] max-w-[45rem]",
+                        "text-5xl font-medium text-snow tracking-tight leading-[1.1] max-w-[45rem]",
                     )}
                 >
                     {HEADLINE.map((part) => {
@@ -66,7 +66,7 @@ export default function LandingNewHero() {
 
                 <div
                     className={cn(
-                        "text-[1.5rem] leading-[1.2] text-[#2a2524] tracking-tight max-w-md ",
+                        "text-[1.5rem] leading-[1.2] text-mist/70 tracking-tight max-w-md ",
                         sourceSerif4.className,
                     )}
                 >
