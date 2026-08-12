@@ -15,6 +15,7 @@ import {
     type AnimatedIcon,
 } from "@/components/icons/AnimatedIcons";
 import { DottedArrowRight } from "@/lib/svgs/svgs";
+import { Button } from "../ui/button";
 
 const MotionLink = motion.create(Link);
 
@@ -206,15 +207,13 @@ export function LandingNavbar() {
                         )}
                     </nav>
 
-                    <button
+                    <Button
+                        variant={'tertiary'}
                         onClick={session ? handleRedirect : handleSignin}
-                        className="flex items-center gap-1.75 bg-[#2A2524] text-[#f0eff8] pr-3.5 pl-1 py-1 font-medium rounded-sm cursor-pointer text-[13px] shadow-xs shadow-black/5"
+                        className="rounded-full"
                     >
-                        <div className="h-7 w-7 bg-primary rounded-[3px] flex justify-center items-center">
-                            <DottedArrowRight size={20} />
-                        </div>
                         Get Started
-                    </button>
+                    </Button>
                 </div>
             </div>
         </header>

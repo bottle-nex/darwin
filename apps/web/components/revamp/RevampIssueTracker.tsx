@@ -232,7 +232,7 @@ function BranchingDiagram() {
     const reduceMotion = useReducedMotion();
     return (
         <div className="relative mt-16">
-            <div className="pointer-events-none absolute inset-0 z-10 shadow-[inset_0_0_80px_60px_#0a0a0a]" />
+            <div className="pointer-events-none absolute inset-0 z-10 shadow-[inset_0_80px_60px_-60px_#0a0a0a,inset_0_-80px_60px_-60px_#0a0a0a]" />
             <motion.svg
                 viewBox="0 0 1360 560"
                 className="h-auto w-full font-mono"
