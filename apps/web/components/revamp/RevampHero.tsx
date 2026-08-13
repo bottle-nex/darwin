@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { Button } from "../ui/button";
-import { FaChevronRight } from "react-icons/fa6";
+import { MdChevronRight } from "react-icons/md";
 
 export default function RevampHero() {
     return (
@@ -18,7 +18,7 @@ export default function RevampHero() {
                     <span className="flex-1 flex justify-end">
                         <Button variant={"tertiary"} className="text-graphite rounded-full bg-snow">
                             Get started
-                            <FaChevronRight />
+                            <MdChevronRight className="text-background!" />
                         </Button>
                     </span>
                 </div>

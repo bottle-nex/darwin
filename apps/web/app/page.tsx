@@ -1,4 +1,5 @@
 import { LandingNavbar } from "@/components/new/LandingNavbar";
+import RevampBentoCards from "@/components/revamp/RevampBentoCards";
 import RevampHero from "@/components/revamp/RevampHero";
 import RevampIssueTracker from "@/components/revamp/RevampIssueTracker";
 
@@ -8,6 +9,7 @@ export default function Home() {
             <LandingNavbar />
             <RevampHero />
             <RevampIssueTracker />
+            <RevampBentoCards />
         </div>
     );
 }

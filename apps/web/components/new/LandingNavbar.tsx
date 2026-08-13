@@ -16,6 +16,7 @@ import {
 } from "@/components/icons/AnimatedIcons";
 import { DottedArrowRight } from "@/lib/svgs/svgs";
 import { Button } from "../ui/button";
+import { MdChevronRight } from "react-icons/md";
 
 const MotionLink = motion.create(Link);
 
@@ -71,7 +72,6 @@ export function LandingNavbar() {
     const session = useUserSessionStore((s) => s.session);
     const [scrolled, setScrolled] = useState(false);
     const [openMenu, setOpenMenu] = useState<string | null>(null);
-    const [hoveredLink, setHoveredLink] = useState<string | null>(null);
     const headerRef = useRef<HTMLElement>(null);
     const reduceMotion = useReducedMotion();
 
@@ -149,7 +149,6 @@ export function LandingNavbar() {
                                                     duration: reduceMotion ? 0.9 : 0.5,
                                                     ease: [0.22, 1, 0.36, 1],
                                                 }}
-                                                onMouseLeave={() => setHoveredLink(null)}
                                                 className="absolute right-0 top-full mt-3 grid w-115 grid-cols-2 gap-1 origin-top rounded-sm bg-charcoal p-1.5 shadow-lg shadow-black/40  border border-graphite"
                                             >
                                                 {item.links.map((link) => (
@@ -157,26 +156,10 @@ export function LandingNavbar() {
                                                         key={link.label}
                                                         href={link.href}
                                                         onClick={() => setOpenMenu(null)}
-                                                        onMouseEnter={() =>
-                                                            setHoveredLink(link.label)
-                                                        }
-                                                        onFocus={() => setHoveredLink(link.label)}
                                                         initial="rest"
                                                         whileHover="hover"
-                                                        className="group relative flex items-start gap-x-3 rounded-[8px] p-2.5"
+                                                        className="group relative flex items-start gap-x-3 rounded-[8px] p-2.5 hover:bg-graphite"
                                                     >
-                                                        {hoveredLink === link.label && (
-                                                            <motion.span
-                                                                layoutId="nav-menu-hover"
-                                                                transition={{
-                                                                    duration: reduceMotion
-                                                                        ? 0
-                                                                        : 0.62,
-                                                                    ease: [0.22, 1, 0.36, 1],
-                                                                }}
-                                                                className="absolute inset-0 rounded-[5px] bg-graphite"
-                                                            />
-                                                        )}
                                                         <span className="relative flex size-9 shrink-0 items-center justify-center rounded-lg bg-graphite text-mist/50 transition-colors duration-200 group-hover:bg-primary/15 group-hover:text-primary">
                                                             <link.icon className="size-5" />
                                                         </span>
@@ -213,6 +196,7 @@ export function LandingNavbar() {
                         className="rounded-full"
                     >
                         Get Started
+                        <MdChevronRight className="text-background!" />
                     </Button>
                 </div>
             </div>

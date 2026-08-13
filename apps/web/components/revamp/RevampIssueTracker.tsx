@@ -94,7 +94,7 @@ function BranchPill({
 function CheckDot({ x, y, delay }: { x: number; y: number; delay: number }) {
     return (
         <motion.g variants={pop(delay)} className={POP_ORIGIN}>
-            <circle cx={x} cy={y} r={10} fill="#3ecf8e" />
+            <circle cx={x} cy={y} r={10} fill="#34D59A" />
             <path
                 d={`M${x - 4.5} ${y + 0.5}l3.5 3.5 6.5-7`}
                 stroke="#0a0a0a"
@@ -116,7 +116,7 @@ function JunctionDot({ x, y, delay }: { x: number; y: number; delay: number }) {
             cy={y}
             r={6}
             fill="#0a0a0a"
-            stroke="#3ecf8e"
+            stroke="#34D59A"
             strokeWidth={2}
         />
     );
@@ -209,6 +209,71 @@ function LaneLine({
     );
 }
 
+const SWEEP = {
+    duration: 4.5,
+    ease: "linear" as const,
+    repeat: Infinity,
+    repeatDelay: 3.4,
+};
+
+function ShootingStar({ y }: { y: number }) {
+    return (
+        <g>
+            <line x1={0} y1={y} x2={1360} y2={y} stroke="#2e2e2e" strokeWidth={1.5} />
+            <motion.line
+                variants={{
+                    hidden: { pathLength: 0 },
+                    visible: {
+                        pathLength: [0, 0, 1, 1],
+                        transition: {
+                            pathLength: { ...SWEEP, times: [0, 200 / 1760, 1560 / 1760, 1] },
+                        },
+                    },
+                }}
+                x1={0}
+                y1={y}
+                x2={1360}
+                y2={y}
+                stroke="#34D59A"
+                strokeOpacity={0.9}
+                strokeWidth={1.5}
+            />
+            <motion.g
+                variants={{
+                    hidden: { x: -200, opacity: 0 },
+                    visible: {
+                        x: 1560,
+                        opacity: 1,
+                        transition: {
+                            opacity: { duration: 0.01 },
+                            x: SWEEP,
+                        },
+                    },
+                }}
+            >
+                <line
+                    x1={-180}
+                    y1={y}
+                    x2={0}
+                    y2={y}
+                    stroke="url(#comet-tail)"
+                    strokeWidth={2.5}
+                    strokeLinecap="round"
+                />
+                <line
+                    x1={-180}
+                    y1={y}
+                    x2={0}
+                    y2={y}
+                    stroke="url(#comet-core)"
+                    strokeWidth={1.25}
+                    strokeLinecap="round"
+                />{" "}
+            </motion.g>
+        </g>
+    );
+}
+
 function NodeCircle({
     x,
     y,
@@ -232,7 +297,6 @@ function BranchingDiagram() {
     const reduceMotion = useReducedMotion();
     return (
         <div className="relative mt-16">
-            <div className="pointer-events-none absolute inset-0 z-10 shadow-[inset_0_80px_60px_-60px_#0a0a0a,inset_0_-80px_60px_-60px_#0a0a0a]" />
             <motion.svg
                 viewBox="0 0 1360 560"
                 className="h-auto w-full font-mono"
@@ -243,9 +307,56 @@ function BranchingDiagram() {
                 viewport={{ once: true, amount: 0.3 }}
             >
                 <defs>
-                    <pattern id="grid-tick" width={68} height={14} patternUnits="userSpaceOnUse">
-                        <line x1={0.5} y1={0} x2={0.5} y2={7} stroke="#1c1c1c" strokeWidth={1} />
+                    <pattern
+                        id="grid-columns"
+                        width={40}
+                        height={560}
+                        patternUnits="userSpaceOnUse"
+                    >
+                        <line
+                            x1={0.5}
+                            y1={0}
+                            x2={0.5}
+                            y2={560}
+                            stroke="#191919"
+                            strokeWidth={1}
+                            strokeDasharray="4 6"
+                        />
                     </pattern>
+                    <pattern
+                        id="ruler-tick"
+                        x={0}
+                        y={278}
+                        width={80}
+                        height={24}
+                        patternUnits="userSpaceOnUse"
+                    >
+                        <line
+                            x1={0.5}
+                            y1={2}
+                            x2={0.5}
+                            y2={22}
+                            stroke="#34D59A"
+                            strokeOpacity={0.55}
+                            strokeWidth={1}
+                        />
+                        <line x1={40.5} y1={2} x2={40.5} y2={22} stroke="#333333" strokeWidth={1} />
+                    </pattern>
+                    <radialGradient id="grid-fade" cx="0.5" cy="0.5" r="0.72">
+                        <stop offset="0" stopColor="#ffffff" />
+                        <stop offset="0.55" stopColor="#ffffff" />
+                        <stop offset="1" stopColor="#ffffff" stopOpacity={0} />
+                    </radialGradient>
+                    <linearGradient id="grid-fade-y" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0" stopColor="#000000" />
+                        <stop offset="0.35" stopColor="#000000" stopOpacity={0} />
+                        <stop offset="0.65" stopColor="#000000" stopOpacity={0} />
+                        <stop offset="1" stopColor="#000000" />
+                    </linearGradient>
+                    <mask id="grid-mask">
+                        <rect x={0} y={0} width={1360} height={560} fill="url(#grid-fade)" />
+                        <rect x={0} y={0} width={1360} height={560} fill="url(#grid-fade-y)" />
+                    </mask>
                     <linearGradient
                         id="fade-preview"
                         gradientUnits="userSpaceOnUse"
@@ -270,6 +381,30 @@ function BranchingDiagram() {
                         <stop offset="0.78" stopColor="#2e2e2e" />
                         <stop offset="1" stopColor="#2e2e2e" stopOpacity={0} />
                     </linearGradient>
+                    <linearGradient
+                        id="comet-tail"
+                        gradientUnits="userSpaceOnUse"
+                        x1={-180}
+                        y1={0}
+                        x2={0}
+                        y2={0}
+                    >
+                        <stop offset="0" stopColor="#34D59A" stopOpacity={0} />
+                        <stop offset="0.5" stopColor="#34D59A" stopOpacity={0.45} />
+                        <stop offset="1" stopColor="#34D59A" stopOpacity={0.85} />
+                    </linearGradient>
+                    <linearGradient
+                        id="comet-core"
+                        gradientUnits="userSpaceOnUse"
+                        x1={-180}
+                        y1={0}
+                        x2={0}
+                        y2={0}
+                    >
+                        <stop offset="0" stopColor="#d9fbe9" stopOpacity={0} />
+                        <stop offset="0.55" stopColor="#d9fbe9" stopOpacity={0.55} />
+                        <stop offset="1" stopColor="#d9fbe9" stopOpacity={1} />
+                    </linearGradient>
                     <clipPath id="avatar-clip">
                         <circle cx={956} cy={208} r={21} />
                     </clipPath>
@@ -281,18 +416,10 @@ function BranchingDiagram() {
                     y={0}
                     width={1360}
                     height={560}
-                    fill="url(#grid-tick)"
+                    fill="url(#grid-columns)"
+                    mask="url(#grid-mask)"
                 />
-
-                <motion.line
-                    variants={draw(0.2, 1)}
-                    x1={0}
-                    y1={290}
-                    x2={1360}
-                    y2={290}
-                    stroke="#2e2e2e"
-                    strokeWidth={2}
-                />
+                <rect x={0} y={278} width={1360} height={24} fill="url(#ruler-tick)" />
 
                 <g>
                     <BranchCurve d="M310 282C310 220 310 126 372 126" delay={0.55} />
@@ -419,6 +546,20 @@ function BranchingDiagram() {
                     <MonoLabel x={1250} y={58} text="dev in progress" delay={1.8} />
                     <CheckDot x={1250} y={126} delay={1.7} />
                 </g>
+
+                {reduceMotion ? (
+                    <line
+                        x1={0}
+                        y1={290}
+                        x2={1360}
+                        y2={290}
+                        stroke="#34D59A"
+                        strokeOpacity={0.55}
+                        strokeWidth={1.5}
+                    />
+                ) : (
+                    <ShootingStar y={290} />
+                )}
 
                 <BranchPill
                     x={48}

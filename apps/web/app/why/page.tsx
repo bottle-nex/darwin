@@ -1,10 +1,6 @@
 import type { Metadata } from "next";
-import { NavBar } from "@/components/nav/Navbar";
-import { Footer } from "@/components/app/Footer";
-import CtaSection from "@/components/app/CtaSection";
-import { WhyHero } from "@/components/why/WhyHero";
-import { ManualGruntSection } from "@/components/why/ManualGruntSection";
-import { AgentsSection } from "@/components/why/AgentsSection";
+import { LandingNavbar } from "@/components/new/LandingNavbar";
+import WhyProcess from "@/components/why/WhyProcess";
 
 export const metadata: Metadata = {
     title: "Why matcha",
@@ -13,13 +9,9 @@ export const metadata: Metadata = {
 
 export default function WhyPage() {
     return (
-        <main className="flex min-h-screen flex-col bg-ink">
-            <NavBar isMarkettingPage />
-            <WhyHero />
-            <AgentsSection />
-            <ManualGruntSection />
-            <CtaSection />
-            <Footer />
+        <main className="flex min-h-screen h-full flex-col bg-ink">
+            <LandingNavbar />
+            <WhyProcess />
         </main>
     );
 }
