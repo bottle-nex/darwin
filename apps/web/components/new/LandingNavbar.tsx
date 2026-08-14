@@ -194,7 +194,7 @@ export function LandingNavbar() {
                     <Button
                         variant={"tertiary"}
                         onClick={session ? handleRedirect : handleSignin}
-                        className="rounded-full pl-4! "
+                        className="rounded-full"
                     >
                         Get Started
                         <MdChevronRight className="text-background!" />

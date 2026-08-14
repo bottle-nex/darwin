@@ -95,6 +95,8 @@
     --font-sans: var(--font-poppins);
     --font-mono: var(--font-geist-mono);
     --font-display: var(--font-tektur);
+    --font-serif: var(--font-instrument-serif);
+    --font-grotesk: var(--font-inter-tight);
 }
 
 @layer base {

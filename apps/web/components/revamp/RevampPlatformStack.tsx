@@ -3,11 +3,12 @@
 import { motion, useReducedMotion } from "motion/react";
 import { useState } from "react";
 import type { IconType } from "react-icons";
-import { LuSquareKanban, LuSquareTerminal } from "react-icons/lu";
+import { LuLayers, LuSquareKanban, LuSquareTerminal } from "react-icons/lu";
 import { cn } from "@/lib/utils";
 import HeroBuddy from "@/components/landing/v2/HeroBuddy";
 import Reveal from "../utility/Reveal";
 import LandingSection from "./LandingSection";
+import SectionHeader from "./SectionHeader";
 import IsoChip, { DEPTH, HALF_H, HALF_W } from "./stack/IsoChip";
 
 const CHIP_X = 310;
@@ -211,13 +212,12 @@ export default function RevampPlatformStack() {
     return (
         <LandingSection>
             <Reveal>
-                <p className="max-w-4xl indent-24 text-[2.5rem] leading-tight tracking-tight">
-                    <span className="text-snow">One machine, assembled in layers. </span>
-                    <span className="text-neutral-500">
-                        The board collects the work, an agent carries it, and sandboxed runners
-                        prove it. Pull the stack apart and every layer clicks into the next.
-                    </span>
-                </p>
+                <SectionHeader
+                    badge="The platform"
+                    icon={LuLayers}
+                    title="One machine, assembled in layers"
+                    description="The board collects the work, agents carry it, and sandboxed runners prove every layer works."
+                />
             </Reveal>
 
             <Reveal delay={0.15} className="mt-16">
