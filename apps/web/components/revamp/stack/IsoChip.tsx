@@ -164,7 +164,20 @@ export default function IsoChip({
                                     <stop offset="0" stopColor="#161616" />
                                     <stop offset="1" stopColor="#0d0d0d" />
                                 </linearGradient>
+                                <filter
+                                    id="iso-chip-glow"
+                                    x="-40%"
+                                    y="-40%"
+                                    width="180%"
+                                    height="180%"
+                                >
+                                    <feGaussianBlur stdDeviation={18} />
+                                </filter>
                             </defs>
+                            <g filter="url(#iso-chip-glow)" opacity={0.28}>
+                                <path d={TOP_FACE} fill={PRIMARY} />
+                                <path d={BODY} fill={PRIMARY} />
+                            </g>
                         </>
                     )}
 
