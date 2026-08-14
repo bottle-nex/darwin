@@ -255,7 +255,7 @@ export default function RevampPlatformStack() {
                                 />
                                 <span
                                     aria-hidden
-                                    className="absolute -inset-y-4 -left-px w-0.5 rounded-full bg-linear-to-b from-primary via-emerald-200 to-primary"
+                                    className="absolute -inset-y-4 -left-px w-0.5 rounded-full bg-primary"
                                 />
                                 <HeroBuddy className="size-6 -my-1" move={false} />
                                 <h3 className="mt-5 text-base font-medium tracking-[0.16em] text-snow uppercase">

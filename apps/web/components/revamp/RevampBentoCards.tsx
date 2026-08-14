@@ -69,7 +69,7 @@ export default function RevampBentoCards() {
                     <span className="text-snow">Four stages, every issue. </span>
                     <span className="text-neutral-500">
                         The board hands it off, an agent picks it up, a sandboxed runner proves it
-                        works, and a pull request lands back with you.
+                        works.
                     </span>
                 </p>
                 <div className="relative mt-10">

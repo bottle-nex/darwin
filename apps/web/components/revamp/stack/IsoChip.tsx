@@ -7,6 +7,8 @@ import type { ReactNode } from "react";
  * Isometric chip geometry. The top face is a square of half-size 80 in flat "plane"
  * coordinates, projected with a 2:1 isometric matrix; DEPTH is the extruded body height.
  */
+const PRIMARY = "#ab9ff2";
+
 export const HALF_W = 138.56;
 export const HALF_H = 80;
 export const DEPTH = 34;
@@ -121,7 +123,7 @@ export default function IsoChip({
 }: IsoChipProps) {
     const reduceMotion = useReducedMotion();
     const isGhost = variant === "ghost";
-    const lineColor = isGhost ? "#47474c" : "rgba(236,229,208,0.45)";
+    const lineColor = isGhost ? "#47474c" : "rgba(171,159,242,0.55)";
     const detailColor = isGhost ? "#3c3c40" : "rgba(12,12,12,0.65)";
 
     return (
@@ -152,31 +154,6 @@ export default function IsoChip({
                     {!isGhost && (
                         <>
                             <defs>
-                                <linearGradient id="iso-chip-holo-side" x1="0" y1="0" x2="1" y2="1">
-                                    <stop offset="0" stopColor="#d3ccf9" />
-                                    <stop offset="0.25" stopColor="#eef4ee" />
-                                    <stop offset="0.45" stopColor="#bfeccf" />
-                                    <stop offset="0.6" stopColor="#8fdcae" />
-                                    <stop offset="0.78" stopColor="#cbc3f7" />
-                                    <stop offset="1" stopColor="#b4e6c6" />
-                                </linearGradient>
-                                <linearGradient id="iso-chip-holo-face" x1="0" y1="0" x2="1" y2="1">
-                                    <stop offset="0" stopColor="#e7e3fc" />
-                                    <stop offset="0.3" stopColor="#bcb2f6" />
-                                    <stop offset="0.5" stopColor="#a9e8c4" />
-                                    <stop offset="0.72" stopColor="#dcf3e4" />
-                                    <stop offset="1" stopColor="#d5cffa" />
-                                </linearGradient>
-                                <linearGradient
-                                    id="iso-chip-side-shade"
-                                    x1="0"
-                                    y1="0"
-                                    x2="0"
-                                    y2="1"
-                                >
-                                    <stop offset="0" stopColor="rgba(10,10,10,0)" />
-                                    <stop offset="1" stopColor="rgba(10,10,10,0.18)" />
-                                </linearGradient>
                                 <linearGradient
                                     id="iso-chip-face-sheen"
                                     x1="0"
@@ -193,11 +170,10 @@ export default function IsoChip({
 
                     <path
                         d={BODY}
-                        fill={isGhost ? "#101012" : "url(#iso-chip-holo-side)"}
+                        fill={isGhost ? "#101012" : PRIMARY}
                         stroke={lineColor}
                         strokeWidth={1}
                     />
-                    {!isGhost && <path d={BODY} fill="url(#iso-chip-side-shade)" />}
 
                     <line
                         x1={0}
@@ -238,19 +214,14 @@ export default function IsoChip({
                             cx={screwX}
                             cy={screwY}
                             r={2.5}
-                            fill={isGhost ? "#4c4c52" : "rgba(255,255,255,0.9)"}
+                            fill={isGhost ? "#4c4c52" : PRIMARY}
                         />
                     ))}
 
                     {isGhost ? (
                         <path d={FACE_PANEL} fill="none" stroke="#3c3c40" strokeWidth={0.75} />
                     ) : (
-                        <path
-                            d={FACE_PANEL}
-                            fill="url(#iso-chip-holo-face)"
-                            stroke="rgba(255,255,255,0.65)"
-                            strokeWidth={1}
-                        />
+                        <path d={FACE_PANEL} fill={PRIMARY} />
                     )}
                     <g transform={ISO_MATRIX} color={isGhost ? "#5b5b61" : "#0a0a0a"}>
                         {glyph}

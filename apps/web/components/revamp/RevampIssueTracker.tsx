@@ -94,7 +94,7 @@ function BranchPill({
 function CheckDot({ x, y, delay }: { x: number; y: number; delay: number }) {
     return (
         <motion.g variants={pop(delay)} className={POP_ORIGIN}>
-            <circle cx={x} cy={y} r={10} fill="#34D59A" />
+            <circle cx={x} cy={y} r={10} fill="#AB9FF2" />
             <path
                 d={`M${x - 4.5} ${y + 0.5}l3.5 3.5 6.5-7`}
                 stroke="#0a0a0a"
@@ -116,7 +116,7 @@ function JunctionDot({ x, y, delay }: { x: number; y: number; delay: number }) {
             cy={y}
             r={6}
             fill="#0a0a0a"
-            stroke="#34D59A"
+            stroke="#AB9FF2"
             strokeWidth={2}
         />
     );
@@ -212,8 +212,6 @@ function LaneLine({
 const SWEEP = {
     duration: 4.5,
     ease: "linear" as const,
-    repeat: Infinity,
-    repeatDelay: 3.4,
 };
 
 function ShootingStar({ y }: { y: number }) {
@@ -234,7 +232,7 @@ function ShootingStar({ y }: { y: number }) {
                 y1={y}
                 x2={1360}
                 y2={y}
-                stroke="#34D59A"
+                stroke="#AB9FF2"
                 strokeOpacity={0.9}
                 strokeWidth={1.5}
             />
@@ -336,7 +334,7 @@ function BranchingDiagram() {
                             y1={2}
                             x2={0.5}
                             y2={22}
-                            stroke="#34D59A"
+                            stroke="#AB9FF2"
                             strokeOpacity={0.55}
                             strokeWidth={1}
                         />
@@ -389,9 +387,9 @@ function BranchingDiagram() {
                         x2={0}
                         y2={0}
                     >
-                        <stop offset="0" stopColor="#34D59A" stopOpacity={0} />
-                        <stop offset="0.5" stopColor="#34D59A" stopOpacity={0.45} />
-                        <stop offset="1" stopColor="#34D59A" stopOpacity={0.85} />
+                        <stop offset="0" stopColor="#AB9FF2" stopOpacity={0} />
+                        <stop offset="0.5" stopColor="#AB9FF2" stopOpacity={0.45} />
+                        <stop offset="1" stopColor="#AB9FF2" stopOpacity={0.85} />
                     </linearGradient>
                     <linearGradient
                         id="comet-core"
@@ -401,9 +399,9 @@ function BranchingDiagram() {
                         x2={0}
                         y2={0}
                     >
-                        <stop offset="0" stopColor="#d9fbe9" stopOpacity={0} />
-                        <stop offset="0.55" stopColor="#d9fbe9" stopOpacity={0.55} />
-                        <stop offset="1" stopColor="#d9fbe9" stopOpacity={1} />
+                        <stop offset="0" stopColor="#e8e3fd" stopOpacity={0} />
+                        <stop offset="0.55" stopColor="#e8e3fd" stopOpacity={0.55} />
+                        <stop offset="1" stopColor="#e8e3fd" stopOpacity={1} />
                     </linearGradient>
                     <clipPath id="avatar-clip">
                         <circle cx={956} cy={208} r={21} />
@@ -553,7 +551,7 @@ function BranchingDiagram() {
                         y1={290}
                         x2={1360}
                         y2={290}
-                        stroke="#34D59A"
+                        stroke="#AB9FF2"
                         strokeOpacity={0.55}
                         strokeWidth={1.5}
                     />
@@ -588,7 +586,7 @@ export default function RevampIssueTracker() {
                     <span className="text-snow">From issue to pull request. </span>
                     <span className="text-neutral-500">
                         An agent branches your repo, implements the fix, and passes every check
-                        before the PR reaches review.
+                        before review.
                     </span>
                 </p>
                 <BranchingDiagram />
