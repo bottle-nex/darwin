@@ -193,7 +193,13 @@ export default function IssueForm({
                     <section className="h-fit flex items-center justify-end gap-x-20">
                         <div className="flex items-center justify-end gap-x-2 ">
                             {!isEdit && !isCustom && <BodyGate body={body} />}
-                            <Button className="rounded-full" variant={'tertiary'} onClick={handleSubmit} loading={pending} disabled={!canSubmit}>
+                            <Button
+                                className="rounded-full"
+                                variant={"tertiary"}
+                                onClick={handleSubmit}
+                                loading={pending}
+                                disabled={!canSubmit}
+                            >
                                 {isEdit ? "Save" : "Create Issue"}
                             </Button>
                         </div>
