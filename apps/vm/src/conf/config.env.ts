@@ -8,7 +8,7 @@ const envSchema = z.object({
     DATABASE_URL: z.string().min(1, "Database URL is required"),
     SERVER_REDIS_URL: z.url("Invalid Redis URL"),
     SERVER_E2B_API_KEY: z.string().nonempty(),
-    SERVER_ANTHROPIC_API_KEY: z.string().min(1, "Anthropic API key is required"),
+    SERVER_CLAUDE_CODE_OAUTH_TOKEN: z.string().min(1, "Claude Code OAuth token is required"),
     SERVER_BRIEF_MODEL: z.string().default("claude-sonnet-5"),
     SERVER_BRIEF_EFFORT: z.enum(["low", "medium", "high", "xhigh", "max"]).default("low"),
     SERVER_SOLVE_MODEL: z.string().default("claude-sonnet-5"),

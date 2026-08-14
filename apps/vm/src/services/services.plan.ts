@@ -59,7 +59,7 @@ export default class PlanService {
                 `--output-format json --tools "Read,Glob,Grep,Bash" --permission-mode bypassPermissions`,
             {
                 cwd: REPO_DIR,
-                envs: { ANTHROPIC_API_KEY: ENV.SERVER_ANTHROPIC_API_KEY },
+                envs: { CLAUDE_CODE_OAUTH_TOKEN: ENV.SERVER_CLAUDE_CODE_OAUTH_TOKEN },
                 timeoutMs: AGENT_TIMEOUT_MS,
             },
         );

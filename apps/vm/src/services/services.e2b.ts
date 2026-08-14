@@ -224,7 +224,7 @@ export default class E2B {
                     {
                         cwd: REPO_DIR,
                         envs: {
-                            ANTHROPIC_API_KEY: ENV.SERVER_ANTHROPIC_API_KEY,
+                            CLAUDE_CODE_OAUTH_TOKEN: ENV.SERVER_CLAUDE_CODE_OAUTH_TOKEN,
                             GH_TOKEN: gh_token,
                         },
                         timeoutMs: ISSUE_SOLVE_TIMEOUT_MS,
