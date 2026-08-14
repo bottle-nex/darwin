@@ -3,15 +3,13 @@
 import { motion, useInView, useReducedMotion } from "motion/react";
 import { useRef } from "react";
 import Reveal from "../utility/Reveal";
-import AgentCard from "./bento/AgentCard";
-import BoardCard from "./bento/BoardCard";
-import PullRequestCard from "./bento/PullRequestCard";
-import RunnerCard from "./bento/RunnerCard";
+import BentoCard from "./bento/BentoCard";
+import LandingSection from "./LandingSection";
 
 const CARDS_SETTLED_MS = 900;
 const LIGHT_STAGGER_MS = 150;
 
-const CARDS = [BoardCard, AgentCard, RunnerCard, PullRequestCard];
+const CARDS = [0, 1, 2, 3];
 
 const CONNECTOR_PATHS = [
     "M149.5 436 V530 Q149.5 544 163.5 544 H446.5 Q460.5 544 460.5 530 V508",
@@ -63,36 +61,34 @@ export default function RevampBentoCards() {
     const lit = Boolean(reduceMotion) || rowInView;
 
     return (
-        <section className="w-full bg-ink pb-28">
-            <div className="mx-auto w-full max-w-7xl px-6">
-                <p className="max-w-4xl indent-24 text-[2.5rem] leading-tight tracking-tight">
-                    <span className="text-snow">Four stages, every issue. </span>
-                    <span className="text-neutral-500">
-                        The board hands it off, an agent picks it up, a sandboxed runner proves it
-                        works.
-                    </span>
-                </p>
-                <div className="relative mt-10">
-                    <ProcessConnectors />
-                    <div
-                        ref={rowRef}
-                        className="relative grid grid-cols-1 gap-6 md:grid-cols-4 md:gap-3 md:pt-13 md:pb-12"
-                    >
-                        {CARDS.map((Card, i) => (
-                            <Reveal
-                                key={Card.name}
-                                delay={i * 0.1}
-                                className={i % 2 === 1 ? "md:mt-18" : undefined}
-                            >
-                                <Card
-                                    lit={lit}
-                                    litDelay={CARDS_SETTLED_MS + i * LIGHT_STAGGER_MS}
-                                />
-                            </Reveal>
-                        ))}
-                    </div>
+        <LandingSection>
+            <p className="max-w-4xl indent-24 text-[2.5rem] leading-tight tracking-tight">
+                <span className="text-snow">Four stages, every issue. </span>
+                <span className="text-neutral-500">
+                    The board hands it off, an agent picks it up, a sandboxed runner proves it
+                    works.
+                </span>
+            </p>
+            <div className="relative mt-16">
+                <ProcessConnectors />
+                <div
+                    ref={rowRef}
+                    className="relative grid grid-cols-1 gap-6 md:grid-cols-4 md:gap-3 md:pt-13 md:pb-12"
+                >
+                    {CARDS.map((i) => (
+                        <Reveal
+                            key={i}
+                            delay={i * 0.1}
+                            className={i % 2 === 1 ? "md:mt-18" : undefined}
+                        >
+                            <BentoCard
+                                lit={lit}
+                                litDelay={CARDS_SETTLED_MS + i * LIGHT_STAGGER_MS}
+                            />
+                        </Reveal>
+                    ))}
                 </div>
             </div>
-        </section>
+        </LandingSection>
     );
 }

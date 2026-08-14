@@ -197,6 +197,13 @@
     border-radius: calc(var(--panel-squeeze) * var(--panel-radius));
 }
 
+/* Registered so `lit-sweep` can transition how far the light reaches, not just its opacity. */
+@property --lit-spread {
+    syntax: "<percentage>";
+    inherits: false;
+    initial-value: 0%;
+}
+
 @layer utilities {
     .grain {
         background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='linear' slope='0.12'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
@@ -297,12 +304,35 @@
     }
 
     .lit-edge.is-lit::after {
-        opacity: 1;
+        opacity: var(--lit-intensity, 1);
+    }
+
+    /* Variant: the light grows out of the top-left corner instead of fading in place. */
+    .lit-edge.lit-sweep::after {
+        background: radial-gradient(
+            var(--lit-spread) var(--lit-spread) at 0% 0%,
+            rgba(255, 255, 255, 0.34) 0%,
+            rgba(255, 255, 255, 0.16) 34%,
+            rgba(255, 255, 255, 0.05) 66%,
+            transparent 100%
+        );
+        transition:
+            opacity 800ms ease-out var(--lit-delay, 0ms),
+            --lit-spread 1800ms cubic-bezier(0.22, 1, 0.36, 1) var(--lit-delay, 0ms);
+    }
+
+    .lit-edge.lit-sweep.is-lit::after {
+        --lit-spread: 120%;
     }
 
     @media (prefers-reduced-motion: reduce) {
         .lit-edge::after {
             transition: none;
+        }
+
+        .lit-edge.lit-sweep::after {
+            transition: none;
+            --lit-spread: 120%;
         }
     }
 

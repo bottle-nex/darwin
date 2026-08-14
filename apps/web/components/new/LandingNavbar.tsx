@@ -17,6 +17,7 @@ import {
 import { DottedArrowRight } from "@/lib/svgs/svgs";
 import { Button } from "../ui/button";
 import { MdChevronRight } from "react-icons/md";
+import { landingContainer } from "../revamp/LandingSection";
 
 const MotionLink = motion.create(Link);
 
@@ -105,7 +106,7 @@ export function LandingNavbar() {
                 scrolled ? "border-b border-graphite bg-ink" : "border-b border-transparent",
             )}
         >
-            <div className="mx-auto max-w-7xl px-6 flex h-full items-center justify-between">
+            <div className={cn(landingContainer, "flex h-full items-center justify-between")}>
                 <Link href="/" aria-label="try matcha home" className="text-snow">
                     <AppLogo size={20} iconOnly />
                 </Link>

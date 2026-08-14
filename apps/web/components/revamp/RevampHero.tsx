@@ -1,11 +1,13 @@
 import Image from "next/image";
 import { Button } from "../ui/button";
 import { MdChevronRight } from "react-icons/md";
+import { cn } from "@/lib/utils";
+import { landingContainer } from "./LandingSection";
 
 export default function RevampHero() {
     return (
-        <main className="relative min-h-screen w-screen bg-ink">
-            <section className="mx-auto w-full max-w-7xl mt-68 h-fit space-y-6">
+        <main className="relative min-h-screen w-screen bg-ink pb-20">
+            <section className={cn(landingContainer, "mt-68 h-fit space-y-6")}>
                 <div className="text-snow text-5xl w-[70%]">
                     Lorem ipsum dolor, sit amet consectetur adipisicing elit. Sequi
                 </div>
@@ -23,13 +25,15 @@ export default function RevampHero() {
                     </span>
                 </div>
             </section>
-            <section className="mx-auto w-full max-w-7xl relative h-[80vh] mt-12">
-                <Image
-                    src={"/landing/hero.jpg"}
-                    alt="something"
-                    fill
-                    className="object-cover rounded-[10px]"
-                />
+            <section className={cn(landingContainer, "mt-16")}>
+                <div className="relative h-[80vh]">
+                    <Image
+                        src={"/landing/hero.jpg"}
+                        alt="something"
+                        fill
+                        className="object-cover rounded-[10px]"
+                    />
+                </div>
             </section>
         </main>
     );

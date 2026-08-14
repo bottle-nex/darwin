@@ -7,6 +7,7 @@ import { LuSquareKanban, LuSquareTerminal } from "react-icons/lu";
 import { cn } from "@/lib/utils";
 import HeroBuddy from "@/components/landing/v2/HeroBuddy";
 import Reveal from "../utility/Reveal";
+import LandingSection from "./LandingSection";
 import IsoChip, { DEPTH, HALF_H, HALF_W } from "./stack/IsoChip";
 
 const CHIP_X = 310;
@@ -208,70 +209,68 @@ export default function RevampPlatformStack() {
     const [highlighted, setHighlighted] = useState<GhostLayerId | null>(null);
 
     return (
-        <section className="w-full bg-ink pb-28">
-            <div className="mx-auto w-full max-w-7xl px-6">
-                <Reveal>
-                    <p className="max-w-4xl indent-24 text-[2.5rem] leading-tight tracking-tight">
-                        <span className="text-snow">One machine, assembled in layers. </span>
-                        <span className="text-neutral-500">
-                            The board collects the work, an agent carries it, and sandboxed runners
-                            prove it. Pull the stack apart and every layer clicks into the next.
-                        </span>
-                    </p>
-                </Reveal>
+        <LandingSection>
+            <Reveal>
+                <p className="max-w-4xl indent-24 text-[2.5rem] leading-tight tracking-tight">
+                    <span className="text-snow">One machine, assembled in layers. </span>
+                    <span className="text-neutral-500">
+                        The board collects the work, an agent carries it, and sandboxed runners
+                        prove it. Pull the stack apart and every layer clicks into the next.
+                    </span>
+                </p>
+            </Reveal>
 
-                <Reveal delay={0.15} className="mt-14">
-                    <div className="grid grid-cols-1 border border-white/5 rounded-[10px] md:grid-cols-[minmax(0,1fr)_minmax(0,1.45fr)_minmax(0,1fr)]">
-                        <div className="flex flex-col max-md:border-b max-md:border-white/5 md:border-r md:border-white/5">
-                            <GhostLayerBlock
-                                layer={BOARD_LAYER}
-                                onHoverChange={setHighlighted}
-                                className="border-b border-white/5"
-                            />
-                            <GhostLayerBlock
-                                layer={RUNNER_LAYER}
-                                onHoverChange={setHighlighted}
-                                className="justify-end"
-                            />
-                        </div>
+            <Reveal delay={0.15} className="mt-16">
+                <div className="grid grid-cols-1 border border-white/5 rounded-[10px] md:grid-cols-[minmax(0,1fr)_minmax(0,1.45fr)_minmax(0,1fr)]">
+                    <div className="flex flex-col max-md:border-b max-md:border-white/5 md:border-r md:border-white/5">
+                        <GhostLayerBlock
+                            layer={BOARD_LAYER}
+                            onHoverChange={setHighlighted}
+                            className="border-b border-white/5"
+                        />
+                        <GhostLayerBlock
+                            layer={RUNNER_LAYER}
+                            onHoverChange={setHighlighted}
+                            className="justify-end"
+                        />
+                    </div>
 
-                        <figure className="order-first px-4 py-10 md:order-none md:px-6 md:py-8">
-                            <StackDiagram highlighted={highlighted} />
-                        </figure>
+                    <figure className="order-first px-4 py-10 md:order-0 md:px-6 md:py-8">
+                        <StackDiagram highlighted={highlighted} />
+                    </figure>
 
-                        <aside className="relative flex items-center p-8 max-md:border-t max-md:border-white/5 md:p-10 md:pl-6">
+                    <aside className="relative flex items-center p-8 max-md:border-t max-md:border-white/5 md:p-10 md:pl-6">
+                        <span
+                            aria-hidden
+                            className="absolute inset-y-0 left-8 w-px bg-white/5 md:left-6"
+                        />
+                        <div className="relative flex-1 pl-10">
                             <span
                                 aria-hidden
-                                className="absolute inset-y-0 left-8 w-px bg-white/5 md:left-6"
+                                className="absolute -top-4 -right-8 left-0 h-px bg-white/5 md:-right-10"
                             />
-                            <div className="relative flex-1 pl-10">
-                                <span
-                                    aria-hidden
-                                    className="absolute -top-4 -right-8 left-0 h-px bg-white/5 md:-right-10"
-                                />
-                                <span
-                                    aria-hidden
-                                    className="absolute -right-8 -bottom-4 left-0 h-px bg-white/5 md:-right-10"
-                                />
-                                <span
-                                    aria-hidden
-                                    className="absolute -inset-y-4 -left-px w-0.5 rounded-full bg-primary"
-                                />
-                                <HeroBuddy className="size-6 -my-1" move={false} />
-                                <h3 className="mt-5 text-base font-medium tracking-[0.16em] text-snow uppercase">
-                                    The agent works it
-                                </h3>
-                                <p className="mt-4 max-w-sm text-[0.8125rem] leading-relaxed text-neutral-400">
-                                    An agent claims the card and reads your repo before touching a
-                                    line — your conventions, your structure, the blast radius of the
-                                    change. It writes the fix the way your team would, proves it on
-                                    a runner, and comes back with a pull request.
-                                </p>
-                            </div>
-                        </aside>
-                    </div>
-                </Reveal>
-            </div>
-        </section>
+                            <span
+                                aria-hidden
+                                className="absolute -right-8 -bottom-4 left-0 h-px bg-white/5 md:-right-10"
+                            />
+                            <span
+                                aria-hidden
+                                className="absolute -inset-y-4 -left-px w-0.5 rounded-full bg-primary"
+                            />
+                            <HeroBuddy className="size-6 -my-1" move={false} />
+                            <h3 className="mt-5 text-base font-medium tracking-[0.16em] text-snow uppercase">
+                                The agent works it
+                            </h3>
+                            <p className="mt-4 max-w-sm text-[0.8125rem] leading-relaxed text-neutral-400">
+                                An agent claims the card and reads your repo before touching a line
+                                — your conventions, your structure, the blast radius of the change.
+                                It writes the fix the way your team would, proves it on a runner,
+                                and comes back with a pull request.
+                            </p>
+                        </div>
+                    </aside>
+                </div>
+            </Reveal>
+        </LandingSection>
     );
 }
