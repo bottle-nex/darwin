@@ -14,10 +14,10 @@ export default function Home() {
             className="relative min-h-screen w-screen flex flex-col bg-ink pb-6"
         >
             {/* <DitherHero /> */}
-            <LandingNavbar/>
+            <LandingNavbar />
             {/* <RevampAiEra /> */}
             <RevampHero />
-            <RevampIntegrations/>
+            <RevampIntegrations />
             <RevampPlatformStack />
             <RevampIssueTracker />
             {/* <RevampBentoCards /> */}
