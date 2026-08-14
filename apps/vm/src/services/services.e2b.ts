@@ -3,6 +3,9 @@ import { ENV } from "../conf/config.env";
 import GithubService from "./service.github";
 import SecretService from "./service.secret";
 import PlanService from "./services.plan";
+import GraphService, { type GraphBuild } from "./service.graph";
+import ClaudeRun from "./service.claude_run";
+import SandboxStream, { redact } from "./service.sandbox_stream";
 import { sign_worker_jwt } from "./service.jwt";
 import IssueSolver, { type ClaimedIssue } from "./service.issue_solver";
 import Logger, { format_duration } from "@trymatcha/logger";
@@ -22,13 +25,6 @@ const ISSUE_PROMPT_PATH = "/home/user/issue_prompt.txt";
 const MCP_CONFIG_PATH = "/home/user/matcha_mcp_config.json";
 const SANDBOX_MCP_ENTRY = "/opt/matcha/sandbox-mcp/index.js";
 const ISSUE_SOLVE_TIMEOUT_MS = 30 * 60_000;
-
-interface AgentReport {
-    result?: string;
-    total_cost_usd: number;
-    duration_ms: number;
-    num_turns: number;
-}
 
 export default class E2B {
     public static async run_onboarding_job(
@@ -61,7 +57,14 @@ export default class E2B {
                 data: { sandboxId: sandbox_id, status: "Cloning" },
             });
 
-            await E2B.clone_repo(sandbox_id, github_repo_url, branch, installation_id, project_id);
+            await E2B.clone_repo(
+                sandbox_id,
+                github_repo_url,
+                branch,
+                installation_id,
+                project_id,
+                log,
+            );
             const commit_sha = await E2B.head_commit(sandbox_id);
             log.info("repo cloned", { commit: commit_sha.slice(0, 7) });
 
@@ -70,8 +73,22 @@ export default class E2B {
                 data: { status: "Detecting" },
             });
 
-            const brief = await PlanService.generate_plan(sandbox_id);
-            await PlanService.set_plan(project_id, brief.planMd, commit_sha);
+            console.log("cloned the repo and now generating the brief for the repo");
+            // const brief = await PlanService.generate_plan(sandbox_id);
+            // console.log(chalk.green("brief is : "), brief);
+            // await PlanService.set_plan(project_id, brief.planMd, commit_sha);
+            // await ConsumptionLog.record({
+            //     stage: "onboard",
+            //     phase: "brief",
+            //     repo: github_repo_url,
+            //     issue: "—",
+            //     model: brief.model,
+            //     effort: brief.effort,
+            //     cost_usd: brief.costUsd,
+            //     num_turns: brief.numTurns,
+            //     duration_ms: brief.durationMs,
+            //     outcome: `brief generated @ ${commit_sha.slice(0, 7)}`,
+            // });
 
             await prisma.setupSession.update({
                 where: { id: session_id },
@@ -133,8 +150,6 @@ export default class E2B {
             include: { project: { include: { githubInstallation: true } } },
         });
 
-        console.log("worker found is : ", worker);
-
         const { project } = worker;
         if (!project.githubRepoUrl || !project.githubDefaultBranch || !project.githubInstallation) {
             log.error(
@@ -167,7 +182,14 @@ export default class E2B {
                 });
 
                 log.info("cloning repo into sandbox", { repo: repo_url });
-                await E2B.clone_repo(sandbox_id, repo_url, branch, installation_id, project.id);
+                await E2B.clone_repo(
+                    sandbox_id,
+                    repo_url,
+                    branch,
+                    installation_id,
+                    project.id,
+                    log,
+                );
                 log.info("clone complete");
             } else {
                 log.info("reusing live sandbox", { sandbox: sandbox_id });
@@ -214,31 +236,36 @@ export default class E2B {
                     break;
                 }
 
-                log.step(`issue #${issue.number} pushed into sandbox`, { title: issue.title });
-                await sandbox.files.write(ISSUE_PROMPT_PATH, E2B.build_issue_prompt(issue, branch));
+                // Rebuilt per issue rather than stored: the graph is derived data, and building
+                // it here means it describes the code as it stands now — including anything an
+                // earlier issue in this same loop already changed.
+                const graph = await E2B.build_graph_for_issue(sandbox, log);
 
-                log.info(`invoking claude for issue #${issue.number}`, { model, effort });
-                const result = await sandbox.commands.run(
-                    `claude -p "$(cat ${ISSUE_PROMPT_PATH})" --model ${model} --effort ${effort} ` +
-                        `--mcp-config ${MCP_CONFIG_PATH} --output-format json --permission-mode bypassPermissions`,
-                    {
-                        cwd: REPO_DIR,
-                        envs: {
-                            ANTHROPIC_API_KEY: ENV.SERVER_ANTHROPIC_API_KEY,
-                            GH_TOKEN: gh_token,
-                        },
-                        timeoutMs: ISSUE_SOLVE_TIMEOUT_MS,
-                    },
+                log.step(`issue #${issue.number} pushed into sandbox`, { title: issue.title });
+                await sandbox.files.write(
+                    ISSUE_PROMPT_PATH,
+                    E2B.build_issue_prompt(issue, branch, project.planMd, graph),
                 );
 
-                let report: AgentReport;
-                try {
-                    report = JSON.parse(result.stdout);
-                } catch {
-                    throw new Error(
-                        `solving agent did not return JSON for issue #${issue.number}: ${result.stderr}`,
-                    );
-                }
+                log.info(`invoking claude for issue #${issue.number}`, {
+                    model,
+                    effort,
+                    brief: project.planMd ? "included" : "absent",
+                    graph: graph ? "included" : "absent",
+                });
+
+                const report = await ClaudeRun.execute(sandbox, log, {
+                    prompt_path: ISSUE_PROMPT_PATH,
+                    model,
+                    effort,
+                    extra_flags: [`--mcp-config ${MCP_CONFIG_PATH}`],
+                    envs: {
+                        ANTHROPIC_API_KEY: ENV.SERVER_ANTHROPIC_API_KEY,
+                        GH_TOKEN: gh_token,
+                    },
+                    timeout_ms: ISSUE_SOLVE_TIMEOUT_MS,
+                    label: `solving agent for issue #${issue.number}`,
+                });
 
                 log.success(`issue #${issue.number} run finished`, {
                     turns: report.num_turns,
@@ -288,14 +315,49 @@ export default class E2B {
         }
     }
 
-    private static build_issue_prompt(issue: ClaimedIssue, base_branch: string): string {
-        return `You are an autonomous coding agent working inside a fresh clone of this repository at ${REPO_DIR}, currently on branch "${base_branch}".
+    /**
+     * Build the code graph for the issue about to be solved.
+     *
+     * Never throws: the graph is an accelerator, not a prerequisite. If graphify fails the issue
+     * is still solvable, just more expensively, so the failure is logged and the run continues
+     * without a graph section in the prompt.
+     */
+    private static async build_graph_for_issue(
+        sandbox: Sandbox,
+        log: Logger,
+    ): Promise<GraphBuild | null> {
+        try {
+            const result = await sandbox.commands.run("git rev-parse HEAD", { cwd: REPO_DIR });
+            return await GraphService.build(sandbox, result.stdout.trim(), log);
+        } catch (error) {
+            log.error("code graph build failed — solving without one", error);
+            return null;
+        }
+    }
 
-## Issue #${issue.number}: ${issue.title}
+    private static build_issue_prompt(
+        issue: ClaimedIssue,
+        base_branch: string,
+        plan_md: string | null,
+        graph: GraphBuild | null,
+    ): string {
+        const intro = `You are an autonomous coding agent working inside a fresh clone of this repository at ${REPO_DIR}, currently on branch "${base_branch}".`;
 
-${issue.description}
+        const brief = plan_md
+            ? `## Project brief
 
-## What to do, in this exact order
+An earlier agent explored this repository and wrote the brief below. Lean on it to orient yourself instead of rediscovering the layout from scratch. It was written against an earlier commit, so confirm anything you depend on before acting on it.
+
+${plan_md}`
+            : null;
+
+        const graph_section = graph ? GraphService.prompt_section(graph) : null;
+
+        const issue_section = `## Issue #${issue.number}: ${issue.title}
+
+${issue.description}`;
+
+        const steps = `## What to do, in this exact order
 
 1. Create a new git branch off "${base_branch}" (never commit directly to "${base_branch}"). Pick a short, descriptive branch name.
 2. Implement the fix using your normal tools.
@@ -303,7 +365,11 @@ ${issue.description}
 4. Push the branch and open a pull request against "${base_branch}" using the gh CLI (already authenticated via GH_TOKEN). Write a clear PR title and description referencing issue #${issue.number}.
 5. Call the report_pr_opened MCP tool with issue_id "${issue.id}", the PR URL, the branch name, and a one-sentence summary of the change.
 
-Do all of this yourself with your Bash tool — you have full permissions in this sandbox.`;
+Do all of this yourself with your Bash tool — you have full permissions in this sandbox.
+
+Never start a long-running command in the background and end your turn waiting on it. This is a single non-interactive run: there is no later turn to come back to, so anything left running when you stop is lost and the issue goes unsolved. Run it in the foreground and wait for it to finish.`;
+
+        return [intro, brief, graph_section, issue_section, steps].filter(Boolean).join("\n\n");
     }
 
     public static async head_commit(sandbox_id: string): Promise<string> {
@@ -355,6 +421,7 @@ Do all of this yourself with your Bash tool — you have full permissions in thi
         branch: string,
         installation_id: number,
         project_id: string,
+        log: Logger,
     ) {
         if (!SAFE_BRANCH.test(branch)) {
             throw new Error(`refusing to clone unsafe branch name: ${branch}`);
@@ -368,10 +435,30 @@ Do all of this yourself with your Bash tool — you have full permissions in thi
         const sandbox = await Sandbox.connect(sandbox_id, { apiKey: ENV.SERVER_E2B_API_KEY });
         const clone_url = repo_url.replace("https://", `https://x-access-token:${token}@`);
 
-        await sandbox.commands.run(
-            `git clone --depth 1 --branch ${branch} --single-branch ${clone_url} ${REPO_DIR}`,
-            { timeoutMs: CLONE_TIMEOUT_MS },
-        );
+        // `--progress` because git only reports progress when stderr is a terminal, and here it
+        // never is — without it a ten-minute clone is silent, which is the thing being fixed.
+        //
+        // Both the stream and the failure path are redacted. `clone_url` carries a live
+        // installation token and git echoes the whole URL back in its own fatal messages, which
+        // run_worker_loop then writes into worker.contextSummary — so an unredacted clone
+        // failure puts a working credential in the database, not just on screen.
+        const stream = SandboxStream.plain(log, [token]);
+        try {
+            await sandbox.commands.run(
+                `git clone --progress --depth 1 --branch ${branch} --single-branch ${clone_url} ${REPO_DIR}`,
+                {
+                    timeoutMs: CLONE_TIMEOUT_MS,
+                    onStdout: stream.onStdout,
+                    onStderr: stream.onStderr,
+                },
+            );
+        } catch (error) {
+            throw new Error(
+                redact(error instanceof Error ? error.message : String(error), [token]),
+            );
+        } finally {
+            stream.flush();
+        }
 
         const env_file = Object.entries(secrets)
             .map(([key, value]) => `${key}=${value}`)

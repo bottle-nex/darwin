@@ -1,11 +1,11 @@
 import { Sandbox } from "e2b";
 import { PlanStatus, prisma } from "@trymatcha/database";
 import { ENV } from "../conf/config.env";
+import ClaudeRun from "./service.claude_run";
 import Logger, { format_duration } from "@trymatcha/logger";
 
 const log = Logger.scope("plan");
 
-const REPO_DIR = "/home/user/repo";
 const PROMPT_PATH = "/home/user/brief_prompt.txt";
 const AGENT_TIMEOUT_MS = 10 * 60_000;
 
@@ -30,13 +30,6 @@ Terms that carry project-specific meaning, and what they refer to in the code.
 
 Rules: describe only what you verified by reading files — never guess at a command or a convention. Cite file paths so the agent can jump straight there. Be specific and dense; skip preamble and closing remarks. Output the markdown document and nothing else.`;
 
-interface AgentReport {
-    result?: string;
-    total_cost_usd: number;
-    duration_ms: number;
-    num_turns: number;
-}
-
 export interface BriefRun {
     planMd: string;
     model: string;
@@ -54,22 +47,16 @@ export default class PlanService {
         const model = ENV.SERVER_BRIEF_MODEL;
         const effort = ENV.SERVER_BRIEF_EFFORT;
         log.step("generating project brief", { model, effort });
-        const result = await sandbox.commands.run(
-            `claude -p "$(cat ${PROMPT_PATH})" --model ${model} --effort ${effort} ` +
-                `--output-format json --tools "Read,Glob,Grep,Bash" --permission-mode bypassPermissions`,
-            {
-                cwd: REPO_DIR,
-                envs: { ANTHROPIC_API_KEY: ENV.SERVER_ANTHROPIC_API_KEY },
-                timeoutMs: AGENT_TIMEOUT_MS,
-            },
-        );
+        const report = await ClaudeRun.execute(sandbox, log, {
+            prompt_path: PROMPT_PATH,
+            model,
+            effort,
+            extra_flags: [`--tools "Read,Glob,Grep,Bash"`],
+            envs: { ANTHROPIC_API_KEY: ENV.SERVER_ANTHROPIC_API_KEY },
+            timeout_ms: AGENT_TIMEOUT_MS,
+            label: "onboarding agent",
+        });
 
-        let report: AgentReport;
-        try {
-            report = JSON.parse(result.stdout);
-        } catch {
-            throw new Error(`onboarding agent did not return JSON: ${result.stderr}`);
-        }
         log.success("brief generated", {
             turns: report.num_turns,
             cost_usd: report.total_cost_usd.toFixed(4),
@@ -78,7 +65,7 @@ export default class PlanService {
 
         const plan_md = report.result?.trim();
         if (!plan_md) {
-            throw new Error(`onboarding agent produced an empty brief: ${result.stderr}`);
+            throw new Error("onboarding agent produced an empty brief");
         }
         log.block("project brief", plan_md);
 
