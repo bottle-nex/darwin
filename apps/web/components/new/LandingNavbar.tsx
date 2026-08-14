@@ -160,7 +160,7 @@ export function LandingNavbar() {
                                                         whileHover="hover"
                                                         className="group relative flex items-start gap-x-3 rounded-[8px] p-2.5 hover:bg-graphite"
                                                     >
-                                                        <span className="relative flex size-9 shrink-0 items-center justify-center rounded-lg bg-graphite text-mist/50 transition-colors duration-200 group-hover:bg-primary/15 group-hover:text-primary">
+                                                        <span className="relative flex size-9 shrink-0 items-center justify-center rounded-[6px] bg-graphite text-mist/50 transition-colors duration-200 group-hover:bg-primary/15 group-hover:text-primary">
                                                             <link.icon className="size-5" />
                                                         </span>
                                                         <span className="relative flex flex-col gap-y-0.5">

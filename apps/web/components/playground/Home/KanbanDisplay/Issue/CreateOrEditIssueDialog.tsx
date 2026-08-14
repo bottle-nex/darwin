@@ -20,8 +20,6 @@ function CreateIssue({ target }: { target: IssueTarget }) {
     const projectId = useActiveProject()?.id;
     const { data: templates } = useListTemplates(projectId);
 
-    // Renders immediately; the default template (if any) is applied to the
-    // still-empty body once the templates call resolves in the background.
     const defaultTemplate = templates?.find((template) => template.isDefault);
     return <IssueForm target={target} issue={null} initialTemplate={defaultTemplate} />;
 }

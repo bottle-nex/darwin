@@ -525,7 +525,7 @@ function BranchingDiagram() {
                             strokeWidth={1.5}
                         />
                         <image
-                            href="/images/founders/rishi.jpg"
+                            href="/images/user.png"
                             x={935}
                             y={187}
                             width={42}

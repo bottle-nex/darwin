@@ -190,20 +190,10 @@ export default function IssueForm({
                             onChange={body.onEditorChange}
                         />
                     </section>
-                    <section className="h-fit flex items-center justify-between gap-x-20">
-                        <div className="flex items-start justify-center gap-x-1 text-xs text-white/70">
-                            <LuInfo className="mt-0.75" size={10} />
-                            <span className="">
-                                The more you tell the agent, the better it solves this. Detail costs
-                                you a minute and saves it a wrong guess.
-                            </span>
-                        </div>
+                    <section className="h-fit flex items-center justify-end gap-x-20">
                         <div className="flex items-center justify-end gap-x-2 ">
                             {!isEdit && !isCustom && <BodyGate body={body} />}
-                            <Button variant={"tertiary"} onClick={close} disabled={pending}>
-                                Cancel
-                            </Button>
-                            <Button onClick={handleSubmit} loading={pending} disabled={!canSubmit}>
+                            <Button className="rounded-full" variant={'tertiary'} onClick={handleSubmit} loading={pending} disabled={!canSubmit}>
                                 {isEdit ? "Save" : "Create Issue"}
                             </Button>
                         </div>

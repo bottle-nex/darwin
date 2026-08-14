@@ -6,15 +6,19 @@ interface LenisProviderProps {
     children: React.ReactNode;
 }
 
+const easeOutExpo = (t: number) => (t === 1 ? 1 : 1 - Math.pow(2, -10 * t));
+
 export default function LenisProvider({ children }: LenisProviderProps) {
     return (
         <ReactLenis
             root
             options={{
-                lerp: 0.075,
-                wheelMultiplier: 1.15,
-                touchMultiplier: 1.8,
+                duration: 1.4,
+                easing: easeOutExpo,
+                wheelMultiplier: 1,
+                touchMultiplier: 1.5,
                 smoothWheel: true,
+                syncTouch: true,
             }}
         >
             {children}
