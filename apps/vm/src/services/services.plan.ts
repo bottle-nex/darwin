@@ -52,7 +52,7 @@ export default class PlanService {
             model,
             effort,
             extra_flags: [`--tools "Read,Glob,Grep,Bash"`],
-            envs: { ANTHROPIC_API_KEY: ENV.SERVER_ANTHROPIC_API_KEY },
+            envs: { CLAUDE_CODE_OAUTH_TOKEN: ENV.SERVER_CLAUDE_CODE_OAUTH_TOKEN },
             timeout_ms: AGENT_TIMEOUT_MS,
             label: "onboarding agent",
         });

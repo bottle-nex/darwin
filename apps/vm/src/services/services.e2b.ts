@@ -260,7 +260,7 @@ export default class E2B {
                     effort,
                     extra_flags: [`--mcp-config ${MCP_CONFIG_PATH}`],
                     envs: {
-                        ANTHROPIC_API_KEY: ENV.SERVER_ANTHROPIC_API_KEY,
+                        CLAUDE_CODE_OAUTH_TOKEN: ENV.SERVER_CLAUDE_CODE_OAUTH_TOKEN,
                         GH_TOKEN: gh_token,
                     },
                     timeout_ms: ISSUE_SOLVE_TIMEOUT_MS,
