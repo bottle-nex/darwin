@@ -1,50 +1,17 @@
 "use client";
 
 import { motion, useInView, useReducedMotion } from "motion/react";
-import { useRef, type CSSProperties } from "react";
-import { cn } from "@/lib/utils";
+import { useRef } from "react";
 import Reveal from "../utility/Reveal";
+import AgentCard from "./bento/AgentCard";
+import BoardCard from "./bento/BoardCard";
+import PullRequestCard from "./bento/PullRequestCard";
+import RunnerCard from "./bento/RunnerCard";
 
 const CARDS_SETTLED_MS = 900;
 const LIGHT_STAGGER_MS = 150;
 
-type ProcessStep = {
-    number: string;
-    title: string;
-    description: string;
-    surface: string;
-};
-
-const PROCESS_STEPS: ProcessStep[] = [
-    {
-        number: "1",
-        title: "File an issue",
-        description:
-            "Drop it on the board your team already plans on. Scope it the way you'd brief a teammate: what's broken, what good looks like, and anything the code won't tell you on its own.",
-        surface: "bg-white/2",
-    },
-    {
-        number: "2",
-        title: "An agent claims it",
-        description:
-            "It pulls the card and reads the repo before touching a single line, learning your conventions, your structure, and the blast radius of the change. Then it plans the work.",
-        surface: "bg-white/6",
-    },
-    {
-        number: "3",
-        title: "The work gets verified",
-        description:
-            "Sandboxed compute clones your project and makes the change against the real thing. The build runs. The tests run. Nothing moves forward until they pass.",
-        surface: "bg-white/2",
-    },
-    {
-        number: "4",
-        title: "You review the PR",
-        description:
-            "The diff and the reasoning land in your repo as a pull request. Approve it, or send it back with notes. Nothing merges itself.",
-        surface: "bg-white/8",
-    },
-];
+const CARDS = [BoardCard, AgentCard, RunnerCard, PullRequestCard];
 
 const CONNECTOR_PATHS = [
     "M149.5 436 V530 Q149.5 544 163.5 544 H446.5 Q460.5 544 460.5 530 V508",
@@ -89,39 +56,6 @@ function ProcessConnectors() {
     );
 }
 
-function ProcessCard({
-    step,
-    className,
-    lit,
-    litDelay,
-}: {
-    step: ProcessStep;
-    className?: string;
-    lit: boolean;
-    litDelay: number;
-}) {
-    return (
-        <div
-            style={{ "--lit-delay": `${litDelay}ms` } as CSSProperties}
-            className={cn(
-                "lit-edge relative flex h-full flex-col justify-between rounded-[10px] bg-linear-to-br from-white/5 to-transparent p-8 md:h-96",
-                lit && "is-lit",
-                className,
-            )}
-        >
-            <span className="text-[2.25rem] leading-none font-light text-snow/70">
-                {step.number}
-            </span>
-            <div>
-                <h3 className="text-xl leading-snug text-snow">{step.title}</h3>
-                <p className="mt-3 text-[0.8125rem] leading-relaxed text-neutral-500">
-                    {step.description}
-                </p>
-            </div>
-        </div>
-    );
-}
-
 export default function RevampBentoCards() {
     const rowRef = useRef<HTMLDivElement>(null);
     const reduceMotion = useReducedMotion();
@@ -144,15 +78,13 @@ export default function RevampBentoCards() {
                         ref={rowRef}
                         className="relative grid grid-cols-1 gap-6 md:grid-cols-4 md:gap-3 md:pt-13 md:pb-12"
                     >
-                        {PROCESS_STEPS.map((step, i) => (
+                        {CARDS.map((Card, i) => (
                             <Reveal
-                                key={step.number}
+                                key={Card.name}
                                 delay={i * 0.1}
                                 className={i % 2 === 1 ? "md:mt-18" : undefined}
                             >
-                                <ProcessCard
-                                    step={step}
-                                    className={step.surface}
+                                <Card
                                     lit={lit}
                                     litDelay={CARDS_SETTLED_MS + i * LIGHT_STAGGER_MS}
                                 />

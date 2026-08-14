@@ -105,7 +105,7 @@ export function LandingNavbar() {
                 scrolled ? "border-b border-graphite bg-ink" : "border-b border-transparent",
             )}
         >
-            <div className="mx-auto max-w-7xl flex h-full items-center justify-between">
+            <div className="mx-auto max-w-7xl px-6 flex h-full items-center justify-between">
                 <Link href="/" aria-label="try matcha home" className="text-snow">
                     <AppLogo size={20} iconOnly />
                 </Link>
@@ -193,7 +193,7 @@ export function LandingNavbar() {
                     <Button
                         variant={"tertiary"}
                         onClick={session ? handleRedirect : handleSignin}
-                        className="rounded-full"
+                        className="rounded-full pl-4! "
                     >
                         Get Started
                         <MdChevronRight className="text-background!" />
