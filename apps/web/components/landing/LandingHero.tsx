@@ -8,7 +8,7 @@ import ShowcaseFrame from "./showcase/ShowcaseFrame";
 
 export default function LandingHero() {
     return (
-        <main className="relative min-h-screen w-screen bg-ink pb-20">
+        <main className="relative min-h-screen w-screen pb-20">
             <section className={cn(landingContainer, "mt-55 h-fit space-y-3")}>
                 <BlurFade className="text-snow text-6xl w-[80%] font-headline">
                     Drop an issue on the board.
@@ -21,9 +21,9 @@ export default function LandingHero() {
                         sandboxed runner, and hand back a PR ready for review.
                     </BlurFade>
                     <span className="flex-1 flex justify-end gap-2">
-                        <Button variant={"tertiary"} className="text-graphite bg-snow">
+                        <Button variant={"tertiary"}>
                             Create Issue
-                            <MdChevronRight className="text-background!" />
+                            <MdChevronRight className="text-ink!" />
                         </Button>
                         <Button className="text-snow/80! bg-snow/10! pl-4 rounded-full">
                             Learn more

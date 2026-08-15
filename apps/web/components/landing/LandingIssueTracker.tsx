@@ -63,7 +63,7 @@ function BranchPill({
 function CheckDot({ x, y, delay }: { x: number; y: number; delay: number }) {
     return (
         <motion.g variants={pop(delay)} className={POP_ORIGIN}>
-            <circle cx={x} cy={y} r={10} fill="#AB9FF2" />
+            <circle cx={x} cy={y} r={10} fill="var(--color-primary)" />
             <path
                 d={`M${x - 4.5} ${y + 0.5}l3.5 3.5 6.5-7`}
                 stroke="#0a0a0a"
@@ -85,7 +85,7 @@ function JunctionDot({ x, y, delay }: { x: number; y: number; delay: number }) {
             cy={y}
             r={6}
             fill="#0a0a0a"
-            stroke="#AB9FF2"
+            stroke="var(--color-primary)"
             strokeWidth={2}
         />
     );
@@ -201,7 +201,7 @@ function ShootingStar({ y }: { y: number }) {
                 y1={y}
                 x2={1360}
                 y2={y}
-                stroke="#AB9FF2"
+                stroke="var(--color-primary)"
                 strokeOpacity={0.9}
                 strokeWidth={1.5}
             />
@@ -303,7 +303,7 @@ function BranchingDiagram() {
                             y1={2}
                             x2={0.5}
                             y2={22}
-                            stroke="#AB9FF2"
+                            stroke="var(--color-primary)"
                             strokeOpacity={0.55}
                             strokeWidth={1}
                         />
@@ -356,9 +356,9 @@ function BranchingDiagram() {
                         x2={0}
                         y2={0}
                     >
-                        <stop offset="0" stopColor="#AB9FF2" stopOpacity={0} />
-                        <stop offset="0.5" stopColor="#AB9FF2" stopOpacity={0.45} />
-                        <stop offset="1" stopColor="#AB9FF2" stopOpacity={0.85} />
+                        <stop offset="0" stopColor="var(--color-primary)" stopOpacity={0} />
+                        <stop offset="0.5" stopColor="var(--color-primary)" stopOpacity={0.45} />
+                        <stop offset="1" stopColor="var(--color-primary)" stopOpacity={0.85} />
                     </linearGradient>
                     <linearGradient
                         id="comet-core"
@@ -520,7 +520,7 @@ function BranchingDiagram() {
                         y1={290}
                         x2={1360}
                         y2={290}
-                        stroke="#AB9FF2"
+                        stroke="var(--color-primary)"
                         strokeOpacity={0.55}
                         strokeWidth={1.5}
                     />

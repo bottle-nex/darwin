@@ -67,7 +67,7 @@ const COMPONENTS: Components = {
         );
     },
     pre: ({ children }) => (
-        <pre className="my-3 overflow-x-auto rounded-md bg-black/30 p-3 leading-[1.6] shadow-[inset_0_1px_0_0_#262626]">
+        <pre className="my-3 overflow-x-auto rounded-md bg-black/30 p-3 leading-[1.6] shadow-[inset_0_1px_0_0_var(--color-edge)]">
             {children}
         </pre>
     ),

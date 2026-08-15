@@ -10,9 +10,9 @@ import parse_env from "@/lib/env_parser";
 export type EnvRow = { key: string; value: string };
 
 const FIELD =
-    "border-white/10 bg-white/5 text-neutral-200 placeholder:text-neutral-500 focus-visible:border-[#9bc24f] focus-visible:ring-[#9bc24f]/30";
+    "border-white/10 bg-white/5 text-neutral-200 placeholder:text-neutral-500 focus-visible:border-matcha focus-visible:ring-matcha/30";
 
-const SURFACE = "rounded-lg bg-white/5 shadow-[inset_0_1px_0_0_#262626]";
+const SURFACE = "rounded-lg bg-white/5 shadow-[inset_0_1px_0_0_var(--color-edge)]";
 
 export default function ProjectEnvStep({
     rows,

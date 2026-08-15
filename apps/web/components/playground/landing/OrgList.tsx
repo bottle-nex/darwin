@@ -8,7 +8,7 @@ import type { Organization } from "@/types/organization";
 import OrgListItem from "./OrgListItem";
 
 const FIELD =
-    "border-white/10 bg-white/5 text-[13px] text-neutral-300 hover:bg-white/7 focus-visible:border-[#9bc24f] focus-visible:ring-[#9bc24f]/30";
+    "border-white/10 bg-white/5 text-[13px] text-neutral-300 hover:bg-white/7 focus-visible:border-matcha focus-visible:ring-matcha/30";
 
 export default function OrgList({
     orgs,

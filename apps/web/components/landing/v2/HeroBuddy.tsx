@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import "./HeroBuddy.css";
 
-const BODY = "#AB9FF2";
+const BODY = "var(--color-primary)";
 const EYE = "#262626";
 const CAP = "#6C55DE";
 const SILK = "#CFC8F7";

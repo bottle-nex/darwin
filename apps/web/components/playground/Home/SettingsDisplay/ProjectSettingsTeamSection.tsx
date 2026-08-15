@@ -44,7 +44,7 @@ export default function ProjectSettingsTeamSection({
             </div>
 
             {project.teams.length === 0 ? (
-                <p className="rounded-lg bg-white/5 px-3 py-6 text-center text-[12px] text-neutral-500 shadow-[inset_0_1px_0_0_#262626]">
+                <p className="rounded-lg bg-white/5 px-3 py-6 text-center text-[12px] text-neutral-500 shadow-[inset_0_1px_0_0_var(--color-edge)]">
                     No teams yet.
                 </p>
             ) : (
@@ -52,7 +52,7 @@ export default function ProjectSettingsTeamSection({
                     {project.teams.map((t) => (
                         <div
                             key={t.id}
-                            className="group flex items-center gap-3 rounded-lg bg-white/5 px-3 py-2 shadow-[inset_0_1px_0_0_#262626]"
+                            className="group flex items-center gap-3 rounded-lg bg-white/5 px-3 py-2 shadow-[inset_0_1px_0_0_var(--color-edge)]"
                         >
                             <PlaygroundAvatar
                                 letter={t.name.trim().charAt(0).toUpperCase()}

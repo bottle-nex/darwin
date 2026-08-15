@@ -11,7 +11,7 @@ import { useSetProjectSecrets } from "@/hooks/project/useSetProjectSecrets";
 import { useDeleteProjectSecret } from "@/hooks/project/useDeleteProjectSecret";
 
 const FIELD =
-    "border-white/10 bg-white/5 text-neutral-200 placeholder:text-neutral-500 focus-visible:border-[#9bc24f] focus-visible:ring-[#9bc24f]/30";
+    "border-white/10 bg-white/5 text-neutral-200 placeholder:text-neutral-500 focus-visible:border-matcha focus-visible:ring-matcha/30";
 
 const KEY_PATTERN = /^[A-Za-z_][A-Za-z0-9_]*$/;
 
@@ -103,7 +103,7 @@ export default function ProjectSettingsEnvSection({
             </div>
 
             {/* Add / overwrite */}
-            <div className="rounded-lg bg-white/5 p-3 shadow-[inset_0_1px_0_0_#262626]">
+            <div className="rounded-lg bg-white/5 p-3 shadow-[inset_0_1px_0_0_var(--color-edge)]">
                 <div className="flex items-end gap-2">
                     <div className="flex-1">
                         <label className="text-[11px] text-neutral-500">Key</label>
@@ -182,7 +182,7 @@ export default function ProjectSettingsEnvSection({
                 {secrets.isLoading ? (
                     <p className="px-1 py-3 text-[13px] text-neutral-500">Loading…</p>
                 ) : list.length === 0 ? (
-                    <p className="rounded-lg bg-white/5 px-3 py-6 text-center text-[13px] text-neutral-500 shadow-[inset_0_1px_0_0_#262626]">
+                    <p className="rounded-lg bg-white/5 px-3 py-6 text-center text-[13px] text-neutral-500 shadow-[inset_0_1px_0_0_var(--color-edge)]">
                         No environment variables yet.
                     </p>
                 ) : (
@@ -193,7 +193,7 @@ export default function ProjectSettingsEnvSection({
                             return (
                                 <div
                                     key={s.key}
-                                    className="group flex items-center justify-between gap-3 rounded-lg bg-cement px-3 py-2 shadow-[inset_0_1px_0_0_#212122]"
+                                    className="group flex items-center justify-between gap-3 rounded-lg bg-cement px-3 py-2 shadow-[inset_0_1px_0_0_var(--color-edge)]"
                                 >
                                     <section>
                                         <div className="flex items-center justify-center gap-x-3">

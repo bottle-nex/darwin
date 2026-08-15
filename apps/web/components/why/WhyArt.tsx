@@ -2,7 +2,7 @@ import type { CSSProperties } from "react";
 
 const INK = "#1F2419";
 const GREEN = "#34D59A";
-const LAVENDER = "#AB9FF2";
+const LAVENDER = "var(--color-primary)";
 
 export const PLATE_BONE = "#EDE7DA";
 export const PLATE_MATCHA = "#DCE4CE";

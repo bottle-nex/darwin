@@ -45,7 +45,7 @@ export default function TemplatePicker({ projectId, onPick }: TemplatePickerProp
                 )}
                 <span className="min-w-0 flex-1 truncate">{template.name}</span>
                 {template.id === defaultId && (
-                    <MdStar className="size-3 shrink-0 text-[#9bc24f]" aria-label="Default" />
+                    <MdStar className="size-3 shrink-0 text-matcha" aria-label="Default" />
                 )}
             </CommandItem>
         );

@@ -18,7 +18,7 @@ export default function StepAgentsMd() {
     return (
         <>
             <StepItem>
-                <div className="max-w-md border-l-2 border-[#AB9FF2]/40 bg-[#0C0C0E] py-4 pl-5 font-mono text-[13px] leading-6 text-neutral-500">
+                <div className="max-w-md border-l-2 border-primary/40 bg-[#0C0C0E] py-4 pl-5 font-mono text-[13px] leading-6 text-neutral-500">
                     {SAMPLE_LINES.map((line, i) => (
                         <div key={i} className={line.startsWith("#") ? "text-neutral-300" : ""}>
                             {line || " "}

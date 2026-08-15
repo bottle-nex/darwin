@@ -67,7 +67,7 @@ function FadedTile({ tile, delay }: { tile: DockTile; delay: number }) {
                 <motion.span
                     key={z}
                     variants={fadeTo(presence * 0.85, delay)}
-                    className="absolute inset-0 rounded-2xl border border-white/[0.07] bg-[#151516]"
+                    className="absolute inset-0 rounded-2xl border border-white/[0.07] bg-cement"
                     style={{ ...soften, transform: `translateZ(${z + 1}px)` }}
                 />
             ))}
@@ -112,7 +112,7 @@ function MatchaTile() {
                         <motion.span
                             key={z}
                             variants={fadeTo(1, 0.7)}
-                            className="absolute inset-0 rounded-2xl border border-white/10 bg-[#0b0b0c]"
+                            className="absolute inset-0 rounded-2xl border border-white/10 bg-ink"
                             style={{ transform: `translateZ(${z}px)` }}
                         />
                     ))}
@@ -157,13 +157,13 @@ function DockScene() {
                             <motion.span
                                 key={z}
                                 variants={fadeTo(1, 0.1)}
-                                className="absolute inset-0 rounded-[22px] border border-white/6 bg-[#101011]"
+                                className="absolute inset-0 rounded-[22px] border border-white/6 bg-charcoal"
                                 style={{ transform: `translateZ(${z - STRIP_DEPTH}px)` }}
                             />
                         ))}
                         <motion.span
                             variants={fadeTo(1, 0.1)}
-                            className="absolute inset-0 rounded-[22px] border border-white/10 bg-[#1c1c1d] shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]"
+                            className="absolute inset-0 rounded-[22px] border border-white/10 bg-graphite shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]"
                         />
                         {DOCK_TILES.map((tile, i) =>
                             tile.icon ? (

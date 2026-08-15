@@ -37,7 +37,7 @@ export default function ProgressTrack({ activeStep }: { activeStep: number }) {
                 );
             })}
             <motion.span
-                className="absolute size-1.5 -translate-x-1/2 bg-[#AB9FF2]"
+                className="absolute size-1.5 -translate-x-1/2 bg-primary"
                 style={{ bottom: -3 }}
                 animate={{ left: `${flagLeft(markerIndex)}%` }}
                 transition={{ type: "spring", stiffness: 260, damping: 24 }}

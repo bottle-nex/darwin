@@ -14,7 +14,6 @@ import {
     PeopleIcon,
     type AnimatedIcon,
 } from "@/components/icons/AnimatedIcons";
-import { DottedArrowRight } from "@/lib/svgs/svgs";
 import { Button } from "../ui/button";
 import { MdChevronRight } from "react-icons/md";
 import { landingContainer } from "../landing/LandingSection";
@@ -193,7 +192,7 @@ export function LandingNavbar() {
 
                     <Button variant={"tertiary"} onClick={session ? handleRedirect : handleSignin}>
                         Get Started
-                        <MdChevronRight className="text-background!" />
+                        <MdChevronRight className="text-black" />
                     </Button>
                 </div>
             </div>

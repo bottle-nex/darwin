@@ -88,7 +88,7 @@ export function FlagSprite({ active, className }: { active: boolean; className?:
     return (
         <svg viewBox="0 0 8 12" shapeRendering="crispEdges" className={className} aria-hidden>
             <rect x="0" y="0" width="1" height="12" fill={active ? "#6E6E7A" : "#26262B"} />
-            <g fill={active ? "#AB9FF2" : "#1E1E23"}>
+            <g fill={active ? "var(--color-primary)" : "#1E1E23"}>
                 <rect x="1" y="1" width="5" height="1" />
                 <rect x="1" y="2" width="4" height="1" />
                 <rect x="1" y="3" width="2" height="1" />

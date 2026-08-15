@@ -1,6 +1,6 @@
 ---
 description: Write a Conventional Commit message (subject + body) from the current changes and commit immediately
-argument-hint: "[optional hint about intent]"
+argumenthint: "[optional hint about intent]"
 ---
 
 Write a Conventional Commit message for the current changes and commit it **immediately** — do not ask me to approve first.

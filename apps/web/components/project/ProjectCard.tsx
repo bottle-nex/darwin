@@ -21,7 +21,7 @@ export default function ProjectCard({
     const branch = project.githubDefaultBranch;
 
     return (
-        <div className="group relative flex w-full flex-col gap-4 rounded-[14px] bg-linear-to-b from-[#1a1a1a] to-neutral-900 p-5 text-left shadow-[inset_0_2px_0_0_#262626] focus-within:ring-2 focus-within:ring-white/20">
+        <div className="group relative flex w-full flex-col gap-4 rounded-[14px] bg-linear-to-b from-[#1a1a1a] to-neutral-900 p-5 text-left shadow-[inset_0_2px_0_0_var(--color-edge)] focus-within:ring-2 focus-within:ring-white/20">
             <Button
                 variant="unstyled"
                 type="button"

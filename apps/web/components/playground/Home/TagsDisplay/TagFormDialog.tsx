@@ -25,7 +25,7 @@ import type { ApiResponse } from "@/types/api";
 import TagDisplay from "./TagDisplay";
 
 const FIELD =
-    "mt-1.5 border-white/10 bg-white/5 text-neutral-200 placeholder:text-neutral-500 focus-visible:border-[#9bc24f] focus-visible:ring-[#9bc24f]/30";
+    "mt-1.5 border-white/10 bg-white/5 text-neutral-200 placeholder:text-neutral-500 focus-visible:border-matcha focus-visible:ring-matcha/30";
 
 type FormValues = {
     name: string;

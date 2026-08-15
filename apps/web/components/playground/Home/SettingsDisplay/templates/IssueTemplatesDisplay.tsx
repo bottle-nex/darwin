@@ -98,7 +98,7 @@ export default function IssueTemplatesDisplay({ projectId }: { projectId: string
                 {templates.isLoading ? (
                     <p className="px-1 py-3 text-[13px] text-neutral-500">Loading…</p>
                 ) : list.length === 0 ? (
-                    <p className="rounded-lg bg-white/5 px-3 py-6 text-center text-[13px] text-neutral-500 shadow-[inset_0_1px_0_0_#262626]">
+                    <p className="rounded-lg bg-white/5 px-3 py-6 text-center text-[13px] text-neutral-500 shadow-[inset_0_1px_0_0_var(--color-edge)]">
                         No issue templates yet.
                     </p>
                 ) : (
@@ -113,7 +113,7 @@ export default function IssueTemplatesDisplay({ projectId }: { projectId: string
                             return (
                                 <li
                                     key={template.id}
-                                    className="group flex flex-col gap-1 rounded-lg bg-cement px-3 py-2.5 shadow-[inset_0_1px_0_0_#212122]"
+                                    className="group flex flex-col gap-1 rounded-lg bg-cement px-3 py-2.5 shadow-[inset_0_1px_0_0_var(--color-edge)]"
                                 >
                                     <article className="flex items-center justify-between gap-3">
                                         <hgroup className="flex min-w-0 items-center gap-2">
@@ -132,7 +132,7 @@ export default function IssueTemplatesDisplay({ projectId }: { projectId: string
                                                 {template.name}
                                             </h4>
                                             {template.isDefault && (
-                                                <span className="flex shrink-0 items-center gap-1 rounded-full bg-[#9bc24f]/10 px-2 py-0.5 text-[10px] text-[#9bc24f]">
+                                                <span className="flex shrink-0 items-center gap-1 rounded-full bg-matcha/10 px-2 py-0.5 text-[10px] text-matcha">
                                                     <MdStar className="size-2.5" aria-hidden />
                                                     Default
                                                 </span>
@@ -148,7 +148,7 @@ export default function IssueTemplatesDisplay({ projectId }: { projectId: string
                                                         loading={defaulting}
                                                         iconOnly
                                                         onClick={() => makeDefault(template)}
-                                                        className="flex size-6 cursor-pointer items-center justify-center rounded text-neutral-400 hover:bg-neutral-700/50 hover:text-[#9bc24f] disabled:opacity-40 [&_svg]:size-3"
+                                                        className="flex size-6 cursor-pointer items-center justify-center rounded text-neutral-400 hover:bg-neutral-700/50 hover:text-matcha disabled:opacity-40 [&_svg]:size-3"
                                                     >
                                                         <MdStarOutline
                                                             className="size-3"

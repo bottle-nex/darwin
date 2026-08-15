@@ -79,7 +79,7 @@ export default function CreateProjectDialogRepository({
     function renderConnect() {
         return (
             <div className="flex flex-1 flex-col items-center justify-center gap-3 text-center">
-                <span className="flex size-10 items-center justify-center rounded-xl bg-white/5 shadow-[inset_0_1px_0_0_#262626]">
+                <span className="flex size-10 items-center justify-center rounded-xl bg-white/5 shadow-[inset_0_1px_0_0_var(--color-edge)]">
                     <FaGithub className="size-4 text-neutral-500" aria-hidden />
                 </span>
                 <p className="max-w-60 text-xs text-neutral-500">
@@ -104,7 +104,7 @@ export default function CreateProjectDialogRepository({
         if (!selectedRepo) return null;
         return (
             <div className="flex flex-col gap-3">
-                <div className="flex items-center gap-2 rounded-lg border border-[#9bc24f]/40 bg-[#9bc24f]/5 px-3 py-2.5">
+                <div className="flex items-center gap-2 rounded-lg border border-matcha/40 bg-matcha/5 px-3 py-2.5">
                     <FaGithub className="size-3.5 shrink-0 text-neutral-300" aria-hidden />
                     <span className="min-w-0 flex-1 truncate font-mono text-xs text-neutral-200">
                         {selectedRepo.fullName}
@@ -121,7 +121,7 @@ export default function CreateProjectDialogRepository({
                             <Button
                                 variant="unstyled"
                                 type="button"
-                                className="mt-1.5 flex w-full cursor-pointer items-center justify-between gap-2 rounded-lg bg-[#171717] px-3 py-2 font-mono text-xs text-neutral-200 shadow-[inset_0_2px_0_0_#262626] hover:bg-[#1c1c1c]"
+                                className="mt-1.5 flex w-full cursor-pointer items-center justify-between gap-2 rounded-lg bg-[#171717] px-3 py-2 font-mono text-xs text-neutral-200 shadow-[inset_0_2px_0_0_var(--color-edge)] hover:bg-[#1c1c1c]"
                             >
                                 <span className="flex min-w-0 items-center gap-2">
                                     <FaCodeBranch

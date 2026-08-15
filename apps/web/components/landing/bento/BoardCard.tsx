@@ -256,7 +256,7 @@ export default function BoardCard({ lit, litDelay }: { lit: boolean; litDelay: n
                                 bounce: 0.35,
                                 duration: 0.6,
                             }}
-                            className="rounded-[6px] border border-[#3f3f3f] bg-[#1c1c1c] px-3 py-0.5 font-mono text-[11px] whitespace-nowrap text-neutral-300"
+                            className="rounded-[6px] border border-[#3f3f3f] bg-graphite px-3 py-0.5 font-mono text-[11px] whitespace-nowrap text-neutral-300"
                         >
                             Connect your GitHub
                         </motion.div>

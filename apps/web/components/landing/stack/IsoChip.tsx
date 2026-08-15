@@ -7,7 +7,7 @@ import type { ReactNode } from "react";
  * Isometric chip geometry. The top face is a square of half-size 80 in flat "plane"
  * coordinates, projected with a 2:1 isometric matrix; DEPTH is the extruded body height.
  */
-const PRIMARY = "#ab9ff2";
+const PRIMARY = "var(--color-primary)";
 
 export const HALF_W = 138.56;
 export const HALF_H = 80;
@@ -123,7 +123,9 @@ export default function IsoChip({
 }: IsoChipProps) {
     const reduceMotion = useReducedMotion();
     const isGhost = variant === "ghost";
-    const lineColor = isGhost ? "#47474c" : "rgba(171,159,242,0.55)";
+    const lineColor = isGhost
+        ? "#47474c"
+        : "color-mix(in srgb, var(--color-primary) 55%, transparent)";
     const detailColor = isGhost ? "#3c3c40" : "rgba(12,12,12,0.65)";
 
     return (

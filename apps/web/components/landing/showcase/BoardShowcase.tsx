@@ -213,7 +213,7 @@ const CUSTOM_COLUMNS: BoardColumn[] = [
 
 function TaskCard({ task }: { task: Task }) {
     return (
-        <div className="rounded-md border border-white/5 bg-[#1b1b1e] p-3 transition-transform duration-300 hover:-translate-y-0.5">
+        <div className="rounded-md border border-white/5 bg-graphite p-3 transition-transform duration-300 hover:-translate-y-0.5">
             <div className="flex items-center gap-1.5">
                 <span
                     className={cn(
@@ -320,7 +320,7 @@ export default function BoardShowcase() {
                                 {columns.map((column) => (
                                     <div
                                         key={column.name}
-                                        className="w-50 shrink-0 rounded-md border border-white/5 bg-[#141416] p-2.5"
+                                        className="w-50 shrink-0 rounded-md border border-white/5 bg-charcoal p-2.5"
                                     >
                                         <div className="flex items-center justify-between px-0.5">
                                             <span className="flex items-center gap-1.5 text-[11px] font-medium text-neutral-200">

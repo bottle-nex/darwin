@@ -20,7 +20,7 @@ import { ORGANIZATIONS_QUERY_KEY } from "@/hooks/playground/useFetchOrganization
 import type { Organization } from "@/types/organization";
 
 const FIELD =
-    "mt-1.5 border-white/10 bg-white/5 text-neutral-200 placeholder:text-neutral-500 focus-visible:border-[#9bc24f] focus-visible:ring-[#9bc24f]/30";
+    "mt-1.5 border-white/10 bg-white/5 text-neutral-200 placeholder:text-neutral-500 focus-visible:border-matcha focus-visible:ring-matcha/30";
 
 type FormValues = {
     name: string;
@@ -163,7 +163,7 @@ export default function CreateOrganizationModal({
                             maxLength={150}
                             placeholder="What does this organization work on?"
                             rows={4}
-                            className="mt-1.5 w-full resize-none rounded-md bg-white/5 px-3 py-2 text-sm text-neutral-200 placeholder:text-neutral-500 outline-none focus-visible:border-[#9bc24f] focus-visible:ring-[3px] focus-visible:ring-[#9bc24f]/30 shadow-[inset_0_1px_0_0_#262626]"
+                            className="mt-1.5 w-full resize-none rounded-md bg-white/5 px-3 py-2 text-sm text-neutral-200 placeholder:text-neutral-500 outline-none focus-visible:border-matcha focus-visible:ring-[3px] focus-visible:ring-matcha/30 shadow-[inset_0_1px_0_0_var(--color-edge)]"
                         />
                         <p className="mt-1 text-right text-xs text-neutral-500">
                             {description?.length ?? 0}/150

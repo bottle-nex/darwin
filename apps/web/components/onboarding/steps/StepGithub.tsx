@@ -35,7 +35,7 @@ export default function StepGithub({
                         <span
                             className={cn(
                                 "size-1.5 rounded-full",
-                                connected ? "bg-[#9bc24f]" : "bg-neutral-700",
+                                connected ? "bg-matcha" : "bg-neutral-700",
                             )}
                         />
                         {connected ? "connected" : "not connected"}

@@ -148,7 +148,7 @@ export default function CreateProjectDialogDetailsStep({
                         placeholder="What does this project do?"
                         rows={4}
                         className={cn(
-                            "mt-1.5 w-full resize-none px-3 py-2 text-sm text-neutral-200 outline-none placeholder:text-neutral-500 focus-visible:ring-[3px] focus-visible:ring-[#9bc24f]/30",
+                            "mt-1.5 w-full resize-none px-3 py-2 text-sm text-neutral-200 outline-none placeholder:text-neutral-500 focus-visible:ring-[3px] focus-visible:ring-matcha/30",
                             SURFACE,
                         )}
                     />

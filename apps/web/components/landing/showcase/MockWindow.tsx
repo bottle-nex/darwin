@@ -49,7 +49,7 @@ export function PanelCard({
     children: React.ReactNode;
 }) {
     return (
-        <div className="relative flex w-full flex-col overflow-hidden rounded-lg border border-white/8 bg-[#0b0b0c]/95 p-6 shadow-[0_24px_60px_rgba(0,0,0,0.5)] backdrop-blur-xl transition-transform duration-500 hover:-translate-y-1 md:h-110 md:p-7">
+        <div className="relative flex w-full flex-col overflow-hidden rounded-lg border border-white/8 bg-ink/95 p-6 shadow-[0_24px_60px_rgba(0,0,0,0.5)] backdrop-blur-xl transition-transform duration-500 hover:-translate-y-1 md:h-110 md:p-7">
             <motion.h3
                 variants={appear(0.1)}
                 className="text-lg font-semibold tracking-tight text-snow md:text-xl"
@@ -78,7 +78,7 @@ export function MockWindow({
     children: React.ReactNode;
 }) {
     return (
-        <div className="w-full overflow-hidden rounded-xl border border-white/10 bg-[#101012]/90 shadow-[0_24px_60px_rgba(0,0,0,0.5)] backdrop-blur-xl transition-transform duration-500 hover:-translate-y-1">
+        <div className="w-full overflow-hidden rounded-xl border border-white/10 bg-charcoal/90 shadow-[0_24px_60px_rgba(0,0,0,0.5)] backdrop-blur-xl transition-transform duration-500 hover:-translate-y-1">
             <div className="flex items-center gap-2 border-b border-white/5 px-3.5 py-2.5">
                 <div className="flex gap-1.5">
                     {[0, 1, 2].map((dot) => (
@@ -136,7 +136,7 @@ export function Avatar({ initials, className }: { initials: string; className?: 
     return (
         <span
             className={cn(
-                "flex size-4.5 items-center justify-center rounded-full border border-white/15 bg-[#1c1c1e] text-[7px] font-medium text-neutral-300",
+                "flex size-4.5 items-center justify-center rounded-full border border-white/15 bg-graphite text-[7px] font-medium text-neutral-300",
                 className,
             )}
         >

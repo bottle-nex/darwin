@@ -11,7 +11,7 @@ import useAcceptInvite from "@/hooks/invitations/useAcceptInvite";
 import useRejectInvite from "@/hooks/invitations/useRejectInvite";
 import { INVITATION_STATUS } from "@/types/types.invitation";
 
-const ACCENT = "#9bc24f";
+const ACCENT = "var(--color-matcha)";
 
 function Shell({ children }: { children: React.ReactNode }) {
     return (

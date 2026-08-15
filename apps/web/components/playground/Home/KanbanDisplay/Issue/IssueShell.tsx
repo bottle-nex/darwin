@@ -15,7 +15,7 @@ export default function IssueShell({ children }: { children: React.ReactNode }) 
                 }}
                 className={cn(
                     "h-[80vh] w-[72vw] max-w-none sm:max-w-none p-0 gap-0 overflow-hidden",
-                    "bg-cement rounded-lg",
+                    "bg-charcoal rounded-lg",
                 )}
             >
                 {children}
