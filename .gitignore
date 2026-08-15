@@ -35,6 +35,9 @@ apps/web/.env
 # turbo
 .turbo
 
+# generated package bundles
+packages/sandbox-mcp/dist/
+
 # prisma generated client
 packages/database/generated
 
