@@ -58,6 +58,14 @@ export type NotificationJobData =
       }
     | { action: "issue.commented"; chatId: string; recipientId: string; senderId: string }
     | {
+          action: "issue.referenced";
+          issueId: string;
+          recipientId: string;
+          actorId: string;
+          chatId?: string;
+          projectChatId?: string;
+      }
+    | {
           action: "issue.deleted";
           issueId: string;
           recipientId: string;

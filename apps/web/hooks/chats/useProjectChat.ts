@@ -2,8 +2,7 @@ import { useQuery, type QueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/lib/axios";
 import { PROJECT_CHAT_URL } from "@/routes/api_routes";
 import type { ApiResponse } from "@/types/api";
-import type { ProjectChat } from "@trymatcha/types";
-import type { ProjectMember } from "@/hooks/project/useProjectMembers";
+import type { LabelledReference, ProjectChat } from "@trymatcha/types";
 
 export const PROJECT_CHATS_QUERY_KEY = ["project-chats"] as const;
 
@@ -33,9 +32,9 @@ const OPTIMISTIC_ID_PREFIX = "optimistic:";
 export function build_optimistic_project_chat(
     projectId: string,
     message: string,
+    references: LabelledReference[],
     repliedTo: ProjectChat | null,
     sender: { id: string; name: string | null; email: string; image: string | null },
-    mentionedMembers: ProjectMember[] = [],
 ): ProjectChat {
     return {
         id: `${OPTIMISTIC_ID_PREFIX}${crypto.randomUUID()}`,
@@ -46,13 +45,7 @@ export function build_optimistic_project_chat(
         sender: sender as unknown as ProjectChat["sender"],
         repliedToId: repliedTo?.id ?? null,
         repliedTo: repliedTo ?? null,
-        mentions: mentionedMembers.map((member) => ({
-            id: `${OPTIMISTIC_ID_PREFIX}${member.memberId}`,
-            projectChatId: projectId,
-            memberId: member.memberId,
-            member: { id: member.memberId, user: member },
-            createdAt: new Date(),
-        })) as unknown as ProjectChat["mentions"],
+        references: references as ProjectChat["references"],
         createdAt: new Date(),
         updatedAt: new Date(),
     };

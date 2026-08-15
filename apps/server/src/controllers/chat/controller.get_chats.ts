@@ -4,6 +4,7 @@ import ResponseWriter from "../../services/service.response";
 import Access from "../../access-control/access";
 import { Action, Permissions } from "@trymatcha/access-control";
 import { prisma } from "@trymatcha/database";
+import { MESSAGE_REFERENCE_INCLUDE } from "../../services/service.message-references";
 
 export default class ChatGetController {
     static params_schema = z.object({
@@ -45,7 +46,7 @@ export default class ChatGetController {
                 include: {
                     sender: true,
                     repliedTo: { include: { sender: true } },
-                    mentions: { include: { member: { include: { user: true } } } },
+                    references: { include: MESSAGE_REFERENCE_INCLUDE },
                 },
             });
 

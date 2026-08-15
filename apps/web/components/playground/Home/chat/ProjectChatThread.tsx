@@ -1,32 +1,22 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { animate } from "motion/react";
-import { IoIosSend, IoMdClose } from "react-icons/io";
+import { IoMdClose } from "react-icons/io";
 import { MdChat } from "react-icons/md";
-import { ProjectRole, type Chat, type ProjectChat } from "@trymatcha/types";
+import {
+    ProjectRole,
+    to_plain_text,
+    type Chat,
+    type LabelledReference,
+    type ProjectChat,
+} from "@trymatcha/types";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import PlaygroundAvatar, {
-    toneFor,
-} from "@/components/playground/Core/components/PlaygroundAvatar";
 import SessionServices from "@/lib/session";
-import { useProjectMembers, type ProjectMember } from "@/hooks/project/useProjectMembers";
+import { useProjectMembers } from "@/hooks/project/useProjectMembers";
 import { OPTIMISTIC_ID_PREFIX } from "@/hooks/chats/useChats";
 import LogoLoader from "@/components/app/LogoLoader";
 import ChatMessage from "./ChatMessage";
-
-/** Matches an "@query" being typed at the caret (start of text or after whitespace). */
-const MENTION_AT_CARET = /(?:^|\s)@([^\s@]*)$/;
-
-/** Tiny debounce so the mention search doesn't fire on every keystroke. */
-function useDebouncedValue<T>(value: T, delayMs: number) {
-    const [debounced, setDebounced] = useState(value);
-    useEffect(() => {
-        const id = setTimeout(() => setDebounced(value), delayMs);
-        return () => clearTimeout(id);
-    }, [value, delayMs]);
-    return debounced;
-}
+import ChatComposer, { type ChatComposerHandle } from "./ChatComposer";
 
 type ChatThreadProps = {
     chats: (Chat | ProjectChat)[] | undefined;
@@ -37,7 +27,7 @@ type ChatThreadProps = {
     disabled?: boolean;
     /** True while the initial page of chats is still being fetched. */
     loading?: boolean;
-    onSend: (message: string, mentionedMembers: ProjectMember[], repliedToId?: string) => void;
+    onSend: (message: string, references: LabelledReference[], repliedToId?: string) => void;
     onDelete: (chat: Chat | ProjectChat) => void;
 };
 
@@ -56,13 +46,7 @@ export default function ChatThread({
     onSend,
     onDelete,
 }: ChatThreadProps) {
-    const [message, setMessage] = useState<string>("");
     const [replyTo, setReplyTo] = useState<Chat | ProjectChat | null>(null);
-    const [mentionQuery, setMentionQuery] = useState<string | null>(null);
-    const [mentionIndex, setMentionIndex] = useState<number>(0);
-    // Members tagged in the draft, keyed by the "@Name " text that was inserted for
-    // them — lets handleSend tell whether that mention is still in the message.
-    const [mentionedMembers, setMentionedMembers] = useState<Map<string, ProjectMember>>(new Map());
     const currentUserId = SessionServices.get_user()?.id;
     const { data: members } = useProjectMembers(projectId);
     const viewerIsAdmin =
@@ -70,17 +54,7 @@ export default function ChatThread({
     const activeReplyTo =
         replyTo && !chats?.some((c) => c.id === replyTo.id && c.isDeleted) ? replyTo : null;
     const scrollRef = useRef<HTMLDivElement>(null);
-    const inputRef = useRef<HTMLTextAreaElement>(null);
-
-    // Composing a mention: search the project's members server-side (capped,
-    // debounced) instead of loading the whole project roster into the browser.
-    const isComposingMention = mentionQuery !== null;
-    const debouncedMentionQuery = useDebouncedValue(mentionQuery, 200);
-    const { data: mentionResults } = useProjectMembers(
-        isComposingMention ? projectId : undefined,
-        debouncedMentionQuery ?? "",
-    );
-    const mentionMatches = isComposingMention ? (mentionResults ?? []) : [];
+    const composerRef = useRef<ChatComposerHandle>(null);
 
     // Pin the thread to the newest message whenever the list grows.
     useEffect(() => {
@@ -101,49 +75,12 @@ export default function ChatThread({
     }, [chats?.length]);
 
     useEffect(() => {
-        if (replyTo) {
-            inputRef.current?.focus();
-        }
+        if (replyTo) composerRef.current?.focus();
     }, [replyTo]);
 
-    /** Re-derive the mention popup from the text before the caret. */
-    function syncMention(value: string, caret: number) {
-        const match = MENTION_AT_CARET.exec(value.slice(0, caret));
-        setMentionQuery(match ? match[1] : null);
-        setMentionIndex(0);
-    }
-
-    /** Replace the "@query" before the caret with "@Name " and remember who was tagged. */
-    function insertMention(member: ProjectMember) {
-        const el = inputRef.current;
-        if (!el) return;
-        const caret = el.selectionStart;
-        const before = message
-            .slice(0, caret)
-            .replace(MENTION_AT_CARET, (m) => (m.startsWith("@") ? "" : m[0]));
-        const mentionText = `@${member.name ?? member.email}`;
-        const inserted = `${before}${mentionText} `;
-        setMessage(inserted + message.slice(caret));
-        setMentionQuery(null);
-        setMentionedMembers((prev) => new Map(prev).set(mentionText, member));
-        requestAnimationFrame(() => {
-            el.focus();
-            el.setSelectionRange(inserted.length, inserted.length);
-        });
-    }
-
-    function handleSend() {
-        const trimmed = message.trim();
-        if (!trimmed || disabled) return;
-        // Only keep mentions whose "@Name " text is still present — covers the
-        // case where the tag was inserted then edited or deleted before sending.
-        const stillTagged = Array.from(mentionedMembers.entries())
-            .filter(([mentionText]) => trimmed.includes(mentionText))
-            .map(([, member]) => member);
-        onSend(trimmed, stillTagged, activeReplyTo?.id);
-        setMessage("");
+    function handleSend(message: string, references: LabelledReference[]) {
+        onSend(message, references, activeReplyTo?.id);
         setReplyTo(null);
-        setMentionedMembers(new Map());
     }
 
     /** Scroll a quoted original into view and flash it briefly. */
@@ -199,38 +136,13 @@ export default function ChatThread({
                 )}
             </div>
             <footer className="relative flex flex-col">
-                {mentionMatches.length > 0 && (
-                    <ul className="absolute w-50 bottom-full left-4 right-4 z-10 max-h-48 overflow-y-auto rounded-[10px] border border-white/10 bg-neutral-900 p-1 shadow-lg">
-                        {mentionMatches.map((member, i) => (
-                            <li key={member.id}>
-                                <Button
-                                    variant="unstyled"
-                                    type="button"
-                                    onMouseDown={(e) => {
-                                        e.preventDefault();
-                                        insertMention(member);
-                                    }}
-                                    onMouseEnter={() => setMentionIndex(i)}
-                                    className={`flex w-full items-center gap-x-2.5 px-3 py-1.5 text-left text-[13px] text-neutral-200 rounded-sm ${
-                                        i === mentionIndex ? "bg-white/8" : ""
-                                    }`}
-                                >
-                                    <PlaygroundAvatar
-                                        letter={(member.name ?? member.email)
-                                            .charAt(0)
-                                            .toUpperCase()}
-                                        src={member.image ?? undefined}
-                                        tone={toneFor(member.id)}
-                                        size="md"
-                                        className="rounded-full"
-                                    />
-                                    <span className="truncate">{member.name ?? member.email}</span>
-                                </Button>
-                            </li>
-                        ))}
-                    </ul>
-                )}
-                <div className="rounded-lg bg-[#1a1a1a] shadow-[inset_0_1px_0_0_#262626]">
+                <ChatComposer
+                    ref={composerRef}
+                    projectId={projectId}
+                    placeholder={placeholder}
+                    disabled={disabled}
+                    onSend={handleSend}
+                >
                     {activeReplyTo && (
                         <div className="flex items-center gap-x-2.5 border-b border-white/6 px-2.5 py-2">
                             <span
@@ -245,7 +157,10 @@ export default function ChatThread({
                                         : (activeReplyTo.sender?.name ?? "Unknown")}
                                 </span>
                                 <span className="block truncate text-[12px] leading-4 text-neutral-500">
-                                    {activeReplyTo.message}
+                                    {to_plain_text(
+                                        activeReplyTo.message,
+                                        activeReplyTo.references ?? [],
+                                    )}
                                 </span>
                             </div>
                             <Button
@@ -259,62 +174,7 @@ export default function ChatThread({
                             </Button>
                         </div>
                     )}
-                    <div className="relative">
-                        <Textarea
-                            ref={inputRef}
-                            placeholder={placeholder}
-                            value={message}
-                            rows={1}
-                            data-lenis-prevent
-                            onChange={(e) => {
-                                setMessage(e.target.value);
-                                syncMention(e.target.value, e.target.selectionStart);
-                            }}
-                            onKeyDown={(e) => {
-                                if (mentionMatches.length > 0) {
-                                    if (e.key === "ArrowDown" || e.key === "ArrowUp") {
-                                        e.preventDefault();
-                                        const step = e.key === "ArrowDown" ? 1 : -1;
-                                        setMentionIndex(
-                                            (mentionIndex + step + mentionMatches.length) %
-                                                mentionMatches.length,
-                                        );
-                                        return;
-                                    }
-                                    if (e.key === "Enter" || e.key === "Tab") {
-                                        e.preventDefault();
-                                        insertMention(mentionMatches[mentionIndex]);
-                                        return;
-                                    }
-                                    if (e.key === "Escape") {
-                                        setMentionQuery(null);
-                                        return;
-                                    }
-                                }
-                                if (e.key === "Escape" && activeReplyTo) {
-                                    setReplyTo(null);
-                                    return;
-                                }
-                                if (e.key === "Enter" && !e.shiftKey) {
-                                    e.preventDefault();
-                                    handleSend();
-                                }
-                            }}
-                            disabled={disabled}
-                            className="no-scrollbar min-h-9.5 max-h-28 w-full resize-none overflow-y-auto bg-transparent py-1.75 pr-11 text-[13px] leading-5 text-neutral-100 shadow-none hover:bg-transparent placeholder:text-[13px]!"
-                        />
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={handleSend}
-                            disabled={disabled || !message.trim()}
-                            aria-label="Send message"
-                            className="absolute bottom-0.75 right-1.5 h-8! w-8! text-neutral-400 hover:bg-transparent hover:text-neutral-100 disabled:text-neutral-600"
-                        >
-                            <IoIosSend className="size-5.5" />
-                        </Button>
-                    </div>
-                </div>
+                </ChatComposer>
             </footer>
         </>
     );

@@ -62,6 +62,9 @@ export const CREATE_ISSUE_URL = ISSUES_URL + "/create";
 export const CREATE_COLUMN_URL = ISSUES_URL + "/columns";
 export const BOARD_URL = (project_id: string) => `${ISSUES_URL}/board/${project_id}`;
 export const ISSUE_URL = (id: string) => `${ISSUES_URL}/${id}`;
+export const SEARCH_ISSUES_URL = (project_id: string, query: string) =>
+    `${ISSUES_URL}/search/${project_id}?q=${encodeURIComponent(query)}`;
+export const ISSUE_REFERENCES_URL = (id: string) => `${ISSUES_URL}/${id}/references`;
 export const COLUMN_URL = (id: string) => `${ISSUES_URL}/columns/${id}`;
 export const REORDER_COLUMNS_URL = ISSUES_URL + "/columns/reorder";
 export const ASSIGN_ISSUE_URL = (id: string) => `${ISSUES_URL}/${id}/assignees`;

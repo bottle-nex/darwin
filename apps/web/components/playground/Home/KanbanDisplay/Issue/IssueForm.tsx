@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,6 +25,7 @@ import { useIssueDescription } from "./useIssueDescription";
 import IssueShell from "./IssueShell";
 import IssueTopper from "./IssueTopper";
 import IssueChat from "./chat/IssueChat";
+import IssueReferences from "./IssueReferences";
 import { PRIORITY_OPTIONS } from "./issueHelpers";
 
 export default function IssueForm({
@@ -213,6 +214,7 @@ export default function IssueForm({
                             initialContent={body.html}
                             onChange={body.onEditorChange}
                         />
+                        <IssueReferences issueId={issue?.id} />
                     </section>
                     {readOnly ? (
                         <section className="h-fit flex items-center justify-between">
@@ -223,15 +225,11 @@ export default function IssueForm({
                                     while it runs.
                                 </span>
                             </div>
-                            <Button
-                                size={"xs"}
-                                variant={"tertiary"}
-                                onClick={close}
-                                className="gap-x-1!"
-                            >
+                            <Button size={"xs"} variant={"tertiary"} onClick={close}>
                                 Close
-                                <span className="text-ink!">|</span>
-                                <span className="text-[10px] text-ink">esc</span>
+                                <ShortcutHint>
+                                    <span className="text-[10px]">esc</span>
+                                </ShortcutHint>
                             </Button>
                         </section>
                     ) : (
@@ -246,13 +244,14 @@ export default function IssueForm({
                                     disabled={!canSubmit}
                                 >
                                     {isEdit ? "Save" : "Create Issue"}
-                                    <span className="text-ink!">|</span>
-                                    {isMac ? (
-                                        <MdOutlineKeyboardCommandKey className="text-ink!" />
-                                    ) : (
-                                        <span className="text-[10px]">Ctrl</span>
-                                    )}
-                                    <GrReturn className="text-ink!" />
+                                    <ShortcutHint>
+                                        {isMac ? (
+                                            <MdOutlineKeyboardCommandKey />
+                                        ) : (
+                                            <span className="text-[10px]">Ctrl</span>
+                                        )}
+                                        <GrReturn />
+                                    </ShortcutHint>
                                 </Button>
                             </div>
                         </section>
@@ -261,6 +260,14 @@ export default function IssueForm({
                 <IssueChat issueId={issue?.id} />
             </main>
         </IssueShell>
+    );
+}
+
+function ShortcutHint({ children }: { children: ReactNode }) {
+    return (
+        <span className="ml-0.5 flex items-center gap-0.5 text-ink/40 [&_svg]:text-ink/40!">
+            {children}
+        </span>
     );
 }
 

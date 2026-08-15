@@ -2,8 +2,7 @@ import { useQuery, type QueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/lib/axios";
 import { CHAT_URL } from "@/routes/api_routes";
 import type { ApiResponse } from "@/types/api";
-import type { Chat } from "@trymatcha/types";
-import type { ProjectMember } from "@/hooks/project/useProjectMembers";
+import type { Chat, LabelledReference } from "@trymatcha/types";
 
 export const CHATS_QUERY_KEY = ["chats"] as const;
 
@@ -31,9 +30,9 @@ export const OPTIMISTIC_ID_PREFIX = "optimistic:";
 export function build_optimistic_chat(
     issueId: string,
     message: string,
+    references: LabelledReference[],
     repliedTo: Chat | null,
     sender: { id: string; name: string | null; email: string; image: string | null },
-    mentionedMembers: ProjectMember[] = [],
 ): Chat {
     return {
         id: `${OPTIMISTIC_ID_PREFIX}${crypto.randomUUID()}`,
@@ -44,13 +43,7 @@ export function build_optimistic_chat(
         sender: sender as unknown as Chat["sender"],
         repliedToId: repliedTo?.id ?? null,
         repliedTo: repliedTo ?? null,
-        mentions: mentionedMembers.map((member) => ({
-            id: `${OPTIMISTIC_ID_PREFIX}${member.memberId}`,
-            chatId: issueId,
-            memberId: member.memberId,
-            member: { id: member.memberId, user: member },
-            createdAt: new Date(),
-        })) as unknown as Chat["mentions"],
+        references: references as Chat["references"],
         createdAt: new Date(),
         updatedAt: new Date(),
     };

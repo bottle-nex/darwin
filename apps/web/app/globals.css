@@ -386,6 +386,38 @@
         pointer-events: none;
     }
 
+    /* Tiptap chat composer — a single-paragraph box, not a document. */
+    .chat-composer {
+        outline: none;
+    }
+
+    .chat-composer p.is-editor-empty:first-child::before {
+        content: attr(data-placeholder);
+        float: left;
+        height: 0;
+        color: rgba(255, 255, 255, 0.3);
+        pointer-events: none;
+    }
+
+    .chat-composer > p + p {
+        margin-top: 0.25rem;
+    }
+
+    /* @member / #issue chips, both in the composer and in sent messages. */
+    .reference-chip {
+        border-radius: 4px;
+        padding: 0 0.25rem;
+        font-weight: 500;
+        white-space: nowrap;
+        background: rgba(255, 255, 255, 0.1);
+        color: #f5f5f5;
+    }
+
+    .reference-chip[data-kind="member"] {
+        background: rgba(99, 102, 241, 0.22);
+        color: #c7d2fe;
+    }
+
     .tiptap h1,
     .tiptap h2,
     .tiptap h3 {

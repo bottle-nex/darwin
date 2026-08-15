@@ -20,6 +20,7 @@ enum NotificationType {
   IssuePriorityChanged
   IssueMoved
   IssueCommented
+  IssueReferenced
   IssueDeleted
   InviteAccepted
   AddedToProject

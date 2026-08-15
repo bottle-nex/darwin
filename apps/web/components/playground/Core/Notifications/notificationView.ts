@@ -8,6 +8,7 @@ import {
     HiOutlineChatBubbleLeftRight,
     HiOutlineCheckBadge,
     HiOutlineExclamationTriangle,
+    HiOutlineHashtag,
     HiOutlineKey,
     HiOutlineNoSymbol,
     HiOutlineRectangleGroup,
@@ -45,6 +46,7 @@ const THEME: Record<NotificationType, NotificationTheme> = {
         icon: HiOutlineChatBubbleLeftRight,
         tint: "text-indigo-300",
     },
+    [NotificationType.IssueReferenced]: { icon: HiOutlineHashtag, tint: "text-sky-300" },
     [NotificationType.IssueDeleted]: { icon: HiOutlineTrash, tint: "text-neutral-400" },
     [NotificationType.InviteAccepted]: { icon: HiOutlineCheckBadge, tint: "text-emerald-300" },
     [NotificationType.AddedToProject]: { icon: HiOutlineRectangleGroup, tint: "text-violet-300" },
@@ -89,6 +91,15 @@ export function notification_view(notification: Notification): NotificationView 
                 actorId: String(payload.senderId ?? ""),
                 actorName: String(payload.senderName),
                 action: "mentioned you",
+                body: String(payload.message),
+                issueRef: issueRef ? `${issueRef} ${payload.issueTitle}` : null,
+                projectSlug,
+            };
+        case NotificationType.IssueReferenced:
+            return {
+                actorId: String(payload.senderId ?? ""),
+                actorName: String(payload.senderName),
+                action: "referenced",
                 body: String(payload.message),
                 issueRef: issueRef ? `${issueRef} ${payload.issueTitle}` : null,
                 projectSlug,
@@ -229,6 +240,7 @@ export function notification_target(
         case NotificationType.IssuePriorityChanged:
         case NotificationType.IssueMoved:
         case NotificationType.IssueCommented:
+        case NotificationType.IssueReferenced:
             if (!payload.issueId) return null;
             return {
                 orgSlug,

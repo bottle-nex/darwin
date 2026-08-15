@@ -9,6 +9,7 @@ import IssueStatusChangedNotification from "./actions/action.issue-status-change
 import IssuePriorityChangedNotification from "./actions/action.issue-priority-changed";
 import IssueMovedNotification from "./actions/action.issue-moved";
 import IssueCommentedNotification from "./actions/action.issue-commented";
+import IssueReferencedNotification from "./actions/action.issue-referenced";
 import IssueDeletedNotification from "./actions/action.issue-deleted";
 import InviteAcceptedNotification from "./actions/action.invite-accepted";
 import AddedToProjectNotification from "./actions/action.added-to-project";
@@ -61,6 +62,8 @@ export default class NotificationQueueService {
                 return IssueMovedNotification.handle(data);
             case "issue.commented":
                 return IssueCommentedNotification.handle(data);
+            case "issue.referenced":
+                return IssueReferencedNotification.handle(data);
             case "issue.deleted":
                 return IssueDeletedNotification.handle(data);
             case "invite.accepted":
@@ -107,6 +110,8 @@ export default class NotificationQueueService {
                 return `${data.action}:${data.issueId}:${data.recipientId}~${data.toColumnId ?? "board"}`;
             case "issue.commented":
                 return `${data.action}:${data.chatId}:${data.recipientId}`;
+            case "issue.referenced":
+                return `${data.action}:${data.chatId ?? data.projectChatId}:${data.issueId}:${data.recipientId}`;
             case "issue.deleted":
                 return `${data.action}:${data.issueId}:${data.recipientId}`;
             case "invite.accepted":

@@ -1,7 +1,12 @@
 import { prisma, NotificationType } from "@trymatcha/database";
-import { OutboundSocketMessageType, type NotificationJobData } from "@trymatcha/types";
+import {
+    OutboundSocketMessageType,
+    to_plain_text,
+    type NotificationJobData,
+} from "@trymatcha/types";
 import { ENV } from "../../configs/env";
 import { sendMentionEmail } from "../../services/service.email";
+import { MESSAGE_REFERENCE_INCLUDE } from "../../services/service.message-references";
 import { server_services } from "../..";
 
 type ProjectChatMentionJobData = Extract<NotificationJobData, { action: "project_chat.mention" }>;
@@ -13,6 +18,7 @@ export default class ProjectChatMentionNotification {
             select: {
                 message: true,
                 projectId: true,
+                references: { include: MESSAGE_REFERENCE_INCLUDE },
                 project: { select: { slug: true, organization: { select: { slug: true } } } },
             },
         });
@@ -31,6 +37,7 @@ export default class ProjectChatMentionNotification {
         if (!member || !sender) return;
 
         const senderName = sender.name ?? sender.email;
+        const message = to_plain_text(chat.message, chat.references);
         const orgSlug = chat.project.organization.slug;
         const projectSlug = chat.project.slug;
         const url = `${ENV.SERVER_WEB_URL}/playground/${orgSlug}/${projectSlug}?tab=thread-detail&thread=project`;
@@ -46,7 +53,7 @@ export default class ProjectChatMentionNotification {
                     orgSlug,
                     senderId: data.mentionedById,
                     senderName,
-                    message: chat.message,
+                    message,
                 },
             },
         });
@@ -59,6 +66,6 @@ export default class ProjectChatMentionNotification {
             }),
         );
 
-        await sendMentionEmail(member.user.email, { senderName, message: chat.message, url });
+        await sendMentionEmail(member.user.email, { senderName, message, url });
     }
 }
