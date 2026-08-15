@@ -22,12 +22,7 @@ const SANDBOX_MCP_ENTRY = "/opt/matcha/sandbox-mcp/index.js";
 const REPO_DIR = "/home/user/repo";
 
 const REQUIREMENTS = [
-    {
-        name: "claude",
-        command:
-            "claude --version && claude --help | grep -F -- '--settings' >/dev/null && claude --help | grep -F -- '--add-dir' >/dev/null",
-        needed_for: "running Claude with the external Graphify integration",
-    },
+    { name: "claude", command: "claude --version", needed_for: "running Claude" },
     { name: "gh", command: "gh --version", needed_for: "opening pull requests" },
     { name: "git", command: "git --version", needed_for: "cloning and branching" },
     { name: "node", command: "node --version", needed_for: "running sandbox-mcp" },
