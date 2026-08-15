@@ -99,7 +99,7 @@ function FooterContent() {
     );
 }
 
-export default function RevampFooter() {
+export default function LandingFooter() {
     const footerRef = useRef<HTMLElement>(null);
     const reduceMotion = useReducedMotion();
     const inView = useInView(footerRef, { once: true, amount: 0.4 });

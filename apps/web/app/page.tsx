@@ -1,10 +1,10 @@
-import RevampBentoCards from "@/components/revamp/RevampBentoCards";
-import RevampFooter from "@/components/revamp/RevampFooter";
-import RevampHero from "@/components/revamp/RevampHero";
-import RevampIssueTracker from "@/components/revamp/RevampIssueTracker";
-import RevampPlatformStack from "@/components/revamp/RevampPlatformStack";
+import LandingBentoCards from "@/components/landing/LandingBentoCards";
+import LandingFeatureShowcase from "@/components/landing/LandingFeatureShowcase";
+import LandingFooter from "@/components/landing/LandingFooter";
+import LandingHero from "@/components/landing/LandingHero";
+import LandingIssueTracker from "@/components/landing/LandingIssueTracker";
+import LandingPlatformStack from "@/components/landing/LandingPlatformStack";
 import { LandingNavbar } from "@/components/new/LandingNavbar";
-import RevampIntegrations from "@/components/revamp/RevampIntegrations";
 
 export default function Home() {
     return (
@@ -14,13 +14,14 @@ export default function Home() {
         >
             {/* <DitherHero /> */}
             <LandingNavbar />
-            {/* <RevampAiEra /> */}
-            <RevampHero />
-            {/* <RevampIntegrations /> */}
-            <RevampPlatformStack />
-            <RevampBentoCards />
-            <RevampIssueTracker />
-            <RevampFooter />
+            {/* <LandingAiEra /> */}
+            <LandingHero />
+            {/* <LandingIntegrations /> */}
+            <LandingBentoCards />
+            <LandingFeatureShowcase />
+            <LandingIssueTracker />
+            <LandingPlatformStack />
+            <LandingFooter />
         </div>
     );
 }

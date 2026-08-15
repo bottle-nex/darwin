@@ -73,7 +73,7 @@ export default function BoardCard({ lit, litDelay }: { lit: boolean; litDelay: n
             lit={lit}
             litDelay={litDelay}
             label="Board"
-            description="Issues land on a shared board, each one scoped to a project"
+            description="Connect your GitHub and every issue lands on a shared board"
             diagram={
                 <div className="relative h-full w-full">
                     <DiagramScene hover="connected">

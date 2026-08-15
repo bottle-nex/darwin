@@ -62,7 +62,7 @@ function ProcessConnectors() {
     );
 }
 
-export default function RevampBentoCards() {
+export default function LandingBentoCards() {
     const rowRef = useRef<HTMLDivElement>(null);
     const reduceMotion = useReducedMotion();
     const rowInView = useInView(rowRef, { once: true, amount: 0.3 });

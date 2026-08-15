@@ -263,7 +263,7 @@ export default function AgentCard({ lit, litDelay }: { lit: boolean; litDelay: n
             lit={lit}
             litDelay={litDelay}
             label="Agent"
-            description="The agent carries each issue from the board to a pull request"
+            description="An agent claims each card off the board and works the fix"
             clip={false}
             diagram={
                 <>

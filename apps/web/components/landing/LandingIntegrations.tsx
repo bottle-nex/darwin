@@ -313,7 +313,7 @@ function CircuitBoard() {
     );
 }
 
-export default function RevampIntegrations() {
+export default function LandingIntegrations() {
     const reduceMotion = useReducedMotion();
 
     return (

@@ -327,7 +327,7 @@ export default function PullRequestCard({ lit, litDelay }: { lit: boolean; litDe
             lit={lit}
             litDelay={litDelay}
             label="Pull request"
-            description="A finished pull request comes back for human review"
+            description="The finished fix rolls off the line as a PR, ready for review"
             diagram={
                 <div className="absolute inset-0">
                     <ConveyorScene />

@@ -547,7 +547,7 @@ function BranchingDiagram() {
     );
 }
 
-export default function RevampIssueTracker() {
+export default function LandingIssueTracker() {
     return (
         <LandingSection>
             <SectionHeader

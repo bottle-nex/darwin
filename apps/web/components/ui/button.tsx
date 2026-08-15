@@ -21,7 +21,7 @@ const buttonVariants = cva(
                 secondary:
                     "bg-linear-to-b from-[#404040] to-neutral-900 text-white shadow-[0_1px_2px_0_rgba(15,23,42,0.12),0_1px_3px_0_rgba(15,23,42,0.14)] hover:from-neutral-600 hover:to-neutral-800 focus-visible:border-ring dark:from-neutral-200 dark:to-neutral-200 dark:text-neutral-950 dark:shadow-[0_1px_2px_0_rgba(0,0,0,0.25)] dark:hover:from-neutral-200 dark:hover:to-neutral-300",
                 tertiary:
-                    "bg-white text-ink shadow-[0_1px_2px_0_rgba(15,23,42,0.05)] hover:bg-neutral-50 focus-visible:border-ring [&_svg]:text-neutral-400 hover:[&_svg]:text-neutral-600 dark:from-neutral-700 dark:to-neutral-800 dark:text-neutral-100 dark:border-neutral-600 dark:shadow-[0_1px_2px_0_rgba(0,0,0,0.2)] dark:hover:from-neutral-600 dark:hover:to-neutral-700 dark:[&_svg]:text-neutral-400",
+                    "bg-linear-to-b from-[#E3E3E3] to-neutral-200 text-neutral-900 shadow-[0_1px_2px_0_rgba(15,23,42,0.05)] hover:bg-neutral-50 focus-visible:border-ring [&_svg]:text-neutral-400 hover:[&_svg]:text-neutral-600 dark:from-neutral-700 dark:to-neutral-800 dark:text-neutral-100 dark:border-neutral-600 dark:shadow-[0_1px_2px_0_rgba(0,0,0,0.2)] dark:hover:from-neutral-600 dark:hover:to-neutral-700 dark:[&_svg]:text-neutral-400 pl-4! rounded-full",
                 outline:
                     "bg-linear-to-b from-white to-neutral-50 text-foreground border border-neutral-200 shadow-[0_1px_2px_0_rgba(15,23,42,0.04)] hover:bg-neutral-50 focus-visible:border-ring aria-expanded:bg-neutral-50 dark:from-neutral-800 dark:to-neutral-800 dark:border-neutral-600 dark:hover:from-neutral-700 dark:hover:to-neutral-700 dark:aria-expanded:from-neutral-700",
                 destructive:

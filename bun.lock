@@ -175,6 +175,7 @@
       "name": "web",
       "version": "0.1.0",
       "dependencies": {
+        "@paper-design/shaders-react": "^0.0.80",
         "@radix-ui/react-label": "^2.1.8",
         "@radix-ui/react-select": "^2.2.6",
         "@tanstack/react-query": "^5.101.0",
@@ -644,6 +645,10 @@
     "@octokit/types": ["@octokit/types@16.0.0", "", { "dependencies": { "@octokit/openapi-types": "^27.0.0" } }, "sha512-sKq+9r1Mm4efXW1FCk7hFSeJo4QKreL/tTbR0rz/qx/r1Oa2VV83LTA/H/MuCOX7uCIJmQVRKBcbmWoySjAnSg=="],
 
     "@panva/hkdf": ["@panva/hkdf@1.2.1", "", {}, "sha512-6oclG6Y3PiDFcoyk8srjLfVKyMfVCKJ27JwNPViuXziFpmdz+MZnZN/aKY0JGXgYuO/VghU0jcOAZgWXZ1Dmrw=="],
+
+    "@paper-design/shaders": ["@paper-design/shaders@0.0.80", "", {}, "sha512-pcabvt5xDlFoEhpjUj4b1tGJMfqb0i5mXifWMNQf6z7FoOJYxYDo7F8R6k0JAh5D/7ouxjX5+N0cIq5WURyQ1Q=="],
+
+    "@paper-design/shaders-react": ["@paper-design/shaders-react@0.0.80", "", { "dependencies": { "@paper-design/shaders": "0.0.80" }, "peerDependencies": { "@types/react": "^18 || ^19", "react": "^18 || ^19" }, "optionalPeers": ["@types/react"] }, "sha512-Y1oxUeh5D2AECo05O+4UYRbaMfQzKKYH3Q5jcvirOcoX0hTPYbezCLn5g94nvcuzxy5LN/uqwsL3jDUp8r3E+A=="],
 
     "@pkgjs/parseargs": ["@pkgjs/parseargs@0.11.0", "", {}, "sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg=="],
 

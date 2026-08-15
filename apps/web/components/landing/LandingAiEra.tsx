@@ -5,7 +5,7 @@ import AsciiFanCanvas from "./AsciiFanCanvas";
 
 const bracket = "pointer-events-none absolute size-6 border-neutral-600";
 
-export default function RevampAiEra() {
+export default function LandingAiEra() {
     return (
         <section className="w-full bg-ink py-24 pt-35">
             <div className={cn(landingContainer, "flex flex-col items-center")}>

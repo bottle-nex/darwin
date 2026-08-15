@@ -190,7 +190,7 @@ export default function RunnerCard({ lit, litDelay }: { lit: boolean; litDelay: 
             lit={lit}
             litDelay={litDelay}
             label="Runner"
-            description="A sandboxed runner builds and tests the fix against your repo"
+            description="Your stack spins up in a sandbox where the fix is built and tested"
             diagram={<DockScene />}
         />
     );

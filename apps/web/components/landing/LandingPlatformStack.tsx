@@ -206,7 +206,7 @@ function StackDiagram({ highlighted }: { highlighted: GhostLayerId | null }) {
     );
 }
 
-export default function RevampPlatformStack() {
+export default function LandingPlatformStack() {
     const [highlighted, setHighlighted] = useState<GhostLayerId | null>(null);
 
     return (
