@@ -21,7 +21,13 @@ const TEMPLATE_NAME = "node-py-claude-template";
 const SANDBOX_MCP_ENTRY = "/opt/matcha/sandbox-mcp/index.js";
 const REPO_DIR = "/home/user/repo";
 
-const REQUIREMENTS = [
+interface Requirement {
+    name: string;
+    command: string;
+    needed_for: string;
+}
+
+const REQUIREMENTS: Requirement[] = [
     { name: "claude", command: "claude --version", needed_for: "running Claude" },
     { name: "gh", command: "gh --version", needed_for: "opening pull requests" },
     { name: "git", command: "git --version", needed_for: "cloning and branching" },
