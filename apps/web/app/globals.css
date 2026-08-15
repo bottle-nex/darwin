@@ -97,6 +97,7 @@
     --font-display: var(--font-tektur);
     --font-serif: var(--font-instrument-serif);
     --font-grotesk: var(--font-inter-tight);
+    --font-headline: var(--font-titillium-web);
 }
 
 @layer base {

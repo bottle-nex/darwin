@@ -66,10 +66,8 @@ function IntegrationTile({ tile, large = false }: { tile: IntegrationTileSpec; l
     return (
         <div
             className={cn(
-                "relative [--key-radius:24px] [--wall-step:1.4px]",
-                large
-                    ? "md:[--key-radius:46px] md:[--wall-step:2.8px]"
-                    : "md:[--key-radius:38px] md:[--wall-step:2.4px]",
+                "relative [--key-radius:20px] [--wall-step:1.4px]",
+                large ? "md:[--wall-step:2.8px]" : "md:[--wall-step:2.4px]",
             )}
             title={tile.name}
         >
@@ -119,8 +117,8 @@ function IntegrationTile({ tile, large = false }: { tile: IntegrationTileSpec; l
                 {/* Top face: thick dark bezel frame with a thin specular along the far edge. */}
                 <div
                     className={cn(
-                        "absolute inset-0 rounded-[24px] p-1",
-                        large ? "md:rounded-[46px] md:p-1.5" : "md:rounded-[38px] md:p-[5px]",
+                        "absolute inset-0 rounded-[20px] p-1",
+                        large ? "md:p-1.5" : "md:p-[5px]",
                     )}
                     style={{
                         background: `linear-gradient(180deg, rgba(${tile.glow}, 0.45) 0%, #38383e 6%, #1b1b1f 40%, #060607 100%)`,
@@ -130,8 +128,8 @@ function IntegrationTile({ tile, large = false }: { tile: IntegrationTileSpec; l
                     {/* Screen: lit from the top edge, even color wash, dotted texture. */}
                     <div
                         className={cn(
-                            "relative flex h-full w-full items-center justify-center overflow-hidden rounded-[20px]",
-                            large ? "md:rounded-[40px]" : "md:rounded-[33px]",
+                            "relative flex h-full w-full items-center justify-center overflow-hidden rounded-[16px]",
+                            large ? "md:rounded-[14px]" : "md:rounded-[15px]",
                         )}
                         style={{
                             background: `radial-gradient(130% 70% at 50% -8%, rgba(${tile.glow}, 0.5), rgba(${tile.glow}, 0.1) 55%, transparent 78%), radial-gradient(60% 45% at 50% 58%, rgba(${tile.glow}, 0.12), transparent 72%), linear-gradient(180deg, #1a1a20, #0c0c0f)`,

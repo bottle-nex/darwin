@@ -1,6 +1,5 @@
 import RevampBentoCards from "@/components/revamp/RevampBentoCards";
 import RevampFooter from "@/components/revamp/RevampFooter";
-import RevampAiEra from "@/components/revamp/RevampAiEra";
 import RevampHero from "@/components/revamp/RevampHero";
 import RevampIssueTracker from "@/components/revamp/RevampIssueTracker";
 import RevampPlatformStack from "@/components/revamp/RevampPlatformStack";
@@ -19,8 +18,8 @@ export default function Home() {
             <RevampHero />
             <RevampIntegrations />
             <RevampPlatformStack />
+            <RevampBentoCards />
             <RevampIssueTracker />
-            {/* <RevampBentoCards /> */}
             <RevampFooter />
         </div>
     );

@@ -11,7 +11,7 @@ type SectionHeaderProps = {
     className?: string;
 };
 
-/** Centered landing-section header: badge pill, serif title, muted description. */
+/** Centered landing-section header: badge pill, headline title, muted description. */
 export default function SectionHeader({
     badge,
     icon: Icon = RiSendPlaneFill,
@@ -32,7 +32,7 @@ export default function SectionHeader({
                 <Icon className="size-3.5 text-snow" />
                 <span className="text-xs font-medium tracking-wide text-neutral-200">{badge}</span>
             </span>
-            <h2 className="mt-6 text-4xl tracking-tight text-snow font-serif md:text-6xl">
+            <h2 className="mt-6 text-4xl tracking-tight text-snow font-headline md:text-6xl">
                 {title}
             </h2>
             {description && (

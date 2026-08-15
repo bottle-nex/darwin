@@ -9,7 +9,7 @@ export default function RevampHero() {
     return (
         <main className="relative min-h-screen w-screen bg-ink pb-20">
             <section className={cn(landingContainer, "mt-55 h-fit space-y-3")}>
-                <div className="text-snow text-6xl w-[60%] font-serif">
+                <div className="text-snow text-6xl w-[60%] font-headline">
                     Drop an issue on the board. An agent ships the fix.
                 </div>
                 <div className="flex w-full items-center">
@@ -20,7 +20,7 @@ export default function RevampHero() {
                     </div>
                     <span className="flex-1 flex justify-end">
                         <Button variant={"tertiary"} className="text-graphite rounded-full bg-snow">
-                            Get started
+                            Create Issue
                             <MdChevronRight className="text-background!" />
                         </Button>
                     </span>

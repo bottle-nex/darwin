@@ -1,5 +1,12 @@
 import type { Metadata } from "next";
-import { Geist_Mono, Instrument_Serif, Inter_Tight, Poppins, Tektur } from "next/font/google";
+import {
+    Geist_Mono,
+    Instrument_Serif,
+    Inter_Tight,
+    Poppins,
+    Tektur,
+    Titillium_Web,
+} from "next/font/google";
 import "./globals.css";
 import LenisProvider from "@/providers/LenisProvider";
 import QueryProvider from "@/providers/QueryProvider";
@@ -35,6 +42,12 @@ const interTight = Inter_Tight({
     subsets: ["latin"],
 });
 
+const titilliumWeb = Titillium_Web({
+    variable: "--font-titillium-web",
+    subsets: ["latin"],
+    weight: ["300", "400", "600", "700"],
+});
+
 export const metadata: Metadata = {
     title: "Matcha",
     description: "The modern WhatsApp marketing platform for teams that want to grow.",
@@ -51,7 +64,7 @@ export default async function RootLayout({
         <html
             lang="en"
             suppressHydrationWarning
-            className={`${poppins.variable} ${geistMono.variable} ${tektur.variable} ${instrumentSerif.variable} ${interTight.variable} h-full antialiased`}
+            className={`${poppins.variable} ${geistMono.variable} ${tektur.variable} ${instrumentSerif.variable} ${interTight.variable} ${titilliumWeb.variable} h-full antialiased`}
         >
             <LenisProvider>
                 <body className="min-h-full flex flex-col">
