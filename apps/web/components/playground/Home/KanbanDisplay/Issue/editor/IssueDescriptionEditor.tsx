@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { EditorContent, ReactNodeViewRenderer, useEditor } from "@tiptap/react";
+import { EditorContent, ReactNodeViewRenderer, useEditor, type Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { cn } from "@/lib/utils";
 import TaskList from "@tiptap/extension-task-list";
@@ -34,6 +34,7 @@ interface IssueDescriptionEditorProps {
     editable?: boolean;
     authoring?: boolean;
     onChange?: (state: IssueDescriptionState) => void;
+    onReady?: (editor: Editor) => void;
 }
 
 export default function IssueDescriptionEditor({
@@ -43,6 +44,7 @@ export default function IssueDescriptionEditor({
     editable = true,
     authoring = false,
     onChange,
+    onReady,
 }: IssueDescriptionEditorProps) {
     const onChangeRef = useRef(onChange);
     useEffect(() => {
@@ -68,7 +70,10 @@ export default function IssueDescriptionEditor({
                 class: cn("tiptap min-h-full no-scro", className),
             },
         },
-        onCreate: ({ editor: created }) => report(created),
+        onCreate: ({ editor: created }) => {
+            report(created);
+            onReady?.(created);
+        },
         onUpdate: ({ editor: updated }) => report(updated),
     });
 

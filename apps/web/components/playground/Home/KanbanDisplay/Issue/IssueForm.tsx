@@ -1,5 +1,7 @@
 "use client";
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import { motion } from "motion/react";
+import type { Editor } from "@tiptap/react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,6 +28,7 @@ import IssueShell from "./IssueShell";
 import IssueTopper from "./IssueTopper";
 import IssueChat from "./chat/IssueChat";
 import IssueReferences from "./IssueReferences";
+import SubmitWarningToast, { useSubmitWarning } from "./SubmitWarningToast";
 import { PRIORITY_OPTIONS } from "./issueHelpers";
 
 export default function IssueForm({
@@ -74,15 +77,43 @@ export default function IssueForm({
     const createIssue = useCreateIssue();
     const updateIssue = useUpdateIssue();
     const pending = createIssue.isPending || updateIssue.isPending;
+    const { warning, fire: fireWarning, shakeControls } = useSubmitWarning();
 
-    const canSubmit =
-        title.trim().length > 0 &&
-        Boolean(projectId) &&
-        !pending &&
-        (isEdit || isCustom || (body.ready && memberIds.length > 0));
+    const titleRef = useRef<HTMLInputElement>(null);
+    const editorRef = useRef<Editor | null>(null);
+    const [membersOpen, setMembersOpen] = useState(false);
+
+    /** The first unmet requirement, with a `focus` that puts the user where the fix goes. */
+    function missingField(): { warning: string; focus: () => void } | null {
+        const focusTitle = () => titleRef.current?.focus();
+        const focusDescription = () => editorRef.current?.commands.focus("end");
+        if (title.trim().length === 0) {
+            return { warning: "The issue needs a title.", focus: focusTitle };
+        }
+        if (isEdit || isCustom) return null;
+        if (body.isEmpty) {
+            return { warning: "Add a description first.", focus: focusDescription };
+        }
+        if (body.prompts > 0) {
+            return {
+                warning: `${body.prompts} template field${body.prompts === 1 ? "" : "s"} left to fill.`,
+                focus: focusDescription,
+            };
+        }
+        if (memberIds.length === 0) {
+            return { warning: "Assign at least one member.", focus: () => setMembersOpen(true) };
+        }
+        return null;
+    }
 
     async function handleSubmit() {
-        if (!canSubmit || !projectId) return;
+        if (pending || !projectId) return;
+        const missing = missingField();
+        if (missing) {
+            fireWarning(missing.warning);
+            missing.focus();
+            return;
+        }
         try {
             if (issue) {
                 await updateIssue.mutateAsync({
@@ -149,6 +180,7 @@ export default function IssueForm({
                         />
                         <div className="w-full flex flex-col items-start ">
                             <Input
+                                ref={titleRef}
                                 autoFocus={!readOnly}
                                 readOnly={readOnly}
                                 variant={"ghost"}
@@ -187,6 +219,8 @@ export default function IssueForm({
                                 defaultValue={memberIds}
                                 onChange={setMemberIds}
                                 disabled={readOnly}
+                                open={membersOpen}
+                                onOpenChange={setMembersOpen}
                             />
                             <Capsule
                                 type="calendar"
@@ -213,6 +247,7 @@ export default function IssueForm({
                             editable={!readOnly}
                             initialContent={body.html}
                             onChange={body.onEditorChange}
+                            onReady={(editor) => (editorRef.current = editor)}
                         />
                         <IssueReferences issueId={issue?.id} />
                     </section>
@@ -236,23 +271,27 @@ export default function IssueForm({
                         <section className="h-fit flex items-center justify-end gap-x-20">
                             <div className="flex items-center justify-end gap-x-2">
                                 {!isEdit && !isCustom && <BodyGate body={body} />}
-                                <Button
-                                    variant={"tertiary"}
-                                    size={"xs"}
-                                    onClick={handleSubmit}
-                                    loading={pending}
-                                    disabled={!canSubmit}
-                                >
-                                    {isEdit ? "Save" : "Create Issue"}
-                                    <ShortcutHint>
-                                        {isMac ? (
-                                            <MdOutlineKeyboardCommandKey />
-                                        ) : (
-                                            <span className="text-[10px]">Ctrl</span>
-                                        )}
-                                        <GrReturn />
-                                    </ShortcutHint>
-                                </Button>
+                                <div className="relative isolate">
+                                    <SubmitWarningToast warning={warning} />
+                                    <motion.div animate={shakeControls} className="relative z-10">
+                                        <Button
+                                            variant={"tertiary"}
+                                            size={"xs"}
+                                            onClick={handleSubmit}
+                                            loading={pending}
+                                        >
+                                            {isEdit ? "Save" : "Create Issue"}
+                                            <ShortcutHint>
+                                                {isMac ? (
+                                                    <MdOutlineKeyboardCommandKey />
+                                                ) : (
+                                                    <span className="text-[10px]">Ctrl</span>
+                                                )}
+                                                <GrReturn />
+                                            </ShortcutHint>
+                                        </Button>
+                                    </motion.div>
+                                </div>
                             </div>
                         </section>
                     )}

@@ -14,6 +14,8 @@
     --color-primary-foreground: var(--color-snow);
     --color-matcha: #9bc24f; /* interaction accent: focus rings, success, toggles */
     --color-matcha-foreground: #14150c; /* text/icons on matcha fills */
+    --color-brick: #6e1d1d; /* muted maroon: warning/error pill fills */
+    --color-brick-foreground: #f2bcb9; /* text/icons on brick fills */
 
     /* Hairline card borders and inset top-edge highlights. */
     --color-edge: #212122;

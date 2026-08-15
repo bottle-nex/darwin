@@ -108,7 +108,7 @@ function ActiveCard({ stage, animate }: { stage: number; animate: boolean }) {
             layoutId="mock-active-card"
             layout
             transition={animate ? { type: "spring", stiffness: 240, damping: 26 } : { duration: 0 }}
-            className="rounded-lg border border-white/16 bg-graphite p-2.5"
+            className="rounded-lg border border-white/7 bg-graphite p-2.5"
         >
             <div className="flex items-center justify-between">
                 <span className="font-mono text-[10px] text-neutral-400">MAT-142</span>
