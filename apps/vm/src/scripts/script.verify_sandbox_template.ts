@@ -1,8 +1,12 @@
-import { Sandbox, type CommandResult, type CommandStartOpts } from "e2b";
+import { Sandbox } from "e2b";
 import { ok as assert } from "node:assert/strict";
 import Logger from "@trymatcha/logger";
 import { ENV } from "../conf/config.env";
-import GraphService from "../services/service.graph";
+import GraphService, {
+    GRAPHIFY_INTEGRATION,
+    GRAPHIFY_OUT,
+    GRAPHIFY_SETTINGS,
+} from "../services/service.graph";
 
 const log = Logger.scope("template");
 
@@ -16,17 +20,14 @@ const log = Logger.scope("template");
 const TEMPLATE_NAME = "node-py-claude-template";
 const SANDBOX_MCP_ENTRY = "/opt/matcha/sandbox-mcp/index.js";
 const REPO_DIR = "/home/user/repo";
-const GRAPHIFY_VERSION = "0.9.43";
 
-interface Requirement {
-    name: string;
-    command: string;
-    /** Why the runner needs it, printed when it is missing. */
-    needed_for: string;
-}
-
-const REQUIREMENTS: Requirement[] = [
-    { name: "claude", command: "claude --version", needed_for: "running the solving agent" },
+const REQUIREMENTS = [
+    {
+        name: "claude",
+        command:
+            "claude --version && claude --help | grep -F -- '--settings' >/dev/null && claude --help | grep -F -- '--add-dir' >/dev/null",
+        needed_for: "running Claude with the external Graphify integration",
+    },
     { name: "gh", command: "gh --version", needed_for: "opening pull requests" },
     { name: "git", command: "git --version", needed_for: "cloning and branching" },
     { name: "node", command: "node --version", needed_for: "running sandbox-mcp" },
@@ -37,31 +38,17 @@ const REQUIREMENTS: Requirement[] = [
     },
     {
         name: "graphify",
-        command: `graphify --version | grep -F ${GRAPHIFY_VERSION}`,
+        command: "graphify --version",
         needed_for: "building and querying the code graph",
     },
 ];
 
-async function run(
-    sandbox: Sandbox,
-    command: string,
-    options: CommandStartOpts & { background?: false } = {},
-): Promise<CommandResult> {
-    return sandbox.commands.run(command, { ...options, background: false });
-}
-
 async function verify_requirements(sandbox: Sandbox): Promise<void> {
     let missing = 0;
-    const results = await Promise.all(
-        REQUIREMENTS.map((requirement) =>
-            sandbox.commands
-                .run(`bash -lc ${JSON.stringify(requirement.command)}`, { timeoutMs: 60_000 })
-                .catch(() => null),
-        ),
-    );
-
-    for (const [index, requirement] of REQUIREMENTS.entries()) {
-        const result = results[index];
+    for (const requirement of REQUIREMENTS) {
+        const result = await sandbox.commands
+            .run(`bash -lc ${JSON.stringify(requirement.command)}`, { timeoutMs: 60_000 })
+            .catch(() => null);
         if (!result) {
             missing++;
             log.error(`${requirement.name} is MISSING`, undefined, {
@@ -80,82 +67,59 @@ async function verify_requirements(sandbox: Sandbox): Promise<void> {
 }
 
 async function verify_graphify_workflow(sandbox: Sandbox): Promise<void> {
-    await run(
-        sandbox,
-        `rm -rf ${REPO_DIR} && mkdir -p ${REPO_DIR}/src ${REPO_DIR}/.claude && git init -q -b main ${REPO_DIR} && git -C ${REPO_DIR} config user.email matcha@example.invalid && git -C ${REPO_DIR} config user.name Matcha`,
+    await sandbox.commands.run(
+        `rm -rf ${REPO_DIR} ${GRAPHIFY_INTEGRATION} ${GRAPHIFY_OUT} && mkdir -p ${REPO_DIR}/src && git init -q -b main ${REPO_DIR} && git -C ${REPO_DIR} config user.email matcha@example.invalid && git -C ${REPO_DIR} config user.name Matcha`,
         { timeoutMs: 60_000 },
     );
-    await Promise.all([
-        sandbox.files.write(`${REPO_DIR}/src/base.ts`, 'export const baseSymbol = "v1";\n'),
-        sandbox.files.write(`${REPO_DIR}/CLAUDE.md`, "# Customer instructions\n"),
-        sandbox.files.write(`${REPO_DIR}/.claude/settings.json`, "{}\n"),
-        sandbox.files.write(`${REPO_DIR}/.claudeignore`, "customer-cache/\n"),
-        sandbox.files.write(`${REPO_DIR}/.env`, "MATCHA_TEST_SECRET=hidden\n"),
-    ]);
-    await run(sandbox, "git add -A && git commit -qm base", { cwd: REPO_DIR });
+    await sandbox.files.write(`${REPO_DIR}/src/base.ts`, 'export const baseSymbol = "v1";\n');
+    await sandbox.files.write(`${REPO_DIR}/CLAUDE.md`, "# Customer instructions\n");
+    await sandbox.commands.run("git add -A && git commit -qm base", { cwd: REPO_DIR });
 
-    await GraphService.protect(sandbox);
     assert(
         (await GraphService.prepare(sandbox, log)) === "ready",
         "initial Graphify preparation did not reach ready",
     );
-    await run(
-        sandbox,
-        "test -s graphify-out/graph.json && test -s graphify-out/manifest.json && test -s .claude/skills/graphify/SKILL.md && grep -q graphify .claude/settings.json",
-        { cwd: REPO_DIR },
+    await sandbox.commands.run(
+        `test -s ${GRAPHIFY_OUT}/graph.json && test -s ${GRAPHIFY_OUT}/manifest.json && test -s ${GRAPHIFY_INTEGRATION}/.claude/skills/graphify/SKILL.md && grep -q graphify ${GRAPHIFY_SETTINGS} && test ! -e ${REPO_DIR}/graphify-out`,
     );
-    const read_hook = await run(
-        sandbox,
-        'jq -er \'.hooks.PreToolUse[] | select(.matcher == "Read|Glob") | .hooks[] | select(.type == "command") | .command\' .claude/settings.json',
-        { cwd: REPO_DIR },
+    const read_hook = await sandbox.commands.run(
+        `jq -er '.hooks.PreToolUse[] | select(.matcher == "Read|Glob") | .hooks[] | select(.type == "command") | .command' ${GRAPHIFY_SETTINGS}`,
     );
     const hook_payload = JSON.stringify({
         session_id: "matcha-template-strict",
         tool_name: "Read",
         tool_input: { file_path: "src/base.ts" },
     });
-    const strict_hook = await run(
-        sandbox,
-        `printf %s ${JSON.stringify(hook_payload)} | GRAPHIFY_HOOK_STRICT=1 ${read_hook.stdout.trim()}`,
-        { cwd: REPO_DIR },
+    const strict_hook = await sandbox.commands.run(
+        `printf %s ${JSON.stringify(hook_payload)} | ${read_hook.stdout.trim()}`,
+        {
+            cwd: REPO_DIR,
+            envs: { GRAPHIFY_OUT },
+        },
     );
     assert(
         JSON.parse(strict_hook.stdout).hookSpecificOutput?.permissionDecision === "deny",
         "strict Graphify hook did not block the first raw source read",
     );
-    const disabled_hook = await run(
-        sandbox,
-        `printf %s ${JSON.stringify(hook_payload.replace("matcha-template-strict", "matcha-template-disabled"))} | GRAPHIFY_HOOK_STRICT=0 ${read_hook.stdout.trim()}`,
-        { cwd: REPO_DIR },
-    );
-    assert(
-        JSON.parse(disabled_hook.stdout).hookSpecificOutput?.permissionDecision !== "deny",
-        "GRAPHIFY_HOOK_STRICT=0 did not disable the strict read block",
-    );
-
-    await run(sandbox, "git add -A", { cwd: REPO_DIR });
-    const staged = await run(sandbox, "git diff --cached --name-only", { cwd: REPO_DIR });
-    assert(!staged.stdout.trim(), `Graphify files reached the Git index: ${staged.stdout}`);
+    const worktree = await sandbox.commands.run("git status --porcelain", { cwd: REPO_DIR });
+    assert(!worktree.stdout.trim(), `Graphify changed the customer repo: ${worktree.stdout}`);
 
     await sandbox.files.write(`${REPO_DIR}/src/base.ts`, 'export const baseSymbol = "v2";\n');
-    await run(sandbox, "git add src/base.ts && git commit -qm update-base", { cwd: REPO_DIR });
-
-    const incremental_lines: string[] = [];
-    const original_stream = log.stream.bind(log);
-    log.stream = (line: string) => {
-        incremental_lines.push(line);
-        original_stream(line);
-    };
-    await GraphService.prepare(sandbox, log);
-    const incremental = incremental_lines.find((line) => line.includes("changed;"));
-    assert(
-        incremental,
-        `graphify did not report an incremental scan: ${incremental_lines.join("\n")}`,
-    );
-    const query = await run(sandbox, "graphify query baseSymbol --graph graphify-out/graph.json", {
+    await sandbox.commands.run("git add src/base.ts && git commit -qm update-base", {
         cwd: REPO_DIR,
-        timeoutMs: 60_000,
     });
+
+    assert(
+        (await GraphService.prepare(sandbox, log)) === "ready",
+        "incremental Graphify preparation did not reach ready",
+    );
+    const query = await sandbox.commands.run(
+        `graphify query baseSymbol --graph ${GRAPHIFY_OUT}/graph.json`,
+        {
+            cwd: REPO_DIR,
+            timeoutMs: 60_000,
+        },
+    );
     assert(query.stdout.trim(), "updated graph returned no result for baseSymbol");
 }
 

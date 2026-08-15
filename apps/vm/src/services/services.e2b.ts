@@ -3,7 +3,11 @@ import { ENV } from "../conf/config.env";
 import GithubService from "./service.github";
 import SecretService from "./service.secret";
 import PlanService from "./services.plan";
-import GraphService from "./service.graph";
+import GraphService, {
+    GRAPHIFY_INTEGRATION,
+    GRAPHIFY_OUT,
+    GRAPHIFY_SETTINGS,
+} from "./service.graph";
 import ClaudeRun from "./service.claude_run";
 import SandboxStream, { redact } from "./service.sandbox_stream";
 import { sign_worker_jwt } from "./service.jwt";
@@ -221,9 +225,6 @@ export default class E2B {
             await sandbox.files.write(MCP_CONFIG_PATH, JSON.stringify(mcp_config, null, 2));
             log.info("wrote mcp config into sandbox");
 
-            await GraphService.protect(sandbox);
-            log.info("protected worker-local files from Git");
-
             log.info("worker marked Busy");
             await prisma.worker.update({
                 where: { id: worker_id },
@@ -270,25 +271,33 @@ export default class E2B {
                         prompt_path: ISSUE_PROMPT_PATH,
                         model,
                         effort,
-                        extra_flags: [`--mcp-config ${MCP_CONFIG_PATH}`],
+                        extra_flags: [
+                            `--mcp-config ${MCP_CONFIG_PATH}`,
+                            ...(graph_state === "ready"
+                                ? [
+                                      `--settings ${GRAPHIFY_SETTINGS}`,
+                                      `--add-dir ${GRAPHIFY_INTEGRATION}`,
+                                  ]
+                                : []),
+                        ],
                         envs: {
                             CLAUDE_CODE_OAUTH_TOKEN: ENV.SERVER_CLAUDE_CODE_OAUTH_TOKEN,
                             GH_TOKEN: gh_token,
-                            GRAPHIFY_HOOK_STRICT: graph_state === "ready" ? "1" : "0",
+                            ...(graph_state === "ready" ? { GRAPHIFY_OUT } : {}),
                         },
                         timeout_ms: ISSUE_SOLVE_TIMEOUT_MS,
                         label: `solving agent for issue #${issue.number}`,
                     });
                 } catch (error) {
-                    try {
-                        const worktree = await sandbox.commands.run("git status --porcelain", {
+                    preserve_sandbox = await sandbox.commands
+                        .run("git status --porcelain", {
                             cwd: REPO_DIR,
+                        })
+                        .then((worktree) => Boolean(worktree.stdout.trim()))
+                        .catch((inspection_error) => {
+                            log.error("could not inspect failed solver worktree", inspection_error);
+                            return true;
                         });
-                        preserve_sandbox = Boolean(worktree.stdout.trim());
-                    } catch (inspection_error) {
-                        preserve_sandbox = true;
-                        log.error("could not inspect failed solver worktree", inspection_error);
-                    }
                     throw error;
                 }
 

@@ -35,7 +35,6 @@ apps/web/.env
 # turbo
 .turbo
 
-# generated package bundles
 dist/
 
 # prisma generated client
