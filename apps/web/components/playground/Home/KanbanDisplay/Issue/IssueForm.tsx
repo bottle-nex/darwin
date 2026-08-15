@@ -1,9 +1,11 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { LuInfo } from "react-icons/lu";
+import { MdOutlineKeyboardCommandKey } from "react-icons/md";
+import { GrReturn } from "react-icons/gr";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { useCreateIssue } from "@/hooks/issues/useCreateIssue";
 import { useUpdateIssue } from "@/hooks/issues/useUpdateIssue";
@@ -23,6 +25,7 @@ import { useIssueDescription } from "./useIssueDescription";
 import IssueShell from "./IssueShell";
 import IssueTopper from "./IssueTopper";
 import IssueChat from "./chat/IssueChat";
+import IssueReferences from "./IssueReferences";
 import { PRIORITY_OPTIONS } from "./issueHelpers";
 
 export default function IssueForm({
@@ -30,17 +33,20 @@ export default function IssueForm({
     issue,
     initialDescription,
     initialTemplate,
+    readOnly = false,
 }: {
     target: IssueTarget;
     issue: BoardIssue | null;
     initialDescription?: string;
     initialTemplate?: PickableTemplate;
+    readOnly?: boolean;
 }) {
     const { close } = useIssueDialog();
     const projectId = useActiveProject()?.id;
 
     const isEdit = Boolean(issue);
     const isCustom = target.board === "custom";
+    const [isMac] = useState(() => /Mac|iPhone|iPad/.test(navigator.userAgent));
 
     const [title, setTitle] = useState(issue?.title ?? "");
     const [summary, setSummary] = useState(issue?.summary ?? "");
@@ -88,8 +94,6 @@ export default function IssueForm({
                     priority: PRIORITY_TO_NUMBER[priority],
                     assignee_ids: memberIds,
                     tag_ids: tagIds,
-                    // Explicit `null` — an omitted date reads as "unchanged", so
-                    // clearing one in the picker would never reach the server.
                     start_date: startDate?.toISOString() ?? null,
                     target_date: targetDate?.toISOString() ?? null,
                 });
@@ -113,6 +117,19 @@ export default function IssueForm({
         }
     }
 
+    useEffect(() => {
+        if (readOnly) return;
+        function onKeyDown(event: KeyboardEvent) {
+            if (!(event.metaKey || event.ctrlKey) || event.key !== "Enter" || event.isComposing) {
+                return;
+            }
+            event.preventDefault();
+            handleSubmit();
+        }
+        window.addEventListener("keydown", onKeyDown);
+        return () => window.removeEventListener("keydown", onKeyDown);
+    });
+
     return (
         <IssueShell>
             <main className="flex h-full min-h-0 min-w-0 flex-row">
@@ -132,7 +149,8 @@ export default function IssueForm({
                         />
                         <div className="w-full flex flex-col items-start ">
                             <Input
-                                autoFocus
+                                autoFocus={!readOnly}
+                                readOnly={readOnly}
                                 variant={"ghost"}
                                 placeholder="Issue Title"
                                 maxLength={80}
@@ -141,6 +159,7 @@ export default function IssueForm({
                                 className="text-3xl ring-0 border-0 font-semibold h-8 p-0 bg-transparent hover:bg-transparent! rounded-none"
                             />
                             <Input
+                                readOnly={readOnly}
                                 variant={"ghost"}
                                 placeholder="Add a short summary..."
                                 maxLength={255}
@@ -155,28 +174,33 @@ export default function IssueForm({
                                 options={PRIORITY_OPTIONS}
                                 defaultValue={priority}
                                 onChange={(value) => setPriority(value as Priority)}
+                                disabled={readOnly}
                             />
                             <TagsCapsule
                                 projectId={projectId}
                                 defaultValue={tagIds}
                                 onChange={setTagIds}
+                                disabled={readOnly}
                             />
                             <MembersCapsule
                                 projectId={projectId}
                                 defaultValue={memberIds}
                                 onChange={setMemberIds}
+                                disabled={readOnly}
                             />
                             <Capsule
                                 type="calendar"
                                 placeholder="Start date"
                                 defaultValue={startDate}
                                 onChange={setStartDate}
+                                disabled={readOnly}
                             />
                             <Capsule
                                 type="calendar"
                                 placeholder="Target date"
                                 defaultValue={targetDate}
                                 onChange={setTargetDate}
+                                disabled={readOnly}
                             />
                         </div>
                     </section>
@@ -186,24 +210,52 @@ export default function IssueForm({
                     >
                         <IssueDescriptionEditor
                             key={body.editorKey}
+                            editable={!readOnly}
                             initialContent={body.html}
                             onChange={body.onEditorChange}
                         />
+                        <IssueReferences issueId={issue?.id} />
                     </section>
-                    <section className="h-fit flex items-center justify-end gap-x-20">
-                        <div className="flex items-center justify-end gap-x-2 ">
-                            {!isEdit && !isCustom && <BodyGate body={body} />}
-                            <Button
-                                className="rounded-full"
-                                variant={"tertiary"}
-                                onClick={handleSubmit}
-                                loading={pending}
-                                disabled={!canSubmit}
-                            >
-                                {isEdit ? "Save" : "Create Issue"}
+                    {readOnly ? (
+                        <section className="h-fit flex items-center justify-between">
+                            <div className="flex items-center gap-x-1 text-xs text-white/70">
+                                <LuInfo size={10} />
+                                <span>
+                                    The agent has picked this issue up. It can&apos;t be edited
+                                    while it runs.
+                                </span>
+                            </div>
+                            <Button size={"xs"} variant={"tertiary"} onClick={close}>
+                                Close
+                                <ShortcutHint>
+                                    <span className="text-[10px]">esc</span>
+                                </ShortcutHint>
                             </Button>
-                        </div>
-                    </section>
+                        </section>
+                    ) : (
+                        <section className="h-fit flex items-center justify-end gap-x-20">
+                            <div className="flex items-center justify-end gap-x-2">
+                                {!isEdit && !isCustom && <BodyGate body={body} />}
+                                <Button
+                                    variant={"tertiary"}
+                                    size={"xs"}
+                                    onClick={handleSubmit}
+                                    loading={pending}
+                                    disabled={!canSubmit}
+                                >
+                                    {isEdit ? "Save" : "Create Issue"}
+                                    <ShortcutHint>
+                                        {isMac ? (
+                                            <MdOutlineKeyboardCommandKey />
+                                        ) : (
+                                            <span className="text-[10px]">Ctrl</span>
+                                        )}
+                                        <GrReturn />
+                                    </ShortcutHint>
+                                </Button>
+                            </div>
+                        </section>
+                    )}
                 </div>
                 <IssueChat issueId={issue?.id} />
             </main>
@@ -211,7 +263,14 @@ export default function IssueForm({
     );
 }
 
-/** Nudge on the create form: how many required description fields are still blank. */
+function ShortcutHint({ children }: { children: ReactNode }) {
+    return (
+        <span className="ml-0.5 flex items-center gap-0.5 text-ink/40 [&_svg]:text-ink/40!">
+            {children}
+        </span>
+    );
+}
+
 function BodyGate({ body }: { body: ReturnType<typeof useIssueDescription> }) {
     if (body.prompts === 0) return null;
     return (

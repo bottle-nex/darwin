@@ -6,13 +6,15 @@ import { Action, Permissions } from "@trymatcha/access-control";
 import { server_services } from "..";
 import { OutboundSocketMessageType } from "@trymatcha/types";
 import { issue_recipients } from "../notifications/recipients";
+import MessageReferenceService, {
+    MESSAGE_REFERENCE_INCLUDE,
+} from "../services/service.message-references";
 import type { AuthUser } from "../types/express.d";
 
 export default class ChatSocketHandler {
     static payload_schema = z.object({
         issueId: z.string().min(1),
         message: z.string().trim().min(1).max(5000),
-        mentionedMemberIds: z.array(z.string().min(1)).max(20).optional(),
         repliedToId: z.string().min(1).optional(),
     });
 
@@ -98,7 +100,7 @@ export default class ChatSocketHandler {
             ChatSocketHandler.send_error(ws, "Invalid chat data provided");
             return;
         }
-        const { issueId, message, mentionedMemberIds, repliedToId } = parsed.data;
+        const { issueId, message, repliedToId } = parsed.data;
 
         try {
             const issue = await prisma.issue.findUnique({
@@ -132,27 +134,24 @@ export default class ChatSocketHandler {
                 }
             }
 
-            const mention_ids = mentionedMemberIds?.length
-                ? (
-                      await prisma.projectMember.findMany({
-                          where: { id: { in: mentionedMemberIds }, projectId: issue.projectId },
-                          select: { id: true },
-                      })
-                  ).map((member) => member.id)
-                : [];
+            const resolved = await MessageReferenceService.resolve(message, issue.projectId);
+            if (!resolved.message) {
+                ChatSocketHandler.send_error(ws, "Message is empty");
+                return;
+            }
 
             const chat = await prisma.chat.create({
                 data: {
                     issueId: issue.id,
                     senderId: user.id,
-                    message,
+                    message: resolved.message,
                     repliedToId,
-                    mentions: { create: mention_ids.map((memberId) => ({ memberId })) },
+                    references: { create: MessageReferenceService.to_rows(resolved) },
                 },
                 include: {
                     sender: true,
                     repliedTo: { include: { sender: true } },
-                    mentions: { include: { member: { include: { user: true } } } },
+                    references: { include: MESSAGE_REFERENCE_INCLUDE },
                 },
             });
 
@@ -167,24 +166,51 @@ export default class ChatSocketHandler {
                 JSON.stringify(publish_body),
             );
 
+            const mentioned_user_ids = chat.references.flatMap((reference) =>
+                reference.member ? [reference.member.userId] : [],
+            );
+
             await Promise.all(
-                chat.mentions
-                    .filter((mention) => mention.member.userId !== user.id)
-                    .map((mention) =>
-                        server_services.notifications.enqueue({
-                            action: "chat.mention",
-                            chatId: chat.id,
-                            memberId: mention.memberId,
-                            mentionedById: user.id,
-                        }),
-                    ),
+                chat.references.flatMap((reference) =>
+                    reference.memberId && reference.member?.userId !== user.id
+                        ? [
+                              server_services.notifications.enqueue({
+                                  action: "chat.mention",
+                                  chatId: chat.id,
+                                  memberId: reference.memberId,
+                                  mentionedById: user.id,
+                              }),
+                          ]
+                        : [],
+                ),
+            );
+
+            const referenced = await MessageReferenceService.referenced_issue_recipients({
+                issueIds: resolved.issueIds.filter((id) => id !== issue.id),
+                exclude: [user.id, ...mentioned_user_ids],
+            });
+
+            await Promise.all(
+                referenced.map((target) =>
+                    server_services.notifications.enqueue({
+                        action: "issue.referenced",
+                        issueId: target.issueId,
+                        chatId: chat.id,
+                        recipientId: target.recipientId,
+                        actorId: user.id,
+                    }),
+                ),
             );
 
             await Promise.all(
                 issue_recipients({
                     assigneeIds: issue.assignees.map((assignee) => assignee.id),
                     creatorId: issue.createdById,
-                    exclude: [user.id, ...chat.mentions.map((mention) => mention.member.userId)],
+                    exclude: [
+                        user.id,
+                        ...mentioned_user_ids,
+                        ...referenced.map((target) => target.recipientId),
+                    ],
                 }).map((recipientId) =>
                     server_services.notifications.enqueue({
                         action: "issue.commented",

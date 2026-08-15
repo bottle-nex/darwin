@@ -10,12 +10,14 @@ export const PRIORITY_OPTIONS: CapsuleOption[] = [
     { value: "low", label: "Low", dotClassName: "bg-neutral-600" },
 ];
 
-/** Parked cards and untouched To-Dos are ours; anything else belongs to the agent. */
 export function isEditable(issue: BoardIssue): boolean {
-    return issue.status === IssueStatus.Todo || issue.status === IssueStatus.Parked;
+    return (
+        issue.status === IssueStatus.Todo ||
+        issue.status === IssueStatus.Queued ||
+        issue.status === IssueStatus.Parked
+    );
 }
 
-/** An issue already knows where it lives, so its target is derived, never passed. */
 export function targetForIssue(issue: BoardIssue, columns: BoardColumn[]): IssueTarget {
     if (!issue.customColumnId) return { board: "llm" };
     const column = columns.find((c) => c.id === issue.customColumnId);

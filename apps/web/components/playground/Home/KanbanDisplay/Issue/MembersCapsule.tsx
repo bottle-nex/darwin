@@ -17,8 +17,6 @@ import { useProjectMembers, type ProjectMember } from "@/hooks/project/useProjec
 import ProjectRoleTicker from "@/components/playground/Team/TeamView/ProjectRoleTicker";
 import { CapsuleTrigger } from "./Capsule";
 
-// A small, fixed palette; the tone is picked deterministically from the user id
-// so a given person always reads the same colour across the member list.
 const MEMBER_TONES = [
     "bg-indigo-500/30 text-indigo-100",
     "bg-emerald-500/30 text-emerald-100",
@@ -38,6 +36,7 @@ interface MembersCapsuleProps {
     projectId: string | undefined;
     defaultValue?: string[];
     onChange?: (memberIds: string[]) => void;
+    disabled?: boolean;
     className?: string;
 }
 
@@ -71,6 +70,7 @@ export default function MembersCapsule({
     projectId,
     defaultValue,
     onChange,
+    disabled,
     className,
 }: MembersCapsuleProps) {
     const [open, setOpen] = useState(false);
@@ -94,7 +94,7 @@ export default function MembersCapsule({
                 content="Assigning a member is compulsory, our agent may ask them questions about this issue."
             >
                 <PopoverTrigger asChild>
-                    <CapsuleTrigger className={className}>
+                    <CapsuleTrigger disabled={disabled} className={className}>
                         <MdPeople className="size-3.5 text-white/60" />
                         {selectedMembers.length === 0
                             ? "Members"

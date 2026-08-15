@@ -23,6 +23,7 @@ model Issue {
   updatedAt  DateTime  @updatedAt
   resolvedAt DateTime?
   chats      Chat[]
+  references MessageReference[]
 
   assignerWorkerId String?
   assignedWorker   Worker? @relation(fields: [assignerWorkerId], references: [id], onDelete: Cascade)

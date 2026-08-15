@@ -4,6 +4,8 @@ import ResponseWriter from "../../services/service.response";
 import Access from "../../access-control/access";
 import { Action, Permissions } from "@trymatcha/access-control";
 import { prisma } from "@trymatcha/database";
+import { to_plain_text } from "@trymatcha/types";
+import { MESSAGE_REFERENCE_INCLUDE } from "../../services/service.message-references";
 
 export default class ListIssueThreadsController {
     static params_schema = z.object({
@@ -42,7 +44,11 @@ export default class ListIssueThreadsController {
                         where: { isDeleted: false },
                         orderBy: { createdAt: "desc" },
                         take: 1,
-                        select: { message: true, createdAt: true },
+                        select: {
+                            message: true,
+                            createdAt: true,
+                            references: { include: MESSAGE_REFERENCE_INCLUDE },
+                        },
                     },
                 },
             });
@@ -53,7 +59,13 @@ export default class ListIssueThreadsController {
                     number: issue.number,
                     title: issue.title,
                     lastMessage: issue.chats[0]
-                        ? { message: issue.chats[0].message, createdAt: issue.chats[0].createdAt }
+                        ? {
+                              message: to_plain_text(
+                                  issue.chats[0].message,
+                                  issue.chats[0].references,
+                              ),
+                              createdAt: issue.chats[0].createdAt,
+                          }
                         : null,
                 }))
                 .sort((a, b) => {

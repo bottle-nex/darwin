@@ -152,20 +152,10 @@ export interface Chat {
     /** included one level deep on reads/broadcasts; absent on the nested quote itself. */
     repliedTo?: Chat | null;
 
-    mentions: ChatMention[];
+    references: MessageReference[];
 
     createdAt: Date;
     updatedAt: Date;
-}
-
-/** A user @-tagged in a Chat message, scoped to their ProjectMember row. */
-export interface ChatMention {
-    id: string;
-    chatId: string;
-    memberId: string;
-    member?: ProjectMember;
-
-    createdAt: Date;
 }
 
 export interface ProjectChat {
@@ -181,18 +171,28 @@ export interface ProjectChat {
     /** included one level deep on reads/broadcasts; absent on the nested quote itself. */
     repliedTo?: ProjectChat | null;
 
-    mentions: ProjectChatMention[];
+    references: MessageReference[];
 
     createdAt: Date;
     updatedAt: Date;
 }
 
-/** A user @-tagged in a ProjectChat message, scoped to their ProjectMember row. */
-export interface ProjectChatMention {
+export interface ReferencedIssue {
     id: string;
-    projectChatId: string;
-    memberId: string;
-    member?: ProjectMember;
+    number: number;
+    title: string;
+    status: IssueStatus;
+}
+
+export interface MessageReference {
+    id: string;
+    chatId: string | null;
+    projectChatId: string | null;
+    memberId: string | null;
+    issueId: string | null;
+
+    member?: ProjectMember | null;
+    issue?: ReferencedIssue | null;
 
     createdAt: Date;
 }

@@ -1,7 +1,12 @@
 import { prisma, NotificationType } from "@trymatcha/database";
-import { OutboundSocketMessageType, type NotificationJobData } from "@trymatcha/types";
+import {
+    OutboundSocketMessageType,
+    to_plain_text,
+    type NotificationJobData,
+} from "@trymatcha/types";
 import { ENV } from "../../configs/env";
 import { sendMentionEmail } from "../../services/service.email";
+import { MESSAGE_REFERENCE_INCLUDE } from "../../services/service.message-references";
 import { server_services } from "../..";
 
 type ChatMentionJobData = Extract<NotificationJobData, { action: "chat.mention" }>;
@@ -13,6 +18,7 @@ export default class ChatMentionNotification {
             select: {
                 message: true,
                 issueId: true,
+                references: { include: MESSAGE_REFERENCE_INCLUDE },
                 issue: {
                     select: {
                         title: true,
@@ -40,6 +46,7 @@ export default class ChatMentionNotification {
         if (!member || !sender) return;
 
         const senderName = sender.name ?? sender.email;
+        const message = to_plain_text(chat.message, chat.references);
         const projectId = chat.issue.projectId;
         const orgSlug = chat.issue.project.organization.slug;
         const projectSlug = chat.issue.project.slug;
@@ -59,7 +66,7 @@ export default class ChatMentionNotification {
                     orgSlug,
                     senderId: data.mentionedById,
                     senderName,
-                    message: chat.message,
+                    message,
                 },
             },
         });
@@ -72,6 +79,6 @@ export default class ChatMentionNotification {
             }),
         );
 
-        await sendMentionEmail(member.user.email, { senderName, message: chat.message, url });
+        await sendMentionEmail(member.user.email, { senderName, message, url });
     }
 }

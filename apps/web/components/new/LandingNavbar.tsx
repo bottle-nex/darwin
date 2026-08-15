@@ -17,7 +17,7 @@ import {
 import { DottedArrowRight } from "@/lib/svgs/svgs";
 import { Button } from "../ui/button";
 import { MdChevronRight } from "react-icons/md";
-import { landingContainer } from "../revamp/LandingSection";
+import { landingContainer } from "../landing/LandingSection";
 
 const MotionLink = motion.create(Link);
 
@@ -56,9 +56,9 @@ const NAV_ITEMS: NavItem[] = [
                 icon: ChecklistIcon,
             },
             {
-                label: "Careers",
+                label: "Integrations",
                 href: "#",
-                description: "Build the agent with us",
+                description: "Connect matcha to your favorite tools",
                 icon: BriefcaseIcon,
             },
         ],
@@ -148,7 +148,7 @@ export function LandingNavbar() {
                                                 exit={{ opacity: 0, y: -6, scale: 0.98 }}
                                                 transition={{
                                                     duration: reduceMotion ? 0.9 : 0.5,
-                                                    ease: [0.22, 1, 0.36, 1],
+                                                    ease: [0.22, 1, 16, 1],
                                                 }}
                                                 className="absolute right-0 top-full mt-3 grid w-115 grid-cols-2 gap-1 origin-top rounded-sm bg-charcoal p-1.5 shadow-lg shadow-black/40  border border-graphite"
                                             >
@@ -165,7 +165,7 @@ export function LandingNavbar() {
                                                             <link.icon className="size-5" />
                                                         </span>
                                                         <span className="relative flex flex-col gap-y-0.5">
-                                                            <span className="text-[14px] font-medium text-snow">
+                                                            <span className="text-[13px] font-medium text-snow">
                                                                 {link.label}
                                                             </span>
                                                             <span className="text-[12.5px] leading-snug text-mist/50">
@@ -191,11 +191,7 @@ export function LandingNavbar() {
                         )}
                     </nav>
 
-                    <Button
-                        variant={"tertiary"}
-                        onClick={session ? handleRedirect : handleSignin}
-                        className="rounded-full pl-4! "
-                    >
+                    <Button variant={"tertiary"} onClick={session ? handleRedirect : handleSignin}>
                         Get Started
                         <MdChevronRight className="text-background!" />
                     </Button>

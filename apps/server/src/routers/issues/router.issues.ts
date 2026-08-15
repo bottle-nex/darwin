@@ -10,11 +10,14 @@ import ColumnDeleteController from "../../controllers/issues/controller.delete_c
 import ColumnReorderController from "../../controllers/issues/controller.reorder_columns";
 import IssueAssignController from "../../controllers/issues/controller.assign_issue";
 import IssueUnassignController from "../../controllers/issues/controller.unassign_issue";
+import IssueSearchController from "../../controllers/issues/controller.search_issues";
+import IssueReferencesGetController from "../../controllers/issues/controller.get_issue_references";
 
 const issues_router: Router = Router();
 
 issues_router.post("/create", require_auth, IssueCreateController.process);
 issues_router.get("/board/:project_id", require_auth, IssueGetController.process);
+issues_router.get("/search/:project_id", require_auth, IssueSearchController.process);
 
 issues_router.post("/columns", require_auth, ColumnCreateController.process);
 issues_router.patch("/columns/reorder", require_auth, ColumnReorderController.process);
@@ -23,6 +26,8 @@ issues_router.delete("/columns/:id", require_auth, ColumnDeleteController.proces
 
 issues_router.patch("/:id", require_auth, IssueUpdateController.process);
 issues_router.delete("/:id", require_auth, IssueDeleteController.process);
+
+issues_router.get("/:id/references", require_auth, IssueReferencesGetController.process);
 
 issues_router.post("/:id/assignees", require_auth, IssueAssignController.process);
 issues_router.delete("/:id/assignees/:user_id", require_auth, IssueUnassignController.process);

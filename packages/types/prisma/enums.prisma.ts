@@ -42,6 +42,7 @@ export const NotificationType = {
     IssuePriorityChanged: "IssuePriorityChanged",
     IssueMoved: "IssueMoved",
     IssueCommented: "IssueCommented",
+    IssueReferenced: "IssueReferenced",
     IssueDeleted: "IssueDeleted",
     InviteAccepted: "InviteAccepted",
     AddedToProject: "AddedToProject",

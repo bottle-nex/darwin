@@ -1,5 +1,10 @@
 import { prisma, NotificationType } from "@trymatcha/database";
-import { OutboundSocketMessageType, type NotificationJobData } from "@trymatcha/types";
+import {
+    OutboundSocketMessageType,
+    to_plain_text,
+    type NotificationJobData,
+} from "@trymatcha/types";
+import { MESSAGE_REFERENCE_INCLUDE } from "../../services/service.message-references";
 import { server_services } from "../..";
 
 type IssueCommentedJobData = Extract<NotificationJobData, { action: "issue.commented" }>;
@@ -12,6 +17,7 @@ export default class IssueCommentedNotification {
                 message: true,
                 issueId: true,
                 isDeleted: true,
+                references: { include: MESSAGE_REFERENCE_INCLUDE },
                 issue: {
                     select: {
                         title: true,
@@ -46,7 +52,7 @@ export default class IssueCommentedNotification {
                     orgSlug: chat.issue.project.organization.slug,
                     senderId: data.senderId,
                     senderName: sender.name ?? sender.email,
-                    message: chat.message,
+                    message: to_plain_text(chat.message, chat.references),
                 },
             },
         });
