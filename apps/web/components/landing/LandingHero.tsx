@@ -21,7 +21,7 @@ export default function LandingHero() {
                         sandboxed runner, and hand back a PR ready for review.
                     </BlurFade>
                     <span className="flex-1 flex justify-end gap-2">
-                        <Button variant={"tertiary"} >
+                        <Button variant={"tertiary"}>
                             Create Issue
                             <MdChevronRight className="text-ink!" />
                         </Button>
