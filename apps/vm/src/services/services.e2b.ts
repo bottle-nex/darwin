@@ -174,7 +174,6 @@ export default class E2B {
         this.validate_branch(branch);
 
         let sandbox_id = worker.sandboxId;
-        let preserve_sandbox = false;
         log.step("worker loop starting", { worker: worker_id, project: project.id, branch });
 
         try {
