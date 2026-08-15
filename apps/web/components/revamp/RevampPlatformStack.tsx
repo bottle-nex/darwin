@@ -3,7 +3,7 @@
 import { motion, useReducedMotion } from "motion/react";
 import { useState } from "react";
 import type { IconType } from "react-icons";
-import { LuLayers, LuSquareKanban, LuSquareTerminal } from "react-icons/lu";
+import { LuSquareKanban, LuSquareTerminal } from "react-icons/lu";
 import { cn } from "@/lib/utils";
 import HeroBuddy from "@/components/landing/v2/HeroBuddy";
 import Reveal from "../utility/Reveal";
@@ -48,7 +48,7 @@ const BOARD_LAYER: GhostLayer = {
     icon: LuSquareKanban,
     title: "The board",
     description:
-        "Teams drop issues onto a shared canvas. Every card carries the repo, the scope, and what done looks like — the full context an agent needs to start.",
+        "Teams drop issues onto a shared canvas. Every card carries the repo, the scope, and what done looks like: the full context an agent needs to start.",
 };
 
 const RUNNER_LAYER: GhostLayer = {
@@ -56,7 +56,7 @@ const RUNNER_LAYER: GhostLayer = {
     icon: LuSquareTerminal,
     title: "Code runners",
     description:
-        "Sandboxed, ephemeral compute clones your project and actually runs it — build, test, validate — so nothing ships on faith.",
+        "Sandboxed, ephemeral compute clones your project and actually runs it. Build, test, validate, so nothing ships on faith.",
 };
 
 function fade(delay: number) {
@@ -213,10 +213,9 @@ export default function RevampPlatformStack() {
         <LandingSection>
             <Reveal>
                 <SectionHeader
-                    badge="The platform"
-                    icon={LuLayers}
-                    title="One machine, assembled in layers"
-                    description="The board collects the work, agents carry it, and sandboxed runners prove every layer works."
+                    title="One machine, three layers."
+                    titleContinued="The board collects work, agents carry it, runners prove it."
+                    description="Hover a layer to see what it owns and where it hands the work off to the next one."
                 />
             </Reveal>
 
@@ -262,10 +261,10 @@ export default function RevampPlatformStack() {
                                 The agent works it
                             </h3>
                             <p className="mt-4 max-w-sm text-[0.8125rem] leading-relaxed text-neutral-400">
-                                An agent claims the card and reads your repo before touching a line
-                                — your conventions, your structure, the blast radius of the change.
-                                It writes the fix the way your team would, proves it on a runner,
-                                and comes back with a pull request.
+                                An agent claims the card and reads your repo before touching a line:
+                                your conventions, your structure, the blast radius of the change. It
+                                writes the fix the way your team would, proves it on a runner, and
+                                comes back with a pull request.
                             </p>
                         </div>
                     </aside>

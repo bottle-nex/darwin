@@ -56,9 +56,9 @@ const NAV_ITEMS: NavItem[] = [
                 icon: ChecklistIcon,
             },
             {
-                label: "Careers",
+                label: "Integrations",
                 href: "#",
-                description: "Build the agent with us",
+                description: "Connect matcha to your favorite tools",
                 icon: BriefcaseIcon,
             },
         ],

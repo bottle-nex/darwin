@@ -1,7 +1,6 @@
 "use client";
 import { motion, useReducedMotion } from "motion/react";
 import type { ComponentType, CSSProperties } from "react";
-import { LuPlug } from "react-icons/lu";
 import { RiGithubFill, RiSlackFill } from "react-icons/ri";
 import { SiJira, SiLinear, SiNotion } from "react-icons/si";
 import { MatchaLogo } from "@/components/logo/MatchaLogo";
@@ -321,10 +320,9 @@ export default function RevampIntegrations() {
         <section className="relative overflow-hidden rounded-2xl font-grotesk pt-30">
             <div className={landingContainer}>
                 <SectionHeader
-                    badge="Integrations"
-                    icon={LuPlug}
-                    title="Every tool in one board"
-                    description="Issues from these platforms land on the matcha board, where agents pick them up and solve them."
+                    title="Every tool your team already uses."
+                    titleContinued="GitHub, Linear, Jira, Slack, and Notion feed one board."
+                    description="Connect a workspace once and issues keep landing here. No copy-paste, no second tracker to keep alive."
                 />
             </div>
             {/* Soft vignette behind the tile cluster. */}

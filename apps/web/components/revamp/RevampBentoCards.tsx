@@ -4,12 +4,35 @@ import { motion, useInView, useReducedMotion } from "motion/react";
 import { useRef } from "react";
 import Reveal from "../utility/Reveal";
 import BentoCard from "./bento/BentoCard";
+import { AgentDiagram, BoardDiagram, MergeDiagram, RunnerDiagram } from "./bento/BentoDiagrams";
 import LandingSection from "./LandingSection";
+import SectionHeader from "./SectionHeader";
 
 const CARDS_SETTLED_MS = 900;
 const LIGHT_STAGGER_MS = 150;
 
-const CARDS = [0, 1, 2, 3];
+const CARDS = [
+    {
+        label: "Board",
+        description: "Issues land on a shared board, each one scoped to a project",
+        Diagram: BoardDiagram,
+    },
+    {
+        label: "Agent",
+        description: "An agent claims the issue and works it end to end",
+        Diagram: AgentDiagram,
+    },
+    {
+        label: "Runner",
+        description: "A sandboxed runner builds and tests the fix against your repo",
+        Diagram: RunnerDiagram,
+    },
+    {
+        label: "Pull request",
+        description: "A finished pull request comes back for human review",
+        Diagram: MergeDiagram,
+    },
+];
 
 const CONNECTOR_PATHS = [
     "M149.5 436 V530 Q149.5 544 163.5 544 H446.5 Q460.5 544 460.5 530 V508",
@@ -62,28 +85,29 @@ export default function RevampBentoCards() {
 
     return (
         <LandingSection>
-            <p className="max-w-4xl indent-24 text-[2.5rem] leading-tight tracking-tight">
-                <span className="text-snow">Four stages, every issue. </span>
-                <span className="text-neutral-500">
-                    The board hands it off, an agent picks it up, a sandboxed runner proves it
-                    works.
-                </span>
-            </p>
+            <SectionHeader
+                title="Four stages, every issue."
+                titleContinued="The board hands it off, an agent picks it up."
+                description="Every issue walks the same path: board, agent, sandboxed runner, pull request. Nothing skips a stage."
+            />
             <div className="relative mt-16">
                 <ProcessConnectors />
                 <div
                     ref={rowRef}
                     className="relative grid grid-cols-1 gap-6 md:grid-cols-4 md:gap-3 md:pt-13 md:pb-12"
                 >
-                    {CARDS.map((i) => (
+                    {CARDS.map((card, i) => (
                         <Reveal
-                            key={i}
+                            key={card.label}
                             delay={i * 0.1}
                             className={i % 2 === 1 ? "md:mt-18" : undefined}
                         >
                             <BentoCard
                                 lit={lit}
                                 litDelay={CARDS_SETTLED_MS + i * LIGHT_STAGGER_MS}
+                                label={card.label}
+                                description={card.description}
+                                diagram={<card.Diagram />}
                             />
                         </Reveal>
                     ))}

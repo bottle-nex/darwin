@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useReducedMotion } from "motion/react";
-import { LuBot } from "react-icons/lu";
+import { draw, fade, POP_ORIGIN, pop } from "./diagramMotion";
 import LandingSection from "./LandingSection";
 import SectionHeader from "./SectionHeader";
 
@@ -13,40 +13,6 @@ const PILL_VARIANTS = {
     muted: { fill: "#262626", stroke: "none", text: "#a3a3a3" },
     outline: { fill: "#161616", stroke: "#d4d4d4", text: "#e5e5e5" },
 } as const;
-
-const POP_ORIGIN = "origin-center [transform-box:fill-box]";
-
-function fade(delay: number) {
-    return {
-        hidden: { opacity: 0 },
-        visible: { opacity: 1, transition: { delay, duration: 0.5 } },
-    };
-}
-
-function pop(delay: number) {
-    return {
-        hidden: { opacity: 0, scale: 0.4 },
-        visible: {
-            opacity: 1,
-            scale: 1,
-            transition: { delay, type: "spring" as const, bounce: 0.35, duration: 0.6 },
-        },
-    };
-}
-
-function draw(delay: number, duration: number) {
-    return {
-        hidden: { pathLength: 0, opacity: 0 },
-        visible: {
-            pathLength: 1,
-            opacity: 1,
-            transition: {
-                pathLength: { delay, duration, ease: "easeInOut" as const },
-                opacity: { delay, duration: 0.01 },
-            },
-        },
-    };
-}
 
 function DbGlyph({ cx, cy, color }: { cx: number; cy: number; color: string }) {
     return (
@@ -585,10 +551,9 @@ export default function RevampIssueTracker() {
     return (
         <LandingSection>
             <SectionHeader
-                badge="Agents at work"
-                icon={LuBot}
-                title="From issue to pull request"
-                description="An agent branches your repo, implements the fix, and passes every check before review."
+                title="From issue to review."
+                titleContinued="An agent branches your repo, fixes it, and proves it."
+                description="You open a finished pull request, not a half-built branch. The runner has already proven it works."
             />
             <div className="mt-16">
                 <BranchingDiagram />
