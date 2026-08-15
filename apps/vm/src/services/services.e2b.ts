@@ -236,15 +236,6 @@ export default class E2B {
             let solved_count = 0;
 
             for (;;) {
-                const worktree = await sandbox.commands.run("git status --porcelain", {
-                    cwd: REPO_DIR,
-                });
-                if (worktree.stdout.trim()) {
-                    preserve_sandbox = true;
-                    throw new Error("worker checkout is dirty — preserving sandbox for recovery");
-                }
-                await sandbox.commands.run(`git switch ${branch}`, { cwd: REPO_DIR });
-
                 const issue = await IssueSolver.claim_next_issue(worker_id, log);
                 if (!issue) {
                     log.success("queue empty — stopping loop", { solved: solved_count });
@@ -265,41 +256,27 @@ export default class E2B {
                     brief: project.planMd ? "included" : "absent",
                 });
 
-                let report;
-                try {
-                    report = await ClaudeRun.execute(sandbox, log, {
-                        prompt_path: ISSUE_PROMPT_PATH,
-                        model,
-                        effort,
-                        extra_flags: [
-                            `--mcp-config ${MCP_CONFIG_PATH}`,
-                            ...(graph_state === "ready"
-                                ? [
-                                      `--settings ${GRAPHIFY_SETTINGS}`,
-                                      `--add-dir ${GRAPHIFY_INTEGRATION}`,
-                                  ]
-                                : []),
-                        ],
-                        envs: {
-                            CLAUDE_CODE_OAUTH_TOKEN: ENV.SERVER_CLAUDE_CODE_OAUTH_TOKEN,
-                            GH_TOKEN: gh_token,
-                            ...(graph_state === "ready" ? { GRAPHIFY_OUT } : {}),
-                        },
-                        timeout_ms: ISSUE_SOLVE_TIMEOUT_MS,
-                        label: `solving agent for issue #${issue.number}`,
-                    });
-                } catch (error) {
-                    preserve_sandbox = await sandbox.commands
-                        .run("git status --porcelain", {
-                            cwd: REPO_DIR,
-                        })
-                        .then((worktree) => Boolean(worktree.stdout.trim()))
-                        .catch((inspection_error) => {
-                            log.error("could not inspect failed solver worktree", inspection_error);
-                            return true;
-                        });
-                    throw error;
-                }
+                const report = await ClaudeRun.execute(sandbox, log, {
+                    prompt_path: ISSUE_PROMPT_PATH,
+                    model,
+                    effort,
+                    extra_flags: [
+                        `--mcp-config ${MCP_CONFIG_PATH}`,
+                        ...(graph_state === "ready"
+                            ? [
+                                  `--settings ${GRAPHIFY_SETTINGS}`,
+                                  `--add-dir ${GRAPHIFY_INTEGRATION}`,
+                              ]
+                            : []),
+                    ],
+                    envs: {
+                        CLAUDE_CODE_OAUTH_TOKEN: ENV.SERVER_CLAUDE_CODE_OAUTH_TOKEN,
+                        GH_TOKEN: gh_token,
+                        ...(graph_state === "ready" ? { GRAPHIFY_OUT } : {}),
+                    },
+                    timeout_ms: ISSUE_SOLVE_TIMEOUT_MS,
+                    label: `solving agent for issue #${issue.number}`,
+                });
 
                 log.success(`issue #${issue.number} run finished`, {
                     turns: report.num_turns,
@@ -333,9 +310,7 @@ export default class E2B {
                 log.error("could not mark worker Dead", e, { worker: worker_id });
             }
         } finally {
-            if (sandbox_id && preserve_sandbox) {
-                log.warn("preserving dirty sandbox for recovery", { sandbox: sandbox_id });
-            } else if (sandbox_id) {
+            if (sandbox_id) {
                 log.info("tearing down sandbox", { sandbox: sandbox_id });
                 try {
                     await E2B.destroy(sandbox_id);
@@ -481,10 +456,10 @@ Never start a long-running command in the background and end your turn waiting o
             .join("\n");
         await sandbox.files.write(`${REPO_DIR}/.env`, env_file);
     }
-}
 
-function validate_branch(branch: string): void {
-    if (!SAFE_BRANCH.test(branch)) {
-        throw new Error(`refusing to use unsafe branch name: ${branch}`);
+    public static validate_branch(branch: string): void {
+        if (!SAFE_BRANCH.test(branch)) {
+            throw new Error(`refusing to use unsafe branch name: ${branch}`);
+        }
     }
 }
