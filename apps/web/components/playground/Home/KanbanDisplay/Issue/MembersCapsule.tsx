@@ -38,6 +38,9 @@ interface MembersCapsuleProps {
     onChange?: (memberIds: string[]) => void;
     disabled?: boolean;
     className?: string;
+    /** Pass both to control the popover from outside (e.g. open it on failed submit). */
+    open?: boolean;
+    onOpenChange?: (open: boolean) => void;
 }
 
 function MemberAvatar({ member }: { member: ProjectMember }) {
@@ -72,8 +75,12 @@ export default function MembersCapsule({
     onChange,
     disabled,
     className,
+    open: controlledOpen,
+    onOpenChange,
 }: MembersCapsuleProps) {
-    const [open, setOpen] = useState(false);
+    const [internalOpen, setInternalOpen] = useState(false);
+    const open = controlledOpen ?? internalOpen;
+    const setOpen = onOpenChange ?? setInternalOpen;
     const [selected, setSelected] = useState<string[]>(defaultValue ?? []);
     const { data: members } = useProjectMembers(projectId);
 
