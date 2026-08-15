@@ -33,15 +33,13 @@ function EditIssue({ issueId }: { issueId: string }) {
     if (!board || !issue) return <IssuePending resolved={Boolean(board)} />;
 
     const target = targetForIssue(issue, board.columns);
-    return isEditable(issue) ? (
+    return (
         <IssueForm
             key={issue.id}
             target={target}
             issue={issue}
             initialDescription={issue.description}
+            readOnly={!isEditable(issue)}
         />
-    ) : (
-        // <LockedIssue key={issue.id} target={target} issue={issue} />
-        <></>
     );
 }

@@ -38,6 +38,7 @@ interface MembersCapsuleProps {
     projectId: string | undefined;
     defaultValue?: string[];
     onChange?: (memberIds: string[]) => void;
+    disabled?: boolean;
     className?: string;
 }
 
@@ -71,6 +72,7 @@ export default function MembersCapsule({
     projectId,
     defaultValue,
     onChange,
+    disabled,
     className,
 }: MembersCapsuleProps) {
     const [open, setOpen] = useState(false);
@@ -94,7 +96,7 @@ export default function MembersCapsule({
                 content="Assigning a member is compulsory, our agent may ask them questions about this issue."
             >
                 <PopoverTrigger asChild>
-                    <CapsuleTrigger className={className}>
+                    <CapsuleTrigger disabled={disabled} className={className}>
                         <MdPeople className="size-3.5 text-white/60" />
                         {selectedMembers.length === 0
                             ? "Members"

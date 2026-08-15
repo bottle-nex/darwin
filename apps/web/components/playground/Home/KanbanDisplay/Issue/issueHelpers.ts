@@ -10,9 +10,13 @@ export const PRIORITY_OPTIONS: CapsuleOption[] = [
     { value: "low", label: "Low", dotClassName: "bg-neutral-600" },
 ];
 
-/** Parked cards and untouched To-Dos are ours; anything else belongs to the agent. */
+/** The agent claims an issue by moving it Queued -> InProgress; up to that point it is still ours. */
 export function isEditable(issue: BoardIssue): boolean {
-    return issue.status === IssueStatus.Todo || issue.status === IssueStatus.Parked;
+    return (
+        issue.status === IssueStatus.Todo ||
+        issue.status === IssueStatus.Queued ||
+        issue.status === IssueStatus.Parked
+    );
 }
 
 /** An issue already knows where it lives, so its target is derived, never passed. */

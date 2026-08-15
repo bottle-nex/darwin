@@ -22,6 +22,7 @@ interface TagsCapsuleProps {
     projectId: string | undefined;
     defaultValue?: string[];
     onChange?: (tagIds: string[]) => void;
+    disabled?: boolean;
     className?: string;
 }
 
@@ -29,6 +30,7 @@ export default function TagsCapsule({
     projectId,
     defaultValue,
     onChange,
+    disabled,
     className,
 }: TagsCapsuleProps) {
     const [open, setOpen] = useState(false);
@@ -75,7 +77,7 @@ export default function TagsCapsule({
     return (
         <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
-                <CapsuleTrigger className={className}>
+                <CapsuleTrigger disabled={disabled} className={className}>
                     {selectedTags.length === 0 ? (
                         <>
                             <MdLabel className="size-3.5 text-white/60" />

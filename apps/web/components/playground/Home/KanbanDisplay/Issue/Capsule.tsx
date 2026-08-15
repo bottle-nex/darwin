@@ -82,10 +82,17 @@ interface CapsuleDropdownProps {
     options: CapsuleOption[];
     defaultValue?: string;
     onChange?: (value: string) => void;
+    disabled?: boolean;
     className?: string;
 }
 
-function CapsuleDropdown({ options, defaultValue, onChange, className }: CapsuleDropdownProps) {
+function CapsuleDropdown({
+    options,
+    defaultValue,
+    onChange,
+    disabled,
+    className,
+}: CapsuleDropdownProps) {
     const [open, setOpen] = useState(false);
     const [value, setValue] = useState(defaultValue ?? options[0]?.value);
     const selected = options.find((option) => option.value === value) ?? options[0];
@@ -99,7 +106,7 @@ function CapsuleDropdown({ options, defaultValue, onChange, className }: Capsule
     return (
         <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
-                <CapsuleTrigger className={className}>
+                <CapsuleTrigger disabled={disabled} className={className}>
                     {selected?.dotClassName && (
                         <span className={cn("size-2 rounded-full", selected.dotClassName)} />
                     )}
@@ -120,6 +127,7 @@ interface CapsuleDropdownSearchProps {
     onChange?: (value: string) => void;
     searchPlaceholder?: string;
     emptyText?: string;
+    disabled?: boolean;
     className?: string;
 }
 
@@ -129,6 +137,7 @@ function CapsuleDropdownSearch({
     onChange,
     searchPlaceholder = "Search...",
     emptyText = "No results.",
+    disabled,
     className,
 }: CapsuleDropdownSearchProps) {
     const [open, setOpen] = useState(false);
@@ -144,7 +153,7 @@ function CapsuleDropdownSearch({
     return (
         <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
-                <CapsuleTrigger className={className}>
+                <CapsuleTrigger disabled={disabled} className={className}>
                     {selected?.dotClassName && (
                         <span className={cn("size-2 rounded-full", selected.dotClassName)} />
                     )}
@@ -190,6 +199,7 @@ interface CapsuleCalendarProps {
     defaultValue?: Date;
     onChange?: (value: Date | undefined) => void;
     placeholder?: string;
+    disabled?: boolean;
     className?: string;
 }
 
@@ -197,6 +207,7 @@ function CapsuleCalendar({
     defaultValue,
     onChange,
     placeholder = "Set date",
+    disabled,
     className,
 }: CapsuleCalendarProps) {
     const [open, setOpen] = useState(false);
@@ -211,7 +222,7 @@ function CapsuleCalendar({
     return (
         <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
-                <CapsuleTrigger className={className}>
+                <CapsuleTrigger disabled={disabled} className={className}>
                     <MdCalendarMonth className="size-3.5 text-white/60" />
                     {date ? format(date, "MMM d, yyyy") : placeholder}
                 </CapsuleTrigger>

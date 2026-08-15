@@ -30,11 +30,13 @@ export default function IssueForm({
     issue,
     initialDescription,
     initialTemplate,
+    readOnly = false,
 }: {
     target: IssueTarget;
     issue: BoardIssue | null;
     initialDescription?: string;
     initialTemplate?: PickableTemplate;
+    readOnly?: boolean;
 }) {
     const { close } = useIssueDialog();
     const projectId = useActiveProject()?.id;
@@ -118,7 +120,7 @@ export default function IssueForm({
             <main className="flex h-full min-h-0 min-w-0 flex-row">
                 <div className="flex h-full min-h-0 min-w-0 flex-col justify-between *:px-6 *:py-4 w-[62%]">
                     <section className="flex flex-col items-start gap-y-3 ">
-                        <IssueTopper
+                        {/* <IssueTopper
                             target={target}
                             issue={issue}
                             action={
@@ -129,10 +131,11 @@ export default function IssueForm({
                                     />
                                 )
                             }
-                        />
+                        /> */}
                         <div className="w-full flex flex-col items-start ">
                             <Input
-                                autoFocus
+                                autoFocus={!readOnly}
+                                readOnly={readOnly}
                                 variant={"ghost"}
                                 placeholder="Issue Title"
                                 maxLength={80}
@@ -141,6 +144,7 @@ export default function IssueForm({
                                 className="text-3xl ring-0 border-0 font-semibold h-8 p-0 bg-transparent hover:bg-transparent! rounded-none"
                             />
                             <Input
+                                readOnly={readOnly}
                                 variant={"ghost"}
                                 placeholder="Add a short summary..."
                                 maxLength={255}
@@ -155,28 +159,33 @@ export default function IssueForm({
                                 options={PRIORITY_OPTIONS}
                                 defaultValue={priority}
                                 onChange={(value) => setPriority(value as Priority)}
+                                disabled={readOnly}
                             />
                             <TagsCapsule
                                 projectId={projectId}
                                 defaultValue={tagIds}
                                 onChange={setTagIds}
+                                disabled={readOnly}
                             />
                             <MembersCapsule
                                 projectId={projectId}
                                 defaultValue={memberIds}
                                 onChange={setMemberIds}
+                                disabled={readOnly}
                             />
                             <Capsule
                                 type="calendar"
                                 placeholder="Start date"
                                 defaultValue={startDate}
                                 onChange={setStartDate}
+                                disabled={readOnly}
                             />
                             <Capsule
                                 type="calendar"
                                 placeholder="Target date"
                                 defaultValue={targetDate}
                                 onChange={setTargetDate}
+                                disabled={readOnly}
                             />
                         </div>
                     </section>
@@ -186,24 +195,40 @@ export default function IssueForm({
                     >
                         <IssueDescriptionEditor
                             key={body.editorKey}
+                            editable={!readOnly}
                             initialContent={body.html}
                             onChange={body.onEditorChange}
                         />
                     </section>
-                    <section className="h-fit flex items-center justify-end gap-x-20">
-                        <div className="flex items-center justify-end gap-x-2 ">
-                            {!isEdit && !isCustom && <BodyGate body={body} />}
-                            <Button
-                                className="rounded-full"
-                                variant={"tertiary"}
-                                onClick={handleSubmit}
-                                loading={pending}
-                                disabled={!canSubmit}
-                            >
-                                {isEdit ? "Save" : "Create Issue"}
+                    {readOnly ? (
+                        <section className="h-fit flex items-center justify-between">
+                            <div className="flex items-center gap-x-1 text-xs text-white/70">
+                                <LuInfo size={10} />
+                                <span>
+                                    The agent has picked this issue up. It can&apos;t be edited
+                                    while it runs.
+                                </span>
+                            </div>
+                            <Button variant={"tertiary"} className="rounded-full" onClick={close}>
+                                Close
                             </Button>
-                        </div>
-                    </section>
+                        </section>
+                    ) : (
+                        <section className="h-fit flex items-center justify-end gap-x-20">
+                            <div className="flex items-center justify-end gap-x-2 ">
+                                {!isEdit && !isCustom && <BodyGate body={body} />}
+                                <Button
+                                    className="rounded-full"
+                                    variant={"tertiary"}
+                                    onClick={handleSubmit}
+                                    loading={pending}
+                                    disabled={!canSubmit}
+                                >
+                                    {isEdit ? "Save" : "Create Issue"}
+                                </Button>
+                            </div>
+                        </section>
+                    )}
                 </div>
                 <IssueChat issueId={issue?.id} />
             </main>
