@@ -55,14 +55,6 @@ export function BoardDiagram() {
                     <rect width={280} height={200} fill="url(#bento-board-fade)" />
                 </mask>
             </defs>
-            <motion.g variants={fade(0.1)} mask="url(#bento-board-mask)">
-                {GRID_DOTS.map((dot) => {
-                    const { x, y } = cellCenter(dot.col, dot.row);
-                    return (
-                        <circle key={`${dot.col}-${dot.row}`} cx={x} cy={y} r={1} fill="#2e2e2e" />
-                    );
-                })}
-            </motion.g>
             {ISSUE_CELLS.map((cell) => {
                 const { x, y } = cellCenter(cell.col, cell.row);
                 return (
@@ -72,8 +64,8 @@ export function BoardDiagram() {
                         className={POP_ORIGIN}
                         x={x - 4}
                         y={y - 4}
-                        width={8}
-                        height={8}
+                        width={16}
+                        height={16}
                         rx={1.5}
                         fill="none"
                         stroke={cell.stroke}

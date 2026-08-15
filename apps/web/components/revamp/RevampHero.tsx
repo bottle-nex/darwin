@@ -2,6 +2,7 @@ import Image from "next/image";
 import { Button } from "../ui/button";
 import { MdChevronRight } from "react-icons/md";
 import { cn } from "@/lib/utils";
+import BlurFade from "./BlurFade";
 import HeroBoardMock from "./HeroBoardMock";
 import { landingContainer } from "./LandingSection";
 
@@ -9,15 +10,16 @@ export default function RevampHero() {
     return (
         <main className="relative min-h-screen w-screen bg-ink pb-20">
             <section className={cn(landingContainer, "mt-55 h-fit space-y-3")}>
-                <div className="text-snow text-6xl w-[60%] font-headline">
-                    Drop an issue on the board. An agent ships the fix.
-                </div>
+                <BlurFade className="text-snow text-7xl w-[80%] font-headline">
+                    Drop an issue on the board.
+                    <br />
+                    An agent ships the fix.
+                </BlurFade>
                 <div className="flex w-full items-center">
-                    <div className="text-snow/70 text-lg w-[60%]">
-                        Your team files issues on a shared board. matcha&apos;s agents claim them,
-                        build and verify the fix in a sandboxed runner, and hand back a pull request
-                        ready for review.
-                    </div>
+                    <BlurFade delay={0.2} className="text-snow/70 text-lg w-[60%]">
+                        matcha&apos;s agents claim your issues, build and verify the fix in a
+                        sandboxed runner, and hand back a PR ready for review.
+                    </BlurFade>
                     <span className="flex-1 flex justify-end">
                         <Button variant={"tertiary"} className="text-graphite rounded-full bg-snow">
                             Create Issue
