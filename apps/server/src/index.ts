@@ -15,7 +15,7 @@ const server = http.createServer(app);
 
 app.use(
     cors({
-        origin: ENV.SERVER_WEB_URL,
+        origin: [ENV.SERVER_WEB_URL, ENV.SERVER_ADMIN_URL],
         credentials: true,
     }),
 );

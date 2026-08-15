@@ -52,3 +52,21 @@ export const NotificationType = {
     RoleChanged: "RoleChanged",
 } as const;
 export type NotificationType = (typeof NotificationType)[keyof typeof NotificationType];
+
+export const PostKind = {
+    Blog: "Blog",
+    Changelog: "Changelog",
+} as const;
+export type PostKind = (typeof PostKind)[keyof typeof PostKind];
+
+export const PostStatus = {
+    Draft: "Draft",
+    Published: "Published",
+} as const;
+export type PostStatus = (typeof PostStatus)[keyof typeof PostStatus];
+
+export const ReleaseChannel = {
+    Beta: "Beta",
+    Stable: "Stable",
+} as const;
+export type ReleaseChannel = (typeof ReleaseChannel)[keyof typeof ReleaseChannel];

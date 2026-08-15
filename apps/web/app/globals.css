@@ -4,6 +4,7 @@
 @import "./theme.css";
 
 @source "../**/*.{ts,tsx}";
+@source "../../../packages/editorial/**/*.tsx";
 
 @custom-variant dark (&:where(.dark, .dark *));
 

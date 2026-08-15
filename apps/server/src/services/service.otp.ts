@@ -30,13 +30,13 @@ export default class OtpService {
      * stored as a bcrypt hash (never plaintext) and expires after `SERVER_OTP_TTL_SECONDS`.
      * Pass `email` already lowercased.
      */
-    static async store_otp(email: string, code: string): Promise<void> {
+    static async store_otp(email: string, code: string, namespace = ""): Promise<void> {
         const hash = await bcrypt.hash(code, 10);
         await redis
             .multi()
-            .set(this.code_key(email), hash, "EX", ENV.SERVER_OTP_TTL_SECONDS)
-            .del(this.attempts_key(email))
-            .set(this.cool_down_key(email), "1", "EX", ENV.SERVER_OTP_COOLDOWN_SECONDS)
+            .set(this.code_key(email, namespace), hash, "EX", ENV.SERVER_OTP_TTL_SECONDS)
+            .del(this.attempts_key(email, namespace))
+            .set(this.cool_down_key(email, namespace), "1", "EX", ENV.SERVER_OTP_COOLDOWN_SECONDS)
             .exec();
     }
 
@@ -53,24 +53,19 @@ export default class OtpService {
      * lock check, meaning the lock takes precedence even if the final guess is correct.
      * Pass `email` already lowercased.
      */
-    static async verify_otp(email: string, code: string): Promise<OtpVerifyResult> {
-        const hash = await redis.get(this.code_key(email));
+    static async verify_otp(email: string, code: string, namespace = ""): Promise<OtpVerifyResult> {
+        const hash = await redis.get(this.code_key(email, namespace));
         if (!hash) {
             return { ok: false, reason: "expired" };
         }
 
-        const attempts = await redis.incr(this.attempts_key(email));
+        const attempts = await redis.incr(this.attempts_key(email, namespace));
         if (attempts === 1) {
-            await redis.expire(this.attempts_key(email), ENV.SERVER_OTP_TTL_SECONDS);
+            await redis.expire(this.attempts_key(email, namespace), ENV.SERVER_OTP_TTL_SECONDS);
         }
 
         if (attempts > ENV.SERVER_OTP_MAX_ATTEMPTS) {
-            await redis
-                .pipeline()
-                .del(this.code_key(email))
-                .del(this.attempts_key(email))
-                .del(this.cool_down_key(email))
-                .exec();
+            await this.clear(email, namespace);
             return { ok: false, reason: "locked" };
         }
 
@@ -79,13 +74,17 @@ export default class OtpService {
             return { ok: false, reason: "invalid" };
         }
 
+        await this.clear(email, namespace);
+        return { ok: true };
+    }
+
+    static async clear(email: string, namespace = ""): Promise<void> {
         await redis
             .pipeline()
-            .del(this.code_key(email))
-            .del(this.attempts_key(email))
-            .del(this.cool_down_key(email))
+            .del(this.code_key(email, namespace))
+            .del(this.attempts_key(email, namespace))
+            .del(this.cool_down_key(email, namespace))
             .exec();
-        return { ok: true };
     }
 
     /**
@@ -93,8 +92,8 @@ export default class OtpService {
      * refused a new code. Set by {@link store_otp}, expires after `SERVER_OTP_COOLDOWN_SECONDS`.
      * Pass `email` already lowercased.
      */
-    static async is_cooldown(email: string): Promise<boolean> {
-        return (await redis.exists(this.cool_down_key(email))) === 1;
+    static async is_cooldown(email: string, namespace = ""): Promise<boolean> {
+        return (await redis.exists(this.cool_down_key(email, namespace))) === 1;
     }
 
     /**
@@ -107,18 +106,23 @@ export default class OtpService {
         return randomInt(0, 1_000_000).toString().padStart(6, "0");
     }
 
+    /** Key prefix for a keyspace. `""` is the public web flow; `"admin"` is isolated from it. */
+    static prefix(namespace: string) {
+        return namespace ? `otp:${namespace}:` : "otp:";
+    }
+
     /** Redis key holding the bcrypt-hashed active code for `email`. */
-    static code_key(email: string) {
-        return `otp:${email.toLowerCase()}`;
+    static code_key(email: string, namespace = "") {
+        return `${this.prefix(namespace)}${email.toLowerCase()}`;
     }
 
     /** Redis key holding the failed-attempt counter for `email`. */
-    static attempts_key(email: string) {
-        return `otp:${email.toLowerCase()}:attempts`;
+    static attempts_key(email: string, namespace = "") {
+        return `${this.prefix(namespace)}${email.toLowerCase()}:attempts`;
     }
 
     /** Redis key marking that `email` is within its request cooldown window. */
-    static cool_down_key(email: string) {
-        return `otp:${email.toLowerCase()}:cooldown`;
+    static cool_down_key(email: string, namespace = "") {
+        return `${this.prefix(namespace)}${email.toLowerCase()}:cooldown`;
     }
 }

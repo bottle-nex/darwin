@@ -25,6 +25,22 @@ const envSchema = z.object({
     SERVER_RESEND_API_KEY: z.string().min(1, "Resend api key is required"),
     SERVER_EMAIL_FROM: z.string().min(1).default("matcha <noreply@highgarden.app>"),
     SERVER_WEB_URL: z.string().min(1, "Web URL is required"),
+    SERVER_ADMIN_URL: z.string().default("http://localhost:5174"),
+    SERVER_ADMIN_EMAILS: z
+        .string()
+        .default("")
+        .transform((val) =>
+            val
+                .split(",")
+                .map((entry) => entry.trim().toLowerCase())
+                .filter(Boolean),
+        ),
+    SERVER_ADMIN_JWT_TTL: z.string().default("12h"),
+    SERVER_GCS_PROJECT_ID: z.string().optional(),
+    SERVER_GCS_BUCKET: z.string().optional(),
+    SERVER_GCS_CLIENT_EMAIL: z.string().optional(),
+    SERVER_GCS_PRIVATE_KEY: z.string().optional(),
+    SERVER_GCS_PUBLIC_URL: z.string().optional(),
     DATABASE_URL: z.string().min(1, "Database URL is required"),
     SERVER_GITHUB_APP_ID: z.string().min(1, "GitHub App ID is required"),
     SERVER_GITHUB_APP_SLUG: z.string().min(1, "GitHub App slug is required"),

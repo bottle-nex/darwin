@@ -1,4 +1,13 @@
-import { IssueStatus, NotificationType, OrgRole, ProjectRole, TeamRole } from "./enums.prisma";
+import {
+    IssueStatus,
+    NotificationType,
+    OrgRole,
+    PostKind,
+    PostStatus,
+    ProjectRole,
+    ReleaseChannel,
+    TeamRole,
+} from "./enums.prisma";
 
 export interface User {
     id: string;
@@ -205,4 +214,25 @@ export interface Notification {
     readAt: Date | null;
 
     createdAt: Date;
+}
+
+export interface Post {
+    id: string;
+    kind: PostKind;
+    slug: string;
+    title: string;
+    summary: string | null;
+    content: string;
+    plainText: string;
+    coverImage: string | null;
+    author: string | null;
+    tags: string[];
+    version: string | null;
+    channel: ReleaseChannel | null;
+    status: PostStatus;
+    readingTime: number;
+    publishedAt: Date | null;
+
+    createdAt: Date;
+    updatedAt: Date;
 }

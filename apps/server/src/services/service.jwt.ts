@@ -38,6 +38,35 @@ export function verifySessionJwt(token: string): AuthUser {
     return { id, name: typeof name === "string" ? name : "", email };
 }
 
+export interface AdminClaims {
+    email: string;
+    scope: "admin";
+}
+
+export function signAdminJwt(email: string): string {
+    return jwt.sign({ email, scope: "admin" } satisfies AdminClaims, ENV.SERVER_JWT_SECRET, {
+        algorithm: "HS256",
+        expiresIn: ENV.SERVER_ADMIN_JWT_TTL as SignOptions["expiresIn"],
+    });
+}
+
+export function verifyAdminJwt(token: string): AdminClaims {
+    const payload = jwt.verify(token, ENV.SERVER_JWT_SECRET, {
+        algorithms: ["HS256"],
+    });
+
+    if (typeof payload !== "object" || payload === null) {
+        throw new Error("invalid token payload");
+    }
+
+    const { email, scope } = payload as Record<string, unknown>;
+    if (typeof email !== "string" || scope !== "admin") {
+        throw new Error("not an admin token");
+    }
+
+    return { email, scope: "admin" };
+}
+
 export interface SandboxClaims {
     session_id: string;
 }

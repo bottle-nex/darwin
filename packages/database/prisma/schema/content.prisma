@@ -1,0 +1,38 @@
+enum PostKind {
+  Blog
+  Changelog
+}
+
+enum PostStatus {
+  Draft
+  Published
+}
+
+enum ReleaseChannel {
+  Beta
+  Stable
+}
+
+model Post {
+  id          String          @id @default(cuid())
+  kind        PostKind
+  slug        String
+  title       String
+  summary     String?
+  content     String
+  plainText   String
+  coverImage  String?
+  author      String?
+  tags        String[]        @default([])
+  version     String?
+  channel     ReleaseChannel?
+  status      PostStatus      @default(Draft)
+  readingTime Int             @default(1)
+  publishedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([kind, slug])
+  @@index([kind, status, publishedAt])
+}

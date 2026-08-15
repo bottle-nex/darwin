@@ -61,7 +61,6 @@ export default class OtpVerifyController {
                 update: { emailVerified: new Date() },
                 select: { id: true, email: true, name: true },
             });
-            console.log("user is : ", user);
 
             const token = signSessionJwt({ id: user.id, name: user.name ?? "", email: user.email });
 

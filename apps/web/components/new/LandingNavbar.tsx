@@ -44,13 +44,13 @@ const NAV_ITEMS: NavItem[] = [
             },
             {
                 label: "Blog",
-                href: "#",
+                href: "/blog",
                 description: "Notes on agents and shipping",
                 icon: NoteIcon,
             },
             {
                 label: "Changelog",
-                href: "#",
+                href: "/change-log",
                 description: "What shipped, week by week",
                 icon: ChecklistIcon,
             },
@@ -146,8 +146,8 @@ export function LandingNavbar() {
                                                 animate={{ opacity: 1, y: 0, scale: 1 }}
                                                 exit={{ opacity: 0, y: -6, scale: 0.98 }}
                                                 transition={{
-                                                    duration: reduceMotion ? 0.9 : 0.5,
-                                                    ease: [0.22, 1, 16, 1],
+                                                    duration: reduceMotion ? 0 : 0.22,
+                                                    ease: [0.22, 1, 0.36, 1],
                                                 }}
                                                 className="absolute right-0 top-full mt-3 grid w-115 grid-cols-2 gap-1 origin-top rounded-sm bg-charcoal p-1.5 shadow-lg shadow-black/40  border border-graphite"
                                             >

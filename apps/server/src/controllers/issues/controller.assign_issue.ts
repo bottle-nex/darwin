@@ -96,7 +96,6 @@ export default class IssueAssignController {
                     tags: { select: { id: true, name: true, color: true } },
                 },
             });
-            console.log("Iam here ");
             if (target_user_id !== user.id) {
                 await server_services.notifications.enqueue({
                     action: "issue.assigned",
