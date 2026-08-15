@@ -9,6 +9,7 @@ import {
 import { motion } from "motion/react";
 import { MdContentCopy, MdDelete, MdKeyboardArrowDown } from "react-icons/md";
 import { BsReply } from "react-icons/bs";
+import { HiChevronDown } from "react-icons/hi2";
 import { cn } from "@/lib/utils";
 import PlaygroundAvatar, {
     toneFor,
@@ -114,6 +115,93 @@ function QuotedMessage({
     );
 }
 
+/** Roughly six lines of 13px/leading-snug text — the collapsed message height. */
+const COLLAPSED_HEIGHT = 108;
+const CLIP_LINE_LIMIT = 6;
+/** Comfortably above what {@link COLLAPSED_HEIGHT} can hold, so a clipped
+ *  message always really has something hidden behind "Show more". */
+const CLIP_CHAR_LIMIT = 600;
+
+const EXPAND_TRANSITION = { duration: 0.26, ease: [0.25, 1, 0.35, 1] } as const;
+
+function isClippable(plainText: string): boolean {
+    return plainText.length > CLIP_CHAR_LIMIT || plainText.split("\n").length > CLIP_LINE_LIMIT;
+}
+
+/** Timestamp + options menu. Floats into the last text line on short messages;
+ *  sits in its own row beside "Show more" once a message is clipped. */
+function MessageMeta({
+    chat,
+    isMine,
+    canDelete,
+    sentAt,
+    onDelete,
+    floated,
+}: {
+    chat: AnyChat;
+    isMine: boolean;
+    canDelete: boolean;
+    sentAt: Date;
+    onDelete: (chat: AnyChat) => void;
+    floated: boolean;
+}) {
+    return (
+        <span
+            className={cn(
+                "relative flex items-center",
+                floated ? "float-right ml-2 mt-1.5" : "shrink-0",
+            )}
+        >
+            {!chat.isDeleted && (
+                <DropdownMenu modal={false}>
+                    <DropdownMenuTrigger className="cursor-pointer" asChild>
+                        <Button
+                            type="button"
+                            variant="unstyled"
+                            aria-label="Message options"
+                            className={cn(
+                                "p-0.5 bg-charcoal rounded-sm aspect-square peer absolute inset-x-0 bottom-0 mx-auto w-fit flex cursor-pointer items-center justify-center opacity-0 transition-opacity group-hover/bubble:opacity-100 data-[state=open]:opacity-100 before:absolute before:-inset-x-3 before:-inset-y-2",
+                                isMine
+                                    ? "text-white/80 hover:text-white"
+                                    : "text-neutral-400 hover:text-neutral-200",
+                            )}
+                        >
+                            <MdKeyboardArrowDown className="size-3.75" />
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" sideOffset={6} className="w-32">
+                        <DropdownMenuItem
+                            onSelect={() =>
+                                navigator.clipboard.writeText(
+                                    to_plain_text(chat.message, chat.references),
+                                )
+                            }
+                        >
+                            <MdContentCopy className="size-3.5" />
+                            Copy
+                        </DropdownMenuItem>
+                        {canDelete && (
+                            <DropdownMenuItem onSelect={() => onDelete(chat)}>
+                                <MdDelete className="size-3.5" />
+                                Delete
+                            </DropdownMenuItem>
+                        )}
+                    </DropdownMenuContent>
+                </DropdownMenu>
+            )}
+            <time
+                dateTime={sentAt.toISOString()}
+                className={cn(
+                    "text-[9px] leading-none transition-opacity group-hover/bubble:opacity-0 peer-data-[state=open]:opacity-0",
+                    isMine ? "text-white/80" : "text-neutral-400",
+                )}
+            >
+                {sentAt.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}
+            </time>
+        </span>
+    );
+}
+
 export default function ChatMessage({
     chat,
     isMine,
@@ -138,6 +226,9 @@ export default function ChatMessage({
     const name = senderName(chat);
     const sentAt = new Date(chat.createdAt);
     const [isFresh] = useState(() => Date.now() - sentAt.getTime() < 3000);
+    const [expanded, setExpanded] = useState(false);
+    const clippable = !chat.isDeleted && isClippable(to_plain_text(chat.message, chat.references));
+    const metaProps = { chat, isMine, canDelete, sentAt, onDelete };
     return (
         <motion.li
             id={`chat-${chat.id}`}
@@ -197,60 +288,66 @@ export default function ChatMessage({
                     />
                 )}
                 {chat.isDeleted ? (
-                    <span className={cn("italic", isMine ? "text-white/60" : "text-neutral-500")}>
-                        Message deleted
-                    </span>
-                ) : (
-                    <MessageBody text={chat.message} references={chat.references} isMine={isMine} />
-                )}
-                <span className="relative float-right ml-2 mt-1.5 flex items-center">
-                    {!chat.isDeleted && (
-                        <DropdownMenu modal={false}>
-                            <DropdownMenuTrigger className="cursor-pointer" asChild>
-                                <Button
-                                    type="button"
-                                    variant="unstyled"
-                                    aria-label="Message options"
-                                    className={cn(
-                                        "p-0.5 bg-charcoal rounded-sm aspect-square peer absolute inset-x-0 bottom-0 mx-auto w-fit flex cursor-pointer items-center justify-center opacity-0 transition-opacity group-hover/bubble:opacity-100 data-[state=open]:opacity-100 before:absolute before:-inset-x-3 before:-inset-y-2",
-                                        isMine
-                                            ? "text-white/80 hover:text-white"
-                                            : "text-neutral-400 hover:text-neutral-200",
-                                    )}
-                                >
-                                    <MdKeyboardArrowDown className="size-3.75" />
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" sideOffset={6} className="w-32">
-                                <DropdownMenuItem
-                                    onSelect={() =>
-                                        navigator.clipboard.writeText(
-                                            to_plain_text(chat.message, chat.references),
-                                        )
-                                    }
-                                >
-                                    <MdContentCopy className="size-3.5" />
-                                    Copy
-                                </DropdownMenuItem>
-                                {canDelete && (
-                                    <DropdownMenuItem onSelect={() => onDelete(chat)}>
-                                        <MdDelete className="size-3.5" />
-                                        Delete
-                                    </DropdownMenuItem>
+                    <>
+                        <span
+                            className={cn("italic", isMine ? "text-white/60" : "text-neutral-500")}
+                        >
+                            Message deleted
+                        </span>
+                        <MessageMeta {...metaProps} floated />
+                    </>
+                ) : clippable ? (
+                    <>
+                        <motion.div
+                            initial={false}
+                            animate={{ height: expanded ? "auto" : COLLAPSED_HEIGHT }}
+                            transition={EXPAND_TRANSITION}
+                            className={cn(
+                                "overflow-hidden",
+                                !expanded &&
+                                    "[mask-image:linear-gradient(to_bottom,black_65%,transparent)]",
+                            )}
+                        >
+                            <MessageBody
+                                text={chat.message}
+                                references={chat.references}
+                                isMine={isMine}
+                            />
+                        </motion.div>
+                        <div className="mt-1.5 flex items-center justify-between gap-x-3">
+                            <Button
+                                variant="unstyled"
+                                type="button"
+                                onClick={() => setExpanded((prev) => !prev)}
+                                className={cn(
+                                    "flex cursor-pointer items-center gap-x-1 text-[11px] leading-none font-medium transition-colors",
+                                    isMine
+                                        ? "text-white/70 hover:text-white"
+                                        : "text-neutral-400 hover:text-neutral-200",
                                 )}
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                    )}
-                    <time
-                        dateTime={sentAt.toISOString()}
-                        className={cn(
-                            "text-[9px] leading-none transition-opacity group-hover/bubble:opacity-0 peer-data-[state=open]:opacity-0",
-                            isMine ? "text-white/80" : "text-neutral-400",
-                        )}
-                    >
-                        {sentAt.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}
-                    </time>
-                </span>
+                            >
+                                {expanded ? "Show less" : "Show more"}
+                                <motion.span
+                                    className="flex"
+                                    animate={{ rotate: expanded ? 180 : 0 }}
+                                    transition={EXPAND_TRANSITION}
+                                >
+                                    <HiChevronDown className="size-3.5" />
+                                </motion.span>
+                            </Button>
+                            <MessageMeta {...metaProps} floated={false} />
+                        </div>
+                    </>
+                ) : (
+                    <>
+                        <MessageBody
+                            text={chat.message}
+                            references={chat.references}
+                            isMine={isMine}
+                        />
+                        <MessageMeta {...metaProps} floated />
+                    </>
+                )}
             </article>
         </motion.li>
     );

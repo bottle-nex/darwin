@@ -66,12 +66,18 @@ export function filter_reference_tokens(
     text: string,
     keep: (kind: ReferenceKind, id: string) => boolean,
 ): string {
-    return text
-        .replace(reference_token_pattern(), (literal, _sigil, kind: ReferenceKind, id: string) =>
-            keep(kind, id) ? literal : "",
-        )
-        .replace(/[^\S\n]{2,}/g, " ")
-        .trim();
+    let dropped = false;
+    const filtered = text.replace(
+        reference_token_pattern(),
+        (literal, _sigil, kind: ReferenceKind, id: string) => {
+            if (keep(kind, id)) return literal;
+            dropped = true;
+            return "";
+        },
+    );
+    // Left untouched unless a token actually went — otherwise this would quietly
+    // reflow spacing the sender typed on purpose.
+    return dropped ? filtered.replace(/[^\S\n]{2,}/g, " ").trim() : text;
 }
 
 export function member_label(name: string | null | undefined, email?: string | null): string {

@@ -99,7 +99,6 @@ export default class ProjectChatSocketHandler {
             return;
         }
         const { message, repliedToId } = parsed.data;
-
         try {
             const role = await Access.project(user.id, project_id);
             if (!role || !Permissions.project(role, Action.project.read)) {
