@@ -120,7 +120,7 @@ export default function IssueForm({
             <main className="flex h-full min-h-0 min-w-0 flex-row">
                 <div className="flex h-full min-h-0 min-w-0 flex-col justify-between *:px-6 *:py-4 w-[62%]">
                     <section className="flex flex-col items-start gap-y-3 ">
-                        {/* <IssueTopper
+                        <IssueTopper
                             target={target}
                             issue={issue}
                             action={
@@ -131,7 +131,7 @@ export default function IssueForm({
                                     />
                                 )
                             }
-                        /> */}
+                        />
                         <div className="w-full flex flex-col items-start ">
                             <Input
                                 autoFocus={!readOnly}
@@ -209,7 +209,7 @@ export default function IssueForm({
                                     while it runs.
                                 </span>
                             </div>
-                            <Button variant={"tertiary"} className="rounded-full" onClick={close}>
+                            <Button variant={"tertiary"} onClick={close}>
                                 Close
                             </Button>
                         </section>
