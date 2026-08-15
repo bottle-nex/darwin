@@ -8,6 +8,8 @@
         "dev": "bun run --watch index.ts",
         "start": "bun run index.ts",
         "solve": "bun run src/scripts/script.solve_hardcoded_issue.ts",
+        "template": "bun run src/scripts/script.build_sandbox_template.ts",
+        "template:verify": "bun run src/scripts/script.verify_sandbox_template.ts",
         "lint": "eslint . --max-warnings 0",
         "typecheck": "tsc --noEmit"
     },

@@ -93,6 +93,17 @@ export default class Logger {
         console.log(chalk.dim(indent(body)));
     }
 
+    /**
+     * One line of output mirrored from somewhere else — a sandbox command, a remote process.
+     *
+     * Keeps the clock and the scope tag, because several sandboxes can stream into one terminal
+     * at once and the tag is the only thing telling them apart. Takes the message already
+     * painted: what a streamed line means is known by whoever is reading the stream, not here.
+     */
+    stream(message: string): void {
+        console.log(`${clock()} ${chalk.dim("│")} ${scope_tag(this.scope)} ${message}`);
+    }
+
     private write(level: Level, message: string, fields?: Fields): void {
         const { mark, paint } = LEVELS[level];
         const line = `${clock()} ${paint(mark)} ${scope_tag(this.scope)} ${paint(message)}${render_fields(fields)}`;
