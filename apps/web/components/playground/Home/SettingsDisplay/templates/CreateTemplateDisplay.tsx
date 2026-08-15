@@ -191,11 +191,13 @@ export default function CreateTemplateDisplay({
                         className={cn(
                             "flex size-4 items-center justify-center rounded-[5px] ring-1 transition-colors",
                             isDefault
-                                ? "bg-[#9bc24f] ring-[#9bc24f]"
+                                ? "bg-matcha ring-matcha"
                                 : "bg-white/5 ring-white/15 hover:ring-white/35",
                         )}
                     >
-                        {isDefault && <MdCheck className="size-3 text-[#14150c]" aria-hidden />}
+                        {isDefault && (
+                            <MdCheck className="size-3 text-matcha-foreground" aria-hidden />
+                        )}
                     </span>
                     <span className="text-[12px] text-neutral-400">
                         Load this into every new issue

@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 import "./CanvasBuddy.css";
 
-const BODY = "#AB9FF2";
+const BODY = "var(--color-primary)";
 const EYE = "#262626";
 const CAP = "#6C55DE";
 

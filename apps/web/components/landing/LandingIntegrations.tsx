@@ -298,7 +298,9 @@ function CircuitBoard() {
                         key={d}
                         r={2.6}
                         fill="var(--color-primary)"
-                        style={{ filter: "drop-shadow(0 0 5px rgba(171, 159, 242, 0.9))" }}
+                        style={{
+                            filter: "drop-shadow(0 0 5px color-mix(in srgb, var(--color-primary) 90%, transparent))",
+                        }}
                     >
                         <animateMotion
                             path={d}

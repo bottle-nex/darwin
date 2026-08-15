@@ -1,105 +1,11 @@
 @import "tailwindcss";
 @import "../node_modules/tw-animate-css/dist/tw-animate.css";
+/* All design tokens (colors, radii, fonts) live in theme.css. */
+@import "./theme.css";
 
 @source "../**/*.{ts,tsx}";
 
 @custom-variant dark (&:where(.dark, .dark *));
-
-@theme {
-    --color-ink: #0a0a0a;
-    --color-charcoal: #121213;
-    --color-cement: #181819;
-    --color-graphite: #1d1d1e;
-    --color-snow: #ffffff;
-    --color-mist: #f4f4f4;
-    --color-primary: #ab9ff2;
-    --color-background: #fff8ed;
-}
-
-:root {
-    --radius: 0.625rem;
-
-    --background: var(--color-background);
-    --foreground: #171717;
-    --surface: var(--color-mist);
-    --card: #ffffff;
-    --card-foreground: #171717;
-    --popover: #ffffff;
-    --popover-foreground: #171717;
-
-    --primary: #ab9ff1;
-    --primary-foreground: var(--color-snow);
-    --secondary: var(--color-mist);
-    --secondary-foreground: #171717;
-    --muted: var(--color-mist);
-    --muted-foreground: #737373;
-    --accent: var(--color-mist);
-    --accent-foreground: #171717;
-    --destructive: #e7000b;
-
-    --border: #e5e5e5;
-    --input: #e5e5e5;
-    --ring: #a3a3a3;
-}
-
-.dark {
-    --background: var(--color-cement);
-    --foreground: #ededed;
-    --surface: var(--color-charcoal);
-    --card: var(--color-charcoal);
-    --card-foreground: #ededed;
-    --popover: var(--color-charcoal);
-    --popover-foreground: #ededed;
-
-    --primary: #ab9ff1;
-    --primary-foreground: #171717;
-    --secondary: var(--color-charcoal);
-    --secondary-foreground: #ededed;
-    --muted: var(--color-charcoal);
-    --muted-foreground: #a1a1a1;
-    --accent: #2e2e2e;
-    --accent-foreground: #ededed;
-    --destructive: #ff6467;
-
-    --border: #ffffff1a;
-    --input: #ffffff26;
-    --ring: #525252;
-}
-
-@theme inline {
-    --color-background: var(--background);
-    --color-foreground: var(--foreground);
-    --color-surface: var(--surface);
-    --color-card: var(--card);
-    --color-card-foreground: var(--card-foreground);
-    --color-popover: var(--popover);
-    --color-popover-foreground: var(--popover-foreground);
-    --color-primary: var(--primary);
-    --color-primary-foreground: var(--primary-foreground);
-    --color-secondary: var(--secondary);
-    --color-secondary-foreground: var(--secondary-foreground);
-    --color-muted: var(--muted);
-    --color-muted-foreground: var(--muted-foreground);
-    --color-accent: var(--accent);
-    --color-accent-foreground: var(--accent-foreground);
-    --color-destructive: var(--destructive);
-    --color-border: var(--border);
-    --color-input: var(--input);
-    --color-ring: var(--ring);
-
-    --radius-sm: calc(var(--radius) - 4px);
-    --radius-md: calc(var(--radius) - 2px);
-    --radius-lg: var(--radius);
-    --radius-xl: calc(var(--radius) + 4px);
-
-    --font-sans: var(--font-poppins);
-    --font-mono: var(--font-geist-mono);
-    --font-display: var(--font-tektur);
-    --font-serif: var(--font-instrument-serif);
-    --font-grotesk: var(--font-inter-tight);
-    --font-headline: var(--font-titillium-web);
-    --font-arimo: var(--font-arimo);
-}
 
 @layer base {
     * {
@@ -132,7 +38,7 @@
        scroll pane. */
     * {
         scrollbar-width: thin;
-        scrollbar-color: color-mix(in oklab, var(--foreground) 22%, transparent) transparent;
+        scrollbar-color: color-mix(in oklab, var(--color-foreground) 22%, transparent) transparent;
     }
 
     *::-webkit-scrollbar {
@@ -147,7 +53,7 @@
 
     *::-webkit-scrollbar-thumb {
         border-radius: 9999px;
-        background-color: color-mix(in oklab, var(--foreground) 22%, transparent);
+        background-color: color-mix(in oklab, var(--color-foreground) 22%, transparent);
     }
 
     /* The page scrolls the document root (Lenis drives <html>), so the visible
@@ -487,20 +393,20 @@
     }
 
     .tiptap ul[data-type="taskList"] li > label input[type="checkbox"]:checked {
-        background: #9bc24f;
-        border-color: #9bc24f;
+        background: var(--color-matcha);
+        border-color: var(--color-matcha);
     }
     .tiptap ul[data-type="taskList"] li > label input[type="checkbox"]:checked::after {
         content: "";
         width: 0.62rem;
         height: 0.62rem;
-        background-color: #14150c;
+        background-color: var(--color-matcha-foreground);
         -webkit-mask: var(--tick) center / contain no-repeat;
         mask: var(--tick) center / contain no-repeat;
     }
 
     .tiptap ul[data-type="taskList"] li > label input[type="checkbox"]:focus-visible {
-        outline: 2px solid rgba(155, 194, 79, 0.5);
+        outline: 2px solid color-mix(in srgb, var(--color-matcha) 50%, transparent);
         outline-offset: 1px;
     }
 
@@ -549,8 +455,8 @@
         display: inline;
         padding: 0.05rem 0.35rem;
         border-radius: 0.3rem;
-        background: rgba(171, 159, 242, 0.24);
-        box-shadow: inset 0 0 0 1px rgba(171, 159, 242, 0.6);
+        background: color-mix(in srgb, var(--color-primary) 24%, transparent);
+        box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-primary) 60%, transparent);
         color: #d7d0ff;
         cursor: pointer;
         transition:
@@ -559,12 +465,12 @@
     }
 
     .tiptap .prompt:hover {
-        background: rgba(171, 159, 242, 0.34);
+        background: color-mix(in srgb, var(--color-primary) 34%, transparent);
         color: #ede9ff;
     }
     .tiptap .prompt.ProseMirror-selectednode {
-        background: #ab9ff2;
-        box-shadow: 0 0 0 2px rgba(171, 159, 242, 0.35);
+        background: var(--color-primary);
+        box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-primary) 35%, transparent);
         color: #17131f;
     }
 

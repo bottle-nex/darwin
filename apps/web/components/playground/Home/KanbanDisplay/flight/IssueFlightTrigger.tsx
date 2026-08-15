@@ -122,7 +122,7 @@ export default function IssueFlightTrigger() {
                                     <Button
                                         variant="unstyled"
                                         type="button"
-                                        className="mt-1.5 flex w-full cursor-pointer items-center justify-between rounded-lg bg-[#171717] px-3 py-2 text-left text-sm text-neutral-200 shadow-[inset_0_2px_0_0_#262626] hover:bg-[#1c1c1c]"
+                                        className="mt-1.5 flex w-full cursor-pointer items-center justify-between rounded-lg bg-[#171717] px-3 py-2 text-left text-sm text-neutral-200 shadow-[inset_0_2px_0_0_var(--color-edge)] hover:bg-[#1c1c1c]"
                                     >
                                         {selectedIssue ? (
                                             <span className="truncate">

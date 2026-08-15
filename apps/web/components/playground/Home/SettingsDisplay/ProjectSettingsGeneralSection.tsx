@@ -22,7 +22,7 @@ import { Textarea } from "@/components/ui/textarea";
 import ProjectSettingsBoardSection from "./ProjectSettingsBoardSection";
 
 const FIELD =
-    "border-white/10 bg-white/5 text-neutral-200 placeholder:text-neutral-500 focus-visible:border-[#9bc24f] focus-visible:ring-[#9bc24f]/30";
+    "border-white/10 bg-white/5 text-neutral-200 placeholder:text-neutral-500 focus-visible:border-matcha focus-visible:ring-matcha/30";
 
 export default function ProjectSettingsGeneralSection({
     project,
@@ -131,7 +131,7 @@ export default function ProjectSettingsGeneralSection({
                     Save changes
                 </Button>
                 {update.isSuccess && !dirty && (
-                    <span className="text-[11px] text-[#9bc24f]">Saved</span>
+                    <span className="text-[11px] text-matcha">Saved</span>
                 )}
                 {isAdmin && (
                     <Button

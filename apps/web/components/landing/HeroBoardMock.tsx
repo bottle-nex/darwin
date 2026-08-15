@@ -88,7 +88,7 @@ function Avatar({ initials, className }: { initials: string; className?: string 
 
 function StaticCard({ card }: { card: MockCard }) {
     return (
-        <div className="rounded-lg border border-white/7 bg-[#161619] p-2.5">
+        <div className="rounded-lg border border-white/7 bg-cement p-2.5">
             <div className="flex items-center justify-between">
                 <span className="font-mono text-[10px] text-neutral-500">{card.id}</span>
                 <Avatar initials={card.assignee} />
@@ -108,7 +108,7 @@ function ActiveCard({ stage, animate }: { stage: number; animate: boolean }) {
             layoutId="mock-active-card"
             layout
             transition={animate ? { type: "spring", stiffness: 240, damping: 26 } : { duration: 0 }}
-            className="rounded-lg border border-white/16 bg-[#1b1b1f] p-2.5"
+            className="rounded-lg border border-white/16 bg-graphite p-2.5"
         >
             <div className="flex items-center justify-between">
                 <span className="font-mono text-[10px] text-neutral-400">MAT-142</span>
@@ -181,12 +181,12 @@ export default function HeroBoardMock({ className }: { className?: string }) {
             viewport={{ once: true, amount: 0.3 }}
             transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
             className={cn(
-                "flex overflow-hidden rounded-xl border border-white/10 bg-[#0e0e10] font-grotesk shadow-2xl shadow-black/70",
+                "flex overflow-hidden rounded-xl border border-white/10 bg-charcoal font-grotesk shadow-2xl shadow-black/70",
                 className,
             )}
         >
             {/* Sidebar */}
-            <aside className="hidden w-44 shrink-0 flex-col border-r border-white/6 bg-[#101012] p-3 lg:flex">
+            <aside className="hidden w-44 shrink-0 flex-col border-r border-white/6 bg-charcoal p-3 lg:flex">
                 <div className="flex items-center gap-2 px-1.5">
                     <MatchaLogo className="h-3 w-auto text-snow" />
                     <span className="text-sm font-semibold tracking-tight text-snow">matcha</span>
@@ -225,7 +225,7 @@ export default function HeroBoardMock({ className }: { className?: string }) {
                 </nav>
 
                 {/* Agent status panel with the buddy. */}
-                <div className="mt-auto rounded-lg border border-white/8 bg-[#141417] p-2.5">
+                <div className="mt-auto rounded-lg border border-white/8 bg-charcoal p-2.5">
                     <div className="flex items-center gap-2">
                         <HeroBuddy className="size-6 -my-1" move={false} />
                         <div className="min-w-0">

@@ -21,7 +21,7 @@ function Toaster(props: ToasterProps) {
             }
             toastOptions={{
                 classNames: {
-                    toast: "group toast rounded-lg !shadow-[inset_0_1px_0_0_#262626]",
+                    toast: "group toast rounded-lg !shadow-[inset_0_1px_0_0_var(--color-edge)]",
                     description: "text-neutral-400",
                     actionButton: "bg-neutral-100 text-neutral-900",
                     cancelButton: "bg-white/5 text-neutral-300",

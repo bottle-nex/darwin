@@ -64,8 +64,8 @@ function TaskCard({ task }: { task: ReviewTask }) {
             variants={appear(task.delay)}
             className={
                 task.dim
-                    ? "mt-3 rounded-md border border-white/6 bg-[#121214] p-4 opacity-70"
-                    : "rounded-md border border-white/6 bg-[#121214] p-4"
+                    ? "mt-3 rounded-md border border-white/6 bg-charcoal p-4 opacity-70"
+                    : "rounded-md border border-white/6 bg-charcoal p-4"
             }
         >
             <p className="text-[13px] font-semibold text-neutral-100">{task.title}</p>

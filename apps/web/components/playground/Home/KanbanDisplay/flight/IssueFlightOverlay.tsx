@@ -209,7 +209,7 @@ export default function IssueFlightOverlay() {
             <div
                 ref={highlightRef}
                 style={{ position: "fixed", left: 0, top: 0, opacity: 0 }}
-                className="rounded-lg bg-[#9bc24f]/10 ring-2 ring-[#9bc24f]/70"
+                className="rounded-lg bg-matcha/10 ring-2 ring-matcha/70"
             />
         </div>
     );

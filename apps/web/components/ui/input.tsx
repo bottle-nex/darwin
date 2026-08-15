@@ -8,7 +8,7 @@ const inputVariants = cva(
     {
         variants: {
             variant: {
-                default: "shadow-[inset_0_1px_0_0_#262626]",
+                default: "shadow-[inset_0_1px_0_0_var(--color-edge)]",
                 ghost: "border-none shadow-none",
             },
         },

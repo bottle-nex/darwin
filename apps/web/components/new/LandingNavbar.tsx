@@ -14,7 +14,6 @@ import {
     PeopleIcon,
     type AnimatedIcon,
 } from "@/components/icons/AnimatedIcons";
-import { DottedArrowRight } from "@/lib/svgs/svgs";
 import { Button } from "../ui/button";
 import { MdChevronRight } from "react-icons/md";
 import { landingContainer } from "../landing/LandingSection";

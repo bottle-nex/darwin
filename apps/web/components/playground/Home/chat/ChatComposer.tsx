@@ -146,7 +146,7 @@ const ChatComposer = forwardRef<ChatComposerHandle, ChatComposerProps>(function 
     }));
 
     return (
-        <div className="rounded-lg bg-[#1a1a1a] shadow-[inset_0_1px_0_0_#262626]">
+        <div className="rounded-lg bg-[#1a1a1a] shadow-[inset_0_1px_0_0_var(--color-edge)]">
             {children}
             <div className="relative">
                 <div

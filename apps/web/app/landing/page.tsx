@@ -65,7 +65,7 @@ export default function Landing() {
                 />
                 <Dial
                     size={1095}
-                    color={"#ab9ff2"}
+                    color={"var(--color-primary)"}
                     tick={{
                         size: 43,
                         width: 3.5,
@@ -83,7 +83,7 @@ export default function Landing() {
                 />
                 <Dial
                     size={900}
-                    color={"#ab9ff2"}
+                    color={"var(--color-primary)"}
                     tick={{
                         size: 0,
                         width: 0,

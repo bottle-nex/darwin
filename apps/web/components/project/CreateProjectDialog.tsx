@@ -25,9 +25,9 @@ import type { GithubRepo } from "@/types/organization";
 const FORM_ID = "create-project-form";
 
 export const FIELD =
-    "mt-1.5 border-white/10 bg-white/5 text-neutral-200 placeholder:text-neutral-500 focus-visible:border-[#9bc24f] focus-visible:ring-[#9bc24f]/30";
+    "mt-1.5 border-white/10 bg-white/5 text-neutral-200 placeholder:text-neutral-500 focus-visible:border-matcha focus-visible:ring-matcha/30";
 
-export const SURFACE = "rounded-lg bg-white/5 shadow-[inset_0_1px_0_0_#262626]";
+export const SURFACE = "rounded-lg bg-white/5 shadow-[inset_0_1px_0_0_var(--color-edge)]";
 
 const HEADER_COPY = {
     details: {

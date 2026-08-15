@@ -214,9 +214,9 @@ export default function InviteToTeamDialog({
                         </span>
                         <div
                             className={cn(
-                                "flex min-h-10 flex-wrap items-center gap-1.5 rounded-lg bg-[#1a1a1a] px-2 py-1.5 shadow-[inset_0_1px_0_0_#262626]",
+                                "flex min-h-10 flex-wrap items-center gap-1.5 rounded-lg bg-[#1a1a1a] px-2 py-1.5 shadow-[inset_0_1px_0_0_var(--color-edge)]",
                                 draftLooksInvalid &&
-                                    "shadow-[inset_0_1px_0_0_#262626,inset_0_0_0_1px_rgb(244_63_94/0.4)]",
+                                    "shadow-[inset_0_1px_0_0_var(--color-edge),inset_0_0_0_1px_rgb(244_63_94/0.4)]",
                             )}
                         >
                             {emails.map((email) => (
@@ -305,7 +305,7 @@ export default function InviteToTeamDialog({
                             onChange={(e) => setMessage(e.target.value)}
                             maxLength={500}
                             placeholder="Add a short note to the invite…"
-                            className="h-24 resize-none rounded-lg border-0 bg-[#1a1a1a] text-[13px] text-[#e5e5e5] shadow-[inset_0_1px_0_0_#262626] placeholder:text-[#737373] focus-visible:ring-0"
+                            className="h-24 resize-none rounded-lg border-0 bg-[#1a1a1a] text-[13px] text-[#e5e5e5] shadow-[inset_0_1px_0_0_var(--color-edge)] placeholder:text-[#737373] focus-visible:ring-0"
                         />
                     </div>
                 </div>

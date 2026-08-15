@@ -141,7 +141,7 @@ export default function AgentShowcase() {
                 >
                     <motion.div
                         variants={appear(0.35)}
-                        className="-mr-20 overflow-hidden rounded-md border border-white/6 bg-[#101012]"
+                        className="-mr-20 overflow-hidden rounded-md border border-white/6 bg-charcoal"
                     >
                         <div className="border-b border-white/6 px-3 py-2.5">
                             <SectionLabel label="To Do" />
@@ -166,7 +166,7 @@ export default function AgentShowcase() {
 
                     <motion.div
                         variants={appear(0.9)}
-                        className="mt-auto -mr-20 rounded-md border border-white/5 bg-[#101012] px-3 py-2.5 opacity-45"
+                        className="mt-auto -mr-20 rounded-md border border-white/5 bg-charcoal px-3 py-2.5 opacity-45"
                     >
                         <SectionLabel label="In Progress" />
                     </motion.div>

@@ -19,7 +19,7 @@ import { useNewProjectStore } from "@/store/project/useNewProjectStore";
 import PlaygroundUserMenu from "@/components/playground/Core/TopBar/PlaygroundUserMenu";
 
 const FIELD =
-    "border-white/10 bg-white/5 text-[13px] text-neutral-300 hover:bg-white/7 focus-visible:border-[#9bc24f] focus-visible:ring-[#9bc24f]/30";
+    "border-white/10 bg-white/5 text-[13px] text-neutral-300 hover:bg-white/7 focus-visible:border-matcha focus-visible:ring-matcha/30";
 
 function PlaygroundLanding() {
     const router = useRouter();

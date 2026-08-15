@@ -25,8 +25,7 @@ const COPY: Record<Status, { title: string; hint: string }> = {
 };
 
 function StatusIcon({ status }: { status: Status }) {
-    if (status === "success")
-        return <FaCircleCheck className="size-5 text-[#9bc24f]" aria-hidden />;
+    if (status === "success") return <FaCircleCheck className="size-5 text-matcha" aria-hidden />;
     if (status === "error") return <FaCircleXmark className="size-5 text-red-400" aria-hidden />;
     return <RiLoader4Line className="size-5 animate-spin text-neutral-400" aria-hidden />;
 }

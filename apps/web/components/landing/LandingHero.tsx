@@ -8,7 +8,7 @@ import ShowcaseFrame from "./showcase/ShowcaseFrame";
 
 export default function LandingHero() {
     return (
-        <main className="relative min-h-screen w-screen bg-ink pb-20">
+        <main className="relative min-h-screen w-screen pb-20">
             <section className={cn(landingContainer, "mt-55 h-fit space-y-3")}>
                 <BlurFade className="text-snow text-6xl w-[80%] font-headline">
                     Drop an issue on the board.

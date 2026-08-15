@@ -9,7 +9,7 @@ import { stepItemVariants, stepVariants } from "./choreography";
 import { TOUR_STEPS, type TourStep } from "./steps";
 
 export const UNDERLINE_FIELD =
-    "h-11 rounded-none border-0 border-b border-white/12 bg-transparent px-0 text-lg text-neutral-100 shadow-none placeholder:text-neutral-600 hover:bg-transparent focus-visible:border-[#AB9FF2] focus-visible:ring-0 dark:bg-transparent";
+    "h-11 rounded-none border-0 border-b border-white/12 bg-transparent px-0 text-lg text-neutral-100 shadow-none placeholder:text-neutral-600 hover:bg-transparent focus-visible:border-primary focus-visible:ring-0 dark:bg-transparent";
 
 export function StepItem({ children, className }: { children: ReactNode; className?: string }) {
     return (

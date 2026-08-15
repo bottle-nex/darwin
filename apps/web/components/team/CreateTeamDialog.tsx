@@ -20,9 +20,9 @@ import { useCreateTeam } from "@/hooks/team/useCreateTeam";
 const FORM_ID = "create-team-form";
 
 const FIELD =
-    "mt-1.5 border-white/10 bg-white/5 text-neutral-200 placeholder:text-neutral-500 focus-visible:border-[#9bc24f] focus-visible:ring-[#9bc24f]/30";
+    "mt-1.5 border-white/10 bg-white/5 text-neutral-200 placeholder:text-neutral-500 focus-visible:border-matcha focus-visible:ring-matcha/30";
 
-const SURFACE = "rounded-lg bg-white/5 shadow-[inset_0_1px_0_0_#262626]";
+const SURFACE = "rounded-lg bg-white/5 shadow-[inset_0_1px_0_0_var(--color-edge)]";
 
 type FormValues = {
     name: string;
@@ -187,7 +187,7 @@ export default function CreateTeamDialog() {
                             placeholder="What does this team own?"
                             rows={4}
                             className={cn(
-                                "mt-1.5 w-full resize-none px-3 py-2 text-sm text-neutral-200 outline-none placeholder:text-neutral-500 focus-visible:ring-[3px] focus-visible:ring-[#9bc24f]/30",
+                                "mt-1.5 w-full resize-none px-3 py-2 text-sm text-neutral-200 outline-none placeholder:text-neutral-500 focus-visible:ring-[3px] focus-visible:ring-matcha/30",
                                 SURFACE,
                             )}
                         />
