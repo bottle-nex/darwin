@@ -3,7 +3,7 @@ import { ENV } from "../conf/config.env";
 import GithubService from "./service.github";
 import SecretService from "./service.secret";
 import PlanService from "./services.plan";
-import GraphService, { GRAPH_PATH, type GraphBuild } from "./service.graph";
+import GraphService from "./service.graph";
 import ClaudeRun from "./service.claude_run";
 import SandboxStream, { redact } from "./service.sandbox_stream";
 import { sign_worker_jwt } from "./service.jwt";
@@ -167,8 +167,10 @@ export default class E2B {
         const repo_url = project.githubRepoUrl;
         const branch = project.githubDefaultBranch;
         const installation_id = Number(project.githubInstallation.installationId);
+        validate_branch(branch);
 
         let sandbox_id = worker.sandboxId;
+        let preserve_sandbox = false;
         log.step("worker loop starting", { worker: worker_id, project: project.id, branch });
 
         try {
@@ -212,13 +214,15 @@ export default class E2B {
                             MATCHA_SERVER_URL: ENV.SERVER_PUBLIC_API_URL,
                             MATCHA_SANDBOX_TOKEN: worker_token,
                             MATCHA_SESSION_KIND: "worker",
-                            MATCHA_GRAPH_PATH: GRAPH_PATH,
                         },
                     },
                 },
             };
             await sandbox.files.write(MCP_CONFIG_PATH, JSON.stringify(mcp_config, null, 2));
             log.info("wrote mcp config into sandbox");
+
+            await GraphService.protect(sandbox);
+            log.info("protected worker-local files from Git");
 
             log.info("worker marked Busy");
             await prisma.worker.update({
@@ -231,42 +235,62 @@ export default class E2B {
             let solved_count = 0;
 
             for (;;) {
+                const worktree = await sandbox.commands.run("git status --porcelain", {
+                    cwd: REPO_DIR,
+                });
+                if (worktree.stdout.trim()) {
+                    preserve_sandbox = true;
+                    throw new Error("worker checkout is dirty — preserving sandbox for recovery");
+                }
+                await sandbox.commands.run(`git switch ${branch}`, { cwd: REPO_DIR });
+
                 const issue = await IssueSolver.claim_next_issue(worker_id, log);
                 if (!issue) {
                     log.success("queue empty — stopping loop", { solved: solved_count });
                     break;
                 }
 
-                // Rebuilt per issue rather than stored: the graph is derived data, and building
-                // it here means it describes the code as it stands now — including anything an
-                // earlier issue in this same loop already changed.
-                const graph = await E2B.build_graph_for_issue(sandbox, log);
+                const graph_state = await GraphService.prepare(sandbox, log);
 
                 log.step(`issue #${issue.number} pushed into sandbox`, { title: issue.title });
                 await sandbox.files.write(
                     ISSUE_PROMPT_PATH,
-                    E2B.build_issue_prompt(issue, branch, project.planMd, graph),
+                    E2B.build_issue_prompt(issue, branch, project.planMd),
                 );
 
                 log.info(`invoking claude for issue #${issue.number}`, {
                     model,
                     effort,
                     brief: project.planMd ? "included" : "absent",
-                    graph: graph ? "included" : "absent",
                 });
 
-                const report = await ClaudeRun.execute(sandbox, log, {
-                    prompt_path: ISSUE_PROMPT_PATH,
-                    model,
-                    effort,
-                    extra_flags: [`--mcp-config ${MCP_CONFIG_PATH}`],
-                    envs: {
-                        CLAUDE_CODE_OAUTH_TOKEN: ENV.SERVER_CLAUDE_CODE_OAUTH_TOKEN,
-                        GH_TOKEN: gh_token,
-                    },
-                    timeout_ms: ISSUE_SOLVE_TIMEOUT_MS,
-                    label: `solving agent for issue #${issue.number}`,
-                });
+                let report;
+                try {
+                    report = await ClaudeRun.execute(sandbox, log, {
+                        prompt_path: ISSUE_PROMPT_PATH,
+                        model,
+                        effort,
+                        extra_flags: [`--mcp-config ${MCP_CONFIG_PATH}`],
+                        envs: {
+                            CLAUDE_CODE_OAUTH_TOKEN: ENV.SERVER_CLAUDE_CODE_OAUTH_TOKEN,
+                            GH_TOKEN: gh_token,
+                            GRAPHIFY_HOOK_STRICT: graph_state === "ready" ? "1" : "0",
+                        },
+                        timeout_ms: ISSUE_SOLVE_TIMEOUT_MS,
+                        label: `solving agent for issue #${issue.number}`,
+                    });
+                } catch (error) {
+                    try {
+                        const worktree = await sandbox.commands.run("git status --porcelain", {
+                            cwd: REPO_DIR,
+                        });
+                        preserve_sandbox = Boolean(worktree.stdout.trim());
+                    } catch (inspection_error) {
+                        preserve_sandbox = true;
+                        log.error("could not inspect failed solver worktree", inspection_error);
+                    }
+                    throw error;
+                }
 
                 log.success(`issue #${issue.number} run finished`, {
                     turns: report.num_turns,
@@ -300,7 +324,9 @@ export default class E2B {
                 log.error("could not mark worker Dead", e, { worker: worker_id });
             }
         } finally {
-            if (sandbox_id) {
+            if (sandbox_id && preserve_sandbox) {
+                log.warn("preserving dirty sandbox for recovery", { sandbox: sandbox_id });
+            } else if (sandbox_id) {
                 log.info("tearing down sandbox", { sandbox: sandbox_id });
                 try {
                     await E2B.destroy(sandbox_id);
@@ -316,31 +342,10 @@ export default class E2B {
         }
     }
 
-    /**
-     * Build the code graph for the issue about to be solved.
-     *
-     * Never throws: the graph is an accelerator, not a prerequisite. If graphify fails the issue
-     * is still solvable, just more expensively, so the failure is logged and the run continues
-     * without a graph section in the prompt.
-     */
-    private static async build_graph_for_issue(
-        sandbox: Sandbox,
-        log: Logger,
-    ): Promise<GraphBuild | null> {
-        try {
-            const result = await sandbox.commands.run("git rev-parse HEAD", { cwd: REPO_DIR });
-            return await GraphService.build(sandbox, result.stdout.trim(), log);
-        } catch (error) {
-            log.error("code graph build failed — solving without one", error);
-            return null;
-        }
-    }
-
     private static build_issue_prompt(
         issue: ClaimedIssue,
         base_branch: string,
         plan_md: string | null,
-        graph: GraphBuild | null,
     ): string {
         const intro = `You are an autonomous coding agent working inside a fresh clone of this repository at ${REPO_DIR}, currently on branch "${base_branch}".`;
 
@@ -352,16 +357,12 @@ An earlier agent explored this repository and wrote the brief below. Lean on it 
 ${plan_md}`
             : null;
 
-        const graph_section = graph ? GraphService.prompt_section(graph) : null;
-
         const issue_section = `## Issue #${issue.number}: ${issue.title}
 
 ${issue.description}`;
 
         const actions = [
-            graph
-                ? `Find every file this issue touches by calling the \`search_code\` tool with the symbol the issue centres on — the component, function, or type by its exact name — then read those files before changing them. Reach for Grep when what you are looking for is text rather than structure — copy, comments, a literal string in markup.`
-                : `Find every file this issue touches with Grep and Glob, then read those files before changing them.`,
+            `Investigate the issue and read every relevant file before changing it.`,
             `Create a new git branch off "${base_branch}" (never commit directly to "${base_branch}"). Pick a short, descriptive branch name.`,
             `Implement the fix using your normal tools.`,
             `Commit your changes with a clear commit message.`,
@@ -377,7 +378,7 @@ Do all of this yourself with your Bash tool — you have full permissions in thi
 
 Never start a long-running command in the background and end your turn waiting on it. This is a single non-interactive run: there is no later turn to come back to, so anything left running when you stop is lost and the issue goes unsolved. Run it in the foreground and wait for it to finish.`;
 
-        return [intro, brief, graph_section, issue_section, steps].filter(Boolean).join("\n\n");
+        return [intro, brief, issue_section, steps].filter(Boolean).join("\n\n");
     }
 
     public static async head_commit(sandbox_id: string): Promise<string> {
@@ -431,9 +432,7 @@ Never start a long-running command in the background and end your turn waiting o
         project_id: string,
         log: Logger,
     ) {
-        if (!SAFE_BRANCH.test(branch)) {
-            throw new Error(`refusing to clone unsafe branch name: ${branch}`);
-        }
+        validate_branch(branch);
 
         const [token, secrets] = await Promise.all([
             GithubService.getInstallationToken(installation_id),
@@ -472,5 +471,11 @@ Never start a long-running command in the background and end your turn waiting o
             .map(([key, value]) => `${key}=${value}`)
             .join("\n");
         await sandbox.files.write(`${REPO_DIR}/.env`, env_file);
+    }
+}
+
+function validate_branch(branch: string): void {
+    if (!SAFE_BRANCH.test(branch)) {
+        throw new Error(`refusing to use unsafe branch name: ${branch}`);
     }
 }

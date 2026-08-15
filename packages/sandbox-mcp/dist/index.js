@@ -2,49 +2,6 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
-
-// src/service.graph_search.ts
-import { execFile } from "child_process";
-import { existsSync } from "fs";
-import { promisify } from "util";
-var run = promisify(execFile);
-var QUERY_TIMEOUT_MS = 6e4;
-var MAX_OUTPUT_BYTES = 4 * 1024 * 1024;
-var MAX_ANSWER_CHARS = 12e3;
-var PATH_FALLBACK = "/usr/local/bin:/usr/bin:/bin";
-var FALLBACK_TO_GREP = "Fall back to Grep and Glob for this one.";
-var GraphSearch = class _GraphSearch {
-  static GRAPH_PATH = process.env.MATCHA_GRAPH_PATH;
-  static async query(symbol) {
-    const graph = _GraphSearch.GRAPH_PATH;
-    if (!graph || !existsSync(graph)) {
-      return `No code graph was built for this run. ${FALLBACK_TO_GREP}`;
-    }
-    try {
-      const { stdout } = await run("graphify", ["query", symbol, "--graph", graph], {
-        timeout: QUERY_TIMEOUT_MS,
-        maxBuffer: MAX_OUTPUT_BYTES,
-        env: { ...process.env, PATH: process.env.PATH ?? PATH_FALLBACK }
-      });
-      const answer = stdout.trim();
-      if (!answer) {
-        return `The code graph has no node named "${symbol}". Check the spelling against the code, or ${FALLBACK_TO_GREP.toLowerCase()}`;
-      }
-      return _GraphSearch.clamp(answer);
-    } catch (error) {
-      const reason = error instanceof Error ? error.message : String(error);
-      return `Code graph query failed: ${reason}. ${FALLBACK_TO_GREP}`;
-    }
-  }
-  static clamp(answer) {
-    if (answer.length <= MAX_ANSWER_CHARS) return answer;
-    return `${answer.slice(0, MAX_ANSWER_CHARS)}
-
-[truncated \u2014 ${answer.length - MAX_ANSWER_CHARS} more characters. Ask a narrower question to see the rest.]`;
-  }
-};
-
-// src/index.ts
 var SetupStatus = /* @__PURE__ */ ((SetupStatus2) => {
   SetupStatus2["PENDING"] = "Pending";
   SetupStatus2["PROVISIONING"] = "Provisioning";
@@ -197,15 +154,6 @@ var WorkerMcpServerService = class _WorkerMcpServerService {
       },
       this.report_pr_opened.bind(this)
     );
-    this.mcp_server.tool(
-      "search_code",
-      `Search this repository's code graph: where a symbol is defined, which files import it, and what calls what. Prefer this over Grep when you need every file involved in a change \u2014 it reads the repository's structure rather than its text. Pass one identifier exactly as it appears in the code ("Button", "HostControls", "useLiveQuizStore"), not a sentence \u2014 a sentence seeds the traversal with its own noise words and returns a subgraph that answers nothing. Call it again for each further symbol you need.`,
-      { symbol: z.string() },
-      this.search_code.bind(this)
-    );
-  }
-  async search_code({ symbol }) {
-    return this.text(await GraphSearch.query(symbol));
   }
   async report_status({ status }) {
     console.error(`[sandbox-mcp:worker] report_status(${status}) \u2014 about to notify server`);

@@ -1,109 +1,90 @@
-import type { Sandbox } from "e2b";
+import type { CommandStartOpts, Sandbox } from "e2b";
 import type Logger from "@trymatcha/logger";
 import SandboxStream from "./service.sandbox_stream";
 
 const REPO_DIR = "/home/user/repo";
-
-/**
- * graphify writes its outputs to `<--out>/graphify-out/`. Pointing --out at the home directory
- * rather than the repo keeps graph.json out of the working tree the agent commits from.
- */
-const GRAPH_OUT_ROOT = "/home/user";
-export const GRAPH_PATH = `${GRAPH_OUT_ROOT}/graphify-out/graph.json`;
+const STATE_PATH = ".git/matcha-graphify-state";
 
 const BUILD_TIMEOUT_MS = 15 * 60_000;
 
-export interface GraphBuild {
-    commitSha: string;
-    nodeCount: number;
-    edgeCount: number;
-    durationMs: number;
-}
+const PROTECT_COMMAND = `set -e
+mkdir -p .git/info
+touch .git/info/exclude
+for path in /graphify-out/ /CLAUDE.md /.claude/CLAUDE.md '/.claude/settings.json*' /.claude/skills/graphify/ /.claudeignore /.env; do
+    grep -qxF "$path" .git/info/exclude || printf '%s\n' "$path" >> .git/info/exclude
+done
+git ls-files -z -- ':(glob,top)graphify-out/**' ':(top,literal)CLAUDE.md' ':(top,literal).claude/CLAUDE.md' ':(glob,top).claude/settings.json*' ':(glob,top).claude/skills/graphify/**' ':(top,literal).claudeignore' ':(top,literal).env' |
+git update-index -z --assume-unchanged --stdin
+grep -qxF graphify-out/ .claudeignore 2>/dev/null || printf '\ngraphify-out/\n' >> .claudeignore`;
 
 export default class GraphService {
-    /**
-     * Build the code graph for the repo in a sandbox, leaving it on disk for the agent to query.
-     *
-     * Nothing is persisted and nothing is read back into this process. The graph is derived data
-     * — regenerable from the repo in seconds by a deterministic parser — so rebuilding it per
-     * issue is cheaper than storing it, and it always matches the code actually in the sandbox
-     * rather than whatever HEAD was at onboarding.
-     *
-     * `--code-only` is what keeps it free: tree-sitter AST parsing with no model call at all,
-     * skipping the doc/PDF/image passes that would need an API key.
-     */
-    public static async build(
-        sandbox: Sandbox,
-        commit_sha: string,
-        log: Logger,
-    ): Promise<GraphBuild> {
-        log.step("building code graph", { commit: commit_sha.slice(0, 7) });
-        const started = Date.now();
+    public static async protect(sandbox: Sandbox): Promise<void> {
+        await GraphService.run_checked(sandbox, PROTECT_COMMAND);
+    }
 
-        // The caller's logger rather than a "graph" scope: several workers build graphs
-        // concurrently in this process, and the worker tag is what tells their output apart.
-        const stream = SandboxStream.plain(log);
-        let extract;
+    public static async prepare(sandbox: Sandbox, log: Logger): Promise<"ready" | "disabled"> {
         try {
-            extract = await sandbox.commands.run(
-                `graphify extract ${REPO_DIR} --code-only --out ${GRAPH_OUT_ROOT}`,
-                {
-                    cwd: GRAPH_OUT_ROOT,
-                    timeoutMs: BUILD_TIMEOUT_MS,
-                    onStdout: stream.onStdout,
-                    onStderr: stream.onStderr,
-                },
+            const state = (
+                await GraphService.run_checked(sandbox, `cat ${STATE_PATH} 2>/dev/null || true`)
+            ).stdout.trim();
+            if (state === "disabled") return state;
+
+            const started = Date.now();
+            log.step(state === "ready" ? "synchronizing code graph" : "building code graph");
+            await GraphService.run_graphify(sandbox, "graphify extract . --code-only", log);
+            await GraphService.run_checked(
+                sandbox,
+                "jq -e '(.nodes | length) > 0' graphify-out/graph.json",
+                { timeoutMs: 60_000 },
             );
+
+            if (state !== "ready") {
+                await GraphService.run_graphify(
+                    sandbox,
+                    "graphify install --project --strict",
+                    log,
+                );
+                await GraphService.run_checked(sandbox, `printf ready > ${STATE_PATH}`);
+            }
+
+            log.success("code graph ready", {
+                took: `${Math.round((Date.now() - started) / 1000)}s`,
+            });
+            return "ready";
+        } catch (error) {
+            log.error("code graph unavailable — disabling Graphify", error);
+            try {
+                await GraphService.run_checked(sandbox, `printf disabled > ${STATE_PATH}`);
+            } catch (persist_error) {
+                log.error("could not persist disabled Graphify state", persist_error);
+            }
+            try {
+                await GraphService.run_checked(sandbox, "rm -f graphify-out/graph.json");
+            } catch (cleanup_error) {
+                log.error("could not remove stale Graphify graph", cleanup_error);
+            }
+            return "disabled";
+        }
+    }
+
+    private static async run_graphify(sandbox: Sandbox, command: string, log: Logger) {
+        const stream = SandboxStream.plain(log);
+        try {
+            return await GraphService.run_checked(sandbox, command, {
+                timeoutMs: BUILD_TIMEOUT_MS,
+                onStdout: stream.onStdout,
+                onStderr: stream.onStderr,
+            });
         } finally {
             stream.flush();
         }
-
-        if (extract.exitCode !== 0) {
-            throw new Error(
-                `graphify extract failed (exit ${extract.exitCode}): ${extract.stderr}`,
-            );
-        }
-
-        // Count in the sandbox rather than reading the graph back: this process never needs the
-        // blob, and a large graph would be megabytes over the wire for two numbers.
-        const counts = await sandbox.commands.run(
-            `jq -r '[(.nodes | length), ((.links // .edges // []) | length)] | @tsv' ${GRAPH_PATH}`,
-            { timeoutMs: 60_000 },
-        );
-        const [nodes, edges] = counts.stdout.trim().split(/\s+/);
-        const nodeCount = Number(nodes);
-        const edgeCount = Number(edges);
-
-        if (!Number.isFinite(nodeCount) || nodeCount === 0) {
-            throw new Error(
-                `graphify produced an empty graph: ${extract.stdout || extract.stderr}`,
-            );
-        }
-
-        const durationMs = Date.now() - started;
-        log.success("code graph built", {
-            nodes: nodeCount,
-            edges: edgeCount,
-            took: `${Math.round(durationMs / 1000)}s`,
-        });
-
-        return { commitSha: commit_sha, nodeCount, edgeCount, durationMs };
     }
 
-    /**
-     * The block that goes into the issue prompt.
-     *
-     * Deliberately small: it says what the graph knows and names the tool that reads it. The
-     * graph itself stays on disk — inlining it would be paid for on every turn and would make
-     * the solve more expensive, which is the opposite of the point.
-     */
-    public static prompt_section(build: GraphBuild): string {
-        return `## Code graph
-
-graphify mapped this repository at commit \`${build.commitSha.slice(0, 7)}\` — ${build.nodeCount} nodes, ${build.edgeCount} edges, built by tree-sitter AST parsing of the exact code in this sandbox. It knows where things are defined, what imports what, and what calls what.
-
-Query it with the \`search_code\` tool, one identifier at a time, spelled exactly as the code spells it — \`Button\`, \`HostControls\`, \`useLiveQuizStore\`. It answers from the graph on disk, so it is fast and costs nothing; call it once per symbol you need. Do not phrase the query as a sentence: graphify seeds its traversal from the words you give it, so a sentence seeds it with your own filler and returns a subgraph that answers nothing.
-
-Edges are tagged \`EXTRACTED\` when graphify saw the relationship in the source and \`INFERRED\` when it deduced one, so weigh them accordingly. The graph indexes code structure, not prose — for copy, comments, or a literal string in markup, Grep is still the right tool.`;
+    private static async run_checked(
+        sandbox: Sandbox,
+        command: string,
+        options: CommandStartOpts & { background?: false } = {},
+    ) {
+        return sandbox.commands.run(command, { cwd: REPO_DIR, ...options, background: false });
     }
 }
