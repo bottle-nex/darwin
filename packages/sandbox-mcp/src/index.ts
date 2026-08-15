@@ -1,6 +1,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
+import GraphSearch from "./service.graph_search";
 
 enum SetupStatus {
     PENDING = "Pending",
@@ -191,6 +192,17 @@ export class WorkerMcpServerService {
             },
             this.report_pr_opened.bind(this),
         );
+
+        this.mcp_server.tool(
+            "search_code",
+            'Search this repository\'s code graph: where a symbol is defined, which files import it, and what calls what. Prefer this over Grep when you need every file involved in a change — it reads the repository\'s structure rather than its text. Pass one identifier exactly as it appears in the code ("Button", "HostControls", "useLiveQuizStore"), not a sentence — a sentence seeds the traversal with its own noise words and returns a subgraph that answers nothing. Call it again for each further symbol you need.',
+            { symbol: z.string() },
+            this.search_code.bind(this),
+        );
+    }
+
+    private async search_code({ symbol }: { symbol: string }) {
+        return this.text(await GraphSearch.query(symbol));
     }
 
     private async report_status({ status }: { status: WorkerRuntimeStatus }) {

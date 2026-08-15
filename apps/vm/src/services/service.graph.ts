@@ -9,7 +9,7 @@ const REPO_DIR = "/home/user/repo";
  * rather than the repo keeps graph.json out of the working tree the agent commits from.
  */
 const GRAPH_OUT_ROOT = "/home/user";
-const GRAPH_PATH = `${GRAPH_OUT_ROOT}/graphify-out/graph.json`;
+export const GRAPH_PATH = `${GRAPH_OUT_ROOT}/graphify-out/graph.json`;
 
 const BUILD_TIMEOUT_MS = 15 * 60_000;
 
@@ -93,23 +93,17 @@ export default class GraphService {
     /**
      * The block that goes into the issue prompt.
      *
-     * Deliberately small: it names the graph, says where it is, and teaches the commands. The
+     * Deliberately small: it says what the graph knows and names the tool that reads it. The
      * graph itself stays on disk — inlining it would be paid for on every turn and would make
      * the solve more expensive, which is the opposite of the point.
      */
     public static prompt_section(build: GraphBuild): string {
         return `## Code graph
 
-graphify mapped this repository at commit \`${build.commitSha.slice(0, 7)}\` — ${build.nodeCount} nodes, ${build.edgeCount} edges, built by tree-sitter AST parsing of the exact code in this sandbox. Query it instead of grepping for structure; it already knows what imports what, what calls what, and where things are defined.
+graphify mapped this repository at commit \`${build.commitSha.slice(0, 7)}\` — ${build.nodeCount} nodes, ${build.edgeCount} edges, built by tree-sitter AST parsing of the exact code in this sandbox. It knows where things are defined, what imports what, and what calls what.
 
-\`\`\`
-graphify query "<question>" --graph ${GRAPH_PATH}
-graphify path "<from>" "<to>" --graph ${GRAPH_PATH}
-graphify explain "<node>" --graph ${GRAPH_PATH}
-\`\`\`
+Query it with the \`search_code\` tool, one identifier at a time, spelled exactly as the code spells it — \`Button\`, \`HostControls\`, \`useLiveQuizStore\`. It answers from the graph on disk, so it is fast and costs nothing; call it once per symbol you need. Do not phrase the query as a sentence: graphify seeds its traversal from the words you give it, so a sentence seeds it with your own filler and returns a subgraph that answers nothing.
 
-\`query\` returns the relevant subgraph as text, \`path\` traces how two things connect, and \`explain\` describes one node and its neighbours. All three read the file locally — they are fast and cost nothing.
-
-Edges are tagged \`EXTRACTED\` when graphify saw the relationship in the source and \`INFERRED\` when it deduced one, so weigh them accordingly. Use the graph to find the right files fast, then read those files before changing them.`;
+Edges are tagged \`EXTRACTED\` when graphify saw the relationship in the source and \`INFERRED\` when it deduced one, so weigh them accordingly. The graph indexes code structure, not prose — for copy, comments, or a literal string in markup, Grep is still the right tool.`;
     }
 }

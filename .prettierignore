@@ -11,3 +11,4 @@ yarn.lock
 packages/database/generated
 **/generated
 *.pem
+consumption_details.md

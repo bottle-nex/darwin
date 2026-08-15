@@ -3,7 +3,7 @@ import { ENV } from "../conf/config.env";
 import GithubService from "./service.github";
 import SecretService from "./service.secret";
 import PlanService from "./services.plan";
-import GraphService, { type GraphBuild } from "./service.graph";
+import GraphService, { GRAPH_PATH, type GraphBuild } from "./service.graph";
 import ClaudeRun from "./service.claude_run";
 import SandboxStream, { redact } from "./service.sandbox_stream";
 import { sign_worker_jwt } from "./service.jwt";
@@ -212,6 +212,7 @@ export default class E2B {
                             MATCHA_SERVER_URL: ENV.SERVER_PUBLIC_API_URL,
                             MATCHA_SANDBOX_TOKEN: worker_token,
                             MATCHA_SESSION_KIND: "worker",
+                            MATCHA_GRAPH_PATH: GRAPH_PATH,
                         },
                     },
                 },
@@ -357,13 +358,20 @@ ${plan_md}`
 
 ${issue.description}`;
 
+        const actions = [
+            graph
+                ? `Find every file this issue touches by calling the \`search_code\` tool with the symbol the issue centres on — the component, function, or type by its exact name — then read those files before changing them. Reach for Grep when what you are looking for is text rather than structure — copy, comments, a literal string in markup.`
+                : `Find every file this issue touches with Grep and Glob, then read those files before changing them.`,
+            `Create a new git branch off "${base_branch}" (never commit directly to "${base_branch}"). Pick a short, descriptive branch name.`,
+            `Implement the fix using your normal tools.`,
+            `Commit your changes with a clear commit message.`,
+            `Push the branch and open a pull request against "${base_branch}" using the gh CLI (already authenticated via GH_TOKEN). Write a clear PR title and description referencing issue #${issue.number}.`,
+            `Call the report_pr_opened MCP tool with issue_id "${issue.id}", the PR URL, the branch name, and a one-sentence summary of the change.`,
+        ];
+
         const steps = `## What to do, in this exact order
 
-1. Create a new git branch off "${base_branch}" (never commit directly to "${base_branch}"). Pick a short, descriptive branch name.
-2. Implement the fix using your normal tools.
-3. Commit your changes with a clear commit message.
-4. Push the branch and open a pull request against "${base_branch}" using the gh CLI (already authenticated via GH_TOKEN). Write a clear PR title and description referencing issue #${issue.number}.
-5. Call the report_pr_opened MCP tool with issue_id "${issue.id}", the PR URL, the branch name, and a one-sentence summary of the change.
+${actions.map((action, index) => `${index + 1}. ${action}`).join("\n")}
 
 Do all of this yourself with your Bash tool — you have full permissions in this sandbox.
 
