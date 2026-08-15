@@ -10,19 +10,27 @@ export default function RevampHero() {
     return (
         <main className="relative min-h-screen w-screen bg-ink pb-20">
             <section className={cn(landingContainer, "mt-55 h-fit space-y-3")}>
-                <BlurFade className="text-snow text-7xl w-[80%] font-headline">
+                <BlurFade className="text-snow text-6xl w-[80%] font-headline">
                     Drop an issue on the board.
                     <br />
                     An agent ships the fix.
                 </BlurFade>
                 <div className="flex w-full items-center">
-                    <BlurFade delay={0.2} className="text-snow/70 text-lg w-[60%]">
+                    <BlurFade delay={0.2} className="text-snow/60 text-lg w-[60%]">
                         matcha&apos;s agents claim your issues, build and verify the fix in a
                         sandboxed runner, and hand back a PR ready for review.
                     </BlurFade>
-                    <span className="flex-1 flex justify-end">
-                        <Button variant={"tertiary"} className="text-graphite rounded-full bg-snow">
+                    <span className="flex-1 flex justify-end gap-2">
+                        <Button 
+                        variant={"tertiary"} 
+                        className="text-graphite rounded-full bg-snow font-arimo!">
                             Create Issue
+                            <MdChevronRight className="text-background!" />
+                        </Button>
+                        <Button 
+                            className="text-snow/80! rounded-full bg-snow/10! pl-4"
+                        >
+                            Learn more
                             <MdChevronRight className="text-background!" />
                         </Button>
                     </span>

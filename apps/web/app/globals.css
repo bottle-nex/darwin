@@ -98,6 +98,7 @@
     --font-serif: var(--font-instrument-serif);
     --font-grotesk: var(--font-inter-tight);
     --font-headline: var(--font-titillium-web);
+    --font-arimo: var(--font-arimo);
 }
 
 @layer base {

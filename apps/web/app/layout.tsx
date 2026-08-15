@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import {
+    Arimo,
     Geist_Mono,
     Instrument_Serif,
     Inter_Tight,
@@ -42,6 +43,11 @@ const interTight = Inter_Tight({
     subsets: ["latin"],
 });
 
+const arimo = Arimo({
+    variable: "--font-arimo",
+    subsets: ["latin"],
+});
+
 const titilliumWeb = Titillium_Web({
     variable: "--font-titillium-web",
     subsets: ["latin"],
@@ -64,7 +70,7 @@ export default async function RootLayout({
         <html
             lang="en"
             suppressHydrationWarning
-            className={`${poppins.variable} ${geistMono.variable} ${tektur.variable} ${instrumentSerif.variable} ${interTight.variable} ${titilliumWeb.variable} h-full antialiased`}
+            className={`${poppins.variable} ${geistMono.variable} ${tektur.variable} ${instrumentSerif.variable} ${interTight.variable} ${titilliumWeb.variable} ${arimo.variable} h-full antialiased`}
         >
             <LenisProvider>
                 <body className="min-h-full flex flex-col">

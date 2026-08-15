@@ -116,7 +116,7 @@ export default function RevampFooter() {
             }
             className={cn(
                 landingContainer,
-                "relative mt-20 flex flex-col gap-4 md:h-100 md:flex-row",
+                "relative mt-20 flex flex-col gap-4 md:h-90 md:flex-row",
             )}
         >
             <div aria-hidden className="relative z-10 md:w-[60%]">

@@ -148,7 +148,7 @@ export function LandingNavbar() {
                                                 exit={{ opacity: 0, y: -6, scale: 0.98 }}
                                                 transition={{
                                                     duration: reduceMotion ? 0.9 : 0.5,
-                                                    ease: [0.22, 1, 0.36, 1],
+                                                    ease: [0.22, 1, 16, 1],
                                                 }}
                                                 className="absolute right-0 top-full mt-3 grid w-115 grid-cols-2 gap-1 origin-top rounded-sm bg-charcoal p-1.5 shadow-lg shadow-black/40  border border-graphite"
                                             >

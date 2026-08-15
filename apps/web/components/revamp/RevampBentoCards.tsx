@@ -1,10 +1,11 @@
 "use client";
-
 import { motion, useInView, useReducedMotion } from "motion/react";
 import { useRef } from "react";
 import Reveal from "../utility/Reveal";
-import BentoCard from "./bento/BentoCard";
-import { AgentDiagram, BoardDiagram, MergeDiagram, RunnerDiagram } from "./bento/BentoDiagrams";
+import AgentCard from "./bento/AgentCard";
+import BoardCard from "./bento/BoardCard";
+import PullRequestCard from "./bento/PullRequestCard";
+import RunnerCard from "./bento/RunnerCard";
 import LandingSection from "./LandingSection";
 import SectionHeader from "./SectionHeader";
 
@@ -12,26 +13,10 @@ const CARDS_SETTLED_MS = 900;
 const LIGHT_STAGGER_MS = 150;
 
 const CARDS = [
-    {
-        label: "Board",
-        description: "Issues land on a shared board, each one scoped to a project",
-        Diagram: BoardDiagram,
-    },
-    {
-        label: "Agent",
-        description: "An agent claims the issue and works it end to end",
-        Diagram: AgentDiagram,
-    },
-    {
-        label: "Runner",
-        description: "A sandboxed runner builds and tests the fix against your repo",
-        Diagram: RunnerDiagram,
-    },
-    {
-        label: "Pull request",
-        description: "A finished pull request comes back for human review",
-        Diagram: MergeDiagram,
-    },
+    { key: "board", Card: BoardCard },
+    { key: "agent", Card: AgentCard },
+    { key: "runner", Card: RunnerCard },
+    { key: "pull-request", Card: PullRequestCard },
 ];
 
 const CONNECTOR_PATHS = [
@@ -96,19 +81,13 @@ export default function RevampBentoCards() {
                     ref={rowRef}
                     className="relative grid grid-cols-1 gap-6 md:grid-cols-4 md:gap-3 md:pt-13 md:pb-12"
                 >
-                    {CARDS.map((card, i) => (
+                    {CARDS.map(({ key, Card }, i) => (
                         <Reveal
-                            key={card.label}
+                            key={key}
                             delay={i * 0.1}
                             className={i % 2 === 1 ? "md:mt-18" : undefined}
                         >
-                            <BentoCard
-                                lit={lit}
-                                litDelay={CARDS_SETTLED_MS + i * LIGHT_STAGGER_MS}
-                                label={card.label}
-                                description={card.description}
-                                diagram={<card.Diagram />}
-                            />
+                            <Card lit={lit} litDelay={CARDS_SETTLED_MS + i * LIGHT_STAGGER_MS} />
                         </Reveal>
                     ))}
                 </div>

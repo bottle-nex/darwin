@@ -16,7 +16,7 @@ export default function Home() {
             <LandingNavbar />
             {/* <RevampAiEra /> */}
             <RevampHero />
-            <RevampIntegrations />
+            {/* <RevampIntegrations /> */}
             <RevampPlatformStack />
             <RevampBentoCards />
             <RevampIssueTracker />
