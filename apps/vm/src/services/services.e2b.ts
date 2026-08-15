@@ -171,7 +171,7 @@ export default class E2B {
         const repo_url = project.githubRepoUrl;
         const branch = project.githubDefaultBranch;
         const installation_id = Number(project.githubInstallation.installationId);
-        validate_branch(branch);
+        this.validate_branch(branch);
 
         let sandbox_id = worker.sandboxId;
         let preserve_sandbox = false;
@@ -416,7 +416,7 @@ Never start a long-running command in the background and end your turn waiting o
         project_id: string,
         log: Logger,
     ) {
-        validate_branch(branch);
+        this.validate_branch(branch);
 
         const [token, secrets] = await Promise.all([
             GithubService.getInstallationToken(installation_id),
