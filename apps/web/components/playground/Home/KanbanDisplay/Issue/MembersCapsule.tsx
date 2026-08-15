@@ -17,8 +17,6 @@ import { useProjectMembers, type ProjectMember } from "@/hooks/project/useProjec
 import ProjectRoleTicker from "@/components/playground/Team/TeamView/ProjectRoleTicker";
 import { CapsuleTrigger } from "./Capsule";
 
-// A small, fixed palette; the tone is picked deterministically from the user id
-// so a given person always reads the same colour across the member list.
 const MEMBER_TONES = [
     "bg-indigo-500/30 text-indigo-100",
     "bg-emerald-500/30 text-emerald-100",
