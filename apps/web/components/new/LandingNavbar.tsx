@@ -192,7 +192,7 @@ export function LandingNavbar() {
 
                     <Button variant={"tertiary"} onClick={session ? handleRedirect : handleSignin}>
                         Get Started
-                        <MdChevronRight className="text-background!" />
+                        <MdChevronRight className="text-black" />
                     </Button>
                 </div>
             </div>
