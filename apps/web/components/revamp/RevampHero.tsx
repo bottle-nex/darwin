@@ -21,15 +21,14 @@ export default function RevampHero() {
                         sandboxed runner, and hand back a PR ready for review.
                     </BlurFade>
                     <span className="flex-1 flex justify-end gap-2">
-                        <Button 
-                        variant={"tertiary"} 
-                        className="text-graphite rounded-full bg-snow font-arimo!">
+                        <Button
+                            variant={"tertiary"}
+                            className="text-graphite rounded-full bg-snow font-arimo!"
+                        >
                             Create Issue
                             <MdChevronRight className="text-background!" />
                         </Button>
-                        <Button 
-                            className="text-snow/80! rounded-full bg-snow/10! pl-4"
-                        >
+                        <Button className="text-snow/80! rounded-full bg-snow/10! pl-4">
                             Learn more
                             <MdChevronRight className="text-background!" />
                         </Button>
