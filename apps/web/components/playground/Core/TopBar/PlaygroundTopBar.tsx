@@ -59,8 +59,9 @@ export default function PlaygroundTopBar() {
                 <GithubConnectButton />
                 <Button
                     onClick={() => setOpen(true)}
-                    size="sm"
-                    className="h-6.75 cursor-pointer gap-1 px-2.5 text-[11px] font-medium text-[#3B315C]"
+                    variant={"tertiary"}
+                    size={"xs"}
+                    className="text-ink!"
                 >
                     <MdAdd className="size-3.5" aria-hidden />
                     Create Project

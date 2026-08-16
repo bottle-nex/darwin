@@ -263,7 +263,7 @@ export default function IssueForm({
                             <Button size={"xs"} variant={"tertiary"} onClick={close}>
                                 Close
                                 <ShortcutHint>
-                                    <span className="text-[10px]">esc</span>
+                                    <span className="text-[10px] text-ink">esc</span>
                                 </ShortcutHint>
                             </Button>
                         </section>
@@ -277,17 +277,20 @@ export default function IssueForm({
                                         <Button
                                             variant={"tertiary"}
                                             size={"xs"}
+                                            className="text-ink!"
                                             onClick={handleSubmit}
                                             loading={pending}
                                         >
                                             {isEdit ? "Save" : "Create Issue"}
                                             <ShortcutHint>
                                                 {isMac ? (
-                                                    <MdOutlineKeyboardCommandKey />
+                                                    <MdOutlineKeyboardCommandKey className="text-ink!" />
                                                 ) : (
-                                                    <span className="text-[10px]">Ctrl</span>
+                                                    <span className="text-[10px] text-ink!">
+                                                        Ctrl
+                                                    </span>
                                                 )}
-                                                <GrReturn />
+                                                <GrReturn className="text-ink!" />
                                             </ShortcutHint>
                                         </Button>
                                     </motion.div>

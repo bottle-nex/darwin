@@ -1,10 +1,10 @@
-import type { Metadata } from "next";
-import { ReleaseSection } from "@trymatcha/editorial";
-import ChangeLogHero from "@/components/changelog/ChangeLogHero";
-import { LandingNavbar } from "@/components/new/LandingNavbar";
-import LandingFooter from "@/components/landing/LandingFooter";
-import { landingContainer } from "@/components/landing/LandingSection";
 import { getReleases } from "@/lib/content";
+import { LandingNavbar } from "@/components/new/LandingNavbar";
+import { ReleaseSection } from "@trymatcha/editorial";
+import { landingContainer } from "@/components/landing/LandingSection";
+import type { Metadata } from "next";
+import LandingFooter from "@/components/landing/LandingFooter";
+import ChangeLogHero from "@/components/changelog/ChangeLogHero";
 
 export const metadata: Metadata = {
     title: "Changelog",

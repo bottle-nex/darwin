@@ -1,8 +1,8 @@
-import { ChangelogBackdrop } from "@trymatcha/editorial";
 import { cn } from "@/lib/utils";
-import BlurFade from "../landing/BlurFade";
-import { landingContainer } from "../landing/LandingSection";
 import { Button } from "../ui/button";
+import { landingContainer } from "../landing/LandingSection";
+import { ChangelogBackdrop } from "@trymatcha/editorial";
+import BlurFade from "../landing/BlurFade";
 
 export default function ChangeLogHero() {
     return (
