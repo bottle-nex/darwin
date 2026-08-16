@@ -72,26 +72,6 @@
     }
 }
 
-/* Scroll-driven grow-to-viewport panel — see components/new/HeroPanel.tsx, which
-   drives --squeeze from 1 (resting in its slot) to 0 (covering the screen) as the
-   page scrolls.
-
-   The panel is absolutely positioned, so its containing block is the parent slot:
-   percentages in left/right resolve against the slot's width and percentages in
-   top/bottom against its height. Growing each edge by (100vw - 100%) / 2 therefore
-   lands the panel at exactly 100vw x 100vh without this rule ever needing to know
-   the column's size. Being out of flow also means none of this reflows the page —
-   only the panel's own subtree.
-
-   --squeeze defaults to 1 so the pre-hydration paint is the resting state; Motion
-   then overrides it inline, and the clamp keeps a spring that overshoots either end
-   from inverting the geometry.
-
-   Deliberately NOT inside @layer utilities: Tailwind treats hand-written classes in
-   that layer as candidates and drops any it cannot find in the scanned source, so
-   this rule silently vanished once the component that used to reference it was
-   renamed. Unlayered, it is always emitted. It also outranks Tailwind's utilities,
-   so position/inset/rounded-* classes on the panel itself won't take effect. */
 .expanding-panel {
     --squeeze: 1;
     --panel-squeeze: clamp(0, var(--squeeze), 1);
