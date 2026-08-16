@@ -143,6 +143,7 @@ function GhostLayerBlock({
 
 function StackDiagram({ highlighted }: { highlighted: GhostLayerId | null }) {
     const reduceMotion = useReducedMotion();
+    const [isVisible, setIsVisible] = useState(false);
 
     return (
         <motion.svg
@@ -153,6 +154,7 @@ function StackDiagram({ highlighted }: { highlighted: GhostLayerId | null }) {
             initial={reduceMotion ? false : "hidden"}
             whileInView="visible"
             viewport={{ once: true, amount: 0.25 }}
+            onViewportEnter={() => setIsVisible(true)}
         >
             {GUIDE_XS.map((guideX, i) =>
                 guideSegments(guideX).map(({ y1, y2 }, segment) => (
@@ -179,6 +181,7 @@ function StackDiagram({ highlighted }: { highlighted: GhostLayerId | null }) {
                 ghostOpacity={0.45}
                 entranceOffsetY={110}
                 float={{ amplitude: 10, duration: 6, delay: 0.3 }}
+                active={isVisible}
             />
             <IsoChip
                 variant="ghost"
@@ -189,6 +192,7 @@ function StackDiagram({ highlighted }: { highlighted: GhostLayerId | null }) {
                 ghostOpacity={0.65}
                 entranceOffsetY={-110}
                 float={{ amplitude: 10, duration: 6.6, delay: 1.2 }}
+                active={isVisible}
             />
             <IsoChip
                 variant="active"
@@ -196,6 +200,7 @@ function StackDiagram({ highlighted }: { highlighted: GhostLayerId | null }) {
                 y={AGENT_Y}
                 glyph={<MatchaGlyph />}
                 float={{ amplitude: 6, duration: 5.2, delay: 0 }}
+                active={isVisible}
             />
 
             <motion.g variants={fade(1)} className="max-md:hidden">
