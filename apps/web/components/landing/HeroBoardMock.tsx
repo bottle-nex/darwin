@@ -1,7 +1,7 @@
 "use client";
 
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { useEffect, useState } from "react";
+import { AnimatePresence, motion, useInView, useReducedMotion } from "motion/react";
+import { useEffect, useRef, useState } from "react";
 import {
     LuBot,
     LuChartLine,
@@ -164,18 +164,21 @@ function ActiveCard({ stage, animate }: { stage: number; animate: boolean }) {
 export default function HeroBoardMock({ className }: { className?: string }) {
     const reduceMotion = useReducedMotion();
     const [tick, setTick] = useState(0);
+    const boardRef = useRef<HTMLDivElement>(null);
+    const inView = useInView(boardRef, { amount: 0.2 });
 
     useEffect(() => {
-        if (reduceMotion) return;
+        if (reduceMotion || !inView) return;
         const id = setInterval(() => setTick((t) => t + 1), STAGE_MS);
         return () => clearInterval(id);
-    }, [reduceMotion]);
+    }, [reduceMotion, inView]);
 
     const stage = reduceMotion ? 1 : tick % STAGE_COUNT;
     const log = LOGS[tick % LOGS.length];
 
     return (
         <motion.div
+            ref={boardRef}
             initial={reduceMotion ? false : { opacity: 0, y: 28 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.3 }}

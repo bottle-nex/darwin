@@ -1,7 +1,8 @@
 @import "tailwindcss";
 @import "../node_modules/tw-animate-css/dist/tw-animate.css";
-/* All design tokens (colors, radii, fonts) live in theme.css. */
-@import "./theme.css";
+/* All design tokens (colors, radii, fonts) live in the shared theme package,
+   imported by both apps/web and apps/admin so they cannot drift. */
+@import "../../../packages/theme/theme.css";
 
 @source "../**/*.{ts,tsx}";
 @source "../../../packages/editorial/**/*.tsx";

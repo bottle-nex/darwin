@@ -1,8 +1,15 @@
 "use client";
 
 import { FlutedGlass } from "@paper-design/shaders-react";
-import type { ComponentProps } from "react";
+import type { ComponentProps, CSSProperties } from "react";
 import { cn } from "@/lib/utils";
+
+const shaderStyle: CSSProperties = {
+    position: "absolute",
+    inset: 0,
+    width: "100%",
+    height: "100%",
+};
 
 type ShowcaseFrameProps = {
     image: string;
@@ -29,7 +36,7 @@ export default function ShowcaseFrame({
     return (
         <div className={cn("relative h-110 w-full overflow-hidden rounded-lg md:h-140", className)}>
             <FlutedGlass
-                style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}
+                style={shaderStyle}
                 image={image}
                 colorBack="#00000000"
                 colorShadow="#000000"

@@ -9,7 +9,6 @@ import {
     Titillium_Web,
 } from "next/font/google";
 import "./globals.css";
-import LenisProvider from "@/providers/LenisProvider";
 import QueryProvider from "@/providers/QueryProvider";
 import SessionSetter from "@/components/utility/SessionSetter";
 import { Toaster } from "@/components/ui/sonner";
@@ -72,13 +71,11 @@ export default async function RootLayout({
             suppressHydrationWarning
             className={`${poppins.variable} ${geistMono.variable} ${tektur.variable} ${instrumentSerif.variable} ${interTight.variable} ${titilliumWeb.variable} ${arimo.variable} h-full antialiased`}
         >
-            <LenisProvider>
-                <body className="min-h-full flex flex-col">
-                    <QueryProvider>{children}</QueryProvider>
-                    <Toaster />
-                </body>
-                <SessionSetter session={session} />
-            </LenisProvider>
+            <body className="min-h-full flex flex-col">
+                <QueryProvider>{children}</QueryProvider>
+                <Toaster />
+            </body>
+            <SessionSetter session={session} />
         </html>
     );
 }

@@ -2,11 +2,13 @@
 
 import Image from "next/image";
 import { motion } from "motion/react";
+import { memo } from "react";
 import { LuAlarmClock, LuCornerDownRight, LuMessageSquare, LuPaperclip } from "react-icons/lu";
 import { appear, EASE_OUT, MockScene, PanelCard } from "./MockWindow";
 import ShowcaseFrame from "./ShowcaseFrame";
 
 const BAR_COUNT = 12;
+const PULL_REQUEST_GLASS = { angle: 0, size: 0.3 };
 
 type ReviewTask = {
     title: string;
@@ -116,11 +118,11 @@ function TaskCard({ task }: { task: ReviewTask }) {
     );
 }
 
-export default function PullRequestShowcase() {
+export default memo(function PullRequestShowcase() {
     return (
         <ShowcaseFrame
             image="/landing/feature3.jpg"
-            glass={{ angle: 0, size: 0.3 }}
+            glass={PULL_REQUEST_GLASS}
             contentClassName="max-w-140"
         >
             <MockScene>
@@ -135,4 +137,4 @@ export default function PullRequestShowcase() {
             </MockScene>
         </ShowcaseFrame>
     );
-}
+});

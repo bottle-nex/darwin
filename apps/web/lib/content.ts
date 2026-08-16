@@ -4,19 +4,24 @@ const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:808
 
 const CONTENT_URL = `${BACKEND_URL}/api/v1/content`;
 
-/** Published content changes rarely and only through the admin panel. */
-const REVALIDATE_SECONDS = 300;
+const REVALIDATE_SECONDS = 60;
+
+export const CONTENT_TAG = "content";
 
 async function fetchContent<T>(path: string): Promise<T | null> {
     try {
         const response = await fetch(`${CONTENT_URL}${path}`, {
-            next: { revalidate: REVALIDATE_SECONDS },
+            next: { revalidate: REVALIDATE_SECONDS, tags: [CONTENT_TAG] },
         });
-        if (!response.ok) return null;
+        if (!response.ok) {
+            console.error(`[content] ${path} responded ${response.status}`);
+            return null;
+        }
 
         const body = await response.json();
         return body.success ? (body.data as T) : null;
-    } catch {
+    } catch (err) {
+        console.error(`[content] ${path} failed`, err);
         return null;
     }
 }
@@ -25,15 +30,10 @@ export async function getPosts(): Promise<ContentSummary[]> {
     return (await fetchContent<ContentSummary[]>("/blog")) ?? [];
 }
 
-export async function getPost(slug: string): Promise<ContentEntry | null> {
-    return fetchContent<ContentEntry>(`/blog/${encodeURIComponent(slug)}`);
+export async function getReleases(): Promise<ContentSummary[]> {
+    return (await fetchContent<ContentSummary[]>("/changelog")) ?? [];
 }
 
-/** The changelog index renders entries in full, so this carries the body. */
-export async function getReleases(): Promise<ContentEntry[]> {
-    return (await fetchContent<ContentEntry[]>("/changelog")) ?? [];
-}
-
-export async function getRelease(slug: string): Promise<ContentEntry | null> {
-    return fetchContent<ContentEntry>(`/changelog/${encodeURIComponent(slug)}`);
+export async function getEntry(slug: string): Promise<ContentEntry | null> {
+    return fetchContent<ContentEntry>(`/entry/${encodeURIComponent(slug)}`);
 }

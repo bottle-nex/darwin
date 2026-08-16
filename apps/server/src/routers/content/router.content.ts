@@ -5,8 +5,7 @@ import GetContentController from "../../controllers/content/controller.get-conte
 const content_router: Router = Router();
 
 content_router.get("/blog", ListContentController.handler("Blog"));
-content_router.get("/blog/:slug", GetContentController.handler("Blog"));
 content_router.get("/changelog", ListContentController.handler("Changelog"));
-content_router.get("/changelog/:slug", GetContentController.handler("Changelog"));
+content_router.get("/entry/:slug", GetContentController.process);
 
 export default content_router;

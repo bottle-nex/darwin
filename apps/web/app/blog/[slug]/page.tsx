@@ -1,78 +1,122 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { EntryNav, Prose, formatDate } from "@trymatcha/editorial";
+import { MdArrowBack } from "react-icons/md";
+import { CardCover, ContentCard, Prose } from "@trymatcha/editorial";
 import { LandingNavbar } from "@/components/new/LandingNavbar";
 import LandingFooter from "@/components/landing/LandingFooter";
 import { landingContainer } from "@/components/landing/LandingSection";
+import EntryByline from "@/components/blog/EntryByline";
+import EntryCta from "@/components/blog/EntryCta";
 import { cn } from "@/lib/utils";
-import { getPost, getPosts } from "@/lib/content";
+import { getEntry, getPosts, getReleases } from "@/lib/content";
 
-type PostPageProps = { params: Promise<{ slug: string }> };
+type EntryPageProps = { params: Promise<{ slug: string }> };
 
 export async function generateStaticParams() {
-    const posts = await getPosts();
-    return posts.map((post) => ({ slug: post.slug }));
+    const [posts, releases] = await Promise.all([getPosts(), getReleases()]);
+    return [...posts, ...releases].map((entry) => ({ slug: entry.slug }));
 }
 
-export async function generateMetadata({ params }: PostPageProps): Promise<Metadata> {
+export async function generateMetadata({ params }: EntryPageProps): Promise<Metadata> {
     const { slug } = await params;
-    const post = await getPost(slug);
-    if (!post) return {};
+    const entry = await getEntry(slug);
+    if (!entry) return {};
 
-    return { title: post.title, description: post.summary ?? undefined };
+    return {
+        title: entry.title,
+        description: entry.summary ?? undefined,
+    };
 }
 
-export default async function PostPage({ params }: PostPageProps) {
+export default async function EntryPage({ params }: EntryPageProps) {
     const { slug } = await params;
-    const [post, posts] = await Promise.all([getPost(slug), getPosts()]);
-    if (!post) notFound();
+    const entry = await getEntry(slug);
+    if (!entry) notFound();
 
-    const index = posts.findIndex((entry) => entry.slug === slug);
-    const newer = index > 0 ? posts[index - 1] : undefined;
-    const older = index >= 0 && index < posts.length - 1 ? posts[index + 1] : undefined;
+    const tab = entry.kind === "Changelog" ? "changelog" : "blogs";
+    const [posts, releases] = await Promise.all([getPosts(), getReleases()]);
+    const more = [...posts, ...releases]
+        .filter((candidate) => candidate.slug !== entry.slug)
+        .sort((a, b) => (b.publishedAt ?? "").localeCompare(a.publishedAt ?? ""))
+        .slice(0, 3);
 
     return (
         <main className="min-h-screen bg-ink">
             <LandingNavbar />
 
-            <div className={cn(landingContainer, "pt-36 pb-20")}>
+            <header className={cn(landingContainer, "pt-36")}>
                 <Link
-                    href="/blog"
-                    className="font-mono text-[11px] tracking-widest text-mist/40 uppercase transition-colors hover:text-snow"
+                    href={`/blog?tab=${tab}`}
+                    className="group inline-flex items-center gap-x-2 rounded-full border border-graphite bg-charcoal/60 py-1.5 pr-4 pl-3 text-[13px] text-mist/50 transition-colors hover:border-edge hover:bg-charcoal hover:text-snow"
                 >
-                    ← Blog
+                    <MdArrowBack className="size-3.5 transition-transform duration-200 group-hover:-translate-x-0.5" />
+                    {entry.kind === "Changelog" ? "All changelogs" : "All posts"}
                 </Link>
 
-                <article className="mt-10">
-                    <div className="flex items-center gap-x-3 font-mono text-xs tracking-widest text-mist/40">
-                        <span>{formatDate(post.publishedAt)}</span>
-                        {post.author && (
-                            <>
-                                <span className="text-mist/20">/</span>
-                                <span>{post.author}</span>
-                            </>
-                        )}
-                    </div>
+                <div className="mt-10 max-w-[820px]">
+                    <EntryByline entry={entry} />
 
-                    <h1 className="mt-4 max-w-[680px] text-[2rem] leading-tight tracking-tight text-snow">
-                        {post.title}
+                    <h1 className="mt-5 font-headline text-[2.5rem] leading-[1.08] tracking-tight text-snow sm:text-[3.25rem]">
+                        {entry.title}
                     </h1>
 
-                    <Prose className="mt-8" html={post.content} />
-                </article>
+                    {entry.summary && (
+                        <p className="mt-6 text-xl leading-relaxed text-mist/45">{entry.summary}</p>
+                    )}
+                </div>
+            </header>
 
-                <div className="mt-20">
-                    <EntryNav
-                        previous={
-                            older ? { href: `/blog/${older.slug}`, label: older.title } : undefined
-                        }
-                        next={
-                            newer ? { href: `/blog/${newer.slug}`, label: newer.title } : undefined
-                        }
-                    />
+            <div className={cn(landingContainer, "mt-14")}>
+                <div className="grid grid-cols-1 gap-x-12 gap-y-10 lg:grid-cols-10">
+                    <div className="lg:col-span-7">
+                        <CardCover
+                            src={entry.coverImage}
+                            title={entry.title}
+                            version={entry.version}
+                            size="feature"
+                        />
+
+                        <article className="mt-14 max-w-[680px]">
+                            <Prose html={entry.content} />
+
+                            {entry.tags.length > 0 && (
+                                <div className="mt-16 flex flex-wrap gap-2 border-t border-graphite pt-8">
+                                    {entry.tags.map((tag) => (
+                                        <span
+                                            key={tag}
+                                            className="rounded-full border border-graphite px-3 py-1 font-mono text-[11px] tracking-widest text-mist/40 uppercase"
+                                        >
+                                            {tag}
+                                        </span>
+                                    ))}
+                                </div>
+                            )}
+                        </article>
+                    </div>
+
+                    <aside className="lg:sticky lg:top-24 lg:col-span-3 lg:self-start">
+                        <EntryCta />
+                    </aside>
                 </div>
             </div>
+
+            {more.length > 0 && (
+                <section className={cn(landingContainer, "mt-28")}>
+                    <h2 className="font-mono text-[11px] tracking-[0.18em] text-mist/35 uppercase">
+                        Keep reading
+                    </h2>
+                    <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+                        {more.map((candidate) => (
+                            <ContentCard
+                                key={candidate.slug}
+                                entry={candidate}
+                                href={`/blog/${candidate.slug}`}
+                            />
+                        ))}
+                    </div>
+                </section>
+            )}
 
             <LandingFooter />
         </main>

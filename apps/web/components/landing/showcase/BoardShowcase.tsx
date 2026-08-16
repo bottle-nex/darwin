@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { useState } from "react";
+import { memo, useState } from "react";
 import type { IconType } from "react-icons";
 import {
     BsArrowReturnRight,
@@ -15,6 +15,8 @@ import {
 import { cn } from "@/lib/utils";
 import { appear, EASE_OUT, MockScene, PanelCard } from "./MockWindow";
 import ShowcaseFrame from "./ShowcaseFrame";
+
+const BOARD_GLASS = { angle: 0, size: 0.5 };
 
 type BoardMode = "custom" | "llm";
 
@@ -247,7 +249,7 @@ function TaskCard({ task }: { task: Task }) {
     );
 }
 
-export default function BoardShowcase() {
+export default memo(function BoardShowcase() {
     const [mode, setMode] = useState<BoardMode>("llm");
     const reduceMotion = useReducedMotion();
     const columns = mode === "llm" ? LLM_COLUMNS : CUSTOM_COLUMNS;
@@ -255,7 +257,7 @@ export default function BoardShowcase() {
     return (
         <ShowcaseFrame
             image="/landing/feature1.jpg"
-            glass={{ angle: 0, size: 0.5 }}
+            glass={BOARD_GLASS}
             contentClassName="max-w-140"
         >
             <MockScene>
@@ -348,4 +350,4 @@ export default function BoardShowcase() {
             </MockScene>
         </ShowcaseFrame>
     );
-}
+});

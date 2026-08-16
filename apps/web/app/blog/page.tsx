@@ -1,41 +1,39 @@
 import type { Metadata } from "next";
-import { EditorialHero, PostCard } from "@trymatcha/editorial";
 import { LandingNavbar } from "@/components/new/LandingNavbar";
 import LandingFooter from "@/components/landing/LandingFooter";
 import { landingContainer } from "@/components/landing/LandingSection";
-import { cn } from "@/lib/utils";
-import { getPosts } from "@/lib/content";
+import BlogHero from "@/components/blog/BlogHero";
+import { resolveTab } from "@/components/blog/BlogTabs";
+import AllEntries from "@/components/blog/AllEntries";
+import BlogEntries from "@/components/blog/BlogEntries";
+import ChangelogEntries from "@/components/blog/ChangelogEntries";
+import { getPosts, getReleases } from "@/lib/content";
 
 export const metadata: Metadata = {
-    title: "Blog",
-    description: "Notes on agents, boards, and shipping.",
+    title: "What's new in Matcha",
+    description: "Releases, notes on agents, and everything we have been shipping.",
 };
 
-export default async function BlogPage() {
-    const posts = await getPosts();
+type BlogPageProps = { searchParams: Promise<{ tab?: string }> };
+
+export default async function BlogPage({ searchParams }: BlogPageProps) {
+    const { tab } = await searchParams;
+    const active = resolveTab(tab);
+
+    const [posts, releases] = await Promise.all([getPosts(), getReleases()]);
+    const everything = [...posts, ...releases].sort((a, b) =>
+        (b.publishedAt ?? "").localeCompare(a.publishedAt ?? ""),
+    );
 
     return (
-        <main className="min-h-screen bg-ink">
+        <main data-lenis-prevent className="min-h-screen bg-ink">
             <LandingNavbar />
+            <BlogHero active={active} />
 
-            <div className={cn(landingContainer, "pt-40 pb-20")}>
-                <EditorialHero
-                    title="Notes on agents,"
-                    titleContinued="boards, and shipping."
-                    description="What we are learning while building a board that empties itself."
-                />
-
-                <div className="mt-16">
-                    {posts.length === 0 ? (
-                        <p className="border-t border-graphite py-8 text-[15px] text-mist/35">
-                            No posts published yet.
-                        </p>
-                    ) : (
-                        posts.map((post) => (
-                            <PostCard key={post.slug} post={post} href={`/blog/${post.slug}`} />
-                        ))
-                    )}
-                </div>
+            <div className={landingContainer}>
+                {active === "blogs" && <BlogEntries entries={posts} />}
+                {active === "changelog" && <ChangelogEntries entries={releases} />}
+                {active === "all" && <AllEntries entries={everything} />}
             </div>
 
             <LandingFooter />

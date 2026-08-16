@@ -1,6 +1,7 @@
 import type { Request, Response } from "express";
 import { prisma } from "@trymatcha/database";
 import ResponseWriter from "../../services/service.response";
+import RevalidateService from "../../services/service.revalidate";
 import { post_params_schema } from "./post.schema";
 
 export default class DeletePostController {
@@ -18,6 +19,8 @@ export default class DeletePostController {
             }
 
             await prisma.post.delete({ where: { id } });
+
+            RevalidateService.content();
 
             return ResponseWriter.success(res, { id }, "Post deleted");
         } catch (err) {

@@ -1,7 +1,7 @@
 "use client";
 
-import { motion, useReducedMotion } from "motion/react";
-import { useState } from "react";
+import { motion, useInView, useReducedMotion } from "motion/react";
+import { useRef, useState } from "react";
 import type { IconType } from "react-icons";
 import { LuSquareKanban, LuSquareTerminal } from "react-icons/lu";
 import { cn } from "@/lib/utils";
@@ -143,10 +143,12 @@ function GhostLayerBlock({
 
 function StackDiagram({ highlighted }: { highlighted: GhostLayerId | null }) {
     const reduceMotion = useReducedMotion();
-    const [isVisible, setIsVisible] = useState(false);
+    const diagramRef = useRef<SVGSVGElement>(null);
+    const isVisible = useInView(diagramRef, { amount: 0.25 });
 
     return (
         <motion.svg
+            ref={diagramRef}
             role="img"
             aria-label="Exploded view of the matcha stack: the board, the agent, and code runners"
             viewBox="0 0 620 800"
@@ -154,7 +156,6 @@ function StackDiagram({ highlighted }: { highlighted: GhostLayerId | null }) {
             initial={reduceMotion ? false : "hidden"}
             whileInView="visible"
             viewport={{ once: true, amount: 0.25 }}
-            onViewportEnter={() => setIsVisible(true)}
         >
             {GUIDE_XS.map((guideX, i) =>
                 guideSegments(guideX).map(({ y1, y2 }, segment) => (

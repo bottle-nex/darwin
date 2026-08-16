@@ -1,0 +1,104 @@
+@import "tailwindcss";
+@import "../node_modules/tw-animate-css/dist/tw-animate.css";
+/* Same token file apps/web imports, so the two apps cannot drift. */
+@import "../../../packages/theme/theme.css";
+
+@source "../**/*.{ts,tsx}";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+    * {
+        @apply border-border outline-ring/50;
+    }
+
+    body {
+        @apply bg-ink font-sans text-foreground;
+    }
+}
+
+@layer utilities {
+    .no-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+
+    .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+}
+
+@layer components {
+    .tiptap {
+        @apply text-[15px] leading-7 text-mist/85 outline-none;
+    }
+
+    .tiptap p.is-editor-empty:first-child::before {
+        content: attr(data-placeholder);
+        @apply pointer-events-none float-left h-0 text-mist/25;
+    }
+
+    .tiptap > * + * {
+        @apply mt-4;
+    }
+
+    .tiptap h1 {
+        @apply mt-8 text-3xl font-semibold tracking-tight text-mist;
+    }
+
+    .tiptap h2 {
+        @apply mt-8 text-2xl font-semibold tracking-tight text-mist;
+    }
+
+    .tiptap h3 {
+        @apply mt-6 text-xl font-semibold tracking-tight text-mist;
+    }
+
+    .tiptap ul {
+        @apply list-disc space-y-1 pl-6;
+    }
+
+    .tiptap ol {
+        @apply list-decimal space-y-1 pl-6;
+    }
+
+    .tiptap ul[data-type="taskList"] {
+        @apply list-none space-y-1 pl-1;
+    }
+
+    .tiptap ul[data-type="taskList"] li {
+        @apply flex items-start gap-2;
+    }
+
+    .tiptap ul[data-type="taskList"] li > label {
+        @apply mt-1 shrink-0;
+    }
+
+    .tiptap blockquote {
+        @apply border-l-2 border-primary/40 pl-4 text-mist/60 italic;
+    }
+
+    .tiptap pre {
+        @apply overflow-x-auto rounded-xl bg-white/5 p-4 font-mono text-[13px] text-mist/80;
+    }
+
+    .tiptap code {
+        @apply rounded bg-white/8 px-1.5 py-0.5 font-mono text-[13px] text-primary;
+    }
+
+    .tiptap pre code {
+        @apply bg-transparent p-0 text-mist/80;
+    }
+
+    .tiptap hr {
+        @apply my-8 border-white/10;
+    }
+
+    .tiptap img {
+        @apply my-4 max-w-full rounded-xl;
+    }
+
+    .tiptap a {
+        @apply text-primary underline underline-offset-4;
+    }
+}

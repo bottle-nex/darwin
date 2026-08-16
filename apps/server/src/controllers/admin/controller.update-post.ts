@@ -1,8 +1,9 @@
 import type { Request, Response } from "express";
 import { prisma } from "@trymatcha/database";
 import ResponseWriter from "../../services/service.response";
+import RevalidateService from "../../services/service.revalidate";
 import PostContentService from "../../services/service.post-content";
-import PostService from "../../services/service.post";
+import PostSlugService from "../../services/service.post-slug";
 import { post_body_schema, post_params_schema } from "./post.schema";
 
 export default class UpdatePostController {
@@ -37,12 +38,7 @@ export default class UpdatePostController {
             const frozen = Boolean(existing.publishedAt);
             const slug = frozen
                 ? existing.slug
-                : await PostService.unique_slug(
-                      input.kind,
-                      input.slug || input.title,
-                      input.title,
-                      existing.id,
-                  );
+                : await PostSlugService.unique(input.slug || input.title, input.title, existing.id);
 
             const post = await prisma.post.update({
                 where: { id },
@@ -66,6 +62,8 @@ export default class UpdatePostController {
                             : existing.publishedAt,
                 },
             });
+
+            RevalidateService.content();
 
             return ResponseWriter.success(res, post, "Post updated");
         } catch (err) {
