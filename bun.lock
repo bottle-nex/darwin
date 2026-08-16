@@ -366,10 +366,6 @@
         "typescript": "^5",
       },
     },
-    "packages/theme": {
-      "name": "@trymatcha/theme",
-      "version": "0.0.0",
-    },
     "packages/types": {
       "name": "@trymatcha/types",
       "devDependencies": {
@@ -1062,8 +1058,6 @@
     "@trymatcha/sandbox-mcp": ["@trymatcha/sandbox-mcp@workspace:packages/sandbox-mcp"],
 
     "@trymatcha/server": ["@trymatcha/server@workspace:apps/server"],
-
-    "@trymatcha/theme": ["@trymatcha/theme@workspace:packages/theme"],
 
     "@trymatcha/types": ["@trymatcha/types@workspace:packages/types"],
 
