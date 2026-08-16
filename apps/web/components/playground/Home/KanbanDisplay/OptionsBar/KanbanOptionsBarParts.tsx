@@ -1,6 +1,14 @@
 "use client";
-import { MdAdd, MdPlaylistAdd, MdUpload, MdVerticalSplit, MdViewKanban } from "react-icons/md";
+import {
+    MdAdd,
+    MdKeyboardArrowDown,
+    MdPlaylistAdd,
+    MdUpload,
+    MdVerticalSplit,
+    MdViewKanban,
+} from "react-icons/md";
 import { type IconType } from "react-icons";
+import { DropdownMenu } from "radix-ui";
 import HeroBuddy from "@/components/landing/v2/HeroBuddy";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -86,16 +94,9 @@ export function AddTaskButton() {
             <TooltipComponent delayDuration={1000} content="New issue" side="bottom">
                 <OptionButton label="New issue" icon={RiEdit2Fill} onClick={onAddTask} />
             </TooltipComponent>
-            {/* <DropdownMenu.Root>
+            <DropdownMenu.Root>
                 <DropdownMenu.Trigger asChild>
-                    <Button
-                        variant="tertiary"
-                        type="button"
-                        aria-label="More task options"
-                        className="flex h-6 cursor-pointer items-center px-1 hover:bg-black/5 rounded-none"
-                    >
-                        <MdKeyboardArrowDown className="size-3.5" aria-hidden />
-                    </Button>
+                    <OptionButton label="More task options" icon={MdKeyboardArrowDown} />
                 </DropdownMenu.Trigger>
                 <DropdownMenu.Portal>
                     <DropdownMenu.Content align="end" sideOffset={6} className={MENU_CONTENT_CLASS}>
@@ -128,7 +129,7 @@ export function AddTaskButton() {
                         })}
                     </DropdownMenu.Content>
                 </DropdownMenu.Portal>
-            </DropdownMenu.Root> */}
+            </DropdownMenu.Root>
         </div>
     );
 }
