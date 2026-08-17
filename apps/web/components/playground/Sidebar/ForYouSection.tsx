@@ -29,7 +29,12 @@ export default function PlaygroundSidebarForYouSection({
                     key={r.id}
                     label={r.label}
                     leading={{ kind: "icon", icon: r.icon }}
-                    active={selectedRowId === r.id}
+                    active={
+                        r.id === PlaygroundTab.Chats
+                            ? selectedRowId === PlaygroundTab.Chats ||
+                              selectedRowId === PlaygroundTab.ThreadDetail
+                            : selectedRowId === r.id
+                    }
                     onClick={() =>
                         r.id === PlaygroundTab.Chats
                             ? openThread({ kind: "project" }, projectSlug ?? "")

@@ -1,35 +1,10 @@
 "use client";
-import { useParams } from "next/navigation";
-import { useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
 import { MdChat, MdFolder } from "react-icons/md";
-import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
-import { useActiveProject } from "@/hooks/useActiveProject";
 import { useIssueRoute } from "@/components/playground/Issue/useIssueRoute";
-import type { LabelledReference } from "@trymatcha/types";
-import {
-    useChats,
-    add_chat,
-    build_optimistic_chat,
-    mark_chat_deleted,
-    OPTIMISTIC_ID_PREFIX,
-} from "@/hooks/chats/useChats";
-import {
-    useProjectChat,
-    add_project_chat,
-    build_optimistic_project_chat,
-    mark_project_chat_deleted,
-} from "@/hooks/chats/useProjectChat";
-import { send_socket_message } from "@/hooks/socket/useWebSocket";
-import { InboundSocketMessageType, type Chat, type ProjectChat } from "@trymatcha/types";
-import SessionServices from "@/lib/session";
 import ProjectChatThread from "@/components/playground/Home/chat/ProjectChatThread";
 import { DEFAULT_FOLDER_COLOR } from "@/components/playground/Core/TopBar/PlaygroundProjectSwitcher";
-import {
-    toggle_chat_reaction,
-    toggle_project_chat_reaction,
-} from "@/hooks/chats/useMessageReactions";
 import ThreadsDisplay from "./ThreadsDisplay";
+import { useThreadDetail } from "./useThreadDetail";
 
 /**
  * The conversation opened from the Threads sidebar: the project's single
@@ -38,115 +13,24 @@ import ThreadsDisplay from "./ThreadsDisplay";
  * currently open (e.g. after navigating away).
  */
 export default function ThreadDetailDisplay() {
-    const { projectSlug } = useParams<{ projectSlug?: string }>();
-    const queryClient = useQueryClient();
-    const selectedThread = usePlaygroundNavStore((s) => s.selectedThread);
-    const selectedThreadProjectSlug = usePlaygroundNavStore((s) => s.selectedThreadProjectSlug);
-    const activeProject = useActiveProject();
     const { openIssue } = useIssueRoute();
+    const {
+        selectedThread,
+        isMatchingProject,
+        activeProject,
+        chats,
+        isChatsLoading,
+        handleSend,
+        handleDelete,
+        handleReaction,
+    } = useThreadDetail();
 
-    const { data: projectChats, isLoading: isProjectChatLoading } = useProjectChat(
-        selectedThread?.kind === "project" ? activeProject?.id : undefined,
-    );
-    const { data: issueChats, isLoading: isIssueChatLoading } = useChats(
-        selectedThread?.kind === "issue" ? selectedThread.issueId : undefined,
-    );
-
-    if (!selectedThread || selectedThreadProjectSlug !== projectSlug) {
+    if (!selectedThread || !isMatchingProject) {
         return <ThreadsDisplay />;
     }
 
-    function handleSend(message: string, references: LabelledReference[], repliedToId?: string) {
-        if (!selectedThread) return;
-        const sent =
-            selectedThread.kind === "project"
-                ? send_socket_message({
-                      type: InboundSocketMessageType.PROJECT_CHAT_CREATE,
-                      payload: { message, repliedToId },
-                  })
-                : send_socket_message({
-                      type: InboundSocketMessageType.CHAT_CREATE,
-                      payload: { issueId: selectedThread.issueId, message, repliedToId },
-                  });
-        if (!sent) {
-            toast.error("Couldn't send your message.");
-            return;
-        }
-
-        // Echo the message into the local cache immediately — the real
-        // broadcast (which reconciles this) can take a moment to round-trip.
-        const currentUser = SessionServices.get_user();
-        if (!currentUser?.id || !currentUser.email) return;
-        const sender = {
-            id: currentUser.id,
-            name: currentUser.name ?? null,
-            email: currentUser.email,
-            image: currentUser.image ?? null,
-        };
-        if (selectedThread.kind === "project" && activeProject?.id) {
-            const repliedTo = repliedToId
-                ? (projectChats?.find((c) => c.id === repliedToId) ?? null)
-                : null;
-            add_project_chat(
-                queryClient,
-                build_optimistic_project_chat(
-                    activeProject.id,
-                    message,
-                    references,
-                    repliedTo,
-                    sender,
-                ),
-            );
-        } else if (selectedThread.kind === "issue") {
-            const repliedTo = repliedToId
-                ? (issueChats?.find((c) => c.id === repliedToId) ?? null)
-                : null;
-            add_chat(
-                queryClient,
-                build_optimistic_chat(
-                    selectedThread.issueId,
-                    message,
-                    references,
-                    repliedTo,
-                    sender,
-                ),
-            );
-        }
-    }
-
-    function handleDelete(chat: Chat | ProjectChat) {
-        if (!selectedThread) return;
-        const sent =
-            selectedThread.kind === "project"
-                ? send_socket_message({
-                      type: InboundSocketMessageType.PROJECT_CHAT_DELETE,
-                      payload: { chatId: chat.id },
-                  })
-                : send_socket_message({
-                      type: InboundSocketMessageType.CHAT_DELETE,
-                      payload: { chatId: chat.id },
-                  });
-        if (!sent) {
-            toast.error("Couldn't delete the message.");
-            return;
-        }
-
-        if (selectedThread.kind === "project") {
-            mark_project_chat_deleted(queryClient, chat as ProjectChat);
-        } else {
-            mark_chat_deleted(queryClient, chat as Chat);
-        }
-    }
-
-    function handleReaction(chat: Chat | ProjectChat, emoji: string) {
-        if (chat.id.startsWith(OPTIMISTIC_ID_PREFIX)) return;
-        const sent =
-            selectedThread?.kind === "project"
-                ? toggle_project_chat_reaction(queryClient, chat as ProjectChat, emoji)
-                : toggle_chat_reaction(queryClient, chat as Chat, emoji);
-        if (!sent) toast.error("Couldn't update the reaction.");
-    }
-
+    // Narrowing must happen off `selectedThread.kind` directly (not a boolean returned
+    // from the hook) so TS can discriminate `issueId`/`issueNumber` access below.
     const isProjectThread = selectedThread.kind === "project";
     const title = isProjectThread
         ? (activeProject?.name ?? "Project chat")
@@ -193,13 +77,9 @@ export default function ThreadDetailDisplay() {
                             ? "project"
                             : `issue-${selectedThread.issueId}`
                     }
-                    chats={selectedThread.kind === "project" ? projectChats : issueChats}
+                    chats={chats}
                     projectId={activeProject?.id}
-                    loading={
-                        selectedThread.kind === "project"
-                            ? isProjectChatLoading
-                            : isIssueChatLoading
-                    }
+                    loading={isChatsLoading}
                     placeholder={
                         selectedThread.kind === "project"
                             ? "Message the project..."

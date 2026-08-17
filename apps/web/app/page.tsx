@@ -7,15 +7,15 @@ import LandingFeatureShowcase from "@/components/landing/LandingFeatureShowcase"
 import { LandingNavbar } from "@/components/new/LandingNavbar";
 
 export default function Home() {
-  return (
-    <div data-lenis-prevent className="relative min-h-screen w-screen flex flex-col pb-6">
-      <LandingNavbar />
-      <LandingHero />
-      <LandingBentoCards />
-      <LandingFeatureShowcase />
-      <LandingIssueTracker />
-      <LandingPlatformStack />
-      <LandingFooter />
-    </div>
-  );
+    return (
+        <div data-lenis-prevent className="relative min-h-screen w-screen flex flex-col pb-6">
+            <LandingNavbar />
+            <LandingHero />
+            <LandingBentoCards />
+            <LandingFeatureShowcase />
+            <LandingIssueTracker />
+            <LandingPlatformStack />
+            <LandingFooter />
+        </div>
+    );
 }
