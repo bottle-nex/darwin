@@ -33,6 +33,15 @@ export const IssueStatus = {
 } as const;
 export type IssueStatus = (typeof IssueStatus)[keyof typeof IssueStatus];
 
+export const ProductDiffStatus = {
+    Pending: "Pending",
+    Generating: "Generating",
+    Ready: "Ready",
+    Failed: "Failed",
+    Stale: "Stale",
+} as const;
+export type ProductDiffStatus = (typeof ProductDiffStatus)[keyof typeof ProductDiffStatus];
+
 export const NotificationType = {
     IssueAssigned: "IssueAssigned",
     IssueUnassigned: "IssueUnassigned",

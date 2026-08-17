@@ -28,6 +28,12 @@ export const DELETE_PROJECT_SECRET_URL = (project_id: string, key: string) =>
 export const GET_PROJECT_CONFIG_URL = (project_id: string) => `${PROJECT_URL}/${project_id}/config`;
 export const UPDATE_PROJECT_CONFIG_URL = (project_id: string) =>
     `${PROJECT_URL}/${project_id}/config`;
+export const PRODUCT_DIFFS_URL = (project_id: string) =>
+    `${PROJECT_URL}/${project_id}/product-diffs`;
+export const PRODUCT_DIFF_URL = (project_id: string, product_diff_id: string) =>
+    `${PRODUCT_DIFFS_URL(project_id)}/${product_diff_id}`;
+export const REGENERATE_PRODUCT_DIFF_URL = (project_id: string, issue_id: string) =>
+    `${PRODUCT_DIFFS_URL(project_id)}/${issue_id}/regenerate`;
 
 export const LIST_TAGS_URL = (project_id: string) => `${PROJECT_URL}/${project_id}/tags`;
 export const CREATE_TAG_URL = (project_id: string) => `${PROJECT_URL}/${project_id}/tags`;

@@ -4,6 +4,7 @@ import { IssueStatus, prisma } from "@trymatcha/database";
 import { OutboundSocketMessageType } from "@trymatcha/types";
 import ResponseWriter from "../../services/service.response";
 import { server_services } from "../..";
+import ProductDiffService from "../../services/service.product_diff";
 
 const body_schema = z.object({
     issue_id: z.string().min(1),
@@ -77,6 +78,12 @@ export default class ReportPrOpened {
                 }),
             );
             console.log(`[worker:${worker_id}] published ISSUE_UPDATED for issue ${data.issue_id}`);
+
+            try {
+                await ProductDiffService.prepare(data.issue_id);
+            } catch (error) {
+                console.error("product diff preparation failed", error);
+            }
 
             ResponseWriter.success(res, null, "PR outcome recorded");
         } catch (error) {

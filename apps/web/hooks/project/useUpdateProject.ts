@@ -16,6 +16,7 @@ export interface UpdateProjectInput {
     plan_md?: string;
     tour_completed?: boolean;
     kanban_option_view?: KanbanOptionView;
+    product_diff_enabled?: boolean;
 }
 
 export function useUpdateProject() {

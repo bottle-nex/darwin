@@ -28,6 +28,10 @@ const envSchema = z.object({
     SERVER_PUBLIC_API_URL: z
         .string()
         .min(1, "Public API URL is required — the sandbox calls back to this"),
+    SERVER_PRODUCT_DIFF_BUCKET: z.string().optional(),
+    SERVER_MINIO_URL: z.url({ protocol: /^https?$/ }).optional(),
+    SERVER_MINIO_ACCESS_KEY: z.string().optional(),
+    SERVER_MINIO_SECRET_KEY: z.string().optional(),
 });
 
 function parseEnv() {

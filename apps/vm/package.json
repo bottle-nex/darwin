@@ -23,6 +23,7 @@
         "dotenv": "^17.4.2",
         "e2b": "^2.36.0",
         "jsonwebtoken": "^9.0.3",
+        "minio": "^8.0.7",
         "zod": "^4.4.3"
     },
     "devDependencies": {

@@ -147,7 +147,7 @@ export default class E2B {
      * fresh one and re-clones). Warm-resume via E2B snapshot/pause is possible later using
      * `take_snapshot`/`pause` below, but isn't wired up yet.
      */
-    public static async run_worker_loop(worker_id: string): Promise<void> {
+    public static async run_worker_loop(worker_id: string): Promise<string[]> {
         const log = Logger.scope(`vm:${worker_id.slice(-8)}`);
         const worker = await prisma.worker.findUniqueOrThrow({
             where: { id: worker_id },
@@ -165,7 +165,7 @@ export default class E2B {
                 where: { id: worker_id },
                 data: { status: WorkerStatus.Dead },
             });
-            return;
+            return [];
         }
 
         const repo_url = project.githubRepoUrl;
@@ -174,6 +174,8 @@ export default class E2B {
         this.validate_branch(branch);
 
         let sandbox_id = worker.sandboxId;
+        let pending_product_diff_ids: string[] = [];
+        let teardown_succeeded = false;
         log.step("worker loop starting", { worker: worker_id, project: project.id, branch });
 
         try {
@@ -309,20 +311,54 @@ export default class E2B {
                 log.error("could not mark worker Dead", e, { worker: worker_id });
             }
         } finally {
+            try {
+                const pending_product_diffs = await prisma.productDiff.findMany({
+                    where: {
+                        status: "Pending",
+                        issue: { assignerWorkerId: worker_id },
+                    },
+                    select: { id: true },
+                });
+                pending_product_diff_ids = pending_product_diffs.map(({ id }) => id);
+            } catch (e) {
+                log.error("could not collect pending product diffs", e, { worker: worker_id });
+            }
+
             if (sandbox_id) {
                 log.info("tearing down sandbox", { sandbox: sandbox_id });
                 try {
                     await E2B.destroy(sandbox_id);
-                    await prisma.worker.update({
-                        where: { id: worker_id },
-                        data: { sandboxId: null },
-                    });
+                    teardown_succeeded = true;
                     log.info("sandbox destroyed");
                 } catch (e) {
                     log.error("sandbox teardown failed", e, { sandbox: sandbox_id });
                 }
+
+                if (teardown_succeeded) {
+                    try {
+                        await prisma.worker.update({
+                            where: { id: worker_id },
+                            data: { sandboxId: null },
+                        });
+                    } catch (e) {
+                        log.error("could not clear destroyed sandbox", e, { sandbox: sandbox_id });
+                    }
+                }
+            } else {
+                teardown_succeeded = true;
+            }
+
+            if (!teardown_succeeded) {
+                await prisma.productDiff.updateMany({
+                    where: { id: { in: pending_product_diff_ids }, status: "Pending" },
+                    data: {
+                        status: "Failed",
+                        error: "Coding sandbox teardown failed; Product Diff was not started",
+                    },
+                });
             }
         }
+        return teardown_succeeded ? pending_product_diff_ids : [];
     }
 
     private static build_issue_prompt(
