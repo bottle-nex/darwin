@@ -21,8 +21,8 @@ export default function CreateIssueDialog() {
                     (event.currentTarget as HTMLElement).focus();
                 }}
                 className={cn(
-                    "flex flex-col h-[80vh] w-[72vw] max-w-none sm:max-w-none p-0 gap-0 overflow-hidden",
-                    "bg-charcoal rounded-lg",
+                    "flex flex-col max-h-[80vh] min-h-[40vh] w-187.5 max-w-none sm:max-w-none p-0 gap-0 overflow-hidden",
+                    "bg-charcoal rounded-3xl",
                 )}
             >
                 <CreateIssue target={mode.target} onCreated={close} />

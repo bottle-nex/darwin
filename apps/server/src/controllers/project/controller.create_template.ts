@@ -16,7 +16,6 @@ export const icon_schema = z.discriminatedUnion("kind", [
 
 const body_schema = z.object({
     name: z.string().min(1).max(60),
-    summary: z.string().max(200).optional(),
     description: z.string().min(1).max(20000),
     icon: icon_schema.optional(),
     is_default: z.boolean().optional(),
@@ -62,7 +61,6 @@ export default async function create_template_controller(req: Request, res: Resp
                 data: {
                     projectId: project_id,
                     name: data.name,
-                    summary: data.summary,
                     description: data.description,
                     icon: data.icon,
                     isDefault: data.is_default ?? false,
@@ -70,7 +68,6 @@ export default async function create_template_controller(req: Request, res: Resp
                 select: {
                     id: true,
                     name: true,
-                    summary: true,
                     description: true,
                     icon: true,
                     isDefault: true,

@@ -9,7 +9,6 @@ import type { IssueTemplate } from "@/types/issueTemplate";
 export interface CreateTemplateInput {
     projectId: string;
     name: string;
-    summary?: string;
     description: string;
     icon?: IconPick;
     isDefault?: boolean;
@@ -23,7 +22,6 @@ export function useCreateTemplate() {
                 CREATE_TEMPLATE_URL(input.projectId),
                 {
                     name: input.name,
-                    summary: input.summary,
                     description: input.description,
                     icon: input.icon,
                     is_default: input.isDefault,

@@ -1,6 +1,6 @@
 "use client";
 import type { BoardColumn, BoardIssue } from "@/types/board";
-import IssueTitleFields from "./IssueTitleFields";
+import IssueTitleField from "./IssueTitleField";
 import IssueBody from "./IssueBody";
 import IssueSubmitFooter from "./IssueSubmitFooter";
 import IssueProperties from "./IssueProperties";
@@ -30,7 +30,7 @@ export default function IssueDetail({
                     className="no-scrollbar min-h-0 flex-1 overflow-y-auto px-10 py-8"
                 >
                     <div className="flex w-full flex-col gap-y-4">
-                        <IssueTitleFields form={form} />
+                        <IssueTitleField form={form} />
                         <IssueBody form={form} />
                     </div>
                 </div>

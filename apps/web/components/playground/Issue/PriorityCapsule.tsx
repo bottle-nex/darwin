@@ -6,11 +6,11 @@ import {
     Command,
     CommandEmpty,
     CommandGroup,
-    CommandInput,
     CommandItem,
     CommandList,
 } from "@/components/ui/command";
 import type { Priority } from "@/types/kanban";
+import { cn } from "@/lib/utils";
 import { CapsuleTrigger } from "./Capsule";
 import { PRIORITY_OPTIONS } from "./issueHelpers";
 
@@ -41,22 +41,16 @@ export default function PriorityCapsule({
         <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
                 <CapsuleTrigger disabled={disabled} className={className}>
-                    {CurrentIcon && <CurrentIcon className="size-3.5 text-white/60" />}
+                    {CurrentIcon && (
+                        <CurrentIcon
+                            className={cn("size-3.5 text-white/60", current?.iconClassName)}
+                        />
+                    )}
                     {current?.label ?? "Priority"}
                 </CapsuleTrigger>
             </PopoverTrigger>
-            <PopoverContent className="w-64 p-0">
+            <PopoverContent className="w-52 p-0">
                 <Command>
-                    <CommandInput
-                        icon={false}
-                        border={false}
-                        placeholder="Change priority to..."
-                        trailing={
-                            <span className="shrink-0 rounded bg-cement px-1.5 py-0.5 text-[11px] leading-none font-medium text-neutral-500">
-                                P
-                            </span>
-                        }
-                    />
                     <CommandList>
                         <CommandEmpty>No results.</CommandEmpty>
                         <CommandGroup>
@@ -66,7 +60,12 @@ export default function PriorityCapsule({
                                     value={option.label}
                                     onSelect={() => handleSelect(option.value)}
                                 >
-                                    <option.icon className="size-4 text-neutral-400" />
+                                    <option.icon
+                                        className={cn(
+                                            "size-4 text-neutral-400",
+                                            option.iconClassName,
+                                        )}
+                                    />
                                     <span className="flex-1">{option.label}</span>
                                     {option.value === selected && (
                                         <MdCheck className="size-4 text-neutral-200" />

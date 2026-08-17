@@ -12,7 +12,6 @@ export default class IssueCreateController {
         .object({
             project_id: z.string().min(1),
             title: z.string().min(1).max(80),
-            summary: z.string().max(255).optional(),
             description: z.string().max(20000),
             priority: z.number().int().min(0).max(4).optional(),
             custom_column_id: z.string().optional(),
@@ -108,7 +107,6 @@ export default class IssueCreateController {
                         return tx.issue.create({
                             data: {
                                 title: parsed_body.data.title,
-                                summary: parsed_body.data.summary,
                                 description: parsed_body.data.description,
                                 priority: parsed_body.data.priority ?? 3,
                                 startDate: parsed_body.data.start_date,

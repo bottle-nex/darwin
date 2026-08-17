@@ -8,7 +8,6 @@ import type { Issue } from "@trymatcha/types";
 export interface CreateIssueInput {
     project_id: string;
     title: string;
-    summary?: string;
     description: string;
     priority?: 0 | 1 | 2 | 3 | 4;
     /** Set to file the issue into a custom column; omit for the To-Do lane. */

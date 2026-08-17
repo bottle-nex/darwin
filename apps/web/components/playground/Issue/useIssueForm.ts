@@ -26,8 +26,6 @@ type UseIssueFormArgs = {
 export type IssueFormFields = {
     title: string;
     setTitle: (value: string) => void;
-    summary: string;
-    setSummary: (value: string) => void;
     priority: Priority;
     setPriority: (value: Priority) => void;
     memberIds: string[];
@@ -57,7 +55,6 @@ export function useIssueForm({
     const [isMac] = useState(() => /Mac|iPhone|iPad/.test(navigator.userAgent));
 
     const [title, setTitle] = useState(issue?.title ?? "");
-    const [summary, setSummary] = useState(issue?.summary ?? "");
     const body = useIssueDescription(initialDescription, initialTemplate);
 
     useEffect(() => {
@@ -125,7 +122,6 @@ export function useIssueForm({
                     id: issue.id,
                     project_id: projectId,
                     title: title.trim(),
-                    summary: summary.trim() || null,
                     description: body.toHtml(),
                     priority: PRIORITY_TO_NUMBER[priority],
                     assignee_ids: memberIds,
@@ -137,7 +133,6 @@ export function useIssueForm({
                 await createIssue.mutateAsync({
                     project_id: projectId,
                     title: title.trim(),
-                    summary: summary.trim() || undefined,
                     description: body.toHtml(),
                     priority: PRIORITY_TO_NUMBER[priority],
                     custom_column_id: target.board === "custom" ? target.columnId : undefined,
@@ -171,8 +166,6 @@ export function useIssueForm({
     const fields: IssueFormFields = {
         title,
         setTitle,
-        summary,
-        setSummary,
         priority,
         setPriority,
         memberIds,

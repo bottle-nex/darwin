@@ -20,13 +20,19 @@ export type PriorityOption = {
     value: Priority;
     label: string;
     icon: IconType;
-    /** The server's 0–4 scale, shown as a keyboard hint in the picker. */
     rank: number;
+    iconClassName?: string;
 };
 
 export const PRIORITY_OPTIONS: PriorityOption[] = [
     { value: "none", label: "No priority", icon: LuEllipsis, rank: 0 },
-    { value: "urgent", label: "Urgent", icon: BsExclamationSquareFill, rank: 1 },
+    {
+        value: "urgent",
+        label: "Urgent",
+        icon: BsExclamationSquareFill,
+        rank: 1,
+        iconClassName: "text-[#FF2C56]",
+    },
     { value: "high", label: "High", icon: RiSignalCellular3Fill, rank: 2 },
     { value: "medium", label: "Medium", icon: RiSignalCellular2Fill, rank: 3 },
     { value: "low", label: "Low", icon: RiSignalCellular1Fill, rank: 4 },

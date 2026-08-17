@@ -123,7 +123,6 @@ export interface Issue {
     number: number;
     createdById: string;
     title: string;
-    summary: string | null;
     description: string;
     status: IssueStatus;
     priority: number;

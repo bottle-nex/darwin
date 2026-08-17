@@ -25,7 +25,6 @@ function toBoardIssue(issue: Issue): BoardIssue {
         id: issue.id,
         number: issue.number,
         title: issue.title,
-        summary: issue.summary,
         description: issue.description,
         priority: issue.priority,
         status: issue.status,

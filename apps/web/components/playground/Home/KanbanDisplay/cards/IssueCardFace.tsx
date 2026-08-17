@@ -111,8 +111,8 @@ export default function IssueCardFace({
                         <span className={cn(CHIP, "px-1.5")} title={priorityOption.label}>
                             <priorityOption.icon
                                 className={cn(
-                                    "size-3.5",
-                                    priority === "urgent" ? "text-[#FF2C56]" : "text-neutral-300",
+                                    "size-3.5 text-neutral-300",
+                                    priorityOption.iconClassName,
                                 )}
                                 aria-hidden
                             />
@@ -133,7 +133,7 @@ export default function IssueCardFace({
             {children}
 
             {createdAt && (
-                <p className="mt-2.5 text-[11px] leading-none text-neutral-500">
+                <p className="mt-2.5 text-[12px] leading-none text-neutral-400">
                     Created {shortDate(createdAt)}
                 </p>
             )}

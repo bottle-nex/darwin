@@ -29,7 +29,6 @@ export type BoardIssue = {
     id: string;
     number: number;
     title: string;
-    summary: string | null;
     description: string;
     priority: number;
     status: ServerIssueStatus;

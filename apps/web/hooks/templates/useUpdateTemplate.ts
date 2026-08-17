@@ -10,7 +10,6 @@ export interface UpdateTemplateInput {
     projectId: string;
     templateId: string;
     name?: string;
-    summary?: string;
     description?: string;
     icon?: IconPick;
     isDefault?: boolean;
@@ -24,7 +23,6 @@ export function useUpdateTemplate() {
                 UPDATE_TEMPLATE_URL(input.projectId, input.templateId),
                 {
                     ...(input.name !== undefined ? { name: input.name } : {}),
-                    ...(input.summary !== undefined ? { summary: input.summary } : {}),
                     ...(input.description !== undefined ? { description: input.description } : {}),
                     ...(input.icon !== undefined ? { icon: input.icon } : {}),
                     ...(input.isDefault !== undefined ? { is_default: input.isDefault } : {}),

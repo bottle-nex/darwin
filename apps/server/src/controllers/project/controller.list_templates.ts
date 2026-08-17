@@ -32,7 +32,6 @@ export default async function list_templates_controller(req: Request, res: Respo
             select: {
                 id: true,
                 name: true,
-                summary: true,
                 description: true,
                 icon: true,
                 isDefault: true,

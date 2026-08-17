@@ -10,7 +10,6 @@ export interface UpdateIssueInput {
     /** Used only to invalidate the right board query; not sent in the body. */
     project_id: string;
     title?: string;
-    summary?: string | null;
     description?: string;
     priority?: 0 | 1 | 2 | 3 | 4;
     status?: ServerIssueStatus;
@@ -35,7 +34,6 @@ export function useUpdateIssue() {
                 ISSUE_URL(input.id),
                 {
                     title: input.title,
-                    summary: input.summary,
                     description: input.description,
                     priority: input.priority,
                     status: input.status,

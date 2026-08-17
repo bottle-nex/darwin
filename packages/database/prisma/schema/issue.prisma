@@ -4,7 +4,6 @@ model Issue {
   number      Int
   createdById String
   title       String
-  summary     String?
   description String      @db.Text
   status      IssueStatus @default(Todo)
   priority    Int         @default(3) // 1=Urgent 2=High 3=Normal 4=Low
@@ -59,7 +58,6 @@ model Tag {
 model IssueTemplate {
   id          String  @id @default(cuid())
   name        String
-  summary     String?
   description String  @db.Text
   /// An `IconPick`: a named icon with a colour, or an emoji. Null falls back to a document glyph.
   icon        Json?

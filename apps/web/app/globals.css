@@ -362,7 +362,7 @@
         margin: 0;
         border: 1px solid rgba(255, 255, 255, 0.18);
         border-radius: 0.1875rem;
-        background: rgba(255, 255, 255, 0.05);
+        background: var(--color-charcoal);
         cursor: pointer;
         transition:
             background 0.12s ease,
@@ -371,24 +371,24 @@
 
     .tiptap ul[data-type="taskList"] li > label input[type="checkbox"]:hover {
         border-color: rgba(255, 255, 255, 0.32);
-        background: rgba(255, 255, 255, 0.09);
+        background: var(--color-graphite);
     }
 
     .tiptap ul[data-type="taskList"] li > label input[type="checkbox"]:checked {
-        background: var(--color-matcha);
-        border-color: var(--color-matcha);
+        background: var(--color-snow);
+        border-color: var(--color-snow);
     }
     .tiptap ul[data-type="taskList"] li > label input[type="checkbox"]:checked::after {
         content: "";
         width: 0.62rem;
         height: 0.62rem;
-        background-color: var(--color-matcha-foreground);
+        background-color: var(--color-ink);
         -webkit-mask: var(--tick) center / contain no-repeat;
         mask: var(--tick) center / contain no-repeat;
     }
 
     .tiptap ul[data-type="taskList"] li > label input[type="checkbox"]:focus-visible {
-        outline: 2px solid color-mix(in srgb, var(--color-matcha) 50%, transparent);
+        outline: 2px solid color-mix(in srgb, var(--color-snow) 40%, transparent);
         outline-offset: 1px;
     }
 

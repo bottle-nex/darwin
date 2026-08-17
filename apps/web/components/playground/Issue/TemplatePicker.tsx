@@ -65,7 +65,10 @@ export default function TemplatePicker({ projectId, onPick }: TemplatePickerProp
             </TooltipComponent>
             <PopoverContent align="end" className="w-44 p-0.5">
                 <Command className="bg-transparent">
-                    <CommandList data-lenis-prevent className="no-scrollbar h-20 overflow-y-auto">
+                    <CommandList
+                        data-lenis-prevent
+                        className="no-scrollbar max-h-40 overflow-y-auto"
+                    >
                         <CommandGroup className="p-0">
                             {[...projectTemplates, ...BUILTIN_ISSUE_TEMPLATES].map(row)}
                         </CommandGroup>

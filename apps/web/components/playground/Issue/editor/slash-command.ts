@@ -12,7 +12,7 @@ export const SlashCommand = Extension.create({
             suggestion: {
                 char: "/",
                 startOfLine: false,
-                container: '[data-slot="slash-command-portal"]',
+                floatingUi: { strategy: "fixed" },
                 command: ({ editor, range, props }) => {
                     (props as SlashCommandItem).command({ editor, range });
                 },
@@ -38,6 +38,7 @@ export const SlashCommand = Extension.create({
                             component = new ReactRenderer(SlashCommandList, {
                                 props,
                                 editor: props.editor,
+                                className: "z-[100]",
                             });
                             unmount = props.mount(component.element as HTMLElement);
                         },
