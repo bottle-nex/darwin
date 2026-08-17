@@ -4,6 +4,8 @@ import { useShortcutSheetStore } from "@/store/playground/useShortcutSheetStore"
 import { PlaygroundTab } from "@/components/playground/playgroundTabs";
 import { useSidebarWidthStore } from "@/store/playground/useSidebarWidthStore";
 import { useNotificationsPanelStore } from "@/store/playground/useNotificationsPanelStore";
+import { useIssueStore } from "@/store/issues/useIssueStore";
+import { useNewProjectStore } from "@/store/project/useNewProjectStore";
 
 interface Combination {
     label: string;
@@ -32,6 +34,14 @@ export const COMBINATIONS: Record<string, Combination> = {
     "]": {
         label: "Toggle Notifications",
         run: () => useNotificationsPanelStore.getState().toggle(),
+    },
+    c: {
+        label: "Create Issue",
+        run: () => useIssueStore.getState().openCreate({ board: "llm" }),
+    },
+    "n p": {
+        label: "New Project",
+        run: () => useNewProjectStore.getState().setOpen(true),
     },
 };
 

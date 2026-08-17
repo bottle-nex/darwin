@@ -2,6 +2,7 @@
 import { motion } from "motion/react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import IssueDescriptionEditor from "@/components/playground/Issue/editor/IssueDescriptionEditor";
 import type { ProjectOverview } from "@/types/overview";
 import { MetaDot, SECTION_VARIANTS, STATUS_THEME } from "./overviewTheme";
 
@@ -30,9 +31,12 @@ export default function OverviewMasthead({ overview }: OverviewMastheadProps) {
             )}
 
             {overview.description && (
-                <p className="mt-5 max-w-[68ch] text-[13.5px] leading-[1.8] text-neutral-500">
-                    {overview.description}
-                </p>
+                <div className="mt-5 max-w-[68ch] text-[13.5px] leading-[1.8] text-neutral-500">
+                    <IssueDescriptionEditor
+                        editable={false}
+                        initialContent={overview.description}
+                    />
+                </div>
             )}
 
             <div className="mt-6 flex flex-wrap items-center gap-x-3 gap-y-2 text-[12px] text-neutral-500">

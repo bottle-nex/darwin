@@ -5,6 +5,7 @@ import { COMBINATIONS } from "@/hooks/shortcuts/usePlaygroundShortcuts";
 import { useShortcutSheetStore } from "@/store/playground/useShortcutSheetStore";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import KeyCombo from "@/components/ui/KeyCombo";
 
 interface ShortcutRow {
     label: string;
@@ -14,21 +15,6 @@ interface ShortcutRow {
 interface ShortcutGroup {
     heading: string;
     rows: ShortcutRow[];
-}
-
-function KeyCombo({ keys }: { keys: string[] }) {
-    return (
-        <div className="flex items-center gap-1">
-            {keys.map((key, index) => (
-                <kbd
-                    key={index}
-                    className="inline-flex min-w-6 items-center justify-center rounded border border-white/7 px-1.5 py-0.5 text-xs font-medium text-neutral-300 uppercase"
-                >
-                    {key}
-                </kbd>
-            ))}
-        </div>
-    );
 }
 
 export default function PlaygroundShortcutSheet() {

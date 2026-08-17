@@ -26,7 +26,7 @@ export default function KanbanColumn({
     droppable = false,
     draggableCards = false,
 }: KanbanColumnProps) {
-    const { setNodeRef, isOver } = useDroppable({ id: column.status, disabled: !droppable });
+    const { setNodeRef } = useDroppable({ id: column.status, disabled: !droppable });
     const { title } = column;
     const grid = layout === "grid";
 
@@ -34,9 +34,8 @@ export default function KanbanColumn({
         <div
             data-column-status={column.status}
             className={cn(
-                "group flex max-h-full min-h-0 flex-col self-stretch rounded-xl bg-cement p-2 ring-1 transition-colors",
+                "group flex max-h-full min-h-0 flex-col self-stretch rounded-lg bg-ink/30 ring-1 ring-white/1 p-2 transition-colors",
                 fullWidth ? "min-w-0 flex-1" : "w-80.5 shrink-0",
-                droppable && isOver ? "ring-white/15" : "ring-white/5",
             )}
         >
             <div className="mb-2 flex items-center justify-between gap-2 px-0.5">

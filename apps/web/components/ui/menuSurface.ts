@@ -11,7 +11,7 @@ export const MENU_SIDE_OFFSET = 6;
 export const MENU_ALIGN = "start" as const;
 
 export const MENU_SURFACE =
-    "z-50 min-w-[8rem] rounded-lg border border-white/10 bg-charcoal p-1 shadow-xl animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95";
+    "z-50 min-w-[8rem] rounded-lg border border-white/5 bg-charcoal p-1 shadow-xl animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95";
 
 /**
  * Highlight is spelled three ways because the primitives disagree: Radix menus

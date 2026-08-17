@@ -1,6 +1,7 @@
 "use client";
 import * as React from "react";
 import { HiOutlineBell } from "react-icons/hi2";
+import IconWrapper from "@/components/ui/IconWrapper";
 import { cn } from "@/lib/utils";
 import { useNotificationsPanelStore } from "@/store/playground/useNotificationsPanelStore";
 import { useNotifications } from "@/hooks/notifications/useNotifications";
@@ -29,16 +30,12 @@ export default function NotificationsBellButton({
                     : "Toggle notifications"
             }
             aria-pressed={isOpen}
-            className={cn(
-                "relative flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-md text-neutral-400 transition-colors hover:bg-white/5 hover:text-neutral-100",
-                isOpen && "bg-white/5 text-neutral-100",
-                className,
-            )}
+            className={cn("group relative flex shrink-0 cursor-pointer rounded-full", className)}
         >
-            <HiOutlineBell className="size-4 text-white!" aria-hidden />
+            <IconWrapper icon={HiOutlineBell} active={isOpen} />
             {unreadCount > 0 && (
                 <span
-                    className="absolute -top-0.5 -right-0.5 flex h-3.5 min-w-3.5 items-center justify-center rounded-full bg-primary text-snow px-1 text-[9px] leading-none font-medium tabular-nums ring-2 ring-ink"
+                    className="absolute -top-1 -right-1 flex h-3.5 min-w-3.5 items-center justify-center rounded-full bg-primary text-snow px-1 text-[9px] leading-none font-medium tabular-nums"
                     aria-hidden
                 >
                     {unreadCount > 9 ? "9+" : unreadCount}

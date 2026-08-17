@@ -1,6 +1,6 @@
 "use client";
 import { MdAdd, MdPlaylistAdd, MdUpload } from "react-icons/md";
-import { LuChevronDown, LuSquarePen } from "react-icons/lu";
+import { LuChevronDown } from "react-icons/lu";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -11,6 +11,7 @@ import { TooltipComponent } from "@/components/ui/tooltip-component";
 import { useAddCustomColumnStore } from "@/store/kanban/useAddCustomColumnStore";
 import { useIssueStore } from "@/store/issues/useIssueStore";
 import OptionButton from "./OptionButton";
+import { IoPencilSharp } from "react-icons/io5";
 
 const TASK_OPTIONS = [
     { id: "issue", label: "New issue", icon: MdAdd },
@@ -18,7 +19,6 @@ const TASK_OPTIONS = [
     { id: "import", label: "Import issues", icon: MdUpload },
 ];
 
-/** The toolbar's primary action: new issue, with the rarer creates behind a caret. */
 export default function AddTaskButton() {
     const openCreate = useIssueStore((s) => s.openCreate);
     const setAddColumnOpen = useAddCustomColumnStore((s) => s.setOpen);
@@ -32,7 +32,7 @@ export default function AddTaskButton() {
     return (
         <div className="flex items-center gap-1">
             <TooltipComponent delayDuration={1000} content="New issue" side="bottom">
-                <OptionButton label="New issue" icon={LuSquarePen} onClick={onAddTask} />
+                <OptionButton label="New issue" icon={IoPencilSharp} onClick={onAddTask} />
             </TooltipComponent>
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>

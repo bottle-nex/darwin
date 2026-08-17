@@ -48,14 +48,14 @@ export class KanbanBoard {
             status: KanbanStatus.InProgress,
             title: "In Progress",
             icon: RiProgress4Line,
-            titleBox: "text-amber-300",
+            titleBox: "text-[#F1BF00]",
             cardTint: "bg-gradient-to-br from-amber-500/12 to-amber-500/5",
         },
         {
             status: KanbanStatus.InReview,
             title: "In Review",
             icon: LuCircleDotDashed,
-            titleBox: "text-violet-300",
+            titleBox: "text-violet-400",
             cardTint: "bg-gradient-to-r from-violet-500/12 to-violet-500/5",
         },
         {
@@ -69,7 +69,7 @@ export class KanbanBoard {
             status: KanbanStatus.Failed,
             title: "Failed",
             icon: LuCircleX,
-            titleBox: "text-rose-300",
+            titleBox: "text-rose-400",
             cardTint: "bg-gradient-to-r from-rose-500/10 to-rose-500/5",
         },
         {
