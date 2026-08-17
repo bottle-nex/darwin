@@ -99,7 +99,7 @@ export default function ChatThread({
             <div
                 ref={scrollRef}
                 data-lenis-prevent
-                className="no-scrollbar flex-1 min-h-0 min-w-0 overflow-y-auto text-[13px] text-neutral-500"
+                className="no-scrollbar flex-1 min-h-0 min-w-0 overflow-y-auto text-[13px] text-neutral-500 font-open"
             >
                 {loading ? (
                     <LogoLoader size={32} className="h-full" />

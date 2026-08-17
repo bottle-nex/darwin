@@ -45,12 +45,12 @@
     --radius-lg: 0.625rem;
     --radius-xl: calc(0.625rem + 4px);
 
-    /* Font stacks — the right-hand vars are set by next/font on <html> (app/layout.tsx). */
-    --font-sans: var(--font-poppins);
+    /* Google Sans Flex is the shared UI default. `font-headline` is the display exception. */
+    --font-sans: var(--font-google-sans-flex), ui-sans-serif, system-ui, sans-serif;
     --font-mono: var(--font-geist-mono);
-    --font-display: var(--font-tektur);
-    --font-serif: var(--font-instrument-serif);
-    --font-grotesk: var(--font-inter-tight);
+    --font-display: var(--font-sans);
+    --font-serif: var(--font-sans);
+    --font-grotesk: var(--font-sans);
     --font-headline: var(--font-titillium-web);
-    --font-arimo: var(--font-arimo);
+    --font-arimo: var(--font-sans);
 }
