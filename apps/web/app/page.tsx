@@ -8,7 +8,10 @@ import { LandingNavbar } from "@/components/new/LandingNavbar";
 
 export default function Home() {
     return (
-        <div data-lenis-prevent className="relative min-h-screen w-screen flex flex-col pb-6">
+        <div
+            data-lenis-prevent
+            className="theme-landing relative min-h-screen w-screen flex flex-col pb-6"
+        >
             <LandingNavbar />
             <LandingHero />
             <LandingBentoCards />

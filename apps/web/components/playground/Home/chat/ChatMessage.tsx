@@ -254,10 +254,10 @@ export default function ChatMessage({
                     )}
                     <article
                         className={cn(
-                            "relative min-w-0 flex-1 rounded-[10px] px-3 py-2.5 text-[13px] leading-5 tracking-[0.002em] wrap-anywhere transition-colors duration-200",
+                            "relative min-w-0 flex-1 rounded-lg px-3 py-2.5 text-[13px] leading-5 tracking-[0.005em] wrap-anywhere transition-colors duration-200",
                             isMine
-                                ? "border border-graphite/50 bg-ink/20 text-neutral-100"
-                                : "border border-white/6 bg-[#151515] text-neutral-200",
+                                ? "border border-graphite/50 bg-graphite text-neutral-200"
+                                : "border border-graphite/50 bg-graphite text-neutral-200",
                             endsGroup && (isMine ? "rounded-br-[1px]" : "rounded-bl-[1px]"),
                         )}
                     >
@@ -345,7 +345,7 @@ export default function ChatMessage({
                                             animate={{ rotate: expanded ? 180 : 0 }}
                                             transition={EXPAND_TRANSITION}
                                         >
-                                            <HiChevronDown className="size-3.5" />
+                                            <HiChevronDown className="size-3" />
                                         </motion.span>
                                     </Button>
                                     <MessageTime

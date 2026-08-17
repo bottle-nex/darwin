@@ -61,9 +61,9 @@ export default function PlaygroundTopBar() {
                     onClick={() => setOpen(true)}
                     variant={"tertiary"}
                     size={"xs"}
-                    className="text-ink!"
+                    className="text-ink/80! pl-2! pr-3! rounded-sm! uppercase"
                 >
-                    <MdAdd className="size-3.5" aria-hidden />
+                    <MdAdd className="size-3.5 text-ink!" aria-hidden />
                     Create Project
                 </Button>
                 <PlaygroundUserMenu />
