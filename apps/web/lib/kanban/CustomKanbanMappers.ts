@@ -4,27 +4,18 @@ import type { CustomCard, CustomColumn } from "@/types/kanban-custom";
 
 /** Maps the real API's board payload onto the Custom Kanban's display shapes. */
 export class CustomKanbanMappers {
-    /**
-     * Descriptions are stored as rich-text editor HTML; card previews are plain text.
-     * Entities are left encoded — a preview is a glance, not a rendering.
-     */
-    static stripHtml(html: string): string {
-        return html
-            .replace(/<[^>]*>/g, " ")
-            .replace(/\s+/g, " ")
-            .trim();
-    }
-
     /** Convert a raw server issue row into the card the Custom Kanban renders. */
     static boardIssueToCard(issue: BoardIssue): CustomCard {
         return {
             id: issue.id,
             number: issue.number,
             title: issue.title,
-            description: issue.description || undefined,
             tags: issue.tags,
-            priority: KanbanMappers.NUMBER_TO_PRIORITY[issue.priority] ?? "normal",
+            priority: KanbanMappers.NUMBER_TO_PRIORITY[issue.priority] ?? "medium",
             assignees: issue.assignees.map(KanbanMappers.toAssignee),
+            status: issue.status,
+            createdAt: issue.createdAt,
+            targetDate: issue.targetDate,
         };
     }
 

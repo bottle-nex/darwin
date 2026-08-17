@@ -52,7 +52,7 @@ export default function NotificationsPanel() {
                         className="ml-2 flex h-full flex-col rounded-lg border border-white/5 bg-charcoal"
                     >
                         <header className="flex h-11 shrink-0 items-center gap-2 border-b border-white/5 pr-1.5 pl-3">
-                            <h2 className="text-[13px] font-medium text-neutral-200">
+                            <h2 className="text-[14px] font-medium text-neutral-200">
                                 Notifications
                             </h2>
                             {unreadCount > 0 && (

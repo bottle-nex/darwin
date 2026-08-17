@@ -8,7 +8,6 @@ import { icon_schema } from "./controller.create_template";
 
 const body_schema = z.object({
     name: z.string().min(1).max(60).optional(),
-    summary: z.string().max(200).optional(),
     description: z.string().min(1).max(20000).optional(),
     icon: icon_schema.optional(),
     is_default: z.boolean().optional(),
@@ -74,7 +73,6 @@ export default async function update_template_controller(req: Request, res: Resp
                 where: { id: template_id },
                 data: {
                     ...(data.name !== undefined ? { name: data.name } : {}),
-                    ...(data.summary !== undefined ? { summary: data.summary } : {}),
                     ...(data.description !== undefined ? { description: data.description } : {}),
                     ...(data.icon !== undefined ? { icon: data.icon } : {}),
                     ...(data.is_default !== undefined ? { isDefault: data.is_default } : {}),
@@ -82,7 +80,6 @@ export default async function update_template_controller(req: Request, res: Resp
                 select: {
                     id: true,
                     name: true,
-                    summary: true,
                     description: true,
                     icon: true,
                     isDefault: true,

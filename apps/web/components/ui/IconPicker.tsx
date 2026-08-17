@@ -45,7 +45,7 @@ const GRID =
     "grid grid-cols-[repeat(6,minmax(0,1fr))] gap-0.5 sm:grid-cols-[repeat(8,minmax(0,1fr))]";
 
 const SEARCH =
-    "w-full shrink-0 border-b border-white/10 bg-transparent px-3.5 py-2.5 text-[13px] text-neutral-100 outline-none placeholder:text-neutral-500";
+    "w-full shrink-0 border-b bg-transparent px-3.5 py-2.5 text-[13px] text-neutral-100 outline-none placeholder:text-neutral-500";
 
 const SCROLL = "min-h-0 flex-1 overflow-y-auto p-1.5 no-scrollbar";
 
@@ -89,7 +89,7 @@ function IconsTab({ onPick }: { onPick: (pick: IconPick) => void }) {
 
     return (
         <>
-            <div className="flex shrink-0 items-center gap-1.5 border-b border-white/10 px-3 py-2">
+            <div className="flex shrink-0 items-center gap-1.5 border-b px-3 py-2">
                 {SWATCHES.map((swatch) => (
                     <button
                         key={swatch}
@@ -114,7 +114,7 @@ function IconsTab({ onPick }: { onPick: (pick: IconPick) => void }) {
                             className="size-4.75 aspect-square cursor-pointer rounded-full"
                         />
                     </PopoverTrigger>
-                    <PopoverContent className="w-auto border-white/10 bg-charcoal p-3">
+                    <PopoverContent className="w-auto p-3">
                         <ColorPicker value={color} onChange={setColor} />
                     </PopoverContent>
                 </Popover>
@@ -250,9 +250,9 @@ export default function IconPicker({
             <PopoverContent
                 align={align}
                 aria-label="Pick an icon or emoji"
-                className="flex h-92 w-72 flex-col overflow-hidden border-white/10 bg-neutral-900 p-0 text-neutral-100"
+                className="flex h-92 w-72 flex-col overflow-hidden p-0 text-neutral-100"
             >
-                <div className="flex shrink-0 gap-0.5 border-b border-white/10 px-2">
+                <div className="flex shrink-0 gap-0.5 border-b px-2">
                     {(["icons", "emojis"] as const).map((value) => (
                         <button
                             key={value}

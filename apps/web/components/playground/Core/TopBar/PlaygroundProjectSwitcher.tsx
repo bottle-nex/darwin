@@ -54,11 +54,7 @@ export default function PlaygroundProjectSwitcher() {
             </Popover.Trigger>
 
             <Popover.Portal>
-                <Popover.Content
-                    align="start"
-                    sideOffset={6}
-                    className="z-50 w-72 origin-(--radix-popover-content-transform-origin) rounded-lg border border-graphite bg-ink p-2 shadow-xl animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95"
-                >
+                <Popover.Content align="start" className="w-72 p-1.5">
                     <PlaygroundSearchInput
                         value={query}
                         onChange={setQuery}
@@ -67,7 +63,7 @@ export default function PlaygroundProjectSwitcher() {
                     />
                     <div
                         data-lenis-prevent
-                        className="mt-2 flex max-h-72 flex-col gap-0.5 overflow-y-auto"
+                        className="mt-1.5 flex max-h-72 flex-col gap-px overflow-y-auto"
                     >
                         {filtered.length === 0 ? (
                             <div className="px-2 py-3 text-center text-[12px] text-neutral-500">
@@ -81,10 +77,10 @@ export default function PlaygroundProjectSwitcher() {
                                     type="button"
                                     onClick={() => selectProject(p.slug)}
                                     className={cn(
-                                        "flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 text-left text-[13px] outline-none hover:bg-charcoal",
+                                        "flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 text-left text-[13px] outline-none transition-colors select-none",
                                         p.slug === projectSlug
-                                            ? "text-neutral-100 bg-cement"
-                                            : "text-neutral-300 hover:bg-graphite hover:text-neutral-100",
+                                            ? "bg-white/5 text-neutral-100"
+                                            : "text-neutral-300 hover:bg-white/5 hover:text-neutral-100",
                                     )}
                                 >
                                     <PlaygroundAvatar

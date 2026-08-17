@@ -4,6 +4,12 @@ import { toast } from "sonner";
 import { upsertBoardIssue, updateBoardIssue } from "@/hooks/issues/useBoard";
 import { upsert_chat, mark_chat_deleted } from "@/hooks/chats/useChats";
 import { upsert_project_chat, mark_project_chat_deleted } from "@/hooks/chats/useProjectChat";
+import {
+    reconcile_chat_reaction,
+    reconcile_project_chat_reaction,
+    rollback_reaction,
+} from "@/hooks/chats/useMessageReactions";
+import SessionServices from "@/lib/session";
 import { upsert_notification } from "@/hooks/notifications/useNotifications";
 import { useNotificationsPanelStore } from "@/store/playground/useNotificationsPanelStore";
 import { useFloatNotificationsStore } from "@/store/playground/useFloatNotificationsStore";
@@ -31,6 +37,7 @@ export class SocketHandlers {
 
     static handle_chat_error(message: OutboundSocketMessage) {
         if (message.type !== OutboundSocketMessageType.CHAT_ERROR) return;
+        if (message.operationId) rollback_reaction(message.operationId);
         toast.error(message.message);
     }
 
@@ -42,6 +49,31 @@ export class SocketHandlers {
     static handle_project_chat_deleted(queryClient: QueryClient, message: OutboundSocketMessage) {
         if (message.type !== OutboundSocketMessageType.PROJECT_CHAT_DELETED) return;
         mark_project_chat_deleted(queryClient, message.payload);
+    }
+
+    static handle_chat_reaction_updated(queryClient: QueryClient, message: OutboundSocketMessage) {
+        if (message.type !== OutboundSocketMessageType.CHAT_REACTION_UPDATED) return;
+        const currentUserId = SessionServices.get_user()?.id ?? undefined;
+        const cached = queryClient.getQueryCache().findAll({ queryKey: ["chats"] });
+        for (const query of cached) {
+            const issueId = query.queryKey[1];
+            if (typeof issueId === "string") {
+                reconcile_chat_reaction(queryClient, issueId, message.payload, currentUserId);
+            }
+        }
+    }
+
+    static handle_project_chat_reaction_updated(
+        queryClient: QueryClient,
+        message: OutboundSocketMessage,
+    ) {
+        if (message.type !== OutboundSocketMessageType.PROJECT_CHAT_REACTION_UPDATED) return;
+        reconcile_project_chat_reaction(
+            queryClient,
+            message.projectId,
+            message.payload,
+            SessionServices.get_user()?.id ?? undefined,
+        );
     }
 
     static handle_notification_created(queryClient: QueryClient, message: OutboundSocketMessage) {

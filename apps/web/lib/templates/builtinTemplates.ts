@@ -15,7 +15,6 @@ export const BUILTIN_ISSUE_TEMPLATES: PickableTemplate[] = [
     {
         id: "builtin:bug",
         name: "Bug report",
-        summary: "Something is broken and we need to reproduce it.",
         description: [
             '<p><span data-prompt="What is broken? Describe what you saw, not just the symptom"></span></p>',
             "<hr>",
@@ -50,7 +49,6 @@ export const BUILTIN_ISSUE_TEMPLATES: PickableTemplate[] = [
     {
         id: "builtin:feature",
         name: "Feature request",
-        summary: "Something should exist that doesn't.",
         description: [
             '<p><span data-prompt="What should exist that doesn\'t?"></span></p>',
             "<hr>",
@@ -80,7 +78,6 @@ export const BUILTIN_ISSUE_TEMPLATES: PickableTemplate[] = [
     {
         id: "builtin:chore",
         name: "Refactor / chore",
-        summary: "The code works but it's in the way.",
         description: [
             '<p><span data-prompt="What needs to change, and why is it worth doing now?"></span></p>',
             "<hr>",

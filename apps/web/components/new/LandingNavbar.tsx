@@ -44,13 +44,13 @@ const NAV_ITEMS: NavItem[] = [
             },
             {
                 label: "Blog",
-                href: "/blog",
+                href: "/blog?tab=blogs",
                 description: "Notes on agents and shipping",
                 icon: NoteIcon,
             },
             {
                 label: "Changelog",
-                href: "/change-log",
+                href: "/blog?tab=changelog",
                 description: "What shipped, week by week",
                 icon: ChecklistIcon,
             },
@@ -81,7 +81,7 @@ export function LandingNavbar() {
             setScrolled(scrollY > 10);
         }
 
-        document.addEventListener("scroll", onScroll);
+        document.addEventListener("scroll", onScroll, { passive: true });
         return () => document.removeEventListener("scroll", onScroll);
     }, []);
 
@@ -192,7 +192,7 @@ export function LandingNavbar() {
 
                     <Button variant={"tertiary"} onClick={session ? handleRedirect : handleSignin}>
                         Get Started
-                        <MdChevronRight className="text-black" />
+                        <MdChevronRight className="text-ink!" />
                     </Button>
                 </div>
             </div>

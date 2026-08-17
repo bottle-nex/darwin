@@ -228,7 +228,6 @@ export default class RouterProcessor {
         const new_issues_view = data.new_issues.map((issue) => ({
             id: issue.id,
             title: issue.title,
-            summary: issue.summary,
             priority: issue.priority,
         }));
 

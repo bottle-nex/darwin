@@ -14,7 +14,7 @@ export const KanbanStatus = {
 } as const;
 export type KanbanStatus = (typeof KanbanStatus)[keyof typeof KanbanStatus];
 
-export type Priority = "urgent" | "high" | "normal" | "low";
+export type Priority = "none" | "urgent" | "high" | "medium" | "low";
 
 export type Assignee = {
     id: string;
@@ -41,6 +41,8 @@ export type Issue = {
     assignees: Assignee[];
     comments: number;
     status: KanbanStatus;
+    createdAt?: string;
+    targetDate?: string | null;
 
     /** To Do: position in the agent's pickup queue. */
     queuePosition?: number;

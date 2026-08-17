@@ -1,19 +1,9 @@
-export type {
-    ContentEntry,
-    ContentSummary,
-    Post,
-    PostKind,
-    PostStatus,
-    ReleaseChannel,
-} from "./types";
+export type { ContentEntry, ContentSummary, PostKind, ReleaseChannel } from "./types";
 
 export { formatDate } from "./lib/formatDate";
 
+export { CardCover } from "./components/CardCover";
 export { ChangelogBackdrop } from "./components/ChangelogBackdrop";
-export { EditorialHero } from "./components/EditorialHero";
-export { EntryNav } from "./components/EntryNav";
-export { PostCard } from "./components/PostCard";
+export { ContentCard } from "./components/ContentCard";
 export { Prose } from "./components/Prose";
-export { ReleaseSection } from "./components/ReleaseSection";
-export { Reveal } from "./components/Reveal";
 export { StatusTag } from "./components/StatusTag";

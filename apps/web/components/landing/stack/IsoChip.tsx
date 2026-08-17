@@ -109,6 +109,8 @@ type IsoChipProps = {
     /** Vertical offset the chip travels from during the exploded-view entrance. */
     entranceOffsetY?: number;
     float: { amplitude: number; duration: number; delay: number };
+    /** Whether the parent diagram has entered the viewport; the float loop stays paused until then. */
+    active?: boolean;
 };
 
 export default function IsoChip({
@@ -120,6 +122,7 @@ export default function IsoChip({
     ghostOpacity = 0.6,
     entranceOffsetY = 0,
     float,
+    active = false,
 }: IsoChipProps) {
     const reduceMotion = useReducedMotion();
     const isGhost = variant === "ghost";
@@ -141,7 +144,7 @@ export default function IsoChip({
             }}
         >
             <motion.g
-                animate={reduceMotion ? undefined : { y: [0, -float.amplitude, 0] }}
+                animate={reduceMotion || !active ? undefined : { y: [0, -float.amplitude, 0] }}
                 transition={{
                     duration: float.duration,
                     delay: float.delay,

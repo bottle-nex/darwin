@@ -9,7 +9,6 @@ node_modules
 coverage
 
 # next.js
-.next/
 out/
 build
 
@@ -40,5 +39,12 @@ dist/
 # prisma generated client
 packages/database/generated
 
-# playwright mcp session artifacts
 .playwright-mcp
+
+.next/
+# playwright mcp session artifacts
+.codex
+graphify-out
+.worktrees
+docs
+AGENTS.md

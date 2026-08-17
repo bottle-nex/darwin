@@ -12,9 +12,10 @@ import {
 /** Maps the real API's board payload onto the LLM Kanban's display shapes. */
 export class KanbanMappers {
     static readonly NUMBER_TO_PRIORITY: Record<number, Priority> = {
+        0: "none",
         1: "urgent",
         2: "high",
-        3: "normal",
+        3: "medium",
         4: "low",
     };
 
@@ -45,10 +46,12 @@ export class KanbanMappers {
             title: issue.title,
             project: projectName,
             tags: issue.tags,
-            priority: KanbanMappers.NUMBER_TO_PRIORITY[issue.priority] ?? "normal",
+            priority: KanbanMappers.NUMBER_TO_PRIORITY[issue.priority] ?? "medium",
             assignees: issue.assignees.map(KanbanMappers.toAssignee),
             comments: 0,
             status,
+            createdAt: issue.createdAt,
+            targetDate: issue.targetDate,
         };
     }
 

@@ -5,6 +5,7 @@ import Access from "../../access-control/access";
 import { Action, Permissions } from "@trymatcha/access-control";
 import { prisma } from "@trymatcha/database";
 import { MESSAGE_REFERENCE_INCLUDE } from "../../services/service.message-references";
+import MessageReactionService from "../../services/service.message-reactions";
 
 export default class ProjectChatGetController {
     static params_schema = z.object({
@@ -41,7 +42,20 @@ export default class ProjectChatGetController {
                 },
             });
 
-            ResponseWriter.success(res, { chats }, "Project chats fetched successfully");
+            const reactions = await MessageReactionService.project_chat_summaries(
+                chats.map((chat) => chat.id),
+                user.id,
+            );
+            const chats_with_reactions = chats.map((chat) => ({
+                ...chat,
+                reactions: reactions.get(chat.id) ?? [],
+            }));
+
+            ResponseWriter.success(
+                res,
+                { chats: chats_with_reactions },
+                "Project chats fetched successfully",
+            );
         } catch (err) {
             console.error("ProjectChatGetController error: ", err);
             ResponseWriter.system_error(res);

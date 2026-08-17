@@ -5,13 +5,14 @@ import { Command as CommandPrimitive } from "cmdk";
 import { MdSearch } from "react-icons/md";
 
 import { cn } from "@/lib/utils";
+import { MENU_ITEM } from "./menuSurface";
 
 function Command({ className, ...props }: React.ComponentProps<typeof CommandPrimitive>) {
     return (
         <CommandPrimitive
             data-slot="command"
             className={cn(
-                "flex h-full w-full flex-col overflow-hidden rounded-md bg-charcoal text-neutral-100",
+                "flex h-full w-full flex-col overflow-hidden rounded-lg text-neutral-100",
                 className,
             )}
             {...props}
@@ -21,14 +22,21 @@ function Command({ className, ...props }: React.ComponentProps<typeof CommandPri
 
 function CommandInput({
     className,
+    icon = true,
+    border = true,
+    trailing,
     ...props
-}: React.ComponentProps<typeof CommandPrimitive.Input>) {
+}: React.ComponentProps<typeof CommandPrimitive.Input> & {
+    icon?: boolean;
+    border?: boolean;
+    trailing?: React.ReactNode;
+}) {
     return (
         <div
             data-slot="command-input-wrapper"
-            className="flex items-center gap-2 border-b border-white/10 px-3"
+            className={cn("flex items-center gap-2 px-3", border && "border-b border-white/10")}
         >
-            <MdSearch className="size-4 shrink-0 text-neutral-500" />
+            {icon && <MdSearch className="size-4 shrink-0 text-neutral-500" />}
             <CommandPrimitive.Input
                 data-slot="command-input"
                 className={cn(
@@ -37,6 +45,7 @@ function CommandInput({
                 )}
                 {...props}
             />
+            {trailing}
         </div>
     );
 }
@@ -69,7 +78,7 @@ function CommandGroup({
         <CommandPrimitive.Group
             data-slot="command-group"
             className={cn(
-                "overflow-hidden p-1 text-neutral-200 [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-neutral-500",
+                "overflow-hidden text-neutral-200 [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-[11px] [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:tracking-wide [&_[cmdk-group-heading]]:text-neutral-500 [&_[cmdk-group-heading]]:uppercase",
                 className,
             )}
             {...props}
@@ -81,12 +90,7 @@ function CommandItem({ className, ...props }: React.ComponentProps<typeof Comman
     return (
         <CommandPrimitive.Item
             data-slot="command-item"
-            className={cn(
-                "relative flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 text-[13px] text-neutral-200 outline-none select-none",
-                "data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50",
-                "[&_svg]:pointer-events-none [&_svg]:shrink-0",
-                className,
-            )}
+            className={cn(MENU_ITEM, className)}
             {...props}
         />
     );

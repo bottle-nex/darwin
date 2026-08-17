@@ -44,6 +44,7 @@ export function build_optimistic_chat(
         repliedToId: repliedTo?.id ?? null,
         repliedTo: repliedTo ?? null,
         references: references as Chat["references"],
+        reactions: [],
         createdAt: new Date(),
         updatedAt: new Date(),
     };

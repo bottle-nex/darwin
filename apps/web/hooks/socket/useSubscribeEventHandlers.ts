@@ -22,12 +22,16 @@ export function useSubscribeEventHandlers(project_id: string | undefined) {
                 SocketHandlers.handle_chat_created(queryClient, message),
             [OutboundSocketMessageType.CHAT_DELETED]: (message) =>
                 SocketHandlers.handle_chat_deleted(queryClient, message),
+            [OutboundSocketMessageType.CHAT_REACTION_UPDATED]: (message) =>
+                SocketHandlers.handle_chat_reaction_updated(queryClient, message),
             [OutboundSocketMessageType.CHAT_ERROR]: (message) =>
                 SocketHandlers.handle_chat_error(message),
             [OutboundSocketMessageType.PROJECT_CHAT_CREATED]: (message) =>
                 SocketHandlers.handle_project_chat_created(queryClient, message),
             [OutboundSocketMessageType.PROJECT_CHAT_DELETED]: (message) =>
                 SocketHandlers.handle_project_chat_deleted(queryClient, message),
+            [OutboundSocketMessageType.PROJECT_CHAT_REACTION_UPDATED]: (message) =>
+                SocketHandlers.handle_project_chat_reaction_updated(queryClient, message),
             [OutboundSocketMessageType.NOTIFICATION_CREATED]: (message) =>
                 SocketHandlers.handle_notification_created(queryClient, message),
         };

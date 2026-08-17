@@ -1,7 +1,7 @@
 "use client";
 
-import { motion, useReducedMotion } from "motion/react";
-import { useState } from "react";
+import { motion, useInView, useReducedMotion } from "motion/react";
+import { useRef, useState } from "react";
 import type { IconType } from "react-icons";
 import { LuSquareKanban, LuSquareTerminal } from "react-icons/lu";
 import { cn } from "@/lib/utils";
@@ -143,9 +143,12 @@ function GhostLayerBlock({
 
 function StackDiagram({ highlighted }: { highlighted: GhostLayerId | null }) {
     const reduceMotion = useReducedMotion();
+    const diagramRef = useRef<SVGSVGElement>(null);
+    const isVisible = useInView(diagramRef, { amount: 0.25 });
 
     return (
         <motion.svg
+            ref={diagramRef}
             role="img"
             aria-label="Exploded view of the matcha stack: the board, the agent, and code runners"
             viewBox="0 0 620 800"
@@ -179,6 +182,7 @@ function StackDiagram({ highlighted }: { highlighted: GhostLayerId | null }) {
                 ghostOpacity={0.45}
                 entranceOffsetY={110}
                 float={{ amplitude: 10, duration: 6, delay: 0.3 }}
+                active={isVisible}
             />
             <IsoChip
                 variant="ghost"
@@ -189,6 +193,7 @@ function StackDiagram({ highlighted }: { highlighted: GhostLayerId | null }) {
                 ghostOpacity={0.65}
                 entranceOffsetY={-110}
                 float={{ amplitude: 10, duration: 6.6, delay: 1.2 }}
+                active={isVisible}
             />
             <IsoChip
                 variant="active"
@@ -196,6 +201,7 @@ function StackDiagram({ highlighted }: { highlighted: GhostLayerId | null }) {
                 y={AGENT_Y}
                 glyph={<MatchaGlyph />}
                 float={{ amplitude: 6, duration: 5.2, delay: 0 }}
+                active={isVisible}
             />
 
             <motion.g variants={fade(1)} className="max-md:hidden">

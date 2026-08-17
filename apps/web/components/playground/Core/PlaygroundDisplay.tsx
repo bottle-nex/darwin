@@ -15,6 +15,7 @@ import DraftsDisplay from "@/components/playground/Home/panes/DraftsDisplay";
 import SettingsDisplay from "@/components/playground/Home/SettingsDisplay/SettingsDisplay";
 import TeamDetailDisplay from "@/components/playground/Team/TeamDisplay";
 import LogoLoader from "@/components/app/LogoLoader";
+import { PLAYGROUND_PANE_SHELL } from "@/components/playground/Core/components/paneBar";
 
 function TabPane({ tab }: { tab: string }) {
     switch (tab) {
@@ -73,11 +74,7 @@ export default function PlaygroundDisplay({ isLoading }: { isLoading?: boolean }
     const tab = usePlaygroundNavStore((s) => s.tab);
 
     return (
-        <main
-            className={
-                "relative z-0 flex flex-1 min-w-0 flex-col overflow-hidden rounded-lg ring-1 ring-white/6 bg-charcoal"
-            }
-        >
+        <main className={PLAYGROUND_PANE_SHELL}>
             {isLoading ? <LogoLoader className="h-full w-full" /> : <TabPane tab={tab} />}
         </main>
     );

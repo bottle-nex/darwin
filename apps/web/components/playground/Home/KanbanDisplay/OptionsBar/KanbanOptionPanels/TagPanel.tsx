@@ -1,8 +1,14 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import { MdCheck, MdSearch, MdLabel } from "react-icons/md";
-import { DropdownMenu } from "radix-ui";
+import { MdCheck, MdSearch } from "react-icons/md";
+import { LuTag } from "react-icons/lu";
+import {
+    DropdownMenu,
+    DropdownMenuCheckboxItem,
+    DropdownMenuContent,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { useListTags } from "@/hooks/tags/useListTags";
@@ -19,8 +25,7 @@ type TagPanelProps = {
 
 // Same dark popover as the other panels, but without padding (the header,
 // divider, and scroll area manage their own) and clipped so corners stay round.
-export const TAG_PANEL_CONTENT =
-    "z-50 flex max-h-76 w-60 flex-col overflow-hidden origin-(--radix-dropdown-menu-content-transform-origin) rounded-lg border border-neutral-800 bg-charcoal shadow-xl animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95";
+export const TAG_PANEL_CONTENT = "flex max-h-76 w-60 flex-col overflow-hidden p-0";
 
 /**
  * The panel's rows on their own, so they can also be rendered inside a submenu.
@@ -78,7 +83,7 @@ export function TagPanelItems({ selected, onToggle, onClear }: TagPanelProps) {
                     tags.map((tag) => {
                         const isOn = selected.includes(tag.id);
                         return (
-                            <DropdownMenu.CheckboxItem
+                            <DropdownMenuCheckboxItem
                                 key={tag.id}
                                 checked={isOn}
                                 onCheckedChange={() => onToggle(tag.id)}
@@ -96,7 +101,7 @@ export function TagPanelItems({ selected, onToggle, onClear }: TagPanelProps) {
                                     {isOn && <MdCheck className="size-2.5" aria-hidden />}
                                 </span>
                                 <TagDisplay name={tag.name} color={tag.color} />
-                            </DropdownMenu.CheckboxItem>
+                            </DropdownMenuCheckboxItem>
                         );
                     })
                 )}
@@ -113,17 +118,15 @@ export function TagPanelItems({ selected, onToggle, onClear }: TagPanelProps) {
  */
 export default function TagPanel({ selected, onToggle, onClear }: TagPanelProps) {
     return (
-        <DropdownMenu.Root>
+        <DropdownMenu>
             <TooltipComponent delayDuration={1000} content="Tag" side="bottom">
-                <DropdownMenu.Trigger asChild>
-                    <OptionButton label="Tag" icon={MdLabel} active={selected.length > 0} />
-                </DropdownMenu.Trigger>
+                <DropdownMenuTrigger asChild>
+                    <OptionButton label="Tag" icon={LuTag} active={selected.length > 0} />
+                </DropdownMenuTrigger>
             </TooltipComponent>
-            <DropdownMenu.Portal>
-                <DropdownMenu.Content align="end" sideOffset={6} className={TAG_PANEL_CONTENT}>
-                    <TagPanelItems selected={selected} onToggle={onToggle} onClear={onClear} />
-                </DropdownMenu.Content>
-            </DropdownMenu.Portal>
-        </DropdownMenu.Root>
+            <DropdownMenuContent align="end" className={TAG_PANEL_CONTENT}>
+                <TagPanelItems selected={selected} onToggle={onToggle} onClear={onClear} />
+            </DropdownMenuContent>
+        </DropdownMenu>
     );
 }

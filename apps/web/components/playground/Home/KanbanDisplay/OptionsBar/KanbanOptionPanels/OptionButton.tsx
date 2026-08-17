@@ -2,6 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { forwardRef } from "react";
 import type { IconType } from "react-icons";
+import IconWrapper from "@/components/ui/IconWrapper";
 import { cn } from "@/lib/utils";
 
 type OptionButtonProps = {
@@ -18,23 +19,17 @@ type OptionButtonProps = {
  * filter / open panel / visible search bar reads as "on".
  */
 const OptionButton = forwardRef<HTMLButtonElement, OptionButtonProps>(
-    ({ label, icon: Icon, active, className, ...props }, ref) => (
+    ({ label, icon, active, className, ...props }, ref) => (
         <Button
             variant="unstyled"
             ref={ref}
             type="button"
             aria-label={label}
             aria-pressed={active}
-            className={cn(
-                "flex size-7 cursor-pointer items-center justify-center rounded-[5px] transition-colors",
-                active
-                    ? "bg-white/5 text-neutral-200"
-                    : "text-neutral-400 hover:bg-white/5 hover:text-neutral-200",
-                className,
-            )}
+            className={cn("group flex shrink-0 cursor-pointer rounded-full", className)}
             {...props}
         >
-            <Icon className="size-4" aria-hidden />
+            <IconWrapper icon={icon} active={active} />
         </Button>
     ),
 );

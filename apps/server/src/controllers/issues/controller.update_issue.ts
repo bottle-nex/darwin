@@ -10,9 +10,8 @@ import { server_services } from "../..";
 export default class IssueUpdateController {
     static body_scheam = z.object({
         title: z.string().min(1).max(200).optional(),
-        summary: z.string().max(255).nullable().optional(),
         description: z.string().optional(),
-        priority: z.number().int().min(1).max(4).optional(),
+        priority: z.number().int().min(0).max(4).optional(),
         status: z.enum(IssueStatus).optional(),
         custom_column_id: z.string().nullable().optional(),
         tag_ids: z.array(z.string()).max(20).optional(),
@@ -126,7 +125,6 @@ export default class IssueUpdateController {
                 where: { id },
                 data: {
                     title: body_data.title,
-                    summary: body_data.summary,
                     description: body_data.description,
                     priority: body_data.priority,
                     status: next_status,
@@ -144,7 +142,6 @@ export default class IssueUpdateController {
                     id: true,
                     number: true,
                     title: true,
-                    summary: true,
                     description: true,
                     priority: true,
                     status: true,

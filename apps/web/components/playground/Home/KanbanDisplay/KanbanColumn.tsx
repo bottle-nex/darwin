@@ -35,7 +35,7 @@ export default function KanbanColumn({
             data-column-status={column.status}
             className={cn(
                 "group flex max-h-full min-h-0 flex-col self-stretch rounded-xl bg-cement p-2 ring-1 transition-colors",
-                fullWidth ? "min-w-0 flex-1" : "w-72 shrink-0",
+                fullWidth ? "min-w-0 flex-1" : "w-80.5 shrink-0",
                 droppable && isOver ? "ring-white/15" : "ring-white/5",
             )}
         >

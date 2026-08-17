@@ -1,18 +1,24 @@
 import { cn } from "@/lib/utils";
-import React from "react";
+import type { IconType } from "react-icons";
 
 interface IconWrapperProps {
-    icon: React.ReactElement<{ className?: string }>;
-    stroke_color: string;
-    bg_color: string;
+    icon: IconType;
+    active?: boolean;
+    className?: string;
 }
 
-export default function IconWrapper({ icon, stroke_color, bg_color }: IconWrapperProps) {
+export default function IconWrapper({ icon: Icon, active, className }: IconWrapperProps) {
     return (
-        <span className={cn(bg_color, "rounded-xs p-0.5")}>
-            {React.cloneElement(icon, {
-                className: cn(stroke_color, icon.props.className),
-            })}
+        <span
+            className={cn(
+                "flex size-6.25 items-center justify-center rounded-full ring-[0.5px] transition-colors",
+                active
+                    ? "bg-white/8 text-neutral-100 ring-white/12"
+                    : "bg-white/5 text-neutral-400 ring-white/8 group-hover:bg-white/8 group-hover:text-neutral-200",
+                className,
+            )}
+        >
+            <Icon className="size-3.25" aria-hidden />
         </span>
     );
 }

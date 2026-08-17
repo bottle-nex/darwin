@@ -28,9 +28,10 @@ export class GanttTimeline {
 
     /** Tailwind dark-mode priority dot colours (mirrors the home-page kanban cards). */
     static readonly PRIORITY_DOT: Record<string, string> = {
+        none: "bg-neutral-800",
         urgent: "bg-neutral-100",
         high: "bg-neutral-400",
-        normal: "bg-neutral-600",
+        medium: "bg-neutral-600",
         low: "bg-neutral-700",
     };
 

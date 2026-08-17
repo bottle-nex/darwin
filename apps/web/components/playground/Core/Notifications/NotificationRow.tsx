@@ -55,11 +55,11 @@ export default function NotificationRow({
 
             <span className="flex min-w-0 flex-1 flex-col">
                 <span className="flex items-baseline gap-2">
-                    <span className="min-w-0 flex-1 truncate text-[12.5px] text-neutral-400">
+                    <span className="min-w-0 flex-1 truncate text-[13.5px] text-neutral-400">
                         <span className="font-medium text-neutral-100">{actorName}</span> {action}
                     </span>
                     <span
-                        className="flex shrink-0 items-center gap-1.5 text-[11px] tabular-nums text-neutral-600"
+                        className="flex shrink-0 items-center gap-1.5 text-[11.5px] tabular-nums text-neutral-600"
                         title={format(createdAt, "PPpp")}
                     >
                         {short_age(createdAt)}
@@ -73,13 +73,13 @@ export default function NotificationRow({
                 </span>
 
                 {body && (
-                    <span className="mt-1 line-clamp-2 text-[12.5px] leading-[1.45] text-neutral-500">
+                    <span className="mt-1 line-clamp-2 text-[13px] leading-[1.5] text-neutral-500">
                         {body}
                     </span>
                 )}
 
                 {(issueRef || projectSlug) && (
-                    <span className="mt-1.5 flex items-center gap-1.5 text-[11px] text-neutral-600">
+                    <span className="mt-1.5 flex items-center gap-1.5 text-[11.5px] text-neutral-600">
                         {issueRef && (
                             <span className="truncate font-medium text-neutral-500">
                                 {issueRef}

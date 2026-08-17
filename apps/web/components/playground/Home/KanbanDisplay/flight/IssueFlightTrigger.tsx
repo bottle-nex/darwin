@@ -103,7 +103,7 @@ export default function IssueFlightTrigger() {
             </Button>
 
             <Dialog open={open} onOpenChange={handleOpenChange}>
-                <DialogContent className="border-white/10 bg-charcoal sm:max-w-md">
+                <DialogContent className="sm:max-w-md">
                     <DialogHeader>
                         <DialogTitle className="text-base text-neutral-100">
                             Simulate a status trigger
@@ -133,10 +133,7 @@ export default function IssueFlightTrigger() {
                                         )}
                                     </Button>
                                 </PopoverTrigger>
-                                <PopoverContent
-                                    align="start"
-                                    className="w-80 border-white/10 bg-charcoal p-0"
-                                >
+                                <PopoverContent className="w-80 p-0">
                                     <Command shouldFilter={false}>
                                         <CommandInput
                                             value={issueSearch}
@@ -161,7 +158,8 @@ export default function IssueFlightTrigger() {
                                                         <span className="min-w-0 flex-1 truncate">
                                                             <span className="text-neutral-500">
                                                                 {issue.number}
-                                                            </span>{" "}
+                                                            </span>
+                                                            {""}
                                                             {issue.title}
                                                         </span>
                                                         {issue.id === selectedIssueId && (

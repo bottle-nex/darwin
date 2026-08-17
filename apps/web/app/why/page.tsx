@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { LandingNavbar } from "@/components/new/LandingNavbar";
-import WhyProcess from "@/components/why/WhyProcess";
+import WhyHero from "@/components/why/WhyHero";
+import WhyMatcha from "@/components/why/WhyMatcha";
 
 export const metadata: Metadata = {
     title: "Why matcha",
@@ -11,7 +12,8 @@ export default function WhyPage() {
     return (
         <main className="flex min-h-screen h-full flex-col bg-ink">
             <LandingNavbar />
-            <WhyProcess />
+            <WhyHero />
+            <WhyMatcha />
         </main>
     );
 }

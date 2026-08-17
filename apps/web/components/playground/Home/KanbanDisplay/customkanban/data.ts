@@ -1,11 +1,12 @@
 import type { Priority } from "@/types/kanban";
 import type { CustomColumn } from "@/types/kanban-custom";
 
-/** Map a card's `Priority` to the server's 1–4 priority scale. */
-export const PRIORITY_TO_NUMBER: Record<Priority, 1 | 2 | 3 | 4> = {
+/** Map a card's `Priority` to the server's 0–4 priority scale. */
+export const PRIORITY_TO_NUMBER: Record<Priority, 0 | 1 | 2 | 3 | 4> = {
+    none: 0,
     urgent: 1,
     high: 2,
-    normal: 3,
+    medium: 3,
     low: 4,
 };
 

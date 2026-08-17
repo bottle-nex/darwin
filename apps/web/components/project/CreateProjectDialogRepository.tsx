@@ -138,7 +138,7 @@ export default function CreateProjectDialogRepository({
                         </PopoverTrigger>
                         <PopoverContent
                             align="start"
-                            className="w-(--radix-popover-trigger-width) overflow-hidden border border-neutral-800 bg-charcoal p-0"
+                            className="w-(--radix-popover-trigger-width) overflow-hidden p-0"
                         >
                             <Command>
                                 <CommandInput placeholder="Search branches…" />

@@ -29,6 +29,7 @@ type ChatThreadProps = {
     loading?: boolean;
     onSend: (message: string, references: LabelledReference[], repliedToId?: string) => void;
     onDelete: (chat: Chat | ProjectChat) => void;
+    onReaction: (chat: Chat | ProjectChat, emoji: string) => void;
 };
 
 /**
@@ -45,6 +46,7 @@ export default function ChatThread({
     loading,
     onSend,
     onDelete,
+    onReaction,
 }: ChatThreadProps) {
     const [replyTo, setReplyTo] = useState<Chat | ProjectChat | null>(null);
     const currentUserId = SessionServices.get_user()?.id;
@@ -97,7 +99,7 @@ export default function ChatThread({
             <div
                 ref={scrollRef}
                 data-lenis-prevent
-                className="no-scrollbar flex-1 min-h-0 min-w-0 overflow-y-auto text-[13px] text-neutral-500"
+                className="no-scrollbar flex-1 min-h-0 min-w-0 overflow-y-auto text-[13px] text-neutral-500 font-open"
             >
                 {loading ? (
                     <LogoLoader size={32} className="h-full" />
@@ -120,6 +122,7 @@ export default function ChatThread({
                                 onReply={setReplyTo}
                                 onDelete={onDelete}
                                 onQuoteClick={jumpToChat}
+                                onReaction={onReaction}
                             />
                         ))}
                     </ul>

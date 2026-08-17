@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import { useInView } from "motion/react";
 import { BsChevronRight } from "react-icons/bs";
 import { cn } from "@/lib/utils";
 import Reveal from "../utility/Reveal";
@@ -17,6 +18,7 @@ const FEATURES = [
         description:
             "Every project gets a board the whole team can drop issues onto. Each card is scoped to a repo, so an agent always knows exactly where to work.",
         Panel: BoardShowcase,
+        lazy: false,
     },
     {
         index: "1.1",
@@ -25,6 +27,7 @@ const FEATURES = [
         description:
             "The agent reads the issue, spins your repo up in a sandboxed runner, and iterates until the build and tests pass — no babysitting required.",
         Panel: AgentShowcase,
+        lazy: true,
     },
     {
         index: "1.2",
@@ -33,8 +36,18 @@ const FEATURES = [
         description:
             "You never review plans or prompts. A tested pull request lands back on your repo — read the diff, request changes, or merge.",
         Panel: PullRequestShowcase,
+        lazy: true,
     },
 ];
+
+/** Defers mounting shader-backed panels until they're within `margin` of the viewport, so their WebGL/image work doesn't compete with entry animations on first load. */
+function LazyPanel({ lazy, children }: { lazy: boolean; children: React.ReactNode }) {
+    const ref = useRef<HTMLDivElement>(null);
+    const inView = useInView(ref, { once: true, margin: "600px" });
+
+    if (!lazy) return <>{children}</>;
+    return <div ref={ref}>{inView && children}</div>;
+}
 
 export default function LandingFeatureShowcase() {
     const panelRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -106,7 +119,9 @@ export default function LandingFeatureShowcase() {
                             }}
                         >
                             <Reveal>
-                                <feature.Panel />
+                                <LazyPanel lazy={feature.lazy}>
+                                    <feature.Panel />
+                                </LazyPanel>
                             </Reveal>
                             <Reveal delay={0.1}>
                                 <div className="mt-6">

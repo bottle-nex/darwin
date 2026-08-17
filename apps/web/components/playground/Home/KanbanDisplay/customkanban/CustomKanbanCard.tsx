@@ -1,7 +1,12 @@
 "use client";
 import { useState } from "react";
 import { MdMoreHoriz, MdDelete, MdPeople } from "react-icons/md";
-import { DropdownMenu } from "radix-ui";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,19 +17,13 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog";
-import { useIssueDialog } from "@/components/playground/issue/useIssueDialog";
+import { useIssueRoute } from "@/components/playground/Issue/useIssueRoute";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { useCustomCardActions } from "@/hooks/kanban/useCustomCardActions";
-import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
-import { CustomKanbanMappers } from "@/lib/kanban/CustomKanbanMappers";
 import { CARD_SHELL } from "../cardStyles";
-import { PANEL_CONTENT, PANEL_ITEM } from "../OptionsBar/KanbanOptionPanels/panelStyles";
-import IssueTags from "../IssueTags";
+import IssueCardFace, { issueIdentifier } from "../cards/IssueCardFace";
 import AssigneePicker from "./AssigneePicker";
 import type { CustomCard } from "@/types/kanban-custom";
-import PlaygroundAvatar from "@/components/playground/Core/components/PlaygroundAvatar";
-
-const MAX_AVATARS = 3;
 
 type CustomKanbanCardProps = {
     card: CustomCard;
@@ -32,25 +31,21 @@ type CustomKanbanCardProps = {
 };
 
 export default function CustomKanbanCard({ card, preview = false }: CustomKanbanCardProps) {
-    const projectId = useActiveProject()?.id;
+    const project = useActiveProject();
+    const projectId = project?.id;
     const { removeCard, assignMember, unassignMember, pendingAssigneeId } = useCustomCardActions(
         card.id,
     );
-    const descriptionPreview = card.description
-        ? CustomKanbanMappers.stripHtml(card.description)
-        : "";
-    const shownAssignees = card.assignees.slice(0, MAX_AVATARS);
-    const overflowCount = card.assignees.length - shownAssignees.length;
     const [confirmOpen, setConfirmOpen] = useState(false);
     const [assignOpen, setAssignOpen] = useState(false);
     const canAssign = Boolean(projectId) && !preview;
-    const { openEdit } = useIssueDialog();
+    const { openIssue } = useIssueRoute();
 
     return (
         <div className={cn(CARD_SHELL, "group/card relative")}>
             {!preview && (
-                <DropdownMenu.Root>
-                    <DropdownMenu.Trigger asChild>
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
                         <Button
                             variant="unstyled"
                             type="button"
@@ -60,99 +55,47 @@ export default function CustomKanbanCard({ card, preview = false }: CustomKanban
                         >
                             <MdMoreHoriz className="size-4" aria-hidden />
                         </Button>
-                    </DropdownMenu.Trigger>
-                    <DropdownMenu.Portal>
-                        <DropdownMenu.Content
-                            align="end"
-                            sideOffset={6}
-                            className={`w-40 ${PANEL_CONTENT}`}
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-40">
+                        {canAssign && (
+                            <DropdownMenuItem onSelect={() => setAssignOpen(true)}>
+                                <MdPeople className="size-3.5" aria-hidden />
+                                <span className="flex-1">Assignees</span>
+                            </DropdownMenuItem>
+                        )}
+                        <DropdownMenuItem
+                            onSelect={() => setConfirmOpen(true)}
+                            variant="destructive"
                         >
-                            {canAssign && (
-                                <DropdownMenu.Item
-                                    onSelect={() => setAssignOpen(true)}
-                                    className={PANEL_ITEM}
-                                >
-                                    <MdPeople className="size-3.5" aria-hidden />
-                                    <span className="flex-1">Assignees</span>
-                                </DropdownMenu.Item>
-                            )}
-                            <DropdownMenu.Item
-                                onSelect={() => setConfirmOpen(true)}
-                                className={`${PANEL_ITEM} text-rose-300 data-highlighted:text-rose-200`}
-                            >
-                                <MdDelete className="size-3.5" aria-hidden />
-                                <span className="flex-1">Delete</span>
-                            </DropdownMenu.Item>
-                        </DropdownMenu.Content>
-                    </DropdownMenu.Portal>
-                </DropdownMenu.Root>
+                            <MdDelete className="size-3.5" aria-hidden />
+                            <span className="flex-1">Delete</span>
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
             )}
 
             <div
                 role="button"
                 tabIndex={0}
                 className="cursor-pointer"
-                onClick={() => openEdit(card.id)}
+                onClick={() => openIssue(card.id)}
                 onKeyDown={(e) => {
                     if (e.key === "Enter" || e.key === " ") {
                         e.preventDefault();
-                        openEdit(card.id);
+                        openIssue(card.id);
                     }
                 }}
             >
-                <div className="flex items-center justify-between gap-2 pr-6">
-                    <div className="flex items-center gap-1.5">
-                        <span
-                            className={cn(
-                                "size-1.5 rounded-full",
-                                KanbanBoard.PRIORITY_DOT[card.priority],
-                            )}
-                            aria-hidden
-                        />
-                        <IssueTags tags={card.tags} />
-                    </div>
-                    <span className="font-mono text-[11px] text-neutral-500">
-                        {card.number ? `#${card.number}` : ""}
-                    </span>
-                </div>
-
-                <p className="mt-2 text-[13px] leading-snug font-medium text-neutral-100">
-                    {card.title}
-                </p>
-
-                {descriptionPreview && (
-                    <p className="mt-1.5 line-clamp-2 text-[12px] leading-snug text-neutral-400">
-                        {descriptionPreview}
-                    </p>
-                )}
-
-                <div className="mt-3 flex items-center justify-end border-t border-white/5 pt-2.5">
-                    <button
-                        onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            setAssignOpen(true);
-                        }}
-                        className="flex shrink-0 items-center -space-x-1 cursor-pointer"
-                    >
-                        {shownAssignees.map((a, index) => (
-                            <PlaygroundAvatar
-                                key={a.id}
-                                letter={a.name.charAt(0).toUpperCase()}
-                                src={a.image}
-                                tone={a.tone}
-                                className={cn(
-                                    index === 0 && shownAssignees.length > 1 && "-rotate-7",
-                                )}
-                            />
-                        ))}
-                        {overflowCount > 0 && (
-                            <span className="flex size-5 shrink-0 items-center justify-center rounded-[6px] bg-white/10 text-[11px] font-medium text-neutral-300 ring-1 ring-inset ring-white/15">
-                                +{overflowCount}
-                            </span>
-                        )}
-                    </button>
-                </div>
+                <IssueCardFace
+                    identifier={issueIdentifier(project?.name, card.number ?? "")}
+                    title={card.title}
+                    status={card.status}
+                    priority={card.priority}
+                    targetDate={card.targetDate}
+                    createdAt={card.createdAt}
+                    assignees={card.assignees}
+                    onAssigneesClick={canAssign ? () => setAssignOpen(true) : undefined}
+                />
             </div>
 
             <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>

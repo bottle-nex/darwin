@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "motion/react";
+import { memo } from "react";
 import { cn } from "@/lib/utils";
 import {
     appear,
@@ -13,6 +14,8 @@ import {
     TagPill,
 } from "./MockWindow";
 import ShowcaseFrame from "./ShowcaseFrame";
+
+const AGENT_GLASS = { angle: 0, size: 0.3 };
 
 type Task = {
     name: string;
@@ -127,11 +130,11 @@ function TaskRow({ task }: { task: Task }) {
     );
 }
 
-export default function AgentShowcase() {
+export default memo(function AgentShowcase() {
     return (
         <ShowcaseFrame
             image="/landing/feature2.jpg"
-            glass={{ angle: 0, size: 0.3 }}
+            glass={AGENT_GLASS}
             contentClassName="max-w-140"
         >
             <MockScene>
@@ -174,4 +177,4 @@ export default function AgentShowcase() {
             </MockScene>
         </ShowcaseFrame>
     );
-}
+});

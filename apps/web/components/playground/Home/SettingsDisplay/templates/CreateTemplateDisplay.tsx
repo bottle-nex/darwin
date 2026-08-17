@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 import { useCreateTemplate } from "@/hooks/templates/useCreateTemplate";
 import { useUpdateTemplate } from "@/hooks/templates/useUpdateTemplate";
 import { promptsFromBraces } from "@/lib/templates/promptHtml";
-import IssueDescriptionEditor from "@/components/playground/Home/KanbanDisplay/Issue/editor/IssueDescriptionEditor";
+import IssueDescriptionEditor from "@/components/playground/Issue/editor/IssueDescriptionEditor";
 import type { ApiResponse } from "@/types/api";
 import type { IssueTemplate } from "@/types/issueTemplate";
 import IconPicker, { IconPickGlyph, type IconPick } from "@/components/ui/IconPicker";
@@ -36,7 +36,6 @@ export default function CreateTemplateDisplay({
     const isEdit = Boolean(template);
 
     const [name, setName] = useState(template?.name ?? "");
-    const [summary, setSummary] = useState(template?.summary ?? "");
     const [isDefault, setIsDefault] = useState(template?.isDefault ?? false);
     const [description, setDescription] = useState(template?.description ?? "");
     const [descriptionEmpty, setDescriptionEmpty] = useState(!template?.description);
@@ -67,7 +66,6 @@ export default function CreateTemplateDisplay({
         const payload = {
             projectId,
             name: name.trim(),
-            summary: summary.trim() || undefined,
             description: promptsFromBraces(description),
             icon,
             isDefault,
@@ -139,14 +137,6 @@ export default function CreateTemplateDisplay({
                         className={cn(GHOST, "text-3xl font-semibold text-neutral-100")}
                     />
                 </div>
-                <input
-                    value={summary}
-                    onChange={(e) => setSummary(e.target.value)}
-                    placeholder="Add an optional description…"
-                    aria-label="Template description"
-                    maxLength={200}
-                    className={cn(GHOST, "text-[13px] text-neutral-400")}
-                />
             </header>
 
             <section className="flex flex-col gap-3">
@@ -161,10 +151,6 @@ export default function CreateTemplateDisplay({
                     ))}
                 </ul>
                 <article data-lenis-prevent className="relative min-h-96">
-                    <aside
-                        data-slot="slash-command-portal"
-                        className="pointer-events-none absolute inset-0 z-50"
-                    />
                     <IssueDescriptionEditor
                         authoring
                         initialContent={

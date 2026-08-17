@@ -36,6 +36,7 @@ const envSchema = z.object({
                 .filter(Boolean),
         ),
     SERVER_ADMIN_JWT_TTL: z.string().default("12h"),
+    REVALIDATE_SECRET: z.string().optional(),
     SERVER_GCS_PROJECT_ID: z.string().optional(),
     SERVER_GCS_BUCKET: z.string().optional(),
     SERVER_GCS_CLIENT_EMAIL: z.string().optional(),

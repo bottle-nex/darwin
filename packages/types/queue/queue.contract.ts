@@ -99,4 +99,13 @@ export type NotificationJobData =
           actorId: string;
           role: TeamRole;
           previousRole: TeamRole;
+      }
+    | {
+          action: "message.reacted";
+          reactionId: string;
+          recipientId: string;
+          actorId: string;
+          emoji: string;
+          chatId?: string;
+          projectChatId?: string;
       };

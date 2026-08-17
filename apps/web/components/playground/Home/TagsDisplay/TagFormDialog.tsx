@@ -25,7 +25,7 @@ import type { ApiResponse } from "@/types/api";
 import TagDisplay from "./TagDisplay";
 
 const FIELD =
-    "mt-1.5 border-white/10 bg-white/5 text-neutral-200 placeholder:text-neutral-500 focus-visible:border-matcha focus-visible:ring-matcha/30";
+    "mt-1.5 bg-white/5 text-neutral-200 placeholder:text-neutral-500 focus-visible:border-matcha focus-visible:ring-matcha/30";
 
 type FormValues = {
     name: string;
@@ -125,7 +125,7 @@ export default function TagFormDialog({ open, onOpenChange, projectId, tag }: Ta
 
     return (
         <Dialog open={open} onOpenChange={handleOpenChange}>
-            <DialogContent className="bg-charcoal sm:max-w-105">
+            <DialogContent className="sm:max-w-105">
                 <DialogHeader>
                     <DialogTitle className="text-neutral-100">
                         {isEdit ? "Edit tag" : "New tag"}
@@ -211,10 +211,7 @@ export default function TagFormDialog({ open, onOpenChange, projectId, tag }: Ta
                                                 )}
                                             </Button>
                                         </PopoverTrigger>
-                                        <PopoverContent
-                                            align="start"
-                                            className="w-auto border-white/10 bg-charcoal"
-                                        >
+                                        <PopoverContent className="w-auto">
                                             <ColorPicker
                                                 value={color}
                                                 onChange={(hex) => setValue("color", hex)}

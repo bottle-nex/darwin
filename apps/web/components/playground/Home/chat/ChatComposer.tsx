@@ -8,7 +8,9 @@ import Placeholder from "@tiptap/extension-placeholder";
 import { useQueryClient } from "@tanstack/react-query";
 import type { LabelledReference } from "@trymatcha/types";
 import { IoIosSend } from "react-icons/io";
+import { HiOutlineFaceSmile } from "react-icons/hi2";
 import { Button } from "@/components/ui/button";
+import EmojiPicker from "@/components/ui/EmojiPicker";
 import { createReferenceMention, ISSUE_TRIGGER, SUGGESTION_KEYS } from "./referenceMention";
 
 const MESSAGE_CHAR_LIMIT = 5000;
@@ -168,6 +170,19 @@ const ChatComposer = forwardRef<ChatComposerHandle, ChatComposerProps>(function 
                 >
                     <IoIosSend className="size-5.5" />
                 </Button>
+                <EmojiPicker
+                    onSelect={(emoji) => editor?.chain().focus().insertContent(emoji).run()}
+                >
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        disabled={disabled || !editor}
+                        aria-label="Add emoji"
+                        className="absolute bottom-0.75 right-10 h-8! w-8! text-neutral-400 hover:bg-transparent hover:text-neutral-100 disabled:text-neutral-600"
+                    >
+                        <HiOutlineFaceSmile className="size-4.5" />
+                    </Button>
+                </EmojiPicker>
             </div>
         </div>
     );

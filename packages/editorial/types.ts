@@ -1,10 +1,10 @@
-import type { Post, PostKind, PostStatus, ReleaseChannel } from "@trymatcha/types";
+import type { Post, PostKind, ReleaseChannel } from "@trymatcha/types";
 
-export type { Post, PostKind, PostStatus, ReleaseChannel };
+export type { PostKind, ReleaseChannel };
 
-/** What `GET /api/v1/content/:kind` returns per entry — no body, no draft fields. */
 export type ContentSummary = Pick<
     Post,
+    | "kind"
     | "slug"
     | "title"
     | "summary"
@@ -16,5 +16,4 @@ export type ContentSummary = Pick<
     | "readingTime"
 > & { publishedAt: string | null };
 
-/** What `GET /api/v1/content/:kind/:slug` returns — the full published entry. */
 export type ContentEntry = ContentSummary & { content: string };

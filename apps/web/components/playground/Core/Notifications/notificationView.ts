@@ -8,6 +8,7 @@ import {
     HiOutlineChatBubbleLeftRight,
     HiOutlineCheckBadge,
     HiOutlineExclamationTriangle,
+    HiOutlineFaceSmile,
     HiOutlineHashtag,
     HiOutlineKey,
     HiOutlineNoSymbol,
@@ -54,6 +55,7 @@ const THEME: Record<NotificationType, NotificationTheme> = {
     [NotificationType.RemovedFromTeam]: { icon: HiOutlineUserMinus, tint: "text-neutral-400" },
     [NotificationType.RemovedFromOrg]: { icon: HiOutlineNoSymbol, tint: "text-rose-300" },
     [NotificationType.RoleChanged]: { icon: HiOutlineKey, tint: "text-amber-300" },
+    [NotificationType.MessageReacted]: { icon: HiOutlineFaceSmile, tint: "text-amber-300" },
 };
 
 const FALLBACK_THEME: NotificationTheme = { icon: HiOutlineBell, tint: "text-neutral-400" };
@@ -212,6 +214,15 @@ export function notification_view(notification: Notification): NotificationView 
                 issueRef: null,
                 projectSlug,
             };
+        case NotificationType.MessageReacted:
+            return {
+                actorId: String(payload.actorId ?? ""),
+                actorName: String(payload.actorName),
+                action: `reacted ${String(payload.emoji)} to your message`,
+                body: "",
+                issueRef: issueRef ? `${issueRef} ${payload.issueTitle}` : null,
+                projectSlug,
+            };
         default:
             return {
                 actorId: notification.id,
@@ -254,6 +265,21 @@ export function notification_target(
             };
         case NotificationType.ProjectChatMention:
             return { orgSlug, projectSlug, thread: { kind: "project" } };
+        case NotificationType.MessageReacted:
+            if (payload.issueId) {
+                return {
+                    orgSlug,
+                    projectSlug,
+                    thread: {
+                        kind: "issue",
+                        issueId: String(payload.issueId),
+                        issueNumber: Number(payload.issueNumber),
+                        issueTitle: String(payload.issueTitle),
+                    },
+                };
+            }
+            if (payload.projectChatId) return { orgSlug, projectSlug, thread: { kind: "project" } };
+            return null;
         case NotificationType.IssueDeleted:
         case NotificationType.InviteAccepted:
         case NotificationType.AddedToProject:

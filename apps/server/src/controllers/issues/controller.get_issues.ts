@@ -57,7 +57,6 @@ export default class IssueGetController {
                         id: true,
                         number: true,
                         title: true,
-                        summary: true,
                         description: true,
                         priority: true,
                         status: true,

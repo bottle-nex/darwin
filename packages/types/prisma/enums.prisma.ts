@@ -59,6 +59,7 @@ export const NotificationType = {
     RemovedFromTeam: "RemovedFromTeam",
     RemovedFromOrg: "RemovedFromOrg",
     RoleChanged: "RoleChanged",
+    MessageReacted: "MessageReacted",
 } as const;
 export type NotificationType = (typeof NotificationType)[keyof typeof NotificationType];
 

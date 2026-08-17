@@ -1,0 +1,83 @@
+"use client";
+
+import type { ComponentProps } from "react";
+import { MdContentCopy } from "react-icons/md";
+import { BsReply } from "react-icons/bs";
+import { HiOutlineFaceSmile } from "react-icons/hi2";
+import { to_plain_text, type Chat, type ProjectChat } from "@trymatcha/types";
+import { Button } from "@/components/ui/button";
+import EmojiPicker from "@/components/ui/EmojiPicker";
+import { cn } from "@/lib/utils";
+import { HiOutlineTrash } from "react-icons/hi";
+
+type AnyChat = Chat | ProjectChat;
+
+function ActionButton({ className, ...props }: ComponentProps<typeof Button>) {
+    return (
+        <Button
+            variant="unstyled"
+            type="button"
+            className={cn(
+                "flex size-6 cursor-pointer items-center justify-center rounded-md text-neutral-400 transition-colors hover:bg-white/10 hover:text-neutral-100 disabled:cursor-default disabled:opacity-40 data-[state=open]:bg-white/10 data-[state=open]:text-neutral-100",
+                className,
+            )}
+            {...props}
+        />
+    );
+}
+
+export default function MessageActions({
+    chat,
+    isMine,
+    canDelete,
+    reactionDisabled,
+    onReply,
+    onDelete,
+    onReaction,
+}: {
+    chat: AnyChat;
+    isMine: boolean;
+    canDelete: boolean;
+    reactionDisabled: boolean;
+    onReply: (chat: AnyChat) => void;
+    onDelete: (chat: AnyChat) => void;
+    onReaction: (chat: AnyChat, emoji: string) => void;
+}) {
+    return (
+        <div
+            className={cn(
+                "absolute -top-3 z-20 flex items-center gap-px rounded-lg border border-graphite/50 bg-charcoal p-0.5 text-neutral-100 opacity-0 shadow-lg transition-opacity group-hover/message:opacity-100 focus-within:opacity-100 has-data-[state=open]:opacity-100",
+                isMine ? "left-1" : "right-1",
+            )}
+        >
+            <EmojiPicker
+                align={isMine ? "start" : "end"}
+                onSelect={(emoji) => onReaction(chat, emoji)}
+            >
+                <ActionButton aria-label="Add reaction" disabled={reactionDisabled}>
+                    <HiOutlineFaceSmile className="size-3.5" />
+                </ActionButton>
+            </EmojiPicker>
+            <ActionButton aria-label="Reply" onClick={() => onReply(chat)}>
+                <BsReply className="size-3.5" />
+            </ActionButton>
+            <ActionButton
+                aria-label="Copy message"
+                onClick={() =>
+                    navigator.clipboard.writeText(to_plain_text(chat.message, chat.references))
+                }
+            >
+                <MdContentCopy className="size-3" />
+            </ActionButton>
+            {canDelete && (
+                <ActionButton
+                    aria-label="Delete message"
+                    onClick={() => onDelete(chat)}
+                    className="hover:bg-destructive/20 hover:text-destructive"
+                >
+                    <HiOutlineTrash className="size-3.5" />
+                </ActionButton>
+            )}
+        </div>
+    );
+}

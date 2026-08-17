@@ -5,13 +5,14 @@ import { toast } from "sonner";
 import { MdChat, MdFolder } from "react-icons/md";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
 import { useActiveProject } from "@/hooks/useActiveProject";
-import { useIssueDialog } from "@/components/playground/issue/useIssueDialog";
+import { useIssueRoute } from "@/components/playground/Issue/useIssueRoute";
 import type { LabelledReference } from "@trymatcha/types";
 import {
     useChats,
     add_chat,
     build_optimistic_chat,
     mark_chat_deleted,
+    OPTIMISTIC_ID_PREFIX,
 } from "@/hooks/chats/useChats";
 import {
     useProjectChat,
@@ -24,6 +25,10 @@ import { InboundSocketMessageType, type Chat, type ProjectChat } from "@trymatch
 import SessionServices from "@/lib/session";
 import ProjectChatThread from "@/components/playground/Home/chat/ProjectChatThread";
 import { DEFAULT_FOLDER_COLOR } from "@/components/playground/Core/TopBar/PlaygroundProjectSwitcher";
+import {
+    toggle_chat_reaction,
+    toggle_project_chat_reaction,
+} from "@/hooks/chats/useMessageReactions";
 import ThreadsDisplay from "./ThreadsDisplay";
 
 /**
@@ -38,7 +43,7 @@ export default function ThreadDetailDisplay() {
     const selectedThread = usePlaygroundNavStore((s) => s.selectedThread);
     const selectedThreadProjectSlug = usePlaygroundNavStore((s) => s.selectedThreadProjectSlug);
     const activeProject = useActiveProject();
-    const { openEdit } = useIssueDialog();
+    const { openIssue } = useIssueRoute();
 
     const { data: projectChats, isLoading: isProjectChatLoading } = useProjectChat(
         selectedThread?.kind === "project" ? activeProject?.id : undefined,
@@ -133,6 +138,15 @@ export default function ThreadDetailDisplay() {
         }
     }
 
+    function handleReaction(chat: Chat | ProjectChat, emoji: string) {
+        if (chat.id.startsWith(OPTIMISTIC_ID_PREFIX)) return;
+        const sent =
+            selectedThread?.kind === "project"
+                ? toggle_project_chat_reaction(queryClient, chat as ProjectChat, emoji)
+                : toggle_chat_reaction(queryClient, chat as Chat, emoji);
+        if (!sent) toast.error("Couldn't update the reaction.");
+    }
+
     const isProjectThread = selectedThread.kind === "project";
     const title = isProjectThread
         ? (activeProject?.name ?? "Project chat")
@@ -160,11 +174,11 @@ export default function ThreadDetailDisplay() {
                         role="button"
                         tabIndex={0}
                         className="cursor-pointer truncate text-[13px] font-semibold text-neutral-100"
-                        onClick={() => openEdit(selectedThread.issueId)}
+                        onClick={() => openIssue(selectedThread.issueId)}
                         onKeyDown={(e) => {
                             if (e.key === "Enter" || e.key === " ") {
                                 e.preventDefault();
-                                openEdit(selectedThread.issueId);
+                                openIssue(selectedThread.issueId);
                             }
                         }}
                     >
@@ -196,6 +210,7 @@ export default function ThreadDetailDisplay() {
                     }
                     onSend={handleSend}
                     onDelete={handleDelete}
+                    onReaction={handleReaction}
                 />
             </div>
         </div>

@@ -179,11 +179,6 @@ export default function IssueTemplatesDisplay({ projectId }: { projectId: string
                                             </Button>
                                         </menu>
                                     </article>
-                                    {template.summary && (
-                                        <p className="truncate text-[11.5px] text-neutral-500">
-                                            {template.summary}
-                                        </p>
-                                    )}
                                 </li>
                             );
                         })}

@@ -1,8 +1,9 @@
 import type { Request, Response } from "express";
 import { prisma } from "@trymatcha/database";
 import ResponseWriter from "../../services/service.response";
+import RevalidateService from "../../services/service.revalidate";
 import PostContentService from "../../services/service.post-content";
-import PostService from "../../services/service.post";
+import PostSlugService from "../../services/service.post-slug";
 import { post_body_schema } from "./post.schema";
 
 export default class CreatePostController {
@@ -23,11 +24,7 @@ export default class CreatePostController {
                 return ResponseWriter.invalid_data(res, "The post body is empty");
             }
 
-            const slug = await PostService.unique_slug(
-                input.kind,
-                input.slug || input.title,
-                input.title,
-            );
+            const slug = await PostSlugService.unique(input.slug || input.title, input.title);
 
             const post = await prisma.post.create({
                 data: {
@@ -47,6 +44,8 @@ export default class CreatePostController {
                     publishedAt: input.status === "Published" ? new Date() : null,
                 },
             });
+
+            RevalidateService.content();
 
             return ResponseWriter.created(res, post, "Post created");
         } catch (err) {

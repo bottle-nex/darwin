@@ -1,7 +1,8 @@
 @import "tailwindcss";
 @import "../node_modules/tw-animate-css/dist/tw-animate.css";
-/* All design tokens (colors, radii, fonts) live in theme.css. */
-@import "./theme.css";
+/* All design tokens (colors, radii, fonts) live in the shared theme package,
+   imported by both apps/web and apps/admin so they cannot drift. */
+@import "../../../packages/theme/theme.css";
 
 @source "../**/*.{ts,tsx}";
 @source "../../../packages/editorial/**/*.tsx";
@@ -72,26 +73,6 @@
     }
 }
 
-/* Scroll-driven grow-to-viewport panel — see components/new/HeroPanel.tsx, which
-   drives --squeeze from 1 (resting in its slot) to 0 (covering the screen) as the
-   page scrolls.
-
-   The panel is absolutely positioned, so its containing block is the parent slot:
-   percentages in left/right resolve against the slot's width and percentages in
-   top/bottom against its height. Growing each edge by (100vw - 100%) / 2 therefore
-   lands the panel at exactly 100vw x 100vh without this rule ever needing to know
-   the column's size. Being out of flow also means none of this reflows the page —
-   only the panel's own subtree.
-
-   --squeeze defaults to 1 so the pre-hydration paint is the resting state; Motion
-   then overrides it inline, and the clamp keeps a spring that overshoots either end
-   from inverting the geometry.
-
-   Deliberately NOT inside @layer utilities: Tailwind treats hand-written classes in
-   that layer as candidates and drops any it cannot find in the scanned source, so
-   this rule silently vanished once the component that used to reference it was
-   renamed. Unlayered, it is always emitted. It also outranks Tailwind's utilities,
-   so position/inset/rounded-* classes on the panel itself won't take effect. */
 .expanding-panel {
     --squeeze: 1;
     --panel-squeeze: clamp(0, var(--squeeze), 1);
@@ -250,14 +231,14 @@
     /* Tiptap issue-description editor (Notion/Linear-style slash-command doc). */
     .tiptap {
         outline: none;
-        color: #b8b8b8;
-        font-size: 0.875rem;
-        line-height: 1.6;
+        color: #ededed;
+        font-size: 1rem;
+        line-height: 1.65;
         --tick: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'><path d='M20 6 9 17l-5-5'/></svg>");
     }
 
     .tiptap ::selection {
-        background: transparent;
+        background: color-mix(in srgb, var(--color-matcha) 28%, transparent);
     }
     .tiptap > * + * {
         margin-top: 0.5rem;
@@ -379,9 +360,9 @@
         width: 0.95rem;
         height: 0.95rem;
         margin: 0;
-        border: 1px solid rgba(255, 255, 255, 0.22);
-        border-radius: 0.25rem;
-        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 0.1875rem;
+        background: var(--color-charcoal);
         cursor: pointer;
         transition:
             background 0.12s ease,
@@ -389,25 +370,25 @@
     }
 
     .tiptap ul[data-type="taskList"] li > label input[type="checkbox"]:hover {
-        border-color: rgba(255, 255, 255, 0.4);
-        background: rgba(255, 255, 255, 0.09);
+        border-color: rgba(255, 255, 255, 0.32);
+        background: var(--color-graphite);
     }
 
     .tiptap ul[data-type="taskList"] li > label input[type="checkbox"]:checked {
-        background: var(--color-matcha);
-        border-color: var(--color-matcha);
+        background: var(--color-snow);
+        border-color: var(--color-snow);
     }
     .tiptap ul[data-type="taskList"] li > label input[type="checkbox"]:checked::after {
         content: "";
         width: 0.62rem;
         height: 0.62rem;
-        background-color: var(--color-matcha-foreground);
+        background-color: var(--color-ink);
         -webkit-mask: var(--tick) center / contain no-repeat;
         mask: var(--tick) center / contain no-repeat;
     }
 
     .tiptap ul[data-type="taskList"] li > label input[type="checkbox"]:focus-visible {
-        outline: 2px solid color-mix(in srgb, var(--color-matcha) 50%, transparent);
+        outline: 2px solid color-mix(in srgb, var(--color-snow) 40%, transparent);
         outline-offset: 1px;
     }
 

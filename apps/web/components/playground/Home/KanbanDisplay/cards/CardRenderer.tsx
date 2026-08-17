@@ -1,5 +1,5 @@
 "use client";
-import { useIssueDialog } from "@/components/playground/issue/useIssueDialog";
+import { useIssueRoute } from "@/components/playground/Issue/useIssueRoute";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
 import { PlaygroundTab } from "@/components/playground/playgroundTabs";
 import { KanbanStatus, type Issue } from "@/types/kanban";
@@ -40,13 +40,13 @@ function statusCard(issue: Issue) {
  * so a tap falls through to this handler.
  */
 export default function CardRenderer({ issue }: { issue: Issue }) {
-    const { openEdit } = useIssueDialog();
+    const { openIssue } = useIssueRoute();
     const setTab = usePlaygroundNavStore((s) => s.setTab);
 
     const open =
         issue.status === KanbanStatus.InReview
             ? () => setTab(PlaygroundTab.Reviews)
-            : () => openEdit(issue.id);
+            : () => openIssue(issue.id);
 
     return (
         <div

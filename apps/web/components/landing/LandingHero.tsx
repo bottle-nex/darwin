@@ -6,6 +6,8 @@ import HeroBoardMock from "./HeroBoardMock";
 import { landingContainer } from "./LandingSection";
 import ShowcaseFrame from "./showcase/ShowcaseFrame";
 
+const HERO_GLASS = { angle: 0, size: 0.3 };
+
 export default function LandingHero() {
     return (
         <main className="relative min-h-screen w-screen pb-20">
@@ -36,7 +38,7 @@ export default function LandingHero() {
                 {/* Live board mock floating over the fluted-glass hero backdrop. */}
                 <ShowcaseFrame
                     image="/landing/hero.jpg"
-                    glass={{ angle: 0, size: 0.3 }}
+                    glass={HERO_GLASS}
                     className="h-[80vh] rounded-[10px] md:h-[80vh]"
                     contentClassName="hidden h-[86%] w-[86%] max-w-none sm:block"
                 >
