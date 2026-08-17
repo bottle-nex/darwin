@@ -1,6 +1,6 @@
 "use client";
-import { MdAdd, MdKeyboardArrowDown, MdPlaylistAdd, MdUpload } from "react-icons/md";
-import { RiEdit2Fill } from "react-icons/ri";
+import { MdAdd, MdPlaylistAdd, MdUpload } from "react-icons/md";
+import { LuChevronDown, LuSquarePen } from "react-icons/lu";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -30,13 +30,13 @@ export default function AddTaskButton() {
     };
 
     return (
-        <div className="flex items-center">
+        <div className="flex items-center gap-1">
             <TooltipComponent delayDuration={1000} content="New issue" side="bottom">
-                <OptionButton label="New issue" icon={RiEdit2Fill} onClick={onAddTask} />
+                <OptionButton label="New issue" icon={LuSquarePen} onClick={onAddTask} />
             </TooltipComponent>
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                    <OptionButton label="More task options" icon={MdKeyboardArrowDown} />
+                    <OptionButton label="More task options" icon={LuChevronDown} />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-52">
                     {TASK_OPTIONS.map((option) => {

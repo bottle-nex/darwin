@@ -7,8 +7,8 @@ import {
     MdClose,
     MdSearch,
     MdSortByAlpha,
-    MdSwapVert,
 } from "react-icons/md";
+import { LuArrowUpDown, LuSearch } from "react-icons/lu";
 import { AnimatePresence, motion } from "motion/react";
 import {
     DropdownMenu,
@@ -50,17 +50,17 @@ export default function TagsOptionsBar({ count, onCreate }: TagsOptionsBarProps)
                 </AnimatePresence>
             </div>
 
-            <div className="flex shrink-0 items-center gap-0.5">
+            <div className="flex shrink-0 items-center gap-1.5">
                 <OptionButton
                     label="Search"
-                    icon={MdSearch}
+                    icon={LuSearch}
                     active={searchOpen}
                     onClick={() => (searchOpen ? closeSearch() : openSearch())}
                 />
 
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <OptionButton label="Sort" icon={MdSwapVert} active={sort !== "name"} />
+                        <OptionButton label="Sort" icon={LuArrowUpDown} active={sort !== "name"} />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-48">
                         {SORTS.map((option) => (

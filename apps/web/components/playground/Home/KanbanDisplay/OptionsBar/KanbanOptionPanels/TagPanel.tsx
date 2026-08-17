@@ -1,7 +1,8 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import { MdCheck, MdSearch, MdLabel } from "react-icons/md";
+import { MdCheck, MdSearch } from "react-icons/md";
+import { LuTag } from "react-icons/lu";
 import {
     DropdownMenu,
     DropdownMenuCheckboxItem,
@@ -120,7 +121,7 @@ export default function TagPanel({ selected, onToggle, onClear }: TagPanelProps)
         <DropdownMenu>
             <TooltipComponent delayDuration={1000} content="Tag" side="bottom">
                 <DropdownMenuTrigger asChild>
-                    <OptionButton label="Tag" icon={MdLabel} active={selected.length > 0} />
+                    <OptionButton label="Tag" icon={LuTag} active={selected.length > 0} />
                 </DropdownMenuTrigger>
             </TooltipComponent>
             <DropdownMenuContent align="end" className={TAG_PANEL_CONTENT}>

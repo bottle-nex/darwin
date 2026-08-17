@@ -14,7 +14,7 @@ export default function PlaygroundBreadcrumb({ issueNumber }: { issueNumber?: nu
         <nav className="flex min-w-0 items-center gap-1.5 text-[13px]">
             <PlaygroundAvatar
                 tone="indigo"
-                size="sm"
+                size="md"
                 letter={project?.name.slice(0, 2).toUpperCase() ?? "?"}
             />
             {!project ? (

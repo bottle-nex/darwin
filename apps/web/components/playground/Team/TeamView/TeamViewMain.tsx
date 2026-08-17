@@ -14,7 +14,7 @@ import { TooltipComponent } from "@/components/ui/tooltip-component";
 import PlaygroundAvatar from "@/components/playground/Core/components/PlaygroundAvatar";
 import PlaygroundTeamMembers from "./TeamMembers";
 import { Button } from "@/components/ui/button";
-import { HiUserAdd } from "react-icons/hi";
+import { LuUserPlus } from "react-icons/lu";
 import OptionButton from "../../Home/KanbanDisplay/OptionsBar/KanbanOptionPanels/OptionButton";
 
 type PlaygroundTeamViewProps = {
@@ -57,7 +57,7 @@ export default function PlaygroundTeamViewMain({ team }: PlaygroundTeamViewProps
                 <div className="flex shrink-0 items-center gap-1.5">
                     {isAdmin && (
                         <OptionButton
-                            icon={HiUserAdd}
+                            icon={LuUserPlus}
                             label="add user"
                             onClick={() => setInviteOpen(true)}
                         />

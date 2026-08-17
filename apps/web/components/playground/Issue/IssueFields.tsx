@@ -7,11 +7,6 @@ import PriorityCapsule from "./PriorityCapsule";
 import { DATE_ICON_COLOR } from "./issueHelpers";
 import type { IssueFormState } from "./useIssueForm";
 
-/**
- * Sidebar capsules drop their pill surface so the column reads as rows, not buttons.
- * `variant="unstyled"` applies no disabled styling and CSS :hover still fires on a
- * disabled button, so read-only rows have to mute themselves explicitly.
- */
 const STACKED_CAPSULE =
     "w-full rounded-md bg-transparent px-1.5 py-1.5 text-[13.5px] text-neutral-200 ring-0 [&_svg]:size-[18px] hover:bg-white/5 disabled:cursor-default disabled:text-neutral-400 disabled:hover:bg-transparent";
 

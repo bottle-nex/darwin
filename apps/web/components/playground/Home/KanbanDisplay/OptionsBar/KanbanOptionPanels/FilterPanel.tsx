@@ -2,11 +2,11 @@
 import {
     MdAutoAwesome,
     MdCheck,
-    MdFilterAlt,
     MdKeyboardArrowLeft,
     MdViewKanban,
     MdWindow,
 } from "react-icons/md";
+import { LuListFilter } from "react-icons/lu";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -121,7 +121,7 @@ export default function FilterPanel({ value, onChange, customColumns }: FilterPa
                 <DropdownMenuTrigger asChild>
                     <OptionButton
                         label="Filter"
-                        icon={MdFilterAlt}
+                        icon={LuListFilter}
                         active={value.kind !== "default"}
                     />
                 </DropdownMenuTrigger>

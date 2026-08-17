@@ -1,5 +1,6 @@
 "use client";
-import { MdCheck, MdViewKanban, MdList, MdTune } from "react-icons/md";
+import { MdCheck, MdViewKanban, MdList } from "react-icons/md";
+import { LuSlidersHorizontal } from "react-icons/lu";
 import { type IconType } from "react-icons";
 import {
     DropdownMenu,
@@ -56,7 +57,11 @@ export default function ViewsPanel({ value, onChange }: ViewsPanelProps) {
         <DropdownMenu>
             <TooltipComponent delayDuration={1000} content="Views" side="bottom">
                 <DropdownMenuTrigger asChild>
-                    <OptionButton label="Views" icon={MdTune} active={value !== "board"} />
+                    <OptionButton
+                        label="Views"
+                        icon={LuSlidersHorizontal}
+                        active={value !== "board"}
+                    />
                 </DropdownMenuTrigger>
             </TooltipComponent>
             <DropdownMenuContent align="end" className={VIEWS_PANEL_WIDTH}>

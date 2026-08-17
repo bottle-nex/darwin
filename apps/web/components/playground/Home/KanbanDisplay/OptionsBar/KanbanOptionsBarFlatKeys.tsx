@@ -1,5 +1,5 @@
 "use client";
-import { MdGroup, MdShare } from "react-icons/md";
+import { LuShare2, LuUsers } from "react-icons/lu";
 import { useKanbanOptionsStore } from "@/store/kanban/useKanbanOptionsStore";
 import { useFilteredCustomColumns } from "@/hooks/kanban/useFilteredCustomColumns";
 import { TooltipComponent } from "@/components/ui/tooltip-component";
@@ -36,14 +36,14 @@ export default function KanbanOptionsBarFlatKeys() {
                 <SelectedTags selected={selectedTagIds} onRemove={removeTag} />
             </div>
 
-            <div className="flex shrink-0 items-center gap-0.5">
+            <div className="flex shrink-0 items-center gap-1.5">
                 <TagPanel selected={selectedTagIds} onToggle={toggleTag} onClear={clearTags} />
                 <FilterPanel value={filter} onChange={setFilter} customColumns={customColumns} />
                 <TooltipComponent delayDuration={1000} content="Assignees" side="bottom">
-                    <OptionButton label="Assignees" icon={MdGroup} />
+                    <OptionButton label="Assignees" icon={LuUsers} />
                 </TooltipComponent>
                 <TooltipComponent delayDuration={1000} content="Share" side="bottom">
-                    <OptionButton label="Share" icon={MdShare} />
+                    <OptionButton label="Share" icon={LuShare2} />
                 </TooltipComponent>
                 <BoardViewPanel value={boardView} onChange={setBoardView} />
                 <ViewsPanel value={kanbanView} onChange={setKanbanView} />

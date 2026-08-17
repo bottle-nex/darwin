@@ -1,15 +1,15 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import {
-    MdFilterAlt,
-    MdGroup,
-    MdKeyboardArrowLeft,
-    MdLabel,
-    MdSettings,
-    MdShare,
-    MdTune,
-} from "react-icons/md";
-import { LuEye } from "react-icons/lu";
+    LuChevronLeft,
+    LuEye,
+    LuListFilter,
+    LuSettings,
+    LuShare2,
+    LuSlidersHorizontal,
+    LuTag,
+    LuUsers,
+} from "react-icons/lu";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -62,7 +62,7 @@ export default function KanbanOptionsBarGroupedKeys() {
                 <SelectedTags selected={selectedTagIds} onRemove={removeTag} />
             </div>
 
-            <div className="flex shrink-0 items-center gap-0.5">
+            <div className="flex shrink-0 items-center gap-1.5">
                 <DropdownMenu dir="rtl">
                     <DropdownMenuTrigger asChild>
                         <Button
@@ -71,18 +71,15 @@ export default function KanbanOptionsBarGroupedKeys() {
                             aria-label="Options"
                             className="flex h-7 cursor-pointer items-center gap-1 rounded-md px-2 text-[12px] font-medium text-neutral-400 transition-colors hover:bg-white/5 hover:text-neutral-200"
                         >
-                            <MdTune className="size-3.5" aria-hidden />
+                            <LuSlidersHorizontal className="size-3.5" aria-hidden />
                             Options
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-48 [direction:ltr]">
                         <DropdownMenuSub>
                             <DropdownMenuSubTrigger>
-                                <MdKeyboardArrowLeft
-                                    className="size-3.5 text-neutral-500"
-                                    aria-hidden
-                                />
-                                <MdLabel className="size-3.5 text-neutral-400" aria-hidden />
+                                <LuChevronLeft className="size-3.5 text-neutral-500" aria-hidden />
+                                <LuTag className="size-3.5 text-neutral-400" aria-hidden />
                                 <span className="flex-1">Tag</span>
                                 {selectedTagIds.length > 0 && (
                                     <span className="text-[11px] text-neutral-500">
@@ -103,11 +100,8 @@ export default function KanbanOptionsBarGroupedKeys() {
 
                         <DropdownMenuSub>
                             <DropdownMenuSubTrigger>
-                                <MdKeyboardArrowLeft
-                                    className="size-3.5 text-neutral-500"
-                                    aria-hidden
-                                />
-                                <MdFilterAlt className="size-3.5 text-neutral-400" aria-hidden />
+                                <LuChevronLeft className="size-3.5 text-neutral-500" aria-hidden />
+                                <LuListFilter className="size-3.5 text-neutral-400" aria-hidden />
                                 <span className="flex-1">Filter</span>
                             </DropdownMenuSubTrigger>
                             <DropdownMenuSubContent
@@ -123,10 +117,7 @@ export default function KanbanOptionsBarGroupedKeys() {
 
                         <DropdownMenuSub>
                             <DropdownMenuSubTrigger>
-                                <MdKeyboardArrowLeft
-                                    className="size-3.5 text-neutral-500"
-                                    aria-hidden
-                                />
+                                <LuChevronLeft className="size-3.5 text-neutral-500" aria-hidden />
                                 <LuEye className="size-3.5 text-neutral-400" aria-hidden />
                                 <span className="flex-1">Board</span>
                             </DropdownMenuSubTrigger>
@@ -139,11 +130,11 @@ export default function KanbanOptionsBarGroupedKeys() {
 
                         <DropdownMenuSub>
                             <DropdownMenuSubTrigger>
-                                <MdKeyboardArrowLeft
-                                    className="size-3.5 text-neutral-500"
+                                <LuChevronLeft className="size-3.5 text-neutral-500" aria-hidden />
+                                <LuSlidersHorizontal
+                                    className="size-3.5 text-neutral-400"
                                     aria-hidden
                                 />
-                                <MdTune className="size-3.5 text-neutral-400" aria-hidden />
                                 <span className="flex-1">Views</span>
                             </DropdownMenuSubTrigger>
                             <DropdownMenuSubContent
@@ -156,17 +147,17 @@ export default function KanbanOptionsBarGroupedKeys() {
                         <DropdownMenuSeparator className="my-1 h-px bg-white/5" />
 
                         <DropdownMenuItem disabled>
-                            <MdGroup className="size-3.5 text-neutral-400" aria-hidden />
+                            <LuUsers className="size-3.5 text-neutral-400" aria-hidden />
                             <span className="flex-1">Assignees</span>
                         </DropdownMenuItem>
 
                         <DropdownMenuItem disabled>
-                            <MdShare className="size-3.5 text-neutral-400" aria-hidden />
+                            <LuShare2 className="size-3.5 text-neutral-400" aria-hidden />
                             <span className="flex-1">Share</span>
                         </DropdownMenuItem>
 
                         <DropdownMenuItem disabled>
-                            <MdSettings className="size-3.5 text-neutral-400" aria-hidden />
+                            <LuSettings className="size-3.5 text-neutral-400" aria-hidden />
                             <span className="flex-1">Settings</span>
                         </DropdownMenuItem>
                     </DropdownMenuContent>
