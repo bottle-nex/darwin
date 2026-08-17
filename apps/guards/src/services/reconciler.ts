@@ -81,7 +81,7 @@ export default class Reconciler {
             const cut_off = new Date(Date.now() - STUCK_DISPATCH_MS);
             const issues = await prisma.issue.findMany({
                 where: {
-                    status: IssueStatus.Queued,
+                    status: { in: [IssueStatus.Queued, IssueStatus.InProgress] },
                     assignerWorkerId: { not: null },
                     updatedAt: { lt: cut_off },
                 },
@@ -99,7 +99,7 @@ export default class Reconciler {
 
             for (const [worker_id, status] of worker_ids) {
                 if (status === WorkerStatus.Dead) {
-                    log.warn("Dead worker holding Queued issue(s) — needs manual triage", {
+                    log.warn("Dead worker holding unfinished issue(s) — needs manual triage", {
                         worker: worker_id,
                     });
                     continue;

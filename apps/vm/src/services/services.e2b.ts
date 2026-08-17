@@ -1,6 +1,6 @@
 import { CommandResult, Sandbox, SnapshotInfo } from "e2b";
 import { ENV } from "../conf/config.env";
-import GithubService from "./service.github";
+import GithubService, { type PullRequestSummary } from "./service.github";
 import SecretService from "./service.secret";
 import PlanService from "./services.plan";
 import GraphService, {
@@ -13,7 +13,7 @@ import SandboxStream, { redact } from "./service.sandbox_stream";
 import { sign_worker_jwt } from "./service.jwt";
 import IssueSolver, { type ClaimedIssue } from "./service.issue_solver";
 import Logger, { format_duration } from "@trymatcha/logger";
-import { prisma, WorkerStatus } from "@trymatcha/database";
+import { IssueStatus, prisma, WorkerStatus } from "@trymatcha/database";
 
 const REPO_DIR = "/home/user/repo";
 const SAFE_BRANCH = /^[A-Za-z0-9._/-]+$/;
@@ -128,25 +128,6 @@ export default class E2B {
         }
     }
 
-    /**
-     * Drives a worker end to end: boot (or reuse) its sandbox, then loop claiming the
-     * next Queued issue assigned to it, pushing it into the sandbox as a fresh `claude -p`
-     * invocation, waiting for the PR, and repeating — until no Queued issue is left, at
-     * which point the worker goes Idle. This is what the IssueVm dispatch consumer calls;
-     * re-dispatching an already-running worker is a no-op via the queue's per-worker jobId,
-     * and this method's own re-claim loop is what actually picks up any issue added while
-     * it's mid-run, so a fresh dispatch isn't needed for that case either.
-     *
-     * Per-issue outcome (PR opened, which issue) is reported by Claude itself over
-     * sandbox-mcp, since only the sandbox knows the PR URL. The Busy/Idle transition is
-     * written directly to the db here instead — this process is the one polling the
-     * queue and already knows definitively when it's empty.
-     *
-     * Simplification: the sandbox is always torn down once the loop empties, even though
-     * more issues could get routed to this worker later (a subsequent run just boots a
-     * fresh one and re-clones). Warm-resume via E2B snapshot/pause is possible later using
-     * `take_snapshot`/`pause` below, but isn't wired up yet.
-     */
     public static async run_worker_loop(worker_id: string): Promise<string[]> {
         const log = Logger.scope(`vm:${worker_id.slice(-8)}`);
         const worker = await prisma.worker.findUniqueOrThrow({
@@ -155,9 +136,14 @@ export default class E2B {
         });
 
         const { project } = worker;
-        if (!project.githubRepoUrl || !project.githubDefaultBranch || !project.githubInstallation) {
+        if (
+            !project.githubRepoUrl ||
+            !project.githubRepoFullName ||
+            !project.githubDefaultBranch ||
+            !project.githubInstallation
+        ) {
             log.error(
-                "project is missing repo url / default branch / github installation — marking worker Dead",
+                "project is missing GitHub repository configuration — marking worker Dead",
                 undefined,
                 { worker: worker_id, project: project.id },
             );
@@ -169,13 +155,17 @@ export default class E2B {
         }
 
         const repo_url = project.githubRepoUrl;
+        const repo_full_name = project.githubRepoFullName;
         const branch = project.githubDefaultBranch;
         const installation_id = Number(project.githubInstallation.installationId);
+        const [repo_owner] = repo_full_name.split("/");
+        if (!repo_owner) throw new Error("project GitHub repository name is invalid");
         this.validate_branch(branch);
 
         let sandbox_id = worker.sandboxId;
         let pending_product_diff_ids: string[] = [];
         let teardown_succeeded = false;
+        let current_issue_id: string | null = null;
         log.step("worker loop starting", { worker: worker_id, project: project.id, branch });
 
         try {
@@ -243,49 +233,79 @@ export default class E2B {
                     break;
                 }
 
-                const graph_state = await GraphService.prepare(sandbox, log);
-
-                log.step(`issue #${issue.number} pushed into sandbox`, { title: issue.title });
-                await sandbox.files.write(
-                    ISSUE_PROMPT_PATH,
-                    E2B.build_issue_prompt(issue, branch, project.planMd),
+                current_issue_id = issue.id;
+                let pull_request = await E2B.find_pull_request(
+                    gh_token,
+                    repo_full_name,
+                    repo_owner,
+                    issue.prBranch,
+                    branch,
                 );
+                await E2B.prepare_issue_branch(sandbox, issue.prBranch, branch);
 
-                log.info(`invoking claude for issue #${issue.number}`, {
-                    model,
-                    effort,
-                    brief: project.planMd ? "included" : "absent",
-                });
+                if (pull_request) {
+                    log.info(`existing PR found for issue #${issue.number}`, {
+                        pull: pull_request.number,
+                        branch: issue.prBranch,
+                    });
+                } else {
+                    const graph_state = await GraphService.prepare(sandbox, log);
 
-                const report = await ClaudeRun.execute(sandbox, log, {
-                    prompt_path: ISSUE_PROMPT_PATH,
-                    model,
-                    effort,
-                    extra_flags: [
-                        `--mcp-config ${MCP_CONFIG_PATH}`,
-                        ...(graph_state === "ready"
-                            ? [
-                                  `--settings ${GRAPHIFY_SETTINGS}`,
-                                  `--add-dir ${GRAPHIFY_INTEGRATION}`,
-                              ]
-                            : []),
-                    ],
-                    envs: {
-                        CLAUDE_CODE_OAUTH_TOKEN: ENV.SERVER_CLAUDE_CODE_OAUTH_TOKEN,
-                        GH_TOKEN: gh_token,
-                        ...(graph_state === "ready" ? { GRAPHIFY_OUT } : {}),
-                    },
-                    timeout_ms: ISSUE_SOLVE_TIMEOUT_MS,
-                    label: `solving agent for issue #${issue.number}`,
-                });
+                    log.step(`issue #${issue.number} pushed into sandbox`, { title: issue.title });
+                    await sandbox.files.write(
+                        ISSUE_PROMPT_PATH,
+                        E2B.build_issue_prompt(issue, branch, project.planMd),
+                    );
 
-                log.success(`issue #${issue.number} run finished`, {
-                    turns: report.num_turns,
-                    cost_usd: report.total_cost_usd.toFixed(4),
-                    duration: format_duration(report.duration_ms),
-                });
-                log.block("final message from claude", report.result ?? "(empty)");
+                    log.info(`invoking claude for issue #${issue.number}`, {
+                        model,
+                        effort,
+                        brief: project.planMd ? "included" : "absent",
+                    });
+
+                    const report = await ClaudeRun.execute(sandbox, log, {
+                        prompt_path: ISSUE_PROMPT_PATH,
+                        model,
+                        effort,
+                        extra_flags: [
+                            `--mcp-config ${MCP_CONFIG_PATH}`,
+                            ...(graph_state === "ready"
+                                ? [
+                                      `--settings ${GRAPHIFY_SETTINGS}`,
+                                      `--add-dir ${GRAPHIFY_INTEGRATION}`,
+                                  ]
+                                : []),
+                        ],
+                        envs: {
+                            CLAUDE_CODE_OAUTH_TOKEN: ENV.SERVER_CLAUDE_CODE_OAUTH_TOKEN,
+                            GH_TOKEN: gh_token,
+                            ...(graph_state === "ready" ? { GRAPHIFY_OUT } : {}),
+                        },
+                        timeout_ms: ISSUE_SOLVE_TIMEOUT_MS,
+                        label: `solving agent for issue #${issue.number}`,
+                    });
+
+                    log.success(`issue #${issue.number} run finished`, {
+                        turns: report.num_turns,
+                        cost_usd: report.total_cost_usd.toFixed(4),
+                        duration: format_duration(report.duration_ms),
+                    });
+                    log.block("final message from claude", report.result ?? "(empty)");
+                    pull_request = await E2B.find_pull_request(
+                        gh_token,
+                        repo_full_name,
+                        repo_owner,
+                        issue.prBranch,
+                        branch,
+                    );
+                    if (!pull_request) {
+                        throw new Error(`no open PR found for issue #${issue.number}`);
+                    }
+                }
+
+                await E2B.report_pr_opened(worker_token, issue, pull_request);
                 solved_count++;
+                current_issue_id = null;
             }
 
             log.info("worker marked Idle");
@@ -296,6 +316,12 @@ export default class E2B {
         } catch (error) {
             log.error("worker loop failed", error, { worker: worker_id });
             try {
+                if (current_issue_id) {
+                    await prisma.issue.updateMany({
+                        where: { id: current_issue_id, status: IssueStatus.InProgress },
+                        data: { status: IssueStatus.Failed },
+                    });
+                }
                 await prisma.worker.update({
                     where: { id: worker_id },
                     data: {
@@ -366,7 +392,7 @@ export default class E2B {
         base_branch: string,
         plan_md: string | null,
     ): string {
-        const intro = `You are an autonomous coding agent working inside a fresh clone of this repository at ${REPO_DIR}, currently on branch "${base_branch}".`;
+        const intro = `You are an autonomous coding agent working inside a fresh clone of this repository at ${REPO_DIR}, currently on branch "${issue.prBranch}".`;
 
         const brief = plan_md
             ? `## Project brief
@@ -382,11 +408,10 @@ ${issue.description}`;
 
         const actions = [
             `Investigate the issue and read every relevant file before changing it.`,
-            `Create a new git branch off "${base_branch}" (never commit directly to "${base_branch}"). Pick a short, descriptive branch name.`,
+            `Stay on the existing branch "${issue.prBranch}". Never switch branches or commit directly to "${base_branch}".`,
             `Implement the fix using your normal tools.`,
             `Commit your changes with a clear commit message.`,
             `Push the branch and open a pull request against "${base_branch}" using the gh CLI (already authenticated via GH_TOKEN). Write a clear PR title and description referencing issue #${issue.number}.`,
-            `Call the report_pr_opened MCP tool with issue_id "${issue.id}", the PR URL, the branch name, and a one-sentence summary of the change.`,
         ];
 
         const steps = `## What to do, in this exact order
@@ -398,6 +423,90 @@ Do all of this yourself with your Bash tool — you have full permissions in thi
 Never start a long-running command in the background and end your turn waiting on it. This is a single non-interactive run: there is no later turn to come back to, so anything left running when you stop is lost and the issue goes unsolved. Run it in the foreground and wait for it to finish.`;
 
         return [intro, brief, issue_section, steps].filter(Boolean).join("\n\n");
+    }
+
+    private static async prepare_issue_branch(
+        sandbox: Sandbox,
+        issue_branch: string,
+        base_branch: string,
+    ): Promise<void> {
+        this.validate_branch(issue_branch);
+        this.validate_branch(base_branch);
+
+        const current_branch = await sandbox.commands.run("git branch --show-current", {
+            cwd: REPO_DIR,
+        });
+        if (current_branch.stdout.trim() === issue_branch) return;
+
+        const remote_branch = await sandbox.commands.run(
+            `git ls-remote --heads origin refs/heads/${issue_branch}`,
+            { cwd: REPO_DIR },
+        );
+        const source_branch = remote_branch.stdout.trim() ? issue_branch : base_branch;
+        await sandbox.commands.run(`git fetch --depth 1 origin ${source_branch}`, {
+            cwd: REPO_DIR,
+        });
+        await sandbox.commands.run(`git switch --force-create ${issue_branch} FETCH_HEAD`, {
+            cwd: REPO_DIR,
+        });
+    }
+
+    private static async find_pull_request(
+        token: string,
+        repo_full_name: string,
+        repo_owner: string,
+        issue_branch: string,
+        base_branch: string,
+    ): Promise<PullRequestSummary | null> {
+        const pulls = await GithubService.listOpenPullRequests(
+            token,
+            repo_full_name,
+            repo_owner,
+            issue_branch,
+            base_branch,
+        );
+        if (pulls.length > 1) {
+            throw new Error(`multiple open PRs found for branch ${issue_branch}`);
+        }
+        return pulls[0] ?? null;
+    }
+
+    private static async report_pr_opened(
+        worker_token: string,
+        issue: ClaimedIssue,
+        pull: PullRequestSummary,
+    ): Promise<void> {
+        const url = `${ENV.SERVER_PUBLIC_API_URL.replace(/\/+$/, "")}/api/v1/worker/pr-opened`;
+        let failure = "PR completion callback failed";
+
+        for (let attempt = 1; attempt <= 3; attempt++) {
+            try {
+                const response = await fetch(url, {
+                    method: "POST",
+                    headers: {
+                        authorization: `Bearer ${worker_token}`,
+                        "content-type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        issue_id: issue.id,
+                        pr_url: pull.htmlUrl,
+                        branch: issue.prBranch,
+                        summary: `Completed issue #${issue.number}: ${issue.title}`,
+                    }),
+                });
+                const result = (await response.json()) as { success?: boolean; message?: string };
+                if (response.ok && result.success) return;
+                failure = result.message ?? `PR completion callback failed (${response.status})`;
+            } catch (error) {
+                failure = error instanceof Error ? error.message : String(error);
+            }
+
+            if (attempt < 3) {
+                await new Promise((resolve) => setTimeout(resolve, attempt * 500));
+            }
+        }
+
+        throw new Error(failure);
     }
 
     public static async head_commit(sandbox_id: string): Promise<string> {

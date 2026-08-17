@@ -1,6 +1,8 @@
 -- CreateEnum
 CREATE TYPE "ProductDiffStatus" AS ENUM ('Pending', 'Generating', 'Ready', 'Failed', 'Stale');
 
+ALTER TABLE "Issue" ADD COLUMN "prBranch" TEXT;
+
 -- AlterTable
 ALTER TABLE "ProjectConfig" ADD COLUMN "productDiffEnabled" BOOLEAN NOT NULL DEFAULT false;
 

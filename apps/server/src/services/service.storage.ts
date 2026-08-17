@@ -27,6 +27,15 @@ export default class StorageService {
         );
     }
 
+    static is_product_diff_configured(): boolean {
+        return Boolean(
+            ENV.SERVER_MINIO_URL &&
+            ENV.SERVER_MINIO_ACCESS_KEY &&
+            ENV.SERVER_MINIO_SECRET_KEY &&
+            ENV.SERVER_PRODUCT_DIFF_BUCKET,
+        );
+    }
+
     static is_allowed_type(contentType: string): boolean {
         return contentType in EXTENSIONS;
     }

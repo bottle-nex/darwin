@@ -2,6 +2,7 @@ import { extname } from "node:path";
 import { prisma } from "@trymatcha/database";
 import type { ProductDiffStatus, ProductDiffSummary } from "@trymatcha/types";
 import GithubService from "./service.github";
+import StorageService from "./service.storage";
 
 const FRONTEND_EXTENSIONS = new Set([".tsx", ".jsx", ".vue", ".svelte", ".css", ".scss", ".html"]);
 
@@ -50,7 +51,9 @@ export default class ProductDiffService {
         };
     }
 
-    static async prepare(issueId: string): Promise<{ id: string } | null> {
+    static async prepare(issueId: string, retry_failed = false): Promise<{ id: string } | null> {
+        if (!StorageService.is_product_diff_configured()) return null;
+
         const issue = await prisma.issue.findUnique({
             where: { id: issueId },
             select: {
@@ -96,7 +99,7 @@ export default class ProductDiffService {
             select: { id: true, status: true },
         });
 
-        if (productDiff.status === "Failed") {
+        if (productDiff.status === "Failed" && retry_failed) {
             const reset = await prisma.productDiff.updateMany({
                 where: { id: productDiff.id, status: "Failed" },
                 data: { status: "Pending", error: null },

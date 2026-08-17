@@ -31,6 +31,7 @@ model Issue {
   queuePosition  Int?
   specialization String?
   prUrl          String?
+  prBranch       String?
 
   @@unique([projectId, number])
   @@index([projectId, status])
