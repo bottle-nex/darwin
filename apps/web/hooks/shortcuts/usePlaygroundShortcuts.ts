@@ -37,7 +37,7 @@ export const COMBINATIONS: Record<string, Combination> = {
 
 const SEQUENCE_TIMEOUT_MS = 800;
 
-function isTyping(target: EventTarget | null): boolean {
+export function isTyping(target: EventTarget | null): boolean {
     if (!(target instanceof HTMLElement)) return false;
     if (target.isContentEditable) return true;
     const tag = target.tagName;

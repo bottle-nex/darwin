@@ -24,6 +24,7 @@ interface TagsCapsuleProps {
     onChange?: (tagIds: string[]) => void;
     disabled?: boolean;
     className?: string;
+    placeholder?: string;
 }
 
 export default function TagsCapsule({
@@ -32,6 +33,7 @@ export default function TagsCapsule({
     onChange,
     disabled,
     className,
+    placeholder = "Tags",
 }: TagsCapsuleProps) {
     const [open, setOpen] = useState(false);
     const [search, setSearch] = useState("");
@@ -81,7 +83,7 @@ export default function TagsCapsule({
                     {selectedTags.length === 0 ? (
                         <>
                             <MdLabel className="size-3.5 text-white/60" />
-                            Tags
+                            {placeholder}
                         </>
                     ) : (
                         <>
@@ -89,7 +91,7 @@ export default function TagsCapsule({
                                 {selectedTags.slice(0, 3).map((tag) => (
                                     <span
                                         key={tag.id}
-                                        className="size-2.5 rounded-full ring-2 ring-[#1a1a1b]"
+                                        className="size-2.5 rounded-full ring-2 ring-charcoal"
                                         style={{ backgroundColor: tag.color }}
                                     />
                                 ))}
@@ -101,9 +103,10 @@ export default function TagsCapsule({
                     )}
                 </CapsuleTrigger>
             </PopoverTrigger>
-            <PopoverContent align="start" className="w-40 border-white/10 bg-charcoal p-0">
+            <PopoverContent className="w-40 p-0">
                 <Command shouldFilter={false}>
                     <CommandInput
+                        border={false}
                         value={search}
                         onValueChange={setSearch}
                         placeholder="Search or create tag..."

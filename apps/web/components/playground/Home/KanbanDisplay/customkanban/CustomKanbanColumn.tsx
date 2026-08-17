@@ -2,14 +2,18 @@
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { MdMoreHoriz, MdAdd, MdDelete, MdEdit, MdDragIndicator } from "react-icons/md";
-import { DropdownMenu } from "radix-ui";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { MatchaLogo } from "@/components/logo/MatchaLogo";
-import { PANEL_CONTENT, PANEL_ITEM } from "../OptionsBar/KanbanOptionPanels/panelStyles";
-import { useCreateOrEditIssueStore } from "@/store/issues/useCreateOrEditIssueStore";
+import { useIssueStore } from "@/store/issues/useIssueStore";
 import { useCustomColumnActions } from "@/hooks/kanban/useCustomColumnActions";
 import SortableCustomCard from "./SortableCustomCard";
 import type { CustomColumn } from "@/types/kanban-custom";
@@ -20,7 +24,7 @@ type CustomKanbanColumnProps = {
 };
 
 export default function CustomKanbanColumn({ column, draggable = true }: CustomKanbanColumnProps) {
-    const openCreate = useCreateOrEditIssueStore((s) => s.openCreate);
+    const openCreate = useIssueStore((s) => s.openCreate);
     const { removeColumn, renameColumn } = useCustomColumnActions();
 
     const [renaming, setRenaming] = useState(false);
@@ -33,7 +37,6 @@ export default function CustomKanbanColumn({ column, draggable = true }: CustomK
         transform,
         transition,
         isDragging,
-        isOver,
     } = useSortable({ id: column.id });
 
     const style = { transform: CSS.Transform.toString(transform), transition };
@@ -49,8 +52,7 @@ export default function CustomKanbanColumn({ column, draggable = true }: CustomK
             ref={setNodeRef}
             style={style}
             className={cn(
-                "group flex max-h-full w-72 shrink-0 flex-col self-stretch rounded-[7px] p-1 ring-1 bg-cement",
-                isOver ? "ring-white/15" : "ring-white/5",
+                "group flex max-h-full w-80.5 shrink-0 flex-col self-stretch rounded-[7px] p-1 bg-cement",
                 isDragging && "opacity-40",
             )}
         >
@@ -93,8 +95,8 @@ export default function CustomKanbanColumn({ column, draggable = true }: CustomK
                         </span>
                     </div>
                 )}
-                <DropdownMenu.Root>
-                    <DropdownMenu.Trigger asChild>
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
                         <Button
                             variant="unstyled"
                             type="button"
@@ -103,34 +105,27 @@ export default function CustomKanbanColumn({ column, draggable = true }: CustomK
                         >
                             <MdMoreHoriz className="size-4" aria-hidden />
                         </Button>
-                    </DropdownMenu.Trigger>
-                    <DropdownMenu.Portal>
-                        <DropdownMenu.Content
-                            align="end"
-                            sideOffset={6}
-                            className={`w-44 ${PANEL_CONTENT}`}
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-44">
+                        <DropdownMenuItem
+                            onSelect={() => {
+                                setDraftTitle(column.title);
+                                setRenaming(true);
+                            }}
                         >
-                            <DropdownMenu.Item
-                                onSelect={() => {
-                                    setDraftTitle(column.title);
-                                    setRenaming(true);
-                                }}
-                                className={PANEL_ITEM}
-                            >
-                                <MdEdit className="size-3.5" aria-hidden />
-                                <span className="flex-1">Rename list</span>
-                            </DropdownMenu.Item>
+                            <MdEdit className="size-3.5" aria-hidden />
+                            <span className="flex-1">Rename list</span>
+                        </DropdownMenuItem>
 
-                            <DropdownMenu.Item
-                                onSelect={() => removeColumn(column.id)}
-                                className={`${PANEL_ITEM} text-rose-300 data-highlighted:text-rose-200`}
-                            >
-                                <MdDelete className="size-3.5" aria-hidden />
-                                <span className="flex-1">Delete list</span>
-                            </DropdownMenu.Item>
-                        </DropdownMenu.Content>
-                    </DropdownMenu.Portal>
-                </DropdownMenu.Root>
+                        <DropdownMenuItem
+                            onSelect={() => removeColumn(column.id)}
+                            variant="destructive"
+                        >
+                            <MdDelete className="size-3.5" aria-hidden />
+                            <span className="flex-1">Delete list</span>
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
             </div>
 
             <SortableContext

@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { MdChat, MdFolder } from "react-icons/md";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
 import { useActiveProject } from "@/hooks/useActiveProject";
-import { useIssueDialog } from "@/components/playground/issue/useIssueDialog";
+import { useIssueRoute } from "@/components/playground/Issue/useIssueRoute";
 import type { LabelledReference } from "@trymatcha/types";
 import {
     useChats,
@@ -43,7 +43,7 @@ export default function ThreadDetailDisplay() {
     const selectedThread = usePlaygroundNavStore((s) => s.selectedThread);
     const selectedThreadProjectSlug = usePlaygroundNavStore((s) => s.selectedThreadProjectSlug);
     const activeProject = useActiveProject();
-    const { openEdit } = useIssueDialog();
+    const { openIssue } = useIssueRoute();
 
     const { data: projectChats, isLoading: isProjectChatLoading } = useProjectChat(
         selectedThread?.kind === "project" ? activeProject?.id : undefined,
@@ -174,11 +174,11 @@ export default function ThreadDetailDisplay() {
                         role="button"
                         tabIndex={0}
                         className="cursor-pointer truncate text-[13px] font-semibold text-neutral-100"
-                        onClick={() => openEdit(selectedThread.issueId)}
+                        onClick={() => openIssue(selectedThread.issueId)}
                         onKeyDown={(e) => {
                             if (e.key === "Enter" || e.key === " ") {
                                 e.preventDefault();
-                                openEdit(selectedThread.issueId);
+                                openIssue(selectedThread.issueId);
                             }
                         }}
                     >

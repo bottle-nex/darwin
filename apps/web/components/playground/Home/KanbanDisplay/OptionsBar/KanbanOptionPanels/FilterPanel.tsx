@@ -7,11 +7,19 @@ import {
     MdViewKanban,
     MdWindow,
 } from "react-icons/md";
-import { DropdownMenu } from "radix-ui";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSub,
+    DropdownMenuSubContent,
+    DropdownMenuSubTrigger,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
 import type { FilterValue } from "@/store/kanban/useKanbanOptionsStore";
 import OptionButton from "./OptionButton";
-import { PANEL_CONTENT, PANEL_ITEM, PANEL_LABEL } from "./panelStyles";
 import { TooltipComponent } from "@/components/ui/tooltip-component";
 
 type FilterPanelProps = {
@@ -29,84 +37,68 @@ export function FilterPanelItems({ value, onChange, customColumns }: FilterPanel
 
     return (
         <>
-            <DropdownMenu.Label className={PANEL_LABEL}>Focus column</DropdownMenu.Label>
+            <DropdownMenuLabel>Focus column</DropdownMenuLabel>
 
-            <DropdownMenu.Item
-                className={PANEL_ITEM}
-                onSelect={() => onChange({ kind: "default" })}
-            >
+            <DropdownMenuItem onSelect={() => onChange({ kind: "default" })}>
                 <MdWindow className="size-3.5 text-neutral-400" aria-hidden />
                 <span className="flex-1">Default</span>
                 {value.kind === "default" && (
                     <MdCheck className="size-3.5 text-neutral-300" aria-hidden />
                 )}
-            </DropdownMenu.Item>
+            </DropdownMenuItem>
 
             {hasCustom ? (
-                <DropdownMenu.Sub>
-                    <DropdownMenu.SubTrigger className={PANEL_ITEM}>
+                <DropdownMenuSub>
+                    <DropdownMenuSubTrigger>
                         <MdKeyboardArrowLeft className="size-3.5 text-neutral-500" aria-hidden />
                         <MdViewKanban className="size-3.5 text-neutral-400" aria-hidden />
                         <span className="flex-1">Custom</span>
-                    </DropdownMenu.SubTrigger>
-                    <DropdownMenu.Portal>
-                        <DropdownMenu.SubContent
-                            sideOffset={6}
-                            className={`${FILTER_PANEL_WIDTH} [direction:ltr] ${PANEL_CONTENT}`}
-                        >
-                            {customColumns.map((col) => (
-                                <DropdownMenu.Item
-                                    key={col.id}
-                                    className={PANEL_ITEM}
-                                    onSelect={() => onChange({ kind: "custom", columnId: col.id })}
-                                >
-                                    <span className="flex-1 truncate">{col.title}</span>
-                                    {value.kind === "custom" && value.columnId === col.id && (
-                                        <MdCheck
-                                            className="size-3.5 text-neutral-300"
-                                            aria-hidden
-                                        />
-                                    )}
-                                </DropdownMenu.Item>
-                            ))}
-                        </DropdownMenu.SubContent>
-                    </DropdownMenu.Portal>
-                </DropdownMenu.Sub>
+                    </DropdownMenuSubTrigger>
+                    <DropdownMenuSubContent className={`${FILTER_PANEL_WIDTH} [direction:ltr]`}>
+                        {customColumns.map((col) => (
+                            <DropdownMenuItem
+                                key={col.id}
+
+                                onSelect={() => onChange({ kind: "custom", columnId: col.id })}
+                            >
+                                <span className="flex-1 truncate">{col.title}</span>
+                                {value.kind === "custom" && value.columnId === col.id && (
+                                    <MdCheck className="size-3.5 text-neutral-300" aria-hidden />
+                                )}
+                            </DropdownMenuItem>
+                        ))}
+                    </DropdownMenuSubContent>
+                </DropdownMenuSub>
             ) : (
-                <DropdownMenu.Item disabled className={`${PANEL_ITEM} opacity-50`}>
+                <DropdownMenuItem disabled>
                     <MdViewKanban className="size-3.5 text-neutral-400" aria-hidden />
                     <span className="flex-1">Custom</span>
                     <span className="text-[11px] text-neutral-600">No lists yet</span>
-                </DropdownMenu.Item>
+                </DropdownMenuItem>
             )}
 
-            <DropdownMenu.Sub>
-                <DropdownMenu.SubTrigger className={PANEL_ITEM}>
+            <DropdownMenuSub>
+                <DropdownMenuSubTrigger>
                     <MdKeyboardArrowLeft className="size-3.5 text-neutral-500" aria-hidden />
                     <MdAutoAwesome className="size-3.5 text-neutral-400" aria-hidden />
                     <span className="flex-1">LLM</span>
-                </DropdownMenu.SubTrigger>
-                <DropdownMenu.Portal>
-                    <DropdownMenu.SubContent
-                        sideOffset={6}
-                        className={`${FILTER_PANEL_WIDTH} [direction:ltr] ${PANEL_CONTENT}`}
-                    >
-                        {KanbanBoard.COLUMNS.map((col) => (
-                            <DropdownMenu.Item
-                                key={col.status}
-                                className={PANEL_ITEM}
-                                onSelect={() => onChange({ kind: "llm", status: col.status })}
-                            >
-                                <col.icon className="size-3.5 text-neutral-400" aria-hidden />
-                                <span className="flex-1">{col.title}</span>
-                                {value.kind === "llm" && value.status === col.status && (
-                                    <MdCheck className="size-3.5 text-neutral-300" aria-hidden />
-                                )}
-                            </DropdownMenu.Item>
-                        ))}
-                    </DropdownMenu.SubContent>
-                </DropdownMenu.Portal>
-            </DropdownMenu.Sub>
+                </DropdownMenuSubTrigger>
+                <DropdownMenuSubContent className={`${FILTER_PANEL_WIDTH} [direction:ltr]`}>
+                    {KanbanBoard.COLUMNS.map((col) => (
+                        <DropdownMenuItem
+                            key={col.status}
+
+                            onSelect={() => onChange({ kind: "llm", status: col.status })}
+                        >
+                            <col.icon className="size-3.5 text-neutral-400" aria-hidden />
+                            <span className="flex-1">{col.title}</span>
+                            {value.kind === "llm" && value.status === col.status && (
+                                <MdCheck className="size-3.5 text-neutral-300" aria-hidden />
+                            )}
+                        </DropdownMenuItem>
+                    ))}
+                </DropdownMenuSubContent>
+            </DropdownMenuSub>
         </>
     );
 }
@@ -124,29 +116,19 @@ export function FilterPanelItems({ value, onChange, customColumns }: FilterPanel
  */
 export default function FilterPanel({ value, onChange, customColumns }: FilterPanelProps) {
     return (
-        <DropdownMenu.Root dir="rtl">
+        <DropdownMenu dir="rtl">
             <TooltipComponent delayDuration={1000} content="Filter" side="bottom">
-                <DropdownMenu.Trigger asChild>
+                <DropdownMenuTrigger asChild>
                     <OptionButton
                         label="Filter"
                         icon={MdFilterAlt}
                         active={value.kind !== "default"}
                     />
-                </DropdownMenu.Trigger>
+                </DropdownMenuTrigger>
             </TooltipComponent>
-            <DropdownMenu.Portal>
-                <DropdownMenu.Content
-                    align="start"
-                    sideOffset={6}
-                    className={`${FILTER_PANEL_WIDTH} [direction:ltr] ${PANEL_CONTENT}`}
-                >
-                    <FilterPanelItems
-                        value={value}
-                        onChange={onChange}
-                        customColumns={customColumns}
-                    />
-                </DropdownMenu.Content>
-            </DropdownMenu.Portal>
-        </DropdownMenu.Root>
+            <DropdownMenuContent align="start" className={`${FILTER_PANEL_WIDTH} [direction:ltr]`}>
+                <FilterPanelItems value={value} onChange={onChange} customColumns={customColumns} />
+            </DropdownMenuContent>
+        </DropdownMenu>
     );
 }

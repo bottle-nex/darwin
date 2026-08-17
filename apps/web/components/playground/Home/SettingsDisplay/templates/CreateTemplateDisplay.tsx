@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 import { useCreateTemplate } from "@/hooks/templates/useCreateTemplate";
 import { useUpdateTemplate } from "@/hooks/templates/useUpdateTemplate";
 import { promptsFromBraces } from "@/lib/templates/promptHtml";
-import IssueDescriptionEditor from "@/components/playground/Home/KanbanDisplay/Issue/editor/IssueDescriptionEditor";
+import IssueDescriptionEditor from "@/components/playground/Issue/editor/IssueDescriptionEditor";
 import type { ApiResponse } from "@/types/api";
 import type { IssueTemplate } from "@/types/issueTemplate";
 import IconPicker, { IconPickGlyph, type IconPick } from "@/components/ui/IconPicker";

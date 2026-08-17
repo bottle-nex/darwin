@@ -38,6 +38,9 @@ interface MembersCapsuleProps {
     onChange?: (memberIds: string[]) => void;
     disabled?: boolean;
     className?: string;
+    placeholder?: string;
+    /** The "assigning is compulsory" hint — only meaningful where that rule is enforced. */
+    tooltip?: boolean;
     /** Pass both to control the popover from outside (e.g. open it on failed submit). */
     open?: boolean;
     onOpenChange?: (open: boolean) => void;
@@ -75,6 +78,8 @@ export default function MembersCapsule({
     onChange,
     disabled,
     className,
+    placeholder = "Members",
+    tooltip = true,
     open: controlledOpen,
     onOpenChange,
 }: MembersCapsuleProps) {
@@ -93,27 +98,36 @@ export default function MembersCapsule({
     }
 
     const selectedMembers = (members ?? []).filter((member) => selected.includes(member.id));
+    const trigger = (
+        <CapsuleTrigger disabled={disabled} className={className}>
+            <MdPeople className="size-3.5 text-white/60" />
+            {selectedMembers.length === 0
+                ? placeholder
+                : selectedMembers.length === 1
+                  ? (selectedMembers[0].name ?? selectedMembers[0].email)
+                  : `${selectedMembers.length} members`}
+        </CapsuleTrigger>
+    );
 
     return (
         <Popover open={open} onOpenChange={setOpen}>
-            <TooltipComponent
-                className="w-60"
-                content="Assigning a member is compulsory, our agent may ask them questions about this issue."
-            >
-                <PopoverTrigger asChild>
-                    <CapsuleTrigger disabled={disabled} className={className}>
-                        <MdPeople className="size-3.5 text-white/60" />
-                        {selectedMembers.length === 0
-                            ? "Members"
-                            : selectedMembers.length === 1
-                              ? (selectedMembers[0].name ?? selectedMembers[0].email)
-                              : `${selectedMembers.length} members`}
-                    </CapsuleTrigger>
-                </PopoverTrigger>
-            </TooltipComponent>
-            <PopoverContent align="start" className="w-72 border-white/10 bg-charcoal p-0">
+            {tooltip ? (
+                <TooltipComponent
+                    className="w-60"
+                    content="Assigning a member is compulsory, our agent may ask them questions about this issue."
+                >
+                    <PopoverTrigger asChild>{trigger}</PopoverTrigger>
+                </TooltipComponent>
+            ) : (
+                <PopoverTrigger asChild>{trigger}</PopoverTrigger>
+            )}
+            <PopoverContent className="w-72 p-0">
                 <Command>
-                    <CommandInput placeholder="Search members..." className="text-xs" />
+                    <CommandInput
+                        border={false}
+                        placeholder="Search members..."
+                        className="text-xs"
+                    />
                     <CommandList>
                         <CommandEmpty>No members found.</CommandEmpty>
                         <CommandGroup>

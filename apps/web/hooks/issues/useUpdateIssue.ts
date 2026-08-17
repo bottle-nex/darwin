@@ -12,7 +12,7 @@ export interface UpdateIssueInput {
     title?: string;
     summary?: string | null;
     description?: string;
-    priority?: 1 | 2 | 3 | 4;
+    priority?: 0 | 1 | 2 | 3 | 4;
     status?: ServerIssueStatus;
     /** null moves the issue out of its custom column into its status lane. */
     custom_column_id?: string | null;

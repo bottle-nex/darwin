@@ -2,19 +2,13 @@
 
 import { Button } from "@/components/ui/button";
 import { forwardRef, useState } from "react";
+import type { IconType } from "react-icons";
 import { format } from "date-fns";
-import { MdCheck, MdCalendarMonth } from "react-icons/md";
+import { MdCheck } from "react-icons/md";
+import { HiCalendar } from "react-icons/hi2";
 import { cn } from "@/lib/utils";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-import {
-    Command,
-    CommandEmpty,
-    CommandGroup,
-    CommandInput,
-    CommandItem,
-    CommandList,
-} from "@/components/ui/command";
 
 export interface CapsuleOption {
     value: string;
@@ -113,82 +107,8 @@ function CapsuleDropdown({
                     {selected?.label}
                 </CapsuleTrigger>
             </PopoverTrigger>
-            <PopoverContent align="start" className="w-44 border-white/10 bg-charcoal p-1">
+            <PopoverContent className="w-44 p-1">
                 <CapsuleOptionList options={options} value={value} onSelect={handleSelect} />
-            </PopoverContent>
-        </Popover>
-    );
-}
-
-interface CapsuleDropdownSearchProps {
-    type: "dropdown-search";
-    options: CapsuleOption[];
-    defaultValue?: string;
-    onChange?: (value: string) => void;
-    searchPlaceholder?: string;
-    emptyText?: string;
-    disabled?: boolean;
-    className?: string;
-}
-
-function CapsuleDropdownSearch({
-    options,
-    defaultValue,
-    onChange,
-    searchPlaceholder = "Search...",
-    emptyText = "No results.",
-    disabled,
-    className,
-}: CapsuleDropdownSearchProps) {
-    const [open, setOpen] = useState(false);
-    const [value, setValue] = useState(defaultValue ?? options[0]?.value);
-    const selected = options.find((option) => option.value === value) ?? options[0];
-
-    function handleSelect(next: string) {
-        setValue(next);
-        onChange?.(next);
-        setOpen(false);
-    }
-
-    return (
-        <Popover open={open} onOpenChange={setOpen}>
-            <PopoverTrigger asChild>
-                <CapsuleTrigger disabled={disabled} className={className}>
-                    {selected?.dotClassName && (
-                        <span className={cn("size-2 rounded-full", selected.dotClassName)} />
-                    )}
-                    {selected?.label}
-                </CapsuleTrigger>
-            </PopoverTrigger>
-            <PopoverContent align="start" className="w-56 border-white/10 bg-charcoal p-0">
-                <Command>
-                    <CommandInput placeholder={searchPlaceholder} />
-                    <CommandList>
-                        <CommandEmpty>{emptyText}</CommandEmpty>
-                        <CommandGroup>
-                            {options.map((option) => (
-                                <CommandItem
-                                    key={option.value}
-                                    value={option.label}
-                                    onSelect={() => handleSelect(option.value)}
-                                >
-                                    {option.dotClassName && (
-                                        <span
-                                            className={cn(
-                                                "size-2 rounded-full",
-                                                option.dotClassName,
-                                            )}
-                                        />
-                                    )}
-                                    <span className="flex-1">{option.label}</span>
-                                    {option.value === value && (
-                                        <MdCheck className="size-4 shrink-0 text-neutral-400" />
-                                    )}
-                                </CommandItem>
-                            ))}
-                        </CommandGroup>
-                    </CommandList>
-                </Command>
             </PopoverContent>
         </Popover>
     );
@@ -201,6 +121,8 @@ interface CapsuleCalendarProps {
     placeholder?: string;
     disabled?: boolean;
     className?: string;
+    icon?: IconType;
+    iconClassName?: string;
 }
 
 function CapsuleCalendar({
@@ -209,6 +131,8 @@ function CapsuleCalendar({
     placeholder = "Set date",
     disabled,
     className,
+    icon: Icon = HiCalendar,
+    iconClassName = "text-white/60",
 }: CapsuleCalendarProps) {
     const [open, setOpen] = useState(false);
     const [date, setDate] = useState<Date | undefined>(defaultValue);
@@ -223,25 +147,23 @@ function CapsuleCalendar({
         <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
                 <CapsuleTrigger disabled={disabled} className={className}>
-                    <MdCalendarMonth className="size-3.5 text-white/60" />
+                    <Icon className={cn("size-3.5", iconClassName)} />
                     {date ? format(date, "MMM d, yyyy") : placeholder}
                 </CapsuleTrigger>
             </PopoverTrigger>
-            <PopoverContent align="start" className="w-auto border-white/10 p-0 bg-charcoal">
+            <PopoverContent className="w-auto p-0">
                 <Calendar mode="single" selected={date} onSelect={handleSelect} />
             </PopoverContent>
         </Popover>
     );
 }
 
-export type CapsuleProps = CapsuleDropdownProps | CapsuleDropdownSearchProps | CapsuleCalendarProps;
+export type CapsuleProps = CapsuleDropdownProps | CapsuleCalendarProps;
 
 export default function Capsule(props: CapsuleProps) {
     switch (props.type) {
         case "calendar":
             return <CapsuleCalendar {...props} />;
-        case "dropdown-search":
-            return <CapsuleDropdownSearch {...props} />;
         case "dropdown":
             return <CapsuleDropdown {...props} />;
     }

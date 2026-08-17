@@ -14,7 +14,7 @@ export default class IssueCreateController {
             title: z.string().min(1).max(80),
             summary: z.string().max(255).optional(),
             description: z.string().max(20000),
-            priority: z.number().int().min(1).max(4).optional(),
+            priority: z.number().int().min(0).max(4).optional(),
             custom_column_id: z.string().optional(),
             start_date: z.coerce.date().optional(),
             target_date: z.coerce.date().optional(),

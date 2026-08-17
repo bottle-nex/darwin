@@ -10,8 +10,12 @@ import {
     MdSwapVert,
 } from "react-icons/md";
 import { AnimatePresence, motion } from "motion/react";
-import { DropdownMenu } from "radix-ui";
-import { cn } from "@/lib/utils";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import OptionButton from "@/components/playground/Home/KanbanDisplay/OptionsBar/KanbanOptionPanels/OptionButton";
 import { useTagsOptionsStore, type TagSort } from "@/store/tags/useTagsOptionsStore";
@@ -54,41 +58,26 @@ export default function TagsOptionsBar({ count, onCreate }: TagsOptionsBarProps)
                     onClick={() => (searchOpen ? closeSearch() : openSearch())}
                 />
 
-                <DropdownMenu.Root>
-                    <DropdownMenu.Trigger asChild>
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
                         <OptionButton label="Sort" icon={MdSwapVert} active={sort !== "name"} />
-                    </DropdownMenu.Trigger>
-                    <DropdownMenu.Portal>
-                        <DropdownMenu.Content
-                            align="end"
-                            sideOffset={6}
-                            className="z-50 w-48 origin-(--radix-dropdown-menu-content-transform-origin) rounded-lg border border-neutral-800 bg-charcoal p-1 shadow-xl animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95"
-                        >
-                            {SORTS.map((option) => (
-                                <DropdownMenu.Item
-                                    key={option.id}
-                                    onSelect={() => setSort(option.id)}
-                                    className={cn(
-                                        "flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 text-[13px] text-neutral-300 outline-none select-none",
-                                        "data-highlighted:bg-white/5 data-highlighted:text-neutral-100",
-                                    )}
-                                >
-                                    <option.icon
-                                        className="size-3.5 text-neutral-400"
-                                        aria-hidden
-                                    />
-                                    <span className="flex-1">{option.label}</span>
-                                    {sort === option.id && (
-                                        <MdCheck
-                                            className="size-3.5 text-neutral-200"
-                                            aria-hidden
-                                        />
-                                    )}
-                                </DropdownMenu.Item>
-                            ))}
-                        </DropdownMenu.Content>
-                    </DropdownMenu.Portal>
-                </DropdownMenu.Root>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-48">
+                        {SORTS.map((option) => (
+                            <DropdownMenuItem
+                                key={option.id}
+                                onSelect={() => setSort(option.id)}
+                                className={undefined}
+                            >
+                                <option.icon className="size-3.5 text-neutral-400" aria-hidden />
+                                <span className="flex-1">{option.label}</span>
+                                {sort === option.id && (
+                                    <MdCheck className="size-3.5 text-neutral-200" aria-hidden />
+                                )}
+                            </DropdownMenuItem>
+                        ))}
+                    </DropdownMenuContent>
+                </DropdownMenu>
 
                 <div className="mx-1 h-4 w-px bg-white/8" />
 

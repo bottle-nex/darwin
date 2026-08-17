@@ -1,10 +1,17 @@
 "use client";
 import { MdCheck, MdViewKanban, MdList, MdTune } from "react-icons/md";
 import { type IconType } from "react-icons";
-import { DropdownMenu } from "radix-ui";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItemIndicator,
+    DropdownMenuLabel,
+    DropdownMenuRadioGroup,
+    DropdownMenuRadioItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import type { KanbanView } from "@/types/kanban";
 import OptionButton from "./OptionButton";
-import { PANEL_CONTENT, PANEL_ITEM, PANEL_LABEL } from "./panelStyles";
 import { TooltipComponent } from "@/components/ui/tooltip-component";
 
 const OPTIONS: { value: KanbanView; label: string; icon: IconType }[] = [
@@ -23,22 +30,18 @@ export const VIEWS_PANEL_WIDTH = "w-44";
 export function ViewsPanelItems({ value, onChange }: ViewsPanelProps) {
     return (
         <>
-            <DropdownMenu.Label className={PANEL_LABEL}>Views</DropdownMenu.Label>
-            <DropdownMenu.RadioGroup value={value} onValueChange={(v) => onChange(v as KanbanView)}>
+            <DropdownMenuLabel>Views</DropdownMenuLabel>
+            <DropdownMenuRadioGroup value={value} onValueChange={(v) => onChange(v as KanbanView)}>
                 {OPTIONS.map((option) => (
-                    <DropdownMenu.RadioItem
-                        key={option.value}
-                        value={option.value}
-                        className={PANEL_ITEM}
-                    >
+                    <DropdownMenuRadioItem key={option.value} value={option.value}>
                         <option.icon className="size-3.5 text-neutral-400" aria-hidden />
                         <span className="flex-1">{option.label}</span>
-                        <DropdownMenu.ItemIndicator>
+                        <DropdownMenuItemIndicator>
                             <MdCheck className="size-3.5 text-neutral-300" aria-hidden />
-                        </DropdownMenu.ItemIndicator>
-                    </DropdownMenu.RadioItem>
+                        </DropdownMenuItemIndicator>
+                    </DropdownMenuRadioItem>
                 ))}
-            </DropdownMenu.RadioGroup>
+            </DropdownMenuRadioGroup>
         </>
     );
 }
@@ -50,21 +53,15 @@ export function ViewsPanelItems({ value, onChange }: ViewsPanelProps) {
  */
 export default function ViewsPanel({ value, onChange }: ViewsPanelProps) {
     return (
-        <DropdownMenu.Root>
+        <DropdownMenu>
             <TooltipComponent delayDuration={1000} content="Views" side="bottom">
-                <DropdownMenu.Trigger asChild>
+                <DropdownMenuTrigger asChild>
                     <OptionButton label="Views" icon={MdTune} active={value !== "board"} />
-                </DropdownMenu.Trigger>
+                </DropdownMenuTrigger>
             </TooltipComponent>
-            <DropdownMenu.Portal>
-                <DropdownMenu.Content
-                    align="end"
-                    sideOffset={6}
-                    className={`${VIEWS_PANEL_WIDTH} ${PANEL_CONTENT}`}
-                >
-                    <ViewsPanelItems value={value} onChange={onChange} />
-                </DropdownMenu.Content>
-            </DropdownMenu.Portal>
-        </DropdownMenu.Root>
+            <DropdownMenuContent align="end" className={VIEWS_PANEL_WIDTH}>
+                <ViewsPanelItems value={value} onChange={onChange} />
+            </DropdownMenuContent>
+        </DropdownMenu>
     );
 }

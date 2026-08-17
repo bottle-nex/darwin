@@ -56,9 +56,9 @@ export default function EmojiPicker({
             <PopoverContent
                 align={align}
                 aria-label="Choose an emoji"
-                className="flex h-92 w-72 flex-col overflow-hidden border-white/10 bg-neutral-900 p-0 text-neutral-100"
+                className="flex h-92 w-72 flex-col overflow-hidden p-0 text-neutral-100"
             >
-                <div className="border-b border-white/10 px-2.5 py-2">
+                <div className="border-b px-2.5 py-2">
                     <p className="mb-1.5 text-[11px] text-neutral-500">Quick reactions</p>
                     <div className="flex gap-0.5">
                         {QUICK_REACTION_EMOJIS.map((emoji) => (
@@ -76,7 +76,7 @@ export default function EmojiPicker({
                     value={query}
                     onChange={(event) => setQuery(event.target.value)}
                     placeholder="Search emoji..."
-                    className="w-full shrink-0 border-b border-white/10 bg-transparent px-3.5 py-2.5 text-[13px] text-neutral-100 outline-none placeholder:text-neutral-500"
+                    className="w-full shrink-0 border-b bg-transparent px-3.5 py-2.5 text-[13px] text-neutral-100 outline-none placeholder:text-neutral-500"
                 />
                 <div
                     className="min-h-0 flex-1 overflow-y-auto p-1.5 no-scrollbar"

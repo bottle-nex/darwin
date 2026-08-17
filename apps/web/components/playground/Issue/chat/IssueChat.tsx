@@ -82,7 +82,7 @@ export default function IssueChat({ issueId }: { issueId?: string }) {
     }
 
     return (
-        <section className="m-2.5 flex min-h-0 min-w-0 flex-1 flex-col rounded-[8px] bg-cement *:px-4 *:py-3">
+        <section className="m-2.5 flex min-h-0 min-w-0 flex-1 flex-col rounded-[8px] *:px-4 *:py-3">
             <header className="text-sm font-medium text-neutral-100 flex items-center gap-x-3">
                 <BsChatRightTextFill />
                 <span>Comments and activity</span>

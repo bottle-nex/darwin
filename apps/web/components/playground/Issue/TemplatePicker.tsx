@@ -63,11 +63,7 @@ export default function TemplatePicker({ projectId, onPick }: TemplatePickerProp
                     </CapsuleTrigger>
                 </PopoverTrigger>
             </TooltipComponent>
-            <PopoverContent
-                align="end"
-                sideOffset={6}
-                className="w-44 border-white/10 bg-neutral-900 p-0.5"
-            >
+            <PopoverContent align="end" className="w-44 p-0.5">
                 <Command className="bg-transparent">
                     <CommandList data-lenis-prevent className="no-scrollbar h-20 overflow-y-auto">
                         <CommandGroup className="p-0">

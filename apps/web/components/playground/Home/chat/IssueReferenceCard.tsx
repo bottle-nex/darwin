@@ -5,14 +5,14 @@ import type { ReferencedIssueLabel } from "@trymatcha/types";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
-import { useIssueDialog } from "@/components/playground/issue/useIssueDialog";
+import { useIssueRoute } from "@/components/playground/Issue/useIssueRoute";
 
 const STATUS_STYLE = new Map(
     KanbanBoard.COLUMNS.map((column) => [column.status as string, column]),
 );
 
 export default function IssueReferenceCard({ issue }: { issue: ReferencedIssueLabel }) {
-    const { openEdit } = useIssueDialog();
+    const { openIssue } = useIssueRoute();
     const status = issue.status ? STATUS_STYLE.get(issue.status) : undefined;
     const StatusIcon = status?.icon ?? LuCircleDashed;
 
@@ -20,7 +20,7 @@ export default function IssueReferenceCard({ issue }: { issue: ReferencedIssueLa
         <Button
             variant="unstyled"
             type="button"
-            onClick={() => issue.id && openEdit(issue.id)}
+            onClick={() => issue.id && openIssue(issue.id)}
             className="flex w-full max-w-60 cursor-pointer items-stretch rounded-[14px] border border-graphite/50 bg-cement p-1 text-left"
         >
             <span className="flex w-11 shrink-0 items-start justify-center" aria-hidden>

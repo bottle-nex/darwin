@@ -231,14 +231,14 @@
     /* Tiptap issue-description editor (Notion/Linear-style slash-command doc). */
     .tiptap {
         outline: none;
-        color: #b8b8b8;
-        font-size: 0.875rem;
-        line-height: 1.6;
+        color: #ededed;
+        font-size: 1rem;
+        line-height: 1.65;
         --tick: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'><path d='M20 6 9 17l-5-5'/></svg>");
     }
 
     .tiptap ::selection {
-        background: transparent;
+        background: color-mix(in srgb, var(--color-matcha) 28%, transparent);
     }
     .tiptap > * + * {
         margin-top: 0.5rem;
@@ -360,8 +360,8 @@
         width: 0.95rem;
         height: 0.95rem;
         margin: 0;
-        border: 1px solid rgba(255, 255, 255, 0.22);
-        border-radius: 0.25rem;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 0.1875rem;
         background: rgba(255, 255, 255, 0.05);
         cursor: pointer;
         transition:
@@ -370,7 +370,7 @@
     }
 
     .tiptap ul[data-type="taskList"] li > label input[type="checkbox"]:hover {
-        border-color: rgba(255, 255, 255, 0.4);
+        border-color: rgba(255, 255, 255, 0.32);
         background: rgba(255, 255, 255, 0.09);
     }
 

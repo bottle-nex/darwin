@@ -9,13 +9,14 @@ import PlaygroundAvatar, {
 import { Button } from "@/components/ui/button";
 import ProjectRoleTicker from "./ProjectRoleTicker";
 import useRevokeInvite from "@/hooks/invitations/useRevokeInvite";
-import { cn } from "@/lib/utils";
-import { DropdownMenu } from "radix-ui";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { MdJoinLeft, MdPersonRemove } from "react-icons/md";
 import { PiDotsThreeOutlineVerticalLight } from "react-icons/pi";
-
-const ITEM =
-    "flex cursor-pointer items-center gap-2.5 rounded-md px-3 py-2 text-[12.5px] text-neutral-300 outline-none select-none data-highlighted:bg-white/5 data-highlighted:text-neutral-100";
 
 type MemberDetailProps = { teamId: string } & (
     | {
@@ -97,8 +98,8 @@ function RevokeInviteMenu({ invitationId, teamId }: { invitationId: string; team
     const { mutate: revoke, isPending } = useRevokeInvite(teamId);
 
     return (
-        <DropdownMenu.Root modal={false}>
-            <DropdownMenu.Trigger asChild>
+        <DropdownMenu modal={false}>
+            <DropdownMenuTrigger asChild>
                 <Button
                     variant="unstyled"
                     loading={isPending}
@@ -108,28 +109,16 @@ function RevokeInviteMenu({ invitationId, teamId }: { invitationId: string; team
                 >
                     <PiDotsThreeOutlineVerticalLight size={16} />
                 </Button>
-            </DropdownMenu.Trigger>
-            <DropdownMenu.Portal>
-                <DropdownMenu.Content
-                    align="end"
-                    sideOffset={6}
-                    className="z-50 w-44 origin-(--radix-dropdown-menu-content-transform-origin) overflow-hidden rounded-xl border border-white/10 bg-linear-to-b from-charcoal to-[#101010] p-1 shadow-[0_24px_60px_-15px_rgba(0,0,0,0.85),inset_0_1px_0_0_rgba(255,255,255,0.07)] ring-1 ring-black/40 animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95"
-                >
-                    <DropdownMenu.Item
-                        className={cn(
-                            ITEM,
-                            "text-neutral-300 data-highlighted:bg-red-500/10 data-highlighted:text-red-300 group",
-                        )}
-                        onClick={() => revoke(invitationId)}
-                    >
-                        <MdPersonRemove
-                            className="size-4 text-neutral-400 group-hover:text-red-300"
-                            aria-hidden
-                        />
-                        Revoke invite
-                    </DropdownMenu.Item>
-                </DropdownMenu.Content>
-            </DropdownMenu.Portal>
-        </DropdownMenu.Root>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-44">
+                <DropdownMenuItem className={"group"} onClick={() => revoke(invitationId)}>
+                    <MdPersonRemove
+                        className="size-4 text-neutral-400 group-hover:text-red-300"
+                        aria-hidden
+                    />
+                    Revoke invite
+                </DropdownMenuItem>
+            </DropdownMenuContent>
+        </DropdownMenu>
     );
 }

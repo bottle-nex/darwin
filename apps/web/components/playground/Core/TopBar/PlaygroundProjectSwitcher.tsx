@@ -54,11 +54,7 @@ export default function PlaygroundProjectSwitcher() {
             </Popover.Trigger>
 
             <Popover.Portal>
-                <Popover.Content
-                    align="start"
-                    sideOffset={6}
-                    className="z-50 w-72 origin-(--radix-popover-content-transform-origin) rounded-lg border border-neutral-800 bg-charcoal p-1.5 shadow-xl animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95"
-                >
+                <Popover.Content align="start" className="w-72 p-1.5">
                     <PlaygroundSearchInput
                         value={query}
                         onChange={setQuery}

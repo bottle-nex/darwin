@@ -16,10 +16,12 @@ export type CustomCard = {
     id: string;
     number?: number;
     title: string;
-    description?: string;
     tags: BoardTag[];
     priority: Priority;
     assignees: Assignee[];
+    status?: string;
+    createdAt?: string;
+    targetDate?: string | null;
 };
 
 /** A user-created column ("list") holding its ordered cards. */

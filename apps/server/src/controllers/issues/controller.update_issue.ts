@@ -12,7 +12,7 @@ export default class IssueUpdateController {
         title: z.string().min(1).max(200).optional(),
         summary: z.string().max(255).nullable().optional(),
         description: z.string().optional(),
-        priority: z.number().int().min(1).max(4).optional(),
+        priority: z.number().int().min(0).max(4).optional(),
         status: z.enum(IssueStatus).optional(),
         custom_column_id: z.string().nullable().optional(),
         tag_ids: z.array(z.string()).max(20).optional(),

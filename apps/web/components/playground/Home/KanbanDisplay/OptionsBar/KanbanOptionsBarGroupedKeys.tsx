@@ -3,22 +3,33 @@ import { Button } from "@/components/ui/button";
 import {
     MdFilterAlt,
     MdGroup,
-    MdKeyboardArrowDown,
     MdKeyboardArrowLeft,
     MdLabel,
     MdSettings,
     MdShare,
     MdTune,
 } from "react-icons/md";
-import { DropdownMenu } from "radix-ui";
+import { LuEye } from "react-icons/lu";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuSub,
+    DropdownMenuSubContent,
+    DropdownMenuSubTrigger,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useKanbanOptionsStore } from "@/store/kanban/useKanbanOptionsStore";
 import { useFilteredCustomColumns } from "@/hooks/kanban/useFilteredCustomColumns";
 import { FilterPanelItems, FILTER_PANEL_WIDTH } from "./KanbanOptionPanels/FilterPanel";
 import { TagPanelItems, TAG_PANEL_CONTENT } from "./KanbanOptionPanels/TagPanel";
 import { ViewsPanelItems, VIEWS_PANEL_WIDTH } from "./KanbanOptionPanels/ViewsPanel";
-import { PANEL_CONTENT, PANEL_ITEM } from "./KanbanOptionPanels/panelStyles";
+import { BoardViewPanelItems, BOARD_VIEW_PANEL_WIDTH } from "./KanbanOptionPanels/BoardViewPanel";
 import SelectedTags from "./KanbanOptionPanels/SelectedTags";
-import { AddTaskButton, BoardViewTabs, OPTIONS_BAR_SHELL } from "./KanbanOptionsBarParts";
+import { PANE_BAR_SHELL } from "@/components/playground/Core/components/paneBar";
+import PlaygroundBreadcrumb from "@/components/playground/Core/components/PlaygroundBreadcrumb";
+import AddTaskButton from "./KanbanOptionPanels/AddTaskButton";
 
 /**
  * Every toolbar option collapsed behind one "Options" menu. The panels that have
@@ -38,20 +49,22 @@ export default function KanbanOptionsBarGroupedKeys() {
         setFilter,
         kanbanView,
         setKanbanView,
+        boardView,
+        setBoardView,
     } = useKanbanOptionsStore();
     const customColumns = useFilteredCustomColumns();
 
     return (
-        <div className={OPTIONS_BAR_SHELL}>
+        <div className={PANE_BAR_SHELL}>
             <div className="flex min-w-0 items-center gap-1.5">
-                <BoardViewTabs />
+                <PlaygroundBreadcrumb />
 
                 <SelectedTags selected={selectedTagIds} onRemove={removeTag} />
             </div>
 
             <div className="flex shrink-0 items-center gap-0.5">
-                <DropdownMenu.Root dir="rtl">
-                    <DropdownMenu.Trigger asChild>
+                <DropdownMenu dir="rtl">
+                    <DropdownMenuTrigger asChild>
                         <Button
                             variant="unstyled"
                             type="button"
@@ -61,108 +74,104 @@ export default function KanbanOptionsBarGroupedKeys() {
                             <MdTune className="size-3.5" aria-hidden />
                             Options
                         </Button>
-                    </DropdownMenu.Trigger>
-                    <DropdownMenu.Portal>
-                        <DropdownMenu.Content
-                            align="end"
-                            sideOffset={6}
-                            className={`w-48 [direction:ltr] ${PANEL_CONTENT}`}
-                        >
-                            <DropdownMenu.Sub>
-                                <DropdownMenu.SubTrigger className={PANEL_ITEM}>
-                                    <MdKeyboardArrowLeft
-                                        className="size-3.5 text-neutral-500"
-                                        aria-hidden
-                                    />
-                                    <MdLabel className="size-3.5 text-neutral-400" aria-hidden />
-                                    <span className="flex-1">Tag</span>
-                                    {selectedTagIds.length > 0 && (
-                                        <span className="text-[11px] text-neutral-500">
-                                            {selectedTagIds.length}
-                                        </span>
-                                    )}
-                                </DropdownMenu.SubTrigger>
-                                <DropdownMenu.Portal>
-                                    <DropdownMenu.SubContent
-                                        sideOffset={6}
-                                        className={`[direction:ltr] ${TAG_PANEL_CONTENT}`}
-                                    >
-                                        <TagPanelItems
-                                            selected={selectedTagIds}
-                                            onToggle={toggleTag}
-                                            onClear={clearTags}
-                                        />
-                                    </DropdownMenu.SubContent>
-                                </DropdownMenu.Portal>
-                            </DropdownMenu.Sub>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-48 [direction:ltr]">
+                        <DropdownMenuSub>
+                            <DropdownMenuSubTrigger>
+                                <MdKeyboardArrowLeft
+                                    className="size-3.5 text-neutral-500"
+                                    aria-hidden
+                                />
+                                <MdLabel className="size-3.5 text-neutral-400" aria-hidden />
+                                <span className="flex-1">Tag</span>
+                                {selectedTagIds.length > 0 && (
+                                    <span className="text-[11px] text-neutral-500">
+                                        {selectedTagIds.length}
+                                    </span>
+                                )}
+                            </DropdownMenuSubTrigger>
+                            <DropdownMenuSubContent
+                                className={`[direction:ltr] ${TAG_PANEL_CONTENT}`}
+                            >
+                                <TagPanelItems
+                                    selected={selectedTagIds}
+                                    onToggle={toggleTag}
+                                    onClear={clearTags}
+                                />
+                            </DropdownMenuSubContent>
+                        </DropdownMenuSub>
 
-                            <DropdownMenu.Sub>
-                                <DropdownMenu.SubTrigger className={PANEL_ITEM}>
-                                    <MdKeyboardArrowLeft
-                                        className="size-3.5 text-neutral-500"
-                                        aria-hidden
-                                    />
-                                    <MdFilterAlt
-                                        className="size-3.5 text-neutral-400"
-                                        aria-hidden
-                                    />
-                                    <span className="flex-1">Filter</span>
-                                </DropdownMenu.SubTrigger>
-                                <DropdownMenu.Portal>
-                                    <DropdownMenu.SubContent
-                                        sideOffset={6}
-                                        className={`${FILTER_PANEL_WIDTH} [direction:ltr] ${PANEL_CONTENT}`}
-                                    >
-                                        <FilterPanelItems
-                                            value={filter}
-                                            onChange={setFilter}
-                                            customColumns={customColumns}
-                                        />
-                                    </DropdownMenu.SubContent>
-                                </DropdownMenu.Portal>
-                            </DropdownMenu.Sub>
+                        <DropdownMenuSub>
+                            <DropdownMenuSubTrigger>
+                                <MdKeyboardArrowLeft
+                                    className="size-3.5 text-neutral-500"
+                                    aria-hidden
+                                />
+                                <MdFilterAlt className="size-3.5 text-neutral-400" aria-hidden />
+                                <span className="flex-1">Filter</span>
+                            </DropdownMenuSubTrigger>
+                            <DropdownMenuSubContent
+                                className={`${FILTER_PANEL_WIDTH} [direction:ltr]`}
+                            >
+                                <FilterPanelItems
+                                    value={filter}
+                                    onChange={setFilter}
+                                    customColumns={customColumns}
+                                />
+                            </DropdownMenuSubContent>
+                        </DropdownMenuSub>
 
-                            <DropdownMenu.Sub>
-                                <DropdownMenu.SubTrigger className={PANEL_ITEM}>
-                                    <MdKeyboardArrowLeft
-                                        className="size-3.5 text-neutral-500"
-                                        aria-hidden
-                                    />
-                                    <MdTune className="size-3.5 text-neutral-400" aria-hidden />
-                                    <span className="flex-1">Views</span>
-                                </DropdownMenu.SubTrigger>
-                                <DropdownMenu.Portal>
-                                    <DropdownMenu.SubContent
-                                        sideOffset={6}
-                                        className={`${VIEWS_PANEL_WIDTH} [direction:ltr] ${PANEL_CONTENT}`}
-                                    >
-                                        <ViewsPanelItems
-                                            value={kanbanView}
-                                            onChange={setKanbanView}
-                                        />
-                                    </DropdownMenu.SubContent>
-                                </DropdownMenu.Portal>
-                            </DropdownMenu.Sub>
+                        <DropdownMenuSub>
+                            <DropdownMenuSubTrigger>
+                                <MdKeyboardArrowLeft
+                                    className="size-3.5 text-neutral-500"
+                                    aria-hidden
+                                />
+                                <LuEye className="size-3.5 text-neutral-400" aria-hidden />
+                                <span className="flex-1">Board</span>
+                            </DropdownMenuSubTrigger>
+                            <DropdownMenuSubContent
+                                className={`${BOARD_VIEW_PANEL_WIDTH} [direction:ltr]`}
+                            >
+                                <BoardViewPanelItems value={boardView} onChange={setBoardView} />
+                            </DropdownMenuSubContent>
+                        </DropdownMenuSub>
 
-                            <DropdownMenu.Separator className="my-1 h-px bg-white/5" />
+                        <DropdownMenuSub>
+                            <DropdownMenuSubTrigger>
+                                <MdKeyboardArrowLeft
+                                    className="size-3.5 text-neutral-500"
+                                    aria-hidden
+                                />
+                                <MdTune className="size-3.5 text-neutral-400" aria-hidden />
+                                <span className="flex-1">Views</span>
+                            </DropdownMenuSubTrigger>
+                            <DropdownMenuSubContent
+                                className={`${VIEWS_PANEL_WIDTH} [direction:ltr]`}
+                            >
+                                <ViewsPanelItems value={kanbanView} onChange={setKanbanView} />
+                            </DropdownMenuSubContent>
+                        </DropdownMenuSub>
 
-                            <DropdownMenu.Item disabled className={`${PANEL_ITEM} opacity-40`}>
-                                <MdGroup className="size-3.5 text-neutral-400" aria-hidden />
-                                <span className="flex-1">Assignees</span>
-                            </DropdownMenu.Item>
+                        <DropdownMenuSeparator className="my-1 h-px bg-white/5" />
 
-                            <DropdownMenu.Item disabled className={`${PANEL_ITEM} opacity-40`}>
-                                <MdShare className="size-3.5 text-neutral-400" aria-hidden />
-                                <span className="flex-1">Share</span>
-                            </DropdownMenu.Item>
+                        <DropdownMenuItem disabled>
+                            <MdGroup className="size-3.5 text-neutral-400" aria-hidden />
+                            <span className="flex-1">Assignees</span>
+                        </DropdownMenuItem>
 
-                            <DropdownMenu.Item disabled className={`${PANEL_ITEM} opacity-40`}>
-                                <MdSettings className="size-3.5 text-neutral-400" aria-hidden />
-                                <span className="flex-1">Settings</span>
-                            </DropdownMenu.Item>
-                        </DropdownMenu.Content>
-                    </DropdownMenu.Portal>
-                </DropdownMenu.Root>
+                        <DropdownMenuItem disabled>
+                            <MdShare className="size-3.5 text-neutral-400" aria-hidden />
+                            <span className="flex-1">Share</span>
+                        </DropdownMenuItem>
+
+                        <DropdownMenuItem disabled>
+                            <MdSettings className="size-3.5 text-neutral-400" aria-hidden />
+                            <span className="flex-1">Settings</span>
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+                <div className="mx-1 h-4 w-px bg-white/8" />
 
                 <AddTaskButton />
             </div>

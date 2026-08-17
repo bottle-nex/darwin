@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { PLAYGROUND_DEFAULT_TAB } from "@/components/playground/playgroundTabs";
+import { useIssueStore } from "@/store/issues/useIssueStore";
 import type { ProjectTeam } from "@/types/project";
 
 /**
@@ -49,25 +50,32 @@ export const usePlaygroundNavStore = create<PlaygroundNavState>((set) => ({
     selectedTeamProjectSlug: null,
     selectedThread: null,
     selectedThreadProjectSlug: null,
-    setTab: (tabId) => set({ tab: tabId }),
-    openTeam: (team, projectSlug) =>
+    setTab: (tabId) => {
+        useIssueStore.getState().close();
+        set({ tab: tabId });
+    },
+    openTeam: (team, projectSlug) => {
+        useIssueStore.getState().close();
         set({
             selectedTeam: team,
             selectedTeamProjectSlug: projectSlug,
             tab: TEAM_DETAIL_TAB,
-        }),
+        });
+    },
     clearTeam: () =>
         set({
             selectedTeam: null,
             selectedTeamProjectSlug: null,
             tab: PLAYGROUND_DEFAULT_TAB,
         }),
-    openThread: (thread, projectSlug) =>
+    openThread: (thread, projectSlug) => {
+        useIssueStore.getState().close();
         set({
             selectedThread: thread,
             selectedThreadProjectSlug: projectSlug,
             tab: THREAD_DETAIL_TAB,
-        }),
+        });
+    },
     clearThread: () =>
         set({
             selectedThread: null,

@@ -11,7 +11,9 @@ export interface WorkerLane {
 }
 
 export type GanttIssueStatus = "queued" | "solving" | "done";
-export type Priority = "urgent" | "high" | "normal" | "low";
+
+import type { Priority } from "@/types/kanban";
+export type { Priority };
 
 /**
  * One issue a worker has on its timeline.

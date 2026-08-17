@@ -9,11 +9,12 @@ import PlaygroundDisplay from "@/components/playground/Core/PlaygroundDisplay";
 import OnboardingDisplay from "@/components/onboarding/OnboardingDisplay";
 import CreateTeamDialog from "@/components/team/CreateTeamDialog";
 import DeleteTeamDialog from "@/components/team/DeleteTeamDialog";
-import CreateOrEditIssueDialog from "@/components/playground/Home/KanbanDisplay/Issue/CreateOrEditIssueDialog";
+import CreateIssueDialog from "@/components/playground/Issue/CreateIssueDialog";
+import IssueDisplay from "@/components/playground/Issue/IssueDisplay";
 import PlaygroundShortcutSheet from "@/components/playground/Sidebar/PlaygroundShortcutSheet";
 import NotificationsPanel from "@/components/playground/Core/Notifications/NotificationsPanel";
 import FloatNotifications from "@/components/playground/Core/Notifications/FloatNotifications";
-import { useIssueDialog } from "@/components/playground/issue/useIssueDialog";
+import { useIssueRoute } from "@/components/playground/Issue/useIssueRoute";
 import { useGetDashboard } from "@/hooks/dashboard/useGetDashboard";
 import { useGetProject } from "@/hooks/project/useGetProject";
 import { useIssueThreads } from "@/hooks/chats/useIssueThreads";
@@ -38,7 +39,7 @@ export default function PlaygroundShell() {
     useSubscribeEventHandlers(activeProject?.id);
 
     usePlaygroundUrlSync(project?.teams, issueThreads);
-    useIssueDialog({ sync: true });
+    const { mode } = useIssueRoute({ sync: true });
     usePlaygroundShortcuts();
     useLayoutEffect(() => {
         useSidebarWidthStore.persist.rehydrate();
@@ -55,6 +56,8 @@ export default function PlaygroundShell() {
                 <SidebarResizeHandle />
                 {showOnboarding ? (
                     <OnboardingDisplay project={project} orgId={dashboard!.org.id} />
+                ) : mode?.kind === "open" ? (
+                    <IssueDisplay issueId={mode.issueId} />
                 ) : (
                     <PlaygroundDisplay isLoading={loading} />
                 )}
@@ -63,7 +66,7 @@ export default function PlaygroundShell() {
             <PlaygroundSheetSidebar />
             <CreateTeamDialog />
             <DeleteTeamDialog />
-            <CreateOrEditIssueDialog />
+            <CreateIssueDialog />
             <PlaygroundShortcutSheet />
             <FloatNotifications />
         </main>

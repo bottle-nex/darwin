@@ -76,9 +76,10 @@ export class KanbanBoard {
 
     /** Dark-themed dot colour per priority. */
     static readonly PRIORITY_DOT: Record<Priority, string> = {
+        none: "bg-neutral-700",
         urgent: "bg-rose-500",
         high: "bg-amber-400",
-        normal: "bg-neutral-500",
+        medium: "bg-neutral-500",
         low: "bg-neutral-600",
     };
 
