@@ -11,11 +11,28 @@ model Chat {
   repliedTo  Chat?              @relation("ChatReplies", fields: [repliedToId], references: [id], onDelete: SetNull)
   replies    Chat[]             @relation("ChatReplies")
   references MessageReference[]
+  reactions  ChatReaction[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([issueId])
+}
+
+model ChatReaction {
+  id     String @id @default(cuid())
+  chatId String
+  userId String
+  emoji  String @db.VarChar(32)
+
+  chat Chat @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([chatId, userId])
+  @@index([chatId])
+  @@index([userId])
 }
 
 model ProjectChat {
@@ -31,11 +48,28 @@ model ProjectChat {
   repliedTo  ProjectChat?       @relation("ProjectChatReplies", fields: [repliedToId], references: [id], onDelete: SetNull)
   replies    ProjectChat[]      @relation("ProjectChatReplies")
   references MessageReference[]
+  reactions  ProjectChatReaction[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([projectId])
+}
+
+model ProjectChatReaction {
+  id            String @id @default(cuid())
+  projectChatId String
+  userId        String
+  emoji         String @db.VarChar(32)
+
+  projectChat ProjectChat @relation(fields: [projectChatId], references: [id], onDelete: Cascade)
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([projectChatId, userId])
+  @@index([projectChatId])
+  @@index([userId])
 }
 
 /// An entity tagged inside a message body. The body stores an opaque

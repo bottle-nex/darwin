@@ -46,6 +46,7 @@ export function build_optimistic_project_chat(
         repliedToId: repliedTo?.id ?? null,
         repliedTo: repliedTo ?? null,
         references: references as ProjectChat["references"],
+        reactions: [],
         createdAt: new Date(),
         updatedAt: new Date(),
     };

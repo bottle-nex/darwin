@@ -8,6 +8,7 @@ import {
     ReleaseChannel,
     TeamRole,
 } from "./enums.prisma";
+import type { ReactionSummary } from "../chat/reaction";
 
 export interface User {
     id: string;
@@ -162,6 +163,7 @@ export interface Chat {
     repliedTo?: Chat | null;
 
     references: MessageReference[];
+    reactions: ReactionSummary[];
 
     createdAt: Date;
     updatedAt: Date;
@@ -181,6 +183,7 @@ export interface ProjectChat {
     repliedTo?: ProjectChat | null;
 
     references: MessageReference[];
+    reactions: ReactionSummary[];
 
     createdAt: Date;
     updatedAt: Date;
@@ -191,6 +194,7 @@ export interface ReferencedIssue {
     number: number;
     title: string;
     status: IssueStatus;
+    priority: number;
 }
 
 export interface MessageReference {

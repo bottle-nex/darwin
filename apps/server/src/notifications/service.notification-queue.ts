@@ -17,6 +17,7 @@ import AddedToTeamNotification from "./actions/action.added-to-team";
 import RemovedFromTeamNotification from "./actions/action.removed-from-team";
 import RemovedFromOrgNotification from "./actions/action.removed-from-org";
 import RoleChangedNotification from "./actions/action.role-changed";
+import MessageReactedNotification from "./actions/action.message-reacted";
 
 export default class NotificationQueueService {
     private queue: Queue<NotificationJobData>;
@@ -78,6 +79,8 @@ export default class NotificationQueueService {
                 return RemovedFromOrgNotification.handle(data);
             case "member.role_changed":
                 return RoleChangedNotification.handle(data);
+            case "message.reacted":
+                return MessageReactedNotification.handle(data);
         }
     }
 
@@ -125,6 +128,8 @@ export default class NotificationQueueService {
                 return `${data.action}:${data.orgId}:${data.recipientId}`;
             case "member.role_changed":
                 return `${data.action}:${data.teamId}:${data.recipientId}~${data.role}`;
+            case "message.reacted":
+                return `${data.action}:${data.reactionId}`;
         }
     }
 

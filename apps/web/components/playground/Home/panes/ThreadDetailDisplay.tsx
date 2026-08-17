@@ -12,6 +12,7 @@ import {
     add_chat,
     build_optimistic_chat,
     mark_chat_deleted,
+    OPTIMISTIC_ID_PREFIX,
 } from "@/hooks/chats/useChats";
 import {
     useProjectChat,
@@ -24,6 +25,10 @@ import { InboundSocketMessageType, type Chat, type ProjectChat } from "@trymatch
 import SessionServices from "@/lib/session";
 import ProjectChatThread from "@/components/playground/Home/chat/ProjectChatThread";
 import { DEFAULT_FOLDER_COLOR } from "@/components/playground/Core/TopBar/PlaygroundProjectSwitcher";
+import {
+    toggle_chat_reaction,
+    toggle_project_chat_reaction,
+} from "@/hooks/chats/useMessageReactions";
 import ThreadsDisplay from "./ThreadsDisplay";
 
 /**
@@ -133,6 +138,15 @@ export default function ThreadDetailDisplay() {
         }
     }
 
+    function handleReaction(chat: Chat | ProjectChat, emoji: string) {
+        if (chat.id.startsWith(OPTIMISTIC_ID_PREFIX)) return;
+        const sent =
+            selectedThread?.kind === "project"
+                ? toggle_project_chat_reaction(queryClient, chat as ProjectChat, emoji)
+                : toggle_chat_reaction(queryClient, chat as Chat, emoji);
+        if (!sent) toast.error("Couldn't update the reaction.");
+    }
+
     const isProjectThread = selectedThread.kind === "project";
     const title = isProjectThread
         ? (activeProject?.name ?? "Project chat")
@@ -196,6 +210,7 @@ export default function ThreadDetailDisplay() {
                     }
                     onSend={handleSend}
                     onDelete={handleDelete}
+                    onReaction={handleReaction}
                 />
             </div>
         </div>

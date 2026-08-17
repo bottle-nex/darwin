@@ -1,10 +1,20 @@
+import type { IssueStatus } from "../prisma/enums.prisma";
+
 export type ReferenceKind = "member" | "issue";
+
+export type ReferencedIssueLabel = {
+    id?: string;
+    number: number;
+    title: string;
+    status?: IssueStatus;
+    priority?: number;
+};
 
 export type LabelledReference = {
     memberId: string | null;
     issueId: string | null;
     member?: { user?: { name: string | null; email: string } | null } | null;
-    issue?: { number: number; title: string } | null;
+    issue?: ReferencedIssueLabel | null;
 };
 
 export type ParsedReference = {
@@ -105,6 +115,16 @@ export function reference_labels(references: LabelledReference[]): Map<string, s
         }
     }
     return labels;
+}
+
+export function reference_issues(
+    references: LabelledReference[],
+): Map<string, ReferencedIssueLabel> {
+    const issues = new Map<string, ReferencedIssueLabel>();
+    for (const reference of references) {
+        if (reference.issueId && reference.issue) issues.set(reference.issueId, reference.issue);
+    }
+    return issues;
 }
 
 const TOMBSTONE: Record<ReferenceKind, string> = {

@@ -8,6 +8,7 @@ import {
     add_chat,
     build_optimistic_chat,
     mark_chat_deleted,
+    OPTIMISTIC_ID_PREFIX,
 } from "@/hooks/chats/useChats";
 import { send_socket_message } from "@/hooks/socket/useWebSocket";
 import {
@@ -18,6 +19,7 @@ import {
 } from "@trymatcha/types";
 import SessionServices from "@/lib/session";
 import ChatThread from "@/components/playground/Home/chat/ProjectChatThread";
+import { toggle_chat_reaction } from "@/hooks/chats/useMessageReactions";
 
 /** The "Comments and activity" panel for an issue. Disabled until the issue is saved. */
 export default function IssueChat({ issueId }: { issueId?: string }) {
@@ -72,6 +74,13 @@ export default function IssueChat({ issueId }: { issueId?: string }) {
         );
     }
 
+    function handleReaction(chat: Chat | ProjectChat, emoji: string) {
+        if (chat.id.startsWith(OPTIMISTIC_ID_PREFIX)) return;
+        if (!toggle_chat_reaction(queryClient, chat as Chat, emoji)) {
+            toast.error("Couldn't update the reaction.");
+        }
+    }
+
     return (
         <section className="m-2.5 flex min-h-0 min-w-0 flex-1 flex-col rounded-[8px] bg-cement *:px-4 *:py-3">
             <header className="text-sm font-medium text-neutral-100 flex items-center gap-x-3">
@@ -89,6 +98,7 @@ export default function IssueChat({ issueId }: { issueId?: string }) {
                 disabled={!issueId}
                 onSend={handleSend}
                 onDelete={handleDelete}
+                onReaction={handleReaction}
             />
         </section>
     );

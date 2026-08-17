@@ -28,4 +28,5 @@ enum NotificationType {
   RemovedFromTeam
   RemovedFromOrg
   RoleChanged
+  MessageReacted
 }

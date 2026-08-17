@@ -5,9 +5,11 @@ import Access from "../access-control/access";
 import { Action, Permissions } from "@trymatcha/access-control";
 import { server_services } from "..";
 import { OutboundSocketMessageType } from "@trymatcha/types";
+import { pending_operation_id, reaction_payload_schema } from "./reaction.payload";
 import MessageReferenceService, {
     MESSAGE_REFERENCE_INCLUDE,
 } from "../services/service.message-references";
+import MessageReactionService from "../services/service.message-reactions";
 import type { AuthUser } from "../types/express.d";
 
 export default class ProjectChatSocketHandler {
@@ -19,6 +21,79 @@ export default class ProjectChatSocketHandler {
     static delete_payload_schema = z.object({
         chatId: z.string().min(1),
     });
+
+    static async handle_project_chat_reaction(
+        ws: WebSocket,
+        user: AuthUser,
+        project_id: string,
+        raw_payload: unknown,
+    ) {
+        const parsed = reaction_payload_schema.safeParse(raw_payload);
+        if (!parsed.success) {
+            ProjectChatSocketHandler.send_error(
+                ws,
+                "Invalid reaction data provided",
+                pending_operation_id(raw_payload),
+            );
+            return;
+        }
+        const { chatId, emoji, operationId } = parsed.data;
+
+        try {
+            const chat = await prisma.projectChat.findUnique({
+                where: { id: chatId },
+                select: { id: true, senderId: true, isDeleted: true, projectId: true },
+            });
+            if (!chat || chat.projectId !== project_id || chat.isDeleted) {
+                ProjectChatSocketHandler.send_error(ws, "Message not found", operationId);
+                return;
+            }
+
+            const role = await Access.project(user.id, project_id);
+            if (!role || !Permissions.project(role, Action.project.read)) {
+                ProjectChatSocketHandler.send_error(
+                    ws,
+                    "You dont have access to this project",
+                    operationId,
+                );
+                return;
+            }
+
+            const mutation = await MessageReactionService.change_project_chat_reaction(
+                chat.id,
+                user.id,
+                emoji,
+            );
+            const channel_name = server_services.publisher.get_channel_name(project_id);
+            await server_services.publisher.publish_message(
+                channel_name,
+                JSON.stringify({
+                    type: OutboundSocketMessageType.PROJECT_CHAT_REACTION_UPDATED,
+                    projectId: project_id,
+                    payload: {
+                        chatId: chat.id,
+                        updates: mutation.updates,
+                        actorId: user.id,
+                        operationId,
+                    },
+                }),
+            );
+
+            if (mutation.reactionId && chat.senderId && chat.senderId !== user.id) {
+                await server_services.notifications.enqueue({
+                    action: "message.reacted",
+                    reactionId: mutation.reactionId,
+                    recipientId: chat.senderId,
+                    actorId: user.id,
+                    emoji,
+                    projectChatId: chat.id,
+                });
+            }
+        } catch (error) {
+            console.error("Project chat reaction error: ", error);
+            ProjectChatSocketHandler.send_error(ws, "Something went wrong", operationId);
+        }
+    }
 
     static async handle_project_chat_delete(
         ws: WebSocket,
@@ -142,7 +217,7 @@ export default class ProjectChatSocketHandler {
             const publish_body = {
                 type: OutboundSocketMessageType.PROJECT_CHAT_CREATED,
                 projectId: project_id,
-                payload: chat,
+                payload: { ...chat, reactions: [] },
             };
             await server_services.publisher.publish_message(
                 channel_name,
@@ -191,8 +266,10 @@ export default class ProjectChatSocketHandler {
         }
     }
 
-    private static send_error(ws: WebSocket, message: string) {
+    private static send_error(ws: WebSocket, message: string, operationId?: string) {
         if (ws.readyState !== WebSocket.OPEN) return;
-        ws.send(JSON.stringify({ type: OutboundSocketMessageType.CHAT_ERROR, message }));
+        ws.send(
+            JSON.stringify({ type: OutboundSocketMessageType.CHAT_ERROR, message, operationId }),
+        );
     }
 }

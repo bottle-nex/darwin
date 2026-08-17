@@ -1,22 +1,25 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { motion } from "motion/react";
-import { MdContentCopy, MdDelete, MdKeyboardArrowDown } from "react-icons/md";
-import { BsReply } from "react-icons/bs";
 import { HiChevronDown } from "react-icons/hi2";
 import { cn } from "@/lib/utils";
 import PlaygroundAvatar, {
     toneFor,
     type AvatarTone,
 } from "@/components/playground/Core/components/PlaygroundAvatar";
-import { to_plain_text, type Chat, type ProjectChat } from "@trymatcha/types";
+import {
+    reference_issues,
+    to_plain_text,
+    type Chat,
+    type ProjectChat,
+    type ReferencedIssueLabel,
+} from "@trymatcha/types";
 import MessageBody from "./MessageBody";
+import IssueReferenceCard from "./IssueReferenceCard";
+import MessageActions from "./MessageActions";
+import MessageReactions from "./MessageReactions";
+import { OPTIMISTIC_ID_PREFIX } from "@/hooks/chats/useChats";
+import { useReactionPending } from "@/hooks/chats/useMessageReactions";
 
 type AnyChat = Chat | ProjectChat;
 
@@ -128,77 +131,66 @@ function isClippable(plainText: string): boolean {
     return plainText.length > CLIP_CHAR_LIMIT || plainText.split("\n").length > CLIP_LINE_LIMIT;
 }
 
-/** Timestamp + options menu. Floats into the last text line on short messages;
- *  sits in its own row beside "Show more" once a message is clipped. */
-function MessageMeta({
-    chat,
+const TIME_TEXT = "text-[9px] leading-none tabular-nums";
+
+function messageTimeLabel(sentAt: Date): string {
+    return sentAt.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+}
+
+function MessageTime({
     isMine,
-    canDelete,
     sentAt,
-    onDelete,
-    floated,
+    className,
 }: {
-    chat: AnyChat;
     isMine: boolean;
-    canDelete: boolean;
     sentAt: Date;
-    onDelete: (chat: AnyChat) => void;
-    floated: boolean;
+    className?: string;
 }) {
     return (
-        <span
+        <time
+            dateTime={sentAt.toISOString()}
+            className={cn(TIME_TEXT, isMine ? "text-white/50" : "text-neutral-500", className)}
+        >
+            {messageTimeLabel(sentAt)}
+        </time>
+    );
+}
+
+function taggedIssuesOf(chat: AnyChat): ReferencedIssueLabel[] {
+    return [...reference_issues(chat.references ?? []).values()];
+}
+
+function IssueReferenceCards({
+    issues,
+    isMine,
+}: {
+    issues: ReferencedIssueLabel[];
+    isMine: boolean;
+}) {
+    if (issues.length === 0) return null;
+    return (
+        <div
             className={cn(
-                "relative flex items-center",
-                floated ? "float-right ml-2 mt-1.5" : "shrink-0",
+                "mb-1 grid gap-1.5",
+                issues.length > 1 && "grid-cols-[repeat(2,minmax(0,15rem))]",
+                isMine ? "justify-end" : "ml-8",
             )}
         >
-            {!chat.isDeleted && (
-                <DropdownMenu modal={false}>
-                    <DropdownMenuTrigger className="cursor-pointer" asChild>
-                        <Button
-                            type="button"
-                            variant="unstyled"
-                            aria-label="Message options"
-                            className={cn(
-                                "p-0.5 bg-charcoal rounded-sm aspect-square peer absolute inset-x-0 bottom-0 mx-auto w-fit flex cursor-pointer items-center justify-center opacity-0 transition-opacity group-hover/bubble:opacity-100 data-[state=open]:opacity-100 before:absolute before:-inset-x-3 before:-inset-y-2",
-                                isMine
-                                    ? "text-white/80 hover:text-white"
-                                    : "text-neutral-400 hover:text-neutral-200",
-                            )}
-                        >
-                            <MdKeyboardArrowDown className="size-3.75" />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" sideOffset={6} className="w-32">
-                        <DropdownMenuItem
-                            onSelect={() =>
-                                navigator.clipboard.writeText(
-                                    to_plain_text(chat.message, chat.references),
-                                )
-                            }
-                        >
-                            <MdContentCopy className="size-3.5" />
-                            Copy
-                        </DropdownMenuItem>
-                        {canDelete && (
-                            <DropdownMenuItem onSelect={() => onDelete(chat)}>
-                                <MdDelete className="size-3.5" />
-                                Delete
-                            </DropdownMenuItem>
-                        )}
-                    </DropdownMenuContent>
-                </DropdownMenu>
-            )}
-            <time
-                dateTime={sentAt.toISOString()}
-                className={cn(
-                    "text-[9px] leading-none transition-opacity group-hover/bubble:opacity-0 peer-data-[state=open]:opacity-0",
-                    isMine ? "text-white/80" : "text-neutral-400",
-                )}
-            >
-                {sentAt.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}
-            </time>
-        </span>
+            {issues.map((issue) => (
+                <IssueReferenceCard key={issue.id ?? issue.number} issue={issue} />
+            ))}
+        </div>
+    );
+}
+
+function TrailingMessageTime({ isMine, sentAt }: { isMine: boolean; sentAt: Date }) {
+    return (
+        <>
+            <span className={cn("invisible ml-2 inline-block select-none", TIME_TEXT)} aria-hidden>
+                {messageTimeLabel(sentAt)}
+            </span>
+            <MessageTime isMine={isMine} sentAt={sentAt} className="absolute right-3 bottom-1.5" />
+        </>
     );
 }
 
@@ -212,6 +204,7 @@ export default function ChatMessage({
     onReply,
     onDelete,
     onQuoteClick,
+    onReaction,
 }: {
     chat: AnyChat;
     isMine: boolean;
@@ -222,13 +215,16 @@ export default function ChatMessage({
     onReply: (chat: AnyChat) => void;
     onDelete: (chat: AnyChat) => void;
     onQuoteClick: (chatId: string) => void;
+    onReaction: (chat: AnyChat, emoji: string) => void;
 }) {
     const name = senderName(chat);
     const sentAt = new Date(chat.createdAt);
     const [isFresh] = useState(() => Date.now() - sentAt.getTime() < 3000);
     const [expanded, setExpanded] = useState(false);
     const clippable = !chat.isDeleted && isClippable(to_plain_text(chat.message, chat.references));
-    const metaProps = { chat, isMine, canDelete, sentAt, onDelete };
+    const reactionPending = useReactionPending(chat.id);
+    const reactionDisabled = reactionPending || chat.id.startsWith(OPTIMISTIC_ID_PREFIX);
+    const taggedIssues = chat.isDeleted ? [] : taggedIssuesOf(chat);
     return (
         <motion.li
             id={`chat-${chat.id}`}
@@ -237,118 +233,150 @@ export default function ChatMessage({
             transition={{ type: "spring", stiffness: 400, damping: 26 }}
             style={{ transformOrigin: isMine ? "bottom right" : "bottom left" }}
             className={cn(
-                "flex items-end gap-2 rounded-lg transition-colors duration-500 relative",
-                isMine ? "flex-row-reverse" : "flex-row",
-                startsGroup ? "mt-4 first:mt-0" : "mt-1",
+                "group/message relative flex flex-col rounded-lg transition-colors duration-300",
+                isMine ? "items-end" : "items-start",
+                startsGroup ? "mt-5 first:mt-0" : "mt-1.5",
             )}
         >
-            {!isMine && (
-                <PlaygroundAvatar
-                    letter={name.charAt(0).toUpperCase()}
-                    src={chat.sender?.image ?? undefined}
-                    tone={toneFor(chat.senderId ?? name)}
-                    size="lg"
-                    className={cn("rounded-full", !endsGroup && "invisible")}
-                />
-            )}
-            <article
-                className={cn(
-                    "group/bubble relative min-w-0 max-w-[65%] rounded-[5px] px-2.5 py-1.5 text-[13px] leading-snug wrap-anywhere",
-                    isMine ? "bg-indigo-500/85 text-white" : "bg-white/6 text-neutral-200",
-                    endsGroup && (isMine ? "rounded-br-xs" : "rounded-bl-xs"),
-                )}
-            >
-                {!chat.isDeleted && (
-                    <Button
-                        variant="unstyled"
-                        type="button"
-                        onClick={() => onReply(chat)}
-                        aria-label="Reply"
+            <div className="flex w-fit max-w-[84%] flex-col sm:max-w-[72%]">
+                <IssueReferenceCards issues={taggedIssues} isMine={isMine} />
+                <div
+                    className={cn("flex items-end gap-2", isMine ? "flex-row-reverse" : "flex-row")}
+                >
+                    {!isMine && (
+                        <PlaygroundAvatar
+                            letter={name.charAt(0).toUpperCase()}
+                            src={chat.sender?.image ?? undefined}
+                            tone={toneFor(chat.senderId ?? name)}
+                            size="lg"
+                            className={cn("rounded-full", !endsGroup && "invisible")}
+                        />
+                    )}
+                    <article
                         className={cn(
-                            "absolute top-1 z-10 cursor-pointer rounded-md bg-neutral-800 p-1 text-neutral-300 opacity-0 transition-opacity hover:text-white group-hover/bubble:opacity-100",
-                            isMine ? "-left-7" : "-right-7",
+                            "relative min-w-0 flex-1 rounded-[10px] px-3 py-2.5 text-[13px] leading-5 tracking-[0.002em] wrap-anywhere transition-colors duration-200",
+                            isMine
+                                ? "border border-graphite/50 bg-ink/20 text-neutral-100"
+                                : "border border-white/6 bg-[#151515] text-neutral-200",
+                            endsGroup && (isMine ? "rounded-br-[1px]" : "rounded-bl-[1px]"),
                         )}
                     >
-                        <BsReply className="size-3.5" />
-                    </Button>
-                )}
-                {startsGroup && !isMine && (
-                    <header
-                        className={cn("mb-0.5 text-[10.5px] font-medium", senderToneText(chat))}
-                    >
-                        {name}
-                    </header>
-                )}
-                {!chat.isDeleted && chat.repliedToId && (
-                    <QuotedMessage
-                        quote={chat.repliedTo}
-                        isMine={isMine}
-                        viewerId={viewerId}
-                        onQuoteClick={onQuoteClick}
-                    />
-                )}
-                {chat.isDeleted ? (
-                    <>
-                        <span
-                            className={cn("italic", isMine ? "text-white/60" : "text-neutral-500")}
-                        >
-                            Message deleted
-                        </span>
-                        <MessageMeta {...metaProps} floated />
-                    </>
-                ) : clippable ? (
-                    <>
-                        <motion.div
-                            initial={false}
-                            animate={{ height: expanded ? "auto" : COLLAPSED_HEIGHT }}
-                            transition={EXPAND_TRANSITION}
-                            className={cn(
-                                "overflow-hidden",
-                                !expanded &&
-                                    "[mask-image:linear-gradient(to_bottom,black_65%,transparent)]",
-                            )}
-                        >
-                            <MessageBody
-                                text={chat.message}
-                                references={chat.references}
+                        {!chat.isDeleted && (
+                            <MessageActions
+                                chat={chat}
                                 isMine={isMine}
+                                canDelete={canDelete}
+                                reactionDisabled={reactionDisabled}
+                                onReply={onReply}
+                                onDelete={onDelete}
+                                onReaction={onReaction}
                             />
-                        </motion.div>
-                        <div className="mt-1.5 flex items-center justify-between gap-x-3">
-                            <Button
-                                variant="unstyled"
-                                type="button"
-                                onClick={() => setExpanded((prev) => !prev)}
+                        )}
+                        {startsGroup && !isMine && (
+                            <header
                                 className={cn(
-                                    "flex cursor-pointer items-center gap-x-1 text-[11px] leading-none font-medium transition-colors",
-                                    isMine
-                                        ? "text-white/70 hover:text-white"
-                                        : "text-neutral-400 hover:text-neutral-200",
+                                    "mb-1.5 flex items-center gap-1.5 text-[10px] leading-none font-semibold tracking-[0.025em]",
+                                    senderToneText(chat),
                                 )}
                             >
-                                {expanded ? "Show less" : "Show more"}
-                                <motion.span
-                                    className="flex"
-                                    animate={{ rotate: expanded ? 180 : 0 }}
-                                    transition={EXPAND_TRANSITION}
+                                <span
+                                    className={cn(
+                                        "h-1.5 w-1.5 rounded-full",
+                                        NAME_TONE_RULE[senderTone(chat)],
+                                    )}
+                                    aria-hidden
+                                />
+                                {name}
+                            </header>
+                        )}
+                        {!chat.isDeleted && chat.repliedToId && (
+                            <QuotedMessage
+                                quote={chat.repliedTo}
+                                isMine={isMine}
+                                viewerId={viewerId}
+                                onQuoteClick={onQuoteClick}
+                            />
+                        )}
+                        {chat.isDeleted ? (
+                            <>
+                                <span
+                                    className={cn(
+                                        "italic",
+                                        isMine ? "text-white/60" : "text-neutral-500",
+                                    )}
                                 >
-                                    <HiChevronDown className="size-3.5" />
-                                </motion.span>
-                            </Button>
-                            <MessageMeta {...metaProps} floated={false} />
-                        </div>
-                    </>
-                ) : (
-                    <>
-                        <MessageBody
-                            text={chat.message}
-                            references={chat.references}
-                            isMine={isMine}
-                        />
-                        <MessageMeta {...metaProps} floated />
-                    </>
-                )}
-            </article>
+                                    Message deleted
+                                </span>
+                                <TrailingMessageTime isMine={isMine} sentAt={sentAt} />
+                            </>
+                        ) : clippable ? (
+                            <>
+                                <motion.div
+                                    initial={false}
+                                    animate={{ height: expanded ? "auto" : COLLAPSED_HEIGHT }}
+                                    transition={EXPAND_TRANSITION}
+                                    className={cn(
+                                        "overflow-hidden",
+                                        !expanded &&
+                                            "[mask-image:linear-gradient(to_bottom,black_65%,transparent)]",
+                                    )}
+                                >
+                                    <MessageBody
+                                        text={chat.message}
+                                        references={chat.references}
+                                        isMine={isMine}
+                                    />
+                                </motion.div>
+                                <div className="mt-1.5 flex items-center justify-between gap-x-3">
+                                    <Button
+                                        variant="unstyled"
+                                        type="button"
+                                        onClick={() => setExpanded((prev) => !prev)}
+                                        className={cn(
+                                            "flex cursor-pointer items-center gap-x-1 text-[11px] leading-none font-medium transition-colors",
+                                            isMine
+                                                ? "text-white/70 hover:text-white"
+                                                : "text-neutral-400 hover:text-neutral-200",
+                                        )}
+                                    >
+                                        {expanded ? "Show less" : "Show more"}
+                                        <motion.span
+                                            className="flex"
+                                            animate={{ rotate: expanded ? 180 : 0 }}
+                                            transition={EXPAND_TRANSITION}
+                                        >
+                                            <HiChevronDown className="size-3.5" />
+                                        </motion.span>
+                                    </Button>
+                                    <MessageTime
+                                        isMine={isMine}
+                                        sentAt={sentAt}
+                                        className="shrink-0"
+                                    />
+                                </div>
+                            </>
+                        ) : (
+                            <>
+                                <MessageBody
+                                    text={chat.message}
+                                    references={chat.references}
+                                    isMine={isMine}
+                                />
+                                <TrailingMessageTime isMine={isMine} sentAt={sentAt} />
+                            </>
+                        )}
+                    </article>
+                </div>
+            </div>
+            {!chat.isDeleted && (
+                <MessageReactions
+                    reactions={chat.reactions ?? []}
+                    isMine={isMine}
+                    disabled={reactionDisabled}
+                    className={cn("max-w-[84%] sm:max-w-[72%]", !isMine && "ml-8")}
+                    onReact={(emoji) => onReaction(chat, emoji)}
+                />
+            )}
         </motion.li>
     );
 }
