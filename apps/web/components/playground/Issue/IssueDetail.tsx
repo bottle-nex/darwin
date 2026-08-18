@@ -4,10 +4,11 @@ import type { BoardColumn, BoardIssue } from "@/types/board";
 import { useIssueChatPanelStore } from "@/store/issues/useIssueChatPanelStore";
 import OptionButton from "@/components/playground/Home/KanbanDisplay/OptionsBar/KanbanOptionPanels/OptionButton";
 import { TooltipComponent } from "@/components/ui/tooltip-component";
+import { PLAYGROUND_PANE_SHELL } from "@/components/playground/Core/components/paneBar";
 import {
-    PANE_BAR_SHELL,
-    PLAYGROUND_PANE_SHELL,
-} from "@/components/playground/Core/components/paneBar";
+    PaneActionsSlot,
+    PaneLeadSlot,
+} from "@/components/playground/Core/components/PlaygroundPaneSlots";
 import PlaygroundBreadcrumb from "@/components/playground/Core/components/PlaygroundBreadcrumb";
 import IssueTitleField from "./IssueTitleField";
 import IssueBody from "./IssueBody";
@@ -37,8 +38,11 @@ export default function IssueDetail({
 
     return (
         <main className={PLAYGROUND_PANE_SHELL}>
-            <div className={PANE_BAR_SHELL}>
+            <PaneLeadSlot>
                 <PlaygroundBreadcrumb issueNumber={issue.number} />
+            </PaneLeadSlot>
+
+            <PaneActionsSlot>
                 <div className="flex items-center gap-x-2">
                     <TooltipComponent delayDuration={1000} content="Comments" side="bottom">
                         <OptionButton
@@ -50,7 +54,7 @@ export default function IssueDetail({
                     </TooltipComponent>
                     <IssueSubmitAction form={form} warningPlacement="below" />
                 </div>
-            </div>
+            </PaneActionsSlot>
             <div className="flex min-h-0 min-w-0 flex-1 flex-row m-4">
                 <div className="flex min-h-0 w-full min-w-0 max-w-200 flex-col">
                     <div

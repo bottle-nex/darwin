@@ -5,10 +5,8 @@ import { useBoard } from "@/hooks/issues/useBoard";
 import { isTyping } from "@/hooks/shortcuts/usePlaygroundShortcuts";
 import { Button } from "@/components/ui/button";
 import LogoLoader from "@/components/app/LogoLoader";
-import {
-    PANE_BAR_SHELL,
-    PLAYGROUND_PANE_SHELL,
-} from "@/components/playground/Core/components/paneBar";
+import { PLAYGROUND_PANE_SHELL } from "@/components/playground/Core/components/paneBar";
+import { PaneLeadSlot } from "@/components/playground/Core/components/PlaygroundPaneSlots";
 import PlaygroundBreadcrumb from "@/components/playground/Core/components/PlaygroundBreadcrumb";
 import { useIssueRoute } from "./useIssueRoute";
 import IssueDetail from "./IssueDetail";
@@ -35,9 +33,9 @@ export default function IssueDisplay({ issueId }: { issueId: string }) {
 
     return (
         <main className={PLAYGROUND_PANE_SHELL}>
-            <div className={PANE_BAR_SHELL}>
+            <PaneLeadSlot>
                 <PlaygroundBreadcrumb />
-            </div>
+            </PaneLeadSlot>
             {!board ? (
                 <LogoLoader className="h-full w-full text-snow" />
             ) : (

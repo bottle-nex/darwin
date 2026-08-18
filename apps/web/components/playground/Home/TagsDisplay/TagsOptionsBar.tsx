@@ -18,6 +18,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import OptionButton from "@/components/playground/Home/KanbanDisplay/OptionsBar/KanbanOptionPanels/OptionButton";
+import {
+    PaneActionsSlot,
+    PaneLeadSlot,
+} from "@/components/playground/Core/components/PlaygroundPaneSlots";
 import { useTagsOptionsStore, type TagSort } from "@/store/tags/useTagsOptionsStore";
 
 const SORTS: { id: TagSort; label: string; icon: typeof MdSortByAlpha }[] = [
@@ -38,60 +42,78 @@ export default function TagsOptionsBar({ count, onCreate }: TagsOptionsBarProps)
         useTagsOptionsStore();
 
     return (
-        <div className="flex h-10 shrink-0 items-center justify-between gap-2 border-b border-white/5 px-3">
-            <div className="flex min-w-0 items-center gap-2">
-                <span className="shrink-0 text-[13px] font-medium text-neutral-200">Tags</span>
-                <span className="shrink-0 text-[12px] text-neutral-500">{count}</span>
+        <>
+            <PaneLeadSlot>
+                <div className="flex min-w-0 items-center gap-2">
+                    <span className="shrink-0 text-[13px] font-medium text-neutral-200">Tags</span>
+                    <span className="shrink-0 text-[12px] text-neutral-500">{count}</span>
 
-                <AnimatePresence initial={false}>
-                    {searchOpen && (
-                        <TagsSearchBar value={search} onChange={setSearch} onClose={closeSearch} />
-                    )}
-                </AnimatePresence>
-            </div>
+                    <AnimatePresence initial={false}>
+                        {searchOpen && (
+                            <TagsSearchBar
+                                value={search}
+                                onChange={setSearch}
+                                onClose={closeSearch}
+                            />
+                        )}
+                    </AnimatePresence>
+                </div>
+            </PaneLeadSlot>
 
-            <div className="flex shrink-0 items-center gap-1.5">
-                <OptionButton
-                    label="Search"
-                    icon={LuSearch}
-                    active={searchOpen}
-                    onClick={() => (searchOpen ? closeSearch() : openSearch())}
-                />
+            <PaneActionsSlot>
+                <div className="flex shrink-0 items-center gap-1.5">
+                    <OptionButton
+                        label="Search"
+                        icon={LuSearch}
+                        active={searchOpen}
+                        onClick={() => (searchOpen ? closeSearch() : openSearch())}
+                    />
 
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <OptionButton label="Sort" icon={LuArrowUpDown} active={sort !== "name"} />
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-48">
-                        {SORTS.map((option) => (
-                            <DropdownMenuItem
-                                key={option.id}
-                                onSelect={() => setSort(option.id)}
-                                className={undefined}
-                            >
-                                <option.icon className="size-3.5 text-neutral-400" aria-hidden />
-                                <span className="flex-1">{option.label}</span>
-                                {sort === option.id && (
-                                    <MdCheck className="size-3.5 text-neutral-200" aria-hidden />
-                                )}
-                            </DropdownMenuItem>
-                        ))}
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <OptionButton
+                                label="Sort"
+                                icon={LuArrowUpDown}
+                                active={sort !== "name"}
+                            />
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-48">
+                            {SORTS.map((option) => (
+                                <DropdownMenuItem
+                                    key={option.id}
+                                    onSelect={() => setSort(option.id)}
+                                    className={undefined}
+                                >
+                                    <option.icon
+                                        className="size-3.5 text-neutral-400"
+                                        aria-hidden
+                                    />
+                                    <span className="flex-1">{option.label}</span>
+                                    {sort === option.id && (
+                                        <MdCheck
+                                            className="size-3.5 text-neutral-200"
+                                            aria-hidden
+                                        />
+                                    )}
+                                </DropdownMenuItem>
+                            ))}
+                        </DropdownMenuContent>
+                    </DropdownMenu>
 
-                <div className="mx-1 h-4 w-px bg-white/8" />
+                    <div className="mx-1 h-4 w-px bg-white/8" />
 
-                <Button
-                    type="button"
-                    variant="tertiary"
-                    onClick={onCreate}
-                    className="ml-0.5 flex h-6 items-center gap-1 rounded-sm bg-neutral-100 px-2 text-[11.5px] font-medium text-neutral-900 hover:bg-neutral-200"
-                >
-                    <MdAdd className="size-3.5 text-neutral-800!" aria-hidden />
-                    New tag
-                </Button>
-            </div>
-        </div>
+                    <Button
+                        type="button"
+                        variant="tertiary"
+                        onClick={onCreate}
+                        className="ml-0.5 flex h-6 items-center gap-1 rounded-sm bg-neutral-100 px-2 text-[11.5px] font-medium text-neutral-900 hover:bg-neutral-200"
+                    >
+                        <MdAdd className="size-3.5 text-neutral-800!" aria-hidden />
+                        New tag
+                    </Button>
+                </div>
+            </PaneActionsSlot>
+        </>
     );
 }
 
