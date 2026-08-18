@@ -27,7 +27,7 @@ export default function ThreadDisplay() {
     }
 
     return (
-        <div className="flex min-h-0 flex-1 flex-col *:px-4 *:py-3">
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col *:px-4 *:py-3">
             <ProjectChatThread
                 key={
                     selectedThread.kind === "project"

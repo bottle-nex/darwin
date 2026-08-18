@@ -22,31 +22,34 @@ export default function IssueReferenceCard({ issue }: { issue: ReferencedIssueLa
             type="button"
             onClick={() => issue.id && openIssue(issue.id)}
             className={cn(
-                "flex w-60 h-25 cursor-pointer items-stretch rounded-[8px] border border-graphite/50 p-1 text-left relative",
+                "flex w-full max-w-52 h-21 cursor-pointer items-stretch rounded-[7px] border border-graphite/50 p-1 text-left relative",
                 status?.cardTint ?? "bg-cement",
             )}
         >
-            <div className="h-4.5 w-4.5 bg-charcoal rounded-full absolute top-1/2 -translate-y-1/2 -left-2 border-r border-graphite" />
-            <span className="flex w-12 shrink-0 items-start justify-center" aria-hidden>
-                <span className="flex size-8 items-center justify-center rounded-full">
-                    <StatusIcon className={cn("size-6", status?.titleBox ?? "text-neutral-500")} />
+            <div className="h-3.5 w-3.5 bg-charcoal rounded-full absolute top-1/2 -translate-y-1/2 -left-1.5 border-r border-graphite" />
+            <span className="flex w-9 shrink-0 items-start justify-center" aria-hidden>
+                <span className="flex size-6 items-center justify-center rounded-full">
+                    <StatusIcon
+                        className={cn("size-4.5", status?.titleBox ?? "text-neutral-500")}
+                    />
                 </span>
             </span>
-            <span className="flex min-w-0 flex-1 flex-col items-start gap-0.75 rounded-[6px] bg-charcoal/70 px-2.5 py-2 backdrop-blur-xs">
-                <span className="line-clamp-2 text-[12px] leading-4 font-medium text-neutral-100">
-                    {issue.title}
-                </span>
-                {issue.description && (
-                    <span
-                        className="line-clamp-2 text-[11.5px] leading-4 font-medium text-foreground/60 [&_a]:underline [&_em]:italic [&_p]:m-0 [&_p]:inline [&_strong]:font-semibold [&_strong]:text-neutral-200"
-                        dangerouslySetInnerHTML={{ __html: issue.description }}
-                    />
-                )}
-                <span className="line-clamp-2 text-[11.5px] leading-4 font-medium text-neutral-100"></span>
-                <span className="text-[10px] leading-4 text-neutral-500">
+            <span className="flex min-w-0 flex-1 flex-col items-start justify-between gap-0.5 rounded-[5px] bg-charcoal/70 px-2 py-1.5 backdrop-blur-xs">
+                <span className="shrink-0 text-[11.5px] leading-3.5 text-neutral-500">
                     #{issue.number}
                     {status && ` · ${status.title}`}
                 </span>
+                <div className="w-full min-w-0 overflow-hidden">
+                    <span className="block truncate text-[14px] leading-4.5 font-medium text-neutral-100">
+                        {issue.title}
+                    </span>
+                    {issue.description && (
+                        <span
+                            className="line-clamp-1 text-[10.5px] leading-3.5 font-medium text-foreground/60 [&_a]:underline [&_em]:italic [&_p]:m-0 [&_p]:inline [&_strong]:font-semibold [&_strong]:text-neutral-200"
+                            dangerouslySetInnerHTML={{ __html: issue.description }}
+                        />
+                    )}
+                </div>
             </span>
         </Button>
     );

@@ -97,7 +97,7 @@ function QuotedMessage({
                     </cite>
                     <span
                         className={cn(
-                            "truncate text-[12px] leading-4",
+                            "line-clamp-2 wrap-anywhere text-[12px] leading-4",
                             isMine ? "text-white/65" : "text-neutral-400",
                         )}
                     >
@@ -172,7 +172,7 @@ function IssueReferenceCards({
         <div
             className={cn(
                 "mb-1 mt-1 grid gap-2",
-                issues.length > 1 && "grid-cols-[repeat(2,minmax(0,15rem))]",
+                issues.length > 1 && "grid-cols-[repeat(2,minmax(0,13rem))]",
                 isMine ? "justify-end" : "ml-8",
             )}
         >

@@ -28,7 +28,7 @@ export default function ThreadPanelSidebar() {
                 active={isProjectChatActive}
                 onClick={() => openThread({ kind: "project" }, projectSlug ?? "")}
             />
-            <div className="my-1.5 h-px bg-white/5 px-2" />
+            {/*<div className="my-1.5 h-px bg-white/5 px-2" />*/}
             {(threads ?? []).map((t) => {
                 const isActive =
                     selectedThread?.kind === "issue" && selectedThread.issueId === t.id;
