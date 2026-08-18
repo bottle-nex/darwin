@@ -3,10 +3,8 @@ import z from "zod";
 import ResponseWriter from "../../services/service.response";
 import Access from "../../access-control/access";
 import { Action, Permissions } from "@trymatcha/access-control";
-import { ActivityType, ActorType, IssueStatus, Prisma, prisma } from "@trymatcha/database";
-import { server_services } from "../..";
-import { OutboundSocketMessageType } from "@trymatcha/types";
-import ActivityService from "../../services/service.activity";
+import { prisma } from "@trymatcha/database";
+import IssueService from "../../services/service.issue";
 
 export default class IssueCreateController {
     static body_schema = z
@@ -95,99 +93,22 @@ export default class IssueCreateController {
                 }
             }
 
-            let issue: { id: string; status: IssueStatus } | undefined;
-            for (let attempt = 0; attempt < 5; attempt++) {
-                try {
-                    issue = await prisma.$transaction(async (tx) => {
-                        const last_issue = await tx.issue.findFirst({
-                            where: { projectId: parsed_body.data.project_id },
-                            orderBy: { number: "desc" },
-                            select: { number: true },
-                        });
-
-                        const created = await tx.issue.create({
-                            data: {
-                                title: parsed_body.data.title,
-                                description: parsed_body.data.description,
-                                priority: parsed_body.data.priority ?? 3,
-                                startDate: parsed_body.data.start_date,
-                                targetDate: parsed_body.data.target_date,
-                                projectId: parsed_body.data.project_id,
-                                createdById: user.id,
-                                customColumnId: parsed_body.data.custom_column_id,
-                                status: parsed_body.data.custom_column_id
-                                    ? IssueStatus.Parked
-                                    : IssueStatus.Todo,
-                                number: (last_issue?.number ?? 0) + 1,
-                                assignees: parsed_body.data.assignee_ids?.length
-                                    ? {
-                                          connect: parsed_body.data.assignee_ids.map((id) => ({
-                                              id,
-                                          })),
-                                      }
-                                    : undefined,
-                                tags: parsed_body.data.tag_ids?.length
-                                    ? { connect: parsed_body.data.tag_ids.map((id) => ({ id })) }
-                                    : undefined,
-                            },
-                            select: {
-                                id: true,
-                                status: true,
-                            },
-                        });
-
-                        await ActivityService.emit(tx, {
-                            issueId: created.id,
-                            actor: { type: ActorType.User, userId: user.id, name: user.name },
-                            events: [
-                                { type: ActivityType.IssueCreated, dedupeKey: "issue:created" },
-                            ],
-                        });
-
-                        return created;
-                    });
-                    break;
-                } catch (error) {
-                    if (
-                        error instanceof Prisma.PrismaClientKnownRequestError &&
-                        error.code === "P2002"
-                    ) {
-                        continue;
-                    }
-                    throw error;
-                }
-            }
-
-            if (!issue) {
-                ResponseWriter.system_error(res);
-                return;
-            }
-
-            const full_issue = await prisma.issue.findUniqueOrThrow({
-                where: { id: issue.id },
-                include: { creator: true, assignees: true, tags: true },
+            const full_issue = await IssueService.create_issue({
+                project_id: parsed_body.data.project_id,
+                title: parsed_body.data.title,
+                description: parsed_body.data.description,
+                priority: parsed_body.data.priority,
+                custom_column_id: parsed_body.data.custom_column_id,
+                start_date: parsed_body.data.start_date,
+                target_date: parsed_body.data.target_date,
+                assignee_ids: parsed_body.data.assignee_ids,
+                tag_ids: parsed_body.data.tag_ids,
+                created_by: { id: user.id, name: user.name },
             });
 
-            const channel_name = server_services.publisher.get_channel_name(
-                parsed_body.data.project_id,
-            );
-
-            const publishing_body = {
-                type: OutboundSocketMessageType.ISSUE_CREATED,
-                projectId: parsed_body.data.project_id,
-                payload: full_issue,
-            };
-
-            await server_services.publisher.publish_message(
-                channel_name,
-                JSON.stringify(publishing_body),
-            );
-
-            if (!parsed_body.data.custom_column_id || issue.status === IssueStatus.Todo) {
-                console.log(
-                    `[issue:${issue.id}] created as Todo in project ${parsed_body.data.project_id}, queueing project for routing`,
-                );
-                await server_services.queue.enqueue_project(parsed_body.data.project_id);
+            if (!full_issue) {
+                ResponseWriter.system_error(res);
+                return;
             }
 
             ResponseWriter.created(res, { issue: full_issue }, "Issue created successfully");

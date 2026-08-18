@@ -97,3 +97,8 @@ export const PROJECT_CHAT_URL = (project_id: string) => `${PROJECT_CHATS_URL}/${
 
 export const NOTIFICATIONS_URL = API_URL + "/notifications";
 export const NOTIFICATIONS_READ_URL = NOTIFICATIONS_URL + "/read";
+
+export const API_KEYS_URL = API_URL + "/claude-mcp/api-keys";
+export const REVOKE_API_KEY_URL = (id: string) => `${API_KEYS_URL}/${id}`;
+export const CLAUDE_MCP_URL = API_URL + "/claude-mcp/mcp";
+export const CLAUDE_MCP_CONNECTOR_URL = (key: string) => `${CLAUDE_MCP_URL}/${key}`;

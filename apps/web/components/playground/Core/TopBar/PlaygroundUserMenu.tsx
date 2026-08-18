@@ -31,6 +31,7 @@ import { useFetchOrganizations } from "@/hooks/playground/useFetchOrganizations"
 import PlaygroundAvatar from "@/components/playground/Core/components/PlaygroundAvatar";
 import SessionServices from "@/lib/session";
 import CreateOrganizationModal from "@/components/playground/landing/CreateOrganizationModal";
+import SettingsPanel from "@/components/playground/Core/TopBar/SettingsPanel";
 
 const MENU_ITEMS: { id: string; label: string; icon: IconType }[] = [
     { id: "personal", label: "Personal info", icon: MdPerson },
@@ -100,6 +101,7 @@ function OrgSwitcherSubMenu({ onCreateOrg }: { onCreateOrg: () => void }) {
 export default function PlaygroundUserMenu() {
     const user = useUserSessionStore((s) => s.session?.user);
     const [isCreateOrgOpen, setIsCreateOrgOpen] = useState(false);
+    const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
     const name = user?.name?.trim() || user?.email?.split("@")[0] || "User";
     const handle = `@${(user?.email?.split("@")[0] || name).toLowerCase().replace(/\s+/g, "")}`;
@@ -171,7 +173,14 @@ export default function PlaygroundUserMenu() {
 
                     <div className="p-1">
                         {MENU_ITEMS.map((item) => (
-                            <DropdownMenuItem key={item.id}>
+                            <DropdownMenuItem
+                                key={item.id}
+                                onSelect={
+                                    item.id === "settings"
+                                        ? () => setIsSettingsOpen(true)
+                                        : undefined
+                                }
+                            >
                                 <item.icon className="size-4 text-neutral-400" aria-hidden />
                                 {item.label}
                             </DropdownMenuItem>
@@ -197,6 +206,7 @@ export default function PlaygroundUserMenu() {
                 </DropdownMenuContent>
             </DropdownMenu>
             <CreateOrganizationModal open={isCreateOrgOpen} onOpenChange={setIsCreateOrgOpen} />
+            <SettingsPanel open={isSettingsOpen} onOpenChange={setIsSettingsOpen} />
         </>
     );
 }
