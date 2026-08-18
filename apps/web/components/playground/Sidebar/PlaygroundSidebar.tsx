@@ -34,7 +34,11 @@ export default function PlaygroundSidebar() {
         >
             <motion.div
                 initial={false}
-                animate={collapsed ? { rotateY: -32, scale: 0.9 } : { rotateY: 0, scale: 1 }}
+                animate={
+                    collapsed
+                        ? { rotateY: -32, scale: 0.9, opacity: 0 }
+                        : { rotateY: 0, scale: 1, opacity: 1 }
+                }
                 transition={{ duration: instant ? 0 : 0.35, ease: [0.22, 1, 0.36, 1] }}
                 style={{ width, transformOrigin: "left center" }}
                 className={cn("h-full min-h-0", collapsed && "pointer-events-none")}
