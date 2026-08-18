@@ -11,12 +11,9 @@ import {
     PaneLeadSlot,
 } from "@/components/playground/Core/components/PlaygroundPaneSlots";
 import PlaygroundBreadcrumb from "@/components/playground/Core/components/PlaygroundBreadcrumb";
-<<<<<<< HEAD
 import IssueDropdown from "@/components/playground/Home/KanbanDisplay/IssueDropdown";
-=======
 import ConfirmDialog from "@/components/utility/ConfirmDialog";
 import { useEscapeExit } from "@/hooks/shortcuts/useEscapeExit";
->>>>>>> d613c6f (added escape exits and global confirm dialog.)
 import IssueTitleField from "./IssueTitleField";
 import IssueBody from "./IssueBody";
 import IssueSubmitAction from "./IssueSubmitAction";
@@ -101,23 +98,16 @@ export default function IssueDetail({
                     <IssueProperties form={form} issue={issue} />
                     <IssueChatPanel issueId={issue.id} />
                 </div>
-<<<<<<< HEAD
+                <ConfirmDialog
+                    open={confirmingClose}
+                    onOpenChange={setConfirmingClose}
+                    title="Save your changes?"
+                    description="This issue has unsaved edits. Closing it now will lose them."
+                    cancel={{ label: "Discard", variant: "destructive", onClick: close }}
+                    confirm={{ label: "Save", variant: "tertiary", onClick: saveAndClose }}
+                    pending={form.pending}
+                />
             </main>
         </IssueDropdown>
-=======
-                <IssueProperties form={form} issue={issue} />
-                <IssueChatPanel issueId={issue.id} />
-            </div>
-            <ConfirmDialog
-                open={confirmingClose}
-                onOpenChange={setConfirmingClose}
-                title="Save your changes?"
-                description="This issue has unsaved edits. Closing it now will lose them."
-                cancel={{ label: "Discard", variant: "destructive", onClick: close }}
-                confirm={{ label: "Save", variant: "tertiary", onClick: saveAndClose }}
-                pending={form.pending}
-            />
-        </main>
->>>>>>> d613c6f (added escape exits and global confirm dialog.)
     );
 }

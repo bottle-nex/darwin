@@ -196,11 +196,11 @@ export function useIssueForm({
             title !== issue.title ||
             body.isDirty ||
             priority !== (KanbanMappers.NUMBER_TO_PRIORITY[issue.priority] ?? "medium") ||
-            !sameIds(
+            !sameIdSet(
                 memberIds,
                 issue.assignees.map((a) => a.id),
             ) ||
-            !sameIds(
+            !sameIdSet(
                 tagIds,
                 issue.tags.map((t) => t.id),
             ) ||
@@ -246,7 +246,7 @@ export function useIssueForm({
     };
 }
 
-function sameIds(a: string[], b: string[]): boolean {
+function sameIdSet(a: string[], b: string[]): boolean {
     if (a.length !== b.length) return false;
     const sortedB = [...b].sort();
     return [...a].sort().every((id, index) => id === sortedB[index]);
