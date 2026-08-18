@@ -1,21 +1,14 @@
-/// One entry on an issue's timeline. Append-only — rows are never updated after
-/// insert, so anything that mutates while it happens (an agent run, a comment)
-/// lives in its own table and is grouped or merged in at read time.
-///
-/// Display values are frozen into `payload` at write time — a label's name and
-/// colour, the actor's name — so the timeline stays readable after the row it
-/// described is deleted.
 model IssueActivity {
   id      String @id @default(cuid())
-  /// The real sort key. `createdAt` is millisecond-resolution and one update can
-  /// emit six rows in a single transaction, which leaves cuid-keyed ordering
-  /// non-deterministic within the batch and visibly reshuffles the feed on refetch.
+  
+  // this stores the sequence number for each activity row (basically what happened first)
   seq     BigInt @default(autoincrement())
   issueId String
   issue   Issue  @relation(fields: [issueId], references: [id], onDelete: Cascade)
 
   type    ActivityType
-  /// Discriminated by `type`. See ActivityPayloadMap in @trymatcha/types.
+  
+  // this is the most crucial point, as it stores the JSON (instead of strict DS)
   payload Json?
 
   actorType     ActorType
@@ -26,13 +19,11 @@ model IssueActivity {
 
   surface ActivitySurface @default(Primary)
 
-  /// Grouping key, not a pointer — every row emitted during an agent attempt
-  /// carries it, and the `RunStarted` row is the one that renders as the card.
+  // this is created when an agent session starts to work on an issue
   sessionId String?
   session   AgentSession? @relation(fields: [sessionId], references: [id], onDelete: SetNull)
 
-  /// Idempotency for retried worker reports. The unique index below is what
-  /// makes `createMany({ skipDuplicates: true })` actually deduplicate.
+  // this is used to drop duplicate activity rows
   dedupeKey String?
 
   createdAt DateTime @default(now())
@@ -42,12 +33,7 @@ model IssueActivity {
   @@index([sessionId])
 }
 
-/// One attempt by a worker at one issue. Unlike an activity row this mutates for
-/// the whole time it runs — status flips, stats and cost accumulate — which is
-/// why it is not itself a row on the timeline.
-///
-/// `id` is the `run_id` the VM mints per attempt, so the worker's "run started"
-/// report is an upsert and survives being retried.
+// an agent session is created when an agent starts working on an issue
 model AgentSession {
   id       String  @id
   issueId  String
@@ -58,7 +44,7 @@ model AgentSession {
   attemptNumber Int                @default(1)
   status        AgentSessionStatus @default(Running)
 
-  /// One-line description of what the attempt did, written when it settles.
+  // a basic summary of what changed
   summary  String?
   /// { numTurns, durationMs, commits?, filesChanged? }
   stats    Json?
@@ -84,9 +70,6 @@ enum AgentSessionStatus {
   Aborted
 }
 
-/// Who caused the event. `System` covers transitions nobody authored — a lease
-/// expiring, an issue being requeued — which would otherwise be misattributed
-/// to whichever worker happened to be holding the issue.
 enum ActorType {
   User
   Agent
@@ -94,17 +77,12 @@ enum ActorType {
   Github
 }
 
-/// Primary renders in the feed. Secondary hides behind "show details".
-/// Audit never renders — it exists for compliance queries and for the agent
-/// rehydrating what happened on an issue.
 enum ActivitySurface {
-  Primary
-  Secondary
-  Audit
+  Primary // renders in the feed
+  Secondary // hides behind "show details"
+  Audit // never renders
 }
 
-/// The full event vocabulary. Members without a writer today are declared
-/// deliberately: adding the writer later shouldn't need a migration.
 enum ActivityType {
   // lifecycle
   IssueCreated

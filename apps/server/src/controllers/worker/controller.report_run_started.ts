@@ -5,7 +5,7 @@ import ResponseWriter from "../../services/service.response";
 import ActivityService from "../../services/service.activity";
 
 const body_schema = z.object({
-    /** Minted by the VM per attempt and used as `AgentSession.id`, which is what makes this idempotent. */
+    // minted by the VM, used as AgentSession.id
     run_id: z.string().min(1),
     issue_id: z.string().min(1),
 });
@@ -60,12 +60,8 @@ export default class ReportRunStarted {
                             payload: { attemptNumber: session.attemptNumber },
                             dedupeKey: `run:${session.id}:started`,
                         },
-                        // The VM flips the issue itself in its compare-and-swap claim,
-                        // so by the time this lands the transition has already happened.
                         {
                             type: ActivityType.StatusChanged,
-                            // A claimable issue is always `Queued`, never parked in a
-                            // custom column, so both ends are plain statuses.
                             payload: {
                                 from: { kind: "status", status: IssueStatus.Queued },
                                 to: { kind: "status", status: IssueStatus.InProgress },

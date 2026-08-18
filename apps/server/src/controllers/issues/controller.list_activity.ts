@@ -14,7 +14,6 @@ export default class IssueActivityListController {
     });
 
     static query_schema = z.object({
-        /** `seq` of the oldest row already held — the page returned ends just before it. */
         before: z.coerce.bigint().optional(),
         limit: z.coerce.number().int().min(1).max(200).optional(),
     });
@@ -53,8 +52,6 @@ export default class IssueActivityListController {
 
             const limit = query_data.limit ?? DEFAULT_LIMIT;
 
-            // Newest-first so the default page is the tail of the feed, then
-            // reversed below because the timeline renders oldest to newest.
             const rows = await prisma.issueActivity.findMany({
                 where: {
                     issueId: params_data.id,

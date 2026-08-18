@@ -12,7 +12,6 @@ const body_schema = z.object({
     pr_url: z.string().min(1),
     branch: z.string().min(1),
     summary: z.string().min(1),
-    /** Attaches the PR row to the attempt that opened it. Absent on older VM builds. */
     run_id: z.string().min(1).optional(),
 });
 

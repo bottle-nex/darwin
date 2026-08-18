@@ -139,8 +139,6 @@ export default class IssueCreateController {
                         await ActivityService.emit(tx, {
                             issueId: created.id,
                             actor: { type: ActorType.User, userId: user.id, name: user.name },
-                            // Same key the backfill migration used, so a pre-existing
-                            // issue never ends up with two "created" rows.
                             events: [
                                 { type: ActivityType.IssueCreated, dedupeKey: "issue:created" },
                             ],

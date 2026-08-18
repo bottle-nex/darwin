@@ -84,7 +84,7 @@ export default class IssueAssignController {
 
             const already_assigned = issue.assignees.length > 0;
 
-            // `connect` is idempotent — re-assigning an already-assigned user is a no-op.
+            // `connect` is idempotent, re-assigning an already-assigned user is a no-op.
             const { updated, activities } = await prisma.$transaction(async (tx) => {
                 const updated = await tx.issue.update({
                     where: { id: issue_id },

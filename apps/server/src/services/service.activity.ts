@@ -7,32 +7,25 @@ type EventFor<T extends ActivityType> = {
     type: T;
     payload?: Omit<ActivityPayloadMap[T], "actor">;
     surface?: ActivitySurface;
-    /** Scoped to the issue by `@@unique([issueId, dedupeKey])`, so it only needs to be unique per issue. */
     dedupeKey?: string;
 };
 
-/** Discriminated by `type`, so a heterogeneous batch still typechecks each payload. */
 export type ActivityEvent = { [T in ActivityType]: EventFor<T> }[ActivityType];
 
 export type ActivityActor = {
     type: ActorType;
     userId?: string | null;
     workerId?: string | null;
-    /** Frozen into every payload — the actor relations are `SetNull`. */
     name?: string | null;
     image?: string | null;
 };
 
-/** Anything Prisma hands back for `IssueActivity`, whatever was included alongside. */
+// this just stores the sequence number for each activity row (basically what happened first)
 type ActivityRow = { seq: bigint };
 
 export const ACTIVITY_ACTOR_SELECT = { select: { id: true, name: true, image: true } } as const;
 
 export default class ActivityService {
-    /**
-     * Appends timeline rows in the caller's transaction, so an activity row can
-     * never outlive a mutation that rolled back. Publish separately, after commit.
-     */
     static async emit(
         tx: Prisma.TransactionClient,
         input: {
@@ -69,12 +62,10 @@ export default class ActivityService {
         });
     }
 
-    /** `seq` is a BigInt and would throw in `JSON.stringify`. See `IssueActivity` in @trymatcha/types. */
     static to_wire<T extends ActivityRow>(row: T) {
         return { ...row, seq: row.seq.toString() };
     }
 
-    /** One message per batch — N publishes for one PATCH can land out of order. */
     static async publish(project_id: string, issue_id: string, rows: ActivityRow[]) {
         if (!rows.length) return;
 
@@ -88,6 +79,7 @@ export default class ActivityService {
         );
     }
 
+    // used to emit agent session..
     static async publish_session(project_id: string, session: AgentSession) {
         await server_services.publisher.publish_message(
             server_services.publisher.get_channel_name(project_id),
