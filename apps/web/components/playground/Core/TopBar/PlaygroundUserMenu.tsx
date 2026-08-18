@@ -117,39 +117,42 @@ export default function PlaygroundUserMenu() {
         <>
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                    {user?.image ? (
-                        <Button
-                            variant="unstyled"
-                            type="button"
-                            aria-label="Account menu"
-                            className="relative size-7 cursor-pointer overflow-hidden rounded-full outline-none ring-1 ring-white/10 transition hover:ring-white/25 data-[state=open]:ring-white/30"
-                        >
-                            <Image
-                                src={user.image}
-                                alt=""
-                                fill
-                                sizes="28px"
-                                className="object-cover"
-                            />
-                        </Button>
-                    ) : (
-                        <Button
-                            variant="unstyled"
-                            type="button"
-                            aria-label="Account menu"
-                            className="cursor-pointer"
-                        >
+                    <Button
+                        variant="unstyled"
+                        type="button"
+                        aria-label="Account menu"
+                        className="flex w-full cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 text-left transition-colors hover:bg-white/5 data-[state=open]:bg-white/5"
+                    >
+                        {user?.image ? (
+                            <span className="relative size-7 shrink-0 overflow-hidden rounded-full ring-1 ring-white/10">
+                                <Image
+                                    src={user.image}
+                                    alt=""
+                                    fill
+                                    sizes="28px"
+                                    className="object-cover"
+                                />
+                            </span>
+                        ) : (
                             <PlaygroundAvatar
                                 size="sm"
                                 tone="emerald"
                                 letter={initial}
-                                className="size-6.5 text-[12px]"
+                                className="size-7 shrink-0 text-[12px]"
                             />
-                        </Button>
-                    )}
+                        )}
+                        <span className="min-w-0 flex-1">
+                            <span className="block truncate text-[12px] font-medium text-neutral-200">
+                                {name}
+                            </span>
+                            <span className="block truncate text-[11px] text-neutral-500">
+                                {user?.email}
+                            </span>
+                        </span>
+                    </Button>
                 </DropdownMenuTrigger>
 
-                <DropdownMenuContent align="end" className="w-66">
+                <DropdownMenuContent align="start" side="top" className="w-66">
                     <div className="flex items-center gap-3 px-3.5 py-3">
                         {user?.image ? (
                             <span className="relative size-9 shrink-0 overflow-hidden rounded-xl shadow-sm ring-1 ring-white/15">

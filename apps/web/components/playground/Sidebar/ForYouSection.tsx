@@ -1,6 +1,6 @@
 "use client";
 import { useParams } from "next/navigation";
-import { HiOutlineCheckCircle } from "react-icons/hi2";
+import { HiOutlineCheckCircle, HiOutlineCog6Tooth } from "react-icons/hi2";
 import { HiOutlineAnnotation } from "react-icons/hi";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
 import Row from "./SidebarRow";
@@ -12,6 +12,7 @@ import { PlaygroundTab } from "../playgroundTabs";
 const FOR_YOU_ROWS: { id: string; label: string; icon: React.ComponentType }[] = [
     { id: PlaygroundTab.Chats, label: "Chats", icon: HiOutlineAnnotation },
     { id: PlaygroundTab.Reviews, label: "Reviews", icon: HiOutlineCheckCircle },
+    { id: PlaygroundTab.SettingsProject, label: "Settings", icon: HiOutlineCog6Tooth },
 ];
 
 export default function PlaygroundSidebarForYouSection({
