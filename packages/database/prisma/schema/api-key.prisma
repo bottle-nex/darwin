@@ -1,0 +1,17 @@
+model ApiKey {
+  id         String    @id @default(cuid())
+  userId     String
+  label      String
+  prefix     String
+  hashedKey  String
+  lastUsedAt DateTime?
+  revokedAt  DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([prefix])
+  @@index([userId])
+}
