@@ -1,6 +1,6 @@
 "use client";
 import { useParams } from "next/navigation";
-import { HiOutlineAtSymbol, HiOutlineCheckCircle } from "react-icons/hi2";
+import { HiOutlineCheckCircle, HiOutlineCog6Tooth } from "react-icons/hi2";
 import { HiOutlineAnnotation } from "react-icons/hi";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
 import Row from "./SidebarRow";
@@ -11,8 +11,8 @@ import { PlaygroundTab } from "../playgroundTabs";
 // Everything waiting on you personally, as opposed to the board at large.
 const FOR_YOU_ROWS: { id: string; label: string; icon: React.ComponentType }[] = [
     { id: PlaygroundTab.Chats, label: "Chats", icon: HiOutlineAnnotation },
-    { id: PlaygroundTab.Mentions, label: "Mentions", icon: HiOutlineAtSymbol },
     { id: PlaygroundTab.Reviews, label: "Reviews", icon: HiOutlineCheckCircle },
+    { id: PlaygroundTab.SettingsProject, label: "Settings", icon: HiOutlineCog6Tooth },
 ];
 
 export default function PlaygroundSidebarForYouSection({
@@ -29,7 +29,12 @@ export default function PlaygroundSidebarForYouSection({
                     key={r.id}
                     label={r.label}
                     leading={{ kind: "icon", icon: r.icon }}
-                    active={selectedRowId === r.id}
+                    active={
+                        r.id === PlaygroundTab.Chats
+                            ? selectedRowId === PlaygroundTab.Chats ||
+                              selectedRowId === PlaygroundTab.ThreadDetail
+                            : selectedRowId === r.id
+                    }
                     onClick={() =>
                         r.id === PlaygroundTab.Chats
                             ? openThread({ kind: "project" }, projectSlug ?? "")

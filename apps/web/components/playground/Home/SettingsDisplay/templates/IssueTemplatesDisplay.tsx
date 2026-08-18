@@ -3,16 +3,9 @@
 import { useState } from "react";
 import { MdAdd, MdDelete, MdDescription, MdEdit, MdStar, MdStarOutline } from "react-icons/md";
 import { IconPickGlyph } from "@/components/ui/IconPicker";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import { Button } from "@/components/ui/button";
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-} from "@/components/ui/dialog";
+import ConfirmDialog from "@/components/utility/ConfirmDialog";
 import { TooltipComponent } from "@/components/ui/tooltip-component";
 import { useListTemplates } from "@/hooks/templates/useListTemplates";
 import { useUpdateTemplate } from "@/hooks/templates/useUpdateTemplate";
@@ -186,40 +179,23 @@ export default function IssueTemplatesDisplay({ projectId }: { projectId: string
                 )}
             </section>
 
-            <Dialog
+            <ConfirmDialog
                 open={Boolean(confirmDelete)}
-                onOpenChange={(next) =>
-                    !deleteTemplate.isPending && !next && setConfirmDelete(null)
-                }
-            >
-                <DialogContent className="bg-charcoal sm:max-w-105">
-                    <DialogHeader>
-                        <DialogTitle className="text-neutral-100">Delete template?</DialogTitle>
-                        <DialogDescription className="text-neutral-500">
-                            &ldquo;{confirmDelete?.name}&rdquo; will no longer be offered when
-                            someone files an issue. Issues already filed with it keep their
-                            description.
-                        </DialogDescription>
-                    </DialogHeader>
-                    <DialogFooter>
-                        <Button
-                            type="button"
-                            variant="tertiary"
-                            onClick={() => setConfirmDelete(null)}
-                            disabled={deleteTemplate.isPending}
-                        >
-                            Cancel
-                        </Button>
-                        <Button
-                            type="button"
-                            loading={deleteTemplate.isPending}
-                            onClick={() => confirmDelete && removeTemplate(confirmDelete)}
-                        >
-                            Delete
-                        </Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
+                onOpenChange={(next) => !next && setConfirmDelete(null)}
+                title="Delete template?"
+                description={`"${confirmDelete?.name}" will no longer be offered when someone files an issue. Issues already filed with it keep their description.`}
+                cancel={{
+                    label: "Cancel",
+                    variant: "outline",
+                    onClick: () => setConfirmDelete(null),
+                }}
+                confirm={{
+                    label: "Delete",
+                    variant: "destructive",
+                    onClick: () => confirmDelete && removeTemplate(confirmDelete),
+                }}
+                pending={deleteTemplate.isPending}
+            />
         </section>
     );
 }

@@ -14,6 +14,8 @@ import { sign_worker_jwt } from "./service.jwt";
 import IssueSolver, { type ClaimedIssue } from "./service.issue_solver";
 import Logger, { format_duration } from "@trymatcha/logger";
 import { prisma, WorkerStatus } from "@trymatcha/database";
+import RunReporter from "./service.run_report";
+import { randomUUID } from "node:crypto";
 
 const REPO_DIR = "/home/user/repo";
 const SAFE_BRANCH = /^[A-Za-z0-9._/-]+$/;
@@ -210,21 +212,30 @@ export default class E2B {
             ]);
             log.info("minted github + worker tokens for the sandbox");
 
-            const mcp_config = {
-                mcpServers: {
-                    matcha: {
-                        command: "node",
-                        args: [SANDBOX_MCP_ENTRY],
-                        env: {
-                            MATCHA_SERVER_URL: ENV.SERVER_PUBLIC_API_URL,
-                            MATCHA_SANDBOX_TOKEN: worker_token,
-                            MATCHA_SESSION_KIND: "worker",
+            // Rewritten per issue below so the sandbox's PR report carries the run it
+            // belongs to; claude re-spawns the MCP server on every invocation.
+            const write_mcp_config = (run_id: string) =>
+                sandbox.files.write(
+                    MCP_CONFIG_PATH,
+                    JSON.stringify(
+                        {
+                            mcpServers: {
+                                matcha: {
+                                    command: "node",
+                                    args: [SANDBOX_MCP_ENTRY],
+                                    env: {
+                                        MATCHA_SERVER_URL: ENV.SERVER_PUBLIC_API_URL,
+                                        MATCHA_SANDBOX_TOKEN: worker_token,
+                                        MATCHA_SESSION_KIND: "worker",
+                                        MATCHA_RUN_ID: run_id,
+                                    },
+                                },
+                            },
                         },
-                    },
-                },
-            };
-            await sandbox.files.write(MCP_CONFIG_PATH, JSON.stringify(mcp_config, null, 2));
-            log.info("wrote mcp config into sandbox");
+                        null,
+                        2,
+                    ),
+                );
 
             log.info("worker marked Busy");
             await prisma.worker.update({
@@ -243,6 +254,12 @@ export default class E2B {
                     break;
                 }
 
+                // Minted after the claim lands, and used as the AgentSession id so a
+                // retried report is an upsert rather than a second attempt row.
+                const run_id = randomUUID();
+                await write_mcp_config(run_id);
+                await RunReporter.started(worker_token, run_id, issue.id, log);
+
                 const graph_state = await GraphService.prepare(sandbox, log);
 
                 log.step(`issue #${issue.number} pushed into sandbox`, { title: issue.title });
@@ -257,27 +274,41 @@ export default class E2B {
                     brief: project.planMd ? "included" : "absent",
                 });
 
-                const report = await ClaudeRun.execute(sandbox, log, {
-                    prompt_path: ISSUE_PROMPT_PATH,
-                    model,
-                    effort,
-                    extra_flags: [
-                        `--mcp-config ${MCP_CONFIG_PATH}`,
-                        ...(graph_state === "ready"
-                            ? [
-                                  `--settings ${GRAPHIFY_SETTINGS}`,
-                                  `--add-dir ${GRAPHIFY_INTEGRATION}`,
-                              ]
-                            : []),
-                    ],
-                    envs: {
-                        CLAUDE_CODE_OAUTH_TOKEN: ENV.SERVER_CLAUDE_CODE_OAUTH_TOKEN,
-                        GH_TOKEN: gh_token,
-                        ...(graph_state === "ready" ? { GRAPHIFY_OUT } : {}),
-                    },
-                    timeout_ms: ISSUE_SOLVE_TIMEOUT_MS,
-                    label: `solving agent for issue #${issue.number}`,
-                });
+                let report;
+                try {
+                    report = await ClaudeRun.execute(sandbox, log, {
+                        prompt_path: ISSUE_PROMPT_PATH,
+                        model,
+                        effort,
+                        extra_flags: [
+                            `--mcp-config ${MCP_CONFIG_PATH}`,
+                            ...(graph_state === "ready"
+                                ? [
+                                      `--settings ${GRAPHIFY_SETTINGS}`,
+                                      `--add-dir ${GRAPHIFY_INTEGRATION}`,
+                                  ]
+                                : []),
+                        ],
+                        envs: {
+                            CLAUDE_CODE_OAUTH_TOKEN: ENV.SERVER_CLAUDE_CODE_OAUTH_TOKEN,
+                            GH_TOKEN: gh_token,
+                            ...(graph_state === "ready" ? { GRAPHIFY_OUT } : {}),
+                        },
+                        timeout_ms: ISSUE_SOLVE_TIMEOUT_MS,
+                        label: `solving agent for issue #${issue.number}`,
+                    });
+                } catch (error) {
+                    await RunReporter.failed(
+                        worker_token,
+                        run_id,
+                        issue.id,
+                        error instanceof Error ? error.message : String(error),
+                        log,
+                    );
+                    throw error;
+                }
+
+                await RunReporter.completed(worker_token, run_id, issue.id, report, log);
 
                 log.success(`issue #${issue.number} run finished`, {
                     turns: report.num_turns,

@@ -6,6 +6,7 @@ import { FaCircleCheck, FaCircleXmark } from "react-icons/fa6";
 import { RiLoader4Line } from "react-icons/ri";
 import { Button } from "@/components/ui/button";
 import { useCompleteGithubConnect } from "@/hooks/github/useCompleteGithubConnect";
+import { useUserSessionStore } from "@/store/user/useUserSessionStore";
 
 type Status = "loading" | "success" | "error";
 
@@ -34,6 +35,7 @@ function GithubCallback() {
     const router = useRouter();
     const params = useSearchParams();
     const complete = useCompleteGithubConnect();
+    const token = useUserSessionStore((s) => s.session?.user?.token);
 
     const installationId = params.get("installation_id");
     const code = params.get("code");
@@ -49,7 +51,7 @@ function GithubCallback() {
     const started = useRef(false);
 
     useEffect(() => {
-        if (started.current || !installationId || !code || !state) return;
+        if (started.current || !installationId || !code || !state || !token) return;
         started.current = true;
 
         complete.mutate(
@@ -71,7 +73,7 @@ function GithubCallback() {
                 },
             },
         );
-    }, [installationId, code, state, complete, router]);
+    }, [installationId, code, state, token, complete, router]);
 
     const copy = COPY[status];
 

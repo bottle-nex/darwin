@@ -8,6 +8,8 @@ export const VERIFY_OTP_URL = AUTH_URL + "/otp/verify";
 
 export const LIST_ORG = API_URL + "/org";
 export const CREATE_ORG = API_URL + "/org/create";
+
+export const LAST_VISITED_URL = API_URL + "/user/last-visited";
 export const PLAYGROUND_URL = API_URL + "/playground";
 export const PRELOAD_URL = PLAYGROUND_URL + "/preload";
 export const DASHBOARD_URL = (orgSlug: string) => `${PLAYGROUND_URL}/dashboard/${orgSlug}`;
@@ -71,6 +73,7 @@ export const ISSUE_URL = (id: string) => `${ISSUES_URL}/${id}`;
 export const SEARCH_ISSUES_URL = (project_id: string, query: string) =>
     `${ISSUES_URL}/search/${project_id}?q=${encodeURIComponent(query)}`;
 export const ISSUE_REFERENCES_URL = (id: string) => `${ISSUES_URL}/${id}/references`;
+export const ISSUE_ACTIVITY_URL = (id: string) => `${ISSUES_URL}/${id}/activity`;
 export const COLUMN_URL = (id: string) => `${ISSUES_URL}/columns/${id}`;
 export const REORDER_COLUMNS_URL = ISSUES_URL + "/columns/reorder";
 export const ASSIGN_ISSUE_URL = (id: string) => `${ISSUES_URL}/${id}/assignees`;

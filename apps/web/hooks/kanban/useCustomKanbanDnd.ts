@@ -8,7 +8,7 @@ import {
     useSensor,
     useSensors,
 } from "@dnd-kit/core";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { useUpdateIssue } from "@/hooks/issues/useUpdateIssue";

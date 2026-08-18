@@ -3,7 +3,8 @@ import { Geist_Mono, Google_Sans_Flex, Titillium_Web } from "next/font/google";
 import "./globals.css";
 import QueryProvider from "@/providers/QueryProvider";
 import SessionSetter from "@/components/utility/SessionSetter";
-import { Toaster } from "@/components/ui/sonner";
+import ThemeScope from "@/components/utility/ThemeScope";
+import { Toaster } from "@/components/utility/Toast";
 import { getServerSession } from "next-auth";
 import { authOption } from "./api/auth/[...nextauth]/options";
 
@@ -42,6 +43,7 @@ export default async function RootLayout({
             className={`${googleSansFlex.variable} ${geistMono.variable} ${titilliumWeb.variable} h-full antialiased`}
         >
             <body className="min-h-full flex flex-col">
+                <ThemeScope />
                 <QueryProvider>{children}</QueryProvider>
                 <Toaster />
             </body>

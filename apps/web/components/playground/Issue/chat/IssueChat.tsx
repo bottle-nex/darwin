@@ -1,6 +1,6 @@
 "use client";
 import { useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import { BsChatRightTextFill } from "react-icons/bs";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import {
@@ -21,7 +21,7 @@ import SessionServices from "@/lib/session";
 import ChatThread from "@/components/playground/Home/chat/ProjectChatThread";
 import { toggle_chat_reaction } from "@/hooks/chats/useMessageReactions";
 
-/** The "Comments and activity" panel for an issue. Disabled until the issue is saved. */
+/** The comments panel for an issue. Disabled until the issue is saved. */
 export default function IssueChat({ issueId }: { issueId?: string }) {
     const queryClient = useQueryClient();
     const { data: chats, isLoading } = useChats(issueId);
@@ -85,7 +85,7 @@ export default function IssueChat({ issueId }: { issueId?: string }) {
         <section className="m-2.5 flex min-h-0 min-w-0 flex-1 flex-col rounded-[8px] *:px-4 *:py-3">
             <header className="text-sm font-medium text-neutral-100 flex items-center gap-x-3">
                 <BsChatRightTextFill />
-                <span>Comments and activity</span>
+                <span>Comments</span>
             </header>
             <ChatThread
                 key={issueId ?? "unsaved"}

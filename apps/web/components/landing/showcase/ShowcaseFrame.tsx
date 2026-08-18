@@ -19,7 +19,7 @@ type ShowcaseFrameProps = {
     className?: string;
     /** Overrides the centred content width (defaults to max-w-110). */
     contentClassName?: string;
-    children: React.ReactNode;
+    children?: React.ReactNode;
 };
 
 /**

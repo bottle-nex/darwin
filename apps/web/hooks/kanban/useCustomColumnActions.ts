@@ -1,5 +1,5 @@
 "use client";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { useCreateColumn } from "@/hooks/issues/useCreateColumn";
 import { useUpdateColumn } from "@/hooks/issues/useUpdateColumn";

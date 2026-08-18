@@ -1,9 +1,9 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/lib/axios";
 import { ASSIGN_ISSUE_URL, UNASSIGN_ISSUE_URL } from "@/routes/api_routes";
-import { BOARD_QUERY_KEY } from "@/hooks/issues/useBoard";
+import { updateBoardIssue } from "@/hooks/issues/useBoard";
 import type { ApiResponse } from "@/types/api";
-import type { BoardIssue } from "@/types/board";
+import type { Issue } from "@trymatcha/types";
 
 export interface AssignIssueInput {
     id: string;
@@ -16,16 +16,13 @@ export function useAssignIssue() {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: async ({ id, user_id }: AssignIssueInput) => {
-            const res = await apiClient.post<ApiResponse<{ issue: BoardIssue }>>(
-                ASSIGN_ISSUE_URL(id),
-                { user_id },
-            );
+            const res = await apiClient.post<ApiResponse<{ issue: Issue }>>(ASSIGN_ISSUE_URL(id), {
+                user_id,
+            });
             return res.data.data.issue;
         },
-        onSuccess: (_data, variables) => {
-            queryClient.invalidateQueries({
-                queryKey: [...BOARD_QUERY_KEY, variables.project_id],
-            });
+        onSuccess: (data, variables) => {
+            updateBoardIssue(queryClient, variables.project_id, data);
         },
     });
 }
@@ -35,15 +32,13 @@ export function useUnassignIssue() {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: async ({ id, user_id }: AssignIssueInput) => {
-            const res = await apiClient.delete<ApiResponse<{ issue: BoardIssue }>>(
+            const res = await apiClient.delete<ApiResponse<{ issue: Issue }>>(
                 UNASSIGN_ISSUE_URL(id, user_id),
             );
             return res.data.data.issue;
         },
-        onSuccess: (_data, variables) => {
-            queryClient.invalidateQueries({
-                queryKey: [...BOARD_QUERY_KEY, variables.project_id],
-            });
+        onSuccess: (data, variables) => {
+            updateBoardIssue(queryClient, variables.project_id, data);
         },
     });
 }

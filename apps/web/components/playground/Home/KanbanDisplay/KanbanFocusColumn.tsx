@@ -1,21 +1,21 @@
 "use client";
 import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
 import type { BoardState } from "@/types/kanban";
-import type { FilterValue } from "@/store/kanban/useKanbanOptionsStore";
+import type { FocusValue } from "@/store/kanban/useKanbanOptionsStore";
 import { useFilteredCustomColumns } from "@/hooks/kanban/useFilteredCustomColumns";
 import KanbanColumn from "./KanbanColumn";
 import CustomKanbanColumn from "./customkanban/CustomKanbanColumn";
 
 type KanbanFocusColumnProps = {
-    filter: FilterValue;
+    focus: FocusValue;
     board: BoardState;
 };
 
-export default function KanbanFocusColumn({ filter, board }: KanbanFocusColumnProps) {
+export default function KanbanFocusColumn({ focus, board }: KanbanFocusColumnProps) {
     const columns = useFilteredCustomColumns();
 
-    if (filter.kind === "llm") {
-        const column = KanbanBoard.COLUMNS.find((c) => c.status === filter.status);
+    if (focus.kind === "llm") {
+        const column = KanbanBoard.COLUMNS.find((c) => c.status === focus.status);
         if (!column) return null;
         return (
             <KanbanColumn
@@ -29,8 +29,8 @@ export default function KanbanFocusColumn({ filter, board }: KanbanFocusColumnPr
         );
     }
 
-    if (filter.kind === "custom") {
-        const column = columns.find((c) => c.id === filter.columnId);
+    if (focus.kind === "custom") {
+        const column = columns.find((c) => c.id === focus.columnId);
         if (!column) return null;
         return <CustomKanbanColumn column={column} draggable={false} />;
     }

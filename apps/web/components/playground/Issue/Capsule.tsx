@@ -24,7 +24,7 @@ export const CapsuleTrigger = forwardRef<HTMLButtonElement, React.ComponentProps
                 type="button"
                 ref={ref}
                 className={cn(
-                    "flex items-center gap-1.5 px-3 py-1 bg-white/5 ring ring-white/10 text-xs text-white/55 rounded-xl cursor-pointer hover:bg-white/10 transition-colors",
+                    "flex w-fit! items-center gap-1.5 px-3! py-1 bg-white/5 ring ring-white/10 text-[12px] text-white/55 rounded-full! cursor-pointer hover:bg-white/10 transition-colors",
                     className,
                 )}
                 {...props}
@@ -74,25 +74,17 @@ function CapsuleOptionList({ options, value, onSelect }: CapsuleOptionListProps)
 interface CapsuleDropdownProps {
     type: "dropdown";
     options: CapsuleOption[];
-    defaultValue?: string;
+    value?: string;
     onChange?: (value: string) => void;
     disabled?: boolean;
     className?: string;
 }
 
-function CapsuleDropdown({
-    options,
-    defaultValue,
-    onChange,
-    disabled,
-    className,
-}: CapsuleDropdownProps) {
+function CapsuleDropdown({ options, value, onChange, disabled, className }: CapsuleDropdownProps) {
     const [open, setOpen] = useState(false);
-    const [value, setValue] = useState(defaultValue ?? options[0]?.value);
     const selected = options.find((option) => option.value === value) ?? options[0];
 
     function handleSelect(next: string) {
-        setValue(next);
         onChange?.(next);
         setOpen(false);
     }
@@ -116,7 +108,7 @@ function CapsuleDropdown({
 
 interface CapsuleCalendarProps {
     type: "calendar";
-    defaultValue?: Date;
+    value?: Date;
     onChange?: (value: Date | undefined) => void;
     placeholder?: string;
     disabled?: boolean;
@@ -126,7 +118,7 @@ interface CapsuleCalendarProps {
 }
 
 function CapsuleCalendar({
-    defaultValue,
+    value,
     onChange,
     placeholder = "Set date",
     disabled,
@@ -135,10 +127,8 @@ function CapsuleCalendar({
     iconClassName = "text-white/60",
 }: CapsuleCalendarProps) {
     const [open, setOpen] = useState(false);
-    const [date, setDate] = useState<Date | undefined>(defaultValue);
 
     function handleSelect(next: Date | undefined) {
-        setDate(next);
         onChange?.(next);
         setOpen(false);
     }
@@ -148,11 +138,11 @@ function CapsuleCalendar({
             <PopoverTrigger asChild>
                 <CapsuleTrigger disabled={disabled} className={className}>
                     <Icon className={cn("size-3.5", iconClassName)} />
-                    {date ? format(date, "MMM d, yyyy") : placeholder}
+                    {value ? format(value, "MMM d, yyyy") : placeholder}
                 </CapsuleTrigger>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0">
-                <Calendar mode="single" selected={date} onSelect={handleSelect} />
+                <Calendar mode="single" selected={value} onSelect={handleSelect} />
             </PopoverContent>
         </Popover>
     );

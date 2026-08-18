@@ -1,17 +1,21 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { EditorContent, ReactNodeViewRenderer, useEditor, type Editor } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
 import { cn } from "@/lib/utils";
+import { TableKit } from "@tiptap/extension-table";
+import { Timestamp } from "./timestamp";
+import { SlashCommand } from "./slash-command";
+import { useEffect, useRef } from "react";
+import { EditorPlaceholder } from "./placeholder";
+import { TableFigure, TableTitle } from "./table";
+import { Toggle, ToggleBody, ToggleSummary } from "./toggle";
+import { Prompt, PromptMark, countPrompts } from "./prompt";
+import { EditorContent, ReactNodeViewRenderer, useEditor, type Editor } from "@tiptap/react";
+import Image from "@tiptap/extension-image";
 import TaskList from "@tiptap/extension-task-list";
 import TaskItem from "@tiptap/extension-task-item";
-import Image from "@tiptap/extension-image";
-import Placeholder from "@tiptap/extension-placeholder";
-import CharacterCount from "@tiptap/extension-character-count";
-import { SlashCommand } from "./slash-command";
-import { Prompt, PromptMark, countPrompts } from "./prompt";
+import StarterKit from "@tiptap/starter-kit";
 import ImageNodeView from "./ImageNodeView";
+import CharacterCount from "@tiptap/extension-character-count";
 
 const DESCRIPTION_CHAR_LIMIT = 2500;
 
@@ -38,7 +42,7 @@ interface IssueDescriptionEditorProps {
 }
 
 export default function IssueDescriptionEditor({
-    placeholder = "Add a description... type '/' for commands",
+    placeholder = "Add a description...",
     className,
     initialContent,
     editable = true,
@@ -60,8 +64,25 @@ export default function IssueDescriptionEditor({
             TaskList,
             TaskItem.configure({ nested: true }),
             ImageWithControls.configure({ inline: true, allowBase64: true }),
+            Toggle,
+            ToggleSummary,
+            ToggleBody,
+            TableFigure,
+            TableTitle,
+            Timestamp,
+            TableKit.configure({
+                table: { resizable: true },
+                tableHeader: {
+                    HTMLAttributes: {
+                        class: "border border-white/12 bg-white/6 px-2 py-1 text-left align-top font-medium",
+                    },
+                },
+                tableCell: {
+                    HTMLAttributes: { class: "border border-white/12 px-2 py-1 align-top" },
+                },
+            }),
             authoring ? PromptMark : Prompt,
-            Placeholder.configure({ placeholder }),
+            EditorPlaceholder.configure({ emptyDocText: placeholder }),
             CharacterCount.configure({ limit: DESCRIPTION_CHAR_LIMIT }),
             SlashCommand,
         ],

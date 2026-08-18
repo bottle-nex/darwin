@@ -6,6 +6,11 @@ model User {
   emailVerified DateTime?
   setupComplete Boolean   @default(false)
 
+  lastVisitedOrgId     String?
+  lastVisitedProjectId String?
+  lastVisitedOrg       Organization? @relation("UserLastVisitedOrg", fields: [lastVisitedOrgId], references: [id], onDelete: SetNull)
+  lastVisitedProject   Project?      @relation("UserLastVisitedProject", fields: [lastVisitedProjectId], references: [id], onDelete: SetNull)
+
   orgMemberships       OrgMember[]
   teamMemberships      TeamMember[]
   projectMemberships   ProjectMember[]
@@ -29,6 +34,7 @@ model User {
 
   customColumnOrders CustomColumnOrder[]
   notifications      Notification[]
+  issueActivities    IssueActivity[]     @relation(name: "ActivityActor")
 }
 
 model GithubAccount {

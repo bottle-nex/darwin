@@ -20,7 +20,7 @@ export default function IssueProperties({
             <PropertyGroup title="Properties">
                 <LLMIssueStatusTicker
                     status={issue.status}
-                    className="px-1.5 text-[13px] [&_svg]:size-[18px]"
+                    className="text-[13px] [&_svg]:size-[18px]"
                 />
                 <IssueFields form={form} layout="stacked" />
             </PropertyGroup>
@@ -34,7 +34,7 @@ export default function IssueProperties({
 function PropertyGroup({ title, children }: { title: string; children: ReactNode }) {
     return (
         <section className="flex flex-col gap-y-2">
-            <h2 className="text-[13px] text-neutral-500 ml-1.25">{title}</h2>
+            <h2 className="text-[13px] text-neutral-500 ml-2.5">{title}</h2>
             <div className="flex flex-col items-start gap-y-0.5">{children}</div>
         </section>
     );

@@ -1,10 +1,11 @@
 import { Request, Response } from "express";
 import z from "zod";
-import { IssueStatus, prisma } from "@trymatcha/database";
+import { ActivityType, ActorType, IssueStatus, prisma } from "@trymatcha/database";
 import { Action, Permissions } from "@trymatcha/access-control";
 import ResponseWriter from "../../services/service.response";
 import Access from "../../access-control/access";
 import { server_services } from "../..";
+import ActivityService from "../../services/service.activity";
 
 export default class IssueAssignController {
     static params_schema = z.object({
@@ -38,7 +39,11 @@ export default class IssueAssignController {
         try {
             const issue = await prisma.issue.findUnique({
                 where: { id: issue_id },
-                select: { projectId: true, status: true },
+                select: {
+                    projectId: true,
+                    status: true,
+                    assignees: { where: { id: target_user_id }, select: { id: true } },
+                },
             });
             if (!issue) {
                 ResponseWriter.not_found(res, "Issue not found");
@@ -77,25 +82,56 @@ export default class IssueAssignController {
                 }
             }
 
-            // `connect` is idempotent — re-assigning an already-assigned user is a no-op.
-            const updated = await prisma.issue.update({
-                where: { id: issue_id },
-                data: { assignees: { connect: { id: target_user_id } } },
-                select: {
-                    id: true,
-                    number: true,
-                    title: true,
-                    description: true,
-                    priority: true,
-                    status: true,
-                    customColumnId: true,
-                    createdAt: true,
-                    startDate: true,
-                    targetDate: true,
-                    assignees: { select: { id: true, name: true, email: true, image: true } },
-                    tags: { select: { id: true, name: true, color: true } },
-                },
+            const already_assigned = issue.assignees.length > 0;
+
+            // `connect` is idempotent, re-assigning an already-assigned user is a no-op.
+            const { updated, activities } = await prisma.$transaction(async (tx) => {
+                const updated = await tx.issue.update({
+                    where: { id: issue_id },
+                    data: { assignees: { connect: { id: target_user_id } } },
+                    select: {
+                        id: true,
+                        number: true,
+                        title: true,
+                        description: true,
+                        priority: true,
+                        status: true,
+                        customColumnId: true,
+                        createdAt: true,
+                        startDate: true,
+                        targetDate: true,
+                        prUrl: true,
+                        assignees: { select: { id: true, name: true, email: true, image: true } },
+                        tags: { select: { id: true, name: true, color: true } },
+                    },
+                });
+
+                const target = updated.assignees.find((assignee) => assignee.id === target_user_id);
+                const activities =
+                    already_assigned || !target
+                        ? []
+                        : await ActivityService.emit(tx, {
+                              issueId: issue_id,
+                              actor: { type: ActorType.User, userId: user.id, name: user.name },
+                              events: [
+                                  {
+                                      type: ActivityType.AssigneeAdded,
+                                      payload: {
+                                          user: {
+                                              id: target.id,
+                                              name: target.name,
+                                              image: target.image,
+                                          },
+                                      },
+                                  },
+                              ],
+                          });
+
+                return { updated, activities };
             });
+
+            await ActivityService.publish(issue.projectId, issue_id, activities);
+
             if (target_user_id !== user.id) {
                 await server_services.notifications.enqueue({
                     action: "issue.assigned",

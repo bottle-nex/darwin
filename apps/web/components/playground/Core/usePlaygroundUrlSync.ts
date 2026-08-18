@@ -52,7 +52,7 @@ export function usePlaygroundUrlSync(
         if (hydratedRef.current) return;
         const params = new URLSearchParams(window.location.search);
         initialRef.current = {
-            tab: params.get("tab"), // active tab -> threads, mentions, kanban, etc
+            tab: params.get("tab"), // active tab -> threads, kanban, etc
             team: params.get("team"), // team slug, when the tab is team-detail
             thread: params.get("thread"), // "project" or an issue id, when the tab is thread-detail
         };

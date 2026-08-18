@@ -46,8 +46,8 @@ export default function MessageActions({
     return (
         <div
             className={cn(
-                "absolute -top-3 z-20 flex items-center gap-px rounded-lg border border-graphite/50 bg-charcoal p-0.5 text-neutral-100 opacity-0 shadow-lg transition-opacity group-hover/message:opacity-100 focus-within:opacity-100 has-data-[state=open]:opacity-100",
-                isMine ? "left-1" : "right-1",
+                "absolute -top-6 z-20 flex items-center gap-px rounded-lg border border-graphite/50 bg-charcoal p-0.5 text-neutral-100 opacity-0 shadow-lg transition-opacity group-hover/message:opacity-100 focus-within:opacity-100 has-data-[state=open]:opacity-100",
+                isMine ? "right-1" : "left-1",
             )}
         >
             <EmojiPicker

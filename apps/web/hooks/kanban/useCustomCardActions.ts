@@ -1,5 +1,5 @@
 "use client";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { useDeleteIssue } from "@/hooks/issues/useDeleteIssue";
 import { useAssignIssue, useUnassignIssue } from "@/hooks/issues/useAssignIssue";

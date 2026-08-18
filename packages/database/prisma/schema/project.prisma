@@ -21,6 +21,7 @@ model Project {
   teams        Team[]
   members      ProjectMember[]
   invitations  Invitation[]
+  lastVisitedByUsers User[] @relation("UserLastVisitedProject")
 
   githubInstallationId String?
   githubInstallation   GithubInstallation? @relation(fields: [githubInstallationId], references: [id], onDelete: SetNull)

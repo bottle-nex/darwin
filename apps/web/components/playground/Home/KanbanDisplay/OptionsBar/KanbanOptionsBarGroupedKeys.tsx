@@ -1,171 +1,165 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import {
-    LuChevronLeft,
+    LuColumns3,
     LuEye,
     LuListFilter,
     LuSettings,
     LuShare2,
     LuSlidersHorizontal,
-    LuTag,
-    LuUsers,
 } from "react-icons/lu";
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuSeparator,
-    DropdownMenuSub,
-    DropdownMenuSubContent,
-    DropdownMenuSubTrigger,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { activeFacetKeys } from "@/lib/kanban/boardFilter";
+import { useKanbanFilterStore } from "@/store/kanban/useKanbanFilterStore";
 import { useKanbanOptionsStore } from "@/store/kanban/useKanbanOptionsStore";
 import { useFilteredCustomColumns } from "@/hooks/kanban/useFilteredCustomColumns";
-import { FilterPanelItems, FILTER_PANEL_WIDTH } from "./KanbanOptionPanels/FilterPanel";
-import { TagPanelItems, TAG_PANEL_CONTENT } from "./KanbanOptionPanels/TagPanel";
+import { FocusPanelItems, FOCUS_PANEL_WIDTH } from "./KanbanOptionPanels/FocusPanel";
+import { FiltersPanelItems, FILTERS_PANEL_WIDTH } from "./KanbanOptionPanels/FiltersPanel";
 import { ViewsPanelItems, VIEWS_PANEL_WIDTH } from "./KanbanOptionPanels/ViewsPanel";
 import { BoardViewPanelItems, BOARD_VIEW_PANEL_WIDTH } from "./KanbanOptionPanels/BoardViewPanel";
-import SelectedTags from "./KanbanOptionPanels/SelectedTags";
-import { PANE_BAR_SHELL } from "@/components/playground/Core/components/paneBar";
+import FilterChipsBar from "./KanbanOptionPanels/FilterChipsBar";
+import {
+    PaneActionsSlot,
+    PaneLeadSlot,
+} from "@/components/playground/Core/components/PlaygroundPaneSlots";
 import PlaygroundBreadcrumb from "@/components/playground/Core/components/PlaygroundBreadcrumb";
 import AddTaskButton from "./KanbanOptionPanels/AddTaskButton";
+import EagerSubmenu from "./KanbanOptionPanels/EagerSubmenu";
 
 /**
  * Every toolbar option collapsed behind one "Options" menu. The panels that have
- * their own rows (tag, filter, views) become submenus; the rest are plain items.
+ * their own rows (filter, focus, views) become submenus; the rest are plain items.
  *
  * `dir="rtl"` on the root makes those flyouts open to the *left*, matching the
- * standalone FilterPanel — see its comment for why the content is forced back to
+ * standalone FocusPanel — see its comment for why the content is forced back to
  * `[direction:ltr]`.
  */
 export default function KanbanOptionsBarGroupedKeys() {
-    const {
-        selectedTagIds,
-        toggleTag,
-        removeTag,
-        clearTags,
-        filter,
-        setFilter,
-        kanbanView,
-        setKanbanView,
-        boardView,
-        setBoardView,
-    } = useKanbanOptionsStore();
+    const focus = useKanbanOptionsStore((s) => s.focus);
+    const setFocus = useKanbanOptionsStore((s) => s.setFocus);
+    const kanbanView = useKanbanOptionsStore((s) => s.kanbanView);
+    const setKanbanView = useKanbanOptionsStore((s) => s.setKanbanView);
+    const boardView = useKanbanOptionsStore((s) => s.boardView);
+    const setBoardView = useKanbanOptionsStore((s) => s.setBoardView);
+    const filters = useKanbanFilterStore((s) => s.filters);
     const customColumns = useFilteredCustomColumns();
+    const activeCount = activeFacetKeys(filters).length;
 
     return (
-        <div className={PANE_BAR_SHELL}>
-            <div className="flex min-w-0 items-center gap-1.5">
-                <PlaygroundBreadcrumb />
+        <>
+            <PaneLeadSlot>
+                <div className="flex min-w-0 items-center gap-1.5">
+                    <PlaygroundBreadcrumb />
 
-                <SelectedTags selected={selectedTagIds} onRemove={removeTag} />
-            </div>
+                    <FilterChipsBar />
+                </div>
+            </PaneLeadSlot>
 
-            <div className="flex shrink-0 items-center gap-1.5">
-                <DropdownMenu dir="rtl">
-                    <DropdownMenuTrigger asChild>
-                        <Button
-                            variant="unstyled"
-                            type="button"
-                            aria-label="Options"
-                            className="flex h-7 cursor-pointer items-center gap-1 rounded-md px-2 text-[12px] font-medium text-neutral-400 transition-colors hover:bg-white/5 hover:text-neutral-200"
-                        >
-                            <LuSlidersHorizontal className="size-3.5" aria-hidden />
-                            Options
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-48 [direction:ltr]">
-                        <DropdownMenuSub>
-                            <DropdownMenuSubTrigger>
-                                <LuChevronLeft className="size-3.5 text-neutral-500" aria-hidden />
-                                <LuTag className="size-3.5 text-neutral-400" aria-hidden />
-                                <span className="flex-1">Tag</span>
-                                {selectedTagIds.length > 0 && (
-                                    <span className="text-[11px] text-neutral-500">
-                                        {selectedTagIds.length}
-                                    </span>
-                                )}
-                            </DropdownMenuSubTrigger>
-                            <DropdownMenuSubContent
-                                className={`[direction:ltr] ${TAG_PANEL_CONTENT}`}
+            <PaneActionsSlot>
+                <div className="flex shrink-0 items-center gap-1.5">
+                    <DropdownMenu dir="rtl">
+                        <DropdownMenuTrigger asChild>
+                            <Button
+                                variant="unstyled"
+                                type="button"
+                                aria-label="Options"
+                                className="flex h-7 cursor-pointer items-center gap-1 rounded-md px-2 text-[12px] font-medium text-neutral-400 transition-colors hover:bg-white/5 hover:text-neutral-200"
                             >
-                                <TagPanelItems
-                                    selected={selectedTagIds}
-                                    onToggle={toggleTag}
-                                    onClear={clearTags}
-                                />
-                            </DropdownMenuSubContent>
-                        </DropdownMenuSub>
-
-                        <DropdownMenuSub>
-                            <DropdownMenuSubTrigger>
-                                <LuChevronLeft className="size-3.5 text-neutral-500" aria-hidden />
-                                <LuListFilter className="size-3.5 text-neutral-400" aria-hidden />
-                                <span className="flex-1">Filter</span>
-                            </DropdownMenuSubTrigger>
-                            <DropdownMenuSubContent
-                                className={`${FILTER_PANEL_WIDTH} [direction:ltr]`}
+                                <LuSlidersHorizontal className="size-3.5" aria-hidden />
+                                Options
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-48 [direction:ltr]">
+                            <EagerSubmenu
+                                className={`${FILTERS_PANEL_WIDTH} [direction:ltr]`}
+                                trigger={
+                                    <>
+                                        <LuListFilter
+                                            className="size-3.5 text-neutral-400"
+                                            aria-hidden
+                                        />
+                                        <span className="flex-1">Filter</span>
+                                        {activeCount > 0 && (
+                                            <span className="text-[11px] text-neutral-500">
+                                                {activeCount}
+                                            </span>
+                                        )}
+                                    </>
+                                }
                             >
-                                <FilterPanelItems
-                                    value={filter}
-                                    onChange={setFilter}
+                                <FiltersPanelItems />
+                            </EagerSubmenu>
+
+                            <EagerSubmenu
+                                className={`${FOCUS_PANEL_WIDTH} [direction:ltr]`}
+                                trigger={
+                                    <>
+                                        <LuColumns3
+                                            className="size-3.5 text-neutral-400"
+                                            aria-hidden
+                                        />
+                                        <span className="flex-1">Focus</span>
+                                    </>
+                                }
+                            >
+                                <FocusPanelItems
+                                    value={focus}
+                                    onChange={setFocus}
                                     customColumns={customColumns}
                                 />
-                            </DropdownMenuSubContent>
-                        </DropdownMenuSub>
+                            </EagerSubmenu>
 
-                        <DropdownMenuSub>
-                            <DropdownMenuSubTrigger>
-                                <LuChevronLeft className="size-3.5 text-neutral-500" aria-hidden />
-                                <LuEye className="size-3.5 text-neutral-400" aria-hidden />
-                                <span className="flex-1">Board</span>
-                            </DropdownMenuSubTrigger>
-                            <DropdownMenuSubContent
+                            <EagerSubmenu
                                 className={`${BOARD_VIEW_PANEL_WIDTH} [direction:ltr]`}
+                                trigger={
+                                    <>
+                                        <LuEye className="size-3.5 text-neutral-400" aria-hidden />
+                                        <span className="flex-1">Board</span>
+                                    </>
+                                }
                             >
                                 <BoardViewPanelItems value={boardView} onChange={setBoardView} />
-                            </DropdownMenuSubContent>
-                        </DropdownMenuSub>
+                            </EagerSubmenu>
 
-                        <DropdownMenuSub>
-                            <DropdownMenuSubTrigger>
-                                <LuChevronLeft className="size-3.5 text-neutral-500" aria-hidden />
-                                <LuSlidersHorizontal
-                                    className="size-3.5 text-neutral-400"
-                                    aria-hidden
-                                />
-                                <span className="flex-1">Views</span>
-                            </DropdownMenuSubTrigger>
-                            <DropdownMenuSubContent
+                            <EagerSubmenu
                                 className={`${VIEWS_PANEL_WIDTH} [direction:ltr]`}
+                                trigger={
+                                    <>
+                                        <LuSlidersHorizontal
+                                            className="size-3.5 text-neutral-400"
+                                            aria-hidden
+                                        />
+                                        <span className="flex-1">Views</span>
+                                    </>
+                                }
                             >
                                 <ViewsPanelItems value={kanbanView} onChange={setKanbanView} />
-                            </DropdownMenuSubContent>
-                        </DropdownMenuSub>
+                            </EagerSubmenu>
 
-                        <DropdownMenuSeparator className="my-1 h-px bg-white/5" />
+                            <DropdownMenuSeparator className="my-1 h-px bg-white/5" />
 
-                        <DropdownMenuItem disabled>
-                            <LuUsers className="size-3.5 text-neutral-400" aria-hidden />
-                            <span className="flex-1">Assignees</span>
-                        </DropdownMenuItem>
+                            <DropdownMenuItem disabled>
+                                <LuShare2 className="size-3.5 text-neutral-400" aria-hidden />
+                                <span className="flex-1">Share</span>
+                            </DropdownMenuItem>
 
-                        <DropdownMenuItem disabled>
-                            <LuShare2 className="size-3.5 text-neutral-400" aria-hidden />
-                            <span className="flex-1">Share</span>
-                        </DropdownMenuItem>
+                            <DropdownMenuItem disabled>
+                                <LuSettings className="size-3.5 text-neutral-400" aria-hidden />
+                                <span className="flex-1">Settings</span>
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                    <div className="mx-1 h-4 w-px bg-white/8" />
 
-                        <DropdownMenuItem disabled>
-                            <LuSettings className="size-3.5 text-neutral-400" aria-hidden />
-                            <span className="flex-1">Settings</span>
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
-                <div className="mx-1 h-4 w-px bg-white/8" />
-
-                <AddTaskButton />
-            </div>
-        </div>
+                    <AddTaskButton />
+                </div>
+            </PaneActionsSlot>
+        </>
     );
 }

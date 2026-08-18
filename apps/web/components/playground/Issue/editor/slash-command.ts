@@ -2,7 +2,13 @@ import { Extension } from "@tiptap/core";
 import Suggestion, { type SuggestionOptions } from "@tiptap/suggestion";
 import { ReactRenderer } from "@tiptap/react";
 import SlashCommandList, { type SlashCommandListHandle } from "./SlashCommandList";
-import { SLASH_COMMAND_ITEMS, type SlashCommandItem } from "./commandItems";
+import {
+    isSlashCommandDateInsert,
+    isSlashCommandSizedInsert,
+    SLASH_COMMAND_ENTRIES,
+    SLASH_COMMAND_ITEMS,
+    type SlashCommandSelection,
+} from "./commandItems";
 
 export const SlashCommand = Extension.create({
     name: "slashCommand",
@@ -14,21 +20,38 @@ export const SlashCommand = Extension.create({
                 startOfLine: false,
                 floatingUi: { strategy: "fixed" },
                 command: ({ editor, range, props }) => {
-                    (props as SlashCommandItem).command({ editor, range });
+                    const selection = props as SlashCommandSelection;
+                    if (isSlashCommandDateInsert(selection))
+                        selection.insertDate({
+                            editor,
+                            range,
+                            iso: selection.datetime?.iso ?? new Date().toISOString(),
+                            mode: selection.datetime?.mode ?? "datetime",
+                        });
+                    else if (isSlashCommandSizedInsert(selection))
+                        selection.insert({
+                            editor,
+                            range,
+                            rows: selection.size?.rows ?? 1,
+                            cols: selection.size?.cols ?? 1,
+                        });
+                    else if (!("items" in selection)) selection.command({ editor, range });
                 },
-            } satisfies Partial<SuggestionOptions<SlashCommandItem>>,
+            } satisfies Partial<SuggestionOptions<SlashCommandSelection>>,
         };
     },
 
     addProseMirrorPlugins() {
         return [
-            Suggestion<SlashCommandItem>({
+            Suggestion<SlashCommandSelection>({
                 editor: this.editor,
                 ...this.options.suggestion,
                 items: ({ query }) =>
-                    SLASH_COMMAND_ITEMS.filter((item) =>
-                        item.title.toLowerCase().includes(query.toLowerCase()),
-                    ),
+                    query
+                        ? SLASH_COMMAND_ITEMS.filter((item) =>
+                              item.title.toLowerCase().includes(query.toLowerCase()),
+                          )
+                        : SLASH_COMMAND_ENTRIES,
                 render: () => {
                     let component: ReactRenderer<SlashCommandListHandle>;
                     let unmount: (() => void) | undefined;
