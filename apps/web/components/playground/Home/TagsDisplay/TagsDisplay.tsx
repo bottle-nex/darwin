@@ -22,7 +22,7 @@ import {
 import type { Tag } from "@/types/tags";
 import { useTagsOptionsStore } from "@/store/tags/useTagsOptionsStore";
 import TagDisplay from "./TagDisplay";
-import TagFormDialog from "./TagFormDialog";
+import CreateTagDialog from "./CreateTagDialog";
 import TagsOptionsBar from "./TagsOptionsBar";
 
 export default function TagsDisplay() {
@@ -137,7 +137,7 @@ export default function TagsDisplay() {
             </div>
 
             {activeProject?.id && (
-                <TagFormDialog
+                <CreateTagDialog
                     open={formOpen}
                     onOpenChange={setFormOpen}
                     projectId={activeProject.id}
