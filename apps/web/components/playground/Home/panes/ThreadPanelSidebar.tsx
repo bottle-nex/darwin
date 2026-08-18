@@ -21,7 +21,7 @@ export default function ThreadPanelSidebar() {
     const isProjectChatActive = selectedThread?.kind === "project";
 
     return (
-        <div className="flex w-68 shrink-0 flex-col overflow-y-auto border-r border-white/5 p-2">
+        <div className="mt-[calc(var(--pane-top-inset)*-1)] flex w-68 shrink-0 flex-col overflow-y-auto border-r border-white/5 px-2 pb-2 pt-[calc(var(--pane-top-inset)+0.5rem)]">
             <Row
                 label="Project chat"
                 leading={{ kind: "icon", icon: HiOutlineChatBubbleLeftRight }}
