@@ -1,12 +1,15 @@
 "use client";
 import { useEffect, useLayoutEffect } from "react";
 import { useParams } from "next/navigation";
-import PlaygroundTopBar from "@/components/playground/Core/TopBar/PlaygroundTopBar";
+import PlaygroundActions from "@/components/playground/Core/TopBar/PlaygroundActions";
+import PlaygroundCollapsedLead from "@/components/playground/Core/TopBar/PlaygroundCollapsedLead";
+import PlaygroundPaneFrame from "@/components/playground/Core/components/PlaygroundPaneFrame";
 import PlaygroundSidebar from "@/components/playground/Sidebar/PlaygroundSidebar";
 import PlaygroundSheetSidebar from "@/components/playground/Sidebar/PlaygroundSheetSidebar";
 import SidebarResizeHandle from "@/components/playground/Sidebar/SidebarResizeHandle";
 import PlaygroundDisplay from "@/components/playground/Core/PlaygroundDisplay";
 import OnboardingDisplay from "@/components/onboarding/OnboardingDisplay";
+import CreateProjectDialog from "@/components/project/CreateProjectDialog";
 import CreateTeamDialog from "@/components/team/CreateTeamDialog";
 import DeleteTeamDialog from "@/components/team/DeleteTeamDialog";
 import CreateIssueDialog from "@/components/playground/Issue/CreateIssueDialog";
@@ -57,21 +60,28 @@ export default function PlaygroundShell() {
     const showOnboarding = !loading && !!project && !project.tourCompleted;
 
     return (
-        <main className="flex h-screen flex-col overflow-hidden text-neutral-100 pt-px select-none">
-            <PlaygroundTopBar />
-            <section className="flex flex-1 min-h-0 p-2 pt-px">
+        <main className="flex h-screen flex-col overflow-hidden text-neutral-100 select-none">
+            <section className="flex flex-1 min-h-0 p-2">
                 <PlaygroundSidebar />
                 <SidebarResizeHandle />
-                {showOnboarding ? (
-                    <OnboardingDisplay project={project} orgId={dashboard!.org.id} />
-                ) : mode?.kind === "open" ? (
-                    <IssueDisplay issueId={mode.issueId} />
-                ) : (
-                    <PlaygroundDisplay isLoading={loading} />
-                )}
+                <PlaygroundPaneFrame
+                    lead={<PlaygroundCollapsedLead />}
+                    actions={<PlaygroundActions />}
+                >
+                    {showOnboarding ? (
+                        <div className="flex min-h-0 flex-1 flex-col pt-[var(--pane-top-inset)]">
+                            <OnboardingDisplay project={project} orgId={dashboard!.org.id} />
+                        </div>
+                    ) : mode?.kind === "open" ? (
+                        <IssueDisplay issueId={mode.issueId} />
+                    ) : (
+                        <PlaygroundDisplay isLoading={loading} />
+                    )}
+                </PlaygroundPaneFrame>
                 <NotificationsPanel />
             </section>
             <PlaygroundSheetSidebar />
+            <CreateProjectDialog />
             <CreateTeamDialog />
             <DeleteTeamDialog />
             <CreateIssueDialog />
