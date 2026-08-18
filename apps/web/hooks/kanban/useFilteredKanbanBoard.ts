@@ -5,11 +5,11 @@ import { KanbanMappers } from "@/lib/kanban/KanbanMappers";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { useBoard } from "@/hooks/issues/useBoard";
 import { useKanbanBoardStore } from "@/store/kanban/useKanbanBoardStore";
-import { useKanbanOptionsStore } from "@/store/kanban/useKanbanOptionsStore";
+import { useIssueFilter } from "@/hooks/kanban/useIssueFilter";
 import type { BoardState } from "@/types/kanban";
 
 /**
- * The LLM board with the active tag filter applied.
+ * The LLM board with the active filters applied.
  *
  * `useKanbanBoardStore.board` is a mirror that `useKanbanPane` seeds from the
  * `useBoard` query in an effect — it also holds local-only edits (drag-and-drop
@@ -29,12 +29,12 @@ export function useFilteredKanbanBoard(): BoardState {
 
     const seededBoard = useKanbanBoardStore((s) => s.seededBoard);
     const mirroredBoard = useKanbanBoardStore((s) => s.board);
-    const selectedTagIds = useKanbanOptionsStore((s) => s.selectedTagIds);
+    const matchesFilters = useIssueFilter();
 
     const board = useMemo(() => {
         if (!serverBoard || seededBoard === serverBoard) return mirroredBoard;
         return KanbanMappers.boardIssuesToLlmBoard(serverBoard, projectName);
     }, [serverBoard, seededBoard, mirroredBoard, projectName]);
 
-    return useMemo(() => KanbanBoard.filterBoard(board, selectedTagIds), [board, selectedTagIds]);
+    return useMemo(() => KanbanBoard.filterBoard(board, matchesFilters), [board, matchesFilters]);
 }

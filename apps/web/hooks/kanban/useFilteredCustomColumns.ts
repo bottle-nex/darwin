@@ -4,6 +4,7 @@ import { CustomKanbanMappers } from "@/lib/kanban/CustomKanbanMappers";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { useBoard } from "@/hooks/issues/useBoard";
 import { useCustomKanbanStore } from "@/store/kanban/useCustomKanbanStore";
+import { useIssueFilter } from "@/hooks/kanban/useIssueFilter";
 import type { CustomColumn } from "@/types/kanban-custom";
 
 /**
@@ -21,9 +22,19 @@ export function useFilteredCustomColumns(): CustomColumn[] {
 
     const seededBoard = useCustomKanbanStore((s) => s.seededBoard);
     const mirroredColumns = useCustomKanbanStore((s) => s.columns);
+    const matchesFilters = useIssueFilter({ skipStatus: true });
 
-    return useMemo(() => {
+    const columns = useMemo(() => {
         if (!serverBoard || seededBoard === serverBoard) return mirroredColumns;
         return CustomKanbanMappers.boardToColumns(serverBoard);
     }, [serverBoard, seededBoard, mirroredColumns]);
+
+    return useMemo(
+        () =>
+            columns.map((column) => ({
+                ...column,
+                cards: column.cards.filter((card) => matchesFilters(card.id)),
+            })),
+        [columns, matchesFilters],
+    );
 }

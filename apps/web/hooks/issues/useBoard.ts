@@ -33,6 +33,7 @@ function toBoardIssue(issue: Issue): BoardIssue {
         startDate: issue.startDate ? new Date(issue.startDate).toISOString() : null,
         targetDate: issue.targetDate ? new Date(issue.targetDate).toISOString() : null,
         prUrl: issue.prUrl,
+        creator: issue.creator ?? null,
         assignees: issue.assignees,
         tags: issue.tags,
     };

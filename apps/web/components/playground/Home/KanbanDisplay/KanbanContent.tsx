@@ -8,15 +8,15 @@ import KanbanBothBoards from "./KanbanBothBoards";
 import CustomKanbanBoard from "./customkanban/CustomKanbanBoard";
 
 export default function KanbanContent() {
-    const filter = useKanbanOptionsStore((s) => s.filter);
+    const focus = useKanbanOptionsStore((s) => s.focus);
     const boardView = useKanbanOptionsStore((s) => s.boardView);
     const kanbanView = useKanbanOptionsStore((s) => s.kanbanView);
     const board = useFilteredKanbanBoard();
 
-    if (filter.kind !== "default") {
+    if (focus.kind !== "default") {
         return (
             <div className="flex min-h-0 flex-1 items-start overflow-hidden px-3 pt-3 pb-3">
-                <KanbanFocusColumn filter={filter} board={board} />
+                <KanbanFocusColumn focus={focus} board={board} />
             </div>
         );
     }

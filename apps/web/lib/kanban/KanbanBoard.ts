@@ -96,17 +96,9 @@ export class KanbanBoard {
         ) as BoardState;
     }
 
-    /**
-     * Apply the selected tags to every column. An issue matches when it carries one
-     * of the selected tags (when any are selected). Matching is by tag id, not name —
-     * names are renameable and collide across projects. Returns a new board; the
-     * focus filter (which single column to show) is applied at render.
-     */
-    static filterBoard(board: BoardState, tagIds: string[]): BoardState {
-        const matches = (issue: Issue) =>
-            tagIds.length === 0 || issue.tags.some((t) => tagIds.includes(t.id));
+    static filterBoard(board: BoardState, matches: (issueId: string) => boolean): BoardState {
         return Object.fromEntries(
-            KanbanBoard.STATUSES.map((s) => [s, board[s].filter(matches)]),
+            KanbanBoard.STATUSES.map((s) => [s, board[s].filter((issue) => matches(issue.id))]),
         ) as BoardState;
     }
 }
