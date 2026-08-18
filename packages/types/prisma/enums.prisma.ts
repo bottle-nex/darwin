@@ -69,7 +69,6 @@ export const ActivityType = {
     PriorityChanged: "PriorityChanged",
     TitleChanged: "TitleChanged",
     DescriptionChanged: "DescriptionChanged",
-    SummaryChanged: "SummaryChanged",
     AssigneeAdded: "AssigneeAdded",
     AssigneeRemoved: "AssigneeRemoved",
     LabelAdded: "LabelAdded",

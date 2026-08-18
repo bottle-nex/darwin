@@ -119,7 +119,6 @@ enum ActivityType {
   PriorityChanged
   TitleChanged
   DescriptionChanged
-  SummaryChanged
   AssigneeAdded
   AssigneeRemoved
   LabelAdded
