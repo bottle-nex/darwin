@@ -2,7 +2,6 @@
 import { useParams } from "next/navigation";
 import { HiOutlineChatBubbleLeftRight } from "react-icons/hi2";
 import Row from "@/components/playground/Sidebar/SidebarRow";
-import { MICRO_LABEL } from "@/components/playground/Core/components/paneBar";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { useIssueThreads } from "@/hooks/chats/useIssueThreads";
@@ -12,7 +11,7 @@ import { useIssueThreads } from "@/hooks/chats/useIssueThreads";
  * tab is active. "Project chat" is pinned; below it, every issue with
  * comment activity, most recent first.
  */
-export default function ChatsListPane() {
+export default function ThreadPanelSidebar() {
     const { projectSlug } = useParams<{ projectSlug?: string }>();
     const activeProject = useActiveProject();
     const { data: threads } = useIssueThreads(activeProject?.id);
@@ -23,7 +22,6 @@ export default function ChatsListPane() {
 
     return (
         <div className="flex w-68 shrink-0 flex-col overflow-y-auto border-r border-white/5 p-2">
-            <p className={`${MICRO_LABEL} px-2 py-1.5`}>Chats</p>
             <Row
                 label="Project chat"
                 leading={{ kind: "icon", icon: HiOutlineChatBubbleLeftRight }}

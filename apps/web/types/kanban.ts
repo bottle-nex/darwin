@@ -60,13 +60,15 @@ export type Issue = {
     error?: string;
 };
 
-/** Static definition for a column header. `titleBox` is the only per-status colour. */
+/** Static definition for a column header. `titleBox`/`cardTint` are the per-status colours. */
 export type KanbanColumnDef = {
     status: KanbanStatus;
     title: string;
     icon: IconType;
     /** Tailwind classes for the coloured box wrapping the column title. */
     titleBox: string;
+    /** Tailwind gradient classes for a subtle per-status tint on reference cards. */
+    cardTint: string;
 };
 
 /** The two ways to view the board's issues. */

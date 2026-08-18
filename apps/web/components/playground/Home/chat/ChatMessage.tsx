@@ -171,7 +171,7 @@ function IssueReferenceCards({
     return (
         <div
             className={cn(
-                "mb-1 grid gap-1.5",
+                "mb-1 mt-1 grid gap-2",
                 issues.length > 1 && "grid-cols-[repeat(2,minmax(0,15rem))]",
                 isMine ? "justify-end" : "ml-8",
             )}
@@ -238,7 +238,12 @@ export default function ChatMessage({
                 startsGroup ? "mt-5 first:mt-0" : "mt-1.5",
             )}
         >
-            <div className="flex w-fit max-w-[84%] flex-col sm:max-w-[72%]">
+            <div
+                className={cn(
+                    "flex w-fit max-w-[84%] flex-col sm:max-w-[72%]",
+                    isMine ? "items-end" : "items-start",
+                )}
+            >
                 <IssueReferenceCards issues={taggedIssues} isMine={isMine} />
                 <div
                     className={cn("flex items-end gap-2", isMine ? "flex-row-reverse" : "flex-row")}
@@ -254,7 +259,7 @@ export default function ChatMessage({
                     )}
                     <article
                         className={cn(
-                            "relative min-w-0 flex-1 rounded-lg px-3 py-2.5 text-[13px] leading-5 tracking-[0.005em] wrap-anywhere transition-colors duration-200",
+                            "relative  min-w-20 flex-1 rounded-lg px-3 pb-2 pt-1.25 text-[13px] leading-5 tracking-[0.005em] wrap-anywhere transition-colors duration-200",
                             isMine
                                 ? "border border-graphite/50 bg-graphite text-neutral-200"
                                 : "border border-graphite/50 bg-graphite text-neutral-200",

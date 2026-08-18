@@ -202,6 +202,7 @@ export interface MessageReference {
     projectChatId: string | null;
     memberId: string | null;
     issueId: string | null;
+    description: string | null;
 
     member?: ProjectMember | null;
     issue?: ReferencedIssue | null;

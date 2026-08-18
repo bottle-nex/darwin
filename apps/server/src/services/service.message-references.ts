@@ -4,7 +4,16 @@ import { issue_recipients } from "../notifications/recipients";
 
 export const MESSAGE_REFERENCE_INCLUDE = {
     member: { include: { user: true } },
-    issue: { select: { id: true, number: true, title: true, status: true, priority: true } },
+    issue: {
+        select: {
+            id: true,
+            number: true,
+            title: true,
+            status: true,
+            priority: true,
+            description: true,
+        },
+    },
 } as const;
 
 export type ResolvedReferences = {

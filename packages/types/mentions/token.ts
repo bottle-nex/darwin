@@ -7,6 +7,7 @@ export type ReferencedIssueLabel = {
     number: number;
     title: string;
     status?: IssueStatus;
+    description?: string;
     priority?: number;
 };
 

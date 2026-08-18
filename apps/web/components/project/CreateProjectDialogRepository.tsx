@@ -223,7 +223,7 @@ export default function CreateProjectDialogRepository({
     }
 
     return (
-        <div className="flex flex-1 flex-col px-5 py-5">
+        <div className="flex flex-[2] flex-col px-5 py-5">
             <div className="mb-2 flex items-center justify-between">
                 <Label className="text-neutral-300">
                     Repository

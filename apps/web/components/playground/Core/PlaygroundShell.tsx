@@ -1,5 +1,5 @@
 "use client";
-import { useLayoutEffect } from "react";
+import { useEffect, useLayoutEffect } from "react";
 import { useParams } from "next/navigation";
 import PlaygroundTopBar from "@/components/playground/Core/TopBar/PlaygroundTopBar";
 import PlaygroundSidebar from "@/components/playground/Sidebar/PlaygroundSidebar";
@@ -17,6 +17,7 @@ import FloatNotifications from "@/components/playground/Core/Notifications/Float
 import { useIssueRoute } from "@/components/playground/Issue/useIssueRoute";
 import { useGetDashboard } from "@/hooks/dashboard/useGetDashboard";
 import { useGetProject } from "@/hooks/project/useGetProject";
+import { useSetLastVisited } from "@/hooks/user/useSetLastVisited";
 import { useIssueThreads } from "@/hooks/chats/useIssueThreads";
 import { usePlaygroundUrlSync } from "./usePlaygroundUrlSync";
 import { useSubscribeEventHandlers } from "@/hooks/socket/useSubscribeEventHandlers";
@@ -37,6 +38,13 @@ export default function PlaygroundShell() {
     const { data: issueThreads } = useIssueThreads(activeProject?.id);
 
     useSubscribeEventHandlers(activeProject?.id);
+
+    const { mutate: setLastVisited } = useSetLastVisited();
+    useEffect(() => {
+        if (orgSlug && activeProject) {
+            setLastVisited({ orgSlug, projectSlug: activeProject.slug });
+        }
+    }, [orgSlug, activeProject, setLastVisited]);
 
     usePlaygroundUrlSync(project?.teams, issueThreads);
     const { mode } = useIssueRoute({ sync: true });

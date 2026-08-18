@@ -25,7 +25,7 @@ const oauth_options = [
     { type: "github", label: "Continue with GitHub", image: "/images/github.png" },
 ] as const;
 
-export default function LoginForm({ callbackUrl = "/" }: LoginFormProps) {
+export default function LoginForm({ callbackUrl = "/playground" }: LoginFormProps) {
     const router = useRouter();
     const [step, setStep] = useState<Step>("options");
     const [email, setEmail] = useState("");

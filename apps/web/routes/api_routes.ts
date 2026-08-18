@@ -8,6 +8,8 @@ export const VERIFY_OTP_URL = AUTH_URL + "/otp/verify";
 
 export const LIST_ORG = API_URL + "/org";
 export const CREATE_ORG = API_URL + "/org/create";
+
+export const LAST_VISITED_URL = API_URL + "/user/last-visited";
 export const PLAYGROUND_URL = API_URL + "/playground";
 export const PRELOAD_URL = PLAYGROUND_URL + "/preload";
 export const DASHBOARD_URL = (orgSlug: string) => `${PLAYGROUND_URL}/dashboard/${orgSlug}`;

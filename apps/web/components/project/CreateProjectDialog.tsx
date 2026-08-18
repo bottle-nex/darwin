@@ -230,7 +230,7 @@ export default function CreateProjectDialog() {
         <Dialog open={open} onOpenChange={handleOpenChange}>
             <DialogContent
                 showCloseButton={false}
-                className="gap-0 overflow-hidden border-white/10 bg-charcoal p-0 sm:max-w-3xl"
+                className="gap-0 overflow-hidden border-white/10 bg-charcoal p-0 sm:max-w-4xl"
             >
                 <div className="flex items-start justify-between gap-4 px-5 py-4">
                     <DialogHeader className="gap-1">

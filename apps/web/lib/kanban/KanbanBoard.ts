@@ -28,49 +28,56 @@ export class KanbanBoard {
      */
     static readonly BRIDGE_STATUSES: KanbanStatus[] = [KanbanStatus.Todo];
 
-    /** Column headers in board order. Only `titleBox` is per-status coloured. */
+    /** Column headers in board order. `titleBox`/`cardTint` are per-status coloured. */
     static readonly COLUMNS: KanbanColumnDef[] = [
         {
             status: KanbanStatus.Todo,
             title: "To Do",
             icon: LuCircle,
             titleBox: "text-neutral-100",
+            cardTint: "bg-gradient-to-r from-white/8 to-white/2",
         },
         {
             status: KanbanStatus.Queued,
             title: "Queued",
             icon: LuCircleDashed,
             titleBox: "text-sky-300",
+            cardTint: "bg-gradient-to-r from-sky-500/12 via-cement to-cement",
         },
         {
             status: KanbanStatus.InProgress,
             title: "In Progress",
             icon: RiProgress4Line,
             titleBox: "text-amber-300",
+            cardTint: "bg-gradient-to-br from-amber-500/12 to-amber-500/5",
         },
         {
             status: KanbanStatus.InReview,
             title: "In Review",
             icon: LuCircleDotDashed,
             titleBox: "text-violet-300",
+            cardTint: "bg-gradient-to-r from-violet-500/12 to-violet-500/5",
         },
         {
             status: KanbanStatus.Done,
             title: "Done",
             icon: LuCircleCheck,
             titleBox: "text-emerald-300",
+            cardTint: "bg-gradient-to-r from-emerald-500/12 to-emerald-500/5",
         },
         {
             status: KanbanStatus.Failed,
             title: "Failed",
             icon: LuCircleX,
             titleBox: "text-rose-300",
+            cardTint: "bg-gradient-to-r from-rose-500/10 to-rose-500/5",
         },
         {
             status: KanbanStatus.Cancelled,
             title: "Cancelled",
             icon: LuCircleSlash,
             titleBox: "text-neutral-300",
+            cardTint: "bg-gradient-to-r from-white/6 to-white/2",
         },
     ];
 

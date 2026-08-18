@@ -68,7 +68,11 @@ export default function CreateProjectDialogDetailsStep({
 
     return (
         <div className="flex h-96">
-            <form id={formId} onSubmit={onSubmit} className="flex flex-1 flex-col gap-4 px-5 py-5">
+            <form
+                id={formId}
+                onSubmit={onSubmit}
+                className="flex flex-[3] flex-col gap-4 px-5 py-5"
+            >
                 <div>
                     <Label htmlFor="project-name" className="text-neutral-300">
                         Name
