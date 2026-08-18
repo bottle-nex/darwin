@@ -1,19 +1,34 @@
-import { Job, Worker } from "bullmq";
+import { Queue, Worker, type Job } from "bullmq";
 import queue_config from "../conf/config.queue";
 import { ENV } from "../conf/config.env";
 import E2B from "./services.e2b";
 import Logger from "@trymatcha/logger";
-import { QueueName, type DispatchJobData, type OnboardJobData } from "@trymatcha/types";
+import {
+    QueueName,
+    type DispatchJobData,
+    type OnboardJobData,
+    type ProductDiffJobData,
+} from "@trymatcha/types";
+import ProductDiffRunner from "./service.product_diff";
 
 const log = Logger.scope("queue");
 
 export default class QueueService {
     private onboard_consumer: Worker<OnboardJobData> | null = null;
     private dispatch_consumer: Worker<DispatchJobData> | null = null;
+    private product_diff_consumer: Worker<ProductDiffJobData> | null = null;
+    // VM owns this producer because Product Diff starts only after coding sandbox teardown.
+    private product_diff_producer!: Queue<ProductDiffJobData>;
 
     constructor() {
+        this.init_product_diff_producer();
         this.init_onboard_consumer();
         this.init_dispatch_consumer();
+        this.init_product_diff_consumer();
+    }
+
+    private init_product_diff_producer() {
+        this.product_diff_producer = new Queue(QueueName.ProductDiff, queue_config);
     }
 
     private init_onboard_consumer() {
@@ -53,7 +68,10 @@ export default class QueueService {
             QueueName.IssueVm,
             async (job: Job<DispatchJobData>) => {
                 log.step("dispatch job received", { worker: job.data.workerId });
-                await E2B.run_worker_loop(job.data.workerId);
+                const product_diff_ids = await E2B.run_worker_loop(job.data.workerId);
+                for (const product_diff_id of product_diff_ids) {
+                    await this.enqueue_product_diff(product_diff_id);
+                }
             },
             {
                 connection: queue_config.connection!,
@@ -73,10 +91,38 @@ export default class QueueService {
         });
     }
 
+    private init_product_diff_consumer() {
+        this.product_diff_consumer = new Worker<ProductDiffJobData>(
+            QueueName.ProductDiff,
+            async (job: Job<ProductDiffJobData>) => ProductDiffRunner.run(job.data.productDiffId),
+            { connection: queue_config.connection!, concurrency: 1 },
+        );
+
+        this.product_diff_consumer.on("completed", (job) => {
+            log.success("product diff job completed", { productDiff: job.data.productDiffId });
+        });
+
+        this.product_diff_consumer.on("failed", (job, err) => {
+            log.error("product diff job failed", err, { productDiff: job?.data.productDiffId });
+        });
+    }
+
+    private async enqueue_product_diff(product_diff_id: string) {
+        await this.product_diff_producer.add(
+            "generate",
+            { productDiffId: product_diff_id },
+            { jobId: product_diff_id, removeOnComplete: true, removeOnFail: true },
+        );
+        log.info("product diff enqueued", { productDiff: product_diff_id });
+    }
+
     async close() {
         await this.onboard_consumer?.close();
         await this.dispatch_consumer?.close();
+        await this.product_diff_consumer?.close();
+        await this.product_diff_producer.close();
         this.onboard_consumer = null;
         this.dispatch_consumer = null;
+        this.product_diff_consumer = null;
     }
 }

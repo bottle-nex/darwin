@@ -28,7 +28,7 @@ export default async function get_project_config_controller(req: Request, res: R
 
         const config = await prisma.projectConfig.findUniqueOrThrow({
             where: { projectId: project_id },
-            select: { kanbanOptionView: true },
+            select: { kanbanOptionView: true, productDiffEnabled: true },
         });
 
         ResponseWriter.success(res, config);

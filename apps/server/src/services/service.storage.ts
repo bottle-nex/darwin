@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { Storage } from "@google-cloud/storage";
+import { Client as MinioClient } from "minio";
 import { ENV } from "../configs/env";
 
 const SIGNED_URL_TTL_MS = 5 * 60 * 1000;
@@ -14,6 +15,7 @@ const EXTENSIONS: Record<string, string> = {
 
 export default class StorageService {
     static client: Storage | null = null;
+    static minioClient: MinioClient | null = null;
 
     static is_configured(): boolean {
         return Boolean(
@@ -44,6 +46,28 @@ export default class StorageService {
         return this.client;
     }
 
+    static minio(): MinioClient {
+        if (
+            !ENV.SERVER_MINIO_URL ||
+            !ENV.SERVER_MINIO_ACCESS_KEY ||
+            !ENV.SERVER_MINIO_SECRET_KEY ||
+            !ENV.SERVER_PRODUCT_DIFF_BUCKET
+        ) {
+            throw new Error("MinIO Product Diff storage is not configured");
+        }
+        if (!this.minioClient) {
+            const endpoint = new URL(ENV.SERVER_MINIO_URL);
+            this.minioClient = new MinioClient({
+                endPoint: endpoint.hostname,
+                port: Number(endpoint.port || (endpoint.protocol === "https:" ? 443 : 80)),
+                useSSL: endpoint.protocol === "https:",
+                accessKey: ENV.SERVER_MINIO_ACCESS_KEY,
+                secretKey: ENV.SERVER_MINIO_SECRET_KEY,
+            });
+        }
+        return this.minioClient;
+    }
+
     static async signed_upload_url(contentType: string) {
         const extension = EXTENSIONS[contentType];
         if (!extension) {
@@ -65,5 +89,13 @@ export default class StorageService {
             uploadUrl,
             publicUrl: `${ENV.SERVER_GCS_PUBLIC_URL!.replace(/\/+$/, "")}/${key}`,
         };
+    }
+
+    static async signed_product_diff_url(key: string): Promise<string> {
+        return this.minio().presignedGetObject(
+            ENV.SERVER_PRODUCT_DIFF_BUCKET!,
+            key,
+            SIGNED_URL_TTL_MS / 1000,
+        );
     }
 }

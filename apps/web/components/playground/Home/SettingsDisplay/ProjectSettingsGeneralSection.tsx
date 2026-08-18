@@ -19,6 +19,7 @@ import { useDeleteProject } from "@/hooks/project/useDeleteProject";
 import { useGetProjectConfig } from "@/hooks/project/useGetProjectConfig";
 import type { KanbanOptionView, ProjectDetail } from "@/types/project";
 import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
 import ProjectSettingsBoardSection from "./ProjectSettingsBoardSection";
 
 const FIELD =
@@ -41,17 +42,22 @@ export default function ProjectSettingsGeneralSection({
     const [description, setDescription] = useState(project.description ?? "");
     const [confirmOpen, setConfirmOpen] = useState(false);
     const [optionsBarDraft, setOptionsBarDraft] = useState<KanbanOptionView | null>(null);
+    const [productDiffDraft, setProductDiffDraft] = useState<boolean | null>(null);
 
     const { data: config } = useGetProjectConfig(project.id);
     const savedOptionsBar = config?.kanbanOptionView ?? "FLAT";
     const optionsBarView = optionsBarDraft ?? savedOptionsBar;
     const optionsBarDirty = optionsBarDraft !== null && optionsBarDraft !== savedOptionsBar;
+    const savedProductDiff = config?.productDiffEnabled ?? false;
+    const productDiffEnabled = productDiffDraft ?? savedProductDiff;
+    const productDiffDirty = productDiffDraft !== null && productDiffDraft !== savedProductDiff;
 
     const dirty =
         name.trim() !== project.name ||
         slug.trim() !== project.slug ||
         description.trim() !== (project.description ?? "") ||
-        optionsBarDirty;
+        optionsBarDirty ||
+        productDiffDirty;
     const canSave = name.trim().length > 0 && slug.trim().length > 0 && dirty && !update.isPending;
 
     const slugTaken =
@@ -65,6 +71,7 @@ export default function ProjectSettingsGeneralSection({
             slug: slug.trim(),
             description: description.trim(),
             ...(optionsBarDirty && { kanban_option_view: optionsBarView }),
+            ...(productDiffDirty && { product_diff_enabled: productDiffEnabled }),
         });
     }
 
@@ -117,6 +124,20 @@ export default function ProjectSettingsGeneralSection({
             </div>
 
             <ProjectSettingsBoardSection value={optionsBarView} onChange={setOptionsBarDraft} />
+
+            <div className="flex items-center justify-between gap-4 rounded-lg border border-white/8 p-3">
+                <div>
+                    <p className="text-[12px] font-medium text-neutral-200">Product Diff</p>
+                    <p className="mt-1 text-[11px] text-neutral-500">
+                        Generate visual base and head previews for frontend pull requests.
+                    </p>
+                </div>
+                <Switch
+                    checked={productDiffEnabled}
+                    onCheckedChange={setProductDiffDraft}
+                    aria-label="Enable Product Diff"
+                />
+            </div>
 
             <div className="h-px bg-white/5" />
 

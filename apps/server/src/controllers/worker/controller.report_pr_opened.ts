@@ -6,6 +6,7 @@ import ResponseWriter from "../../services/service.response";
 import { server_services } from "../..";
 import ActivityService from "../../services/service.activity";
 import { location_of } from "../../services/service.activity-diff";
+import ProductDiffService from "../../services/service.product_diff";
 
 const body_schema = z.object({
     issue_id: z.string().min(1),
@@ -119,6 +120,12 @@ export default class ReportPrOpened {
             console.log(`[worker:${worker_id}] published ISSUE_UPDATED for issue ${data.issue_id}`);
 
             await ActivityService.publish(updated_issue.projectId, data.issue_id, activities);
+
+            try {
+                await ProductDiffService.prepare(data.issue_id);
+            } catch (error) {
+                console.error("product diff preparation failed", error);
+            }
 
             ResponseWriter.success(res, null, "PR outcome recorded");
         } catch (error) {

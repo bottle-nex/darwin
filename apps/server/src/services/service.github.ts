@@ -170,6 +170,39 @@ export default class GithubService {
         return auth.token;
     }
 
+    static async getPullRequest(
+        installationId: number,
+        owner: string,
+        repo: string,
+        pullNumber: number,
+    ): Promise<{ state: string; baseSha: string; headSha: string }> {
+        const token = await this.getInstallationToken(installationId);
+        const octokit = new Octokit({ auth: token });
+        const { data } = await octokit.rest.pulls.get({
+            owner,
+            repo,
+            pull_number: pullNumber,
+        });
+        return { state: data.state, baseSha: data.base.sha, headSha: data.head.sha };
+    }
+
+    static async listPullRequestFiles(
+        installationId: number,
+        owner: string,
+        repo: string,
+        pullNumber: number,
+    ): Promise<string[]> {
+        const token = await this.getInstallationToken(installationId);
+        const octokit = new Octokit({ auth: token });
+        const files = await octokit.paginate(octokit.rest.pulls.listFiles, {
+            owner,
+            repo,
+            pull_number: pullNumber,
+            per_page: 100,
+        });
+        return files.map((file) => file.filename);
+    }
+
     /**
      * Read an installation as the App itself — confirms it exists under this App
      * and surfaces the account that installed it. Used to verify the

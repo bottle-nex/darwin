@@ -1,0 +1,26 @@
+model ProductDiff {
+  id             String            @id @default(cuid())
+  issueId        String
+  pullNumber     Int
+  baseSha        String
+  headSha        String
+  status         ProductDiffStatus @default(Pending)
+  manifest       Json?
+  artifactPrefix String?
+  error          String?           @db.Text
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+
+  issue Issue @relation(fields: [issueId], references: [id], onDelete: Cascade)
+
+  @@unique([issueId, baseSha, headSha])
+  @@index([status, createdAt])
+}
+
+enum ProductDiffStatus {
+  Pending
+  Generating
+  Ready
+  Failed
+  Stale
+}

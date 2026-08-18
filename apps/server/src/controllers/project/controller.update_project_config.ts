@@ -41,7 +41,7 @@ export default async function update_project_config_controller(req: Request, res
             where: { projectId: project_id },
             create: { projectId: project_id, kanbanOptionView: kanban_option_view },
             update: { kanbanOptionView: kanban_option_view },
-            select: { kanbanOptionView: true },
+            select: { kanbanOptionView: true, productDiffEnabled: true },
         });
 
         ResponseWriter.success(res, config, "Project config updated successfully");

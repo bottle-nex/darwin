@@ -130,6 +130,15 @@ export const ActivityType = {
 } as const;
 export type ActivityType = (typeof ActivityType)[keyof typeof ActivityType];
 
+export const ProductDiffStatus = {
+    Pending: "Pending",
+    Generating: "Generating",
+    Ready: "Ready",
+    Failed: "Failed",
+    Stale: "Stale",
+} as const;
+export type ProductDiffStatus = (typeof ProductDiffStatus)[keyof typeof ProductDiffStatus];
+
 export const NotificationType = {
     IssueAssigned: "IssueAssigned",
     IssueUnassigned: "IssueUnassigned",

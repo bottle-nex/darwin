@@ -4,6 +4,7 @@ export const QueueName = {
     IssueRouter: "issue.router",
     IssueVm: "issue.vm",
     ProjectOnboard: "project.onboard",
+    ProductDiff: "product.diff",
     Notification: "notification.dispatch",
 } as const;
 export type QueueName = (typeof QueueName)[keyof typeof QueueName];
@@ -22,6 +23,10 @@ export interface OnboardJobData {
     repo_url: string;
     branch: string;
     installation_id: number;
+}
+
+export interface ProductDiffJobData {
+    productDiffId: string;
 }
 
 export type NotificationJobData =

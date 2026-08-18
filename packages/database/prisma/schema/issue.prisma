@@ -18,11 +18,12 @@ model Issue {
   tags         Tag[]
   customColumn CustomColumn? @relation(fields: [customColumnId], references: [id], onDelete: Cascade)
 
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
-  resolvedAt DateTime?
-  chats      Chat[]
-  references MessageReference[]
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+  resolvedAt   DateTime?
+  chats        Chat[]
+  references   MessageReference[]
+  productDiffs ProductDiff[]
 
   assignerWorkerId String?
   assignedWorker   Worker? @relation(fields: [assignerWorkerId], references: [id], onDelete: Cascade)

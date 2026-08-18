@@ -19,6 +19,7 @@ const body_schema = z.object({
     plan_md: z.string().optional(),
     tour_completed: z.boolean().optional(),
     kanban_option_view: z.enum(["FLAT", "GROUPED"]).optional(),
+    product_diff_enabled: z.boolean().optional(),
 });
 
 export default async function update_project_controller(req: Request, res: Response) {
@@ -38,6 +39,7 @@ export default async function update_project_controller(req: Request, res: Respo
             plan_md,
             tour_completed,
             kanban_option_view,
+            product_diff_enabled,
         } = parsed.data;
         const user_id = req.user.id;
 
@@ -56,11 +58,17 @@ export default async function update_project_controller(req: Request, res: Respo
                 description,
                 planMd: plan_md,
                 tourCompleted: tour_completed,
-                ...(kanban_option_view && {
+                ...((kanban_option_view !== undefined || product_diff_enabled !== undefined) && {
                     projectConfig: {
                         upsert: {
-                            create: { kanbanOptionView: kanban_option_view },
-                            update: { kanbanOptionView: kanban_option_view },
+                            create: {
+                                kanbanOptionView: kanban_option_view,
+                                productDiffEnabled: product_diff_enabled,
+                            },
+                            update: {
+                                kanbanOptionView: kanban_option_view,
+                                productDiffEnabled: product_diff_enabled,
+                            },
                         },
                     },
                 }),

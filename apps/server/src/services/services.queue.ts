@@ -1,14 +1,21 @@
 import { Queue } from "bullmq";
 import queue_config from "../configs/config.queue";
-import { QueueName, type OnboardJobData, type RouteJobData } from "@trymatcha/types";
+import {
+    QueueName,
+    type OnboardJobData,
+    type ProductDiffJobData,
+    type RouteJobData,
+} from "@trymatcha/types";
 
 export default class QueueService {
     private queue: Queue<RouteJobData>;
     private onboard_queue: Queue<OnboardJobData>;
+    private product_diff_queue: Queue<ProductDiffJobData>;
 
     constructor() {
         this.queue = new Queue(QueueName.IssueRouter, queue_config);
         this.onboard_queue = new Queue(QueueName.ProjectOnboard, queue_config);
+        this.product_diff_queue = new Queue(QueueName.ProductDiff, queue_config);
     }
 
     async enqueue_project(project_id: string) {
@@ -35,5 +42,15 @@ export default class QueueService {
             removeOnFail: true,
         });
         console.log(`[queue] onboarding session ${data.session_id} enqueued`);
+    }
+
+    async enqueue_product_diff(product_diff_id: string) {
+        console.log(`[queue] enqueueing Product Diff ${product_diff_id}`);
+        await this.product_diff_queue.add(
+            "generate",
+            { productDiffId: product_diff_id },
+            { jobId: product_diff_id, removeOnComplete: true, removeOnFail: true },
+        );
+        console.log(`[queue] Product Diff ${product_diff_id} enqueued`);
     }
 }

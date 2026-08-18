@@ -57,4 +57,5 @@ export type KanbanOptionView = "FLAT" | "GROUPED";
 
 export interface ProjectConfig {
     kanbanOptionView: KanbanOptionView;
+    productDiffEnabled: boolean;
 }
