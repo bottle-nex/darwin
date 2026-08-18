@@ -47,7 +47,12 @@ export default function ResourcePickerDialog({
             >
                 <DialogTitle className="sr-only">{title}</DialogTitle>
                 <Command loop className="bg-transparent">
-                    <CommandInput autoFocus placeholder={placeholder} className="h-10" />
+                    <CommandInput
+                        autoFocus
+                        border={false}
+                        placeholder={placeholder}
+                        className="h-10"
+                    />
                     <CommandList data-lenis-prevent className="no-scrollbar max-h-80 p-2">
                         <CommandEmpty>{emptyLabel}</CommandEmpty>
                         {resources.map((resource) => (
