@@ -1,6 +1,5 @@
 "use client";
 import type { ReactNode } from "react";
-import { MdCheck } from "react-icons/md";
 import { cn } from "@/lib/utils";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import {
@@ -24,7 +23,6 @@ export default function ResourcePickerDialog({
     placeholder,
     emptyLabel,
     resources,
-    activeId,
     destructive = false,
     onPick,
 }: {
@@ -34,7 +32,6 @@ export default function ResourcePickerDialog({
     placeholder: string;
     emptyLabel: string;
     resources: PickableResource[];
-    activeId?: string | null;
     destructive?: boolean;
     onPick: (id: string) => void;
 }) {
@@ -43,10 +40,10 @@ export default function ResourcePickerDialog({
         <Dialog open onOpenChange={onOpenChange}>
             <DialogContent
                 showCloseButton={false}
-                className="top-[18%] w-125 max-w-[calc(100%-2rem)] translate-y-0 gap-0 overflow-hidden rounded-2xl border-white/10 bg-charcoal p-0 sm:max-w-none"
+                className="top-[18%] w-125 max-w-[calc(100%-2rem)] translate-y-0 gap-0 overflow-hidden rounded-2xl border-white/10 bg-cement p-0 sm:max-w-none"
             >
                 <DialogTitle className="sr-only">{title}</DialogTitle>
-                <Command loop className="bg-transparent">
+                <Command loop disablePointerSelection className="bg-transparent">
                     <CommandInput
                         autoFocus
                         border={false}
@@ -61,7 +58,7 @@ export default function ResourcePickerDialog({
                                 value={`${resource.label} ${resource.id}`}
                                 onSelect={() => onPick(resource.id)}
                                 className={cn(
-                                    "justify-between px-2.5 py-2",
+                                    "px-2.5 py-2 hover:bg-white/5 data-[selected=true]:not-hover:bg-transparent",
                                     destructive && "text-rose-300/90",
                                 )}
                             >
@@ -69,9 +66,6 @@ export default function ResourcePickerDialog({
                                     {resource.leading}
                                     <span className="truncate">{resource.label}</span>
                                 </span>
-                                {resource.id === activeId && (
-                                    <MdCheck className="size-3.5 shrink-0 text-neutral-400" />
-                                )}
                             </CommandItem>
                         ))}
                     </CommandList>

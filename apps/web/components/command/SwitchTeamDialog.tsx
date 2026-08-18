@@ -12,7 +12,6 @@ export default function SwitchTeamDialog() {
     const pending = useCommandActionStore((s) => s.pending);
     const clear = useCommandActionStore((s) => s.clear);
     const { data: project } = useGetProject(useActiveProject()?.id);
-    const selectedTeam = usePlaygroundNavStore((s) => s.selectedTeam);
     const openTeam = usePlaygroundNavStore((s) => s.openTeam);
 
     const teams = project?.teams ?? [];
@@ -24,7 +23,6 @@ export default function SwitchTeamDialog() {
             title="Switch team"
             placeholder="Search teams..."
             emptyLabel="No teams found."
-            activeId={selectedTeam?.id ?? null}
             resources={teams.map((team) => ({
                 id: team.id,
                 label: team.name,

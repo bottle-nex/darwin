@@ -13,7 +13,6 @@ export default function SwitchProjectDialog() {
     const { data: dashboard } = useGetDashboard(orgSlug);
 
     const projects = dashboard?.projects ?? [];
-    const active = projects.find((project) => project.slug === projectSlug);
 
     return (
         <ResourcePickerDialog
@@ -22,7 +21,6 @@ export default function SwitchProjectDialog() {
             title="Switch project"
             placeholder="Search projects..."
             emptyLabel="No projects found."
-            activeId={active?.id ?? null}
             resources={projects.map((project) => ({
                 id: project.id,
                 label: project.name,

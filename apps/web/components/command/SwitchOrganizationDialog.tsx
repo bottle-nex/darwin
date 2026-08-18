@@ -13,7 +13,6 @@ export default function SwitchOrganizationDialog() {
     const { data: organizations } = useFetchOrganizations();
 
     const orgs = organizations ?? [];
-    const active = orgs.find((org) => org.slug === orgSlug);
 
     return (
         <ResourcePickerDialog
@@ -22,7 +21,6 @@ export default function SwitchOrganizationDialog() {
             title="Switch organization"
             placeholder="Search organizations..."
             emptyLabel="No organizations found."
-            activeId={active?.id ?? null}
             resources={orgs.map((org) => ({
                 id: org.id,
                 label: org.name,
