@@ -3,9 +3,10 @@ import z from "zod";
 import ResponseWriter from "../../services/service.response";
 import Access from "../../access-control/access";
 import { Action, Permissions } from "@trymatcha/access-control";
-import { IssueStatus, Prisma, prisma } from "@trymatcha/database";
+import { ActivityType, ActorType, IssueStatus, Prisma, prisma } from "@trymatcha/database";
 import { server_services } from "../..";
 import { OutboundSocketMessageType } from "@trymatcha/types";
+import ActivityService from "../../services/service.activity";
 
 export default class IssueCreateController {
     static body_schema = z
@@ -104,7 +105,7 @@ export default class IssueCreateController {
                             select: { number: true },
                         });
 
-                        return tx.issue.create({
+                        const created = await tx.issue.create({
                             data: {
                                 title: parsed_body.data.title,
                                 description: parsed_body.data.description,
@@ -134,6 +135,18 @@ export default class IssueCreateController {
                                 status: true,
                             },
                         });
+
+                        await ActivityService.emit(tx, {
+                            issueId: created.id,
+                            actor: { type: ActorType.User, userId: user.id, name: user.name },
+                            // Same key the backfill migration used, so a pre-existing
+                            // issue never ends up with two "created" rows.
+                            events: [
+                                { type: ActivityType.IssueCreated, dedupeKey: "issue:created" },
+                            ],
+                        });
+
+                        return created;
                     });
                     break;
                 } catch (error) {

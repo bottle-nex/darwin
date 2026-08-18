@@ -1,4 +1,8 @@
 import {
+    ActivitySurface,
+    ActivityType,
+    ActorType,
+    AgentSessionStatus,
     IssueStatus,
     NotificationType,
     OrgRole,
@@ -9,6 +13,7 @@ import {
     TeamRole,
 } from "./enums.prisma";
 import type { ReactionSummary } from "../chat/reaction";
+import type { ActivityPayload, ActivityUserRef } from "../activity/payload";
 
 export interface User {
     id: string;
@@ -146,6 +151,59 @@ export interface Tag {
 
     createdAt: Date;
     updatedAt: Date;
+}
+
+export interface IssueActivity {
+    id: string;
+    /** `BigInt` in Postgres, stringified on the wire. The feed's real sort key. */
+    seq: string;
+    issueId: string;
+
+    type: ActivityType;
+    payload: ActivityPayload | null;
+
+    actorType: ActorType;
+    actorUserId: string | null;
+    actorUser: ActivityUserRef | null;
+    actorWorkerId: string | null;
+
+    surface: ActivitySurface;
+
+    sessionId: string | null;
+    /** Present only on the `RunStarted` row, which is the one that renders as the card. */
+    session?: AgentSession | null;
+
+    createdAt: Date;
+}
+
+export interface AgentSessionStats {
+    numTurns?: number;
+    durationMs?: number;
+    commits?: number;
+    filesChanged?: number;
+}
+
+export interface AgentSessionCost {
+    totalCostUsd?: number;
+    sandboxSeconds?: number;
+}
+
+export interface AgentSession {
+    id: string;
+    issueId: string;
+    workerId: string | null;
+
+    attemptNumber: number;
+    status: AgentSessionStatus;
+
+    summary: string | null;
+    stats: AgentSessionStats | null;
+    cost: AgentSessionCost | null;
+    traceUrl: string | null;
+    error: string | null;
+
+    startedAt: Date;
+    endedAt: Date | null;
 }
 
 export interface Chat {

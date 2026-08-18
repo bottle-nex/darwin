@@ -14,7 +14,7 @@ export default function IssueChatPanel({ issueId }: { issueId: string }) {
 
     return (
         <motion.aside
-            aria-label="Comments and activity"
+            aria-label="Comments"
             initial={false}
             animate={{ width: isOpen ? CHAT_PANEL_WIDTH : 0 }}
             transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}

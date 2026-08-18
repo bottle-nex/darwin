@@ -34,6 +34,10 @@ export function useSubscribeEventHandlers(project_id: string | undefined) {
                 SocketHandlers.handle_project_chat_reaction_updated(queryClient, message),
             [OutboundSocketMessageType.NOTIFICATION_CREATED]: (message) =>
                 SocketHandlers.handle_notification_created(queryClient, message),
+            [OutboundSocketMessageType.ACTIVITY_CREATED]: (message) =>
+                SocketHandlers.handle_activity_created(queryClient, message),
+            [OutboundSocketMessageType.AGENT_SESSION_UPDATED]: (message) =>
+                SocketHandlers.handle_agent_session_updated(queryClient, message),
         };
 
         Object.entries(handlers_map).forEach(([type, handler]) => {

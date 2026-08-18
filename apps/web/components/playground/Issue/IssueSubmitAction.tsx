@@ -9,12 +9,14 @@ import { cn } from "@/lib/utils";
 import SubmitWarningToast from "./SubmitWarningToast";
 import type { IssueFormState } from "./useIssueForm";
 
-export default function IssueSubmitFooter({
+export default function IssueSubmitAction({
     form,
     className,
+    warningPlacement = "above",
 }: {
     form: IssueFormState;
     className?: string;
+    warningPlacement?: "above" | "below";
 }) {
     const { body, submit, pending, warning, shakeControls, isEdit, isCustom, isMac, readOnly } =
         form;
@@ -41,7 +43,7 @@ export default function IssueSubmitFooter({
                     </span>
                 )}
                 <div className="relative isolate">
-                    <SubmitWarningToast warning={warning} />
+                    <SubmitWarningToast warning={warning} placement={warningPlacement} />
                     <motion.div animate={shakeControls} className="relative z-10">
                         <Button
                             variant="tertiary"

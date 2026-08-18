@@ -163,6 +163,8 @@ export class WorkerMcpServerService {
 
     private static readonly SERVER = process.env.MATCHA_SERVER_URL!;
     private static readonly TOKEN = process.env.MATCHA_SANDBOX_TOKEN!; // per-worker token
+    /** The attempt this invocation belongs to, so the PR lands on the right session. */
+    private static readonly RUN_ID = process.env.MATCHA_RUN_ID;
 
     constructor() {
         this.mcp_server = new McpServer({
@@ -215,7 +217,7 @@ export class WorkerMcpServerService {
         try {
             await this.api("/pr-opened", {
                 method: "POST",
-                body: JSON.stringify(args),
+                body: JSON.stringify({ ...args, run_id: WorkerMcpServerService.RUN_ID }),
             });
             console.error(`[sandbox-mcp:worker] report_pr_opened — server acknowledged`);
             return this.text("ok");

@@ -1,0 +1,189 @@
+/// One entry on an issue's timeline. Append-only — rows are never updated after
+/// insert, so anything that mutates while it happens (an agent run, a comment)
+/// lives in its own table and is grouped or merged in at read time.
+///
+/// Display values are frozen into `payload` at write time — a label's name and
+/// colour, the actor's name — so the timeline stays readable after the row it
+/// described is deleted.
+model IssueActivity {
+  id      String @id @default(cuid())
+  /// The real sort key. `createdAt` is millisecond-resolution and one update can
+  /// emit six rows in a single transaction, which leaves cuid-keyed ordering
+  /// non-deterministic within the batch and visibly reshuffles the feed on refetch.
+  seq     BigInt @default(autoincrement())
+  issueId String
+  issue   Issue  @relation(fields: [issueId], references: [id], onDelete: Cascade)
+
+  type    ActivityType
+  /// Discriminated by `type`. See ActivityPayloadMap in @trymatcha/types.
+  payload Json?
+
+  actorType     ActorType
+  actorUserId   String?
+  actorUser     User?   @relation(name: "ActivityActor", fields: [actorUserId], references: [id], onDelete: SetNull)
+  actorWorkerId String?
+  actorWorker   Worker? @relation(name: "ActivityWorker", fields: [actorWorkerId], references: [id], onDelete: SetNull)
+
+  surface ActivitySurface @default(Primary)
+
+  /// Grouping key, not a pointer — every row emitted during an agent attempt
+  /// carries it, and the `RunStarted` row is the one that renders as the card.
+  sessionId String?
+  session   AgentSession? @relation(fields: [sessionId], references: [id], onDelete: SetNull)
+
+  /// Idempotency for retried worker reports. The unique index below is what
+  /// makes `createMany({ skipDuplicates: true })` actually deduplicate.
+  dedupeKey String?
+
+  createdAt DateTime @default(now())
+
+  @@unique([issueId, dedupeKey])
+  @@index([issueId, seq])
+  @@index([sessionId])
+}
+
+/// One attempt by a worker at one issue. Unlike an activity row this mutates for
+/// the whole time it runs — status flips, stats and cost accumulate — which is
+/// why it is not itself a row on the timeline.
+///
+/// `id` is the `run_id` the VM mints per attempt, so the worker's "run started"
+/// report is an upsert and survives being retried.
+model AgentSession {
+  id       String  @id
+  issueId  String
+  issue    Issue   @relation(fields: [issueId], references: [id], onDelete: Cascade)
+  workerId String?
+  worker   Worker? @relation(fields: [workerId], references: [id], onDelete: SetNull)
+
+  attemptNumber Int                @default(1)
+  status        AgentSessionStatus @default(Running)
+
+  /// One-line description of what the attempt did, written when it settles.
+  summary  String?
+  /// { numTurns, durationMs, commits?, filesChanged? }
+  stats    Json?
+  /// { totalCostUsd, sandboxSeconds? }
+  cost     Json?
+  /// Full tool-call trace. Mirrors Worker.contextBlobUrl, scoped to one attempt.
+  traceUrl String?
+  error    String?
+
+  activities IssueActivity[]
+
+  startedAt DateTime  @default(now())
+  endedAt   DateTime?
+
+  @@index([issueId, startedAt])
+  @@index([workerId, status])
+}
+
+enum AgentSessionStatus {
+  Running
+  Succeeded
+  Failed
+  Aborted
+}
+
+/// Who caused the event. `System` covers transitions nobody authored — a lease
+/// expiring, an issue being requeued — which would otherwise be misattributed
+/// to whichever worker happened to be holding the issue.
+enum ActorType {
+  User
+  Agent
+  System
+  Github
+}
+
+/// Primary renders in the feed. Secondary hides behind "show details".
+/// Audit never renders — it exists for compliance queries and for the agent
+/// rehydrating what happened on an issue.
+enum ActivitySurface {
+  Primary
+  Secondary
+  Audit
+}
+
+/// The full event vocabulary. Members without a writer today are declared
+/// deliberately: adding the writer later shouldn't need a migration.
+enum ActivityType {
+  // lifecycle
+  IssueCreated
+  IssueReopened
+  IssueResolved
+  IssueCancelled
+  IssueArchived
+  IssueDeleted
+
+  // field edits
+  StatusChanged
+  PriorityChanged
+  TitleChanged
+  DescriptionChanged
+  SummaryChanged
+  AssigneeAdded
+  AssigneeRemoved
+  LabelAdded
+  LabelRemoved
+  DatesChanged
+  ColumnChanged
+  SpecializationChanged
+
+  // relationships
+  RelationAdded
+  RelationRemoved
+  SplitIntoSubIssues
+
+  // queue and routing
+  Queued
+  Routed
+  Reprioritized
+  Preempted
+  Starved
+
+  // agent run
+  RunStarted
+  RunCompleted
+  AttemptFailed
+  RunAborted
+  WorkerHandoff
+  WorkerDied
+  HumanTookOver
+  HandedBackToHuman
+
+  // verification
+  BugReproduced
+  BugNotReproduced
+  BuildResult
+  TestResult
+  AcceptanceChecked
+
+  // github
+  BranchCreated
+  CommitsPushed
+  PrOpened
+  PrReviewReceived
+  PrFeedbackAddressed
+  PrChecksFailed
+  PrRebased
+  PrMerged
+  PrClosed
+  PrReverted
+
+  // outbound MCP
+  ExternalMessageSent
+  ExternalIssueOpened
+  ExternalDocUpdated
+  OncallPaged
+
+  // security and cost
+  ScopeRequested
+  ScopeGranted
+  ScopeDenied
+  GuardrailHit
+  SecretAccessed
+  BudgetThresholdCrossed
+  BudgetExceeded
+
+  // comms
+  AttachmentAdded
+}

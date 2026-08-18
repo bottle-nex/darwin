@@ -1,4 +1,4 @@
-import { IssueStatus, prisma } from "@trymatcha/database";
+import { ActorType, IssueStatus, prisma } from "@trymatcha/database";
 import { Request, Response } from "express";
 import z from "zod";
 import ResponseWriter from "../../services/service.response";
@@ -6,6 +6,9 @@ import Access from "../../access-control/access";
 import { Action, Permissions } from "@trymatcha/access-control";
 import { issue_recipients } from "../../notifications/recipients";
 import { server_services } from "../..";
+import { OutboundSocketMessageType } from "@trymatcha/types";
+import ActivityService from "../../services/service.activity";
+import { diff_issue } from "../../services/service.activity-diff";
 
 export default class IssueUpdateController {
     static body_scheam = z.object({
@@ -56,9 +59,15 @@ export default class IssueUpdateController {
                     projectId: true,
                     status: true,
                     priority: true,
+                    title: true,
+                    description: true,
+                    startDate: true,
+                    targetDate: true,
                     customColumnId: true,
+                    customColumn: { select: { id: true, label: true } },
                     createdById: true,
-                    assignees: { select: { id: true } },
+                    assignees: { select: { id: true, name: true, image: true } },
+                    tags: { select: { id: true, name: true, color: true } },
                 },
             });
             if (!issue) {
@@ -121,38 +130,51 @@ export default class IssueUpdateController {
                 next_status = issue.status;
             }
 
-            const updated = await prisma.issue.update({
-                where: { id },
-                data: {
-                    title: body_data.title,
-                    description: body_data.description,
-                    priority: body_data.priority,
-                    status: next_status,
-                    customColumnId: next_column_id,
-                    startDate: body_data.start_date,
-                    targetDate: body_data.target_date,
-                    tags: body_data.tag_ids
-                        ? { set: body_data.tag_ids.map((id) => ({ id })) }
-                        : undefined,
-                    assignees: body_data.assignee_ids
-                        ? { set: body_data.assignee_ids.map((id) => ({ id })) }
-                        : undefined,
-                },
-                select: {
-                    id: true,
-                    number: true,
-                    title: true,
-                    description: true,
-                    priority: true,
-                    status: true,
-                    customColumnId: true,
-                    createdAt: true,
-                    startDate: true,
-                    targetDate: true,
-                    assignees: { select: { id: true, name: true, email: true, image: true } },
-                    tags: { select: { id: true, name: true, color: true } },
-                },
+            const { updated, activities } = await prisma.$transaction(async (tx) => {
+                const updated = await tx.issue.update({
+                    where: { id },
+                    data: {
+                        title: body_data.title,
+                        description: body_data.description,
+                        priority: body_data.priority,
+                        status: next_status,
+                        customColumnId: next_column_id,
+                        startDate: body_data.start_date,
+                        targetDate: body_data.target_date,
+                        tags: body_data.tag_ids
+                            ? { set: body_data.tag_ids.map((id) => ({ id })) }
+                            : undefined,
+                        assignees: body_data.assignee_ids
+                            ? { set: body_data.assignee_ids.map((id) => ({ id })) }
+                            : undefined,
+                    },
+                    include: {
+                        creator: true,
+                        assignees: true,
+                        tags: true,
+                        customColumn: { select: { id: true, label: true } },
+                    },
+                });
+
+                const activities = await ActivityService.emit(tx, {
+                    issueId: id,
+                    actor: { type: ActorType.User, userId: user.id, name: user.name },
+                    events: diff_issue(issue, updated),
+                });
+
+                return { updated, activities };
             });
+
+            const channel_name = server_services.publisher.get_channel_name(issue.projectId);
+            await server_services.publisher.publish_message(
+                channel_name,
+                JSON.stringify({
+                    type: OutboundSocketMessageType.ISSUE_UPDATED,
+                    projectId: issue.projectId,
+                    payload: updated,
+                }),
+            );
+            await ActivityService.publish(issue.projectId, id, activities);
 
             await IssueUpdateController.notify(
                 user.id,

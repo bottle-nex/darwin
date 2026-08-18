@@ -13,6 +13,7 @@ import SessionServices from "@/lib/session";
 import { upsert_notification } from "@/hooks/notifications/useNotifications";
 import { useNotificationsPanelStore } from "@/store/playground/useNotificationsPanelStore";
 import { useFloatNotificationsStore } from "@/store/playground/useFloatNotificationsStore";
+import { append_activities, update_agent_session } from "@/hooks/activity/useActivity";
 
 export class SocketHandlers {
     static handle_issue_created(queryClient: QueryClient, message: OutboundSocketMessage) {
@@ -82,5 +83,15 @@ export class SocketHandlers {
         if (!useNotificationsPanelStore.getState().isOpen) {
             useFloatNotificationsStore.getState().push(message.payload);
         }
+    }
+
+    static handle_activity_created(queryClient: QueryClient, message: OutboundSocketMessage) {
+        if (message.type !== OutboundSocketMessageType.ACTIVITY_CREATED) return;
+        append_activities(queryClient, message.payload.issueId, message.payload.activities);
+    }
+
+    static handle_agent_session_updated(queryClient: QueryClient, message: OutboundSocketMessage) {
+        if (message.type !== OutboundSocketMessageType.AGENT_SESSION_UPDATED) return;
+        update_agent_session(queryClient, message.payload);
     }
 }

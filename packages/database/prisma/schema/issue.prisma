@@ -31,6 +31,9 @@ model Issue {
   specialization String?
   prUrl          String?
 
+  activities    IssueActivity[]
+  agentSessions AgentSession[]
+
   @@unique([projectId, number])
   @@index([projectId, status])
   @@index([projectId, customColumnId])
