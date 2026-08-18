@@ -39,7 +39,6 @@ const MENU_ITEMS: { id: string; label: string; icon: IconType }[] = [
     { id: "settings", label: "Settings", icon: MdSettings },
 ];
 
-/** Submenu row showing the active organization and a flyout to switch between them. */
 function OrgSwitcherSubMenu({ onCreateOrg }: { onCreateOrg: () => void }) {
     const router = useRouter();
     const { orgSlug } = useParams<{ orgSlug: string }>();
@@ -61,9 +60,7 @@ function OrgSwitcherSubMenu({ onCreateOrg }: { onCreateOrg: () => void }) {
             </DropdownMenuSubTrigger>
 
             <DropdownMenuSubContent className="max-h-80 w-60 overflow-y-auto p-1">
-                <DropdownMenuLabel className="px-2 py-1.5 text-[11px] font-medium tracking-wide text-neutral-500 uppercase">
-                    Organizations
-                </DropdownMenuLabel>
+                <DropdownMenuLabel>Organizations</DropdownMenuLabel>
 
                 {orgs.length === 0 ? (
                     <div className="px-3 py-2 text-[12px] text-neutral-500">No organizations</div>
@@ -89,7 +86,7 @@ function OrgSwitcherSubMenu({ onCreateOrg }: { onCreateOrg: () => void }) {
                     ))
                 )}
 
-                <DropdownMenuSeparator className="my-1 h-px bg-white/10" />
+                <DropdownMenuSeparator />
 
                 <DropdownMenuItem onSelect={onCreateOrg}>
                     <MdAdd className="size-4 text-neutral-400" aria-hidden />
@@ -100,11 +97,6 @@ function OrgSwitcherSubMenu({ onCreateOrg }: { onCreateOrg: () => void }) {
     );
 }
 
-/**
- * Account menu opened from the top-bar avatar: profile header, an organization
- * switcher submenu backed by the user's organizations, account links, and a
- * working logout (next-auth `signOut`).
- */
 export default function PlaygroundUserMenu() {
     const user = useUserSessionStore((s) => s.session?.user);
     const [isCreateOrgOpen, setIsCreateOrgOpen] = useState(false);
@@ -165,12 +157,7 @@ export default function PlaygroundUserMenu() {
                                 />
                             </span>
                         ) : (
-                            <PlaygroundAvatar
-                                size="md"
-                                tone="emerald"
-                                letter={initial}
-                                // className="size-9 text-[15px]"
-                            />
+                            <PlaygroundAvatar size="md" tone="emerald" letter={initial} />
                         )}
                         <div className="min-w-0">
                             <p className="truncate text-[12px] font-semibold text-neutral-100">
@@ -180,7 +167,7 @@ export default function PlaygroundUserMenu() {
                         </div>
                     </div>
 
-                    <DropdownMenuSeparator className="h-0.5 bg-[#0F0F0F] shadow-xs shadow-white/4" />
+                    <DropdownMenuSeparator />
 
                     <div className="p-1">
                         {MENU_ITEMS.map((item) => (
@@ -193,12 +180,12 @@ export default function PlaygroundUserMenu() {
                         <OrgSwitcherSubMenu onCreateOrg={() => setIsCreateOrgOpen(true)} />
                     </div>
 
-                    <DropdownMenuSeparator className="h-0.5 bg-[#0F0F0F] shadow-xs shadow-white/4" />
+                    <DropdownMenuSeparator />
 
                     <div className="p-1">
                         <DropdownMenuItem
                             onSelect={() => signOut({ callbackUrl: "/" })}
-                            className={"group"}
+                            className="group"
                         >
                             <MdLogout
                                 className="size-4 text-neutral-400 group-hover:text-red-300"

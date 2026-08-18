@@ -60,7 +60,7 @@ export default function PlaygroundShell() {
     const showOnboarding = !loading && !!project && !project.tourCompleted;
 
     return (
-        <main className="flex h-screen flex-col overflow-hidden text-neutral-100 select-none">
+        <main className="flex h-screen flex-col overflow-hidden text-neutral-100 select-none tracking-wide">
             <section className="flex flex-1 min-h-0 p-2">
                 <PlaygroundSidebar />
                 <SidebarResizeHandle />

@@ -1,15 +1,23 @@
 "use client";
 import { useState } from "react";
+import { MdOutlineKeyboardArrowRight } from "react-icons/md";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
+import { DIALOG_TITLE_FIELD, GHOST_FIELD } from "@/components/ui/fieldStyles";
+import PlaygroundAvatar from "@/components/playground/Core/components/PlaygroundAvatar";
+import { cn } from "@/lib/utils";
+import { useActiveProject } from "@/hooks/useActiveProject";
 import { useAddCustomColumnStore } from "@/store/kanban/useAddCustomColumnStore";
 import { useCustomColumnActions } from "@/hooks/kanban/useCustomColumnActions";
 
 export default function AddCustomColumnDialog() {
     const { open, setOpen } = useAddCustomColumnStore();
+    const project = useActiveProject();
     const { addColumn, addingColumn } = useCustomColumnActions();
     const [title, setTitle] = useState("");
+
+    const ready = Boolean(title.trim()) && !addingColumn;
 
     function handleOpenChange(next: boolean) {
         setOpen(next);
@@ -17,9 +25,8 @@ export default function AddCustomColumnDialog() {
     }
 
     async function submit() {
-        const name = title.trim();
-        if (!name) return;
-        const added = await addColumn(name);
+        if (!ready) return;
+        const added = await addColumn(title.trim());
         if (added) handleOpenChange(false);
     }
 
@@ -27,45 +34,61 @@ export default function AddCustomColumnDialog() {
         <Dialog open={open} onOpenChange={handleOpenChange}>
             <DialogContent
                 showCloseButton={false}
-                className="border-white/10 bg-charcoal sm:max-w-sm"
+                onOpenAutoFocus={(event) => {
+                    event.preventDefault();
+                    (event.currentTarget as HTMLElement).focus();
+                }}
+                className={cn(
+                    "flex w-110 max-w-none flex-col gap-0 overflow-hidden p-0 sm:max-w-none",
+                    "rounded-3xl bg-charcoal",
+                )}
             >
-                <DialogHeader className="gap-1.5">
-                    <DialogTitle className="text-base text-neutral-100">
-                        Add custom column
-                    </DialogTitle>
-                </DialogHeader>
+                <DialogTitle className="sr-only">Add custom column</DialogTitle>
 
-                <Input
-                    autoFocus
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    placeholder="List title…"
-                    onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                            e.preventDefault();
-                            submit();
-                        }
-                    }}
-                />
+                <main className="flex min-w-0 flex-col *:px-6">
+                    <section className="flex flex-col items-start gap-y-3 pt-4 pb-2">
+                        <div className="flex items-center justify-start gap-x-1 text-snow text-xs">
+                            <PlaygroundAvatar
+                                letter={project?.name.slice(0, 2) ?? ""}
+                                tone="emerald"
+                                className="uppercase"
+                            />
+                            <span>
+                                <MdOutlineKeyboardArrowRight />
+                            </span>
+                            <span className="text-sm">New List</span>
+                        </div>
+                        <Textarea
+                            rows={1}
+                            autoFocus
+                            placeholder="List title"
+                            maxLength={60}
+                            value={title}
+                            onChange={(e) => setTitle(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.key === "Enter") {
+                                    e.preventDefault();
+                                    submit();
+                                }
+                            }}
+                            className={cn(GHOST_FIELD, DIALOG_TITLE_FIELD)}
+                        />
+                    </section>
 
-                <div className="mt-2 flex justify-end gap-2">
-                    <Button
-                        variant="tertiary"
-                        size="sm"
-                        disabled={addingColumn}
-                        onClick={() => handleOpenChange(false)}
-                    >
-                        Cancel
-                    </Button>
-                    <Button
-                        size="sm"
-                        loading={addingColumn}
-                        disabled={!title.trim()}
-                        onClick={submit}
-                    >
-                        Add list
-                    </Button>
-                </div>
+                    <section className="flex h-fit items-center justify-end pb-4">
+                        <Button
+                            type="button"
+                            variant="tertiary"
+                            size="xs"
+                            className="text-ink!"
+                            onClick={submit}
+                            loading={addingColumn}
+                            disabled={!ready}
+                        >
+                            Add list
+                        </Button>
+                    </section>
+                </main>
             </DialogContent>
         </Dialog>
     );
