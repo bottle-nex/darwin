@@ -95,7 +95,7 @@ function CommandMenuBody({ onDone }: { onDone: () => void }) {
                 }
             }}
         >
-            <div className="px-3">
+            <div className="px-1.5 pt-3">
                 <CommandInput
                     autoFocus
                     border={false}
@@ -104,7 +104,7 @@ function CommandMenuBody({ onDone }: { onDone: () => void }) {
                     placeholder={
                         page ? `${ISSUE_PAGE_TITLE[page]}...` : "Type a command or search..."
                     }
-                    className="h-11 text-[14px]"
+                    className="text-[14px]"
                     trailing={
                         page ? (
                             <button
@@ -127,7 +127,7 @@ function CommandMenuBody({ onDone }: { onDone: () => void }) {
             ) : (
                 <CommandList
                     data-lenis-prevent
-                    className="no-scrollbar max-h-[min(60vh,26rem)] p-2"
+                    className="no-scrollbar max-h-[min(60vh,26rem)] px-2 pt-1 pb-2"
                 >
                     <CommandEmpty>No matching commands.</CommandEmpty>
                     {groups.map((group) => (
@@ -141,11 +141,11 @@ function CommandMenuBody({ onDone }: { onDone: () => void }) {
                                         disabled={!available}
                                         onSelect={() => run(entry)}
                                         className={cn(
-                                            "justify-between px-2.5 py-2 text-[13.5px]",
+                                            "justify-between p-2.5 text-[13.5px]",
                                             entry.destructive && "text-rose-300/90",
                                         )}
                                     >
-                                        <span className="flex min-w-0 items-center gap-2.5">
+                                        <span className="flex min-w-0 items-center gap-2">
                                             <entry.icon
                                                 className={cn(
                                                     "size-4 text-neutral-400",
