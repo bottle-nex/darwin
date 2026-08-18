@@ -14,6 +14,8 @@ import { sign_worker_jwt } from "./service.jwt";
 import IssueSolver, { type ClaimedIssue } from "./service.issue_solver";
 import Logger, { format_duration } from "@trymatcha/logger";
 import { IssueStatus, prisma, WorkerStatus } from "@trymatcha/database";
+import RunReporter from "./service.run_report";
+import { randomUUID } from "node:crypto";
 
 const REPO_DIR = "/home/user/repo";
 const SAFE_BRANCH = /^[A-Za-z0-9._/-]+$/;
@@ -200,21 +202,26 @@ export default class E2B {
             ]);
             log.info("minted github + worker tokens for the sandbox");
 
-            const mcp_config = {
-                mcpServers: {
-                    matcha: {
-                        command: "node",
-                        args: [SANDBOX_MCP_ENTRY],
-                        env: {
-                            MATCHA_SERVER_URL: ENV.SERVER_PUBLIC_API_URL,
-                            MATCHA_SANDBOX_TOKEN: worker_token,
-                            MATCHA_SESSION_KIND: "worker",
+            await sandbox.files.write(
+                MCP_CONFIG_PATH,
+                JSON.stringify(
+                    {
+                        mcpServers: {
+                            matcha: {
+                                command: "node",
+                                args: [SANDBOX_MCP_ENTRY],
+                                env: {
+                                    MATCHA_SERVER_URL: ENV.SERVER_PUBLIC_API_URL,
+                                    MATCHA_SANDBOX_TOKEN: worker_token,
+                                    MATCHA_SESSION_KIND: "worker",
+                                },
+                            },
                         },
                     },
-                },
-            };
-            await sandbox.files.write(MCP_CONFIG_PATH, JSON.stringify(mcp_config, null, 2));
-            log.info("wrote mcp config into sandbox");
+                    null,
+                    2,
+                ),
+            );
 
             log.info("worker marked Busy");
             await prisma.worker.update({
@@ -243,12 +250,20 @@ export default class E2B {
                 );
                 await E2B.prepare_issue_branch(sandbox, issue.prBranch, branch);
 
+                // Minted after the claim lands, and used as the AgentSession id so a
+                // retried report is an upsert rather than a second attempt row. A resumed
+                // issue whose PR already exists never runs claude, so it has no run.
+                let run_id: string | undefined;
+
                 if (pull_request) {
                     log.info(`existing PR found for issue #${issue.number}`, {
                         pull: pull_request.number,
                         branch: issue.prBranch,
                     });
                 } else {
+                    run_id = randomUUID();
+                    await RunReporter.started(worker_token, run_id, issue.id, log);
+
                     const graph_state = await GraphService.prepare(sandbox, log);
 
                     log.step(`issue #${issue.number} pushed into sandbox`, { title: issue.title });
@@ -263,27 +278,41 @@ export default class E2B {
                         brief: project.planMd ? "included" : "absent",
                     });
 
-                    const report = await ClaudeRun.execute(sandbox, log, {
-                        prompt_path: ISSUE_PROMPT_PATH,
-                        model,
-                        effort,
-                        extra_flags: [
-                            `--mcp-config ${MCP_CONFIG_PATH}`,
-                            ...(graph_state === "ready"
-                                ? [
-                                      `--settings ${GRAPHIFY_SETTINGS}`,
-                                      `--add-dir ${GRAPHIFY_INTEGRATION}`,
-                                  ]
-                                : []),
-                        ],
-                        envs: {
-                            CLAUDE_CODE_OAUTH_TOKEN: ENV.SERVER_CLAUDE_CODE_OAUTH_TOKEN,
-                            GH_TOKEN: gh_token,
-                            ...(graph_state === "ready" ? { GRAPHIFY_OUT } : {}),
-                        },
-                        timeout_ms: ISSUE_SOLVE_TIMEOUT_MS,
-                        label: `solving agent for issue #${issue.number}`,
-                    });
+                    let report;
+                    try {
+                        report = await ClaudeRun.execute(sandbox, log, {
+                            prompt_path: ISSUE_PROMPT_PATH,
+                            model,
+                            effort,
+                            extra_flags: [
+                                `--mcp-config ${MCP_CONFIG_PATH}`,
+                                ...(graph_state === "ready"
+                                    ? [
+                                          `--settings ${GRAPHIFY_SETTINGS}`,
+                                          `--add-dir ${GRAPHIFY_INTEGRATION}`,
+                                      ]
+                                    : []),
+                            ],
+                            envs: {
+                                CLAUDE_CODE_OAUTH_TOKEN: ENV.SERVER_CLAUDE_CODE_OAUTH_TOKEN,
+                                GH_TOKEN: gh_token,
+                                ...(graph_state === "ready" ? { GRAPHIFY_OUT } : {}),
+                            },
+                            timeout_ms: ISSUE_SOLVE_TIMEOUT_MS,
+                            label: `solving agent for issue #${issue.number}`,
+                        });
+                    } catch (error) {
+                        await RunReporter.failed(
+                            worker_token,
+                            run_id,
+                            issue.id,
+                            error instanceof Error ? error.message : String(error),
+                            log,
+                        );
+                        throw error;
+                    }
+
+                    await RunReporter.completed(worker_token, run_id, issue.id, report, log);
 
                     log.success(`issue #${issue.number} run finished`, {
                         turns: report.num_turns,
@@ -291,6 +320,7 @@ export default class E2B {
                         duration: format_duration(report.duration_ms),
                     });
                     log.block("final message from claude", report.result ?? "(empty)");
+
                     pull_request = await E2B.find_pull_request(
                         gh_token,
                         repo_full_name,
@@ -303,7 +333,7 @@ export default class E2B {
                     }
                 }
 
-                await E2B.report_pr_opened(worker_token, issue, pull_request);
+                await E2B.report_pr_opened(worker_token, issue, pull_request, run_id);
                 solved_count++;
                 current_issue_id = null;
             }
@@ -475,6 +505,7 @@ Never start a long-running command in the background and end your turn waiting o
         worker_token: string,
         issue: ClaimedIssue,
         pull: PullRequestSummary,
+        run_id: string | undefined,
     ): Promise<void> {
         const url = `${ENV.SERVER_PUBLIC_API_URL.replace(/\/+$/, "")}/api/v1/worker/pr-opened`;
         let failure = "PR completion callback failed";
@@ -492,6 +523,7 @@ Never start a long-running command in the background and end your turn waiting o
                         pr_url: pull.htmlUrl,
                         branch: issue.prBranch,
                         summary: `Completed issue #${issue.number}: ${issue.title}`,
+                        ...(run_id ? { run_id } : {}),
                     }),
                 });
                 const result = (await response.json()) as { success?: boolean; message?: string };

@@ -40,6 +40,7 @@ export default class ListIssueThreadsController {
                     id: true,
                     number: true,
                     title: true,
+                    status: true,
                     chats: {
                         where: { isDeleted: false },
                         orderBy: { createdAt: "desc" },
@@ -58,6 +59,7 @@ export default class ListIssueThreadsController {
                     id: issue.id,
                     number: issue.number,
                     title: issue.title,
+                    status: issue.status,
                     lastMessage: issue.chats[0]
                         ? {
                               message: to_plain_text(

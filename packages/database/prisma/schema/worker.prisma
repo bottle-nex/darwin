@@ -15,7 +15,9 @@ model Worker {
   nextQueuePos   Int       @default(1)
   leaseExpiresAt DateTime?
 
-  issues Issue[]
+  issues     Issue[]
+  activities IssueActivity[] @relation(name: "ActivityWorker")
+  sessions   AgentSession[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

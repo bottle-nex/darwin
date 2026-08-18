@@ -10,6 +10,7 @@ model Organization {
   invitations        Invitation[]
   createdBy          User                @relation("OrgCreator", fields: [createdById], references: [id])
   githubInstallation GithubInstallation?
+  lastVisitedByUsers User[]              @relation("UserLastVisitedOrg")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

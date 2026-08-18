@@ -1,74 +1,43 @@
 "use client";
 import { useState } from "react";
 import { HiOutlineMagnifyingGlass } from "react-icons/hi2";
-import { COMBINATIONS } from "@/hooks/shortcuts/usePlaygroundShortcuts";
+import {
+    COMMAND_ENTRIES,
+    comboToKeys,
+    isCommandAvailable,
+} from "@/hooks/shortcuts/usePlaygroundShortcuts";
 import { useShortcutSheetStore } from "@/store/playground/useShortcutSheetStore";
+import { useCommandContextStore } from "@/store/command/useCommandContextStore";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-
-interface ShortcutRow {
-    label: string;
-    keys: string[];
-}
-
-interface ShortcutGroup {
-    heading: string;
-    rows: ShortcutRow[];
-}
-
-function KeyCombo({ keys }: { keys: string[] }) {
-    return (
-        <div className="flex items-center gap-1">
-            {keys.map((key, index) => (
-                <kbd
-                    key={index}
-                    className="inline-flex min-w-6 items-center justify-center rounded border border-white/7 px-1.5 py-0.5 text-xs font-medium text-neutral-300 uppercase"
-                >
-                    {key}
-                </kbd>
-            ))}
-        </div>
-    );
-}
+import KeyCombo from "@/components/ui/KeyCombo";
+import { cn } from "@/lib/utils";
+import { COMMAND_KIND_ORDER } from "@/types/command.type";
 
 export default function PlaygroundShortcutSheet() {
     const isOpen = useShortcutSheetStore((s) => s.isOpen);
     const setOpen = useShortcutSheetStore((s) => s.setOpen);
+    const orgSlug = useCommandContextStore((s) => s.orgSlug);
+    const projectId = useCommandContextStore((s) => s.projectId);
+    const issueId = useCommandContextStore((s) => s.issueId);
     const [query, setQuery] = useState("");
 
-    function comboToKeys(combo: string): string[] {
-        return combo
-            .split(" ")
-            .flatMap((token) => (token.startsWith("mod+") ? ["⌘", token.slice(4)] : [token]));
-    }
+    const context = { orgSlug, projectId, issueId };
+    const normalized = query.trim().toLowerCase();
 
-    const allGroups: ShortcutGroup[] = [
-        {
-            heading: "Shortcuts",
-            rows: Object.entries(COMBINATIONS).map(([combo, { label }]) => ({
-                label,
-                keys: comboToKeys(combo),
-            })),
-        },
-    ];
-
-    function filterGroups(query: string): ShortcutGroup[] {
-        const normalized = query.trim().toLowerCase();
-        if (!normalized) return allGroups;
-        return allGroups
-            .map((group) => ({
-                ...group,
-                rows: group.rows.filter((row) => row.label.toLowerCase().includes(normalized)),
-            }))
-            .filter((group) => group.rows.length > 0);
-    }
+    const groups = COMMAND_KIND_ORDER.map((kind) => ({
+        kind,
+        entries: COMMAND_ENTRIES.filter(
+            (entry) =>
+                entry.kind === kind &&
+                (!normalized || entry.label.toLowerCase().includes(normalized)),
+        ),
+    })).filter((group) => group.entries.length > 0);
 
     function handleOpenChange(open: boolean) {
         setOpen(open);
         if (!open) setQuery("");
     }
-
-    const groups = filterGroups(query);
 
     return (
         <Sheet open={isOpen} onOpenChange={handleOpenChange}>
@@ -91,21 +60,25 @@ export default function PlaygroundShortcutSheet() {
                     </div>
                 </SheetHeader>
 
-                <div className="flex flex-col gap-5 overflow-y-auto p-4">
+                <div data-lenis-prevent className="flex flex-col gap-5 overflow-y-auto p-4">
                     {groups.map((group) => (
-                        <div key={group.heading} className="flex flex-col gap-1">
+                        <div key={group.kind} className="flex flex-col gap-1">
                             <h3 className="px-1 pb-0.5 text-xs font-medium tracking-wide text-neutral-300">
-                                {group.heading}
+                                {group.kind}
                             </h3>
-                            {group.rows.map((row) => (
+                            {group.entries.map((entry) => (
                                 <div
-                                    key={row.label}
-                                    className="flex items-center justify-between rounded-md px-1 py-1.5"
+                                    key={entry.combo}
+                                    className={cn(
+                                        "flex items-center justify-between rounded-md px-1 py-1.5",
+                                        !isCommandAvailable(entry, context) && "opacity-40",
+                                    )}
                                 >
-                                    <span className="text-[12.5px] text-neutral-500">
-                                        {row.label}
+                                    <span className="flex min-w-0 items-center gap-2 text-[12.5px] text-neutral-500">
+                                        <entry.icon className="size-3.5 shrink-0" aria-hidden />
+                                        <span className="truncate">{entry.label}</span>
                                     </span>
-                                    <KeyCombo keys={row.keys} />
+                                    <KeyCombo keys={comboToKeys(entry.combo)} />
                                 </div>
                             ))}
                         </div>

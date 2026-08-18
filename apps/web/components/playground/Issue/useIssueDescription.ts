@@ -5,17 +5,15 @@ import { promptsFromBraces, stripPrompts } from "@/lib/templates/promptHtml";
 import type { IssueDescriptionState } from "./editor/IssueDescriptionEditor";
 import type { PickableTemplate } from "@/types/issueTemplate";
 
-export function useIssueDescription(initialHtml?: string, initialTemplate?: PickableTemplate) {
-    const opening = initialTemplate
-        ? promptsFromBraces(initialTemplate.description)
-        : (initialHtml ?? "");
-
-    const [html, setHtml] = useState(opening);
-    const [isEmpty, setIsEmpty] = useState(!opening);
+export function useIssueDescription(initialHtml?: string) {
+    const [html, setHtml] = useState(initialHtml ?? "");
+    const [isEmpty, setIsEmpty] = useState(!initialHtml);
     const [prompts, setPrompts] = useState(0);
     const [editorKey, setEditorKey] = useState(0);
+    const [baseline, setBaseline] = useState<string | null>(null);
 
     const ready = !isEmpty && prompts === 0;
+    const isDirty = baseline !== null && html !== baseline;
 
     function pickTemplate(template: PickableTemplate) {
         setHtml(promptsFromBraces(template.description));
@@ -24,6 +22,7 @@ export function useIssueDescription(initialHtml?: string, initialTemplate?: Pick
     }
 
     function onEditorChange(state: IssueDescriptionState) {
+        if (baseline === null) setBaseline(state.html);
         setHtml(state.html);
         setIsEmpty(state.isEmpty);
         setPrompts(state.prompts);
@@ -33,5 +32,15 @@ export function useIssueDescription(initialHtml?: string, initialTemplate?: Pick
         return stripPrompts(html);
     }
 
-    return { html, isEmpty, prompts, ready, editorKey, pickTemplate, onEditorChange, toHtml };
+    return {
+        html,
+        isEmpty,
+        prompts,
+        ready,
+        isDirty,
+        editorKey,
+        pickTemplate,
+        onEditorChange,
+        toHtml,
+    };
 }

@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import type { Editor } from "@tiptap/react";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { useCreateIssue } from "@/hooks/issues/useCreateIssue";
 import { useUpdateIssue } from "@/hooks/issues/useUpdateIssue";
@@ -10,7 +10,6 @@ import { PRIORITY_TO_NUMBER } from "@/components/playground/Home/KanbanDisplay/c
 import type { Priority } from "@/types/kanban";
 import type { BoardIssue } from "@/types/board";
 import type { IssueTarget } from "@/store/issues/useIssueStore";
-import type { PickableTemplate } from "@/types/issueTemplate";
 import { useIssueDescription } from "./useIssueDescription";
 import { useSubmitWarning } from "./SubmitWarningToast";
 
@@ -18,7 +17,6 @@ type UseIssueFormArgs = {
     target: IssueTarget;
     issue: BoardIssue | null;
     initialDescription?: string;
-    initialTemplate?: PickableTemplate;
     readOnly?: boolean;
     onSubmitted?: () => void;
 };
@@ -40,11 +38,14 @@ export type IssueFormFields = {
     setMembersOpen: (value: boolean) => void;
 };
 
+function sameIds(a: { id: string }[], b: { id: string }[]) {
+    return a.length === b.length && a.every((item, index) => item.id === b[index].id);
+}
+
 export function useIssueForm({
     target,
     issue,
     initialDescription,
-    initialTemplate,
     readOnly = false,
     onSubmitted,
 }: UseIssueFormArgs) {
@@ -55,14 +56,7 @@ export function useIssueForm({
     const [isMac] = useState(() => /Mac|iPhone|iPad/.test(navigator.userAgent));
 
     const [title, setTitle] = useState(issue?.title ?? "");
-    const body = useIssueDescription(initialDescription, initialTemplate);
-
-    useEffect(() => {
-        if (!isEdit && initialTemplate && body.isEmpty && body.prompts === 0) {
-            body.pickTemplate(initialTemplate);
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [initialTemplate]);
+    const body = useIssueDescription(initialDescription);
 
     const [priority, setPriority] = useState<Priority>(
         issue ? (KanbanMappers.NUMBER_TO_PRIORITY[issue.priority] ?? "medium") : "medium",
@@ -76,6 +70,27 @@ export function useIssueForm({
         issue?.targetDate ? new Date(issue.targetDate) : undefined,
     );
     const [membersOpen, setMembersOpen] = useState(false);
+
+    const [syncedIssue, setSyncedIssue] = useState(issue);
+    if (issue && syncedIssue && issue !== syncedIssue) {
+        setSyncedIssue(issue);
+        if (issue.title !== syncedIssue.title) setTitle(issue.title);
+        if (issue.priority !== syncedIssue.priority) {
+            setPriority(KanbanMappers.NUMBER_TO_PRIORITY[issue.priority] ?? "medium");
+        }
+        if (!sameIds(issue.assignees, syncedIssue.assignees)) {
+            setMemberIds(issue.assignees.map((assignee) => assignee.id));
+        }
+        if (!sameIds(issue.tags, syncedIssue.tags)) {
+            setTagIds(issue.tags.map((tag) => tag.id));
+        }
+        if (issue.startDate !== syncedIssue.startDate) {
+            setStartDate(issue.startDate ? new Date(issue.startDate) : undefined);
+        }
+        if (issue.targetDate !== syncedIssue.targetDate) {
+            setTargetDate(issue.targetDate ? new Date(issue.targetDate) : undefined);
+        }
+    }
 
     const createIssue = useCreateIssue();
     const updateIssue = useUpdateIssue();
@@ -108,13 +123,13 @@ export function useIssueForm({
         return null;
     }
 
-    async function submit() {
-        if (pending || !projectId) return;
+    async function submit(): Promise<boolean> {
+        if (pending || !projectId) return false;
         const missing = missingField();
         if (missing) {
             fireWarning(missing.warning);
             missing.focus();
-            return;
+            return false;
         }
         try {
             if (issue) {
@@ -143,8 +158,10 @@ export function useIssueForm({
                 });
             }
             onSubmitted?.();
+            return true;
         } catch {
             toast.error(isEdit ? "Couldn't update the issue." : "Couldn't create the issue.");
+            return false;
         }
     }
 
@@ -162,6 +179,27 @@ export function useIssueForm({
         window.addEventListener("keydown", onKeyDown);
         return () => window.removeEventListener("keydown", onKeyDown);
     });
+
+    function hasEdits(): boolean {
+        if (!issue || readOnly) return false;
+        return (
+            title !== issue.title ||
+            body.isDirty ||
+            priority !== (KanbanMappers.NUMBER_TO_PRIORITY[issue.priority] ?? "medium") ||
+            !sameIdSet(
+                memberIds,
+                issue.assignees.map((a) => a.id),
+            ) ||
+            !sameIdSet(
+                tagIds,
+                issue.tags.map((t) => t.id),
+            ) ||
+            startDate?.getTime() !== dateValue(issue.startDate) ||
+            targetDate?.getTime() !== dateValue(issue.targetDate)
+        );
+    }
+
+    const isDirty = hasEdits();
 
     const fields: IssueFormFields = {
         title,
@@ -194,7 +232,18 @@ export function useIssueForm({
         isMac,
         projectId,
         readOnly,
+        isDirty,
     };
+}
+
+function sameIdSet(a: string[], b: string[]): boolean {
+    if (a.length !== b.length) return false;
+    const sortedB = [...b].sort();
+    return [...a].sort().every((id, index) => id === sortedB[index]);
+}
+
+function dateValue(value: string | Date | null | undefined): number | undefined {
+    return value ? new Date(value).getTime() : undefined;
 }
 
 export type IssueFormState = ReturnType<typeof useIssueForm>;

@@ -266,12 +266,14 @@
         margin-top: 0.25rem;
     }
 
-    .tiptap p.is-editor-empty:first-child::before {
+    .tiptap .editor-placeholder::before {
         content: attr(data-placeholder);
         float: left;
         height: 0;
+        white-space: nowrap;
         color: rgba(255, 255, 255, 0.3);
         pointer-events: none;
+        user-select: none;
     }
 
     /* Tiptap chat composer — a single-paragraph box, not a document. */
@@ -426,6 +428,52 @@
     .tiptap pre code {
         background: none;
         padding: 0;
+    }
+
+    .tiptap .timestamp-chip {
+        display: inline-block;
+        border-radius: 0.4rem;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: rgba(255, 255, 255, 0.06);
+        padding: 0.05rem 0.4rem;
+        font-family: var(--font-mono);
+        font-size: 0.85em;
+        color: #dcdcdc;
+        white-space: nowrap;
+    }
+
+    .tiptap .timestamp-chip.ProseMirror-selectednode {
+        border-color: color-mix(in srgb, var(--color-primary) 70%, transparent);
+        background: color-mix(in srgb, var(--color-primary) 25%, transparent);
+    }
+
+    .tiptap .tableWrapper {
+        overflow-x: auto;
+    }
+
+    .tiptap table {
+        width: 100%;
+        table-layout: fixed;
+        border-collapse: collapse;
+        font-size: 0.9rem;
+    }
+
+    .tiptap table p {
+        margin: 0;
+    }
+
+    .tiptap table .selectedCell {
+        background: color-mix(in srgb, var(--color-primary) 18%, transparent);
+    }
+
+    .tiptap table .column-resize-handle {
+        position: absolute;
+        top: 0;
+        right: -2px;
+        bottom: 0;
+        width: 4px;
+        cursor: col-resize;
+        background: color-mix(in srgb, var(--color-primary) 60%, transparent);
     }
 
     .tiptap hr {

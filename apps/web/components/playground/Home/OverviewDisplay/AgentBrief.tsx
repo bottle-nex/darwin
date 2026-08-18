@@ -11,9 +11,6 @@ import Markdown from "@/components/utility/Markdown";
 import { EASE, SECTION_VARIANTS, SectionLabel, approxTokensOf } from "./overviewTheme";
 
 const COLLAPSED_HEIGHT = 424;
-
-const FADE_MASK = "linear-gradient(to bottom, #000 55%, transparent 100%)";
-
 const PLAIN_BUTTON = "font-sans normal-case";
 
 type AgentBriefProps = {

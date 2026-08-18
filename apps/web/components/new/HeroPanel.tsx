@@ -1,12 +1,10 @@
 "use client";
-
 import type { CSSProperties } from "react";
 import { useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion, useScroll, useSpring, useTransform } from "motion/react";
 import { cn } from "@/lib/utils";
 import { sourceSerif4 } from "@/lib/fonts";
 import ParticleField from "./ParticleField";
-import { Button } from "../ui/button";
 import { DottedArrowRight } from "@/lib/svgs/svgs";
 
 const SCROLL_SPRING = { stiffness: 700, damping: 16, mass: 0.15 };

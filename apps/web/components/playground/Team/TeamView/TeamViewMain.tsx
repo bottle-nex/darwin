@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useParams } from "next/navigation";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import { MdDelete } from "react-icons/md";
 import type { ProjectTeam } from "@/types/project";
 import { useDeleteTeamStore } from "@/store/team/useDeleteTeamStore";
@@ -16,6 +16,10 @@ import PlaygroundTeamMembers from "./TeamMembers";
 import { Button } from "@/components/ui/button";
 import { LuUserPlus } from "react-icons/lu";
 import OptionButton from "../../Home/KanbanDisplay/OptionsBar/KanbanOptionPanels/OptionButton";
+import {
+    PaneActionsSlot,
+    PaneLeadSlot,
+} from "@/components/playground/Core/components/PlaygroundPaneSlots";
 
 type PlaygroundTeamViewProps = {
     team: ProjectTeam;
@@ -37,7 +41,7 @@ export default function PlaygroundTeamViewMain({ team }: PlaygroundTeamViewProps
 
     return (
         <div className="flex min-h-0 flex-1 flex-col">
-            <div className="flex h-10 shrink-0 items-center justify-between gap-2 border-b border-white/5 px-3">
+            <PaneLeadSlot>
                 <div className="flex min-w-0 items-center gap-2">
                     <PlaygroundAvatar
                         size="md"
@@ -53,7 +57,9 @@ export default function PlaygroundTeamViewMain({ team }: PlaygroundTeamViewProps
                         </p>
                     </div>
                 </div>
+            </PaneLeadSlot>
 
+            <PaneActionsSlot>
                 <div className="flex shrink-0 items-center gap-1.5">
                     {isAdmin && (
                         <OptionButton
@@ -75,7 +81,7 @@ export default function PlaygroundTeamViewMain({ team }: PlaygroundTeamViewProps
                         </Button>
                     </TooltipComponent>
                 </div>
-            </div>
+            </PaneActionsSlot>
 
             <PlaygroundTeamMembers teamId={team.id} />
 

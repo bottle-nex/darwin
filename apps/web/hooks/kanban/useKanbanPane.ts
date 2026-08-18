@@ -1,19 +1,23 @@
 "use client";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { useBoard } from "@/hooks/issues/useBoard";
 import { useListTemplates } from "@/hooks/templates/useListTemplates";
 import { useKanbanBoardStore } from "@/store/kanban/useKanbanBoardStore";
 import { useCustomKanbanStore } from "@/store/kanban/useCustomKanbanStore";
+import { useKanbanFilterStore } from "@/store/kanban/useKanbanFilterStore";
 import { useKanbanOptionsStore } from "@/store/kanban/useKanbanOptionsStore";
+import { useKanbanFilterUrlSync } from "./useKanbanFilterUrlSync";
 import { useCustomKanbanDnd } from "./useCustomKanbanDnd";
 
 export function useKanbanPane() {
     const activeProject = useActiveProject();
     const { data: board } = useBoard(activeProject?.id);
     const projectName = activeProject?.name ?? "";
+    const projectId = activeProject?.id;
 
     useListTemplates(activeProject?.id);
+    useKanbanFilterUrlSync();
 
     useEffect(() => {
         if (!board) return;
@@ -23,14 +27,23 @@ export function useKanbanPane() {
 
     const dnd = useCustomKanbanDnd();
 
-    const filter = useKanbanOptionsStore((s) => s.filter);
-    const setFilter = useKanbanOptionsStore((s) => s.setFilter);
+    const focus = useKanbanOptionsStore((s) => s.focus);
+    const setFocus = useKanbanOptionsStore((s) => s.setFocus);
     const columns = useCustomKanbanStore((s) => s.columns);
     useEffect(() => {
-        if (filter.kind === "custom" && !columns.some((c) => c.id === filter.columnId)) {
-            setFilter({ kind: "default" });
+        if (focus.kind === "custom" && !columns.some((c) => c.id === focus.columnId)) {
+            setFocus({ kind: "default" });
         }
-    }, [filter, columns, setFilter]);
+    }, [focus, columns, setFocus]);
+
+    const lastProjectRef = useRef(projectId);
+    useEffect(() => {
+        const previous = lastProjectRef.current;
+        lastProjectRef.current = projectId;
+        if (previous && projectId && previous !== projectId) {
+            useKanbanFilterStore.getState().clearAll();
+        }
+    }, [projectId]);
 
     return { dnd };
 }

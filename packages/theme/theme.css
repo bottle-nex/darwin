@@ -54,3 +54,102 @@
     --font-headline: var(--font-titillium-web);
     --font-arimo: var(--font-sans);
 }
+
+/*
+ * Landing (marketing/public site) and playground (in-app workspace) each get
+ * their own complete copy of every color token, seeded with today's values,
+ * so either can be retuned without shifting the other. Utility classes like
+ * `bg-charcoal` always resolve through these custom properties, so scoping
+ * them here is enough — no component classNames need to change.
+ */
+.theme-landing {
+    --color-ink: #0a0a0a;
+    --color-charcoal: #121213;
+    --color-cement: #181819;
+    --color-graphite: #1d1d1e;
+
+    --color-snow: #ffffff;
+    --color-mist: #f4f4f4;
+
+    --color-primary: #ab9ff2;
+    --color-primary-foreground: var(--color-snow);
+    --color-matcha: #9bc24f;
+    --color-matcha-foreground: #14150c;
+    --color-brick: #6e1d1d;
+    --color-brick-foreground: #f2bcb9;
+
+    --color-edge: #212122;
+
+    --color-background: #fff8ed;
+    --color-foreground: #171717;
+    --color-surface: var(--color-mist);
+    --color-card: var(--color-snow);
+    --color-card-foreground: var(--color-foreground);
+    --color-popover: var(--color-snow);
+    --color-popover-foreground: var(--color-foreground);
+    --color-secondary: var(--color-mist);
+    --color-secondary-foreground: var(--color-foreground);
+    --color-muted: var(--color-mist);
+    --color-muted-foreground: #737373;
+    --color-accent: var(--color-mist);
+    --color-accent-foreground: var(--color-foreground);
+    --color-destructive: #e7000b;
+    --color-border: #e5e5e5;
+    --color-input: #e5e5e5;
+    --color-ring: #a3a3a3;
+}
+
+/*
+ * Codex-inspired dark surfaces for the playground, a shade darker than the
+ * reference screenshot. Colorful tokens (primary/matcha/brick/destructive)
+ * are intentionally untouched — only neutrals/surfaces/text change here.
+ */
+.theme-playground {
+    --color-ink: #0c0c0c;
+    --color-charcoal: #141414;
+    --color-cement: #1a1a1a;
+    --color-graphite: #212121;
+
+    --color-snow: #ffffff;
+    --color-mist: #f4f4f4;
+
+    --color-primary: #ab9ff2;
+    --color-primary-foreground: var(--color-snow);
+    --color-matcha: #9bc24f;
+    --color-matcha-foreground: #14150c;
+    --color-brick: #6e1d1d;
+    --color-brick-foreground: #f2bcb9;
+
+    --color-edge: #242424;
+
+    --color-background: #070707;
+    --color-foreground: #e4e4e4;
+    --color-surface: #101010;
+    --color-card: #1a1a1a;
+    --color-card-foreground: var(--color-foreground);
+    --color-popover: #212121;
+    --color-popover-foreground: var(--color-foreground);
+    --color-secondary: #101010;
+    --color-secondary-foreground: var(--color-foreground);
+    --color-muted: #101010;
+    --color-muted-foreground: #828282;
+    --color-accent: #1a1a1a;
+    --color-accent-foreground: var(--color-foreground);
+    --color-destructive: #e7000b;
+    --color-border: #242424;
+    --color-input: #242424;
+    --color-ring: #3a3a3a;
+
+    /*
+     * Tailwind's default `neutral` scale is what most playground text/hairline
+     * classes actually use (`text-neutral-400`, etc.) rather than the tokens
+     * above — scope-override just the shades in use so text genuinely follows
+     * the Codex tone everywhere it's rendered.
+     */
+    --color-neutral-100: #e4e4e4;
+    --color-neutral-200: #cfcfcf;
+    --color-neutral-300: #b5b5b5;
+    --color-neutral-400: #999999;
+    --color-neutral-500: #828282;
+    --color-neutral-600: #626262;
+}

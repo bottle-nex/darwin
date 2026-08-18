@@ -14,7 +14,9 @@ export default function PlaygroundLayout({ children }: { children: React.ReactNo
         <AccessControlProvider>
             <TooltipProvider>
                 <script dangerouslySetInnerHTML={{ __html: restoreSidebarWidthScript }} />
-                <div className="h-dvh overflow-hidden overscroll-none bg-ink">{children}</div>
+                <div className="theme-playground h-dvh overflow-hidden overscroll-none bg-ink">
+                    {children}
+                </div>
             </TooltipProvider>
         </AccessControlProvider>
     );

@@ -36,16 +36,15 @@ export default function TemplatePicker({ projectId, onPick }: TemplatePickerProp
                 key={template.id}
                 value={template.name}
                 onSelect={() => handlePick(template)}
-                className="gap-x-3.5 rounded-sm px-1.5 py-1 text-[12px] text-neutral-200"
             >
                 {template.icon ? (
-                    <IconPickGlyph pick={template.icon} className="size-3 shrink-0 text-xs" />
+                    <IconPickGlyph pick={template.icon} className="size-3.5 shrink-0" />
                 ) : (
-                    <FaLongArrowAltRight className="size-3 shrink-0 text-white/30" aria-hidden />
+                    <FaLongArrowAltRight className="size-3.5 shrink-0 text-white/30" aria-hidden />
                 )}
                 <span className="min-w-0 flex-1 truncate">{template.name}</span>
                 {template.id === defaultId && (
-                    <MdStar className="size-3 shrink-0 text-matcha" aria-label="Default" />
+                    <MdStar className="size-3.5 shrink-0 text-matcha" aria-label="Default" />
                 )}
             </CommandItem>
         );
@@ -63,13 +62,13 @@ export default function TemplatePicker({ projectId, onPick }: TemplatePickerProp
                     </CapsuleTrigger>
                 </PopoverTrigger>
             </TooltipComponent>
-            <PopoverContent align="end" className="w-44 p-0.5">
-                <Command className="bg-transparent">
+            <PopoverContent align="end" className="w-44 p-0">
+                <Command>
                     <CommandList
                         data-lenis-prevent
                         className="no-scrollbar max-h-40 overflow-y-auto"
                     >
-                        <CommandGroup className="p-0">
+                        <CommandGroup>
                             {[...projectTemplates, ...BUILTIN_ISSUE_TEMPLATES].map(row)}
                         </CommandGroup>
                     </CommandList>

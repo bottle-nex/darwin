@@ -15,25 +15,23 @@ import { CapsuleTrigger } from "./Capsule";
 import { PRIORITY_OPTIONS } from "./issueHelpers";
 
 export default function PriorityCapsule({
-    defaultValue,
+    value,
     onChange,
     disabled,
     className,
 }: {
-    defaultValue?: Priority;
+    value?: Priority;
     onChange?: (value: Priority) => void;
     disabled?: boolean;
     className?: string;
 }) {
     const [open, setOpen] = useState(false);
-    const [selected, setSelected] = useState<Priority>(defaultValue ?? "medium");
 
-    const current = PRIORITY_OPTIONS.find((option) => option.value === selected);
+    const current = PRIORITY_OPTIONS.find((option) => option.value === value);
     const CurrentIcon = current?.icon;
 
-    function handleSelect(value: Priority) {
-        setSelected(value);
-        onChange?.(value);
+    function handleSelect(next: Priority) {
+        onChange?.(next);
         setOpen(false);
     }
 
@@ -67,7 +65,7 @@ export default function PriorityCapsule({
                                         )}
                                     />
                                     <span className="flex-1">{option.label}</span>
-                                    {option.value === selected && (
+                                    {option.value === value && (
                                         <MdCheck className="size-4 text-neutral-200" />
                                     )}
                                     <span className="w-3 text-right text-[12px] text-neutral-500">

@@ -33,6 +33,27 @@ export default class ConnectCompleteController {
 
             const stored = await GithubService.consume_state(state);
             if (!stored || stored.userId !== userId) {
+                const existing = await prisma.githubInstallation.findUnique({
+                    where: { installationId: BigInt(installationId) },
+                    select: {
+                        orgId: true,
+                        accountLogin: true,
+                        organization: { select: { slug: true } },
+                    },
+                });
+
+                if (existing && (await Access.org(userId, existing.orgId))) {
+                    return ResponseWriter.success(
+                        res,
+                        {
+                            orgId: existing.orgId,
+                            orgSlug: existing.organization.slug,
+                            accountLogin: existing.accountLogin,
+                        },
+                        "GitHub already connected.",
+                    );
+                }
+
                 return ResponseWriter.custom(
                     res,
                     false,

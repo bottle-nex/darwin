@@ -20,7 +20,7 @@ import { CapsuleTrigger } from "./Capsule";
 
 interface TagsCapsuleProps {
     projectId: string | undefined;
-    defaultValue?: string[];
+    value?: string[];
     onChange?: (tagIds: string[]) => void;
     disabled?: boolean;
     className?: string;
@@ -29,7 +29,7 @@ interface TagsCapsuleProps {
 
 export default function TagsCapsule({
     projectId,
-    defaultValue,
+    value,
     onChange,
     disabled,
     className,
@@ -37,7 +37,7 @@ export default function TagsCapsule({
 }: TagsCapsuleProps) {
     const [open, setOpen] = useState(false);
     const [search, setSearch] = useState("");
-    const [selected, setSelected] = useState<string[]>(defaultValue ?? []);
+    const selected = value ?? [];
     const { data: tags } = useListTags(projectId);
     const createTag = useCreateTag();
 
@@ -45,7 +45,6 @@ export default function TagsCapsule({
         const next = selected.includes(id)
             ? selected.filter((tagId) => tagId !== id)
             : [...selected, id];
-        setSelected(next);
         onChange?.(next);
     }
 
@@ -65,9 +64,7 @@ export default function TagsCapsule({
             { projectId, name, color },
             {
                 onSuccess: (tag) => {
-                    const next = [...selected, tag.id];
-                    setSelected(next);
-                    onChange?.(next);
+                    onChange?.([...selected, tag.id]);
                     setSearch("");
                 },
             },

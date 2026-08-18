@@ -26,7 +26,7 @@ export default function KanbanBoardView({ board, leading, startAligned }: Kanban
         <div
             data-kanban-scroll-row
             className={cn(
-                "flex min-h-0 flex-1 gap-4 overflow-x-auto px-3 pt-3 pb-3",
+                "flex min-h-0 flex-1 gap-y-4 gap-x-2 overflow-x-auto px-3 pt-3 pb-3",
                 startAligned && "items-start",
             )}
         >

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useAnimationControls } from "motion/react";
+import { cn } from "@/lib/utils";
 
 const WARNING_LIFETIME_MS = 2200;
 /** How far above the button the toast settles (px). */
@@ -39,17 +40,30 @@ export function useSubmitWarning() {
     return { warning, fire, shakeControls };
 }
 
-/** Warning pill that springs up from behind the submit button. Place inside a `relative isolate` wrapper. */
-export default function SubmitWarningToast({ warning }: { warning: SubmitWarning }) {
+/** Warning pill that springs out from behind the submit button. Place inside a `relative isolate` wrapper. */
+export default function SubmitWarningToast({
+    warning,
+    placement = "above",
+}: {
+    warning: SubmitWarning;
+    placement?: "above" | "below";
+}) {
+    const below = placement === "below";
     return (
         <AnimatePresence>
             {warning && (
                 <motion.div
                     key={warning.id}
-                    initial={{ x: "-50%", y: -10, opacity: 0, scale: 0.7, filter: "blur(4px)" }}
+                    initial={{
+                        x: "-50%",
+                        y: below ? 10 : -10,
+                        opacity: 0,
+                        scale: 0.7,
+                        filter: "blur(4px)",
+                    }}
                     animate={{
                         x: "-50%",
-                        y: WARNING_RAISE_Y,
+                        y: below ? -WARNING_RAISE_Y : WARNING_RAISE_Y,
                         opacity: 1,
                         scale: 1,
                         filter: "blur(0px)",
@@ -60,7 +74,10 @@ export default function SubmitWarningToast({ warning }: { warning: SubmitWarning
                         transition: { duration: 0.4, ease: "easeOut" },
                     }}
                     transition={{ type: "spring", stiffness: 550, damping: 30 }}
-                    className="pointer-events-none absolute bottom-0 left-1/2 -z-10 rounded-full bg-brick px-4 py-1.5 text-xs font-medium whitespace-nowrap text-brick-foreground shadow-sm"
+                    className={cn(
+                        "pointer-events-none absolute left-1/2 -z-10 rounded-full bg-brick px-4 py-1.5 text-xs font-medium whitespace-nowrap text-brick-foreground shadow-sm",
+                        below ? "top-0" : "bottom-0",
+                    )}
                 >
                     {warning.text}
                 </motion.div>

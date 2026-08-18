@@ -5,9 +5,7 @@ import OverviewDisplay from "@/components/playground/Home/OverviewDisplay/Overvi
 import KanbanDisplay from "@/components/playground/Home/KanbanDisplay/KanbanDisplay";
 import GanttDisplay from "@/components/playground/Home/GanttDisplay/GanttDisplay";
 import TagsDisplay from "@/components/playground/Home/TagsDisplay/TagsDisplay";
-import ThreadsDisplay from "@/components/playground/Home/panes/ThreadsDisplay";
-import ThreadDetailDisplay from "@/components/playground/Home/panes/ThreadDetailDisplay";
-import MentionsDisplay from "@/components/playground/Home/panes/MentionsDisplay";
+import ChatsDisplay from "@/components/playground/Home/panes/ChatsDisplay";
 import ReviewsDisplay from "@/components/playground/Home/panes/ReviewsDisplay";
 import AssignedToMeDisplay from "@/components/playground/Home/panes/AssignedToMeDisplay";
 import InProgressDisplay from "@/components/playground/Home/panes/InProgressDisplay";
@@ -31,8 +29,6 @@ function TabPane({ tab }: { tab: string }) {
                     <TagsDisplay />
                 </div>
             );
-        case PlaygroundTab.Mentions:
-            return <MentionsDisplay />;
         case PlaygroundTab.Reviews:
             return <ReviewsDisplay />;
         case PlaygroundTab.AssignedToMe:
@@ -56,9 +52,8 @@ function TabPane({ tab }: { tab: string }) {
         case PlaygroundTab.SettingsEnv:
             return <SettingsDisplay section="env" />;
         case PlaygroundTab.Chats:
-            return <ThreadsDisplay />;
         case PlaygroundTab.ThreadDetail:
-            return <ThreadDetailDisplay />;
+            return <ChatsDisplay />;
 
         case PlaygroundTab.Kanban:
         default:

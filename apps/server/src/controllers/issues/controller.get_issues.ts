@@ -64,6 +64,15 @@ export default class IssueGetController {
                         createdAt: true,
                         startDate: true,
                         targetDate: true,
+                        prUrl: true,
+                        creator: {
+                            select: {
+                                id: true,
+                                name: true,
+                                email: true,
+                                image: true,
+                            },
+                        },
                         assignees: {
                             select: {
                                 id: true,

@@ -1,24 +1,13 @@
 "use client";
 
 import * as React from "react";
-import { MdClose } from "react-icons/md";
-import { IoPersonAddOutline } from "react-icons/io5";
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-} from "@/components/ui/dialog";
+import { MdClose, MdOutlineKeyboardArrowRight } from "react-icons/md";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { GHOST_FIELD } from "@/components/ui/fieldStyles";
+import { CapsuleTrigger } from "@/components/playground/Issue/Capsule";
 import PlaygroundAvatar from "@/components/playground/Core/components/PlaygroundAvatar";
 import { ProjectRole } from "@trymatcha/types";
 import { cn } from "@/lib/utils";
@@ -80,25 +69,51 @@ export default function InviteToTeamDialog({
     onSubmit,
     isPending = false,
 }: InviteToTeamDialogProps) {
+    if (!open) return null;
+    return (
+        <Dialog open onOpenChange={onOpenChange}>
+            <DialogContent
+                showCloseButton={false}
+                onOpenAutoFocus={(event) => {
+                    event.preventDefault();
+                    (event.currentTarget as HTMLElement).focus();
+                }}
+                className={cn(
+                    "flex flex-col max-h-[80vh] min-h-[40vh] w-150 max-w-none sm:max-w-none p-0 gap-0 overflow-hidden",
+                    "bg-charcoal rounded-3xl",
+                )}
+            >
+                <DialogTitle className="sr-only">Invite members</DialogTitle>
+                <InviteForm
+                    sender={sender}
+                    orgName={orgName}
+                    projectName={projectName}
+                    teamName={teamName}
+                    onSubmit={onSubmit}
+                    isPending={isPending}
+                />
+            </DialogContent>
+        </Dialog>
+    );
+}
+
+function InviteForm({
+    sender,
+    orgName,
+    projectName,
+    teamName,
+    onSubmit,
+    isPending,
+}: Omit<InviteToTeamDialogProps, "open" | "onOpenChange"> & { isPending: boolean }) {
     const [emails, setEmails] = React.useState<string[]>([]);
     const [draft, setDraft] = React.useState("");
     const [message, setMessage] = React.useState("");
     const [role, setRole] = React.useState<ProjectRole>(ProjectRole.Write);
+    const [roleOpen, setRoleOpen] = React.useState(false);
 
     const debouncedDraft = useDebouncedValue(draft, 300);
     const draftLooksInvalid = debouncedDraft.trim().length > 0 && !isValidEmail(debouncedDraft);
     const atLimit = emails.length >= MAX_EMAILS;
-
-    // Reset everything whenever the dialog is closed.
-    function handleOpenChange(next: boolean) {
-        if (!next) {
-            setEmails([]);
-            setDraft("");
-            setMessage("");
-            setRole(ProjectRole.Write);
-        }
-        onOpenChange(next);
-    }
 
     const addEmails = React.useCallback((raw: string) => {
         const candidates = raw
@@ -164,182 +179,149 @@ export default function InviteToTeamDialog({
     const senderLetter = (sender.name || sender.email || "?").trim().charAt(0).toUpperCase();
 
     return (
-        <Dialog open={open} onOpenChange={handleOpenChange}>
-            <DialogContent
-                className="gap-0 border-white/5 bg-charcoal p-0 sm:max-w-md"
-                showCloseButton={false}
-            >
-                <DialogHeader className="border-b border-white/5 px-5 py-4">
-                    <DialogTitle className="flex items-center gap-2 text-[15px] font-semibold text-neutral-100">
-                        <IoPersonAddOutline className="size-4 text-neutral-400" />
-                        Invite members
-                    </DialogTitle>
-                    <DialogDescription className="text-[12px] text-neutral-500">
-                        Send an email invite to join this team.
-                    </DialogDescription>
-                </DialogHeader>
-
-                <div className="flex flex-col gap-4 px-5 py-4">
-                    {/* From */}
-                    <div className="flex flex-col gap-1.5">
-                        <span className="text-[11px] font-medium uppercase tracking-wide text-neutral-500">
-                            From
-                        </span>
-                        <div className="flex items-center gap-2.5">
-                            {sender.image ? (
-                                // eslint-disable-next-line @next/next/no-img-element
-                                <img
-                                    src={sender.image}
-                                    alt={sender.name ?? sender.email ?? "Sender"}
-                                    className="size-8 shrink-0 rounded-[5px] object-cover"
-                                />
-                            ) : (
-                                <PlaygroundAvatar size="xl" letter={senderLetter} tone="indigo" />
-                            )}
-                            <div className="min-w-0">
-                                <p className="truncate text-[13px] font-medium text-neutral-100">
-                                    {sender.name ?? "You"}
-                                </p>
-                                <p className="truncate text-[11px] text-neutral-500">
-                                    {sender.email}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* To */}
-                    <div className="flex flex-col gap-1.5">
-                        <span className="text-[11px] font-medium uppercase tracking-wide text-neutral-500">
-                            To
-                        </span>
-                        <div
-                            className={cn(
-                                "flex min-h-10 flex-wrap items-center gap-1.5 rounded-lg bg-[#1a1a1a] px-2 py-1.5 shadow-[inset_0_1px_0_0_var(--color-edge)]",
-                                draftLooksInvalid &&
-                                    "shadow-[inset_0_1px_0_0_var(--color-edge),inset_0_0_0_1px_rgb(244_63_94/0.4)]",
-                            )}
-                        >
-                            {emails.map((email) => (
-                                <span
-                                    key={email}
-                                    className="flex items-center gap-1 rounded-md bg-white/5 py-1 pl-2 pr-1 text-[12px] text-neutral-200"
-                                >
-                                    {email}
-                                    <Button
-                                        variant="unstyled"
-                                        type="button"
-                                        onClick={() => removeEmail(email)}
-                                        aria-label={`Remove ${email}`}
-                                        className="flex size-4 cursor-pointer items-center justify-center rounded text-neutral-400 hover:bg-white/10 hover:text-neutral-100"
-                                    >
-                                        <MdClose className="size-3" />
-                                    </Button>
-                                </span>
-                            ))}
-                            <input
-                                type="email"
-                                value={draft}
-                                onChange={(e) => setDraft(e.target.value)}
-                                onKeyDown={handleKeyDown}
-                                onPaste={handlePaste}
-                                onBlur={commitDraft}
-                                disabled={atLimit}
-                                placeholder={emails.length === 0 ? "name@company.com" : ""}
-                                className="h-7 min-w-32 flex-1 bg-transparent px-1 text-[13px] text-[#e5e5e5] outline-none placeholder:text-[#737373] disabled:cursor-not-allowed"
-                            />
-                        </div>
-                        <p className="min-h-3.5 text-[11px]">
-                            {atLimit ? (
-                                <span className="text-amber-400">
-                                    Maximum of {MAX_EMAILS} emails reached.
-                                </span>
-                            ) : draftLooksInvalid ? (
-                                <span className="text-rose-400">
-                                    That doesn&apos;t look like a valid email.
-                                </span>
-                            ) : (
-                                <span className="text-neutral-500">
-                                    Press Enter or comma to add multiple.
-                                </span>
-                            )}
-                        </p>
-                    </div>
-
-                    {/* Role */}
-                    <div className="flex flex-col gap-1.5">
-                        <span className="text-[11px] font-medium uppercase tracking-wide text-neutral-500">
-                            Project role
-                        </span>
-                        <Select value={role} onValueChange={(v) => setRole(v as ProjectRole)}>
-                            <SelectTrigger className="w-full">
-                                <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {PROJECT_ROLES.map((r) => (
-                                    <SelectItem key={r} value={r}>
-                                        {r}
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                        <p className="min-h-3.5 text-[11px] text-neutral-500">{ROLE_HINTS[role]}</p>
-                    </div>
-
-                    {/* Context */}
-                    <div className="flex flex-col gap-1.5 rounded-lg bg-white/2 p-3 ring-1 ring-white/5">
-                        <Detail label="Organization" value={orgName} />
-                        <Detail label="Project" value={projectName} />
-                        <Detail label="Team" value={teamName} />
-                    </div>
-
-                    {/* Message */}
-                    <div className="flex flex-col gap-1.5">
-                        <span className="text-[11px] font-medium uppercase tracking-wide text-neutral-500">
-                            Message{" "}
-                            <span className="font-normal lowercase text-neutral-600">
-                                (optional)
-                            </span>
-                        </span>
-                        <Textarea
-                            value={message}
-                            onChange={(e) => setMessage(e.target.value)}
-                            maxLength={500}
-                            placeholder="Add a short note to the invite…"
-                            className="h-24 resize-none rounded-lg border-0 bg-[#1a1a1a] text-[13px] text-[#e5e5e5] shadow-[inset_0_1px_0_0_var(--color-edge)] placeholder:text-[#737373] focus-visible:ring-0"
+        <main className="flex min-h-0 min-w-0 flex-1 flex-col justify-between *:px-6">
+            <section className="flex flex-col items-start gap-y-3 pt-4 pb-2">
+                <div className="flex w-full items-center justify-between gap-x-4">
+                    <div className="flex items-center justify-start gap-x-1 text-snow text-xs">
+                        <PlaygroundAvatar
+                            letter={orgName.slice(0, 2)}
+                            tone="emerald"
+                            className="uppercase"
                         />
+                        <span>
+                            <MdOutlineKeyboardArrowRight />
+                        </span>
+                        <span className="text-sm">Invite Members</span>
+                    </div>
+                    <div className="flex min-w-0 items-center gap-x-2">
+                        <PlaygroundAvatar
+                            letter={senderLetter}
+                            tone="indigo"
+                            src={sender.image ?? undefined}
+                        />
+                        <span className="min-w-0 truncate text-[12px] text-white/45">
+                            {sender.email}
+                        </span>
                     </div>
                 </div>
+                <p className="min-h-3.5 text-[11px]">
+                    {atLimit ? (
+                        <span className="text-amber-400">
+                            Maximum of {MAX_EMAILS} emails reached.
+                        </span>
+                    ) : draftLooksInvalid ? (
+                        <span className="text-rose-400">
+                            That doesn&apos;t look like a valid email.
+                        </span>
+                    ) : (
+                        <span className="text-neutral-500">
+                            Press Enter or comma to add multiple.
+                        </span>
+                    )}
+                </p>
+                <div className="flex w-full flex-wrap items-center gap-1.5">
+                    {emails.map((email) => (
+                        <span
+                            key={email}
+                            className="flex items-center gap-1 rounded-full bg-white/5 py-1 pr-1 pl-2.5 text-[12px] text-neutral-200 ring ring-white/10"
+                        >
+                            {email}
+                            <Button
+                                variant="unstyled"
+                                type="button"
+                                onClick={() => removeEmail(email)}
+                                aria-label={`Remove ${email}`}
+                                className="flex size-4 cursor-pointer items-center justify-center rounded-full text-neutral-400 hover:bg-white/10 hover:text-neutral-100"
+                            >
+                                <MdClose className="size-3" />
+                            </Button>
+                        </span>
+                    ))}
+                    <input
+                        type="email"
+                        autoFocus
+                        value={draft}
+                        onChange={(e) => setDraft(e.target.value)}
+                        onKeyDown={handleKeyDown}
+                        onPaste={handlePaste}
+                        onBlur={commitDraft}
+                        disabled={atLimit}
+                        placeholder={emails.length === 0 ? "name@company.com" : ""}
+                        className={cn(
+                            GHOST_FIELD,
+                            "h-8 min-w-48 flex-1 text-xl font-medium text-neutral-100 placeholder:text-neutral-600 disabled:cursor-not-allowed",
+                        )}
+                    />
+                </div>
+            </section>
 
-                <div className="flex items-center justify-end gap-2 border-t border-white/5 px-5 py-3">
+            <section
+                data-lenis-prevent
+                className="no-scrollbar flex-1 min-h-0 overflow-y-auto pb-4"
+            >
+                <Textarea
+                    rows={3}
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    maxLength={500}
+                    placeholder="Add a short note to the invite…"
+                    className={cn(GHOST_FIELD, "w-full text-[13px] leading-6 text-neutral-300")}
+                />
+            </section>
+
+            <section className="flex flex-col gap-y-4 pb-4">
+                <div className="flex flex-wrap items-center gap-2.5">
+                    <Popover open={roleOpen} onOpenChange={setRoleOpen}>
+                        <PopoverTrigger asChild>
+                            <CapsuleTrigger>{role}</CapsuleTrigger>
+                        </PopoverTrigger>
+                        <PopoverContent align="start" className="w-64 p-1">
+                            <div className="flex flex-col gap-0.5">
+                                {PROJECT_ROLES.map((option) => (
+                                    <Button
+                                        variant="unstyled"
+                                        key={option}
+                                        type="button"
+                                        onClick={() => {
+                                            setRole(option);
+                                            setRoleOpen(false);
+                                        }}
+                                        className={cn(
+                                            "flex cursor-pointer flex-col items-start gap-0.5 rounded-md px-2 py-1.5 text-left transition-colors",
+                                            option === role ? "bg-white/8" : "hover:bg-white/5",
+                                        )}
+                                    >
+                                        <span className="text-[13px] text-neutral-200">
+                                            {option}
+                                        </span>
+                                        <span className="text-[11px] text-neutral-500">
+                                            {ROLE_HINTS[option]}
+                                        </span>
+                                    </Button>
+                                ))}
+                            </div>
+                        </PopoverContent>
+                    </Popover>
+
+                    <CapsuleTrigger disabled>{orgName}</CapsuleTrigger>
+                    <CapsuleTrigger disabled>{projectName}</CapsuleTrigger>
+                    <CapsuleTrigger disabled>{teamName}</CapsuleTrigger>
+                </div>
+
+                <div className="flex h-fit items-center justify-end gap-x-2">
                     <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleOpenChange(false)}
-                        disabled={isPending}
-                        className="h-8 cursor-pointer text-[12px] text-neutral-400 hover:bg-white/5 hover:text-neutral-100"
-                    >
-                        Cancel
-                    </Button>
-                    <Button
-                        size="sm"
+                        type="button"
+                        variant="tertiary"
+                        size="xs"
+                        className="text-ink!"
                         onClick={handleSubmit}
                         loading={isPending}
                         disabled={!canSubmit}
-                        className="h-8 cursor-pointer rounded-md bg-neutral-100 px-3 text-[12px] font-medium text-neutral-900 hover:bg-white disabled:opacity-50"
                     >
                         Send invites
                     </Button>
                 </div>
-            </DialogContent>
-        </Dialog>
-    );
-}
-
-function Detail({ label, value }: { label: string; value: string }) {
-    return (
-        <div className="flex items-center justify-between gap-3">
-            <span className="text-[12px] text-neutral-500">{label}</span>
-            <span className="truncate text-[12px] font-medium text-neutral-200">{value}</span>
-        </div>
+            </section>
+        </main>
     );
 }

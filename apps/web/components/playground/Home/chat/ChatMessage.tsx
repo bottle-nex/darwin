@@ -97,7 +97,7 @@ function QuotedMessage({
                     </cite>
                     <span
                         className={cn(
-                            "truncate text-[12px] leading-4",
+                            "line-clamp-2 wrap-anywhere text-[12px] leading-4",
                             isMine ? "text-white/65" : "text-neutral-400",
                         )}
                     >
@@ -171,8 +171,8 @@ function IssueReferenceCards({
     return (
         <div
             className={cn(
-                "mb-1 grid gap-1.5",
-                issues.length > 1 && "grid-cols-[repeat(2,minmax(0,15rem))]",
+                "mb-1 mt-1 grid gap-2",
+                issues.length > 1 && "grid-cols-[repeat(2,minmax(0,13rem))]",
                 isMine ? "justify-end" : "ml-8",
             )}
         >
@@ -238,7 +238,12 @@ export default function ChatMessage({
                 startsGroup ? "mt-5 first:mt-0" : "mt-1.5",
             )}
         >
-            <div className="flex w-fit max-w-[84%] flex-col sm:max-w-[72%]">
+            <div
+                className={cn(
+                    "flex w-fit max-w-[84%] flex-col sm:max-w-[72%]",
+                    isMine ? "items-end" : "items-start",
+                )}
+            >
                 <IssueReferenceCards issues={taggedIssues} isMine={isMine} />
                 <div
                     className={cn("flex items-end gap-2", isMine ? "flex-row-reverse" : "flex-row")}
@@ -254,10 +259,10 @@ export default function ChatMessage({
                     )}
                     <article
                         className={cn(
-                            "relative min-w-0 flex-1 rounded-[10px] px-3 py-2.5 text-[13px] leading-5 tracking-[0.002em] wrap-anywhere transition-colors duration-200",
+                            "relative  min-w-20 flex-1 rounded-lg px-3 pb-2 pt-1.25 text-[13px] leading-5 tracking-[0.005em] wrap-anywhere transition-colors duration-200",
                             isMine
-                                ? "border border-graphite/50 bg-ink/20 text-neutral-100"
-                                : "border border-white/6 bg-[#151515] text-neutral-200",
+                                ? "border border-graphite/50 bg-graphite text-neutral-200"
+                                : "border border-graphite/50 bg-graphite text-neutral-200",
                             endsGroup && (isMine ? "rounded-br-[1px]" : "rounded-bl-[1px]"),
                         )}
                     >
@@ -345,7 +350,7 @@ export default function ChatMessage({
                                             animate={{ rotate: expanded ? 180 : 0 }}
                                             transition={EXPAND_TRANSITION}
                                         >
-                                            <HiChevronDown className="size-3.5" />
+                                            <HiChevronDown className="size-3" />
                                         </motion.span>
                                     </Button>
                                     <MessageTime

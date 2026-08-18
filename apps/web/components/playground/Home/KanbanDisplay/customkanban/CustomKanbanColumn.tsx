@@ -52,7 +52,7 @@ export default function CustomKanbanColumn({ column, draggable = true }: CustomK
             ref={setNodeRef}
             style={style}
             className={cn(
-                "group flex max-h-full w-80.5 shrink-0 flex-col self-stretch rounded-[7px] p-1 bg-cement",
+                "group flex max-h-full min-h-0 w-84 shrink-0 flex-col self-stretch rounded-lg bg-ink/30 p-2 ring-1 ring-white/1 transition-colors",
                 isDragging && "opacity-40",
             )}
         >
@@ -132,7 +132,10 @@ export default function CustomKanbanColumn({ column, draggable = true }: CustomK
                 items={column.cards.map((c) => c.id)}
                 strategy={verticalListSortingStrategy}
             >
-                <div className="flex min-h-0 flex-1 flex-col gap-1.5 overflow-y-auto rounded-lg p-0.5">
+                <div
+                    data-lenis-prevent
+                    className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto rounded-lg p-0.5 no-scrollbar"
+                >
                     {column.cards.map((card) => (
                         <SortableCustomCard key={card.id} card={card} />
                     ))}

@@ -1,9 +1,11 @@
 import { Request, Response } from "express";
 import { z } from "zod";
-import { IssueStatus, prisma } from "@trymatcha/database";
+import { ActivityType, ActorType, IssueStatus, prisma } from "@trymatcha/database";
 import { OutboundSocketMessageType } from "@trymatcha/types";
 import ResponseWriter from "../../services/service.response";
 import { server_services } from "../..";
+import ActivityService from "../../services/service.activity";
+import { location_of } from "../../services/service.activity-diff";
 import ProductDiffService from "../../services/service.product_diff";
 
 const body_schema = z.object({
@@ -11,6 +13,7 @@ const body_schema = z.object({
     pr_url: z.string().min(1),
     branch: z.string().min(1),
     summary: z.string().min(1),
+    run_id: z.string().min(1).optional(),
 });
 
 export default class ReportPrOpened {
@@ -36,6 +39,7 @@ export default class ReportPrOpened {
                     status: true,
                     prUrl: true,
                     prBranch: true,
+                    customColumn: { select: { id: true, label: true } },
                 },
             });
             if (!issue || issue.assignerWorkerId !== worker_id) {
@@ -81,6 +85,15 @@ export default class ReportPrOpened {
                     `(branch: ${data.branch}, writing to db now)`,
             );
 
+            // A reassigned issue must not let this worker attach rows to another
+            // worker's session, so the run has to match both the issue and the worker.
+            const session = data.run_id
+                ? await prisma.agentSession.findFirst({
+                      where: { id: data.run_id, issueId: data.issue_id, workerId: worker_id },
+                      select: { id: true },
+                  })
+                : null;
+
             const completion = await prisma.$transaction(async (transaction) => {
                 const update = await transaction.issue.updateMany({
                     where: {
@@ -118,7 +131,33 @@ export default class ReportPrOpened {
                         },
                     },
                 });
-                return { issue: persisted_issue, transitioned };
+
+                // Only the call that actually moved the issue writes activity — a retried
+                // callback would otherwise append a second StatusChanged, which has no
+                // dedupe key of its own.
+                const activities = transitioned
+                    ? await ActivityService.emit(transaction, {
+                          issueId: data.issue_id,
+                          actor: { type: ActorType.Agent, workerId: worker_id },
+                          sessionId: session?.id,
+                          events: [
+                              {
+                                  type: ActivityType.PrOpened,
+                                  payload: { url: data.pr_url },
+                                  dedupeKey: `pr:${data.pr_url}`,
+                              },
+                              {
+                                  type: ActivityType.StatusChanged,
+                                  payload: {
+                                      from: location_of(issue.status, issue.customColumn),
+                                      to: { kind: "status", status: IssueStatus.InReview },
+                                  },
+                              },
+                          ],
+                      })
+                    : [];
+
+                return { issue: persisted_issue, transitioned, activities };
             });
 
             console.log(
@@ -140,9 +179,19 @@ export default class ReportPrOpened {
                 console.log(
                     `[worker:${worker_id}] published ISSUE_UPDATED for issue ${data.issue_id}`,
                 );
+
+                await ActivityService.publish(
+                    completion.issue.projectId,
+                    data.issue_id,
+                    completion.activities,
+                );
             }
 
-            await ProductDiffService.prepare(data.issue_id);
+            try {
+                await ProductDiffService.prepare(data.issue_id);
+            } catch (error) {
+                console.error("product diff preparation failed", error);
+            }
 
             ResponseWriter.success(res, null, "PR outcome recorded");
         } catch (error) {

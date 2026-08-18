@@ -41,7 +41,7 @@ export default function KanbanDragOverlay() {
                         {activeItem.kind === "custom" ? (
                             <CustomKanbanCard card={activeItem.card} preview />
                         ) : (
-                            <CardRenderer issue={activeItem.issue} />
+                            <CardRenderer issue={activeItem.issue} preview />
                         )}
                     </div>
                 )

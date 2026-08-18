@@ -1,11 +1,10 @@
 "use client";
 import type { IssueTarget } from "@/store/issues/useIssueStore";
-import type { PickableTemplate } from "@/types/issueTemplate";
 import TemplatePicker from "./TemplatePicker";
 import IssueTitleField from "./IssueTitleField";
 import IssueFields from "./IssueFields";
 import IssueBody from "./IssueBody";
-import IssueSubmitFooter from "./IssueSubmitFooter";
+import IssueSubmitAction from "./IssueSubmitAction";
 import { useIssueForm } from "./useIssueForm";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { MdOutlineKeyboardArrowRight } from "react-icons/md";
@@ -13,14 +12,12 @@ import PlaygroundAvatar from "../Core/components/PlaygroundAvatar";
 
 export default function CreateIssueForm({
     target,
-    initialTemplate,
     onCreated,
 }: {
     target: IssueTarget;
-    initialTemplate?: PickableTemplate;
     onCreated: () => void;
 }) {
-    const form = useIssueForm({ target, issue: null, initialTemplate, onSubmitted: onCreated });
+    const form = useIssueForm({ target, issue: null, onSubmitted: onCreated });
     const project = useActiveProject();
     return (
         <main className="flex min-h-0 min-w-0 flex-1 flex-col justify-between *:px-6">
@@ -52,7 +49,7 @@ export default function CreateIssueForm({
             </section>
             <section className="flex flex-col gap-y-4 pb-4">
                 <IssueFields form={form} layout="row" />
-                <IssueSubmitFooter form={form} />
+                <IssueSubmitAction form={form} />
             </section>
         </main>
     );
