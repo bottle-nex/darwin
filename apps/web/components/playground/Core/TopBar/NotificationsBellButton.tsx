@@ -32,7 +32,7 @@ export default function NotificationsBellButton({
             aria-pressed={isOpen}
             className={cn("group relative flex shrink-0 cursor-pointer rounded-full", className)}
         >
-            <IconWrapper icon={HiOutlineBell} active={isOpen} />
+            <IconWrapper icon={HiOutlineBell} active={isOpen} variant="ghost" />
             {unreadCount > 0 && (
                 <span
                     className="absolute -top-1 -right-1 flex h-3.5 min-w-3.5 items-center justify-center rounded-full bg-primary text-snow px-1 text-[9px] leading-none font-medium tabular-nums"
