@@ -199,9 +199,9 @@ export const COMBINATIONS: Record<string, CommandAction> = {
         isAvailable: inProject,
         run: openNewTeam,
     },
-    "n w": {
+    "n o": {
         kind: CommandKind.New,
-        label: "New Workspace",
+        label: "New Organization",
         icon: HiOutlineBriefcase,
         run: () => useCommandActionStore.getState().start("new-organization"),
     },

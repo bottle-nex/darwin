@@ -1,11 +1,6 @@
 "use client";
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { cn } from "@/lib/utils";
 import CreateOrganizationForm from "@/components/playground/landing/CreateOrganizationForm";
 
 export default function CreateOrganizationModal({
@@ -15,17 +10,21 @@ export default function CreateOrganizationModal({
     open: boolean;
     onOpenChange: (open: boolean) => void;
 }) {
+    if (!open) return null;
     return (
-        <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="border-white/10 bg-charcoal sm:max-w-105">
-                <DialogHeader>
-                    <DialogTitle className="text-neutral-100">Create organization</DialogTitle>
-                    <DialogDescription className="text-neutral-500">
-                        Organizations group your projects, teams, and the issues your agents pick
-                        up.
-                    </DialogDescription>
-                </DialogHeader>
-
+        <Dialog open onOpenChange={onOpenChange}>
+            <DialogContent
+                showCloseButton={false}
+                onOpenAutoFocus={(event) => {
+                    event.preventDefault();
+                    (event.currentTarget as HTMLElement).focus();
+                }}
+                className={cn(
+                    "flex flex-col max-h-[80vh] min-h-[40vh] w-150 max-w-none sm:max-w-none p-0 gap-0 overflow-hidden",
+                    "bg-charcoal rounded-3xl",
+                )}
+            >
+                <DialogTitle className="sr-only">Create organization</DialogTitle>
                 <CreateOrganizationForm
                     onSuccess={() => onOpenChange(false)}
                     onCancel={() => onOpenChange(false)}

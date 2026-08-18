@@ -95,7 +95,7 @@ function CommandMenuBody({ onDone }: { onDone: () => void }) {
                 }
             }}
         >
-            <div className="border-b border-white/10 px-3">
+            <div className="px-3">
                 <CommandInput
                     autoFocus
                     border={false}
