@@ -26,6 +26,9 @@ import { usePlaygroundUrlSync } from "./usePlaygroundUrlSync";
 import { useSubscribeEventHandlers } from "@/hooks/socket/useSubscribeEventHandlers";
 import usePlaygroundShortcuts from "@/hooks/shortcuts/usePlaygroundShortcuts";
 import { useSidebarWidthStore } from "@/store/playground/useSidebarWidthStore";
+import { useCommandContextStore } from "@/store/command/useCommandContextStore";
+import CommandMenu from "@/components/command/CommandMenu";
+import CommandDialogs from "@/components/command/CommandDialogs";
 
 export default function PlaygroundShell() {
     const { orgSlug, projectSlug } = useParams<{
@@ -52,6 +55,15 @@ export default function PlaygroundShell() {
     usePlaygroundUrlSync(project?.teams, issueThreads);
     const { mode } = useIssueRoute({ sync: true });
     usePlaygroundShortcuts();
+
+    const setCommandContext = useCommandContextStore((s) => s.setContext);
+    useEffect(() => {
+        setCommandContext({
+            orgSlug: orgSlug ?? null,
+            projectId: activeProject?.id ?? null,
+            issueId: mode?.kind === "open" ? mode.issueId : null,
+        });
+    }, [orgSlug, activeProject?.id, mode, setCommandContext]);
     useLayoutEffect(() => {
         useSidebarWidthStore.persist.rehydrate();
     }, []);
@@ -86,6 +98,8 @@ export default function PlaygroundShell() {
             <DeleteTeamDialog />
             <CreateIssueDialog />
             <PlaygroundShortcutSheet />
+            <CommandMenu />
+            <CommandDialogs />
             <FloatNotifications />
         </main>
     );
