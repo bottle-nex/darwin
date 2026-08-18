@@ -5,7 +5,7 @@ import TemplatePicker from "./TemplatePicker";
 import IssueTitleField from "./IssueTitleField";
 import IssueFields from "./IssueFields";
 import IssueBody from "./IssueBody";
-import IssueSubmitFooter from "./IssueSubmitFooter";
+import IssueSubmitAction from "./IssueSubmitAction";
 import { useIssueForm } from "./useIssueForm";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { MdOutlineKeyboardArrowRight } from "react-icons/md";
@@ -52,7 +52,7 @@ export default function CreateIssueForm({
             </section>
             <section className="flex flex-col gap-y-4 pb-4">
                 <IssueFields form={form} layout="row" />
-                <IssueSubmitFooter form={form} />
+                <IssueSubmitAction form={form} />
             </section>
         </main>
     );

@@ -1,4 +1,11 @@
-import type { Chat, Issue, Notification, ProjectChat } from "../prisma/schemas.prisma";
+import type {
+    AgentSession,
+    Chat,
+    Issue,
+    IssueActivity,
+    Notification,
+    ProjectChat,
+} from "../prisma/schemas.prisma";
 
 export enum InboundSocketMessageType {
     ISSUE_CREATE = "ISSUE_CREATE",
@@ -63,6 +70,8 @@ export enum OutboundSocketMessageType {
     PROJECT_CHAT_DELETED = "PROJECT_CHAT_DELETED",
     PROJECT_CHAT_REACTION_UPDATED = "PROJECT_CHAT_REACTION_UPDATED",
     NOTIFICATION_CREATED = "NOTIFICATION_CREATED",
+    ACTIVITY_CREATED = "ACTIVITY_CREATED",
+    AGENT_SESSION_UPDATED = "AGENT_SESSION_UPDATED",
 }
 
 export type OutboundSocketMessage =
@@ -124,4 +133,15 @@ export type OutboundSocketMessage =
     | {
           type: OutboundSocketMessageType.NOTIFICATION_CREATED;
           payload: Notification;
+      }
+    /** One message per emit batch — publishing per row would let concurrent edits interleave. */
+    | {
+          type: OutboundSocketMessageType.ACTIVITY_CREATED;
+          projectId: string;
+          payload: { issueId: string; activities: IssueActivity[] };
+      }
+    | {
+          type: OutboundSocketMessageType.AGENT_SESSION_UPDATED;
+          projectId: string;
+          payload: AgentSession;
       };

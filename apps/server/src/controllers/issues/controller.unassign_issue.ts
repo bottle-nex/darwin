@@ -1,10 +1,11 @@
 import { Request, Response } from "express";
 import z from "zod";
-import { prisma } from "@trymatcha/database";
+import { ActivityType, ActorType, prisma } from "@trymatcha/database";
 import { Action, Permissions } from "@trymatcha/access-control";
 import ResponseWriter from "../../services/service.response";
 import Access from "../../access-control/access";
 import { server_services } from "../..";
+import ActivityService from "../../services/service.activity";
 
 export default class IssueUnassignController {
     static params_schema = z.object({
@@ -33,7 +34,13 @@ export default class IssueUnassignController {
         try {
             const issue = await prisma.issue.findUnique({
                 where: { id: issue_id },
-                select: { projectId: true },
+                select: {
+                    projectId: true,
+                    assignees: {
+                        where: { id: target_user_id },
+                        select: { id: true, name: true, image: true },
+                    },
+                },
             });
             if (!issue) {
                 ResponseWriter.not_found(res, "Issue not found");
@@ -55,25 +62,43 @@ export default class IssueUnassignController {
                 return;
             }
 
+            const removed = issue.assignees[0];
+
             // `disconnect` is idempotent — removing a user who isn't assigned is a no-op.
-            const updated = await prisma.issue.update({
-                where: { id: issue_id },
-                data: { assignees: { disconnect: { id: target_user_id } } },
-                select: {
-                    id: true,
-                    number: true,
-                    title: true,
-                    description: true,
-                    priority: true,
-                    status: true,
-                    customColumnId: true,
-                    createdAt: true,
-                    startDate: true,
-                    targetDate: true,
-                    assignees: { select: { id: true, name: true, email: true, image: true } },
-                    tags: { select: { id: true, name: true, color: true } },
-                },
+            const { updated, activities } = await prisma.$transaction(async (tx) => {
+                const updated = await tx.issue.update({
+                    where: { id: issue_id },
+                    data: { assignees: { disconnect: { id: target_user_id } } },
+                    select: {
+                        id: true,
+                        number: true,
+                        title: true,
+                        description: true,
+                        priority: true,
+                        status: true,
+                        customColumnId: true,
+                        createdAt: true,
+                        startDate: true,
+                        targetDate: true,
+                        assignees: { select: { id: true, name: true, email: true, image: true } },
+                        tags: { select: { id: true, name: true, color: true } },
+                    },
+                });
+
+                const activities = removed
+                    ? await ActivityService.emit(tx, {
+                          issueId: issue_id,
+                          actor: { type: ActorType.User, userId: user.id, name: user.name },
+                          events: [
+                              { type: ActivityType.AssigneeRemoved, payload: { user: removed } },
+                          ],
+                      })
+                    : [];
+
+                return { updated, activities };
             });
+
+            await ActivityService.publish(issue.projectId, issue_id, activities);
 
             // Dropping yourself doesn't need to notify yourself.
             if (target_user_id !== user.id) {

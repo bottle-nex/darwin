@@ -12,6 +12,7 @@ import IssueAssignController from "../../controllers/issues/controller.assign_is
 import IssueUnassignController from "../../controllers/issues/controller.unassign_issue";
 import IssueSearchController from "../../controllers/issues/controller.search_issues";
 import IssueReferencesGetController from "../../controllers/issues/controller.get_issue_references";
+import IssueActivityListController from "../../controllers/issues/controller.list_activity";
 
 const issues_router: Router = Router();
 
@@ -28,6 +29,7 @@ issues_router.patch("/:id", require_auth, IssueUpdateController.process);
 issues_router.delete("/:id", require_auth, IssueDeleteController.process);
 
 issues_router.get("/:id/references", require_auth, IssueReferencesGetController.process);
+issues_router.get("/:id/activity", require_auth, IssueActivityListController.process);
 
 issues_router.post("/:id/assignees", require_auth, IssueAssignController.process);
 issues_router.delete("/:id/assignees/:user_id", require_auth, IssueUnassignController.process);

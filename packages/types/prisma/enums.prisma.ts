@@ -33,6 +33,103 @@ export const IssueStatus = {
 } as const;
 export type IssueStatus = (typeof IssueStatus)[keyof typeof IssueStatus];
 
+export const AgentSessionStatus = {
+    Running: "Running",
+    Succeeded: "Succeeded",
+    Failed: "Failed",
+    Aborted: "Aborted",
+} as const;
+export type AgentSessionStatus = (typeof AgentSessionStatus)[keyof typeof AgentSessionStatus];
+
+export const ActorType = {
+    User: "User",
+    Agent: "Agent",
+    System: "System",
+    Github: "Github",
+} as const;
+export type ActorType = (typeof ActorType)[keyof typeof ActorType];
+
+/** Primary renders in the feed, Secondary hides behind "show details", Audit never renders. */
+export const ActivitySurface = {
+    Primary: "Primary",
+    Secondary: "Secondary",
+    Audit: "Audit",
+} as const;
+export type ActivitySurface = (typeof ActivitySurface)[keyof typeof ActivitySurface];
+
+export const ActivityType = {
+    IssueCreated: "IssueCreated",
+    IssueReopened: "IssueReopened",
+    IssueResolved: "IssueResolved",
+    IssueCancelled: "IssueCancelled",
+    IssueArchived: "IssueArchived",
+    IssueDeleted: "IssueDeleted",
+
+    StatusChanged: "StatusChanged",
+    PriorityChanged: "PriorityChanged",
+    TitleChanged: "TitleChanged",
+    DescriptionChanged: "DescriptionChanged",
+    AssigneeAdded: "AssigneeAdded",
+    AssigneeRemoved: "AssigneeRemoved",
+    LabelAdded: "LabelAdded",
+    LabelRemoved: "LabelRemoved",
+    DatesChanged: "DatesChanged",
+    ColumnChanged: "ColumnChanged",
+    SpecializationChanged: "SpecializationChanged",
+
+    RelationAdded: "RelationAdded",
+    RelationRemoved: "RelationRemoved",
+    SplitIntoSubIssues: "SplitIntoSubIssues",
+
+    Queued: "Queued",
+    Routed: "Routed",
+    Reprioritized: "Reprioritized",
+    Preempted: "Preempted",
+    Starved: "Starved",
+
+    RunStarted: "RunStarted",
+    RunCompleted: "RunCompleted",
+    AttemptFailed: "AttemptFailed",
+    RunAborted: "RunAborted",
+    WorkerHandoff: "WorkerHandoff",
+    WorkerDied: "WorkerDied",
+    HumanTookOver: "HumanTookOver",
+    HandedBackToHuman: "HandedBackToHuman",
+
+    BugReproduced: "BugReproduced",
+    BugNotReproduced: "BugNotReproduced",
+    BuildResult: "BuildResult",
+    TestResult: "TestResult",
+    AcceptanceChecked: "AcceptanceChecked",
+
+    BranchCreated: "BranchCreated",
+    CommitsPushed: "CommitsPushed",
+    PrOpened: "PrOpened",
+    PrReviewReceived: "PrReviewReceived",
+    PrFeedbackAddressed: "PrFeedbackAddressed",
+    PrChecksFailed: "PrChecksFailed",
+    PrRebased: "PrRebased",
+    PrMerged: "PrMerged",
+    PrClosed: "PrClosed",
+    PrReverted: "PrReverted",
+
+    ExternalMessageSent: "ExternalMessageSent",
+    ExternalIssueOpened: "ExternalIssueOpened",
+    ExternalDocUpdated: "ExternalDocUpdated",
+    OncallPaged: "OncallPaged",
+
+    ScopeRequested: "ScopeRequested",
+    ScopeGranted: "ScopeGranted",
+    ScopeDenied: "ScopeDenied",
+    GuardrailHit: "GuardrailHit",
+    SecretAccessed: "SecretAccessed",
+    BudgetThresholdCrossed: "BudgetThresholdCrossed",
+    BudgetExceeded: "BudgetExceeded",
+
+    AttachmentAdded: "AttachmentAdded",
+} as const;
+export type ActivityType = (typeof ActivityType)[keyof typeof ActivityType];
+
 export const NotificationType = {
     IssueAssigned: "IssueAssigned",
     IssueUnassigned: "IssueUnassigned",
