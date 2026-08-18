@@ -16,7 +16,9 @@ interface TableSizePickerProps {
 
 export default function TableSizePicker({ rows, cols, onHover, onSelect }: TableSizePickerProps) {
     return (
-        <div className={cn(MENU_SURFACE, "pointer-events-auto flex flex-col items-center gap-2 p-2")}>
+        <div
+            className={cn(MENU_SURFACE, "pointer-events-auto flex flex-col items-center gap-2 p-2")}
+        >
             <div className="flex flex-col gap-1">
                 {Array.from({ length: TABLE_PICKER_MAX_ROWS }, (_, row) => (
                     <div key={row} className="flex gap-1">

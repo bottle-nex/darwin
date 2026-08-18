@@ -171,7 +171,12 @@ const SlashCommandList = forwardRef<SlashCommandListHandle, SlashCommandListProp
 
         if (!items.length) {
             return (
-                <div className={cn(MENU_SURFACE, "pointer-events-auto w-56 py-6 text-center text-sm text-neutral-500")}>
+                <div
+                    className={cn(
+                        MENU_SURFACE,
+                        "pointer-events-auto w-56 py-6 text-center text-sm text-neutral-500",
+                    )}
+                >
                     No matches
                 </div>
             );
