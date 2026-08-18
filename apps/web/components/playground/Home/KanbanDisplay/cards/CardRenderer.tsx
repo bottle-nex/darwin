@@ -3,6 +3,7 @@ import { useIssueRoute } from "@/components/playground/Issue/useIssueRoute";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
 import { PlaygroundTab } from "@/components/playground/playgroundTabs";
 import { KanbanStatus, type Issue } from "@/types/kanban";
+import IssueDropdown from "../IssueDropdown";
 import TodoCard from "./TodoCard";
 import QueuedCard from "./QueuedCard";
 import InProgressCard from "./InProgressCard";
@@ -39,7 +40,13 @@ function statusCard(issue: Issue) {
  * column — the board's pointer sensor only starts a drag past a 5px threshold,
  * so a tap falls through to this handler.
  */
-export default function CardRenderer({ issue }: { issue: Issue }) {
+export default function CardRenderer({
+    issue,
+    preview = false,
+}: {
+    issue: Issue;
+    preview?: boolean;
+}) {
     const { openIssue } = useIssueRoute();
     const setTab = usePlaygroundNavStore((s) => s.setTab);
 
@@ -48,7 +55,7 @@ export default function CardRenderer({ issue }: { issue: Issue }) {
             ? () => setTab(PlaygroundTab.Reviews)
             : () => openIssue(issue.id);
 
-    return (
+    const card = (
         <div
             role="button"
             tabIndex={0}
@@ -65,4 +72,7 @@ export default function CardRenderer({ issue }: { issue: Issue }) {
             {statusCard(issue)}
         </div>
     );
+
+    if (preview) return card;
+    return <IssueDropdown issueId={issue.id}>{card}</IssueDropdown>;
 }

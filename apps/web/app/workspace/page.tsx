@@ -120,7 +120,7 @@ export default function WorkspacePage() {
             <div className="relative z-10 flex h-full items-center justify-center px-6">
                 <div className="w-full max-w-100">
                     <h1 className="text-center text-2xl font-semibold text-neutral-100">
-                        Create a workspace
+                        Create Organization
                     </h1>
                     <p className="mt-2 text-center text-[15px] text-neutral-400">
                         Move work forward across teams and agents

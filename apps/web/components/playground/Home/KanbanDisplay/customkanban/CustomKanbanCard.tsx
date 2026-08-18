@@ -22,6 +22,7 @@ import { useActiveProject } from "@/hooks/useActiveProject";
 import { useCustomCardActions } from "@/hooks/kanban/useCustomCardActions";
 import { CARD_SHELL } from "../cardStyles";
 import IssueCardFace, { issueIdentifier } from "../cards/IssueCardFace";
+import IssueDropdown from "../IssueDropdown";
 import AssigneePicker from "./AssigneePicker";
 import type { CustomCard } from "@/types/kanban-custom";
 
@@ -41,7 +42,7 @@ export default function CustomKanbanCard({ card, preview = false }: CustomKanban
     const canAssign = Boolean(projectId) && !preview;
     const { openIssue } = useIssueRoute();
 
-    return (
+    const face = (
         <div className={cn(CARD_SHELL, "group/card relative")}>
             {!preview && (
                 <DropdownMenu>
@@ -141,4 +142,7 @@ export default function CustomKanbanCard({ card, preview = false }: CustomKanban
             )}
         </div>
     );
+
+    if (preview) return face;
+    return <IssueDropdown issueId={card.id}>{face}</IssueDropdown>;
 }

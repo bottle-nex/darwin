@@ -17,6 +17,7 @@ import {
     DropdownMenuSubTrigger,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { cn } from "@/lib/utils";
 import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
 import type { FilterValue } from "@/store/kanban/useKanbanOptionsStore";
 import OptionButton from "./OptionButton";
@@ -90,7 +91,7 @@ export function FilterPanelItems({ value, onChange, customColumns }: FilterPanel
 
                             onSelect={() => onChange({ kind: "llm", status: col.status })}
                         >
-                            <col.icon className="size-3.5 text-neutral-400" aria-hidden />
+                            <col.icon className={cn("size-3.5", col.titleBox)} aria-hidden />
                             <span className="flex-1">{col.title}</span>
                             {value.kind === "llm" && value.status === col.status && (
                                 <MdCheck className="size-3.5 text-neutral-300" aria-hidden />
