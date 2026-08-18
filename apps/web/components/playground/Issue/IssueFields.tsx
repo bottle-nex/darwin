@@ -24,7 +24,7 @@ export default function IssueFields({
     const tags = (
         <TagsCapsule
             projectId={projectId}
-            defaultValue={fields.tagIds}
+            value={fields.tagIds}
             onChange={fields.setTagIds}
             className={capsuleClass}
             placeholder={inSidebar ? "Add tag" : undefined}
@@ -35,7 +35,7 @@ export default function IssueFields({
 
     const priority = (
         <PriorityCapsule
-            defaultValue={fields.priority}
+            value={fields.priority}
             onChange={fields.setPriority}
             className={capsuleClass}
         />
@@ -43,7 +43,7 @@ export default function IssueFields({
     const members = (
         <MembersCapsule
             projectId={projectId}
-            defaultValue={fields.memberIds}
+            value={fields.memberIds}
             onChange={fields.setMemberIds}
             disabled={readOnly}
             open={fields.membersOpen}
@@ -57,7 +57,7 @@ export default function IssueFields({
         <Capsule
             type="calendar"
             placeholder="Start date"
-            defaultValue={fields.startDate}
+            value={fields.startDate}
             onChange={fields.setStartDate}
             className={capsuleClass}
             icon={HiCalendar}
@@ -68,7 +68,7 @@ export default function IssueFields({
         <Capsule
             type="calendar"
             placeholder="Target date"
-            defaultValue={fields.targetDate}
+            value={fields.targetDate}
             onChange={fields.setTargetDate}
             className={capsuleClass}
             icon={HiCalendar}

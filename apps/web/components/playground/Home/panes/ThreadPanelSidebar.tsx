@@ -2,6 +2,7 @@
 import { useParams } from "next/navigation";
 import { HiOutlineChatBubbleLeftRight } from "react-icons/hi2";
 import Row from "@/components/playground/Sidebar/SidebarRow";
+import LLMIssueStatusTicker from "@/components/playground/Home/KanbanDisplay/LLMIssueStatusTicker";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { useIssueThreads } from "@/hooks/chats/useIssueThreads";
@@ -37,6 +38,9 @@ export default function ThreadPanelSidebar() {
                         key={t.id}
                         label={`#${t.number} ${t.title}`}
                         leading={{ kind: "icon", icon: HiOutlineChatBubbleLeftRight }}
+                        trailing={
+                            <LLMIssueStatusTicker status={t.status} size="sm" showLabel={false} />
+                        }
                         active={isActive}
                         onClick={() =>
                             openThread(

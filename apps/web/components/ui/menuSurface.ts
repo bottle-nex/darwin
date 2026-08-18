@@ -18,10 +18,10 @@ export const MENU_SURFACE =
  * and selects set `data-highlighted`, cmdk sets `data-selected`.
  */
 export const MENU_ITEM =
-    "flex cursor-pointer items-center gap-2 rounded-[10px] px-2 py-1.5 text-[13.5px] text-neutral-300 outline-none select-none data-highlighted:bg-white/5 data-highlighted:text-neutral-100 data-[selected=true]:bg-white/5 data-[selected=true]:text-neutral-100 aria-disabled:pointer-events-none aria-disabled:opacity-40 [&_svg]:pointer-events-none [&_svg]:shrink-0";
+    "flex cursor-pointer items-center gap-2 rounded-[10px] px-2 py-1.5 text-[13.5px] text-snow/90 outline-none select-none data-highlighted:bg-white/5 data-highlighted:text-neutral-100 data-[selected=true]:bg-white/5 data-[selected=true]:text-neutral-100 aria-disabled:pointer-events-none aria-disabled:opacity-40 [&_svg]:pointer-events-none [&_svg]:shrink-0";
 
 export const MENU_ITEM_DESTRUCTIVE =
-    "text-rose-300 data-highlighted:bg-rose-500/10 data-highlighted:text-rose-200";
+    "text-rose-400 data-highlighted:bg-rose-500/10 data-highlighted:text-rose-500";
 
 export const MENU_LABEL =
     "px-2 py-1.5 text-[11px] font-medium tracking-wide text-neutral-500 uppercase";

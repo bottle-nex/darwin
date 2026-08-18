@@ -34,7 +34,7 @@ function memberTone(id: string): string {
 
 interface MembersCapsuleProps {
     projectId: string | undefined;
-    defaultValue?: string[];
+    value?: string[];
     onChange?: (memberIds: string[]) => void;
     disabled?: boolean;
     className?: string;
@@ -74,7 +74,7 @@ function MemberAvatar({ member }: { member: ProjectMember }) {
 
 export default function MembersCapsule({
     projectId,
-    defaultValue,
+    value,
     onChange,
     disabled,
     className,
@@ -86,14 +86,13 @@ export default function MembersCapsule({
     const [internalOpen, setInternalOpen] = useState(false);
     const open = controlledOpen ?? internalOpen;
     const setOpen = onOpenChange ?? setInternalOpen;
-    const [selected, setSelected] = useState<string[]>(defaultValue ?? []);
+    const selected = value ?? [];
     const { data: members } = useProjectMembers(projectId);
 
     function toggle(id: string) {
         const next = selected.includes(id)
             ? selected.filter((memberId) => memberId !== id)
             : [...selected, id];
-        setSelected(next);
         onChange?.(next);
     }
 

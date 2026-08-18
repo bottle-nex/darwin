@@ -28,7 +28,7 @@ interface IssueState {
     close: () => void;
 }
 
-export const useIssueStore = create<IssueState>((set) => ({
+export const useIssueStore = create<IssueState>((set, get) => ({
     mode: null,
     openCreate: (target) => set({ mode: { kind: "create", target } }),
     openIssue: (issueId) => {
@@ -38,6 +38,7 @@ export const useIssueStore = create<IssueState>((set) => ({
     },
     syncIssue: (issueId) => set({ mode: issueId ? { kind: "open", issueId } : null }),
     close: () => {
+        if (!get().mode) return;
         set({ mode: null });
         const base = basePath(window.location.pathname);
         if (base !== window.location.pathname) {

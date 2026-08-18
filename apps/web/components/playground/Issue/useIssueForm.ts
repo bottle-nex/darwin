@@ -40,6 +40,10 @@ export type IssueFormFields = {
     setMembersOpen: (value: boolean) => void;
 };
 
+function sameIds(a: { id: string }[], b: { id: string }[]) {
+    return a.length === b.length && a.every((item, index) => item.id === b[index].id);
+}
+
 export function useIssueForm({
     target,
     issue,
@@ -76,6 +80,27 @@ export function useIssueForm({
         issue?.targetDate ? new Date(issue.targetDate) : undefined,
     );
     const [membersOpen, setMembersOpen] = useState(false);
+
+    const [syncedIssue, setSyncedIssue] = useState(issue);
+    if (issue && syncedIssue && issue !== syncedIssue) {
+        setSyncedIssue(issue);
+        if (issue.title !== syncedIssue.title) setTitle(issue.title);
+        if (issue.priority !== syncedIssue.priority) {
+            setPriority(KanbanMappers.NUMBER_TO_PRIORITY[issue.priority] ?? "medium");
+        }
+        if (!sameIds(issue.assignees, syncedIssue.assignees)) {
+            setMemberIds(issue.assignees.map((assignee) => assignee.id));
+        }
+        if (!sameIds(issue.tags, syncedIssue.tags)) {
+            setTagIds(issue.tags.map((tag) => tag.id));
+        }
+        if (issue.startDate !== syncedIssue.startDate) {
+            setStartDate(issue.startDate ? new Date(issue.startDate) : undefined);
+        }
+        if (issue.targetDate !== syncedIssue.targetDate) {
+            setTargetDate(issue.targetDate ? new Date(issue.targetDate) : undefined);
+        }
+    }
 
     const createIssue = useCreateIssue();
     const updateIssue = useUpdateIssue();

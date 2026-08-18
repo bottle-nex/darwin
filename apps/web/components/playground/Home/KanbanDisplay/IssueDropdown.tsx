@@ -6,11 +6,10 @@ import { isAxiosError } from "axios";
 import TurndownService from "turndown";
 import { MdCheck } from "react-icons/md";
 import {
-    LuChevronRight,
     LuCalendar,
     LuColumns3,
     LuCopy,
-    LuExternalLink,
+    LuCopyPlus,
     LuFingerprint,
     LuHash,
     LuLink,
@@ -20,6 +19,7 @@ import {
     LuTrash2,
     LuUsers,
 } from "react-icons/lu";
+import { RxTriangleRight } from "react-icons/rx";
 import { TbFileInvoiceFilled } from "react-icons/tb";
 import { Button } from "@/components/ui/button";
 import {
@@ -44,21 +44,18 @@ import { cn } from "@/lib/utils";
 import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
 import { PRIORITY_TO_NUMBER } from "./customkanban/data";
 import { PRIORITY_OPTIONS, isEditable } from "@/components/playground/Issue/issueHelpers";
-import { useIssueRoute } from "@/components/playground/Issue/useIssueRoute";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { useBoard } from "@/hooks/issues/useBoard";
+import { useCreateIssue, type CreateIssueInput } from "@/hooks/issues/useCreateIssue";
 import { useUpdateIssue } from "@/hooks/issues/useUpdateIssue";
 import { useDeleteIssue } from "@/hooks/issues/useDeleteIssue";
 import { useAssignIssue, useUnassignIssue } from "@/hooks/issues/useAssignIssue";
 import { useFilteredCustomColumns } from "@/hooks/kanban/useFilteredCustomColumns";
 import { useProjectMembers } from "@/hooks/project/useProjectMembers";
 import { useListTags } from "@/hooks/tags/useListTags";
-import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
-import { PlaygroundTab } from "@/components/playground/playgroundTabs";
-import { KanbanStatus } from "@/types/kanban";
 import type { BoardIssue } from "@/types/board";
 
-const ICON = "size-3.5 text-neutral-400";
+const ICON = "size-3.5 text-snow/50!";
 
 const CHEVRON = "ml-auto size-3.5 text-neutral-500";
 
@@ -124,7 +121,7 @@ function Submenu({
                 onPointerEnter={() => !disabled && setOpen(true)}
             >
                 {trigger}
-                <LuChevronRight className={CHEVRON} aria-hidden />
+                <RxTriangleRight className={CHEVRON} aria-hidden />
             </ContextMenuSubTrigger>
             <ContextMenuSubContent className={className}>{children}</ContextMenuSubContent>
         </ContextMenuSub>
@@ -143,13 +140,12 @@ export default function IssueDropdown({
     const { data: board } = useBoard(projectId);
     const issue = board?.issues.find((row) => row.id === issueId);
 
-    const { openIssue } = useIssueRoute();
-    const setTab = usePlaygroundNavStore((s) => s.setTab);
     const columns = useFilteredCustomColumns();
     const { data: members } = useProjectMembers(projectId);
     const { data: tags } = useListTags(projectId);
 
     const updateIssue = useUpdateIssue();
+    const createIssue = useCreateIssue();
     const deleteIssue = useDeleteIssue();
     const assignIssue = useAssignIssue();
     const unassignIssue = useUnassignIssue();
@@ -172,14 +168,6 @@ export default function IssueDropdown({
         updateIssue.mutate(input, {
             onError: () => toast.error("Couldn't update the issue."),
         });
-    }
-
-    function open() {
-        if (issue!.status === KanbanStatus.InReview) {
-            setTab(PlaygroundTab.Reviews);
-            return;
-        }
-        openIssue(issue!.id);
     }
 
     function issueHref() {
@@ -213,15 +201,31 @@ export default function IssueDropdown({
         patch({ id: issue!.id, project_id: projectId!, tag_ids: next });
     }
 
+    function duplicate() {
+        createIssue.mutate(
+            {
+                project_id: projectId!,
+                title: issue!.title,
+                description: issue!.description,
+                priority: issue!.priority as CreateIssueInput["priority"],
+                custom_column_id: issue!.customColumnId ?? undefined,
+                start_date: issue!.startDate ?? undefined,
+                target_date: issue!.targetDate ?? undefined,
+                assignee_ids: issue!.assignees.map((member) => member.id),
+                tag_ids: issue!.tags.map((tag) => tag.id),
+            },
+            {
+                onSuccess: () => toast.success("Duplicated issue."),
+                onError: () => toast.error("Couldn't duplicate the issue."),
+            },
+        );
+    }
+
     return (
         <>
             <ContextMenu>
                 <ContextMenuTrigger asChild>{children}</ContextMenuTrigger>
-                <ContextMenuContent className="w-52">
-                    <ContextMenuItem onSelect={open}>
-                        <LuExternalLink className={ICON} aria-hidden />
-                        <span className="flex-1">Open</span>
-                    </ContextMenuItem>
+                <ContextMenuContent className="w-50">
                     <ContextMenuItem onSelect={() => window.open(issueHref(), "_blank")}>
                         <LuSquareArrowOutUpRight className={ICON} aria-hidden />
                         <span className="flex-1">Open in new tab</span>
@@ -489,6 +493,11 @@ export default function IssueDropdown({
                                 <span className="flex-1 whitespace-nowrap">Copy {field.label}</span>
                             </ContextMenuItem>
                         ))}
+                        <ContextMenuSeparator />
+                        <ContextMenuItem onSelect={duplicate}>
+                            <LuCopyPlus className={ICON} aria-hidden />
+                            <span className="flex-1 whitespace-nowrap">Duplicate issue</span>
+                        </ContextMenuItem>
                     </Submenu>
 
                     <ContextMenuItem

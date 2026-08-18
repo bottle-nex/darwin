@@ -80,6 +80,7 @@ export default class IssueUnassignController {
                         createdAt: true,
                         startDate: true,
                         targetDate: true,
+                        prUrl: true,
                         assignees: { select: { id: true, name: true, email: true, image: true } },
                         tags: { select: { id: true, name: true, color: true } },
                     },

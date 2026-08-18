@@ -11,7 +11,7 @@ export default function PlaygroundBreadcrumb({ issueNumber }: { issueNumber?: nu
     const inIssue = issueNumber !== undefined;
 
     return (
-        <nav className="flex min-w-0 items-center gap-1.5 text-[13px]">
+        <nav className="flex min-w-0 items-center gap-1.5 text-[14px]">
             <PlaygroundAvatar
                 tone="indigo"
                 size="md"

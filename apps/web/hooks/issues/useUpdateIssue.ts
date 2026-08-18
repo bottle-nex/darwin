@@ -1,13 +1,14 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/lib/axios";
 import { ISSUE_URL } from "@/routes/api_routes";
-import { BOARD_QUERY_KEY } from "@/hooks/issues/useBoard";
+import { updateBoardIssue } from "@/hooks/issues/useBoard";
 import type { ApiResponse } from "@/types/api";
-import type { BoardIssue, ServerIssueStatus } from "@/types/board";
+import type { ServerIssueStatus } from "@/types/board";
+import type { Issue } from "@trymatcha/types";
 
 export interface UpdateIssueInput {
     id: string;
-    /** Used only to invalidate the right board query; not sent in the body. */
+    /** Used only to target the right board cache entry; not sent in the body. */
     project_id: string;
     title?: string;
     description?: string;
@@ -28,9 +29,8 @@ export function useUpdateIssue() {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: async (input: UpdateIssueInput) => {
-            // `project_id` is only for cache invalidation; send the editable fields.
             // Omitted (undefined) fields are dropped by JSON, so they stay untouched.
-            const res = await apiClient.patch<ApiResponse<{ issue: BoardIssue }>>(
+            const res = await apiClient.patch<ApiResponse<{ issue: Issue }>>(
                 ISSUE_URL(input.id),
                 {
                     title: input.title,
@@ -46,10 +46,8 @@ export function useUpdateIssue() {
             );
             return res.data.data.issue;
         },
-        onSuccess: (_data, variables) => {
-            queryClient.invalidateQueries({
-                queryKey: [...BOARD_QUERY_KEY, variables.project_id],
-            });
+        onSuccess: (data, variables) => {
+            updateBoardIssue(queryClient, variables.project_id, data);
         },
     });
 }
