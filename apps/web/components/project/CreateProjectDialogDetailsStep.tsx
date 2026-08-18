@@ -121,7 +121,7 @@ export default function CreateProjectDialogDetailsStep({
                 className="no-scrollbar flex-1 min-h-0 overflow-y-auto pb-4"
             >
                 <IssueDescriptionEditor
-                    placeholder="What does this project do? Type '/' for commands"
+                    placeholder="What does this project do?"
                     onChange={(state) => {
                         setDescription(state.html);
                         setDescriptionEmpty(state.isEmpty);
