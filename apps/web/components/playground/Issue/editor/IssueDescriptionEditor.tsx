@@ -7,9 +7,13 @@ import { cn } from "@/lib/utils";
 import TaskList from "@tiptap/extension-task-list";
 import TaskItem from "@tiptap/extension-task-item";
 import Image from "@tiptap/extension-image";
-import Placeholder from "@tiptap/extension-placeholder";
 import CharacterCount from "@tiptap/extension-character-count";
+import { TableKit } from "@tiptap/extension-table";
 import { SlashCommand } from "./slash-command";
+import { EditorPlaceholder } from "./placeholder";
+import { Toggle, ToggleBody, ToggleSummary } from "./toggle";
+import { TableFigure, TableTitle } from "./table";
+import { Timestamp } from "./timestamp";
 import { Prompt, PromptMark, countPrompts } from "./prompt";
 import ImageNodeView from "./ImageNodeView";
 
@@ -38,7 +42,7 @@ interface IssueDescriptionEditorProps {
 }
 
 export default function IssueDescriptionEditor({
-    placeholder = "Add a description... type '/' for commands",
+    placeholder = "Add a description...",
     className,
     initialContent,
     editable = true,
@@ -60,8 +64,25 @@ export default function IssueDescriptionEditor({
             TaskList,
             TaskItem.configure({ nested: true }),
             ImageWithControls.configure({ inline: true, allowBase64: true }),
+            Toggle,
+            ToggleSummary,
+            ToggleBody,
+            TableFigure,
+            TableTitle,
+            Timestamp,
+            TableKit.configure({
+                table: { resizable: true },
+                tableHeader: {
+                    HTMLAttributes: {
+                        class: "border border-white/12 bg-white/6 px-2 py-1 text-left align-top font-medium",
+                    },
+                },
+                tableCell: {
+                    HTMLAttributes: { class: "border border-white/12 px-2 py-1 align-top" },
+                },
+            }),
             authoring ? PromptMark : Prompt,
-            Placeholder.configure({ placeholder }),
+            EditorPlaceholder.configure({ emptyDocText: placeholder }),
             CharacterCount.configure({ limit: DESCRIPTION_CHAR_LIMIT }),
             SlashCommand,
         ],

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import type { Editor } from "@tiptap/react";
 import { AxiosError } from "axios";
 import { toast } from "sonner";
 import { MdCheck, MdChevronLeft, MdDescription } from "react-icons/md";
@@ -13,6 +14,8 @@ import IssueDescriptionEditor from "@/components/playground/Issue/editor/IssueDe
 import type { ApiResponse } from "@/types/api";
 import type { IssueTemplate } from "@/types/issueTemplate";
 import IconPicker, { IconPickGlyph, type IconPick } from "@/components/ui/IconPicker";
+import ConfirmDialog from "@/components/utility/ConfirmDialog";
+import { useEscapeExit } from "@/hooks/shortcuts/useEscapeExit";
 
 const GHOST = "w-full bg-transparent outline-none placeholder:text-white/25";
 
@@ -41,12 +44,29 @@ export default function CreateTemplateDisplay({
     const [descriptionEmpty, setDescriptionEmpty] = useState(!template?.description);
     const [icon, setIcon] = useState<IconPick | undefined>(template?.icon);
     const [iconOpen, setIconOpen] = useState(false);
+    const [descriptionBaseline, setDescriptionBaseline] = useState<string | null>(null);
+    const [confirmingExit, setConfirmingExit] = useState(false);
+    const [editor, setEditor] = useState<Editor | null>(null);
 
     const createTemplate = useCreateTemplate();
     const updateTemplate = useUpdateTemplate();
     const pending = createTemplate.isPending || updateTemplate.isPending;
 
     const canSave = name.trim().length > 0 && !descriptionEmpty && !pending;
+
+    const isDirty =
+        name !== (template?.name ?? "") ||
+        isDefault !== (template?.isDefault ?? false) ||
+        JSON.stringify(icon ?? null) !== JSON.stringify(template?.icon ?? null) ||
+        (descriptionBaseline !== null && description !== descriptionBaseline);
+
+    useEscapeExit({
+        enabled: !confirmingExit && !iconOpen,
+        isDirty,
+        editor,
+        onExit: onDone,
+        onDirtyExit: () => setConfirmingExit(true),
+    });
 
     function handleError(err: unknown) {
         const code =
@@ -157,7 +177,9 @@ export default function CreateTemplateDisplay({
                             template ? promptsFromBraces(template.description) : undefined
                         }
                         placeholder="Write the issue… press '/' for commands"
+                        onReady={setEditor}
                         onChange={(state) => {
+                            if (descriptionBaseline === null) setDescriptionBaseline(state.html);
                             setDescription(state.html);
                             setDescriptionEmpty(state.isEmpty);
                         }}
@@ -199,6 +221,16 @@ export default function CreateTemplateDisplay({
                     </Button>
                 </menu>
             </footer>
+
+            <ConfirmDialog
+                open={confirmingExit}
+                onOpenChange={setConfirmingExit}
+                title="Save your changes?"
+                description="This template has unsaved edits. Leaving now will lose them."
+                cancel={{ label: "Discard", variant: "destructive", onClick: onDone }}
+                confirm={{ label: "Save", variant: "tertiary", onClick: handleSave }}
+                pending={pending}
+            />
         </form>
     );
 }

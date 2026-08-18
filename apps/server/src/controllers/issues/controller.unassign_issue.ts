@@ -53,7 +53,7 @@ export default class IssueUnassignController {
                 return;
             }
 
-            // Anyone may drop themselves; removing someone else needs the assign permission.
+            // Anyone may drop themselves, removing someone else needs the assign permission.
             if (
                 target_user_id !== user.id &&
                 !Permissions.project(role, Action.project.assign_issue)
@@ -64,7 +64,7 @@ export default class IssueUnassignController {
 
             const removed = issue.assignees[0];
 
-            // `disconnect` is idempotent — removing a user who isn't assigned is a no-op.
+            // `disconnect` is idempotent, removing an user who isn't assigned is a no-op.
             const { updated, activities } = await prisma.$transaction(async (tx) => {
                 const updated = await tx.issue.update({
                     where: { id: issue_id },

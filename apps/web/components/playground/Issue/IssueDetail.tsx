@@ -1,4 +1,5 @@
 "use client";
+import { useState } from "react";
 import { BsChatRightText } from "react-icons/bs";
 import type { BoardColumn, BoardIssue } from "@/types/board";
 import { useIssueChatPanelStore } from "@/store/issues/useIssueChatPanelStore";
@@ -11,6 +12,8 @@ import {
 } from "@/components/playground/Core/components/PlaygroundPaneSlots";
 import PlaygroundBreadcrumb from "@/components/playground/Core/components/PlaygroundBreadcrumb";
 import IssueDropdown from "@/components/playground/Home/KanbanDisplay/IssueDropdown";
+import ConfirmDialog from "@/components/utility/ConfirmDialog";
+import { useEscapeExit } from "@/hooks/shortcuts/useEscapeExit";
 import IssueTitleField from "./IssueTitleField";
 import IssueBody from "./IssueBody";
 import IssueSubmitAction from "./IssueSubmitAction";
@@ -18,6 +21,7 @@ import IssueProperties from "./IssueProperties";
 import ActivityFeed from "./activity/ActivityFeed";
 import IssueChatPanel from "./chat/IssueChatPanel";
 import { isEditable, targetForIssue } from "./issueHelpers";
+import { useIssueRoute } from "./useIssueRoute";
 import { useIssueForm } from "./useIssueForm";
 
 export default function IssueDetail({
@@ -29,6 +33,8 @@ export default function IssueDetail({
 }) {
     const chatOpen = useIssueChatPanelStore((s) => s.isOpen);
     const toggleChat = useIssueChatPanelStore((s) => s.toggle);
+    const { close } = useIssueRoute();
+    const [confirmingClose, setConfirmingClose] = useState(false);
 
     const form = useIssueForm({
         target: targetForIssue(issue, columns),
@@ -36,6 +42,20 @@ export default function IssueDetail({
         initialDescription: issue.description,
         readOnly: !isEditable(issue),
     });
+
+    const { isDirty } = form;
+
+    useEscapeExit({
+        enabled: !confirmingClose,
+        isDirty,
+        editor: form.editorRef.current,
+        onExit: close,
+        onDirtyExit: () => setConfirmingClose(true),
+    });
+
+    async function saveAndClose() {
+        if (await form.submit()) close();
+    }
 
     return (
         <IssueDropdown issueId={issue.id}>
@@ -78,6 +98,15 @@ export default function IssueDetail({
                     <IssueProperties form={form} issue={issue} />
                     <IssueChatPanel issueId={issue.id} />
                 </div>
+                <ConfirmDialog
+                    open={confirmingClose}
+                    onOpenChange={setConfirmingClose}
+                    title="Save your changes?"
+                    description="This issue has unsaved edits. Closing it now will lose them."
+                    cancel={{ label: "Discard", variant: "destructive", onClick: close }}
+                    confirm={{ label: "Save", variant: "tertiary", onClick: saveAndClose }}
+                    pending={form.pending}
+                />
             </main>
         </IssueDropdown>
     );

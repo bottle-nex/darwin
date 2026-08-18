@@ -2,13 +2,7 @@ import { ENV } from "../conf/config.env";
 import type { AgentReport } from "./service.claude_run";
 import type Logger from "@trymatcha/logger";
 
-/**
- * Reports the lifecycle of one solve attempt to the server, which owns the
- * `AgentSession` row and the socket broadcast. The vm app has direct database
- * access but no publisher, so this goes over HTTP rather than through Prisma.
- *
- * Never throws — a dropped report must not take down a run that is otherwise fine.
- */
+// since vm doesn't has the access to the prisma, so we use http to report run lifecycle
 export default class RunReporter {
     static async started(token: string, run_id: string, issue_id: string, log: Logger) {
         await RunReporter.post("/run-started", token, { run_id, issue_id }, log);

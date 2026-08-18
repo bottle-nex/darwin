@@ -133,13 +133,13 @@ export function useIssueForm({
         return null;
     }
 
-    async function submit() {
-        if (pending || !projectId) return;
+    async function submit(): Promise<boolean> {
+        if (pending || !projectId) return false;
         const missing = missingField();
         if (missing) {
             fireWarning(missing.warning);
             missing.focus();
-            return;
+            return false;
         }
         try {
             if (issue) {
@@ -168,8 +168,10 @@ export function useIssueForm({
                 });
             }
             onSubmitted?.();
+            return true;
         } catch {
             toast.error(isEdit ? "Couldn't update the issue." : "Couldn't create the issue.");
+            return false;
         }
     }
 
@@ -187,6 +189,27 @@ export function useIssueForm({
         window.addEventListener("keydown", onKeyDown);
         return () => window.removeEventListener("keydown", onKeyDown);
     });
+
+    function hasEdits(): boolean {
+        if (!issue || readOnly) return false;
+        return (
+            title !== issue.title ||
+            body.isDirty ||
+            priority !== (KanbanMappers.NUMBER_TO_PRIORITY[issue.priority] ?? "medium") ||
+            !sameIdSet(
+                memberIds,
+                issue.assignees.map((a) => a.id),
+            ) ||
+            !sameIdSet(
+                tagIds,
+                issue.tags.map((t) => t.id),
+            ) ||
+            startDate?.getTime() !== dateValue(issue.startDate) ||
+            targetDate?.getTime() !== dateValue(issue.targetDate)
+        );
+    }
+
+    const isDirty = hasEdits();
 
     const fields: IssueFormFields = {
         title,
@@ -219,7 +242,18 @@ export function useIssueForm({
         isMac,
         projectId,
         readOnly,
+        isDirty,
     };
+}
+
+function sameIdSet(a: string[], b: string[]): boolean {
+    if (a.length !== b.length) return false;
+    const sortedB = [...b].sort();
+    return [...a].sort().every((id, index) => id === sortedB[index]);
+}
+
+function dateValue(value: string | Date | null | undefined): number | undefined {
+    return value ? new Date(value).getTime() : undefined;
 }
 
 export type IssueFormState = ReturnType<typeof useIssueForm>;

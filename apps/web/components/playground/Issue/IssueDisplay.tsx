@@ -1,8 +1,7 @@
 "use client";
-import { useEffect } from "react";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { useBoard } from "@/hooks/issues/useBoard";
-import { isTyping } from "@/hooks/shortcuts/usePlaygroundShortcuts";
+import { useEscapeExit } from "@/hooks/shortcuts/useEscapeExit";
 import { Button } from "@/components/ui/button";
 import LogoLoader from "@/components/app/LogoLoader";
 import { PLAYGROUND_PANE_SHELL } from "@/components/playground/Core/components/paneBar";
@@ -16,16 +15,10 @@ export default function IssueDisplay({ issueId }: { issueId: string }) {
     const { data: board } = useBoard(projectId);
     const { close } = useIssueRoute();
 
-    useEffect(() => {
-        function onKeyDown(event: KeyboardEvent) {
-            if (event.key !== "Escape" || isTyping(event.target)) return;
-            close();
-        }
-        window.addEventListener("keydown", onKeyDown);
-        return () => window.removeEventListener("keydown", onKeyDown);
-    }, [close]);
-
     const issue = board?.issues.find((i) => i.id === issueId);
+    const showsDetail = Boolean(board && issue);
+
+    useEscapeExit({ enabled: !showsDetail, onExit: close });
 
     if (board && issue) {
         return <IssueDetail key={issue.id} issue={issue} columns={board.columns} />;
