@@ -2,7 +2,7 @@
 import { AnimatePresence, motion } from "motion/react";
 import { HiOutlineArrowUpCircle, HiOutlineUserPlus } from "react-icons/hi2";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
-import { PANE_FRAME_NOTCH_HEIGHT } from "@/components/playground/Core/components/PaneFrameShape";
+import { PANE_TOP_BAR_HEIGHT } from "@/components/playground/Core/components/PlaygroundPaneFrame";
 import PlaygroundLeadBar from "@/components/playground/Core/TopBar/PlaygroundLeadBar";
 import PlaygroundUserMenu from "@/components/playground/Core/TopBar/PlaygroundUserMenu";
 import { PlaygroundTab } from "../playgroundTabs";
@@ -32,7 +32,7 @@ export default function SidebarContent() {
         <div className="flex h-full min-h-0 flex-col pr-2">
             <div
                 className="flex shrink-0 items-center px-1"
-                style={{ height: PANE_FRAME_NOTCH_HEIGHT }}
+                style={{ height: PANE_TOP_BAR_HEIGHT }}
             >
                 <PlaygroundLeadBar />
             </div>

@@ -7,6 +7,12 @@
             "runtimeArgs": ["run", "dev", "--filter=web"],
             "port": 3000,
             "autoPort": true
+        },
+        {
+            "name": "server",
+            "runtimeExecutable": "bun",
+            "runtimeArgs": ["run", "dev", "--filter=@trymatcha/server"],
+            "port": 8080
         }
     ]
 }

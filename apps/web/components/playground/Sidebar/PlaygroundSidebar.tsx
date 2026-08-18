@@ -26,7 +26,7 @@ export default function PlaygroundSidebar() {
             aria-label="Sidebar"
             style={{ width: `var(${SIDEBAR_WIDTH_CSS_VAR}, ${SIDEBAR_DEFAULT_WIDTH}px)` }}
             className={cn(
-                "h-full min-h-0 shrink-0 overflow-visible perspective-distant",
+                "h-full min-h-0 shrink-0 overflow-visible border-r border-border perspective-distant",
                 instant
                     ? "transition-none"
                     : "transition-[width] duration-350 ease-[cubic-bezier(0.22,1,0.36,1)]",

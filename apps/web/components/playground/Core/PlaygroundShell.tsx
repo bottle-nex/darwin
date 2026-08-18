@@ -73,7 +73,7 @@ export default function PlaygroundShell() {
 
     return (
         <main className="flex h-screen flex-col overflow-hidden text-neutral-100 select-none tracking-wide">
-            <section className="flex flex-1 min-h-0 p-2">
+            <section className="flex flex-1 min-h-0">
                 <PlaygroundSidebar />
                 <SidebarResizeHandle />
                 <PlaygroundPaneFrame
@@ -81,7 +81,7 @@ export default function PlaygroundShell() {
                     actions={<PlaygroundActions />}
                 >
                     {showOnboarding ? (
-                        <div className="flex min-h-0 flex-1 flex-col pt-[var(--pane-top-inset)]">
+                        <div className="flex min-h-0 flex-1 flex-col">
                             <OnboardingDisplay project={project} orgId={dashboard!.org.id} />
                         </div>
                     ) : mode?.kind === "open" ? (
