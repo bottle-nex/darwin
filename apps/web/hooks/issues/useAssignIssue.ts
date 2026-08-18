@@ -16,10 +16,9 @@ export function useAssignIssue() {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: async ({ id, user_id }: AssignIssueInput) => {
-            const res = await apiClient.post<ApiResponse<{ issue: Issue }>>(
-                ASSIGN_ISSUE_URL(id),
-                { user_id },
-            );
+            const res = await apiClient.post<ApiResponse<{ issue: Issue }>>(ASSIGN_ISSUE_URL(id), {
+                user_id,
+            });
             return res.data.data.issue;
         },
         onSuccess: (data, variables) => {

@@ -68,9 +68,7 @@ export default function PlaygroundSidebarRow({
                 </span>
             )}
 
-            {trailing && (
-                <span className="ml-1 flex shrink-0 items-center gap-1">{trailing}</span>
-            )}
+            {trailing && <span className="ml-1 flex shrink-0 items-center gap-1">{trailing}</span>}
 
             {isLocked && (
                 <span className="flex size-5 shrink-0 items-center justify-center text-neutral-400 ">

@@ -30,20 +30,17 @@ export function useUpdateIssue() {
     return useMutation({
         mutationFn: async (input: UpdateIssueInput) => {
             // Omitted (undefined) fields are dropped by JSON, so they stay untouched.
-            const res = await apiClient.patch<ApiResponse<{ issue: Issue }>>(
-                ISSUE_URL(input.id),
-                {
-                    title: input.title,
-                    description: input.description,
-                    priority: input.priority,
-                    status: input.status,
-                    custom_column_id: input.custom_column_id,
-                    tag_ids: input.tag_ids,
-                    assignee_ids: input.assignee_ids,
-                    start_date: input.start_date,
-                    target_date: input.target_date,
-                },
-            );
+            const res = await apiClient.patch<ApiResponse<{ issue: Issue }>>(ISSUE_URL(input.id), {
+                title: input.title,
+                description: input.description,
+                priority: input.priority,
+                status: input.status,
+                custom_column_id: input.custom_column_id,
+                tag_ids: input.tag_ids,
+                assignee_ids: input.assignee_ids,
+                start_date: input.start_date,
+                target_date: input.target_date,
+            });
             return res.data.data.issue;
         },
         onSuccess: (data, variables) => {
