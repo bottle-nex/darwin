@@ -2,10 +2,7 @@
 import { Suspense, useEffect, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import CreateOrganizationForm from "@/components/playground/landing/CreateOrganizationForm";
-import CreateProjectDialog from "@/components/project/CreateProjectDialog";
 import LogoLoader from "@/components/app/LogoLoader";
-import NoResource from "@/components/utility/NoResource";
-import ProjectsGlyph from "@/components/utility/ProjectsGlyph";
 import { useFetchOrganizations } from "@/hooks/playground/useFetchOrganizations";
 import { useGetDashboard } from "@/hooks/dashboard/useGetDashboard";
 import { useLastVisited } from "@/hooks/user/useLastVisited";
@@ -14,7 +11,7 @@ import { useNewProjectStore } from "@/store/project/useNewProjectStore";
 function PlaygroundResolver() {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const { setOpen, setTargetOrgSlug } = useNewProjectStore();
+    const { setOpen, setTargetOrgSlug, setForceCreate } = useNewProjectStore();
 
     const { isPending: orgsPending, data: organizations } = useFetchOrganizations();
     const { isPending: lastVisitedPending, data: lastVisited } = useLastVisited();
@@ -50,20 +47,17 @@ function PlaygroundResolver() {
     useEffect(() => {
         if (readyToRedirect) {
             router.replace(`/playground/${resolvedOrgSlug}/${targetProjectSlug}`);
+        } else if (noProjects) {
+            router.replace(`/playground/${resolvedOrgSlug}`);
         }
-    }, [readyToRedirect, resolvedOrgSlug, targetProjectSlug, router]);
-
-    function openCreateProject() {
-        if (!resolvedOrgSlug) return;
-        setTargetOrgSlug(resolvedOrgSlug);
-        setOpen(true);
-    }
+    }, [readyToRedirect, noProjects, resolvedOrgSlug, targetProjectSlug, router]);
 
     const loading =
         orgsPending ||
         lastVisitedPending ||
         (!!resolvedOrgSlug && dashboardPending) ||
-        readyToRedirect;
+        readyToRedirect ||
+        noProjects;
 
     return (
         <main className="flex h-dvh items-center justify-center bg-ink px-6 text-neutral-100">
@@ -78,21 +72,18 @@ function PlaygroundResolver() {
                             pick up.
                         </p>
                     </div>
-                    <CreateOrganizationForm onSuccess={() => {}} />
+                    <CreateOrganizationForm
+                        onSuccess={(org) => {
+                            setTargetOrgSlug(org.slug);
+                            setForceCreate(true);
+                            setOpen(true);
+                            router.replace(`/playground/${org.slug}`);
+                        }}
+                    />
                 </div>
-            ) : noProjects ? (
-                <NoResource
-                    className="items-center text-center"
-                    icon={<ProjectsGlyph className="size-24" />}
-                    title="Projects"
-                    description="A project groups the issues your team files onto a shared board. An agent picks them up, implements the fix, runs tests, and opens a pull request for review. Create one to start filing issues."
-                    action={{ label: "Create new project", onClick: openCreateProject }}
-                />
             ) : loading ? (
                 <LogoLoader />
             ) : null}
-
-            <CreateProjectDialog />
         </main>
     );
 }

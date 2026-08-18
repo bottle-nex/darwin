@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { isAxiosError } from "axios";
 import { useParams } from "next/navigation";
+import { signOut } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import {
     Dialog,
@@ -14,6 +15,7 @@ import {
 import { slugify } from "@/lib/format";
 import { useNewProjectStore } from "@/store/project/useNewProjectStore";
 import { useFetchOrganizations } from "@/hooks/playground/useFetchOrganizations";
+import { useGetDashboard } from "@/hooks/dashboard/useGetDashboard";
 import { useCreateProject } from "@/hooks/project/useCreateProject";
 import { useSetProjectSecrets } from "@/hooks/project/useSetProjectSecrets";
 import ProjectEnvStep, { type EnvRow } from "@/components/project/ProjectEnvStep";
@@ -43,12 +45,14 @@ const HEADER_COPY = {
 } as const;
 
 export default function CreateProjectDialog() {
-    const { open, setOpen, targetOrgSlug, setTargetOrgSlug } = useNewProjectStore();
+    const { open, setOpen, targetOrgSlug, setTargetOrgSlug, forceCreate, setForceCreate } =
+        useNewProjectStore();
     const { orgSlug: orgSlugParam } = useParams<{ orgSlug: string }>();
     const { data: organizations } = useFetchOrganizations();
 
     const orgSlug = targetOrgSlug ?? (typeof orgSlugParam === "string" ? orgSlugParam : "");
     const org = (organizations ?? []).find((o) => o.slug === orgSlug);
+    const { data: dashboard } = useGetDashboard(org?.slug);
 
     const createProject = useCreateProject();
     const setSecrets = useSetProjectSecrets();
@@ -74,6 +78,9 @@ export default function CreateProjectDialog() {
     const name = useWatch({ control, name: "name" });
     const detailsReady = Boolean(name?.trim());
 
+    const mustCreateProject =
+        open && !!org && forceCreate && dashboard?.projects.length === 0 && !createdProjectId;
+
     function handleOpenChange(next: boolean) {
         setOpen(next);
         if (!next) {
@@ -81,6 +88,7 @@ export default function CreateProjectDialog() {
             setSelectedRepo(null);
             setSelectedBranch("");
             setTargetOrgSlug(null);
+            setForceCreate(false);
             setStep("details");
             setCreatedProjectId(null);
             setEnvRows([{ key: "", value: "" }]);
@@ -146,15 +154,27 @@ export default function CreateProjectDialog() {
             case "details":
                 return (
                     <>
-                        <Button
-                            type="button"
-                            variant="tertiary"
-                            size="sm"
-                            onClick={() => handleOpenChange(false)}
-                            disabled={createProject.isPending}
-                        >
-                            Cancel
-                        </Button>
+                        {mustCreateProject ? (
+                            <Button
+                                type="button"
+                                variant="tertiary"
+                                size="sm"
+                                onClick={() => signOut({ callbackUrl: "/" })}
+                                disabled={createProject.isPending}
+                            >
+                                Log out
+                            </Button>
+                        ) : (
+                            <Button
+                                type="button"
+                                variant="tertiary"
+                                size="sm"
+                                onClick={() => handleOpenChange(false)}
+                                disabled={createProject.isPending}
+                            >
+                                Cancel
+                            </Button>
+                        )}
                         <Button
                             type="submit"
                             form={FORM_ID}
@@ -225,9 +245,19 @@ export default function CreateProjectDialog() {
     }
 
     const copy = HEADER_COPY[step];
+    const description =
+        step === "details" && mustCreateProject
+            ? "Every organization needs at least one project to continue. Create one to get started."
+            : copy.description;
 
     return (
-        <Dialog open={open} onOpenChange={handleOpenChange}>
+        <Dialog
+            open={open}
+            onOpenChange={(next) => {
+                if (!next && mustCreateProject) return;
+                handleOpenChange(next);
+            }}
+        >
             <DialogContent
                 showCloseButton={false}
                 className="gap-0 overflow-hidden border-white/10 bg-charcoal p-0 sm:max-w-4xl"
@@ -238,7 +268,7 @@ export default function CreateProjectDialog() {
                             {copy.title}
                         </DialogTitle>
                         <DialogDescription className="text-xs text-neutral-500">
-                            {copy.description}
+                            {description}
                         </DialogDescription>
                     </DialogHeader>
                     <div className="flex shrink-0 items-center gap-2">{renderActions()}</div>
