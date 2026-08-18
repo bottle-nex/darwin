@@ -1,13 +1,7 @@
 import { cn } from "@/lib/utils";
 import HeroBuddy from "../landing/v2/HeroBuddy";
-import { Source_Serif_4 } from "next/font/google";
 import { IoIosPlayCircle } from "react-icons/io";
 import HeroPanel from "./HeroPanel";
-
-const sourceSerif4 = Source_Serif_4({
-    subsets: ["latin"],
-    weight: ["400", "500", "600"],
-});
 
 export default function LandingHero() {
     return (

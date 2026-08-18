@@ -22,8 +22,7 @@ export default function IssueReferenceCard({ issue }: { issue: ReferencedIssueLa
             type="button"
             onClick={() => issue.id && openIssue(issue.id)}
             className={cn(
-                "flex w-full max-w-52 h-21 cursor-pointer items-stretch rounded-[7px] border border-graphite/50 p-1 text-left relative",
-                status?.cardTint ?? "bg-cement",
+                "flex w-full max-w-52 h-21 cursor-pointer items-stretch rounded-[7px] border border-graphite/50 p-1 text-left relative bg-linear-to-r from-white/8 to-white/2",
             )}
         >
             <div className="h-3.5 w-3.5 bg-charcoal rounded-full absolute top-1/2 -translate-y-1/2 -left-1.5 border-r border-graphite" />

@@ -67,8 +67,6 @@ export type KanbanColumnDef = {
     icon: IconType;
     /** Tailwind classes for the coloured box wrapping the column title. */
     titleBox: string;
-    /** Tailwind gradient classes for a subtle per-status tint on reference cards. */
-    cardTint: string;
 };
 
 /** The two ways to view the board's issues. */
