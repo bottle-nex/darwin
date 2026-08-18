@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { MdCheck, MdPeople } from "react-icons/md";
-import { cn } from "@/lib/utils";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { TooltipComponent } from "@/components/ui/tooltip-component";
 import {
@@ -13,24 +12,10 @@ import {
     CommandItem,
     CommandList,
 } from "@/components/ui/command";
-import { useProjectMembers, type ProjectMember } from "@/hooks/project/useProjectMembers";
+import { useProjectMembers } from "@/hooks/project/useProjectMembers";
 import ProjectRoleTicker from "@/components/playground/Team/TeamView/ProjectRoleTicker";
 import { CapsuleTrigger } from "./Capsule";
-
-const MEMBER_TONES = [
-    "bg-indigo-500/30 text-indigo-100",
-    "bg-emerald-500/30 text-emerald-100",
-    "bg-sky-500/30 text-sky-100",
-    "bg-rose-500/30 text-rose-100",
-    "bg-amber-500/30 text-amber-100",
-    "bg-violet-500/30 text-violet-100",
-];
-
-function memberTone(id: string): string {
-    let hash = 0;
-    for (let i = 0; i < id.length; i++) hash = (hash * 31 + id.charCodeAt(i)) >>> 0;
-    return MEMBER_TONES[hash % MEMBER_TONES.length];
-}
+import MemberAvatar from "./MemberAvatar";
 
 interface MembersCapsuleProps {
     projectId: string | undefined;
@@ -44,32 +29,6 @@ interface MembersCapsuleProps {
     /** Pass both to control the popover from outside (e.g. open it on failed submit). */
     open?: boolean;
     onOpenChange?: (open: boolean) => void;
-}
-
-function MemberAvatar({ member }: { member: ProjectMember }) {
-    const initial = (member.name?.trim()?.[0] ?? member.email[0] ?? "?").toUpperCase();
-
-    if (member.image) {
-        return (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-                src={member.image}
-                alt=""
-                className="size-6 shrink-0 rounded-full object-cover ring-1 ring-white/10"
-            />
-        );
-    }
-
-    return (
-        <span
-            className={cn(
-                "flex size-6 shrink-0 items-center justify-center rounded-full text-[10px] font-semibold",
-                memberTone(member.id),
-            )}
-        >
-            {initial}
-        </span>
-    );
 }
 
 export default function MembersCapsule({

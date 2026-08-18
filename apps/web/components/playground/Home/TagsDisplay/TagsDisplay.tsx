@@ -2,25 +2,16 @@
 import { useMemo, useState } from "react";
 import { MdDelete, MdEdit, MdLabel } from "react-icons/md";
 import { useParams } from "next/navigation";
-import { toast } from "sonner";
 import { useGetDashboard } from "@/hooks/dashboard/useGetDashboard";
 import { useListTags } from "@/hooks/tags/useListTags";
-import { useDeleteTag } from "@/hooks/tags/useDeleteTag";
 import { Button } from "@/components/ui/button";
 import LogoLoader from "@/components/app/LogoLoader";
 import PaneEmptyState from "@/components/playground/Core/components/PaneEmptyState";
 import NoResource from "@/components/utility/NoResource";
 import ProjectsGlyph from "@/components/utility/ProjectsGlyph";
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-} from "@/components/ui/dialog";
 import type { Tag } from "@/types/tags";
 import { useTagsOptionsStore } from "@/store/tags/useTagsOptionsStore";
+import { useDeleteTagStore } from "@/store/tags/useDeleteTagStore";
 import TagDisplay from "./TagDisplay";
 import CreateTagDialog from "./CreateTagDialog";
 import TagsOptionsBar from "./TagsOptionsBar";
@@ -31,13 +22,12 @@ export default function TagsDisplay() {
     const activeProject = dashboard?.projects.find((p) => p.slug === projectSlug);
 
     const { data: tags, isLoading, isError } = useListTags(activeProject?.id);
-    const deleteTag = useDeleteTag();
+    const requestDelete = useDeleteTagStore((s) => s.requestDelete);
     const search = useTagsOptionsStore((s) => s.search);
     const sort = useTagsOptionsStore((s) => s.sort);
 
     const [formOpen, setFormOpen] = useState(false);
     const [editingTag, setEditingTag] = useState<Tag | undefined>(undefined);
-    const [deleteTarget, setDeleteTarget] = useState<Tag | null>(null);
 
     const visibleTags = useMemo(() => {
         const query = search.trim().toLowerCase();
@@ -59,20 +49,6 @@ export default function TagsDisplay() {
     function openEdit(tag: Tag) {
         setEditingTag(tag);
         setFormOpen(true);
-    }
-
-    function handleDelete() {
-        if (!activeProject?.id || !deleteTarget) return;
-        deleteTag.mutate(
-            { projectId: activeProject.id, tagId: deleteTarget.id },
-            {
-                onSuccess: () => {
-                    toast.success("Tag deleted.");
-                    setDeleteTarget(null);
-                },
-                onError: () => toast.error("Couldn't delete the tag."),
-            },
-        );
     }
 
     return (
@@ -126,7 +102,7 @@ export default function TagsDisplay() {
                                     variant="ghost"
                                     size="icon-sm"
                                     aria-label={`Delete ${tag.name}`}
-                                    onClick={() => setDeleteTarget(tag)}
+                                    onClick={() => requestDelete(tag)}
                                 >
                                     <MdDelete className="size-3.5 text-red-400" />
                                 </Button>
@@ -144,48 +120,6 @@ export default function TagsDisplay() {
                     tag={editingTag}
                 />
             )}
-
-            <Dialog
-                open={Boolean(deleteTarget)}
-                onOpenChange={(next) => {
-                    if (!next) setDeleteTarget(null);
-                }}
-            >
-                <DialogContent className="border-white/10 bg-charcoal sm:max-w-100">
-                    <DialogHeader>
-                        <DialogTitle className="text-neutral-100">Delete tag</DialogTitle>
-                        <DialogDescription className="text-neutral-500">
-                            This removes the tag from your project. Issues using it will lose this
-                            label. This can&apos;t be undone.
-                        </DialogDescription>
-                    </DialogHeader>
-
-                    {deleteTarget && (
-                        <div className="py-1">
-                            <TagDisplay name={deleteTarget.name} color={deleteTarget.color} />
-                        </div>
-                    )}
-
-                    <DialogFooter>
-                        <Button
-                            type="button"
-                            variant="tertiary"
-                            onClick={() => setDeleteTarget(null)}
-                            disabled={deleteTag.isPending}
-                        >
-                            Cancel
-                        </Button>
-                        <Button
-                            type="button"
-                            variant="destructive"
-                            loading={deleteTag.isPending}
-                            onClick={handleDelete}
-                        >
-                            Delete
-                        </Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
         </div>
     );
 }
