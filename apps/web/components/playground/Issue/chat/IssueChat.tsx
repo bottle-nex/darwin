@@ -1,6 +1,6 @@
 "use client";
 import { useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import { BsChatRightTextFill } from "react-icons/bs";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import {

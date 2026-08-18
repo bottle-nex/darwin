@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useParams } from "next/navigation";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import { MdDelete } from "react-icons/md";
 import type { ProjectTeam } from "@/types/project";
 import { useDeleteTeamStore } from "@/store/team/useDeleteTeamStore";

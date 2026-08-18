@@ -1,6 +1,6 @@
 "use client";
 import { MotionConfig, motion } from "motion/react";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { useGetProject } from "@/hooks/project/useGetProject";
 import { useProjectMembers } from "@/hooks/project/useProjectMembers";

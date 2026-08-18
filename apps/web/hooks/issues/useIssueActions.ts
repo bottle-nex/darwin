@@ -1,5 +1,5 @@
 "use client";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import { isAxiosError } from "axios";
 import TurndownService from "turndown";
 import type { IconType } from "react-icons";

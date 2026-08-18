@@ -1,6 +1,6 @@
 "use client";
 import { useParams, useRouter } from "next/navigation";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import ConfirmDialog from "@/components/utility/ConfirmDialog";
 import { useDeleteProject } from "@/hooks/project/useDeleteProject";
 import { useDeleteProjectStore } from "@/store/project/useDeleteProjectStore";

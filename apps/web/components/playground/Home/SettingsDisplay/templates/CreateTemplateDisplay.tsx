@@ -3,7 +3,7 @@
 import { useState } from "react";
 import type { Editor } from "@tiptap/react";
 import { AxiosError } from "axios";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import { MdCheck, MdChevronLeft, MdDescription } from "react-icons/md";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";

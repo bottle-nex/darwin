@@ -1,6 +1,6 @@
 import type { QueryClient } from "@tanstack/react-query";
 import { OutboundSocketMessageType, type OutboundSocketMessage } from "@trymatcha/types";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import { upsertBoardIssue, updateBoardIssue } from "@/hooks/issues/useBoard";
 import { upsert_chat, mark_chat_deleted } from "@/hooks/chats/useChats";
 import { upsert_project_chat, mark_project_chat_deleted } from "@/hooks/chats/useProjectChat";

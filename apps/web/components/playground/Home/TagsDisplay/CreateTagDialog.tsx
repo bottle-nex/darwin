@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { MdCheck, MdColorize, MdOutlineKeyboardArrowRight } from "react-icons/md";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import { AxiosError } from "axios";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";

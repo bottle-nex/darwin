@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import type { Editor } from "@tiptap/react";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { useCreateIssue } from "@/hooks/issues/useCreateIssue";
 import { useUpdateIssue } from "@/hooks/issues/useUpdateIssue";

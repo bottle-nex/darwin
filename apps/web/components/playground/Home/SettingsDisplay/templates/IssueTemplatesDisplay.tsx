@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { MdAdd, MdDelete, MdDescription, MdEdit, MdStar, MdStarOutline } from "react-icons/md";
 import { IconPickGlyph } from "@/components/ui/IconPicker";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import { Button } from "@/components/ui/button";
 import ConfirmDialog from "@/components/utility/ConfirmDialog";
 import { TooltipComponent } from "@/components/ui/tooltip-component";

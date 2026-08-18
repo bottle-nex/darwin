@@ -4,7 +4,7 @@ import "./globals.css";
 import QueryProvider from "@/providers/QueryProvider";
 import SessionSetter from "@/components/utility/SessionSetter";
 import ThemeScope from "@/components/utility/ThemeScope";
-import { Toaster } from "@/components/ui/sonner";
+import { Toaster } from "@/components/utility/Toast";
 import { getServerSession } from "next-auth";
 import { authOption } from "./api/auth/[...nextauth]/options";
 

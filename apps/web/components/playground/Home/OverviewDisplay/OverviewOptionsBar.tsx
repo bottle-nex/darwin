@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { LuCheck, LuCopy } from "react-icons/lu";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {

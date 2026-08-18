@@ -11,7 +11,6 @@ import {
     HiXCircle,
     HiXMark,
 } from "react-icons/hi2";
-import { MatchaLogo } from "@/components/logo/MatchaLogo";
 import { cn } from "@/lib/utils";
 import { useToastStore } from "@/store/toast/useToastStore";
 import type { ToastItem, ToastPosition, ToastStatus } from "@/types/toast.type";
@@ -214,24 +213,8 @@ function ToastCard({
                 zIndex,
                 pointerEvents: stackOpacity === 0 ? "none" : "auto",
             }}
-            className="group overflow-hidden rounded-lg bg-cement shadow-[0_10px_30px_-12px_rgba(0,0,0,0.55),inset_0_1px_0_0_var(--color-edge)]"
+            className="group overflow-hidden rounded-lg bg-linear-to-br from-cement to-graphite shadow-[0_10px_30px_-12px_rgba(0,0,0,0.55),inset_0_1px_0_0_var(--color-edge)]"
         >
-            <MatchaLogo
-                className="pointer-events-none absolute -bottom-2 -left-4 h-16 w-16 text-white/[0.09]"
-                style={{
-                    maskImage: "linear-gradient(115deg, black 5%, transparent 70%)",
-                    WebkitMaskImage: "linear-gradient(115deg, black 5%, transparent 70%)",
-                }}
-            />
-            <div
-                aria-hidden
-                className="pointer-events-none absolute inset-0"
-                style={{
-                    background:
-                        "linear-gradient(115deg, transparent 46%, rgba(255,255,255,0.05) 100%, transparent 54%)",
-                }}
-            />
-
             <div className="relative flex items-start gap-3 p-3.5 pr-9">
                 <Icon className={cn("mt-0.5 size-5 shrink-0", iconClassName)} aria-hidden />
 

@@ -1,7 +1,7 @@
 "use client";
 import { useParams } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import type { LabelledReference } from "@trymatcha/types";
