@@ -1,6 +1,11 @@
 import { createAppAuth } from "@octokit/auth-app";
 import { ENV } from "../conf/config.env";
 
+export interface PullRequestSummary {
+    number: number;
+    htmlUrl: string;
+}
+
 /** GitHub access needed by coding and Product Diff workers. Full OAuth stays in the server. */
 export default class GithubService {
     private static _appAuth: ReturnType<typeof createAppAuth> | null = null;
@@ -59,5 +64,36 @@ export default class GithubService {
             head: { sha: string };
         };
         return { state: pull.state, baseSha: pull.base.sha, headSha: pull.head.sha };
+    }
+
+    static async listOpenPullRequests(
+        token: string,
+        fullName: string,
+        owner: string,
+        headBranch: string,
+        baseBranch: string,
+    ): Promise<PullRequestSummary[]> {
+        const query = new URLSearchParams({
+            state: "open",
+            head: `${owner}:${headBranch}`,
+            base: baseBranch,
+            per_page: "100",
+        });
+        const response = await fetch(`https://api.github.com/repos/${fullName}/pulls?${query}`, {
+            headers: {
+                Accept: "application/vnd.github+json",
+                Authorization: `Bearer ${token}`,
+                "X-GitHub-Api-Version": "2022-11-28",
+            },
+        });
+        if (!response.ok) throw new Error(`GitHub pull request lookup failed (${response.status})`);
+        const pulls = (await response.json()) as Array<{
+            number: number;
+            html_url: string;
+        }>;
+        return pulls.map((pull) => ({
+            number: pull.number,
+            htmlUrl: pull.html_url,
+        }));
     }
 }

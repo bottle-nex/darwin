@@ -36,7 +36,7 @@ export default async function regenerate_product_diff_controller(req: Request, r
             return;
         }
 
-        const product_diff = await ProductDiffService.prepare(issue.id);
+        const product_diff = await ProductDiffService.prepare(issue.id, true);
         if (!product_diff) {
             ResponseWriter.custom(
                 res,

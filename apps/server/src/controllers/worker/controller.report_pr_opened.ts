@@ -37,11 +37,46 @@ export default class ReportPrOpened {
                     id: true,
                     assignerWorkerId: true,
                     status: true,
+                    prUrl: true,
+                    prBranch: true,
                     customColumn: { select: { id: true, label: true } },
                 },
             });
             if (!issue || issue.assignerWorkerId !== worker_id) {
                 ResponseWriter.not_authorized(res, "Issue is not assigned to this worker");
+                return;
+            }
+            if (issue.prBranch !== data.branch) {
+                ResponseWriter.custom(
+                    res,
+                    false,
+                    "PR_BRANCH_MISMATCH",
+                    "PR branch does not match the expected issue branch",
+                    409,
+                );
+                return;
+            }
+            if (issue.prUrl && issue.prUrl !== data.pr_url) {
+                ResponseWriter.custom(
+                    res,
+                    false,
+                    "PR_URL_CONFLICT",
+                    "A different PR is already recorded for this issue",
+                    409,
+                );
+                return;
+            }
+            if (
+                issue.status !== IssueStatus.InProgress &&
+                !(issue.status === IssueStatus.InReview && issue.prUrl === data.pr_url)
+            ) {
+                ResponseWriter.custom(
+                    res,
+                    false,
+                    "ISSUE_NOT_COMPLETABLE",
+                    "Issue is not waiting for PR completion",
+                    409,
+                );
                 return;
             }
 
@@ -59,14 +94,32 @@ export default class ReportPrOpened {
                   })
                 : null;
 
-            const { updated_issue, activities } = await prisma.$transaction(async (tx) => {
-                const updated_issue = await tx.issue.update({
-                    where: { id: data.issue_id },
+            const completion = await prisma.$transaction(async (transaction) => {
+                const update = await transaction.issue.updateMany({
+                    where: {
+                        id: data.issue_id,
+                        status: IssueStatus.InProgress,
+                        prUrl: null,
+                        prBranch: data.branch,
+                    },
                     data: { status: IssueStatus.InReview, prUrl: data.pr_url },
+                });
+                const transitioned = update.count === 1;
+
+                const persisted_issue = await transaction.issue.findUniqueOrThrow({
+                    where: { id: data.issue_id },
                     include: { creator: true, assignees: true, tags: true },
                 });
+                if (
+                    !transitioned &&
+                    (persisted_issue.status !== IssueStatus.InReview ||
+                        persisted_issue.prUrl !== data.pr_url ||
+                        persisted_issue.prBranch !== data.branch)
+                ) {
+                    throw new Error("PR completion conflicted with the persisted issue state");
+                }
 
-                await tx.worker.update({
+                await transaction.worker.update({
                     where: { id: worker_id },
                     data: {
                         contextSummary: {
@@ -79,47 +132,60 @@ export default class ReportPrOpened {
                     },
                 });
 
-                const activities = await ActivityService.emit(tx, {
-                    issueId: data.issue_id,
-                    actor: { type: ActorType.Agent, workerId: worker_id },
-                    sessionId: session?.id,
-                    events: [
-                        {
-                            type: ActivityType.PrOpened,
-                            payload: { url: data.pr_url },
-                            dedupeKey: `pr:${data.pr_url}`,
-                        },
-                        {
-                            type: ActivityType.StatusChanged,
-                            payload: {
-                                from: location_of(issue.status, issue.customColumn),
-                                to: { kind: "status", status: IssueStatus.InReview },
-                            },
-                        },
-                    ],
-                });
+                // Only the call that actually moved the issue writes activity — a retried
+                // callback would otherwise append a second StatusChanged, which has no
+                // dedupe key of its own.
+                const activities = transitioned
+                    ? await ActivityService.emit(transaction, {
+                          issueId: data.issue_id,
+                          actor: { type: ActorType.Agent, workerId: worker_id },
+                          sessionId: session?.id,
+                          events: [
+                              {
+                                  type: ActivityType.PrOpened,
+                                  payload: { url: data.pr_url },
+                                  dedupeKey: `pr:${data.pr_url}`,
+                              },
+                              {
+                                  type: ActivityType.StatusChanged,
+                                  payload: {
+                                      from: location_of(issue.status, issue.customColumn),
+                                      to: { kind: "status", status: IssueStatus.InReview },
+                                  },
+                              },
+                          ],
+                      })
+                    : [];
 
-                return { updated_issue, activities };
+                return { issue: persisted_issue, transitioned, activities };
             });
 
             console.log(
                 `[worker:${worker_id}] issue ${data.issue_id} marked InReview, PR outcome persisted`,
             );
 
-            const channel_name = server_services.publisher.get_channel_name(
-                updated_issue.projectId,
-            );
-            await server_services.publisher.publish_message(
-                channel_name,
-                JSON.stringify({
-                    type: OutboundSocketMessageType.ISSUE_UPDATED,
-                    projectId: updated_issue.projectId,
-                    payload: updated_issue,
-                }),
-            );
-            console.log(`[worker:${worker_id}] published ISSUE_UPDATED for issue ${data.issue_id}`);
+            if (completion.transitioned) {
+                const channel_name = server_services.publisher.get_channel_name(
+                    completion.issue.projectId,
+                );
+                await server_services.publisher.publish_message(
+                    channel_name,
+                    JSON.stringify({
+                        type: OutboundSocketMessageType.ISSUE_UPDATED,
+                        projectId: completion.issue.projectId,
+                        payload: completion.issue,
+                    }),
+                );
+                console.log(
+                    `[worker:${worker_id}] published ISSUE_UPDATED for issue ${data.issue_id}`,
+                );
 
-            await ActivityService.publish(updated_issue.projectId, data.issue_id, activities);
+                await ActivityService.publish(
+                    completion.issue.projectId,
+                    data.issue_id,
+                    completion.activities,
+                );
+            }
 
             try {
                 await ProductDiffService.prepare(data.issue_id);
