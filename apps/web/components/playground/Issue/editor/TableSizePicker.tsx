@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { MENU_SURFACE } from "@/components/ui/menuSurface";
 
 export const TABLE_PICKER_MAX_ROWS = 8;
 export const TABLE_PICKER_MAX_COLS = 10;
@@ -15,7 +16,7 @@ interface TableSizePickerProps {
 
 export default function TableSizePicker({ rows, cols, onHover, onSelect }: TableSizePickerProps) {
     return (
-        <div className="pointer-events-auto flex flex-col items-center gap-2 rounded-md border border-white/10 bg-neutral-900 p-2 shadow-lg">
+        <div className={cn(MENU_SURFACE, "pointer-events-auto flex flex-col items-center gap-2 p-2")}>
             <div className="flex flex-col gap-1">
                 {Array.from({ length: TABLE_PICKER_MAX_ROWS }, (_, row) => (
                     <div key={row} className="flex gap-1">

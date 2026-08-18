@@ -266,31 +266,14 @@
         margin-top: 0.25rem;
     }
 
-    .tiptap .has-placeholder {
-        position: relative;
-    }
-
-    .tiptap .editor-placeholder {
-        position: absolute;
-        top: 0;
-        left: 0;
+    .tiptap .editor-placeholder::before {
+        content: attr(data-placeholder);
+        float: left;
+        height: 0;
         white-space: nowrap;
         color: rgba(255, 255, 255, 0.3);
         pointer-events: none;
         user-select: none;
-    }
-
-    .tiptap .editor-placeholder kbd {
-        display: inline-block;
-        margin: 0 0.1rem;
-        padding: 0 0.25rem;
-        border-radius: 0.25rem;
-        border: 1px solid rgba(255, 255, 255, 0.16);
-        background: rgba(255, 255, 255, 0.06);
-        font-family: var(--font-mono);
-        font-size: 0.78em;
-        line-height: 1.5;
-        color: rgba(255, 255, 255, 0.4);
     }
 
     /* Tiptap chat composer — a single-paragraph box, not a document. */

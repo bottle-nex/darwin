@@ -1,10 +1,7 @@
 "use client";
 import { cn } from "@/lib/utils";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { useActiveProject } from "@/hooks/useActiveProject";
-import { useListTemplates } from "@/hooks/templates/useListTemplates";
 import { useIssueStore } from "@/store/issues/useIssueStore";
-import type { IssueTarget } from "@/store/issues/useIssueStore";
 import CreateIssueForm from "./CreateIssueForm";
 
 export default function CreateIssueDialog() {
@@ -25,21 +22,8 @@ export default function CreateIssueDialog() {
                     "bg-charcoal rounded-3xl",
                 )}
             >
-                <CreateIssue target={mode.target} onCreated={close} />
+                <CreateIssueForm target={mode.target} onCreated={close} />
             </DialogContent>
         </Dialog>
-    );
-}
-
-function CreateIssue({ target, onCreated }: { target: IssueTarget; onCreated: () => void }) {
-    const projectId = useActiveProject()?.id;
-    const { data: templates } = useListTemplates(projectId);
-
-    return (
-        <CreateIssueForm
-            target={target}
-            initialTemplate={templates?.find((template) => template.isDefault)}
-            onCreated={onCreated}
-        />
     );
 }

@@ -5,13 +5,9 @@ import { promptsFromBraces, stripPrompts } from "@/lib/templates/promptHtml";
 import type { IssueDescriptionState } from "./editor/IssueDescriptionEditor";
 import type { PickableTemplate } from "@/types/issueTemplate";
 
-export function useIssueDescription(initialHtml?: string, initialTemplate?: PickableTemplate) {
-    const opening = initialTemplate
-        ? promptsFromBraces(initialTemplate.description)
-        : (initialHtml ?? "");
-
-    const [html, setHtml] = useState(opening);
-    const [isEmpty, setIsEmpty] = useState(!opening);
+export function useIssueDescription(initialHtml?: string) {
+    const [html, setHtml] = useState(initialHtml ?? "");
+    const [isEmpty, setIsEmpty] = useState(!initialHtml);
     const [prompts, setPrompts] = useState(0);
     const [editorKey, setEditorKey] = useState(0);
     const [baseline, setBaseline] = useState<string | null>(null);

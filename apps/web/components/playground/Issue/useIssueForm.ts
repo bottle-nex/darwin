@@ -10,7 +10,6 @@ import { PRIORITY_TO_NUMBER } from "@/components/playground/Home/KanbanDisplay/c
 import type { Priority } from "@/types/kanban";
 import type { BoardIssue } from "@/types/board";
 import type { IssueTarget } from "@/store/issues/useIssueStore";
-import type { PickableTemplate } from "@/types/issueTemplate";
 import { useIssueDescription } from "./useIssueDescription";
 import { useSubmitWarning } from "./SubmitWarningToast";
 
@@ -18,7 +17,6 @@ type UseIssueFormArgs = {
     target: IssueTarget;
     issue: BoardIssue | null;
     initialDescription?: string;
-    initialTemplate?: PickableTemplate;
     readOnly?: boolean;
     onSubmitted?: () => void;
 };
@@ -48,7 +46,6 @@ export function useIssueForm({
     target,
     issue,
     initialDescription,
-    initialTemplate,
     readOnly = false,
     onSubmitted,
 }: UseIssueFormArgs) {
@@ -59,14 +56,7 @@ export function useIssueForm({
     const [isMac] = useState(() => /Mac|iPhone|iPad/.test(navigator.userAgent));
 
     const [title, setTitle] = useState(issue?.title ?? "");
-    const body = useIssueDescription(initialDescription, initialTemplate);
-
-    useEffect(() => {
-        if (!isEdit && initialTemplate && body.isEmpty && body.prompts === 0) {
-            body.pickTemplate(initialTemplate);
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [initialTemplate]);
+    const body = useIssueDescription(initialDescription);
 
     const [priority, setPriority] = useState<Priority>(
         issue ? (KanbanMappers.NUMBER_TO_PRIORITY[issue.priority] ?? "medium") : "medium",

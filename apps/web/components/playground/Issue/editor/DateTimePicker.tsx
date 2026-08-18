@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { LuChevronDown, LuChevronUp } from "react-icons/lu";
 import { cn } from "@/lib/utils";
+import { MENU_SURFACE } from "@/components/ui/menuSurface";
 import type { TimestampMode } from "./timestamp";
 
 export const DATE_TIME_SEGMENTS = ["day", "month", "year", "hour", "minute", "mode"] as const;
@@ -79,7 +80,7 @@ export default function DateTimePicker({
     onInsert,
 }: DateTimePickerProps) {
     return (
-        <div className="pointer-events-auto flex flex-col gap-2 rounded-md border border-white/10 bg-neutral-900 p-2 shadow-lg">
+        <div className={cn(MENU_SURFACE, "pointer-events-auto flex flex-col gap-2 p-2")}>
             <div className="flex items-end gap-1">
                 {DATE_TIME_SEGMENTS.filter((name) => name !== "mode").map((name) => (
                     <div key={name} className="flex flex-col items-center gap-0.5">

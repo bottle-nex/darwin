@@ -1,21 +1,21 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { EditorContent, ReactNodeViewRenderer, useEditor, type Editor } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
 import { cn } from "@/lib/utils";
+import { TableKit } from "@tiptap/extension-table";
+import { Timestamp } from "./timestamp";
+import { SlashCommand } from "./slash-command";
+import { useEffect, useRef } from "react";
+import { EditorPlaceholder } from "./placeholder";
+import { TableFigure, TableTitle } from "./table";
+import { Toggle, ToggleBody, ToggleSummary } from "./toggle";
+import { Prompt, PromptMark, countPrompts } from "./prompt";
+import { EditorContent, ReactNodeViewRenderer, useEditor, type Editor } from "@tiptap/react";
+import Image from "@tiptap/extension-image";
 import TaskList from "@tiptap/extension-task-list";
 import TaskItem from "@tiptap/extension-task-item";
-import Image from "@tiptap/extension-image";
-import CharacterCount from "@tiptap/extension-character-count";
-import { TableKit } from "@tiptap/extension-table";
-import { SlashCommand } from "./slash-command";
-import { EditorPlaceholder } from "./placeholder";
-import { Toggle, ToggleBody, ToggleSummary } from "./toggle";
-import { TableFigure, TableTitle } from "./table";
-import { Timestamp } from "./timestamp";
-import { Prompt, PromptMark, countPrompts } from "./prompt";
+import StarterKit from "@tiptap/starter-kit";
 import ImageNodeView from "./ImageNodeView";
+import CharacterCount from "@tiptap/extension-character-count";
 
 const DESCRIPTION_CHAR_LIMIT = 2500;
 

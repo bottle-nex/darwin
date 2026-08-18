@@ -2,8 +2,9 @@
 
 import { Button } from "@/components/ui/button";
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
-import { LuChevronRight } from "react-icons/lu";
+import { RxTriangleRight } from "react-icons/rx";
 import { cn } from "@/lib/utils";
+import { MENU_ITEM, MENU_SURFACE } from "@/components/ui/menuSurface";
 import {
     isSlashCommandDateInsert,
     isSlashCommandGroup,
@@ -33,10 +34,8 @@ interface TableSize {
     cols: number;
 }
 
-const ROW_CLASS =
-    "flex w-full items-center gap-2 rounded-[5px] px-2 py-1.5 text-left text-[13px] text-neutral-200 transition-colors cursor-pointer";
-const PANEL_CLASS =
-    "flex w-56 flex-col gap-px rounded-md border border-white/10 bg-neutral-900 p-1 shadow-lg pointer-events-auto";
+const ROW_CLASS = cn(MENU_ITEM, "w-full text-left");
+const PANEL_CLASS = cn(MENU_SURFACE, "flex w-56 flex-col gap-px pointer-events-auto");
 
 function clamp(value: number, max: number) {
     return Math.min(Math.max(value, 1), max);
@@ -172,7 +171,7 @@ const SlashCommandList = forwardRef<SlashCommandListHandle, SlashCommandListProp
 
         if (!items.length) {
             return (
-                <div className="bg-charcoal pointer-events-auto w-56 rounded-md border border-white/10 p-2 text-[13px] text-neutral-500 shadow-lg">
+                <div className={cn(MENU_SURFACE, "pointer-events-auto w-56 py-6 text-center text-sm text-neutral-500")}>
                     No matches
                 </div>
             );
@@ -199,15 +198,13 @@ const SlashCommandList = forwardRef<SlashCommandListHandle, SlashCommandListProp
                                     else command(item);
                                 }}
                                 onMouseEnter={() => selectRow(index)}
-                                className={cn(
-                                    ROW_CLASS,
-                                    index === selected ? "bg-white/10" : "hover:bg-white/5",
-                                )}
+                                data-selected={index === selected}
+                                className={ROW_CLASS}
                             >
                                 <Icon className="size-4 shrink-0 text-neutral-400" />
                                 {item.title}
                                 {hasSubmenu && (
-                                    <LuChevronRight className="ml-auto size-3.5 shrink-0 text-neutral-500" />
+                                    <RxTriangleRight className="ml-auto size-3.5 shrink-0 text-neutral-500" />
                                 )}
                             </Button>
                         );
@@ -226,10 +223,8 @@ const SlashCommandList = forwardRef<SlashCommandListHandle, SlashCommandListProp
                                     onMouseDown={(event) => event.preventDefault()}
                                     onClick={() => command(item)}
                                     onMouseEnter={() => setNested(index)}
-                                    className={cn(
-                                        ROW_CLASS,
-                                        index === nested ? "bg-white/10" : "hover:bg-white/5",
-                                    )}
+                                    data-selected={index === nested}
+                                    className={ROW_CLASS}
                                 >
                                     <Icon className="size-4 shrink-0 text-neutral-400" />
                                     {item.title}
