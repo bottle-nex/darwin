@@ -6,7 +6,6 @@ import KanbanDisplay from "@/components/playground/Home/KanbanDisplay/KanbanDisp
 import GanttDisplay from "@/components/playground/Home/GanttDisplay/GanttDisplay";
 import TagsDisplay from "@/components/playground/Home/TagsDisplay/TagsDisplay";
 import ChatsDisplay from "@/components/playground/Home/panes/ChatsDisplay";
-import MentionsDisplay from "@/components/playground/Home/panes/MentionsDisplay";
 import ReviewsDisplay from "@/components/playground/Home/panes/ReviewsDisplay";
 import AssignedToMeDisplay from "@/components/playground/Home/panes/AssignedToMeDisplay";
 import InProgressDisplay from "@/components/playground/Home/panes/InProgressDisplay";
@@ -30,8 +29,6 @@ function TabPane({ tab }: { tab: string }) {
                     <TagsDisplay />
                 </div>
             );
-        case PlaygroundTab.Mentions:
-            return <MentionsDisplay />;
         case PlaygroundTab.Reviews:
             return <ReviewsDisplay />;
         case PlaygroundTab.AssignedToMe:
