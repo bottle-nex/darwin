@@ -5,6 +5,8 @@ import { useLayoutEffect } from "react";
 
 const SCOPE_CLASSES = ["theme-landing", "theme-playground"];
 
+const PLAYGROUND_ROUTES = ["/playground", "/workspace"];
+
 /**
  * Radix portals (Dialog/Sheet/DropdownMenu/Popover/Select) and the sonner
  * Toaster mount as direct children of <body>, outside the per-route wrapper
@@ -15,7 +17,9 @@ export default function ThemeScope() {
     const pathname = usePathname();
 
     useLayoutEffect(() => {
-        const scope = pathname?.startsWith("/playground") ? "theme-playground" : "theme-landing";
+        const scope = PLAYGROUND_ROUTES.some((route) => pathname?.startsWith(route))
+            ? "theme-playground"
+            : "theme-landing";
         document.body.classList.remove(...SCOPE_CLASSES);
         document.body.classList.add(scope);
     }, [pathname]);

@@ -1,11 +1,7 @@
 "use client";
-import { LuShare2, LuUsers } from "react-icons/lu";
 import { useKanbanOptionsStore } from "@/store/kanban/useKanbanOptionsStore";
 import { useFilteredCustomColumns } from "@/hooks/kanban/useFilteredCustomColumns";
-import { TooltipComponent } from "@/components/ui/tooltip-component";
-import OptionButton from "./KanbanOptionPanels/OptionButton";
 import FilterPanel from "./KanbanOptionPanels/FilterPanel";
-import TagPanel from "./KanbanOptionPanels/TagPanel";
 import SelectedTags from "./KanbanOptionPanels/SelectedTags";
 import ViewsPanel from "./KanbanOptionPanels/ViewsPanel";
 import BoardViewPanel from "./KanbanOptionPanels/BoardViewPanel";
@@ -16,9 +12,7 @@ import AddTaskButton from "./KanbanOptionPanels/AddTaskButton";
 export default function KanbanOptionsBarFlatKeys() {
     const {
         selectedTagIds,
-        toggleTag,
         removeTag,
-        clearTags,
         filter,
         setFilter,
         kanbanView,
@@ -36,15 +30,8 @@ export default function KanbanOptionsBarFlatKeys() {
                 <SelectedTags selected={selectedTagIds} onRemove={removeTag} />
             </div>
 
-            <div className="flex shrink-0 items-center gap-1.5">
-                <TagPanel selected={selectedTagIds} onToggle={toggleTag} onClear={clearTags} />
+            <div className="flex shrink-0 items-center gap-0.75">
                 <FilterPanel value={filter} onChange={setFilter} customColumns={customColumns} />
-                <TooltipComponent delayDuration={1000} content="Assignees" side="bottom">
-                    <OptionButton label="Assignees" icon={LuUsers} />
-                </TooltipComponent>
-                <TooltipComponent delayDuration={1000} content="Share" side="bottom">
-                    <OptionButton label="Share" icon={LuShare2} />
-                </TooltipComponent>
                 <BoardViewPanel value={boardView} onChange={setBoardView} />
                 <ViewsPanel value={kanbanView} onChange={setKanbanView} />
                 <div className="mx-1 h-4 w-px bg-white/8" />
