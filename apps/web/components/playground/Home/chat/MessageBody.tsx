@@ -14,10 +14,6 @@ import { useIssueRoute } from "@/components/playground/Issue/useIssueRoute";
 
 const TOMBSTONE_LABEL = { member: "@unknown", issue: "#deleted issue" } as const;
 
-const STATUS_STYLE = new Map(
-    KanbanBoard.COLUMNS.map((column) => [column.status as string, column]),
-);
-
 export default function MessageBody({
     text,
     references,
@@ -62,7 +58,7 @@ export default function MessageBody({
                 }
 
                 const issue = issues.get(token.id);
-                const status = issue?.status ? STATUS_STYLE.get(issue.status) : undefined;
+                const status = KanbanBoard.columnFor(issue?.status);
                 const StatusIcon = status?.icon;
                 return (
                     <button

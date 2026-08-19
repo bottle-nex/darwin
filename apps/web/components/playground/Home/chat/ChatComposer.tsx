@@ -9,6 +9,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import type { LabelledReference } from "@trymatcha/types";
 import { IoIosSend } from "react-icons/io";
 import { HiOutlineFaceSmile } from "react-icons/hi2";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import EmojiPicker from "@/components/ui/EmojiPicker";
 import { createReferenceMention, ISSUE_TRIGGER, SUGGESTION_KEYS } from "./referenceMention";
@@ -23,6 +24,7 @@ interface ChatComposerProps {
     projectId: string | undefined;
     placeholder: string;
     disabled?: boolean;
+    className?: string;
     onSend: (message: string, references: LabelledReference[]) => void;
     children?: React.ReactNode;
 }
@@ -71,7 +73,7 @@ function draft_references(editor: Editor): LabelledReference[] {
 }
 
 const ChatComposer = forwardRef<ChatComposerHandle, ChatComposerProps>(function ChatComposer(
-    { projectId, placeholder, disabled, onSend, children },
+    { projectId, placeholder, disabled, className, onSend, children },
     ref,
 ) {
     const queryClient = useQueryClient();
@@ -105,7 +107,13 @@ const ChatComposer = forwardRef<ChatComposerHandle, ChatComposerProps>(function 
             }),
             Placeholder.configure({ placeholder }),
             ...(projectId
-                ? [createReferenceMention(queryClient, projectId, `[data-slot="${portalSlot}"]`)]
+                ? [
+                      createReferenceMention({
+                          queryClient,
+                          projectId,
+                          container: `[data-slot="${portalSlot}"]`,
+                      }),
+                  ]
                 : []),
             Extension.create({
                 name: "sendOnEnter",
@@ -148,7 +156,12 @@ const ChatComposer = forwardRef<ChatComposerHandle, ChatComposerProps>(function 
     }));
 
     return (
-        <div className="rounded-lg bg-[#1a1a1a] shadow-[inset_0_1px_0_0_var(--color-edge)]">
+        <div
+            className={cn(
+                "rounded-lg bg-[#1a1a1a] shadow-[inset_0_1px_0_0_var(--color-edge)]",
+                className,
+            )}
+        >
             {children}
             <div className="relative">
                 <div

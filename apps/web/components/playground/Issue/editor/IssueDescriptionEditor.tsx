@@ -16,6 +16,8 @@ import TaskItem from "@tiptap/extension-task-item";
 import StarterKit from "@tiptap/starter-kit";
 import ImageNodeView from "./ImageNodeView";
 import CharacterCount from "@tiptap/extension-character-count";
+import { useQueryClient } from "@tanstack/react-query";
+import { createReferenceMention } from "@/components/playground/Home/chat/referenceMention";
 
 const DESCRIPTION_CHAR_LIMIT = 2500;
 
@@ -37,6 +39,8 @@ interface IssueDescriptionEditorProps {
     initialContent?: string;
     editable?: boolean;
     authoring?: boolean;
+    /** Enables `@member` mentions, scoped to this project's members. */
+    mentionProjectId?: string;
     onChange?: (state: IssueDescriptionState) => void;
     onReady?: (editor: Editor) => void;
 }
@@ -47,9 +51,11 @@ export default function IssueDescriptionEditor({
     initialContent,
     editable = true,
     authoring = false,
+    mentionProjectId,
     onChange,
     onReady,
 }: IssueDescriptionEditorProps) {
+    const queryClient = useQueryClient();
     const onChangeRef = useRef(onChange);
     useEffect(() => {
         onChangeRef.current = onChange;
@@ -85,6 +91,15 @@ export default function IssueDescriptionEditor({
             EditorPlaceholder.configure({ emptyDocText: placeholder }),
             CharacterCount.configure({ limit: DESCRIPTION_CHAR_LIMIT }),
             SlashCommand,
+            ...(mentionProjectId
+                ? [
+                      createReferenceMention({
+                          queryClient,
+                          projectId: mentionProjectId,
+                          triggers: ["member"],
+                      }),
+                  ]
+                : []),
         ],
         editorProps: {
             attributes: {

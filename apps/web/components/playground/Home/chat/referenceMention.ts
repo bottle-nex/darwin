@@ -72,16 +72,71 @@ const insert_reference: ReferenceSuggestionOptions["command"] = ({ editor, range
         .run();
 };
 
-export function createReferenceMention(
-    queryClient: QueryClient,
-    projectId: string,
-    portalSelector: string,
-) {
+export type ReferenceTrigger = "member" | "issue";
+
+function member_matches(member: ProjectMember, query: string): boolean {
+    const needle = query.trim().toLowerCase();
+    if (!needle) return true;
+    return (
+        (member.name?.toLowerCase().includes(needle) ?? false) ||
+        member.email.toLowerCase().includes(needle)
+    );
+}
+
+function to_member_item(member: ProjectMember): ReferenceSuggestion {
+    return {
+        kind: "member",
+        id: member.memberId,
+        label: displayNameOf(member.name, member.email),
+        member,
+    };
+}
+
+export function createReferenceMention({
+    queryClient,
+    projectId,
+    container,
+    triggers = ["member", "issue"],
+}: {
+    queryClient: QueryClient;
+    projectId: string;
+    container?: string;
+    triggers?: ReferenceTrigger[];
+}) {
     const shared = {
-        container: portalSelector,
+        ...(container ? { container } : { floatingUi: { strategy: "fixed" as const } }),
         allowSpaces: false,
         command: insert_reference,
         render: render_suggestion,
+    };
+
+    const member_suggestion = {
+        ...shared,
+        char: MEMBER_TRIGGER,
+        pluginKey: SUGGESTION_KEYS[0],
+        items: async ({ query }: { query: string }) => {
+            const roster = await search_members(queryClient, projectId, "");
+            const narrowed = roster.filter((member) => member_matches(member, query));
+            if (narrowed.length || !query.trim()) return narrowed.map(to_member_item);
+
+            const searched = await search_members(queryClient, projectId, query);
+            return searched.map(to_member_item);
+        },
+    };
+
+    const issue_suggestion = {
+        ...shared,
+        char: ISSUE_TRIGGER,
+        pluginKey: SUGGESTION_KEYS[1],
+        items: async ({ query }: { query: string }) => {
+            const issues = await search_issues(queryClient, projectId, query);
+            return issues.map((issue) => ({
+                kind: "issue" as const,
+                id: issue.id,
+                label: `${issue.number} ${issue.title}`,
+                issue,
+            }));
+        },
     };
 
     return Mention.configure({
@@ -98,35 +153,8 @@ export function createReferenceMention(
             },
             `${node.attrs.mentionSuggestionChar ?? MEMBER_TRIGGER}${node.attrs.label}`,
         ],
-        suggestions: [
-            {
-                ...shared,
-                char: MEMBER_TRIGGER,
-                pluginKey: SUGGESTION_KEYS[0],
-                items: async ({ query }) => {
-                    const members = await search_members(queryClient, projectId, query);
-                    return members.map((member) => ({
-                        kind: "member" as const,
-                        id: member.memberId,
-                        label: displayNameOf(member.name, member.email),
-                        member,
-                    }));
-                },
-            },
-            {
-                ...shared,
-                char: ISSUE_TRIGGER,
-                pluginKey: SUGGESTION_KEYS[1],
-                items: async ({ query }) => {
-                    const issues = await search_issues(queryClient, projectId, query);
-                    return issues.map((issue) => ({
-                        kind: "issue" as const,
-                        id: issue.id,
-                        label: `${issue.number} ${issue.title}`,
-                        issue,
-                    }));
-                },
-            },
-        ],
+        suggestions: triggers.map((trigger) =>
+            trigger === "member" ? member_suggestion : issue_suggestion,
+        ),
     });
 }

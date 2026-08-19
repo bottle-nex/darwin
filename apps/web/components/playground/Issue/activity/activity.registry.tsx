@@ -24,6 +24,7 @@ import {
     type ActivityPayloadMap,
 } from "@trymatcha/types";
 import { formatDate } from "@/lib/format";
+import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
 import { PRIORITY_OPTIONS } from "../issueHelpers";
 import TextDiff from "./TextDiff";
 
@@ -38,6 +39,14 @@ function location_label(location: ActivityLocationRef | undefined): string {
     if (!location) return "unknown";
     if (location.kind === "column") return location.label;
     return STATUS_LABEL[location.status] ?? location.status;
+}
+
+type Glyph = { icon: IconType; iconClassName: string };
+
+function location_glyph(location: ActivityLocationRef | undefined): Glyph | undefined {
+    if (location?.kind !== "status") return undefined;
+    const column = KanbanBoard.columnFor(location.status);
+    return column ? { icon: column.icon, iconClassName: column.titleBox } : undefined;
 }
 
 function priority_label(rank: number | undefined): string {
@@ -109,6 +118,7 @@ function dates_predicate(from: DateRange | undefined, to: DateRange | undefined)
 type ActivityEntry<K extends ActivityType> = {
     icon: IconType;
     iconClassName: string;
+    glyph?: (payload: ActivityPayloadMap[K]) => Glyph | undefined;
     render: (payload: ActivityPayloadMap[K]) => ReactNode;
     detail?: (payload: ActivityPayloadMap[K]) => ReactNode;
     summary?: string;
@@ -124,6 +134,7 @@ const REGISTRY: { [K in ActivityType]?: ActivityEntry<K> } = {
     [ActivityType.StatusChanged]: {
         icon: LuCircleDashed,
         iconClassName: "text-[#F1BF00]",
+        glyph: (payload) => location_glyph(payload.to),
         render: (payload) => (
             <>
                 moved this from <Pill>{location_label(payload.from)}</Pill> to{" "}
@@ -252,8 +263,7 @@ const REGISTRY: { [K in ActivityType]?: ActivityEntry<K> } = {
 const UNTEMPLATED_TONE = "text-neutral-500";
 
 type ResolvedEntry = {
-    icon: IconType;
-    iconClassName: string;
+    glyph: (payload: ActivityPayload | null) => Glyph;
     render: (payload: ActivityPayload | null) => ReactNode;
     detail: ((payload: ActivityPayload | null) => ReactNode) | null;
     summary: string;
@@ -266,6 +276,7 @@ export function activity_entry(type: ActivityType): ResolvedEntry {
         | {
               icon: IconType;
               iconClassName: string;
+              glyph?: (payload: never) => Glyph | undefined;
               render: (payload: never) => ReactNode;
               detail?: (payload: never) => ReactNode;
               summary?: string;
@@ -273,17 +284,16 @@ export function activity_entry(type: ActivityType): ResolvedEntry {
         | undefined;
     if (!entry) {
         return {
-            icon: LuActivity,
-            iconClassName: UNTEMPLATED_TONE,
+            glyph: () => ({ icon: LuActivity, iconClassName: UNTEMPLATED_TONE }),
             render: () => humanize(type),
             detail: null,
             summary: humanize(type),
         };
     }
-    const detail = entry.detail;
+    const { glyph, detail } = entry;
+    const fallback: Glyph = { icon: entry.icon, iconClassName: entry.iconClassName };
     return {
-        icon: entry.icon,
-        iconClassName: entry.iconClassName,
+        glyph: (payload) => glyph?.((payload ?? {}) as never) ?? fallback,
         render: (payload) => entry.render((payload ?? {}) as never),
         detail: detail ? (payload) => detail((payload ?? {}) as never) : null,
         summary: entry.summary ?? humanize(type),

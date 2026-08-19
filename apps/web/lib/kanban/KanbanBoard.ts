@@ -83,7 +83,14 @@ export class KanbanBoard {
         low: "bg-neutral-600",
     };
 
-    /** Whether a status is a Custom-Kanban bridge column. */
+    private static readonly COLUMN_BY_STATUS = new Map(
+        KanbanBoard.COLUMNS.map((column) => [column.status as string, column]),
+    );
+
+    static columnFor(status: string | undefined): KanbanColumnDef | undefined {
+        return status ? KanbanBoard.COLUMN_BY_STATUS.get(status) : undefined;
+    }
+
     static isBridgeStatus(status: string): status is KanbanStatus {
         return (KanbanBoard.BRIDGE_STATUSES as string[]).includes(status);
     }

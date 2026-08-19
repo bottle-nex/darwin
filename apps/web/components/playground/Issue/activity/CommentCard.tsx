@@ -1,12 +1,11 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 import { MdContentCopy } from "react-icons/md";
 import { HiOutlineTrash } from "react-icons/hi";
 import { HiOutlineFaceSmile } from "react-icons/hi2";
 import { BsReply } from "react-icons/bs";
 import { to_plain_text, type Chat, type LabelledReference } from "@trymatcha/types";
 import { formatRelativeTime } from "@/lib/format";
-import { Button } from "@/components/ui/button";
 import EmojiPicker from "@/components/ui/EmojiPicker";
 import PlaygroundAvatar, {
     toneFor,
@@ -160,48 +159,6 @@ function CommentContent({
     );
 }
 
-function ReplyComposer({
-    projectId,
-    open,
-    onOpen,
-    onSend,
-}: {
-    projectId: string | undefined;
-    open: boolean;
-    onOpen: () => void;
-    onSend: (message: string, references: LabelledReference[]) => void;
-}) {
-    const composerRef = useRef<ChatComposerHandle>(null);
-
-    useEffect(() => {
-        if (open) composerRef.current?.focus();
-    }, [open]);
-
-    if (!open) {
-        return (
-            <Button
-                variant="unstyled"
-                type="button"
-                onClick={onOpen}
-                className="flex w-full cursor-text items-center px-3 py-2.5 text-left text-[13px] text-neutral-600 transition-colors hover:text-neutral-500"
-            >
-                Leave a reply...
-            </Button>
-        );
-    }
-
-    return (
-        <div className="p-1.5">
-            <ChatComposer
-                ref={composerRef}
-                projectId={projectId}
-                placeholder="Leave a reply..."
-                onSend={onSend}
-            />
-        </div>
-    );
-}
-
 export default function CommentCard({
     thread,
     projectId,
@@ -210,12 +167,15 @@ export default function CommentCard({
     onReaction,
     canDelete,
 }: { thread: CommentThread; projectId: string | undefined } & CommentHandlers) {
-    const [replying, setReplying] = useState(false);
+    const composerRef = useRef<ChatComposerHandle>(null);
     const { root, replies } = thread;
+
+    function focusComposer() {
+        composerRef.current?.focus();
+    }
 
     function handleSend(message: string, references: LabelledReference[]) {
         onReply(message, references, root.id);
-        setReplying(false);
     }
 
     return (
@@ -223,7 +183,7 @@ export default function CommentCard({
             <CommentContent
                 comment={root}
                 avatarSize="lg"
-                onReplyClick={() => setReplying(true)}
+                onReplyClick={focusComposer}
                 onDelete={onDelete}
                 onReaction={onReaction}
                 canDelete={canDelete}
@@ -235,7 +195,7 @@ export default function CommentCard({
                             <CommentContent
                                 comment={reply}
                                 avatarSize="md"
-                                onReplyClick={() => setReplying(true)}
+                                onReplyClick={focusComposer}
                                 onDelete={onDelete}
                                 onReaction={onReaction}
                                 canDelete={canDelete}
@@ -245,10 +205,11 @@ export default function CommentCard({
                 </ul>
             )}
             <div className="border-t border-white/6">
-                <ReplyComposer
+                <ChatComposer
+                    ref={composerRef}
                     projectId={projectId}
-                    open={replying}
-                    onOpen={() => setReplying(true)}
+                    placeholder="Leave a reply..."
+                    className="rounded-none bg-transparent shadow-none"
                     onSend={handleSend}
                 />
             </div>
