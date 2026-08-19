@@ -203,15 +203,17 @@ export default class ChatSocketHandler {
                 return;
             }
 
+            let thread_root_id: string | undefined;
             if (repliedToId) {
                 const replied_to = await prisma.chat.findUnique({
                     where: { id: repliedToId },
-                    select: { issueId: true },
+                    select: { issueId: true, repliedToId: true },
                 });
                 if (!replied_to || replied_to.issueId !== issue.id) {
                     ChatSocketHandler.send_error(ws, "Replied message not found");
                     return;
                 }
+                thread_root_id = replied_to.repliedToId ?? repliedToId;
             }
 
             const resolved = await MessageReferenceService.resolve(message, issue.projectId);
@@ -225,7 +227,7 @@ export default class ChatSocketHandler {
                     issueId: issue.id,
                     senderId: user.id,
                     message: resolved.message,
-                    repliedToId,
+                    repliedToId: thread_root_id,
                     references: { create: MessageReferenceService.to_rows(resolved) },
                 },
                 include: {
