@@ -80,11 +80,13 @@ export default function IssueDescriptionEditor({
                 table: { resizable: true },
                 tableHeader: {
                     HTMLAttributes: {
-                        class: "border border-white/12 bg-white/6 px-2 py-1 text-left align-top font-medium",
+                        class: "rounded-sm bg-graphite px-4 py-3 text-left align-top font-medium text-snow",
                     },
                 },
                 tableCell: {
-                    HTMLAttributes: { class: "border border-white/12 px-2 py-1 align-top" },
+                    HTMLAttributes: {
+                        class: "rounded-sm bg-cement px-4 py-3 align-top text-neutral-200",
+                    },
                 },
             }),
             authoring ? PromptMark : Prompt,
