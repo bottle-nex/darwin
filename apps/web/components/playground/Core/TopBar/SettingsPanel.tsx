@@ -10,7 +10,11 @@ import { useApiKeys } from "@/hooks/apiKeys/useApiKeys";
 import { useCreateApiKey } from "@/hooks/apiKeys/useCreateApiKey";
 import { useRevokeApiKey } from "@/hooks/apiKeys/useRevokeApiKey";
 import type { CreatedApiKey } from "@/types/apiKey.type";
-import { MdContentCopy, MdKey } from "react-icons/md";
+import { MdCheck, MdContentCopy, MdKey } from "react-icons/md";
+import { useSidebarThemeStore } from "@/store/playground/useSidebarThemeStore";
+import { useSetSidebarTheme } from "@/hooks/user/useSetSidebarTheme";
+import { SIDEBAR_THEME_OPTIONS, meshPaletteFor, resolveGradientKey } from "@/lib/sidebarTheme";
+import { MeshGradientSurface } from "@/components/playground/Sidebar/SidebarMeshGradient";
 
 function formatDate(value: string | null) {
     if (!value) return "Never";
@@ -84,6 +88,59 @@ function CreatedKeyBanner({
             >
                 Done
             </Button>
+        </div>
+    );
+}
+
+function AppearanceSection() {
+    const activeTheme = useSidebarThemeStore((s) => s.theme);
+    const setSidebarTheme = useSetSidebarTheme();
+    const [hour] = useState(() => new Date().getHours());
+
+    return (
+        <div className="flex flex-col gap-y-4">
+            <div className="flex flex-col gap-y-1">
+                <h2 className="text-sm font-semibold text-neutral-100">Sidebar</h2>
+                <p className="text-xs text-neutral-500">
+                    Time of day shifts through the day, lightest in the morning and darker as night
+                    approaches.
+                </p>
+            </div>
+
+            <div className="grid grid-cols-3 gap-3">
+                {SIDEBAR_THEME_OPTIONS.map(({ theme, label }) => {
+                    const palette = meshPaletteFor(resolveGradientKey(theme, hour));
+                    const active = theme === activeTheme;
+
+                    return (
+                        <Button
+                            key={theme}
+                            type="button"
+                            variant="unstyled"
+                            aria-pressed={active}
+                            onClick={() => setSidebarTheme.mutate(theme)}
+                            className="flex cursor-pointer flex-col items-stretch gap-y-1.5 text-left"
+                        >
+                            <span
+                                className={cn(
+                                    "relative h-14 overflow-hidden rounded-lg border border-white/5",
+                                    !palette && "bg-ink",
+                                    active && "ring-1 ring-matcha",
+                                )}
+                            >
+                                {palette && <MeshGradientSurface palette={palette} blurPx={12} />}
+                                {active && (
+                                    <MdCheck
+                                        className="absolute top-1.5 right-1.5 size-3.5 text-matcha"
+                                        aria-hidden
+                                    />
+                                )}
+                            </span>
+                            <span className="text-[11px] text-neutral-400">{label}</span>
+                        </Button>
+                    );
+                })}
+            </div>
         </div>
     );
 }
@@ -224,8 +281,16 @@ export default function SettingsPanel({
                 <DialogTitle className="border-b border-white/5 px-6 py-4 text-base font-semibold text-neutral-100">
                     Settings
                 </DialogTitle>
-                <div data-lenis-prevent className="no-scrollbar flex-1 overflow-y-auto px-6 py-5">
-                    <ApiKeysSection />
+                <div
+                    data-lenis-prevent
+                    className="no-scrollbar flex flex-1 flex-col divide-y divide-white/5 overflow-y-auto px-6"
+                >
+                    <div className="py-5">
+                        <AppearanceSection />
+                    </div>
+                    <div className="py-5">
+                        <ApiKeysSection />
+                    </div>
                 </div>
             </DialogContent>
         </Dialog>

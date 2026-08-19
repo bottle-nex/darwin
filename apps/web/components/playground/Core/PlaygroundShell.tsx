@@ -17,6 +17,7 @@ import IssueDisplay from "@/components/playground/Issue/IssueDisplay";
 import PlaygroundShortcutSheet from "@/components/playground/Sidebar/PlaygroundShortcutSheet";
 import NotificationsPanel from "@/components/playground/Core/Notifications/NotificationsPanel";
 import FloatNotifications from "@/components/playground/Core/Notifications/FloatNotifications";
+import SidebarThemeSync from "@/components/playground/Core/SidebarThemeSync";
 import { useIssueRoute } from "@/components/playground/Issue/useIssueRoute";
 import { useGetDashboard } from "@/hooks/dashboard/useGetDashboard";
 import { useGetProject } from "@/hooks/project/useGetProject";
@@ -101,6 +102,7 @@ export default function PlaygroundShell() {
             <CommandMenu />
             <CommandDialogs />
             <FloatNotifications />
+            <SidebarThemeSync />
         </main>
     );
 }

@@ -41,8 +41,8 @@ export default function PlaygroundSidebarRow({
             className={cn(
                 "group flex w-full cursor-pointer items-center gap-1 rounded-md py-1 pr-2.5 text-left text-[13.25px] font-medium ring-inset focus-visible:ring-1 focus-visible:ring-primary focus-visible:outline-hidden rounded-[5px]",
                 active
-                    ? "bg-cement text-neutral-100"
-                    : "text-neutral-400 hover:bg-charcoal hover:text-neutral-100",
+                    ? "bg-white/10 text-neutral-50"
+                    : "text-neutral-300 hover:bg-white/3 hover:text-neutral-100",
             )}
             style={{ paddingLeft: 8 + indent * 16 }}
         >
