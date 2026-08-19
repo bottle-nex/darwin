@@ -89,7 +89,8 @@ export default function ActivityRow({
     activity: IssueActivity;
     rail?: { above: boolean; below: boolean };
 }) {
-    const { icon: Icon, iconClassName, render, detail } = activity_entry(activity.type);
+    const { glyph, render, detail } = activity_entry(activity.type);
+    const { icon: Icon, iconClassName } = glyph(activity.payload);
     const actor = actor_of(activity);
     const at = new Date(activity.createdAt);
     const railSpan = railClass(rail.above, rail.below);
@@ -106,7 +107,7 @@ export default function ActivityRow({
             <span
                 aria-hidden
                 className={cn(
-                    "relative z-10 mt-0.5 flex size-[22px] shrink-0 items-center justify-center rounded-full bg-[#151515]",
+                    "relative z-10 mt-0.5 flex size-[22px] shrink-0 items-center justify-center rounded-full bg-charcoal ",
                     iconClassName,
                 )}
             >
