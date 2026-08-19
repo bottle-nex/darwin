@@ -2,14 +2,12 @@
 import { useEffect, useState } from "react";
 import { motion } from "motion/react";
 import { cn } from "@/lib/utils";
-import { SIDEBAR_GRADIENT_CSS_VAR } from "@/lib/sidebarTheme";
 import {
     SIDEBAR_DEFAULT_WIDTH,
     SIDEBAR_WIDTH_CSS_VAR,
     useSidebarWidthStore,
 } from "@/store/playground/useSidebarWidthStore";
 import SidebarContent from "./SidebarContent";
-import SidebarMeshGradient from "./SidebarMeshGradient";
 
 export default function PlaygroundSidebar() {
     const { width, collapsed, dragging } = useSidebarWidthStore();
@@ -26,18 +24,14 @@ export default function PlaygroundSidebar() {
         <aside
             data-lenis-prevent
             aria-label="Sidebar"
-            style={{
-                width: `var(${SIDEBAR_WIDTH_CSS_VAR}, ${SIDEBAR_DEFAULT_WIDTH}px)`,
-                background: `var(${SIDEBAR_GRADIENT_CSS_VAR}, var(--color-ink))`,
-            }}
+            style={{ width: `var(${SIDEBAR_WIDTH_CSS_VAR}, ${SIDEBAR_DEFAULT_WIDTH}px)` }}
             className={cn(
-                "relative h-full min-h-0 shrink-0 overflow-visible perspective-distant",
+                "h-full min-h-0 shrink-0 overflow-visible perspective-distant",
                 instant
                     ? "transition-none"
                     : "transition-[width] duration-350 ease-[cubic-bezier(0.22,1,0.36,1)]",
             )}
         >
-            <SidebarMeshGradient />
             <motion.div
                 initial={false}
                 animate={

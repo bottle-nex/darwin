@@ -13,7 +13,12 @@ import type { CreatedApiKey } from "@/types/apiKey.type";
 import { MdCheck, MdContentCopy, MdKey } from "react-icons/md";
 import { useSidebarThemeStore } from "@/store/playground/useSidebarThemeStore";
 import { useSetSidebarTheme } from "@/hooks/user/useSetSidebarTheme";
-import { SIDEBAR_THEME_OPTIONS, meshPaletteFor, resolveGradientKey } from "@/lib/sidebarTheme";
+import {
+    SIDEBAR_THEME_OPTIONS,
+    meshPaletteFor,
+    resolveGradientKey,
+    staticGradientFor,
+} from "@/lib/sidebarTheme";
 import { MeshGradientSurface } from "@/components/playground/Sidebar/SidebarMeshGradient";
 
 function formatDate(value: string | null) {
@@ -100,7 +105,7 @@ function AppearanceSection() {
     return (
         <div className="flex flex-col gap-y-4">
             <div className="flex flex-col gap-y-1">
-                <h2 className="text-sm font-semibold text-neutral-100">Sidebar</h2>
+                <h2 className="text-sm font-semibold text-neutral-100">Background</h2>
                 <p className="text-xs text-neutral-500">
                     Time of day shifts through the day, lightest in the morning and darker as night
                     approaches.
@@ -109,7 +114,9 @@ function AppearanceSection() {
 
             <div className="grid grid-cols-3 gap-3">
                 {SIDEBAR_THEME_OPTIONS.map(({ theme, label }) => {
-                    const palette = meshPaletteFor(resolveGradientKey(theme, hour));
+                    const gradientKey = resolveGradientKey(theme, hour);
+                    const palette = meshPaletteFor(gradientKey);
+                    const staticGradient = staticGradientFor(gradientKey);
                     const active = theme === activeTheme;
 
                     return (
@@ -128,7 +135,14 @@ function AppearanceSection() {
                                     active && "ring-1 ring-matcha",
                                 )}
                             >
-                                {palette && <MeshGradientSurface palette={palette} blurPx={12} />}
+                                {staticGradient ? (
+                                    <span
+                                        className="absolute inset-0"
+                                        style={{ background: staticGradient }}
+                                    />
+                                ) : (
+                                    palette && <MeshGradientSurface palette={palette} blurPx={12} />
+                                )}
                                 {active && (
                                     <MdCheck
                                         className="absolute top-1.5 right-1.5 size-3.5 text-matcha"

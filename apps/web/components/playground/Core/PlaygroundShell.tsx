@@ -6,6 +6,7 @@ import PlaygroundCollapsedLead from "@/components/playground/Core/TopBar/Playgro
 import PlaygroundPaneFrame from "@/components/playground/Core/components/PlaygroundPaneFrame";
 import PlaygroundSidebar from "@/components/playground/Sidebar/PlaygroundSidebar";
 import PlaygroundSheetSidebar from "@/components/playground/Sidebar/PlaygroundSheetSidebar";
+import SidebarMeshGradient from "@/components/playground/Sidebar/SidebarMeshGradient";
 import SidebarResizeHandle from "@/components/playground/Sidebar/SidebarResizeHandle";
 import PlaygroundDisplay from "@/components/playground/Core/PlaygroundDisplay";
 import OnboardingDisplay from "@/components/onboarding/OnboardingDisplay";
@@ -27,6 +28,7 @@ import { usePlaygroundUrlSync } from "./usePlaygroundUrlSync";
 import { useSubscribeEventHandlers } from "@/hooks/socket/useSubscribeEventHandlers";
 import usePlaygroundShortcuts from "@/hooks/shortcuts/usePlaygroundShortcuts";
 import { useSidebarWidthStore } from "@/store/playground/useSidebarWidthStore";
+import { SIDEBAR_GRADIENT_CSS_VAR } from "@/lib/sidebarTheme";
 import { useCommandContextStore } from "@/store/command/useCommandContextStore";
 import CommandMenu from "@/components/command/CommandMenu";
 import CommandDialogs from "@/components/command/CommandDialogs";
@@ -73,8 +75,14 @@ export default function PlaygroundShell() {
     const showOnboarding = !loading && !!project && !project.tourCompleted;
 
     return (
-        <main className="flex h-screen flex-col overflow-hidden text-neutral-100 select-none tracking-wide">
-            <section className="flex flex-1 min-h-0">
+        <main
+            style={{
+                background: `var(${SIDEBAR_GRADIENT_CSS_VAR}, var(--color-ink))`,
+            }}
+            className="relative flex h-screen flex-col overflow-hidden text-neutral-100 select-none tracking-wide"
+        >
+            <SidebarMeshGradient />
+            <section className="relative flex flex-1 min-h-0 p-2">
                 <PlaygroundSidebar />
                 <SidebarResizeHandle />
                 <PlaygroundPaneFrame

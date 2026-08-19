@@ -10,7 +10,7 @@ import { GanttTimeline } from "@/lib/gantt/GanttTimeline";
 export default function GanttSidebar({ pausedWorkerIds }: { pausedWorkerIds: Set<string> }) {
     return (
         <div
-            className="flex h-full shrink-0 flex-col border-r border-border bg-charcoal"
+            className="flex h-full shrink-0 flex-col border-r border-border"
             style={{ width: GanttTimeline.SIDEBAR_WIDTH }}
         >
             <div

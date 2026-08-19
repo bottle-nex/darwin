@@ -2,13 +2,14 @@
 import { MeshGradient } from "@paper-design/shaders-react";
 import { useSyncExternalStore, type CSSProperties } from "react";
 import { cn } from "@/lib/utils";
-import { meshPaletteFor } from "@/lib/sidebarTheme";
+import { meshPaletteFor, staticGradientFor } from "@/lib/sidebarTheme";
 import { useSidebarThemeStore } from "@/store/playground/useSidebarThemeStore";
 
-const DRIFT_SPEED = 0.15;
-const SIDEBAR_BLUR_PX = 28;
+const DRIFT_SPEED = 0;
+const SIDEBAR_BLUR_PX = 40;
 const SCRIM_OPACITY = 0.45;
-const GRAIN_OPACITY = 0.6;
+const TOP_SHADE_BACKGROUND =
+    "linear-gradient(to bottom, rgba(10, 10, 10, 0.46) 0%, rgba(10, 10, 10, 0.22) 42%, transparent 72%)";
 
 const REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)";
 
@@ -62,13 +63,24 @@ export function MeshGradientSurface({
                 speed={prefersReducedMotion ? 0 : DRIFT_SPEED}
             />
             <div className="absolute inset-0 bg-ink" style={{ opacity: SCRIM_OPACITY }} />
-            <div className="grain absolute inset-0" style={{ opacity: GRAIN_OPACITY }} />
+            <div className="absolute inset-0" style={{ background: TOP_SHADE_BACKGROUND }} />
         </div>
     );
 }
 
 export default function SidebarMeshGradient() {
     const gradientKey = useSidebarThemeStore((s) => s.gradientKey);
+    const staticGradient = gradientKey && staticGradientFor(gradientKey);
+
+    if (staticGradient) {
+        return (
+            <div
+                aria-hidden
+                className="pointer-events-none absolute inset-0"
+                style={{ background: staticGradient }}
+            />
+        );
+    }
 
     const palette = gradientKey && meshPaletteFor(gradientKey);
     if (!palette) return null;

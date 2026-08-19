@@ -3,9 +3,7 @@ import { useEffect } from "react";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
 import { useSidebarWidthStore } from "@/store/playground/useSidebarWidthStore";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
-import { SIDEBAR_GRADIENT_CSS_VAR } from "@/lib/sidebarTheme";
 import SidebarContent from "./SidebarContent";
-import SidebarMeshGradient from "./SidebarMeshGradient";
 
 export default function PlaygroundSheetSidebar() {
     const { width, collapsed, sheetOpen, openSheet, closeSheet } = useSidebarWidthStore();
@@ -38,16 +36,8 @@ export default function PlaygroundSheetSidebar() {
                     className="top-3 bottom-3 left-0 h-auto max-w-[calc(100%-1.5rem)] gap-0 border-0 bg-transparent p-0 pl-3 text-neutral-100 shadow-none will-change-transform ease-[cubic-bezier(0.32,0.72,0,1)] data-[state=closed]:duration-200 data-[state=open]:duration-300"
                 >
                     <SheetTitle className="sr-only">Sidebar</SheetTitle>
-                    <div
-                        style={{
-                            background: `var(${SIDEBAR_GRADIENT_CSS_VAR}, var(--color-charcoal))`,
-                        }}
-                        className="relative flex min-h-0 flex-1 flex-col overflow-hidden rounded-lg border border-white/5 py-2 shadow-xl"
-                    >
-                        <SidebarMeshGradient />
-                        <div className="relative flex min-h-0 flex-1 flex-col">
-                            <SidebarContent />
-                        </div>
+                    <div className="flex min-h-0 flex-1 flex-col overflow-hidden py-2">
+                        <SidebarContent />
                     </div>
                 </SheetContent>
             </Sheet>

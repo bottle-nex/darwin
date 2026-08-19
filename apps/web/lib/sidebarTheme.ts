@@ -11,11 +11,18 @@ export const SIDEBAR_MESH_PALETTES: Record<SidebarGradientKey, string[] | null> 
     dusk: ["#3a1f1a", "#4d2422", "#341c38", "#170f12"],
     evening: ["#161a33", "#201c40", "#2b1e40", "#0e0f1c"],
     midnight: ["#0d1018", "#141a2b", "#1a1a2e", "#08090e"],
-    matcha: ["#1d2a12", "#294016", "#31491a", "#101507"],
-    lilac: ["#221c3d", "#332a5c", "#403570", "#100d1c"],
-    ember: ["#2e1210", "#4d1c15", "#5f2812", "#160a08"],
-    slate: ["#151d2a", "#202d40", "#2b3d54", "#0b0f16"],
+    matcha: ["#0f1812", "#101c14", "#112116", "#122518"],
+    lilac: ["#121020", "#151020", "#181021", "#190f20"],
+    ember: ["#1f100e", "#24120f", "#291510", "#2e1711"],
+    slate: ["#0f161d", "#101a22", "#121e27", "#14222c"],
     neutral: null,
+};
+
+const STATIC_GRADIENTS: Partial<Record<SidebarGradientKey, string>> = {
+    matcha: "linear-gradient(180deg, #0f1812 0%, #101c14 55%, #112116 78%, #122518 100%)",
+    lilac: "linear-gradient(180deg, #121020 0%, #151020 55%, #181021 78%, #190f20 100%)",
+    ember: "linear-gradient(180deg, #1f100e 0%, #24120f 55%, #291510 78%, #2e1711 100%)",
+    slate: "linear-gradient(180deg, #0f161d 0%, #101a22 55%, #121e27 78%, #14222c 100%)",
 };
 
 export const TIME_OF_DAY_BANDS: { startHour: number; key: SidebarGradientKey }[] = [
@@ -62,10 +69,14 @@ export function meshPaletteFor(key: SidebarGradientKey): string[] | null {
     return SIDEBAR_MESH_PALETTES[key];
 }
 
+export function staticGradientFor(key: SidebarGradientKey): string | null {
+    return STATIC_GRADIENTS[key] ?? null;
+}
+
 export function flatGradientFor(key: SidebarGradientKey): string | null {
     const palette = SIDEBAR_MESH_PALETTES[key];
     if (!palette) return null;
-    return `linear-gradient(155deg, ${palette.join(", ")})`;
+    return staticGradientFor(key) ?? `linear-gradient(155deg, ${palette.join(", ")})`;
 }
 
 export function applySidebarGradient(key: SidebarGradientKey) {
@@ -81,10 +92,12 @@ export const SIDEBAR_GRADIENT_BOOTSTRAP_SCRIPT = `try{
 var bands=${JSON.stringify(TIME_OF_DAY_BANDS)};
 var named=${JSON.stringify(NAMED_GRADIENT_KEYS)};
 var palettes=${JSON.stringify(SIDEBAR_MESH_PALETTES)};
+var staticGradients=${JSON.stringify(STATIC_GRADIENTS)};
 var stored=localStorage.getItem(${JSON.stringify(SIDEBAR_THEME_STORAGE_KEY)});
 var theme=(stored&&JSON.parse(stored).state.theme)||${JSON.stringify(SIDEBAR_THEME_DEFAULT)};
 var key=named[theme];
 if(!key){var h=new Date().getHours();key=bands[0].key;for(var i=0;i<bands.length;i++){if(h>=bands[i].startHour)key=bands[i].key}}
 var palette=palettes[key];
-if(palette)document.documentElement.style.setProperty(${JSON.stringify(SIDEBAR_GRADIENT_CSS_VAR)},"linear-gradient(155deg, "+palette.join(", ")+")")
+var gradient=staticGradients[key]||(palette&&"linear-gradient(155deg, "+palette.join(", ")+")");
+if(gradient)document.documentElement.style.setProperty(${JSON.stringify(SIDEBAR_GRADIENT_CSS_VAR)},gradient)
 }catch(e){}`;

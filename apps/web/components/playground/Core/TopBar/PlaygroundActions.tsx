@@ -7,14 +7,14 @@ import { COMBINATIONS } from "@/hooks/shortcuts/usePlaygroundShortcuts";
 
 export default function PlaygroundActions() {
     return (
-        <div className="flex items-center gap-2.5 -mt-1 -mr-2">
+        <div className="flex items-center gap-2">
             <TooltipComponent content="Toggle notifications" side="bottom" delayDuration={500}>
                 <NotificationsBellButton />
             </TooltipComponent>
             <Button
                 variant="tertiary"
                 size="xs"
-                className="pl-2! rounded-sm pr-3!"
+                className="pl-2! rounded-sm pr-3! scale-95"
                 onClick={() => COMBINATIONS["n i"].run()}
             >
                 <BsPlus className="size-4 text-ink!" />

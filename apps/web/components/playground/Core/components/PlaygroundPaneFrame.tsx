@@ -19,7 +19,7 @@ export default function PlaygroundPaneFrame({
     const [actionsSlot, setActionsSlot] = useState<HTMLDivElement | null>(null);
 
     return (
-        <div className="flex min-w-0 flex-1 flex-col bg-charcoal">
+        <div className="flex min-w-0 flex-1 flex-col overflow-hidden rounded-lg bg-ink ring-1 ring-white/4 shadow-2xl">
             <div
                 className="flex shrink-0 items-center justify-between gap-2 border-b border-border px-2.5"
                 style={{ height: PANE_TOP_BAR_HEIGHT }}

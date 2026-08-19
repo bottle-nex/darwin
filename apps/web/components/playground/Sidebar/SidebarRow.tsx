@@ -41,7 +41,7 @@ export default function PlaygroundSidebarRow({
             className={cn(
                 "group flex w-full cursor-pointer items-center gap-1 rounded-md py-1 pr-2.5 text-left text-[13.25px] font-medium ring-inset focus-visible:ring-1 focus-visible:ring-primary focus-visible:outline-hidden rounded-[5px]",
                 active
-                    ? "bg-white/10 text-neutral-50"
+                    ? "bg-white/7 text-neutral-50"
                     : "text-neutral-300 hover:bg-white/3 hover:text-neutral-100",
             )}
             style={{ paddingLeft: 8 + indent * 16 }}
@@ -55,7 +55,7 @@ export default function PlaygroundSidebarRow({
             </span>
 
             <span className="flex min-w-0 flex-1 items-baseline gap-1.5">
-                <span className="truncate text-[13px]">{label}</span>
+                <span className="truncate text-[13.5px]">{label}</span>
                 {suffix && (
                     <span className="truncate text-[10px] text-neutral-500">- {suffix}</span>
                 )}
