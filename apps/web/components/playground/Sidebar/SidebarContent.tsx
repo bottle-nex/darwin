@@ -1,16 +1,15 @@
 "use client";
 import { AnimatePresence, motion } from "motion/react";
-import { HiOutlineArrowUpCircle, HiOutlineUserPlus } from "react-icons/hi2";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
 import { PANE_TOP_BAR_HEIGHT } from "@/components/playground/Core/components/PlaygroundPaneFrame";
 import PlaygroundLeadBar from "@/components/playground/Core/TopBar/PlaygroundLeadBar";
 import PlaygroundUserMenu from "@/components/playground/Core/TopBar/PlaygroundUserMenu";
 import { PlaygroundTab } from "../playgroundTabs";
-import SidebarRow from "./SidebarRow";
 import BoardSection from "./BoardSection";
 import ForYouSection from "./ForYouSection";
 import TeamsSection from "./TeamsSection";
 import SettingsNavSection from "./SettingsNavSection";
+import SidebarActions from "./SidebarActions";
 
 const SETTINGS_TABS: string[] = [
     PlaygroundTab.SettingsProject,
@@ -31,10 +30,13 @@ export default function SidebarContent() {
     return (
         <div className="flex h-full min-h-0 flex-col pr-2">
             <div
-                className="flex shrink-0 items-center px-1"
+                className="flex shrink-0 items-center justify-between gap-1 px-1"
                 style={{ height: PANE_TOP_BAR_HEIGHT }}
             >
-                <PlaygroundLeadBar />
+                <div className="min-w-0 flex-1">
+                    <PlaygroundLeadBar />
+                </div>
+                <SidebarActions />
             </div>
 
             <div className="min-h-0 flex-1 overflow-y-auto px-1">
@@ -60,9 +62,7 @@ export default function SidebarContent() {
                 </AnimatePresence>
             </div>
 
-            <div className="flex flex-col gap-0.5 px-1 pb-1">
-                <SidebarRow label="Invite" leading={{ kind: "icon", icon: HiOutlineUserPlus }} />
-                <SidebarRow label="Pro" leading={{ kind: "icon", icon: HiOutlineArrowUpCircle }} />
+            <div className="px-1 pb-1">
                 <PlaygroundUserMenu />
             </div>
         </div>

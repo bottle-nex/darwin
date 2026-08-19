@@ -1,0 +1,68 @@
+"use client";
+
+import { HiOutlineBell } from "react-icons/hi2";
+import { IoPencilSharp } from "react-icons/io5";
+import { Button } from "@/components/ui/button";
+import { TooltipComponent } from "@/components/ui/tooltip-component";
+import { useNotifications } from "@/hooks/notifications/useNotifications";
+import { useActiveProject } from "@/hooks/useActiveProject";
+import { cn } from "@/lib/utils";
+import { useIssueStore } from "@/store/issues/useIssueStore";
+import { useNotificationsPanelStore } from "@/store/playground/useNotificationsPanelStore";
+
+const ACTION_BUTTON_CLASS =
+    "relative flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-md text-neutral-400 transition-colors hover:bg-white/5 hover:text-neutral-100 disabled:cursor-default disabled:opacity-40";
+
+export default function SidebarActions() {
+    const activeProject = useActiveProject();
+    const openCreate = useIssueStore((state) => state.openCreate);
+    const notificationsOpen = useNotificationsPanelStore((state) => state.isOpen);
+    const toggleNotifications = useNotificationsPanelStore((state) => state.toggle);
+    const { data } = useNotifications();
+    const unreadCount = data?.unreadCount ?? 0;
+
+    return (
+        <div className="flex shrink-0 items-center gap-0.5">
+            <TooltipComponent content="Create issue" side="bottom" delayDuration={500}>
+                <Button
+                    variant="unstyled"
+                    type="button"
+                    disabled={!activeProject}
+                    onClick={() => openCreate({ board: "llm" })}
+                    aria-label="Create issue"
+                    className={ACTION_BUTTON_CLASS}
+                >
+                    <IoPencilSharp className="size-3.5" aria-hidden />
+                </Button>
+            </TooltipComponent>
+
+            <TooltipComponent content="Notifications" side="bottom" delayDuration={500}>
+                <Button
+                    variant="unstyled"
+                    type="button"
+                    onClick={toggleNotifications}
+                    aria-label={
+                        unreadCount > 0
+                            ? `Toggle notifications (${unreadCount} unread)`
+                            : "Toggle notifications"
+                    }
+                    aria-pressed={notificationsOpen}
+                    className={cn(
+                        ACTION_BUTTON_CLASS,
+                        notificationsOpen && "bg-white/8 text-neutral-100",
+                    )}
+                >
+                    <HiOutlineBell className="size-3.75" aria-hidden />
+                    {unreadCount > 0 ? (
+                        <span
+                            className="absolute top-0 right-0 flex h-3 min-w-3 items-center justify-center rounded-full bg-primary px-0.5 text-[8px] leading-none font-medium text-ink tabular-nums"
+                            aria-hidden
+                        >
+                            {unreadCount > 9 ? "9+" : unreadCount}
+                        </span>
+                    ) : null}
+                </Button>
+            </TooltipComponent>
+        </div>
+    );
+}

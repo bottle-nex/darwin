@@ -1,6 +1,10 @@
 "use client";
 import { useParams } from "next/navigation";
-import { HiOutlineCheckCircle, HiOutlineCog6Tooth } from "react-icons/hi2";
+import {
+    HiOutlineCheckCircle,
+    HiOutlineClipboardDocumentList,
+    HiOutlineCog6Tooth,
+} from "react-icons/hi2";
 import { HiOutlineAnnotation } from "react-icons/hi";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
 import Row from "./SidebarRow";
@@ -10,6 +14,11 @@ import { PlaygroundTab } from "../playgroundTabs";
 
 // Everything waiting on you personally, as opposed to the board at large.
 const FOR_YOU_ROWS: { id: string; label: string; icon: React.ComponentType }[] = [
+    {
+        id: PlaygroundTab.AssignedToMe,
+        label: "My issues",
+        icon: HiOutlineClipboardDocumentList,
+    },
     { id: PlaygroundTab.Chats, label: "Chats", icon: HiOutlineAnnotation },
     { id: PlaygroundTab.Reviews, label: "Reviews", icon: HiOutlineCheckCircle },
     { id: PlaygroundTab.SettingsProject, label: "Settings", icon: HiOutlineCog6Tooth },

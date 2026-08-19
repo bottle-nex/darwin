@@ -72,10 +72,19 @@ function readFilters(params: URLSearchParams): BoardFilters {
  * a refresh and can be shared as a link. Only ever touches its own params, so
  * it coexists with `usePlaygroundUrlSync` writing `tab`/`team`/`thread`.
  */
-export function useKanbanFilterUrlSync() {
+export function useKanbanFilterUrlSync(projectId?: string) {
     const filters = useKanbanFilterStore((s) => s.filters);
     const setFilters = useKanbanFilterStore((s) => s.setFilters);
     const hydratedRef = useRef(false);
+    const lastProjectRef = useRef(projectId);
+
+    useEffect(() => {
+        const previous = lastProjectRef.current;
+        lastProjectRef.current = projectId;
+        if (previous && projectId && previous !== projectId) {
+            useKanbanFilterStore.getState().clearAll();
+        }
+    }, [projectId]);
 
     useEffect(() => {
         if (hydratedRef.current) return;

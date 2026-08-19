@@ -11,17 +11,13 @@ export const SIDEBAR_MESH_PALETTES: Record<SidebarGradientKey, string[] | null> 
     dusk: ["#3a1f1a", "#4d2422", "#341c38", "#170f12"],
     evening: ["#161a33", "#201c40", "#2b1e40", "#0e0f1c"],
     midnight: ["#0d1018", "#141a2b", "#1a1a2e", "#08090e"],
-    matcha: ["#0f1812", "#101c14", "#112116", "#122518"],
     lilac: ["#121020", "#151020", "#181021", "#190f20"],
-    ember: ["#1f100e", "#24120f", "#291510", "#2e1711"],
     slate: ["#0f161d", "#101a22", "#121e27", "#14222c"],
     neutral: null,
 };
 
 const STATIC_GRADIENTS: Partial<Record<SidebarGradientKey, string>> = {
-    matcha: "linear-gradient(180deg, #0f1812 0%, #101c14 55%, #112116 78%, #122518 100%)",
     lilac: "linear-gradient(180deg, #121020 0%, #151020 55%, #181021 78%, #190f20 100%)",
-    ember: "linear-gradient(180deg, #1f100e 0%, #24120f 55%, #291510 78%, #2e1711 100%)",
     slate: "linear-gradient(180deg, #0f161d 0%, #101a22 55%, #121e27 78%, #14222c 100%)",
 };
 
@@ -37,21 +33,24 @@ export const TIME_OF_DAY_BANDS: { startHour: number; key: SidebarGradientKey }[]
 
 const NAMED_GRADIENT_KEYS: Record<SidebarTheme, SidebarGradientKey | null> = {
     [SidebarTheme.TimeOfDay]: null,
-    [SidebarTheme.Matcha]: "matcha",
     [SidebarTheme.Lilac]: "lilac",
-    [SidebarTheme.Ember]: "ember",
     [SidebarTheme.Slate]: "slate",
     [SidebarTheme.Neutral]: "neutral",
 };
 
 export const SIDEBAR_THEME_OPTIONS: { theme: SidebarTheme; label: string }[] = [
     { theme: SidebarTheme.TimeOfDay, label: "Time of day" },
-    { theme: SidebarTheme.Matcha, label: "Matcha" },
     { theme: SidebarTheme.Lilac, label: "Lilac" },
-    { theme: SidebarTheme.Ember, label: "Ember" },
     { theme: SidebarTheme.Slate, label: "Slate" },
     { theme: SidebarTheme.Neutral, label: "Neutral" },
 ];
+
+export function normalizeSidebarTheme(theme: unknown): SidebarTheme {
+    return (
+        SIDEBAR_THEME_OPTIONS.find((option) => option.theme === theme)?.theme ??
+        SIDEBAR_THEME_DEFAULT
+    );
+}
 
 export function resolveTimeOfDayKey(hour: number): SidebarGradientKey {
     let key = TIME_OF_DAY_BANDS[0].key;

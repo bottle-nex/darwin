@@ -7,9 +7,7 @@ import GanttDisplay from "@/components/playground/Home/GanttDisplay/GanttDisplay
 import TagsDisplay from "@/components/playground/Home/TagsDisplay/TagsDisplay";
 import ChatsDisplay from "@/components/playground/Home/panes/ChatsDisplay";
 import ReviewsDisplay from "@/components/playground/Home/panes/ReviewsDisplay";
-import AssignedToMeDisplay from "@/components/playground/Home/panes/AssignedToMeDisplay";
-import InProgressDisplay from "@/components/playground/Home/panes/InProgressDisplay";
-import DraftsDisplay from "@/components/playground/Home/panes/DraftsDisplay";
+import MyIssuesDisplay from "@/components/playground/Home/MyIssuesDisplay/MyIssuesDisplay";
 import SettingsDisplay from "@/components/playground/Home/SettingsDisplay/SettingsDisplay";
 import TeamDetailDisplay from "@/components/playground/Team/TeamDisplay";
 import LogoLoader from "@/components/app/LogoLoader";
@@ -32,11 +30,7 @@ function TabPane({ tab }: { tab: string }) {
         case PlaygroundTab.Reviews:
             return <ReviewsDisplay />;
         case PlaygroundTab.AssignedToMe:
-            return <AssignedToMeDisplay />;
-        case PlaygroundTab.InProgress:
-            return <InProgressDisplay />;
-        case PlaygroundTab.Drafts:
-            return <DraftsDisplay />;
+            return <MyIssuesDisplay />;
         case PlaygroundTab.TeamDetail:
             return <TeamDetailDisplay />;
         case PlaygroundTab.Gantt:

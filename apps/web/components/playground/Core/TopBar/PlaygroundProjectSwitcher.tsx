@@ -42,14 +42,14 @@ export default function PlaygroundProjectSwitcher() {
                 <Button
                     variant="unstyled"
                     type="button"
-                    className="flex h-7 cursor-pointer items-center gap-1.5 text-[13px] font-semibold text-neutral-100 hover:bg-cement rounded-sm px-2"
+                    className="flex h-7 min-w-0 cursor-pointer items-center gap-1.5 rounded-sm px-2 text-[15px] font-semibold text-neutral-100 hover:bg-white/5"
                 >
                     <PlaygroundAvatar
                         tone="indigo"
                         letter={active?.name.slice(0, 2).toUpperCase() ?? "?"}
                     />
-                    <span className="max-w-60 truncate">{active?.name ?? "Select a project"}</span>
-                    <MdKeyboardArrowDown className="size-4 text-neutral-500" aria-hidden />
+                    <span className="min-w-0 truncate">{active?.name ?? "Select a project"}</span>
+                    <MdKeyboardArrowDown className="size-4 shrink-0 text-neutral-500" aria-hidden />
                 </Button>
             </Popover.Trigger>
 
@@ -79,7 +79,7 @@ export default function PlaygroundProjectSwitcher() {
                                     className={cn(
                                         "flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 text-left text-[13px] outline-none transition-colors select-none",
                                         p.slug === projectSlug
-                                            ? "bg-white/5 text-neutral-100"
+                                            ? "bg-charcoal text-neutral-100"
                                             : "text-neutral-300 hover:bg-white/5 hover:text-neutral-100",
                                     )}
                                 >

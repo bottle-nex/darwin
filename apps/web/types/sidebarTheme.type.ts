@@ -9,9 +9,7 @@ export type SidebarGradientKey =
     | "dusk"
     | "evening"
     | "midnight"
-    | "matcha"
     | "lilac"
-    | "ember"
     | "slate"
     | "neutral";
 

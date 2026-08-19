@@ -1,5 +1,4 @@
 "use client";
-
 import { useCallback, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import type { IconType } from "react-icons";
@@ -11,7 +10,6 @@ import {
     HiXCircle,
     HiXMark,
 } from "react-icons/hi2";
-import { MatchaLogo } from "@/components/logo/MatchaLogo";
 import { cn } from "@/lib/utils";
 import { useToastStore } from "@/store/toast/useToastStore";
 import type { ToastItem, ToastPosition, ToastStatus } from "@/types/toast.type";
@@ -216,13 +214,6 @@ function ToastCard({
             }}
             className="group overflow-hidden rounded-lg bg-cement shadow-[0_10px_30px_-12px_rgba(0,0,0,0.55),inset_0_1px_0_0_var(--color-edge)]"
         >
-            <MatchaLogo
-                className="pointer-events-none absolute -bottom-2 -left-4 h-16 w-16 text-white/[0.09]"
-                style={{
-                    maskImage: "linear-gradient(115deg, black 5%, transparent 70%)",
-                    WebkitMaskImage: "linear-gradient(115deg, black 5%, transparent 70%)",
-                }}
-            />
             <div
                 aria-hidden
                 className="pointer-events-none absolute inset-0"

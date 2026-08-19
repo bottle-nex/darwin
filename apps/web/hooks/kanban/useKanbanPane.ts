@@ -1,11 +1,10 @@
 "use client";
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { useBoard } from "@/hooks/issues/useBoard";
 import { useListTemplates } from "@/hooks/templates/useListTemplates";
 import { useKanbanBoardStore } from "@/store/kanban/useKanbanBoardStore";
 import { useCustomKanbanStore } from "@/store/kanban/useCustomKanbanStore";
-import { useKanbanFilterStore } from "@/store/kanban/useKanbanFilterStore";
 import { useKanbanOptionsStore } from "@/store/kanban/useKanbanOptionsStore";
 import { useKanbanFilterUrlSync } from "./useKanbanFilterUrlSync";
 import { useCustomKanbanDnd } from "./useCustomKanbanDnd";
@@ -17,7 +16,7 @@ export function useKanbanPane() {
     const projectId = activeProject?.id;
 
     useListTemplates(activeProject?.id);
-    useKanbanFilterUrlSync();
+    useKanbanFilterUrlSync(projectId);
 
     useEffect(() => {
         if (!board) return;
@@ -35,15 +34,6 @@ export function useKanbanPane() {
             setFocus({ kind: "default" });
         }
     }, [focus, columns, setFocus]);
-
-    const lastProjectRef = useRef(projectId);
-    useEffect(() => {
-        const previous = lastProjectRef.current;
-        lastProjectRef.current = projectId;
-        if (previous && projectId && previous !== projectId) {
-            useKanbanFilterStore.getState().clearAll();
-        }
-    }, [projectId]);
 
     return { dnd };
 }

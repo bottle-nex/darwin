@@ -115,15 +115,15 @@ export default function PlaygroundUserMenu() {
                         variant="unstyled"
                         type="button"
                         aria-label="Account menu"
-                        className="flex w-full cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 text-left transition-colors hover:bg-white/5 data-[state=open]:bg-white/5"
+                        className="flex w-full cursor-pointer items-center gap-2.5 rounded-md px-2 py-1.5 text-left transition-colors hover:bg-white/5 data-[state=open]:bg-white/5"
                     >
                         {user?.image ? (
-                            <span className="relative size-7 shrink-0 overflow-hidden rounded-full ring-1 ring-white/10">
+                            <span className="relative size-5 shrink-0 overflow-hidden rounded-full ring-1 ring-white/10">
                                 <Image
                                     src={user.image}
                                     alt=""
                                     fill
-                                    sizes="28px"
+                                    sizes="24px"
                                     className="object-cover"
                                 />
                             </span>
@@ -136,12 +136,12 @@ export default function PlaygroundUserMenu() {
                             />
                         )}
                         <span className="min-w-0 flex-1">
-                            <span className="block truncate text-[12px] font-medium text-neutral-200">
+                            <span className="block truncate text-[13px] font-medium text-neutral-200">
                                 {name}
                             </span>
-                            <span className="block truncate text-[11px] text-neutral-500">
+                            {/*<span className="block truncate text-[11px] text-neutral-500">
                                 {user?.email}
-                            </span>
+                            </span>*/}
                         </span>
                     </Button>
                 </DropdownMenuTrigger>

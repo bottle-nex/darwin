@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useLayoutEffect } from "react";
 import { useParams } from "next/navigation";
-import PlaygroundActions from "@/components/playground/Core/TopBar/PlaygroundActions";
 import PlaygroundCollapsedLead from "@/components/playground/Core/TopBar/PlaygroundCollapsedLead";
 import PlaygroundPaneFrame from "@/components/playground/Core/components/PlaygroundPaneFrame";
 import PlaygroundSidebar from "@/components/playground/Sidebar/PlaygroundSidebar";
@@ -85,10 +84,7 @@ export default function PlaygroundShell() {
             <section className="relative flex flex-1 min-h-0 p-2">
                 <PlaygroundSidebar />
                 <SidebarResizeHandle />
-                <PlaygroundPaneFrame
-                    lead={<PlaygroundCollapsedLead />}
-                    actions={<PlaygroundActions />}
-                >
+                <PlaygroundPaneFrame lead={<PlaygroundCollapsedLead />}>
                     {showOnboarding ? (
                         <div className="flex min-h-0 flex-1 flex-col">
                             <OnboardingDisplay project={project} orgId={dashboard!.org.id} />

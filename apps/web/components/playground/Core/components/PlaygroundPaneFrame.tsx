@@ -7,11 +7,9 @@ export const PANE_TOP_BAR_HEIGHT = 42;
 
 export default function PlaygroundPaneFrame({
     lead,
-    actions,
     children,
 }: {
     lead?: ReactNode;
-    actions?: ReactNode;
     children: ReactNode;
 }) {
     const sidebarCollapsed = useSidebarWidthStore((s) => s.collapsed);
@@ -19,7 +17,7 @@ export default function PlaygroundPaneFrame({
     const [actionsSlot, setActionsSlot] = useState<HTMLDivElement | null>(null);
 
     return (
-        <div className="flex min-w-0 flex-1 flex-col overflow-hidden rounded-lg bg-ink ring-1 ring-white/4 shadow-2xl">
+        <div className="flex min-w-0 flex-1 flex-col overflow-hidden rounded-xl bg-ink ring-1 ring-white/4 shadow-2xl">
             <div
                 className="flex shrink-0 items-center justify-between gap-2 border-b border-border px-2.5"
                 style={{ height: PANE_TOP_BAR_HEIGHT }}
@@ -32,7 +30,6 @@ export default function PlaygroundPaneFrame({
                 </div>
                 <div className="flex items-center gap-2">
                     <div ref={setActionsSlot} className="flex items-center" />
-                    {actions}
                 </div>
             </div>
 

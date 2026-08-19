@@ -1,8 +1,6 @@
 enum SidebarTheme {
   TimeOfDay
-  Matcha
   Lilac
-  Ember
   Slate
   Neutral
 }

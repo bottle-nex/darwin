@@ -180,9 +180,7 @@ export type ReleaseChannel = (typeof ReleaseChannel)[keyof typeof ReleaseChannel
 
 export const SidebarTheme = {
     TimeOfDay: "TimeOfDay",
-    Matcha: "Matcha",
     Lilac: "Lilac",
-    Ember: "Ember",
     Slate: "Slate",
     Neutral: "Neutral",
 } as const;
