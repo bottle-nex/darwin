@@ -32,6 +32,7 @@ model Issue {
   specialization String?
   prUrl          String?
   prBranch       String?
+  agentDoneAt    DateTime?
 
   activities    IssueActivity[]
   agentSessions AgentSession[]

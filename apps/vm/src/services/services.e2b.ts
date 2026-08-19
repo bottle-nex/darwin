@@ -330,6 +330,11 @@ export default class E2B {
                     log.block("final message from claude", report.result ?? "(empty)");
                 }
 
+                await prisma.issue.update({
+                    where: { id: issue.id },
+                    data: { agentDoneAt: new Date() },
+                });
+
                 let pull_request: PullRequestSummary;
                 try {
                     pull_request =
@@ -352,6 +357,11 @@ export default class E2B {
                     });
                     throw error;
                 }
+
+                await prisma.issue.update({
+                    where: { id: issue.id },
+                    data: { prUrl: pull_request.htmlUrl },
+                });
 
                 log.info(`PR ready for issue #${issue.number}`, { pull: pull_request.number });
                 await OutcomeReporter.publish({

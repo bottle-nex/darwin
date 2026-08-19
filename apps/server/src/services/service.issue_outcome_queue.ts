@@ -28,6 +28,10 @@ export default class IssueOutcomeQueueService {
                 await IssueOutcomeService.pr_opened(data);
                 return;
             }
+            if (data.kind === "reconcile") {
+                await IssueOutcomeService.reconcile(data.issueId);
+                return;
+            }
             await IssueOutcomeService.failed(data);
         } catch (error) {
             if (error instanceof IssueOutcomeConflict) {

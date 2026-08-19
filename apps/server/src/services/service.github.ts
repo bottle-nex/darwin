@@ -186,6 +186,24 @@ export default class GithubService {
         return { state: data.state, baseSha: data.base.sha, headSha: data.head.sha };
     }
 
+    static async findOpenPullRequestByBranch(
+        installationId: number,
+        owner: string,
+        repo: string,
+        branch: string,
+    ): Promise<{ url: string } | null> {
+        const token = await this.getInstallationToken(installationId);
+        const octokit = new Octokit({ auth: token });
+        const { data } = await octokit.rest.pulls.list({
+            owner,
+            repo,
+            state: "open",
+            head: `${owner}:${branch}`,
+            per_page: 1,
+        });
+        return data[0] ? { url: data[0].html_url } : null;
+    }
+
     static async listPullRequestFiles(
         installationId: number,
         owner: string,

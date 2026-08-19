@@ -8,6 +8,7 @@ export const STUCK_CLAIM_MS = 60_000;
 export const RECONCILE_INTERVAL_MS = 30_000;
 export const ORPHAN_TODO_MS = 30_000;
 export const STUCK_DISPATCH_MS = 2 * 60_000;
+export const RECONCILE_AFTER_MS = 60_000;
 
 export default class Reconciler {
     static async sweep_stuck_routed_claims() {
@@ -114,6 +115,34 @@ export default class Reconciler {
         }
     }
 
+    static async sweep_unreported_outcomes() {
+        try {
+            const cut_off = new Date(Date.now() - RECONCILE_AFTER_MS);
+            const issues = await prisma.issue.findMany({
+                where: {
+                    status: IssueStatus.InProgress,
+                    agentDoneAt: { lt: cut_off },
+                    assignerWorkerId: { not: null },
+                },
+                select: { id: true, number: true, assignerWorkerId: true },
+            });
+
+            if (issues.length === 0) return;
+
+            for (const issue of issues) {
+                const running = await guard_services.queue.has_active_dispatch(
+                    issue.assignerWorkerId!,
+                );
+                if (running) continue;
+
+                log.info("issue finished without a recorded outcome", { issue: issue.number });
+                await guard_services.queue.enqueue_reconcile(issue.id);
+            }
+        } catch (err) {
+            log.error("sweep failed: unreported outcomes", err);
+        }
+    }
+
     static async sweep_dead_worker_issues() {
         try {
             const cut_off = new Date(Date.now() - STUCK_DISPATCH_MS);
@@ -121,6 +150,7 @@ export default class Reconciler {
                 where: {
                     status: IssueStatus.InProgress,
                     prUrl: null,
+                    agentDoneAt: null,
                     updatedAt: { lt: cut_off },
                     assignedWorker: { status: WorkerStatus.Dead },
                 },
@@ -163,6 +193,7 @@ export default class Reconciler {
         await Reconciler.sweep_stuck_routed_claims();
         await Reconciler.sweep_orphan_issues();
         await Reconciler.sweep_stuck_dispatches();
+        await Reconciler.sweep_unreported_outcomes();
         await Reconciler.sweep_dead_worker_issues();
     }
 }

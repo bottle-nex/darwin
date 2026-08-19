@@ -4,10 +4,13 @@ import { server_services } from "..";
 import ActivityService, { type ActivityEvent } from "./service.activity";
 import { location_of } from "./service.activity-diff";
 import AgentSessionService from "./service.agent-session";
+import GithubService from "./service.github";
 import ProductDiffService from "./service.product_diff";
 
 type PrOpened = Extract<IssueOutcomeJobData, { kind: "pr_opened" }>;
 type Failed = Extract<IssueOutcomeJobData, { kind: "failed" }>;
+
+export const GIVE_UP_AFTER_MS = 15 * 60_000;
 
 export class IssueOutcomeConflict extends Error {}
 
@@ -27,7 +30,6 @@ export default class IssueOutcomeService {
                 where: {
                     id: data.issueId,
                     status: IssueStatus.InProgress,
-                    prUrl: null,
                     prBranch: data.branch,
                 },
                 data: { status: IssueStatus.InReview, prUrl: data.prUrl },
@@ -118,7 +120,84 @@ export default class IssueOutcomeService {
         await this.broadcast(completion);
     }
 
-    private static session_for(data: IssueOutcomeJobData) {
+    static async reconcile(issueId: string): Promise<void> {
+        const issue = await prisma.issue.findUnique({
+            where: { id: issueId },
+            select: {
+                number: true,
+                title: true,
+                status: true,
+                prUrl: true,
+                prBranch: true,
+                agentDoneAt: true,
+                assignerWorkerId: true,
+                project: {
+                    select: {
+                        githubRepoFullName: true,
+                        githubInstallation: { select: { installationId: true } },
+                    },
+                },
+            },
+        });
+        if (!issue || issue.status !== IssueStatus.InProgress) return;
+
+        const { assignerWorkerId: workerId, prBranch: branch } = issue;
+        if (!workerId || !branch) return;
+
+        const apply = (prUrl: string) =>
+            this.pr_opened({
+                kind: "pr_opened",
+                issueId,
+                workerId,
+                prUrl,
+                branch,
+                summary: `Completed issue #${issue.number}: ${issue.title}`,
+            });
+
+        if (issue.prUrl) {
+            await apply(issue.prUrl);
+            return;
+        }
+
+        const found = await this.open_pull_request_for(branch, issue.project);
+        if (found) {
+            await prisma.issue.update({ where: { id: issueId }, data: { prUrl: found.url } });
+            await apply(found.url);
+            return;
+        }
+
+        if (issue.agentDoneAt && Date.now() - issue.agentDoneAt.getTime() > GIVE_UP_AFTER_MS) {
+            await this.failed({
+                kind: "failed",
+                issueId,
+                workerId,
+                reason: "agent finished without opening a pull request",
+            });
+        }
+    }
+
+    private static async open_pull_request_for(
+        branch: string,
+        project: {
+            githubRepoFullName: string | null;
+            githubInstallation: { installationId: bigint } | null;
+        },
+    ) {
+        const { githubRepoFullName, githubInstallation } = project;
+        if (!githubRepoFullName || !githubInstallation) return null;
+
+        const [owner, repo] = githubRepoFullName.split("/");
+        if (!owner || !repo) return null;
+
+        return GithubService.findOpenPullRequestByBranch(
+            Number(githubInstallation.installationId),
+            owner,
+            repo,
+            branch,
+        );
+    }
+
+    private static session_for(data: PrOpened | Failed) {
         if (!data.runId) return Promise.resolve(null);
         return AgentSessionService.resolve_for_worker(data.runId, data.issueId, data.workerId);
     }

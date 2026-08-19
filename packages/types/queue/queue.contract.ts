@@ -40,7 +40,8 @@ export type IssueOutcomeJobData =
           summary: string;
           runId?: string;
       }
-    | { kind: "failed"; issueId: string; workerId: string; reason: string; runId?: string };
+    | { kind: "failed"; issueId: string; workerId: string; reason: string; runId?: string }
+    | { kind: "reconcile"; issueId: string };
 
 export type NotificationJobData =
     | { action: "issue.assigned"; issueId: string; assigneeId: string; actorId: string }
