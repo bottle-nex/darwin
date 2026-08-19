@@ -12,7 +12,7 @@ import { HiOutlineTrash } from "react-icons/hi";
 
 type AnyChat = Chat | ProjectChat;
 
-function ActionButton({ className, ...props }: ComponentProps<typeof Button>) {
+export function ActionButton({ className, ...props }: ComponentProps<typeof Button>) {
     return (
         <Button
             variant="unstyled"

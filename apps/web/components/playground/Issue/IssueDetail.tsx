@@ -1,10 +1,6 @@
 "use client";
 import { useState } from "react";
-import { BsChatRightText } from "react-icons/bs";
 import type { BoardColumn, BoardIssue } from "@/types/board";
-import { useIssueChatPanelStore } from "@/store/issues/useIssueChatPanelStore";
-import OptionButton from "@/components/playground/Home/KanbanDisplay/OptionsBar/KanbanOptionPanels/OptionButton";
-import { TooltipComponent } from "@/components/ui/tooltip-component";
 import { PLAYGROUND_PANE_SHELL } from "@/components/playground/Core/components/paneBar";
 import {
     PaneActionsSlot,
@@ -19,7 +15,6 @@ import IssueBody from "./IssueBody";
 import IssueSubmitAction from "./IssueSubmitAction";
 import IssueProperties from "./IssueProperties";
 import ActivityFeed from "./activity/ActivityFeed";
-import IssueChatPanel from "./chat/IssueChatPanel";
 import { isEditable, targetForIssue } from "./issueHelpers";
 import { useIssueRoute } from "./useIssueRoute";
 import { useIssueForm } from "./useIssueForm";
@@ -31,8 +26,6 @@ export default function IssueDetail({
     issue: BoardIssue;
     columns: BoardColumn[];
 }) {
-    const chatOpen = useIssueChatPanelStore((s) => s.isOpen);
-    const toggleChat = useIssueChatPanelStore((s) => s.toggle);
     const { close } = useIssueRoute();
     const [confirmingClose, setConfirmingClose] = useState(false);
 
@@ -65,17 +58,7 @@ export default function IssueDetail({
                 </PaneLeadSlot>
 
                 <PaneActionsSlot>
-                    <div className="flex items-center gap-x-2">
-                        <TooltipComponent delayDuration={1000} content="Comments" side="bottom">
-                            <OptionButton
-                                label="Comments"
-                                icon={BsChatRightText}
-                                active={chatOpen}
-                                onClick={toggleChat}
-                            />
-                        </TooltipComponent>
-                        <IssueSubmitAction form={form} warningPlacement="below" />
-                    </div>
+                    <IssueSubmitAction form={form} warningPlacement="below" />
                 </PaneActionsSlot>
                 <div className="flex min-h-0 min-w-0 flex-1 flex-row m-4">
                     <div className="flex min-h-0 w-full min-w-0 max-w-200 flex-col">
@@ -96,7 +79,6 @@ export default function IssueDetail({
                         </div>
                     </div>
                     <IssueProperties form={form} issue={issue} />
-                    <IssueChatPanel issueId={issue.id} />
                 </div>
                 <ConfirmDialog
                     open={confirmingClose}

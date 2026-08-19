@@ -108,109 +108,129 @@ function dates_predicate(from: DateRange | undefined, to: DateRange | undefined)
 
 type ActivityEntry<K extends ActivityType> = {
     icon: IconType;
-    /** The predicate that follows the actor's name, e.g. "changed status from …". */
+    iconClassName: string;
     render: (payload: ActivityPayloadMap[K]) => ReactNode;
-    /**
-     * Optional hover panel. The row states the new value; this is where the
-     * edit's before and after are worth seeing side by side.
-     */
     detail?: (payload: ActivityPayloadMap[K]) => ReactNode;
+    summary?: string;
 };
 
-/**
- * One entry per event type that has a template. Types without one fall back to
- * their humanized name, so a new writer only ever has to add a line here.
- */
 const REGISTRY: { [K in ActivityType]?: ActivityEntry<K> } = {
     [ActivityType.IssueCreated]: {
         icon: LuCirclePlus,
+        iconClassName: "text-sky-300",
         render: () => "created the issue",
+        summary: "created the issue",
     },
     [ActivityType.StatusChanged]: {
         icon: LuCircleDashed,
+        iconClassName: "text-[#F1BF00]",
         render: (payload) => (
             <>
                 moved this from <Pill>{location_label(payload.from)}</Pill> to{" "}
                 <Pill>{location_label(payload.to)}</Pill>
             </>
         ),
+        summary: "changed status",
     },
     [ActivityType.PriorityChanged]: {
         icon: RiSignalCellular2Fill,
+        iconClassName: "text-[#FF2C56]",
         render: (payload) => (
             <>
                 changed priority from <Pill>{priority_label(payload.from)}</Pill> to{" "}
                 <Pill>{priority_label(payload.to)}</Pill>
             </>
         ),
+        summary: "changed priority",
     },
     [ActivityType.TitleChanged]: {
         icon: LuPencil,
+        iconClassName: "text-neutral-300",
         render: (payload) => (
             <>
                 changed the title to <Strong>{payload.to}</Strong>
             </>
         ),
         detail: (payload) => <TextDiff before={payload.from} after={payload.to} />,
+        summary: "changed the title",
     },
     [ActivityType.DescriptionChanged]: {
         icon: LuAlignLeft,
+        iconClassName: "text-neutral-300",
         render: () => "updated the description",
+        summary: "updated the description",
     },
     [ActivityType.AssigneeAdded]: {
         icon: LuUserPlus,
+        iconClassName: "text-emerald-300",
         render: (payload) => (
             <>
                 assigned <Strong>{payload.user?.name ?? "someone"}</Strong>
             </>
         ),
+        summary: "changed assignees",
     },
     [ActivityType.AssigneeRemoved]: {
         icon: LuUserMinus,
+        iconClassName: "text-emerald-300",
         render: (payload) => (
             <>
                 unassigned <Strong>{payload.user?.name ?? "someone"}</Strong>
             </>
         ),
+        summary: "changed assignees",
     },
     [ActivityType.LabelAdded]: {
         icon: LuTag,
+        iconClassName: "text-violet-400",
         render: (payload) => (
             <>
                 added <LabelChip label={payload.label} />
             </>
         ),
+        summary: "changed labels",
     },
     [ActivityType.LabelRemoved]: {
         icon: LuTag,
+        iconClassName: "text-violet-400",
         render: (payload) => (
             <>
                 removed <LabelChip label={payload.label} />
             </>
         ),
+        summary: "changed labels",
     },
     [ActivityType.DatesChanged]: {
         icon: LuCalendar,
+        iconClassName: "text-teal-300",
         render: (payload) => dates_predicate(payload.from, payload.to),
+        summary: "changed dates",
     },
     [ActivityType.RunStarted]: {
         icon: LuPlay,
+        iconClassName: "text-amber-300",
         render: (payload) => `started attempt ${payload.attemptNumber}`,
+        summary: "started an attempt",
     },
     [ActivityType.RunCompleted]: {
         icon: LuCircleCheck,
+        iconClassName: "text-emerald-300",
         render: (payload) => `finished attempt ${payload.attemptNumber}`,
+        summary: "finished an attempt",
     },
     [ActivityType.AttemptFailed]: {
         icon: LuCircleX,
+        iconClassName: "text-red-300",
         render: (payload) => (
             <>
                 failed attempt {payload.attemptNumber} — {payload.reason}
             </>
         ),
+        summary: "failed an attempt",
     },
     [ActivityType.PrOpened]: {
         icon: LuGitPullRequest,
+        iconClassName: "text-violet-400",
         render: (payload) => (
             <>
                 opened{" "}
@@ -224,13 +244,19 @@ const REGISTRY: { [K in ActivityType]?: ActivityEntry<K> } = {
                 </a>
             </>
         ),
+        summary: "opened a pull request",
     },
 };
 
+/** What a type without a template falls back to, alongside {@link LuActivity}. */
+const UNTEMPLATED_TONE = "text-neutral-500";
+
 type ResolvedEntry = {
     icon: IconType;
+    iconClassName: string;
     render: (payload: ActivityPayload | null) => ReactNode;
     detail: ((payload: ActivityPayload | null) => ReactNode) | null;
+    summary: string;
 };
 
 export function activity_entry(type: ActivityType): ResolvedEntry {
@@ -239,15 +265,27 @@ export function activity_entry(type: ActivityType): ResolvedEntry {
     const entry = REGISTRY[type] as
         | {
               icon: IconType;
+              iconClassName: string;
               render: (payload: never) => ReactNode;
               detail?: (payload: never) => ReactNode;
+              summary?: string;
           }
         | undefined;
-    if (!entry) return { icon: LuActivity, render: () => humanize(type), detail: null };
+    if (!entry) {
+        return {
+            icon: LuActivity,
+            iconClassName: UNTEMPLATED_TONE,
+            render: () => humanize(type),
+            detail: null,
+            summary: humanize(type),
+        };
+    }
     const detail = entry.detail;
     return {
         icon: entry.icon,
+        iconClassName: entry.iconClassName,
         render: (payload) => entry.render((payload ?? {}) as never),
         detail: detail ? (payload) => detail((payload ?? {}) as never) : null,
+        summary: entry.summary ?? humanize(type),
     };
 }

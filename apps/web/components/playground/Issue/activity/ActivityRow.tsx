@@ -89,7 +89,7 @@ export default function ActivityRow({
     activity: IssueActivity;
     rail?: { above: boolean; below: boolean };
 }) {
-    const { icon: Icon, render, detail } = activity_entry(activity.type);
+    const { icon: Icon, iconClassName, render, detail } = activity_entry(activity.type);
     const actor = actor_of(activity);
     const at = new Date(activity.createdAt);
     const railSpan = railClass(rail.above, rail.below);
@@ -105,7 +105,10 @@ export default function ActivityRow({
             )}
             <span
                 aria-hidden
-                className="relative z-10 mt-0.5 flex size-[22px] shrink-0 items-center justify-center rounded-full bg-[#151515] text-neutral-500 ring-1 ring-white/8"
+                className={cn(
+                    "relative z-10 mt-0.5 flex size-[22px] shrink-0 items-center justify-center rounded-full bg-[#151515]",
+                    iconClassName,
+                )}
             >
                 <Icon className="size-3" />
             </span>
