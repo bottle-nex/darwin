@@ -27,13 +27,13 @@ interface Requirement {
 
 const REQUIREMENTS: Requirement[] = [
     { name: "claude", command: "claude --version", needed_for: "running the solving agent" },
-    { name: "gh", command: "gh --version", needed_for: "opening the pull request (step 4)" },
+    { name: "gh", command: "gh --version", needed_for: "github cli inside the sandbox" },
     { name: "git", command: "git --version", needed_for: "cloning and branching" },
     { name: "node", command: "node --version", needed_for: "running sandbox-mcp" },
     {
         name: "sandbox-mcp",
         command: `test -f ${SANDBOX_MCP_ENTRY} && echo present`,
-        needed_for: "report_pr_opened, without which a solved issue is never recorded",
+        needed_for: "report_status, the worker's Busy/Idle signal",
     },
     {
         name: "graphify",

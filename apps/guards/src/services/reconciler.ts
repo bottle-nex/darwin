@@ -98,12 +98,7 @@ export default class Reconciler {
             );
 
             for (const [worker_id, status] of worker_ids) {
-                if (status === WorkerStatus.Dead) {
-                    log.warn("Dead worker holding unfinished issue(s) — needs manual triage", {
-                        worker: worker_id,
-                    });
-                    continue;
-                }
+                if (status === WorkerStatus.Dead) continue;
 
                 const has_job = await guard_services.queue.has_active_dispatch(worker_id);
                 if (has_job) continue;
@@ -119,9 +114,55 @@ export default class Reconciler {
         }
     }
 
+    static async sweep_dead_worker_issues() {
+        try {
+            const cut_off = new Date(Date.now() - STUCK_DISPATCH_MS);
+            const issues = await prisma.issue.findMany({
+                where: {
+                    status: IssueStatus.InProgress,
+                    prUrl: null,
+                    updatedAt: { lt: cut_off },
+                    assignedWorker: { status: WorkerStatus.Dead },
+                },
+                select: { id: true, number: true, projectId: true },
+            });
+
+            if (issues.length === 0) return;
+
+            for (const issue of issues) {
+                const successor = await prisma.worker.findFirst({
+                    where: { projectId: issue.projectId, status: { not: WorkerStatus.Dead } },
+                    orderBy: { updatedAt: "asc" },
+                    select: { id: true },
+                });
+
+                if (!successor) {
+                    log.warn("no live worker to take over unfinished issue", {
+                        issue: issue.number,
+                        project: issue.projectId,
+                    });
+                    continue;
+                }
+
+                await prisma.issue.updateMany({
+                    where: { id: issue.id, status: IssueStatus.InProgress, prUrl: null },
+                    data: { assignerWorkerId: successor.id },
+                });
+                log.info("reassigned issue held by a dead worker", {
+                    issue: issue.number,
+                    worker: successor.id,
+                });
+                await guard_services.queue.enqueue_dispatch(successor.id);
+            }
+        } catch (err) {
+            log.error("sweep failed: dead worker issues", err);
+        }
+    }
+
     static async start_sweeper() {
         await Reconciler.sweep_stuck_routed_claims();
         await Reconciler.sweep_orphan_issues();
         await Reconciler.sweep_stuck_dispatches();
+        await Reconciler.sweep_dead_worker_issues();
     }
 }

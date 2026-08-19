@@ -4,7 +4,6 @@ import type Logger from "@trymatcha/logger";
 import SandboxStream, { truncate } from "./service.sandbox_stream";
 
 const REPO_DIR = "/home/user/repo";
-const PR_TOOL = "mcp__matcha__report_pr_opened";
 
 const MAX_TEXT = 160;
 const MAX_ARG = 100;
@@ -72,8 +71,6 @@ function describe_tool(name: string, input: Record<string, unknown>): string {
             return `fetch ${truncate(arg("url"), MAX_ARG)}`;
         case "WebSearch":
             return `search "${truncate(arg("query"), MAX_ARG)}"`;
-        case PR_TOOL:
-            return `pull request opened  ${truncate(arg("pr_url"), MAX_ARG)}`;
         default: {
             const first = Object.values(input).find((value) => typeof value === "string");
             return first ? `${name} ${truncate(String(first), MAX_ARG)}` : name;
@@ -205,10 +202,7 @@ export default class ClaudeRun {
         if (block.type === "tool_use") {
             const name = block.name ?? "tool";
             const summary = describe_tool(name, block.input ?? {});
-            // The PR is the whole point of the run — it should not scroll past looking like
-            // every other tool call.
-            const paint = name === PR_TOOL ? chalk.greenBright : chalk.cyan;
-            return `${paint(name === PR_TOOL ? "✔" : "⟩")} ${paint(summary)}`;
+            return `${chalk.cyan("⟩")} ${chalk.cyan(summary)}`;
         }
 
         if (block.type === "tool_result") {

@@ -2,7 +2,6 @@ import { ENV } from "../conf/config.env";
 import type { AgentReport } from "./service.claude_run";
 import type Logger from "@trymatcha/logger";
 
-// since vm doesn't has the access to the prisma, so we use http to report run lifecycle
 export default class RunReporter {
     static async started(token: string, run_id: string, issue_id: string, log: Logger) {
         await RunReporter.post("/run-started", token, { run_id, issue_id }, log);

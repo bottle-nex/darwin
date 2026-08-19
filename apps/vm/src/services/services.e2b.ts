@@ -12,8 +12,9 @@ import ClaudeRun from "./service.claude_run";
 import SandboxStream, { redact } from "./service.sandbox_stream";
 import { sign_worker_jwt } from "./service.jwt";
 import IssueSolver, { type ClaimedIssue } from "./service.issue_solver";
+import OutcomeReporter from "./service.outcome_queue";
 import Logger, { format_duration } from "@trymatcha/logger";
-import { IssueStatus, prisma, WorkerStatus } from "@trymatcha/database";
+import { prisma, WorkerStatus } from "@trymatcha/database";
 import RunReporter from "./service.run_report";
 import { randomUUID } from "node:crypto";
 
@@ -28,6 +29,7 @@ const SANDBOX_TIMEOUT_MS = 15 * 60_000;
 const WORKER_SANDBOX_TIMEOUT_MS = 55 * 60_000;
 const CLONE_TIMEOUT_MS = 10 * 60_000;
 const ISSUE_PROMPT_PATH = "/home/user/issue_prompt.txt";
+const PR_BODY_PATH = "/home/user/pr_body.md";
 const MCP_CONFIG_PATH = "/home/user/matcha_mcp_config.json";
 const SANDBOX_MCP_ENTRY = "/opt/matcha/sandbox-mcp/index.js";
 const ISSUE_SOLVE_TIMEOUT_MS = 30 * 60_000;
@@ -167,7 +169,6 @@ export default class E2B {
         let sandbox_id = worker.sandboxId;
         let pending_product_diff_ids: string[] = [];
         let teardown_succeeded = false;
-        let current_issue_id: string | null = null;
         log.step("worker loop starting", { worker: worker_id, project: project.id, branch });
 
         try {
@@ -240,24 +241,31 @@ export default class E2B {
                     break;
                 }
 
-                current_issue_id = issue.id;
-                let pull_request = await E2B.find_pull_request(
+                const existing_pull = await E2B.find_pull_request(
                     gh_token,
                     repo_full_name,
                     repo_owner,
                     issue.prBranch,
                     branch,
                 );
-                await E2B.prepare_issue_branch(sandbox, issue.prBranch, branch);
+                const already_pushed = await E2B.prepare_issue_branch(
+                    sandbox,
+                    issue.prBranch,
+                    branch,
+                );
 
                 // Minted after the claim lands, and used as the AgentSession id so a
                 // retried report is an upsert rather than a second attempt row. A resumed
                 // issue whose PR already exists never runs claude, so it has no run.
                 let run_id: string | undefined;
 
-                if (pull_request) {
+                if (existing_pull) {
                     log.info(`existing PR found for issue #${issue.number}`, {
-                        pull: pull_request.number,
+                        pull: existing_pull.number,
+                        branch: issue.prBranch,
+                    });
+                } else if (already_pushed) {
+                    log.info(`branch already pushed for issue #${issue.number}`, {
                         branch: issue.prBranch,
                     });
                 } else {
@@ -320,22 +328,42 @@ export default class E2B {
                         duration: format_duration(report.duration_ms),
                     });
                     log.block("final message from claude", report.result ?? "(empty)");
-
-                    pull_request = await E2B.find_pull_request(
-                        gh_token,
-                        repo_full_name,
-                        repo_owner,
-                        issue.prBranch,
-                        branch,
-                    );
-                    if (!pull_request) {
-                        throw new Error(`no open PR found for issue #${issue.number}`);
-                    }
                 }
 
-                await E2B.report_pr_opened(worker_token, issue, pull_request, run_id);
+                let pull_request: PullRequestSummary;
+                try {
+                    pull_request =
+                        existing_pull ??
+                        (await E2B.ensure_pull_request(
+                            sandbox,
+                            gh_token,
+                            repo_full_name,
+                            repo_owner,
+                            issue,
+                            branch,
+                        ));
+                } catch (error) {
+                    await OutcomeReporter.publish({
+                        kind: "failed",
+                        issueId: issue.id,
+                        workerId: worker_id,
+                        reason: error instanceof Error ? error.message : String(error),
+                        runId: run_id,
+                    });
+                    throw error;
+                }
+
+                log.info(`PR ready for issue #${issue.number}`, { pull: pull_request.number });
+                await OutcomeReporter.publish({
+                    kind: "pr_opened",
+                    issueId: issue.id,
+                    workerId: worker_id,
+                    prUrl: pull_request.htmlUrl,
+                    branch: issue.prBranch,
+                    summary: `Completed issue #${issue.number}: ${issue.title}`,
+                    runId: run_id,
+                });
                 solved_count++;
-                current_issue_id = null;
             }
 
             log.info("worker marked Idle");
@@ -346,12 +374,6 @@ export default class E2B {
         } catch (error) {
             log.error("worker loop failed", error, { worker: worker_id });
             try {
-                if (current_issue_id) {
-                    await prisma.issue.updateMany({
-                        where: { id: current_issue_id, status: IssueStatus.InProgress },
-                        data: { status: IssueStatus.Failed },
-                    });
-                }
                 await prisma.worker.update({
                     where: { id: worker_id },
                     data: {
@@ -441,7 +463,8 @@ ${issue.description}`;
             `Stay on the existing branch "${issue.prBranch}". Never switch branches or commit directly to "${base_branch}".`,
             `Implement the fix using your normal tools.`,
             `Commit your changes with a clear commit message.`,
-            `Push the branch and open a pull request against "${base_branch}" using the gh CLI (already authenticated via GH_TOKEN). Write a clear PR title and description referencing issue #${issue.number}.`,
+            `Push the branch to origin. Do not open a pull request — that is handled for you once you finish.`,
+            `Write a short markdown summary of your change to ${PR_BODY_PATH}. It becomes the pull request description.`,
         ];
 
         const steps = `## What to do, in this exact order
@@ -459,26 +482,30 @@ Never start a long-running command in the background and end your turn waiting o
         sandbox: Sandbox,
         issue_branch: string,
         base_branch: string,
-    ): Promise<void> {
+    ): Promise<boolean> {
         this.validate_branch(issue_branch);
         this.validate_branch(base_branch);
-
-        const current_branch = await sandbox.commands.run("git branch --show-current", {
-            cwd: REPO_DIR,
-        });
-        if (current_branch.stdout.trim() === issue_branch) return;
 
         const remote_branch = await sandbox.commands.run(
             `git ls-remote --heads origin refs/heads/${issue_branch}`,
             { cwd: REPO_DIR },
         );
-        const source_branch = remote_branch.stdout.trim() ? issue_branch : base_branch;
-        await sandbox.commands.run(`git fetch --depth 1 origin ${source_branch}`, {
+        const already_pushed = Boolean(remote_branch.stdout.trim());
+
+        const current_branch = await sandbox.commands.run("git branch --show-current", {
             cwd: REPO_DIR,
         });
-        await sandbox.commands.run(`git switch --force-create ${issue_branch} FETCH_HEAD`, {
-            cwd: REPO_DIR,
-        });
+        if (current_branch.stdout.trim() !== issue_branch) {
+            const source_branch = already_pushed ? issue_branch : base_branch;
+            await sandbox.commands.run(`git fetch --depth 1 origin ${source_branch}`, {
+                cwd: REPO_DIR,
+            });
+            await sandbox.commands.run(`git switch --force-create ${issue_branch} FETCH_HEAD`, {
+                cwd: REPO_DIR,
+            });
+        }
+
+        return already_pushed;
     }
 
     private static async find_pull_request(
@@ -501,44 +528,33 @@ Never start a long-running command in the background and end your turn waiting o
         return pulls[0] ?? null;
     }
 
-    private static async report_pr_opened(
-        worker_token: string,
+    private static async ensure_pull_request(
+        sandbox: Sandbox,
+        token: string,
+        repo_full_name: string,
+        repo_owner: string,
         issue: ClaimedIssue,
-        pull: PullRequestSummary,
-        run_id: string | undefined,
-    ): Promise<void> {
-        const url = `${ENV.SERVER_PUBLIC_API_URL.replace(/\/+$/, "")}/api/v1/worker/pr-opened`;
-        let failure = "PR completion callback failed";
-
-        for (let attempt = 1; attempt <= 3; attempt++) {
-            try {
-                const response = await fetch(url, {
-                    method: "POST",
-                    headers: {
-                        authorization: `Bearer ${worker_token}`,
-                        "content-type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        issue_id: issue.id,
-                        pr_url: pull.htmlUrl,
-                        branch: issue.prBranch,
-                        summary: `Completed issue #${issue.number}: ${issue.title}`,
-                        ...(run_id ? { run_id } : {}),
-                    }),
-                });
-                const result = (await response.json()) as { success?: boolean; message?: string };
-                if (response.ok && result.success) return;
-                failure = result.message ?? `PR completion callback failed (${response.status})`;
-            } catch (error) {
-                failure = error instanceof Error ? error.message : String(error);
-            }
-
-            if (attempt < 3) {
-                await new Promise((resolve) => setTimeout(resolve, attempt * 500));
-            }
+        base_branch: string,
+    ): Promise<PullRequestSummary> {
+        const summary = await sandbox.files.read(PR_BODY_PATH).catch(() => "");
+        try {
+            return await GithubService.createPullRequest(token, repo_full_name, {
+                head: issue.prBranch,
+                base: base_branch,
+                title: `${issue.title} (#${issue.number})`,
+                body: summary.trim() || `Resolves issue #${issue.number}: ${issue.title}`,
+            });
+        } catch (error) {
+            const existing = await E2B.find_pull_request(
+                token,
+                repo_full_name,
+                repo_owner,
+                issue.prBranch,
+                base_branch,
+            );
+            if (existing) return existing;
+            throw error;
         }
-
-        throw new Error(failure);
     }
 
     public static async head_commit(sandbox_id: string): Promise<string> {

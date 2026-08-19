@@ -5,6 +5,7 @@ export const QueueName = {
     IssueVm: "issue.vm",
     ProjectOnboard: "project.onboard",
     ProductDiff: "product.diff",
+    IssueOutcome: "issue.outcome",
     Notification: "notification.dispatch",
 } as const;
 export type QueueName = (typeof QueueName)[keyof typeof QueueName];
@@ -28,6 +29,18 @@ export interface OnboardJobData {
 export interface ProductDiffJobData {
     productDiffId: string;
 }
+
+export type IssueOutcomeJobData =
+    | {
+          kind: "pr_opened";
+          issueId: string;
+          workerId: string;
+          prUrl: string;
+          branch: string;
+          summary: string;
+          runId?: string;
+      }
+    | { kind: "failed"; issueId: string; workerId: string; reason: string; runId?: string };
 
 export type NotificationJobData =
     | { action: "issue.assigned"; issueId: string; assigneeId: string; actorId: string }

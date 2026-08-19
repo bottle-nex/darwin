@@ -96,4 +96,29 @@ export default class GithubService {
             htmlUrl: pull.html_url,
         }));
     }
+
+    static async createPullRequest(
+        token: string,
+        fullName: string,
+        pull: { head: string; base: string; title: string; body: string },
+    ): Promise<PullRequestSummary> {
+        const response = await fetch(`https://api.github.com/repos/${fullName}/pulls`, {
+            method: "POST",
+            headers: {
+                Accept: "application/vnd.github+json",
+                Authorization: `Bearer ${token}`,
+                "X-GitHub-Api-Version": "2022-11-28",
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(pull),
+        });
+        if (!response.ok) {
+            const detail = (await response.json().catch(() => null)) as { message?: string } | null;
+            throw new Error(
+                `GitHub pull request creation failed (${response.status})${detail?.message ? `: ${detail.message}` : ""}`,
+            );
+        }
+        const created = (await response.json()) as { number: number; html_url: string };
+        return { number: created.number, htmlUrl: created.html_url };
+    }
 }
