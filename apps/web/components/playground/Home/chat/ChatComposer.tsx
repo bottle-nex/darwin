@@ -7,12 +7,13 @@ import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
 import { useQueryClient } from "@tanstack/react-query";
 import type { LabelledReference } from "@trymatcha/types";
-import { IoIosSend } from "react-icons/io";
 import { HiOutlineFaceSmile } from "react-icons/hi2";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import EmojiPicker from "@/components/ui/EmojiPicker";
+import IconWrapper from "@/components/ui/IconWrapper";
 import { createReferenceMention, ISSUE_TRIGGER, SUGGESTION_KEYS } from "./referenceMention";
+import { RiTelegram2Line } from "react-icons/ri";
 
 const MESSAGE_CHAR_LIMIT = 5000;
 
@@ -140,7 +141,8 @@ const ChatComposer = forwardRef<ChatComposerHandle, ChatComposerProps>(function 
             extensions,
             editorProps: {
                 attributes: {
-                    class: "chat-composer min-h-9.5 py-1.75 pl-3 pr-11 text-[13px] leading-5 text-neutral-100",
+                    class: "chat-composer min-h-9.5 py-1.75 pl-3 pr-11 text-neutral-100",
+                    spellcheck: "false",
                 },
             },
         },
@@ -174,26 +176,24 @@ const ChatComposer = forwardRef<ChatComposerHandle, ChatComposerProps>(function 
                     className="no-scrollbar max-h-28 overflow-y-auto"
                 />
                 <Button
-                    variant="ghost"
-                    size="icon"
+                    variant="unstyled"
                     onClick={() => submit(editor)}
                     disabled={disabled || !editor || editor.isEmpty}
                     aria-label="Send message"
-                    className="absolute bottom-0.75 right-1.5 h-8! w-8! text-neutral-400 hover:bg-transparent hover:text-neutral-100 disabled:text-neutral-600"
+                    className="group absolute bottom-2 right-1.5 rounded-full"
                 >
-                    <IoIosSend className="size-5.5" />
+                    <IconWrapper icon={RiTelegram2Line} variant="ghost" />
                 </Button>
                 <EmojiPicker
                     onSelect={(emoji) => editor?.chain().focus().insertContent(emoji).run()}
                 >
                     <Button
-                        variant="ghost"
-                        size="icon"
+                        variant="unstyled"
                         disabled={disabled || !editor}
                         aria-label="Add emoji"
-                        className="absolute bottom-0.75 right-10 h-8! w-8! text-neutral-400 hover:bg-transparent hover:text-neutral-100 disabled:text-neutral-600"
+                        className="group absolute bottom-2 right-9 rounded-full"
                     >
-                        <HiOutlineFaceSmile className="size-4.5" />
+                        <IconWrapper icon={HiOutlineFaceSmile} variant="ghost" />
                     </Button>
                 </EmojiPicker>
             </div>

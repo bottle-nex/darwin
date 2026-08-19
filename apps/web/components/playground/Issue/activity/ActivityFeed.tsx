@@ -8,10 +8,6 @@ import ChatComposer from "@/components/playground/Home/chat/ChatComposer";
 import ActivityRow from "./ActivityRow";
 import AgentSessionCard from "./AgentSessionCard";
 import CommentCard, { type CommentThread } from "./CommentCard";
-import CollapsedActivityGroup from "./CollapsedActivityGroup";
-
-// this is used to collapse after this many activities
-const COLLAPSE_THRESHOLD = 3;
 
 type ActivityEntry = { kind: "activity"; at: number; activity: IssueActivity };
 
@@ -19,8 +15,6 @@ type FeedEntry =
     | ActivityEntry
     | { kind: "session"; at: number; session: AgentSession; rows: IssueActivity[] }
     | { kind: "comment"; at: number; thread: CommentThread };
-
-type RenderEntry = FeedEntry | { kind: "group"; rows: IssueActivity[] };
 
 function millis(at: string | Date): number {
     return new Date(at).getTime();
@@ -97,43 +91,16 @@ function build_entries(
     return entries.sort((a, b) => a.at - b.at);
 }
 
-function collapse_runs(entries: FeedEntry[]): RenderEntry[] {
-    const rendered: RenderEntry[] = [];
-    let run: ActivityEntry[] = [];
-
-    function flush() {
-        if (run.length >= COLLAPSE_THRESHOLD) {
-            rendered.push({ kind: "group", rows: run.map((entry) => entry.activity) });
-        } else {
-            rendered.push(...run);
-        }
-        run = [];
-    }
-
-    for (const entry of entries) {
-        if (entry.kind === "activity") {
-            run.push(entry);
-            continue;
-        }
-        flush();
-        rendered.push(entry);
-    }
-    flush();
-    return rendered;
+function is_railed(entry: FeedEntry | undefined): boolean {
+    return entry?.kind === "activity";
 }
 
-function is_railed(entry: RenderEntry | undefined): boolean {
-    return entry?.kind === "activity" || entry?.kind === "group";
-}
-
-function entry_key(entry: RenderEntry): string {
+function entry_key(entry: FeedEntry): string {
     switch (entry.kind) {
         case "session":
             return entry.session.id;
         case "comment":
             return entry.thread.root.id;
-        case "group":
-            return `group:${entry.rows[0].id}`;
         default:
             return entry.activity.id;
     }
@@ -151,10 +118,7 @@ export default function ActivityFeed({ issueId }: { issueId?: string }) {
         canDelete,
     } = useIssueComments(issueId);
 
-    const entries = useMemo(
-        () => collapse_runs(build_entries(activities, comments)),
-        [activities, comments],
-    );
+    const entries = useMemo(() => build_entries(activities, comments), [activities, comments]);
 
     const isLoading = activityLoading || commentsLoading;
 
@@ -193,14 +157,6 @@ export default function ActivityFeed({ issueId }: { issueId?: string }) {
                                         onDelete={remove}
                                         onReaction={react}
                                         canDelete={canDelete}
-                                    />
-                                );
-                            case "group":
-                                return (
-                                    <CollapsedActivityGroup
-                                        key={entry_key(entry)}
-                                        rows={entry.rows}
-                                        rail={rail}
                                     />
                                 );
                             default:

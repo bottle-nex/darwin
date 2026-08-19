@@ -24,7 +24,7 @@ export const CapsuleTrigger = forwardRef<HTMLButtonElement, React.ComponentProps
                 type="button"
                 ref={ref}
                 className={cn(
-                    "flex w-fit! items-center gap-1.5 px-3! py-1 bg-white/5 ring ring-white/10 text-[12px] text-white/55 rounded-full! cursor-pointer hover:bg-white/10 transition-colors",
+                    "flex w-fit! items-center gap-1.5 px-2! py-1! bg-white/5 ring ring-white/10 text-[13px]! font-medium text-white/55 rounded-full! cursor-pointer hover:bg-white/10 transition-colors",
                     className,
                 )}
                 {...props}

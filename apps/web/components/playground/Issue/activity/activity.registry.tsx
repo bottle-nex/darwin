@@ -4,10 +4,8 @@ import type { IconType } from "react-icons";
 import {
     LuActivity,
     LuAlignLeft,
-    LuCalendar,
     LuCircleCheck,
     LuCircleDashed,
-    LuCirclePlus,
     LuCircleX,
     LuGitPullRequest,
     LuPencil,
@@ -17,6 +15,8 @@ import {
     LuUserPlus,
 } from "react-icons/lu";
 import { RiSignalCellular2Fill } from "react-icons/ri";
+import { IoPencilSharp } from "react-icons/io5";
+import { HiCalendar } from "react-icons/hi2";
 import {
     ActivityType,
     type ActivityLocationRef,
@@ -25,7 +25,7 @@ import {
 } from "@trymatcha/types";
 import { formatDate } from "@/lib/format";
 import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
-import { PRIORITY_OPTIONS } from "../issueHelpers";
+import { DATE_ICON_COLOR, PRIORITY_OPTIONS } from "../issueHelpers";
 import TextDiff from "./TextDiff";
 
 /** Every other status already reads as a word. */
@@ -49,8 +49,27 @@ function location_glyph(location: ActivityLocationRef | undefined): Glyph | unde
     return column ? { icon: column.icon, iconClassName: column.titleBox } : undefined;
 }
 
+function priority_option(rank: number | undefined) {
+    return PRIORITY_OPTIONS.find((option) => option.rank === rank);
+}
+
 function priority_label(rank: number | undefined): string {
-    return PRIORITY_OPTIONS.find((option) => option.rank === rank)?.label ?? "No priority";
+    return priority_option(rank)?.label ?? "No priority";
+}
+
+function priority_glyph(rank: number | undefined): Glyph | undefined {
+    const option = priority_option(rank);
+    return option
+        ? { icon: option.icon, iconClassName: option.iconClassName ?? "text-neutral-400" }
+        : undefined;
+}
+
+function dates_glyph(from: DateRange | undefined, to: DateRange | undefined): Glyph {
+    const startMoved = from?.startDate !== to?.startDate;
+    return {
+        icon: HiCalendar,
+        iconClassName: startMoved ? DATE_ICON_COLOR.start : DATE_ICON_COLOR.target,
+    };
 }
 
 /** "PrChecksFailed" -> "pr checks failed", for types that have no template yet. */
@@ -60,7 +79,7 @@ function humanize(type: ActivityType): string {
 
 function Pill({ children }: { children: ReactNode }) {
     return (
-        <span className="rounded-[4px] bg-white/6 px-1.5 py-0.5 text-[12px] font-medium text-neutral-300">
+        <span className="rounded-[4px] bg-graphite px-1.5 py-0.5 text-[12px] font-medium text-neutral-300">
             {children}
         </span>
     );
@@ -73,7 +92,7 @@ function Strong({ children }: { children: ReactNode }) {
 function LabelChip({ label }: { label: { name: string; color: string } | undefined }) {
     if (!label) return <Pill>a label</Pill>;
     return (
-        <span className="inline-flex items-center gap-x-1.5 rounded-[4px] bg-white/6 px-1.5 py-0.5 text-[12px] font-medium text-neutral-300">
+        <span className="inline-flex items-center gap-x-1.5 rounded-[4px] bg-graphite px-1.5 py-0.5 text-[12px] font-medium text-neutral-300">
             <span
                 aria-hidden
                 className="size-1.5 shrink-0 rounded-full"
@@ -126,8 +145,8 @@ type ActivityEntry<K extends ActivityType> = {
 
 const REGISTRY: { [K in ActivityType]?: ActivityEntry<K> } = {
     [ActivityType.IssueCreated]: {
-        icon: LuCirclePlus,
-        iconClassName: "text-sky-300",
+        icon: IoPencilSharp,
+        iconClassName: "text-neutral-400",
         render: () => "created the issue",
         summary: "created the issue",
     },
@@ -145,7 +164,8 @@ const REGISTRY: { [K in ActivityType]?: ActivityEntry<K> } = {
     },
     [ActivityType.PriorityChanged]: {
         icon: RiSignalCellular2Fill,
-        iconClassName: "text-[#FF2C56]",
+        iconClassName: "text-neutral-400",
+        glyph: (payload) => priority_glyph(payload.to),
         render: (payload) => (
             <>
                 changed priority from <Pill>{priority_label(payload.from)}</Pill> to{" "}
@@ -212,8 +232,9 @@ const REGISTRY: { [K in ActivityType]?: ActivityEntry<K> } = {
         summary: "changed labels",
     },
     [ActivityType.DatesChanged]: {
-        icon: LuCalendar,
-        iconClassName: "text-teal-300",
+        icon: HiCalendar,
+        iconClassName: DATE_ICON_COLOR.start,
+        glyph: (payload) => dates_glyph(payload.from, payload.to),
         render: (payload) => dates_predicate(payload.from, payload.to),
         summary: "changed dates",
     },
@@ -249,7 +270,7 @@ const REGISTRY: { [K in ActivityType]?: ActivityEntry<K> } = {
                     href={payload.url}
                     target="_blank"
                     rel="noreferrer"
-                    className="font-medium text-neutral-300 underline decoration-white/20 underline-offset-2 hover:text-white"
+                    className="font-medium text-neutral-300 underline decoration-edge underline-offset-2 hover:text-mist"
                 >
                     a pull request
                 </a>

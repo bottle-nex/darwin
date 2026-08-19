@@ -99,19 +99,16 @@ export default function ActivityRow({
     return (
         <li className="relative flex items-start gap-x-2.5 py-1">
             {railSpan && (
-                <span
-                    aria-hidden
-                    className={cn("absolute left-[10.5px] w-px bg-white/8", railSpan)}
-                />
+                <span aria-hidden className={cn("absolute left-[10.5px] w-px bg-edge", railSpan)} />
             )}
             <span
                 aria-hidden
                 className={cn(
-                    "relative z-10 mt-0.5 flex size-[22px] shrink-0 items-center justify-center rounded-full bg-charcoal ",
+                    "relative z-10 mt-0.5 flex size-[22px] shrink-0 items-center justify-center rounded-full bg-charcoal",
                     iconClassName,
                 )}
             >
-                <Icon className="size-3" />
+                <Icon className="size-3.25" />
             </span>
             <p className="min-w-0 flex-1 text-[13px] leading-[22px] wrap-anywhere text-neutral-500">
                 <ActorAvatar actor={actor} className="mr-1.5 -mt-px align-middle" />
@@ -119,7 +116,7 @@ export default function ActivityRow({
                 {detail ? (
                     <HoverCard openDelay={120} closeDelay={80}>
                         <HoverCardTrigger asChild>
-                            <span className="cursor-default underline decoration-white/15 decoration-dotted underline-offset-4 hover:decoration-white/40">
+                            <span className="cursor-default underline decoration-edge decoration-dotted underline-offset-4 hover:decoration-neutral-500">
                                 {predicate}
                             </span>
                         </HoverCardTrigger>
@@ -133,7 +130,7 @@ export default function ActivityRow({
                 <time
                     dateTime={at.toISOString()}
                     title={at.toLocaleString()}
-                    className="ml-2 text-[11px] whitespace-nowrap text-neutral-600"
+                    className="ml-2 text-[11px] whitespace-nowrap text-snow/80"
                 >
                     {formatRelativeTime(at)}
                 </time>

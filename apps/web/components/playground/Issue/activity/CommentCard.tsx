@@ -130,12 +130,12 @@ function CommentContent({
                 <time
                     dateTime={at.toISOString()}
                     title={at.toLocaleString()}
-                    className="text-[11px] whitespace-nowrap text-neutral-600"
+                    className="text-[11px] whitespace-nowrap text-snow/50"
                 >
                     {formatRelativeTime(at)}
                 </time>
             </header>
-            <div className="mt-1.5 pl-7 text-[13px] leading-[21px] wrap-anywhere text-neutral-300">
+            <div className="mt-1.5 text-[13px] leading-[21px] wrap-anywhere text-neutral-300">
                 {comment.isDeleted ? (
                     <span className="text-neutral-600 italic">Comment deleted</span>
                 ) : (
@@ -151,7 +151,6 @@ function CommentContent({
                     reactions={comment.reactions ?? []}
                     isMine={false}
                     disabled={reactionDisabled}
-                    className="pl-7"
                     onReact={(emoji) => onReaction(comment, emoji)}
                 />
             )}
@@ -179,7 +178,7 @@ export default function CommentCard({
     }
 
     return (
-        <li className="my-3 overflow-hidden rounded-[8px] border border-white/8 bg-white/[0.02]">
+        <li className="my-3 overflow-hidden rounded-[8px] border border-snow/3 bg-graphite">
             <CommentContent
                 comment={root}
                 avatarSize="lg"
@@ -189,9 +188,9 @@ export default function CommentCard({
                 canDelete={canDelete}
             />
             {replies.length > 0 && (
-                <ul className="border-t border-white/6">
+                <ul className="border-t border-snow/3">
                     {replies.map((reply) => (
-                        <li key={reply.id} className="not-first:border-t border-white/6">
+                        <li key={reply.id} className="not-first:border-t border-snow/3">
                             <CommentContent
                                 comment={reply}
                                 avatarSize="md"
@@ -204,7 +203,7 @@ export default function CommentCard({
                     ))}
                 </ul>
             )}
-            <div className="border-t border-white/6">
+            <div className="border-t border-snow/3">
                 <ChatComposer
                     ref={composerRef}
                     projectId={projectId}

@@ -279,6 +279,8 @@
     /* Tiptap chat composer — a single-paragraph box, not a document. */
     .chat-composer {
         outline: none;
+        font-size: 14px;
+        line-height: 20px;
     }
 
     .chat-composer p.is-editor-empty:first-child::before {

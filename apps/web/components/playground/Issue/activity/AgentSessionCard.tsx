@@ -63,12 +63,12 @@ export default function AgentSessionCard({
     const startedAt = new Date(session.startedAt);
 
     return (
-        <li className="my-2 overflow-hidden rounded-lg border border-white/6 bg-[#151515]">
+        <li className="my-2 overflow-hidden rounded-lg border border-edge bg-cement">
             <Button
                 variant="unstyled"
                 type="button"
                 onClick={() => setExpanded((prev) => !prev)}
-                className="flex w-full cursor-pointer items-center gap-x-2.5 px-3 py-2.5 text-left transition-colors hover:bg-white/3"
+                className="flex w-full cursor-pointer items-center gap-x-2.5 px-3 py-2.5 text-left transition-colors hover:bg-graphite"
             >
                 <span
                     aria-hidden
@@ -82,7 +82,7 @@ export default function AgentSessionCard({
                     <time
                         dateTime={startedAt.toISOString()}
                         title={startedAt.toLocaleString()}
-                        className="ml-2 text-[11px] whitespace-nowrap text-neutral-600"
+                        className="ml-2 text-[11px] whitespace-nowrap text-snow/50"
                     >
                         {formatRelativeTime(startedAt)}
                     </time>
@@ -110,7 +110,7 @@ export default function AgentSessionCard({
                 </motion.span>
             </Button>
             {expanded && (
-                <div className="border-t border-white/6 px-3 py-2">
+                <div className="border-t border-edge px-3 py-2">
                     {(session.summary || session.error) && (
                         <p
                             className={cn(
