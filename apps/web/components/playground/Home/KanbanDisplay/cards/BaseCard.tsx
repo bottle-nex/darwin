@@ -15,9 +15,11 @@ export default function BaseCard({ issue, children, className }: BaseCardProps) 
         <div className={cn(CARD_SHELL, className)}>
             <IssueCardFace
                 identifier={issueIdentifier(issue.project, issue.number)}
+                issueId={issue.id}
                 title={issue.title}
                 status={issue.status}
                 priority={issue.priority}
+                tags={issue.tags}
                 targetDate={issue.targetDate}
                 createdAt={issue.createdAt}
                 assignees={issue.assignees}

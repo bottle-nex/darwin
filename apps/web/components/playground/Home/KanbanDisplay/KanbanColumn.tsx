@@ -1,8 +1,10 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { MdMoreHoriz } from "react-icons/md";
+import { MdAdd, MdMoreHoriz } from "react-icons/md";
 import { useDroppable } from "@dnd-kit/core";
 import { cn } from "@/lib/utils";
+import { IssueStatus } from "@trymatcha/types";
+import { useIssueStore } from "@/store/issues/useIssueStore";
 import { MatchaLogo } from "@/components/logo/MatchaLogo";
 import type { Issue, KanbanColumnDef } from "@/types/kanban";
 import CardRenderer from "./cards/CardRenderer";
@@ -27,8 +29,10 @@ export default function KanbanColumn({
     draggableCards = false,
 }: KanbanColumnProps) {
     const { setNodeRef } = useDroppable({ id: column.status, disabled: !droppable });
+    const openCreate = useIssueStore((s) => s.openCreate);
     const { title } = column;
     const grid = layout === "grid";
+    const canAddCard = column.status === IssueStatus.Todo;
 
     return (
         <div
@@ -40,14 +44,27 @@ export default function KanbanColumn({
         >
             <div className="mb-2 flex items-center justify-between gap-2 px-0.5">
                 <LLMIssueStatusTicker status={column.status} count={issues.length} />
-                <Button
-                    variant="unstyled"
-                    type="button"
-                    aria-label={`${title} options`}
-                    className="flex size-6 cursor-pointer items-center justify-center rounded text-neutral-400 opacity-0 transition-opacity hover:bg-white/10 hover:text-neutral-200 focus-visible:opacity-100 group-hover:opacity-100"
-                >
-                    <MdMoreHoriz className="size-4" aria-hidden />
-                </Button>
+                <div className="flex items-center gap-1">
+                    {canAddCard && (
+                        <Button
+                            variant="unstyled"
+                            type="button"
+                            onClick={() => openCreate({ board: "llm" })}
+                            aria-label={`Add an issue to ${title}`}
+                            className="flex size-6 cursor-pointer items-center justify-center rounded text-neutral-400 opacity-0 transition-opacity hover:bg-white/10 hover:text-neutral-200 focus-visible:opacity-100 group-hover:opacity-100"
+                        >
+                            <MdAdd className="size-4" aria-hidden />
+                        </Button>
+                    )}
+                    <Button
+                        variant="unstyled"
+                        type="button"
+                        aria-label={`${title} options`}
+                        className="flex size-6 cursor-pointer items-center justify-center rounded text-neutral-400 opacity-0 transition-opacity hover:bg-white/10 hover:text-neutral-200 focus-visible:opacity-100 group-hover:opacity-100"
+                    >
+                        <MdMoreHoriz className="size-4" aria-hidden />
+                    </Button>
+                </div>
             </div>
 
             <div
@@ -67,6 +84,21 @@ export default function KanbanColumn({
                     ) : (
                         <CardRenderer key={issue.id} issue={issue} />
                     ),
+                )}
+
+                {canAddCard && (
+                    <Button
+                        variant="unstyled"
+                        type="button"
+                        onClick={() => openCreate({ board: "llm" })}
+                        className={cn(
+                            "flex shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-[9px] px-2 py-1.5 text-center text-[13px] font-medium text-neutral-400 opacity-0 transition-opacity hover:bg-white/5 hover:text-neutral-200 focus-visible:opacity-100 group-hover:opacity-100",
+                            grid && "col-span-full",
+                        )}
+                    >
+                        <MdAdd className="size-3.5" aria-hidden />
+                        Add an Issue
+                    </Button>
                 )}
 
                 {issues.length === 0 && (

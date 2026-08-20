@@ -66,7 +66,7 @@ export default class IssueStatusChangedNotification {
 
         if (data.toStatus !== IssueStatus.Failed) return;
 
-        const url = `${ENV.SERVER_WEB_URL}/playground/${orgSlug}/${projectSlug}?tab=thread-detail&thread=${data.issueId}`;
+        const url = `${ENV.SERVER_WEB_URL}/playground/${orgSlug}/${projectSlug}/issue/${data.issueId}`;
         await sendIssueFailedEmail(recipient.email, {
             issueTitle: issue.title,
             projectName: issue.project.name,

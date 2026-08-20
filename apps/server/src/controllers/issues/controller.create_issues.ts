@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import z from "zod";
 import ResponseWriter from "../../services/service.response";
+import DescriptionReferenceService from "../../services/service.description-references";
 import Access from "../../access-control/access";
 import { Action, Permissions } from "@trymatcha/access-control";
 import { prisma } from "@trymatcha/database";
@@ -93,10 +94,15 @@ export default class IssueCreateController {
                 }
             }
 
+            const references = await DescriptionReferenceService.resolve(
+                parsed_body.data.description,
+                parsed_body.data.project_id,
+            );
+
             const full_issue = await IssueService.create_issue({
                 project_id: parsed_body.data.project_id,
                 title: parsed_body.data.title,
-                description: parsed_body.data.description,
+                description: references.message,
                 priority: parsed_body.data.priority,
                 custom_column_id: parsed_body.data.custom_column_id,
                 start_date: parsed_body.data.start_date,
@@ -105,6 +111,10 @@ export default class IssueCreateController {
                 tag_ids: parsed_body.data.tag_ids,
                 created_by: { id: user.id, name: user.name },
             });
+
+            if (full_issue) {
+                await DescriptionReferenceService.write(full_issue.id, references);
+            }
 
             if (!full_issue) {
                 ResponseWriter.system_error(res);

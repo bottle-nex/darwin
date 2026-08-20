@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import IconWrapper from "@/components/ui/IconWrapper";
 
 type TagDisplayProps = {
     name: string;
@@ -12,19 +13,12 @@ type TagDisplayProps = {
  */
 export default function TagDisplay({ name, color, className }: TagDisplayProps) {
     return (
-        <span
-            className={cn(
-                "inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[12px] text-neutral-200",
-                className,
-            )}
-            style={{ backgroundColor: `${color}1a`, borderColor: `${color}40` }}
+        <IconWrapper
+            variant="outline"
+            dotColor={color}
+            className={cn("text-[12px] text-neutral-200", className)}
         >
-            <span
-                className="size-2 shrink-0 rounded-full"
-                style={{ backgroundColor: color }}
-                aria-hidden
-            />
-            <span className="truncate">{name}</span>
-        </span>
+            {name}
+        </IconWrapper>
     );
 }

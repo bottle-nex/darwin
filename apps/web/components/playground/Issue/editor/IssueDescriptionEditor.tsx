@@ -1,5 +1,6 @@
 "use client";
 
+import { Extension } from "@tiptap/core";
 import { cn } from "@/lib/utils";
 import { TableKit } from "@tiptap/extension-table";
 import { Timestamp } from "./timestamp";
@@ -21,6 +22,19 @@ import { createReferenceMention } from "@/components/playground/Home/chat/refere
 
 const DESCRIPTION_CHAR_LIMIT = 2500;
 
+/**
+ * StarterKit's HardBreak claims Mod-Enter for a line break, which swallowed the
+ * form's save. Shift-Enter still inserts a break; Mod-Enter is left for the
+ * submit handler listening on the window.
+ */
+const ModEnterSubmits = Extension.create({
+    name: "modEnterSubmits",
+    priority: 1000,
+    addKeyboardShortcuts() {
+        return { "Mod-Enter": () => true };
+    },
+});
+
 const ImageWithControls = Image.extend({
     addNodeView() {
         return ReactNodeViewRenderer(ImageNodeView);
@@ -39,7 +53,7 @@ interface IssueDescriptionEditorProps {
     initialContent?: string;
     editable?: boolean;
     authoring?: boolean;
-    /** Enables `@member` mentions, scoped to this project's members. */
+    /** Enables `@member` and `#issue` references, scoped to this project. */
     mentionProjectId?: string;
     onChange?: (state: IssueDescriptionState) => void;
     onReady?: (editor: Editor) => void;
@@ -93,12 +107,13 @@ export default function IssueDescriptionEditor({
             EditorPlaceholder.configure({ emptyDocText: placeholder }),
             CharacterCount.configure({ limit: DESCRIPTION_CHAR_LIMIT }),
             SlashCommand,
+            ModEnterSubmits,
             ...(mentionProjectId
                 ? [
                       createReferenceMention({
                           queryClient,
                           projectId: mentionProjectId,
-                          triggers: ["member"],
+                          triggers: ["member", "issue"],
                       }),
                   ]
                 : []),

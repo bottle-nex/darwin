@@ -75,11 +75,11 @@ export default function IssueDropdown({
 
     if (!issue) return <>{children}</>;
 
-    const statusColumn = KanbanBoard.COLUMNS.find((column) => column.status === issue.status);
+    const statusGlyph = KanbanBoard.glyphFor(issue.status);
     const priorityOption = PRIORITY_OPTIONS.find(
         (option) => PRIORITY_TO_NUMBER[option.value] === issue.priority,
     );
-    const StatusIcon = statusColumn?.icon ?? KanbanBoard.COLUMNS[0].icon;
+    const StatusIcon = statusGlyph.icon;
     const PriorityIcon = priorityOption?.icon ?? PRIORITY_OPTIONS[0].icon;
 
     return (
@@ -99,7 +99,7 @@ export default function IssueDropdown({
                     trigger={
                         <>
                             <StatusIcon
-                                className={cn("size-3.5", statusColumn?.titleBox)}
+                                className={cn("size-3.5", statusGlyph.titleBox)}
                                 aria-hidden
                             />
                             <span className="flex-1">Status</span>

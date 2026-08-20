@@ -46,7 +46,6 @@ function TabPane({ tab }: { tab: string }) {
         case PlaygroundTab.SettingsEnv:
             return <SettingsDisplay section="env" />;
         case PlaygroundTab.Chats:
-        case PlaygroundTab.ThreadDetail:
             return <ChatsDisplay />;
 
         case PlaygroundTab.Kanban:

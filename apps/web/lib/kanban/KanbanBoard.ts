@@ -3,6 +3,7 @@ import {
     LuCircleDashed,
     LuCircleDotDashed,
     LuCircleCheck,
+    LuCirclePause,
     LuCircleX,
     LuCircleSlash,
 } from "react-icons/lu";
@@ -14,6 +15,8 @@ import {
     type KanbanColumnDef,
     type Priority,
 } from "@/types/kanban";
+
+export type StatusGlyph = Pick<KanbanColumnDef, "icon" | "titleBox">;
 
 /** Board configuration and lane bookkeeping for the LLM Kanban. */
 export class KanbanBoard {
@@ -89,6 +92,24 @@ export class KanbanBoard {
 
     static columnFor(status: string | undefined): KanbanColumnDef | undefined {
         return status ? KanbanBoard.COLUMN_BY_STATUS.get(status) : undefined;
+    }
+
+    /**
+     * Issues parked in a custom column sit outside the LLM lanes, so they have no
+     * `COLUMNS` entry. Their glyph lives here rather than in `COLUMNS`, which
+     * would add a lane to the board.
+     */
+    private static readonly OFF_BOARD_GLYPH: StatusGlyph = {
+        icon: LuCirclePause,
+        titleBox: "text-neutral-500",
+    };
+
+    /** The status circle for any issue, on a board lane or parked off it. */
+    static glyphFor(status: string | undefined): StatusGlyph {
+        const column = KanbanBoard.columnFor(status);
+        return column
+            ? { icon: column.icon, titleBox: column.titleBox }
+            : KanbanBoard.OFF_BOARD_GLYPH;
     }
 
     static isBridgeStatus(status: string): status is KanbanStatus {

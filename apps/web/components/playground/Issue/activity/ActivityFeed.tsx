@@ -1,9 +1,10 @@
 "use client";
-import { useMemo } from "react";
-import type { AgentSession, Chat, IssueActivity } from "@trymatcha/types";
+import { useMemo, useState } from "react";
+import { to_plain_text, type AgentSession, type Chat, type IssueActivity } from "@trymatcha/types";
 import { useActivity } from "@/hooks/activity/useActivity";
 import { useIssueComments } from "@/hooks/chats/useIssueComments";
 import LogoLoader from "@/components/app/LogoLoader";
+import ConfirmDialog from "@/components/utility/ConfirmDialog";
 import ChatComposer from "@/components/playground/Home/chat/ChatComposer";
 import ActivityRow from "./ActivityRow";
 import AgentSessionCard from "./AgentSessionCard";
@@ -95,6 +96,13 @@ function is_railed(entry: FeedEntry | undefined): boolean {
     return entry?.kind === "activity";
 }
 
+const EXCERPT_LIMIT = 120;
+
+function excerpt(comment: Chat): string {
+    const text = to_plain_text(comment.message, comment.references ?? []);
+    return text.length > EXCERPT_LIMIT ? `${text.slice(0, EXCERPT_LIMIT).trimEnd()}...` : text;
+}
+
 function entry_key(entry: FeedEntry): string {
     switch (entry.kind) {
         case "session":
@@ -118,9 +126,17 @@ export default function ActivityFeed({ issueId }: { issueId?: string }) {
         canDelete,
     } = useIssueComments(issueId);
 
+    const [pendingDelete, setPendingDelete] = useState<Chat | null>(null);
+
     const entries = useMemo(() => build_entries(activities, comments), [activities, comments]);
 
     const isLoading = activityLoading || commentsLoading;
+
+    function confirmDelete() {
+        if (!pendingDelete) return;
+        remove(pendingDelete);
+        setPendingDelete(null);
+    }
 
     return (
         <section className="flex min-w-0 flex-col gap-y-3 pt-2">
@@ -154,7 +170,7 @@ export default function ActivityFeed({ issueId }: { issueId?: string }) {
                                         thread={entry.thread}
                                         projectId={projectId}
                                         onReply={send}
-                                        onDelete={remove}
+                                        onDelete={setPendingDelete}
                                         onReaction={react}
                                         canDelete={canDelete}
                                     />
@@ -182,6 +198,26 @@ export default function ActivityFeed({ issueId }: { issueId?: string }) {
                     onSend={send}
                 />
             </div>
+            <ConfirmDialog
+                open={Boolean(pendingDelete)}
+                onOpenChange={(next) => !next && setPendingDelete(null)}
+                title="Delete comment?"
+                description={
+                    <>
+                        This removes{" "}
+                        <span className="font-medium text-neutral-200">
+                            &ldquo;{pendingDelete ? excerpt(pendingDelete) : ""}&rdquo;
+                        </span>{" "}
+                        from the timeline. You can&apos;t undo this.
+                    </>
+                }
+                cancel={{
+                    label: "Cancel",
+                    variant: "tertiary",
+                    onClick: () => setPendingDelete(null),
+                }}
+                confirm={{ label: "Delete", variant: "destructive", onClick: confirmDelete }}
+            />
         </section>
     );
 }

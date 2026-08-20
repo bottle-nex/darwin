@@ -69,7 +69,8 @@ model ProjectMember {
   project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
   user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  references MessageReference[]
+  references            MessageReference[]
+  descriptionReferences DescriptionReference[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

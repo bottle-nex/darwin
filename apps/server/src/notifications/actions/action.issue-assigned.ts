@@ -36,7 +36,7 @@ export default class IssueAssignedNotification {
         const actorName = actor.name ?? actor.email;
         const orgSlug = issue.project.organization.slug;
         const projectSlug = issue.project.slug;
-        const url = `${ENV.SERVER_WEB_URL}/playground/${orgSlug}/${projectSlug}?tab=thread-detail&thread=${data.issueId}`;
+        const url = `${ENV.SERVER_WEB_URL}/playground/${orgSlug}/${projectSlug}/issue/${data.issueId}`;
 
         const notification = await prisma.notification.create({
             data: {

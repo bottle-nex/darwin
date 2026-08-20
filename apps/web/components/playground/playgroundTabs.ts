@@ -12,7 +12,6 @@ export enum PlaygroundTab {
     Reviews = "reviews",
     AssignedToMe = "assigned-to-me",
     TeamDetail = "team-detail",
-    ThreadDetail = "thread-detail",
     SettingsProject = "settings-project",
     SettingsTemplates = "settings-templates",
     SettingsEnv = "settings-env",

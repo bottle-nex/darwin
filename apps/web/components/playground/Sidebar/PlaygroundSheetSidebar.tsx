@@ -9,12 +9,11 @@ export default function PlaygroundSheetSidebar() {
     const { width, collapsed, sheetOpen, openSheet, closeSheet } = useSidebarWidthStore();
     const tab = usePlaygroundNavStore((s) => s.tab);
     const selectedTeam = usePlaygroundNavStore((s) => s.selectedTeam);
-    const selectedThread = usePlaygroundNavStore((s) => s.selectedThread);
 
     useEffect(() => {
         if (sheetOpen) closeSheet();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [tab, selectedTeam, selectedThread]);
+    }, [tab, selectedTeam]);
 
     return (
         <>
