@@ -1,5 +1,6 @@
 "use client";
 import { useIssueSelection } from "@/hooks/issues/useIssueSelection";
+import { useIssueNavigation } from "@/components/playground/Issue/useIssueNavigation";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
 import { PlaygroundTab } from "@/components/playground/playgroundTabs";
 import { KanbanStatus, type Issue } from "@/types/kanban";
