@@ -58,7 +58,7 @@ export default function ConfirmDialog({
 
     return (
         <Dialog open={open} onOpenChange={(next) => !pending && onOpenChange(next)}>
-            <DialogContent className={cn("sm:max-w-md", className)}>
+            <DialogContent className={cn("sm:max-w-md rounded-xl", className)}>
                 <DialogHeader className="gap-1.5">
                     <DialogTitle className="text-base text-neutral-100">{title}</DialogTitle>
                     <DialogDescription className="text-[13px] text-neutral-400">

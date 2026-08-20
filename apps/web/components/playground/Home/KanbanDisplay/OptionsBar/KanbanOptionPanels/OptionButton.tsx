@@ -32,7 +32,7 @@ const OptionButton = forwardRef<HTMLButtonElement, OptionButtonProps>(
             <IconWrapper
                 icon={icon}
                 active={active}
-                variant="ghost"
+                variant="solid"
                 className="hover:bg-transparent!"
             />
         </Button>

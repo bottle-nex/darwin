@@ -3,6 +3,13 @@ export interface Tag {
     name: string;
     color: string;
     createdAt: string;
+    creator: TagCreator | null;
+}
+
+export interface TagCreator {
+    id: string;
+    name: string | null;
+    image: string | null;
 }
 
 // Curated swatches that read well on the dark charcoal theme. First is matcha green.

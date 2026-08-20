@@ -63,7 +63,13 @@ export default async function update_tag_controller(req: Request, res: Response)
                 ...(data.name !== undefined ? { name: data.name } : {}),
                 ...(data.color !== undefined ? { color: data.color } : {}),
             },
-            select: { id: true, name: true, color: true, createdAt: true },
+            select: {
+                id: true,
+                name: true,
+                color: true,
+                createdAt: true,
+                creator: { select: { id: true, name: true, image: true } },
+            },
         });
 
         ResponseWriter.success(res, tag, "Tag updated");

@@ -5,6 +5,8 @@ import {
     MdAdd,
     MdCheck,
     MdClose,
+    MdDelete,
+    MdEdit,
     MdSearch,
     MdSortByAlpha,
 } from "react-icons/md";
@@ -34,10 +36,22 @@ type TagsOptionsBarProps = {
     count: number;
     /** Open the create-tag dialog. */
     onCreate: () => void;
+    /** How many rows are checked in the list. */
+    selectedCount: number;
+    /** Edit the single checked tag. */
+    onEditSelected: () => void;
+    /** Delete every checked tag. */
+    onDeleteSelected: () => void;
 };
 
 /** Tags toolbar: count, slide-in search, sort menu, and the New tag button. */
-export default function TagsOptionsBar({ count, onCreate }: TagsOptionsBarProps) {
+export default function TagsOptionsBar({
+    count,
+    onCreate,
+    selectedCount,
+    onEditSelected,
+    onDeleteSelected,
+}: TagsOptionsBarProps) {
     const { searchOpen, search, setSearch, openSearch, closeSearch, sort, setSort } =
         useTagsOptionsStore();
 
@@ -46,7 +60,9 @@ export default function TagsOptionsBar({ count, onCreate }: TagsOptionsBarProps)
             <PaneLeadSlot>
                 <div className="flex min-w-0 items-center gap-2">
                     <span className="shrink-0 text-[13px] font-medium text-neutral-200">Tags</span>
-                    <span className="shrink-0 text-[12px] text-neutral-500">{count}</span>
+                    <span className="shrink-0 text-[12px] text-neutral-500">
+                        {selectedCount ? `${selectedCount} selected` : count}
+                    </span>
 
                     <AnimatePresence initial={false}>
                         {searchOpen && (
@@ -62,6 +78,21 @@ export default function TagsOptionsBar({ count, onCreate }: TagsOptionsBarProps)
 
             <PaneActionsSlot>
                 <div className="flex shrink-0 items-center gap-1.5">
+                    {selectedCount === 1 && (
+                        <OptionButton label="Edit tag" icon={MdEdit} onClick={onEditSelected} />
+                    )}
+
+                    {selectedCount > 0 && (
+                        <>
+                            <OptionButton
+                                label="Delete tag"
+                                icon={MdDelete}
+                                onClick={onDeleteSelected}
+                            />
+                            <div className="mx-1 h-4 w-px bg-white/8" />
+                        </>
+                    )}
+
                     <OptionButton
                         label="Search"
                         icon={LuSearch}
@@ -102,15 +133,7 @@ export default function TagsOptionsBar({ count, onCreate }: TagsOptionsBarProps)
 
                     <div className="mx-1 h-4 w-px bg-white/8" />
 
-                    <Button
-                        type="button"
-                        variant="tertiary"
-                        onClick={onCreate}
-                        className="ml-0.5 flex h-6 items-center gap-1 rounded-sm bg-neutral-100 px-2 text-[11.5px] font-medium text-neutral-900 hover:bg-neutral-200"
-                    >
-                        <MdAdd className="size-3.5 text-neutral-800!" aria-hidden />
-                        New tag
-                    </Button>
+                    <OptionButton label="New tag" icon={MdAdd} onClick={onCreate} />
                 </div>
             </PaneActionsSlot>
         </>

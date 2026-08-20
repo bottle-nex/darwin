@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { PLAYGROUND_DEFAULT_TAB } from "@/components/playground/playgroundTabs";
+import { PLAYGROUND_DEFAULT_TAB, PlaygroundTab } from "@/components/playground/playgroundTabs";
 import { useIssueStore } from "@/store/issues/useIssueStore";
 import type { ProjectTeam } from "@/types/project";
 
@@ -8,6 +8,12 @@ import type { ProjectTeam } from "@/types/project";
  * Mirrors `PlaygroundTab.TeamDetail`.
  */
 export const TEAM_DETAIL_TAB = "team-detail";
+
+const SETTINGS_TABS = new Set<string>([
+    PlaygroundTab.SettingsProject,
+    PlaygroundTab.SettingsTemplates,
+    PlaygroundTab.SettingsEnv,
+]);
 
 /**
  * Central navigation state for the playground workspace.
@@ -20,21 +26,31 @@ export const TEAM_DETAIL_TAB = "team-detail";
  */
 interface PlaygroundNavState {
     tab: string;
+    lastWorkspaceTab: string;
     selectedTeam: ProjectTeam | null;
     /** Slug of the project the selected team belongs to — guards stale detail. */
     selectedTeamProjectSlug: string | null;
     setTab: (tabId: string) => void;
+    returnFromSettings: () => void;
     openTeam: (team: ProjectTeam, projectSlug: string) => void;
     clearTeam: () => void;
 }
 
 export const usePlaygroundNavStore = create<PlaygroundNavState>((set) => ({
     tab: PLAYGROUND_DEFAULT_TAB,
+    lastWorkspaceTab: PLAYGROUND_DEFAULT_TAB,
     selectedTeam: null,
     selectedTeamProjectSlug: null,
     setTab: (tabId) => {
         useIssueStore.getState().close();
-        set({ tab: tabId });
+        set((state) => ({
+            tab: tabId,
+            lastWorkspaceTab: SETTINGS_TABS.has(tabId) ? state.lastWorkspaceTab : tabId,
+        }));
+    },
+    returnFromSettings: () => {
+        useIssueStore.getState().close();
+        set((state) => ({ tab: state.lastWorkspaceTab }));
     },
     openTeam: (team, projectSlug) => {
         useIssueStore.getState().close();
@@ -42,6 +58,7 @@ export const usePlaygroundNavStore = create<PlaygroundNavState>((set) => ({
             selectedTeam: team,
             selectedTeamProjectSlug: projectSlug,
             tab: TEAM_DETAIL_TAB,
+            lastWorkspaceTab: TEAM_DETAIL_TAB,
         });
     },
     clearTeam: () =>
@@ -49,5 +66,6 @@ export const usePlaygroundNavStore = create<PlaygroundNavState>((set) => ({
             selectedTeam: null,
             selectedTeamProjectSlug: null,
             tab: PLAYGROUND_DEFAULT_TAB,
+            lastWorkspaceTab: PLAYGROUND_DEFAULT_TAB,
         }),
 }));

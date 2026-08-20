@@ -40,8 +40,19 @@ export default async function create_tag_controller(req: Request, res: Response)
         }
 
         const tag = await prisma.tag.create({
-            data: { projectId: project_id, name: data.name, color: data.color },
-            select: { id: true, name: true, color: true, createdAt: true },
+            data: {
+                projectId: project_id,
+                name: data.name,
+                color: data.color,
+                createdById: user.id,
+            },
+            select: {
+                id: true,
+                name: true,
+                color: true,
+                createdAt: true,
+                creator: { select: { id: true, name: true, image: true } },
+            },
         });
 
         ResponseWriter.created(res, tag, "Tag created");

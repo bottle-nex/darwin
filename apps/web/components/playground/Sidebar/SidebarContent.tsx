@@ -20,6 +20,7 @@ const SETTINGS_TABS: string[] = [
 export default function SidebarContent() {
     const selectedRowId = usePlaygroundNavStore((s) => s.tab);
     const setTab = usePlaygroundNavStore((s) => s.setTab);
+    const returnFromSettings = usePlaygroundNavStore((s) => s.returnFromSettings);
 
     const inSettings = SETTINGS_TABS.includes(selectedRowId);
     const section = {
@@ -39,18 +40,18 @@ export default function SidebarContent() {
                 <SidebarActions />
             </div>
 
-            <div className="min-h-0 flex-1 overflow-y-auto px-2">
-                <AnimatePresence mode="wait" initial={false}>
+            <div className="relative min-h-0 flex-1 overflow-y-auto px-2">
+                <AnimatePresence mode="popLayout" initial={false}>
                     <motion.div
                         key={inSettings ? "settings" : "main"}
                         initial={{ opacity: 0, x: inSettings ? 10 : -10 }}
                         animate={{ opacity: 1, x: 0 }}
                         exit={{ opacity: 0, x: inSettings ? 10 : -10 }}
                         transition={{ duration: 0.16, ease: [0.4, 0, 0.2, 1] }}
-                        className="flex flex-col gap-3"
+                        className="flex flex-col gap-3 will-change-transform"
                     >
                         {inSettings ? (
-                            <SettingsNavSection {...section} />
+                            <SettingsNavSection {...section} onBack={returnFromSettings} />
                         ) : (
                             <>
                                 <BoardSection {...section} />

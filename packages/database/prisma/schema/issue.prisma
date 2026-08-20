@@ -52,9 +52,11 @@ model Tag {
   name  String
   color String
 
-  projectId String
-  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  issues    Issue[]
+  projectId   String
+  createdById String?
+  project     Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  creator     User?   @relation(name: "TagCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  issues      Issue[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

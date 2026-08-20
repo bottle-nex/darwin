@@ -29,7 +29,13 @@ export default async function list_tags_controller(req: Request, res: Response) 
 
         const tags = await prisma.tag.findMany({
             where: { projectId: project_id },
-            select: { id: true, name: true, color: true, createdAt: true },
+            select: {
+                id: true,
+                name: true,
+                color: true,
+                createdAt: true,
+                creator: { select: { id: true, name: true, image: true } },
+            },
             orderBy: { createdAt: "asc" },
         });
 

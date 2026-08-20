@@ -33,6 +33,7 @@ model User {
 
   createdIssues  Issue[] @relation(name: "IssueCreator")
   assignedIssues Issue[] @relation(name: "IssueAssignees")
+  createdTags    Tag[]   @relation(name: "TagCreator")
 
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt

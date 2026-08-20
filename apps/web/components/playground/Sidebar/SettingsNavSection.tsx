@@ -26,13 +26,14 @@ const SETTINGS: SettingsItem[] = [
 export default function PlaygroundSidebarSettingsNavSection({
     selectedRowId,
     onSelect,
-}: SidebarSectionProps) {
+    onBack,
+}: SidebarSectionProps & { onBack: () => void }) {
     return (
         <div className="mt-1 flex flex-col gap-0.5">
             <Row
                 leading={{ kind: "icon", icon: HiOutlineArrowLeft }}
                 label="Back"
-                onClick={() => onSelect(PlaygroundTab.Kanban)}
+                onClick={onBack}
             />
             <div className="my-1.5 h-px bg-white/5" />
             {SETTINGS.map((item) => (
