@@ -5,14 +5,14 @@ import type { ReferencedIssueLabel } from "@trymatcha/types";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
-import { useIssueRoute } from "@/components/playground/Issue/useIssueRoute";
+import { useIssueNavigation } from "@/components/playground/Issue/useIssueNavigation";
 
 const STATUS_STYLE = new Map(
     KanbanBoard.COLUMNS.map((column) => [column.status as string, column]),
 );
 
 export default function IssueReferenceCard({ issue }: { issue: ReferencedIssueLabel }) {
-    const { openIssue } = useIssueRoute();
+    const { openIssue } = useIssueNavigation();
     const status = issue.status ? STATUS_STYLE.get(issue.status) : undefined;
     const StatusIcon = status?.icon ?? LuCircleDashed;
 

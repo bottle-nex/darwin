@@ -16,7 +16,7 @@ import IssueSubmitAction from "./IssueSubmitAction";
 import IssueProperties from "./IssueProperties";
 import ActivityFeed from "./activity/ActivityFeed";
 import { isEditable, targetForIssue } from "./issueHelpers";
-import { useIssueRoute } from "./useIssueRoute";
+import { useIssueNavigation } from "./useIssueNavigation";
 import { useIssueForm } from "./useIssueForm";
 
 export default function IssueDetail({
@@ -26,7 +26,7 @@ export default function IssueDetail({
     issue: BoardIssue;
     columns: BoardColumn[];
 }) {
-    const { close } = useIssueRoute();
+    const { close } = useIssueNavigation();
     const [confirmingClose, setConfirmingClose] = useState(false);
 
     const form = useIssueForm({

@@ -40,7 +40,7 @@ export default function ResourcePickerDialog({
         <Dialog open onOpenChange={onOpenChange}>
             <DialogContent
                 showCloseButton={false}
-                className="top-[18%] w-125 max-w-[calc(100%-2rem)] translate-y-0 gap-0 overflow-hidden rounded-2xl border-white/10 bg-cement p-0 sm:max-w-none"
+                className="top-[18%] w-125 max-w-[calc(100%-2rem)] translate-y-0 gap-0 overflow-hidden rounded-2xl border-white/10 p-0 sm:max-w-none"
             >
                 <DialogTitle className="sr-only">{title}</DialogTitle>
                 <Command loop disablePointerSelection className="bg-transparent">

@@ -17,7 +17,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog";
-import { useIssueRoute } from "@/components/playground/Issue/useIssueRoute";
+import { useIssueNavigation } from "@/components/playground/Issue/useIssueNavigation";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { useCustomCardActions } from "@/hooks/kanban/useCustomCardActions";
 import { CARD_SHELL } from "../cardStyles";
@@ -40,7 +40,7 @@ export default function CustomKanbanCard({ card, preview = false }: CustomKanban
     const [confirmOpen, setConfirmOpen] = useState(false);
     const [assignOpen, setAssignOpen] = useState(false);
     const canAssign = Boolean(projectId) && !preview;
-    const { openIssue } = useIssueRoute();
+    const { openIssue } = useIssueNavigation();
 
     const face = (
         <div className={cn(CARD_SHELL, "group/card relative")}>
@@ -102,7 +102,7 @@ export default function CustomKanbanCard({ card, preview = false }: CustomKanban
             </div>
 
             <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
-                <DialogContent className="border-white/10 bg-charcoal sm:max-w-100">
+                <DialogContent className="border-white/10 sm:max-w-100">
                     <DialogHeader>
                         <DialogTitle className="text-neutral-100">Delete issue</DialogTitle>
                         <DialogDescription className="text-neutral-500">

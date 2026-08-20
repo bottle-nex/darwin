@@ -5,40 +5,56 @@ import { promptsFromBraces, stripPrompts } from "@/lib/templates/promptHtml";
 import type { IssueDescriptionState } from "./editor/IssueDescriptionEditor";
 import type { PickableTemplate } from "@/types/issueTemplate";
 
-export function useIssueDescription(initialHtml?: string) {
-    const [html, setHtml] = useState(initialHtml ?? "");
-    const [isEmpty, setIsEmpty] = useState(!initialHtml);
-    const [prompts, setPrompts] = useState(0);
-    const [editorKey, setEditorKey] = useState(0);
-    const [baseline, setBaseline] = useState<string | null>(null);
+type DescriptionDraft = {
+    html: string;
+    isEmpty: boolean;
+    prompts: number;
+    editorKey: number;
+    baseline: string | null;
+};
 
-    const ready = !isEmpty && prompts === 0;
-    const isDirty = baseline !== null && html !== baseline;
+export function useIssueDescription(initialHtml?: string) {
+    const [draft, setDraft] = useState<DescriptionDraft>({
+        html: initialHtml ?? "",
+        isEmpty: !initialHtml,
+        prompts: 0,
+        editorKey: 0,
+        baseline: null,
+    });
+
+    const ready = !draft.isEmpty && draft.prompts === 0;
+    const isDirty = draft.baseline !== null && draft.html !== draft.baseline;
 
     function pickTemplate(template: PickableTemplate) {
-        setHtml(promptsFromBraces(template.description));
-        setIsEmpty(false);
-        setEditorKey((key) => key + 1);
+        setDraft((current) => ({
+            ...current,
+            html: promptsFromBraces(template.description),
+            isEmpty: false,
+            editorKey: current.editorKey + 1,
+        }));
     }
 
     function onEditorChange(state: IssueDescriptionState) {
-        if (baseline === null) setBaseline(state.html);
-        setHtml(state.html);
-        setIsEmpty(state.isEmpty);
-        setPrompts(state.prompts);
+        setDraft((current) => ({
+            ...current,
+            html: state.html,
+            isEmpty: state.isEmpty,
+            prompts: state.prompts,
+            baseline: current.baseline ?? state.html,
+        }));
     }
 
     function toHtml(): string {
-        return stripPrompts(html);
+        return stripPrompts(draft.html);
     }
 
     return {
-        html,
-        isEmpty,
-        prompts,
+        html: draft.html,
+        isEmpty: draft.isEmpty,
+        prompts: draft.prompts,
         ready,
         isDirty,
-        editorKey,
+        editorKey: draft.editorKey,
         pickTemplate,
         onEditorChange,
         toHtml,

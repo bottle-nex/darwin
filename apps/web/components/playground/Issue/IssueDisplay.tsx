@@ -7,13 +7,13 @@ import LogoLoader from "@/components/app/LogoLoader";
 import { PLAYGROUND_PANE_SHELL } from "@/components/playground/Core/components/paneBar";
 import { PaneLeadSlot } from "@/components/playground/Core/components/PlaygroundPaneSlots";
 import PlaygroundBreadcrumb from "@/components/playground/Core/components/PlaygroundBreadcrumb";
-import { useIssueRoute } from "./useIssueRoute";
+import { useIssueNavigation } from "./useIssueNavigation";
 import IssueDetail from "./IssueDetail";
 
 export default function IssueDisplay({ issueId }: { issueId: string }) {
     const projectId = useActiveProject()?.id;
     const { data: board } = useBoard(projectId);
-    const { close } = useIssueRoute();
+    const { close } = useIssueNavigation();
 
     const issue = board?.issues.find((i) => i.id === issueId);
     const showsDetail = Boolean(board && issue);

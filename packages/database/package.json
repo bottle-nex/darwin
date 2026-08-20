@@ -9,6 +9,7 @@
         "db:migrate:dev": "prisma migrate dev",
         "db:push": "prisma db push",
         "db:seed": "tsx src/seed.ts",
+        "db:seed:playground": "tsx src/seed.playground.ts",
         "db:reset": "prisma migrate reset",
         "db:setup": "tsx src/setup.ts",
         "dev": "tsup src/* --watch",

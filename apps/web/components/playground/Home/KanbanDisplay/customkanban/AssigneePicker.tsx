@@ -41,7 +41,7 @@ export default function AssigneePicker({
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="border-white/10 bg-charcoal sm:max-w-100">
+            <DialogContent className="border-white/10 sm:max-w-100">
                 <DialogHeader>
                     <DialogTitle className="text-neutral-100">Assignees</DialogTitle>
                     <DialogDescription className="text-neutral-500">

@@ -218,7 +218,7 @@ export default function SettingsPanel({
             <DialogContent
                 className={cn(
                     "flex max-h-[80vh] w-140 max-w-none flex-col gap-0 overflow-hidden p-0 sm:max-w-none",
-                    "bg-charcoal rounded-3xl",
+                    "rounded-3xl",
                 )}
             >
                 <DialogTitle className="border-b border-white/5 px-6 py-4 text-base font-semibold text-neutral-100">

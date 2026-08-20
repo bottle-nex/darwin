@@ -34,7 +34,7 @@ export default function CommandMenu() {
                 showCloseButton={false}
                 className={cn(
                     "top-[18%] w-180 max-w-[calc(100%-2rem)] translate-y-0 sm:max-w-none",
-                    "gap-0 overflow-hidden rounded-2xl border-white/10 bg-cement p-0",
+                    "gap-0 overflow-hidden rounded-2xl border-white/10 p-0",
                 )}
             >
                 <DialogTitle className="sr-only">Command menu</DialogTitle>

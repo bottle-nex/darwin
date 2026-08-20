@@ -29,7 +29,7 @@ const OptionButton = forwardRef<HTMLButtonElement, OptionButtonProps>(
             className={cn("group flex shrink-0 cursor-pointer rounded-full", className)}
             {...props}
         >
-            <IconWrapper icon={icon} active={active} variant="ghost" />
+            <IconWrapper icon={icon} active={active} variant="ghost" className="hover:bg-transparent!" />
         </Button>
     ),
 );

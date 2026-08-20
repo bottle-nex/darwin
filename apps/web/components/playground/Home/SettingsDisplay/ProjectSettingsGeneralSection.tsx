@@ -169,7 +169,7 @@ export default function ProjectSettingsGeneralSection({
             </div>
 
             <Dialog open={confirmOpen} onOpenChange={(o) => !del.isPending && setConfirmOpen(o)}>
-                <DialogContent className="border-white/10 bg-charcoal sm:max-w-md">
+                <DialogContent className="border-white/10 sm:max-w-md">
                     <DialogHeader>
                         <DialogTitle className="text-[14px] text-neutral-100">
                             Delete project?

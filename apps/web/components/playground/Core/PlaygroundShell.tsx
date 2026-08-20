@@ -51,7 +51,7 @@ export default function PlaygroundShell() {
     }, [orgSlug, activeProject, setLastVisited]);
 
     usePlaygroundUrlSync(project?.teams);
-    const { mode } = useIssueRoute({ sync: true });
+    const { openIssueId } = useIssueRoute({ sync: true });
     usePlaygroundShortcuts();
 
     const setCommandContext = useCommandContextStore((s) => s.setContext);
@@ -59,9 +59,9 @@ export default function PlaygroundShell() {
         setCommandContext({
             orgSlug: orgSlug ?? null,
             projectId: activeProject?.id ?? null,
-            issueId: mode?.kind === "open" ? mode.issueId : null,
+            issueId: openIssueId,
         });
-    }, [orgSlug, activeProject?.id, mode, setCommandContext]);
+    }, [orgSlug, activeProject?.id, openIssueId, setCommandContext]);
     useLayoutEffect(() => {
         useSidebarWidthStore.persist.rehydrate();
     }, []);
@@ -80,8 +80,8 @@ export default function PlaygroundShell() {
                         <div className="flex min-h-0 flex-1 flex-col">
                             <OnboardingDisplay project={project} orgId={dashboard!.org.id} />
                         </div>
-                    ) : mode?.kind === "open" ? (
-                        <IssueDisplay issueId={mode.issueId} />
+                    ) : openIssueId ? (
+                        <IssueDisplay issueId={openIssueId} />
                     ) : (
                         <PlaygroundDisplay isLoading={loading} />
                     )}

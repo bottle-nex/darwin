@@ -3,7 +3,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useMarkNotificationsRead } from "@/hooks/notifications/useNotifications";
 import { useNotificationsPanelStore } from "@/store/playground/useNotificationsPanelStore";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
-import { useIssueRoute } from "@/components/playground/Issue/useIssueRoute";
+import { useIssueNavigation } from "@/components/playground/Issue/useIssueNavigation";
 import { PlaygroundTab } from "@/components/playground/playgroundTabs";
 import type { Notification } from "@trymatcha/types";
 import { notification_target } from "./notificationView";
@@ -16,7 +16,7 @@ export function useSelectNotification() {
         projectSlug?: string;
     }>();
     const setTab = usePlaygroundNavStore((s) => s.setTab);
-    const { openIssue } = useIssueRoute();
+    const { openIssue } = useIssueNavigation();
     const close = useNotificationsPanelStore((s) => s.close);
 
     return function select(notification: Notification) {

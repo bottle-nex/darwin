@@ -165,8 +165,11 @@ export function useIssueForm({
         }
     }
 
-    // Intentionally dep-less: the listener must close over the current field values,
-    // and React 19.2 here has no useEffectEvent to hold a stable reference instead.
+    const submitRef = useRef(submit);
+    useEffect(() => {
+        submitRef.current = submit;
+    });
+
     useEffect(() => {
         if (readOnly) return;
         function onKeyDown(event: KeyboardEvent) {
@@ -174,11 +177,11 @@ export function useIssueForm({
                 return;
             }
             event.preventDefault();
-            submit();
+            submitRef.current();
         }
         window.addEventListener("keydown", onKeyDown);
         return () => window.removeEventListener("keydown", onKeyDown);
-    });
+    }, [readOnly]);
 
     function hasEdits(): boolean {
         if (!issue || readOnly) return false;

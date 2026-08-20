@@ -1,5 +1,5 @@
 "use client";
-import { useIssueRoute } from "@/components/playground/Issue/useIssueRoute";
+import { useIssueNavigation } from "@/components/playground/Issue/useIssueNavigation";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
 import { PlaygroundTab } from "@/components/playground/playgroundTabs";
 import { KanbanStatus, type Issue } from "@/types/kanban";
@@ -47,7 +47,7 @@ export default function CardRenderer({
     issue: Issue;
     preview?: boolean;
 }) {
-    const { openIssue } = useIssueRoute();
+    const { openIssue } = useIssueNavigation();
     const setTab = usePlaygroundNavStore((s) => s.setTab);
 
     const open =

@@ -10,7 +10,7 @@ import {
 } from "@trymatcha/types";
 import { cn } from "@/lib/utils";
 import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
-import { useIssueRoute } from "@/components/playground/Issue/useIssueRoute";
+import { useIssueNavigation } from "@/components/playground/Issue/useIssueNavigation";
 
 const TOMBSTONE_LABEL = { member: "@unknown", issue: "#deleted issue" } as const;
 
@@ -23,7 +23,7 @@ export default function MessageBody({
     references: LabelledReference[];
     isMine: boolean;
 }) {
-    const { openIssue } = useIssueRoute();
+    const { openIssue } = useIssueNavigation();
     const labels = reference_labels(references);
     const issues = reference_issues(references);
     return (

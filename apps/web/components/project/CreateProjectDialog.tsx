@@ -77,7 +77,7 @@ export default function CreateProjectDialog() {
                 showCloseButton={false}
                 className={cn(
                     "flex flex-col max-h-[80vh] min-h-[40vh] w-187.5 max-w-none sm:max-w-none p-0 gap-0 overflow-hidden",
-                    "bg-charcoal rounded-3xl",
+                    "rounded-3xl",
                 )}
             >
                 <DialogTitle className="sr-only">

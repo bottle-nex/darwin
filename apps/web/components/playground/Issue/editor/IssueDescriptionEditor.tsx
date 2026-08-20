@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { TableKit } from "@tiptap/extension-table";
 import { Timestamp } from "./timestamp";
 import { SlashCommand } from "./slash-command";
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { EditorPlaceholder } from "./placeholder";
 import { TableFigure, TableTitle } from "./table";
 import { Toggle, ToggleBody, ToggleSummary } from "./toggle";
@@ -75,11 +75,10 @@ export default function IssueDescriptionEditor({
         onChangeRef.current = onChange;
     });
 
-    const editor = useEditor({
-        immediatelyRender: false,
-        content: initialContent,
-        editable,
-        extensions: [
+    const [mountContent] = useState(initialContent);
+
+    const extensions = useMemo(
+        () => [
             StarterKit,
             TaskList,
             TaskItem.configure({ nested: true }),
@@ -118,11 +117,20 @@ export default function IssueDescriptionEditor({
                   ]
                 : []),
         ],
-        editorProps: {
-            attributes: {
-                class: cn("tiptap min-h-full no-scro", className),
-            },
-        },
+        [authoring, placeholder, mentionProjectId, queryClient],
+    );
+
+    const editorProps = useMemo(
+        () => ({ attributes: { class: cn("tiptap min-h-full no-scro", className) } }),
+        [className],
+    );
+
+    const editor = useEditor({
+        immediatelyRender: false,
+        content: mountContent,
+        editable,
+        extensions,
+        editorProps,
         onCreate: ({ editor: created }) => {
             report(created);
             onReady?.(created);

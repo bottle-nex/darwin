@@ -3,11 +3,11 @@ import { MdChevronRight } from "react-icons/md";
 import PlaygroundAvatar from "@/components/playground/Core/components/PlaygroundAvatar";
 import { Button } from "@/components/ui/button";
 import { useActiveProject } from "@/hooks/useActiveProject";
-import { useIssueRoute } from "@/components/playground/Issue/useIssueRoute";
+import { useIssueNavigation } from "@/components/playground/Issue/useIssueNavigation";
 
 export default function PlaygroundBreadcrumb({ issueNumber }: { issueNumber?: number }) {
     const project = useActiveProject();
-    const { close } = useIssueRoute();
+    const { close } = useIssueNavigation();
     const inIssue = issueNumber !== undefined;
 
     return (

@@ -10,7 +10,7 @@ import {
     shortDate,
 } from "@/components/playground/Home/KanbanDisplay/cards/IssueCardFace";
 import { DATE_ICON_COLOR, PRIORITY_OPTIONS } from "@/components/playground/Issue/issueHelpers";
-import { useIssueRoute } from "@/components/playground/Issue/useIssueRoute";
+import { useIssueNavigation } from "@/components/playground/Issue/useIssueNavigation";
 import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
 import { KanbanMappers } from "@/lib/kanban/KanbanMappers";
 import { cn } from "@/lib/utils";
@@ -49,7 +49,7 @@ export default function MyIssueRow({
     issue: BoardIssue;
     projectName: string;
 }) {
-    const { openIssue } = useIssueRoute();
+    const { openIssue } = useIssueNavigation();
     const status = KanbanBoard.columnFor(issue.status);
     const StatusIcon = status?.icon ?? LuColumns3;
     const priority = PRIORITY_OPTIONS.find((option) => option.rank === issue.priority);
