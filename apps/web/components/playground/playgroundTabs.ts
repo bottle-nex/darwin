@@ -4,6 +4,7 @@
  * the same string (see `usePlaygroundNavStore`).
  */
 export enum PlaygroundTab {
+    Inbox = "inbox",
     Chats = "chats",
     Kanban = "kanban",
     Overview = "overview",

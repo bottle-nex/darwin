@@ -10,12 +10,14 @@ import { notification_view, short_age, theme_of } from "./notificationView";
 type NotificationRowProps = {
     notification: Notification;
     clickable: boolean;
+    selected?: boolean;
     onSelect: () => void;
 };
 
 export default function NotificationRow({
     notification,
     clickable,
+    selected = false,
     onSelect,
 }: NotificationRowProps) {
     const { actorId, actorName, action, body, issueRef, projectSlug } =
@@ -29,10 +31,12 @@ export default function NotificationRow({
             type="button"
             disabled={!clickable}
             onClick={onSelect}
+            data-selected={selected}
             className={cn(
-                "flex w-full items-start gap-2.5 rounded-lg px-2 py-2.5 text-left transition-colors duration-150",
+                "group flex w-full items-start gap-2.5 rounded-lg px-2 py-2.5 text-left transition-colors duration-150",
+                selected && "bg-cement",
                 clickable
-                    ? "group cursor-pointer hover:bg-cement focus-visible:bg-cement focus-visible:outline-none"
+                    ? "cursor-pointer hover:bg-cement focus-visible:bg-cement focus-visible:outline-none"
                     : "cursor-default",
             )}
         >
@@ -44,7 +48,7 @@ export default function NotificationRow({
                 />
                 <span
                     className={cn(
-                        "absolute -right-1 -bottom-1 flex size-3.5 items-center justify-center rounded-full bg-charcoal ring-2 ring-charcoal transition-colors duration-150 group-hover:bg-cement group-hover:ring-cement",
+                        "absolute -right-1 -bottom-1 flex size-3.5 items-center justify-center rounded-full bg-charcoal ring-2 ring-charcoal transition-colors duration-150 group-hover:bg-cement group-hover:ring-cement group-data-[selected=true]:bg-cement group-data-[selected=true]:ring-cement",
                         tint,
                     )}
                     aria-hidden
