@@ -44,7 +44,7 @@ export default function SidebarResizeHandle() {
             onPointerDown={onPointerDown}
             onPointerMove={onPointerMove}
             onPointerUp={onPointerUp}
-            className="group relative -mx-1 flex w-2 shrink-0 cursor-col-resize items-center justify-center"
+            className="group relative flex w-2 shrink-0 cursor-col-resize items-center justify-center"
         >
             <span className="h-[90%] w-1 bg-transparent transition-colors group-hover:bg-white/20" />
         </div>

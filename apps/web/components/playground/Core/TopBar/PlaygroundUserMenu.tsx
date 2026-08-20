@@ -32,6 +32,8 @@ import PlaygroundAvatar from "@/components/playground/Core/components/Playground
 import SessionServices from "@/lib/session";
 import CreateOrganizationModal from "@/components/playground/landing/CreateOrganizationModal";
 import SettingsPanel from "@/components/playground/Core/TopBar/SettingsPanel";
+import { TooltipComponent } from "@/components/ui/tooltip-component";
+import { SIDEBAR_ICON_BUTTON_CLASS } from "@/components/playground/Sidebar/shared";
 
 const MENU_ITEMS: { id: string; label: string; icon: IconType }[] = [
     { id: "personal", label: "Personal info", icon: MdPerson },
@@ -109,102 +111,130 @@ export default function PlaygroundUserMenu() {
 
     return (
         <>
-            <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                    <Button
-                        variant="unstyled"
-                        type="button"
-                        aria-label="Account menu"
-                        className="flex w-full cursor-pointer items-center gap-2.5 rounded-md px-2 py-1.5 text-left transition-colors hover:bg-white/5 data-[state=open]:bg-white/5"
-                    >
-                        {user?.image ? (
-                            <span className="relative size-5 shrink-0 overflow-hidden rounded-full ring-1 ring-white/10">
-                                <Image
-                                    src={user.image}
-                                    alt=""
-                                    fill
-                                    sizes="24px"
-                                    className="object-cover"
+            <div className="flex items-center gap-0.5">
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button
+                            variant="unstyled"
+                            type="button"
+                            aria-label="Account menu"
+                            className="flex w-fit min-w-0 cursor-pointer items-center gap-2.5 rounded-md px-2 py-1.5 text-left transition-colors hover:bg-white/5 data-[state=open]:bg-white/5"
+                        >
+                            {user?.image ? (
+                                <span className="relative size-5 shrink-0 overflow-hidden rounded-full ring-1 ring-white/10">
+                                    <Image
+                                        src={user.image}
+                                        alt=""
+                                        fill
+                                        sizes="24px"
+                                        className="object-cover"
+                                    />
+                                </span>
+                            ) : (
+                                <PlaygroundAvatar
+                                    size="sm"
+                                    tone="emerald"
+                                    letter={initial}
+                                    className="size-7 shrink-0 text-[12px]"
                                 />
-                            </span>
-                        ) : (
-                            <PlaygroundAvatar
-                                size="sm"
-                                tone="emerald"
-                                letter={initial}
-                                className="size-7 shrink-0 text-[12px]"
-                            />
-                        )}
-                        <span className="min-w-0 flex-1">
-                            <span className="block truncate text-[13px] font-medium text-neutral-200">
-                                {name}
-                            </span>
-                            {/*<span className="block truncate text-[11px] text-neutral-500">
+                            )}
+                            <span className="min-w-0 flex-1">
+                                <span className="block truncate text-[13px] font-medium text-neutral-200">
+                                    {name}
+                                </span>
+                                {/*<span className="block truncate text-[11px] text-neutral-500">
                                 {user?.email}
                             </span>*/}
-                        </span>
-                    </Button>
-                </DropdownMenuTrigger>
-
-                <DropdownMenuContent align="start" side="top" className="w-66">
-                    <div className="flex items-center gap-3 px-3.5 py-3">
-                        {user?.image ? (
-                            <span className="relative size-9 shrink-0 overflow-hidden rounded-xl shadow-sm ring-1 ring-white/15">
-                                <Image
-                                    src={user.image}
-                                    alt=""
-                                    fill
-                                    sizes="36px"
-                                    className="object-cover"
-                                />
                             </span>
-                        ) : (
-                            <PlaygroundAvatar size="md" tone="emerald" letter={initial} />
-                        )}
-                        <div className="min-w-0">
-                            <p className="truncate text-[12px] font-semibold text-neutral-100">
-                                {SessionServices.get_user()?.name}
-                            </p>
-                            <p className="truncate text-[12px] text-neutral-500">{handle}</p>
+                        </Button>
+                    </DropdownMenuTrigger>
+
+                    <DropdownMenuContent align="start" side="top" className="w-66">
+                        <div className="flex items-center gap-3 px-3.5 py-3">
+                            {user?.image ? (
+                                <span className="relative size-9 shrink-0 overflow-hidden rounded-xl shadow-sm ring-1 ring-white/15">
+                                    <Image
+                                        src={user.image}
+                                        alt=""
+                                        fill
+                                        sizes="36px"
+                                        className="object-cover"
+                                    />
+                                </span>
+                            ) : (
+                                <PlaygroundAvatar size="md" tone="emerald" letter={initial} />
+                            )}
+                            <div className="min-w-0">
+                                <p className="truncate text-[12px] font-semibold text-neutral-100">
+                                    {SessionServices.get_user()?.name}
+                                </p>
+                                <p className="truncate text-[12px] text-neutral-500">{handle}</p>
+                            </div>
                         </div>
-                    </div>
 
-                    <DropdownMenuSeparator />
+                        <DropdownMenuSeparator />
 
-                    <div className="p-1">
-                        {MENU_ITEMS.map((item) => (
+                        <div className="p-1">
+                            {MENU_ITEMS.map((item) => (
+                                <DropdownMenuItem
+                                    key={item.id}
+                                    onSelect={
+                                        item.id === "settings"
+                                            ? () => setIsSettingsOpen(true)
+                                            : undefined
+                                    }
+                                >
+                                    <item.icon className="size-4 text-neutral-400" aria-hidden />
+                                    {item.label}
+                                </DropdownMenuItem>
+                            ))}
+
+                            <OrgSwitcherSubMenu onCreateOrg={() => setIsCreateOrgOpen(true)} />
+                        </div>
+
+                        <DropdownMenuSeparator />
+
+                        <div className="p-1">
                             <DropdownMenuItem
-                                key={item.id}
-                                onSelect={
-                                    item.id === "settings"
-                                        ? () => setIsSettingsOpen(true)
-                                        : undefined
-                                }
+                                onSelect={() => signOut({ callbackUrl: "/" })}
+                                className="group"
                             >
-                                <item.icon className="size-4 text-neutral-400" aria-hidden />
-                                {item.label}
+                                <MdLogout
+                                    className="size-4 text-neutral-400 group-hover:text-red-300"
+                                    aria-hidden
+                                />
+                                Logout
                             </DropdownMenuItem>
-                        ))}
+                        </div>
+                    </DropdownMenuContent>
+                </DropdownMenu>
 
-                        <OrgSwitcherSubMenu onCreateOrg={() => setIsCreateOrgOpen(true)} />
-                    </div>
-
-                    <DropdownMenuSeparator />
-
-                    <div className="p-1">
-                        <DropdownMenuItem
-                            onSelect={() => signOut({ callbackUrl: "/" })}
-                            className="group"
+                <div className="ml-auto flex shrink-0 items-center gap-0.5">
+                    <TooltipComponent content="Settings" side="top" delayDuration={500}>
+                        <Button
+                            variant="unstyled"
+                            type="button"
+                            onClick={() => setIsSettingsOpen(true)}
+                            aria-label="Settings"
+                            className={SIDEBAR_ICON_BUTTON_CLASS}
                         >
-                            <MdLogout
-                                className="size-4 text-neutral-400 group-hover:text-red-300"
-                                aria-hidden
-                            />
-                            Logout
-                        </DropdownMenuItem>
-                    </div>
-                </DropdownMenuContent>
-            </DropdownMenu>
+                            <MdSettings className="size-4" aria-hidden />
+                        </Button>
+                    </TooltipComponent>
+
+                    <TooltipComponent content="Log out" side="top" delayDuration={500}>
+                        <Button
+                            variant="unstyled"
+                            type="button"
+                            onClick={() => signOut({ callbackUrl: "/" })}
+                            aria-label="Log out"
+                            className={SIDEBAR_ICON_BUTTON_CLASS}
+                        >
+                            <MdLogout className="size-4" aria-hidden />
+                        </Button>
+                    </TooltipComponent>
+                </div>
+            </div>
             <CreateOrganizationModal open={isCreateOrgOpen} onOpenChange={setIsCreateOrgOpen} />
             <SettingsPanel open={isSettingsOpen} onOpenChange={setIsSettingsOpen} />
         </>

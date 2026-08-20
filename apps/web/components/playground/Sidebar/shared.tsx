@@ -30,6 +30,9 @@ export type SidebarSectionProps = {
     onSelect: (id: string) => void;
 };
 
+export const SIDEBAR_ICON_BUTTON_CLASS =
+    "relative flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-md text-neutral-400 transition-colors hover:bg-white/5 hover:text-neutral-100 disabled:cursor-default disabled:opacity-40";
+
 /** Trailing hover action chip (e.g. the ellipsis / plus beside an agent). */
 export function PlaygroundSidebarRowAction({ children }: { children: React.ReactNode }) {
     return (

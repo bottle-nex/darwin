@@ -28,9 +28,9 @@ export default function SidebarContent() {
     };
 
     return (
-        <div className="flex h-full min-h-0 flex-col pr-2">
+        <div className="flex h-full min-h-0 flex-col">
             <div
-                className="flex shrink-0 items-center justify-between gap-1 px-1"
+                className="flex shrink-0 items-center justify-between gap-1 px-2"
                 style={{ height: PANE_TOP_BAR_HEIGHT }}
             >
                 <div className="min-w-0 flex-1">
@@ -39,7 +39,7 @@ export default function SidebarContent() {
                 <SidebarActions />
             </div>
 
-            <div className="min-h-0 flex-1 overflow-y-auto px-1">
+            <div className="min-h-0 flex-1 overflow-y-auto px-2">
                 <AnimatePresence mode="wait" initial={false}>
                     <motion.div
                         key={inSettings ? "settings" : "main"}
@@ -62,7 +62,7 @@ export default function SidebarContent() {
                 </AnimatePresence>
             </div>
 
-            <div className="px-1 pb-1">
+            <div className="px-2 pb-2">
                 <PlaygroundUserMenu />
             </div>
         </div>

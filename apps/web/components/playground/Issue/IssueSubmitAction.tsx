@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import SubmitWarningToast from "./SubmitWarningToast";
 import type { IssueFormState } from "./useIssueForm";
+import IconWrapper from "@/components/ui/IconWrapper";
 
 export default function IssueSubmitAction({
     form,
@@ -45,21 +46,15 @@ export default function IssueSubmitAction({
                 <div className="relative isolate">
                     <SubmitWarningToast warning={warning} placement={warningPlacement} />
                     <motion.div animate={shakeControls} className="relative z-10">
-                        <Button
-                            variant="tertiary"
-                            size="xs"
-                            className="text-ink!"
-                            onClick={submit}
-                            loading={pending}
-                        >
+                        <Button variant="ghost" size="xs" onClick={submit} loading={pending}>
                             {isEdit ? "Save" : "Create Issue"}
                             <ShortcutHint>
                                 {isMac ? (
-                                    <MdOutlineKeyboardCommandKey className="text-ink!" />
+                                    <MdOutlineKeyboardCommandKey className="text-snow!" />
                                 ) : (
-                                    <span className="text-[10px] text-ink!">Ctrl</span>
+                                    <span className="text-[10px] text-snow!">Ctrl</span>
                                 )}
-                                <GrReturn className="text-ink!" />
+                                <GrReturn className="text-snow!" />
                             </ShortcutHint>
                         </Button>
                     </motion.div>
@@ -70,9 +65,5 @@ export default function IssueSubmitAction({
 }
 
 function ShortcutHint({ children }: { children: ReactNode }) {
-    return (
-        <span className="ml-0.5 flex items-center gap-0.5 text-ink/40 [&_svg]:text-ink/40!">
-            {children}
-        </span>
-    );
+    return <span className="ml-0.5 flex items-center gap-0.5">{children}</span>;
 }

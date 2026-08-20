@@ -9,9 +9,7 @@ import { useActiveProject } from "@/hooks/useActiveProject";
 import { cn } from "@/lib/utils";
 import { useIssueStore } from "@/store/issues/useIssueStore";
 import { useNotificationsPanelStore } from "@/store/playground/useNotificationsPanelStore";
-
-const ACTION_BUTTON_CLASS =
-    "relative flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-md text-neutral-400 transition-colors hover:bg-white/5 hover:text-neutral-100 disabled:cursor-default disabled:opacity-40";
+import { SIDEBAR_ICON_BUTTON_CLASS } from "./shared";
 
 export default function SidebarActions() {
     const activeProject = useActiveProject();
@@ -30,7 +28,7 @@ export default function SidebarActions() {
                     disabled={!activeProject}
                     onClick={() => openCreate({ board: "llm" })}
                     aria-label="Create issue"
-                    className={ACTION_BUTTON_CLASS}
+                    className={SIDEBAR_ICON_BUTTON_CLASS}
                 >
                     <IoPencilSharp className="size-3.5" aria-hidden />
                 </Button>
@@ -48,7 +46,7 @@ export default function SidebarActions() {
                     }
                     aria-pressed={notificationsOpen}
                     className={cn(
-                        ACTION_BUTTON_CLASS,
+                        SIDEBAR_ICON_BUTTON_CLASS,
                         notificationsOpen && "bg-white/8 text-neutral-100",
                     )}
                 >
