@@ -137,7 +137,7 @@ export default function IssueCardFace({
                             variant="outline"
                             icon={HiCalendar}
                             iconClassName={DATE_ICON_COLOR.target}
-                            className="text-neutral-300"
+                            className="px-2.5 text-neutral-300"
                         >
                             {shortDate(targetDate)}
                         </IconWrapper>
@@ -148,7 +148,7 @@ export default function IssueCardFace({
             {children}
 
             {createdAt && (
-                <p className="mt-2.5 text-[12px] leading-none text-neutral-400">
+                <p className="mt-2.5 text-[11px] leading-none text-neutral-400">
                     Created {shortDate(createdAt)}
                 </p>
             )}

@@ -2,7 +2,6 @@
 import { useState, type ReactNode } from "react";
 import { MdCheck } from "react-icons/md";
 import {
-    LuCalendar,
     LuColumns3,
     LuCopy,
     LuCopyPlus,
@@ -12,6 +11,7 @@ import {
     LuUsers,
 } from "react-icons/lu";
 import { RxTriangleRight } from "react-icons/rx";
+import { HiCalendar } from "react-icons/hi2";
 import {
     ContextMenu,
     ContextMenuContent,
@@ -221,7 +221,7 @@ export default function IssueDropdown({
                     className="w-40"
                     trigger={
                         <>
-                            <LuCalendar className={ICON} aria-hidden />
+                            <HiCalendar className={ICON} aria-hidden />
                             <span className="flex-1">Start date</span>
                         </>
                     }
@@ -241,7 +241,7 @@ export default function IssueDropdown({
                     className="w-40"
                     trigger={
                         <>
-                            <LuCalendar className={ICON} aria-hidden />
+                            <HiCalendar className={ICON} aria-hidden />
                             <span className="flex-1">Target date</span>
                         </>
                     }

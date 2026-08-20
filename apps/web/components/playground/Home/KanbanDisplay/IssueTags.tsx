@@ -23,7 +23,7 @@ export default function IssueTags({ tags, max = 2, size = "sm", className }: Iss
                     key={tag.id}
                     name={tag.name}
                     color={tag.color}
-                    className={cn("max-w-28", size === "sm" && "px-1.5 py-0 text-[10px]")}
+                    className={cn("max-w-28", size === "sm" && "px-2 text-[11.5px]")}
                 />
             ))}
             {hidden > 0 && (

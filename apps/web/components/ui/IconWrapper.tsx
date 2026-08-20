@@ -60,7 +60,7 @@ export default function IconWrapper({
             title={title}
             className={cn(
                 "inline-flex items-center justify-center gap-1.5 transition-colors",
-                hasLabel ? "h-6 px-2 text-[11px] leading-none" : "size-6.75",
+                hasLabel ? "h-5 px-2 text-[11px] leading-none" : "size-6.75",
                 surface.shape,
                 active
                     ? cn(surface.active, "text-neutral-100")
