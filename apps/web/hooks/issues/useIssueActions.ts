@@ -9,6 +9,7 @@ import { useActiveProject } from "@/hooks/useActiveProject";
 import { useBoard } from "@/hooks/issues/useBoard";
 import { useCreateIssue, type CreateIssueInput } from "@/hooks/issues/useCreateIssue";
 import { useUpdateIssue, type UpdateIssueInput } from "@/hooks/issues/useUpdateIssue";
+import { useBulkUpdateIssues } from "@/hooks/issues/useBulkUpdateIssues";
 import { useAssignIssue, useUnassignIssue } from "@/hooks/issues/useAssignIssue";
 import { useFilteredCustomColumns } from "@/hooks/kanban/useFilteredCustomColumns";
 import { useProjectMembers } from "@/hooks/project/useProjectMembers";
@@ -54,35 +55,80 @@ function presetToIso(days: number | null): string | null {
 
 export type IssueActions = ReturnType<typeof useIssueActions>;
 
+function shared<T>(issues: BoardIssue[], read: (issue: BoardIssue) => T): T | undefined {
+    if (!issues.length) return undefined;
+    const first = read(issues[0]);
+    return issues.every((issue) => read(issue) === first) ? first : undefined;
+}
+
+function sharedMembership(issues: BoardIssue[], read: (issue: BoardIssue) => { id: string }[]) {
+    if (!issues.length) return new Set<string>();
+    return new Set(
+        read(issues[0])
+            .map((member) => member.id)
+            .filter((id) => issues.every((issue) => read(issue).some((row) => row.id === id))),
+    );
+}
+
 /**
- * Every mutation the product offers on a single issue, in one place, so the
- * context menu and the command menu drive an issue through the same handlers.
+ * Every mutation the product offers on an issue, in one place, so the context
+ * menu and the command menu drive issues through the same handlers. Given many
+ * ids it drives them all through the bulk endpoints.
  */
-export function useIssueActions(issueId: string | null | undefined) {
+export function useIssueActions(target: string | string[] | null | undefined) {
     const projectId = useActiveProject()?.id;
     const { data: board } = useBoard(projectId);
-    const issue = issueId ? board?.issues.find((row) => row.id === issueId) : undefined;
+
+    const issueIds = target ? (Array.isArray(target) ? target : [target]) : [];
+    const issues = issueIds
+        .map((id) => board?.issues.find((row) => row.id === id))
+        .filter((row): row is BoardIssue => Boolean(row));
+    const issue = issues.length === 1 ? issues[0] : undefined;
 
     const columns = useFilteredCustomColumns();
     const { data: members } = useProjectMembers(projectId);
     const { data: tags } = useListTags(projectId);
 
     const updateIssue = useUpdateIssue();
+    const bulkUpdateIssues = useBulkUpdateIssues();
     const createIssue = useCreateIssue();
     const assignIssue = useAssignIssue();
     const unassignIssue = useUnassignIssue();
     const requestDelete = useDeleteIssueStore((s) => s.requestDelete);
 
-    const ready = Boolean(issue && projectId);
-    const editable = Boolean(issue && isEditable(issue));
-    const assigneeIds = new Set(issue?.assignees.map((member) => member.id) ?? []);
-    const tagIds = new Set(issue?.tags.map((tag) => tag.id) ?? []);
+    const ready = Boolean(issues.length && projectId);
+    const editable = issues.length > 0 && issues.every(isEditable);
+    const assigneeIds = sharedMembership(issues, (row) => row.assignees);
+    const tagIds = sharedMembership(issues, (row) => row.tags);
+
+    const failureNote =
+        issues.length > 1 ? "Couldn't update those issues." : "Couldn't update the issue.";
 
     function patch(input: Omit<UpdateIssueInput, "id" | "project_id">) {
         if (!ready) return;
+        if (issues.length > 1) {
+            bulkUpdateIssues.mutate(
+                { issue_ids: issues.map((row) => row.id), project_id: projectId!, ...input },
+                { onError: () => toast.error(failureNote) },
+            );
+            return;
+        }
         updateIssue.mutate(
-            { id: issue!.id, project_id: projectId!, ...input },
-            { onError: () => toast.error("Couldn't update the issue.") },
+            { id: issues[0].id, project_id: projectId!, ...input },
+            { onError: () => toast.error(failureNote) },
+        );
+    }
+
+    function patchMembership(input: {
+        add_tag_ids?: string[];
+        remove_tag_ids?: string[];
+        add_assignee_ids?: string[];
+        remove_assignee_ids?: string[];
+    }) {
+        if (!ready) return;
+        bulkUpdateIssues.mutate(
+            { issue_ids: issues.map((row) => row.id), project_id: projectId!, ...input },
+            { onError: () => toast.error(failureNote) },
         );
     }
 
@@ -93,6 +139,11 @@ export function useIssueActions(issueId: string | null | undefined) {
 
     return {
         issue,
+        issues,
+        count: issues.length,
+        sharedStatus: shared(issues, (row) => row.status),
+        sharedPriority: shared(issues, (row) => row.priority),
+        sharedColumnId: shared(issues, (row) => row.customColumnId),
         projectId,
         columns,
         members: members ?? [],
@@ -109,6 +160,12 @@ export function useIssueActions(issueId: string | null | undefined) {
         moveToColumn: (columnId: string | null) => patch({ custom_column_id: columnId }),
 
         toggleTag: (tagId: string) => {
+            if (issues.length > 1) {
+                patchMembership(
+                    tagIds.has(tagId) ? { remove_tag_ids: [tagId] } : { add_tag_ids: [tagId] },
+                );
+                return;
+            }
             const next = tagIds.has(tagId)
                 ? [...tagIds].filter((id) => id !== tagId)
                 : [...tagIds, tagId];
@@ -117,9 +174,17 @@ export function useIssueActions(issueId: string | null | undefined) {
 
         toggleAssignee: (userId: string) => {
             if (!ready) return;
+            if (issues.length > 1) {
+                patchMembership(
+                    assigneeIds.has(userId)
+                        ? { remove_assignee_ids: [userId] }
+                        : { add_assignee_ids: [userId] },
+                );
+                return;
+            }
             const mutation = assigneeIds.has(userId) ? unassignIssue : assignIssue;
             mutation.mutate(
-                { id: issue!.id, project_id: projectId!, user_id: userId },
+                { id: issues[0].id, project_id: projectId!, user_id: userId },
                 {
                     onError: (error) => {
                         const denied =
@@ -143,7 +208,7 @@ export function useIssueActions(issueId: string | null | undefined) {
         openInNewTab: () => window.open(issueHref(), "_blank"),
 
         duplicate: () => {
-            if (!ready) return;
+            if (!issue || !projectId) return;
             createIssue.mutate(
                 {
                     project_id: projectId!,
@@ -163,6 +228,6 @@ export function useIssueActions(issueId: string | null | undefined) {
             );
         },
 
-        requestDelete: () => issue && requestDelete(issue.id),
+        requestDelete: () => issues.length && requestDelete(issues.map((row) => row.id)),
     };
 }

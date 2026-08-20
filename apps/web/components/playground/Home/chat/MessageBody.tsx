@@ -9,10 +9,36 @@ import {
     type LabelledReference,
 } from "@trymatcha/types";
 import { cn } from "@/lib/utils";
+import { urlSplitPattern, withProtocol } from "@/lib/urls";
 import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
 import { useIssueNavigation } from "@/components/playground/Issue/useIssueNavigation";
 
 const TOMBSTONE_LABEL = { member: "@unknown", issue: "#deleted issue" } as const;
+
+function LinkedText({ text, isMine }: { text: string; isMine: boolean }) {
+    return (
+        <>
+            {text.split(urlSplitPattern()).map((part, index) =>
+                index % 2 === 0 ? (
+                    part
+                ) : (
+                    <a
+                        key={index}
+                        href={withProtocol(part)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={cn(
+                            "underline decoration-current/40 underline-offset-2 transition-colors hover:decoration-current",
+                            isMine ? "text-snow" : "text-primary",
+                        )}
+                    >
+                        {part}
+                    </a>
+                ),
+            )}
+        </>
+    );
+}
 
 export default function MessageBody({
     text,
@@ -29,10 +55,10 @@ export default function MessageBody({
     return (
         <>
             {text.split(reference_split_pattern()).map((part, index) => {
-                if (index % 2 === 0) return part;
+                if (index % 2 === 0) return <LinkedText key={index} text={part} isMine={isMine} />;
 
                 const token = parse_reference_token(part);
-                if (!token) return part;
+                if (!token) return <LinkedText key={index} text={part} isMine={isMine} />;
 
                 const label = labels.get(reference_key(token.kind, token.id));
                 if (!label) {

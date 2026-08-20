@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { TableKit } from "@tiptap/extension-table";
 import { Timestamp } from "./timestamp";
 import { SlashCommand } from "./slash-command";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { EditorPlaceholder } from "./placeholder";
 import { TableFigure, TableTitle } from "./table";
 import { Toggle, ToggleBody, ToggleSummary } from "./toggle";
@@ -16,6 +16,9 @@ import TaskList from "@tiptap/extension-task-list";
 import TaskItem from "@tiptap/extension-task-item";
 import StarterKit from "@tiptap/starter-kit";
 import ImageNodeView from "./ImageNodeView";
+import SelectionToolbar from "./SelectionToolbar";
+import LinkPanel from "./LinkPanel";
+import { LINK_ATTRIBUTES, LinkPrompt, type LinkPromptRequest } from "./link";
 import CharacterCount from "@tiptap/extension-character-count";
 import { useQueryClient } from "@tanstack/react-query";
 import { createReferenceMention } from "@/components/playground/Home/chat/referenceMention";
@@ -70,6 +73,8 @@ export default function IssueDescriptionEditor({
     onReady,
 }: IssueDescriptionEditorProps) {
     const queryClient = useQueryClient();
+    const [linkRequest, setLinkRequest] = useState<LinkPromptRequest | null>(null);
+    const requestLink = useCallback((request: LinkPromptRequest) => setLinkRequest(request), []);
     const onChangeRef = useRef(onChange);
     useEffect(() => {
         onChangeRef.current = onChange;
@@ -79,7 +84,13 @@ export default function IssueDescriptionEditor({
 
     const extensions = useMemo(
         () => [
-            StarterKit,
+            StarterKit.configure({
+                link: {
+                    openOnClick: true,
+                    linkOnPaste: false,
+                    HTMLAttributes: LINK_ATTRIBUTES,
+                },
+            }),
             TaskList,
             TaskItem.configure({ nested: true }),
             ImageWithControls.configure({ inline: true, allowBase64: true }),
@@ -106,6 +117,7 @@ export default function IssueDescriptionEditor({
             EditorPlaceholder.configure({ emptyDocText: placeholder }),
             CharacterCount.configure({ limit: DESCRIPTION_CHAR_LIMIT }),
             SlashCommand,
+            LinkPrompt.configure({ onRequest: requestLink }),
             ModEnterSubmits,
             ...(mentionProjectId
                 ? [
@@ -117,7 +129,7 @@ export default function IssueDescriptionEditor({
                   ]
                 : []),
         ],
-        [authoring, placeholder, mentionProjectId, queryClient],
+        [authoring, placeholder, mentionProjectId, queryClient, requestLink],
     );
 
     const editorProps = useMemo(
@@ -146,5 +158,18 @@ export default function IssueDescriptionEditor({
         });
     }
 
-    return <EditorContent editor={editor} className="h-full" />;
+    return (
+        <>
+            {editor && editable && <SelectionToolbar editor={editor} />}
+            <EditorContent editor={editor} className="h-full" />
+            {editor && editable && linkRequest && (
+                <LinkPanel
+                    key={`${linkRequest.from}-${linkRequest.to}`}
+                    editor={editor}
+                    request={linkRequest}
+                    onClose={() => setLinkRequest(null)}
+                />
+            )}
+        </>
+    );
 }

@@ -28,6 +28,7 @@ import { useNewProjectStore } from "@/store/project/useNewProjectStore";
 import { useNewTeamStore } from "@/store/team/useNewTeamStore";
 import { useCommandMenuStore } from "@/store/command/useCommandMenuStore";
 import { useDeleteIssueStore } from "@/store/issues/useDeleteIssueStore";
+import { useIssueSelectionStore } from "@/store/issues/useIssueSelectionStore";
 import { useCommandActionStore } from "@/store/command/useCommandActionStore";
 import { commandContext } from "@/store/command/useCommandContextStore";
 import {
@@ -42,8 +43,14 @@ function openTab(tab: PlaygroundTab) {
     usePlaygroundNavStore.getState().setTab(tab);
 }
 
+function issueTargets(context: CommandContext): string[] {
+    const selected = useIssueSelectionStore.getState().ids;
+    if (selected.length) return selected;
+    return context.issueId ? [context.issueId] : [];
+}
+
 function onIssue(context: CommandContext): boolean {
-    return Boolean(context.issueId);
+    return issueTargets(context).length > 0;
 }
 
 function openMenuPage(page: CommandPage) {
@@ -248,8 +255,8 @@ export const COMBINATIONS: Record<string, CommandAction> = {
         destructive: true,
         isAvailable: onIssue,
         run: () => {
-            const { issueId } = commandContext();
-            if (issueId) useDeleteIssueStore.getState().requestDelete(issueId);
+            const targets = issueTargets(commandContext());
+            if (targets.length) useDeleteIssueStore.getState().requestDelete(targets);
         },
     },
     "d p": {

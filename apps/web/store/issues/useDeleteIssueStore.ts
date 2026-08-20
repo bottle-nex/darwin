@@ -1,13 +1,13 @@
 import { create } from "zustand";
 
 interface DeleteIssueState {
-    issueId: string | null;
-    requestDelete: (issueId: string) => void;
+    issueIds: string[];
+    requestDelete: (target: string | string[]) => void;
     close: () => void;
 }
 
 export const useDeleteIssueStore = create<DeleteIssueState>((set) => ({
-    issueId: null,
-    requestDelete: (issueId) => set({ issueId }),
-    close: () => set({ issueId: null }),
+    issueIds: [],
+    requestDelete: (target) => set({ issueIds: Array.isArray(target) ? target : [target] }),
+    close: () => set({ issueIds: [] }),
 }));

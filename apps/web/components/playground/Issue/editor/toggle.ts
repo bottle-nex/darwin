@@ -49,6 +49,7 @@ export const ToggleSummary = Node.create({
                     .focus()
                     .run();
             },
+
             Backspace: ({ editor }) => {
                 const { $from, empty } = editor.state.selection;
                 if (!empty || $from.parent.type.name !== this.name) return false;
@@ -134,16 +135,21 @@ export const Toggle = Node.create({
                 () =>
                 ({ tr, state, dispatch }) => {
                     const { $from } = tr.selection;
-                    const depth = $from.depth;
-                    const blockIsEmpty = $from.parent.content.size === 0;
-                    const from = blockIsEmpty ? $from.before(depth) : $from.after(depth);
-                    const to = blockIsEmpty ? $from.after(depth) : from;
-                    const toggle = state.schema.nodes[this.name].createAndFill();
-                    if (!toggle) return false;
+                    const block = $from.parent;
+                    if (!block.isTextblock) return false;
 
+                    const { schema } = state;
+                    const toggle = schema.nodes[this.name].create(null, [
+                        schema.nodes.toggleSummary.create(null, block.content),
+                        schema.nodes.toggleBody.create(null, schema.nodes.paragraph.create()),
+                    ]);
+
+                    const from = $from.before($from.depth);
                     if (dispatch) {
-                        tr.replaceWith(from, to, toggle);
-                        tr.setSelection(TextSelection.near(tr.doc.resolve(from + 2)));
+                        tr.replaceWith(from, $from.after($from.depth), toggle);
+                        tr.setSelection(
+                            TextSelection.near(tr.doc.resolve(from + 2 + block.content.size)),
+                        );
                     }
                     return true;
                 },

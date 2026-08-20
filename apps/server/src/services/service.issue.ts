@@ -1,7 +1,13 @@
 import { ActivityType, ActorType, IssueStatus, Prisma, prisma } from "@trymatcha/database";
 import { OutboundSocketMessageType } from "@trymatcha/types";
+import { Action, Permissions } from "@trymatcha/access-control";
+import z from "zod";
 import { server_services } from "..";
+import Access from "../access-control/access";
 import ActivityService from "./service.activity";
+import DescriptionReferenceService from "./service.description-references";
+import { diff_issue } from "./service.activity-diff";
+import { issue_recipients } from "../notifications/recipients";
 
 export type CreateIssueInput = {
     project_id: string;
@@ -15,6 +21,48 @@ export type CreateIssueInput = {
     tag_ids?: string[];
     created_by: { id: string; name: string };
 };
+
+export const BULK_ISSUE_LIMIT = 100;
+
+export const ISSUE_PATCH_SCHEMA = z.object({
+    title: z.string().min(1).max(200).optional(),
+    description: z.string().optional(),
+    priority: z.number().int().min(0).max(4).optional(),
+    status: z.enum(IssueStatus).optional(),
+    custom_column_id: z.string().nullable().optional(),
+    tag_ids: z.array(z.string()).max(20).optional(),
+    assignee_ids: z.array(z.string()).max(20).optional(),
+    start_date: z.union([z.null(), z.coerce.date()]).optional(),
+    target_date: z.union([z.null(), z.coerce.date()]).optional(),
+});
+
+export type IssuePatch = z.infer<typeof ISSUE_PATCH_SCHEMA>;
+
+export type IssueActor = { id: string; name?: string | null };
+
+export type IssueMutationFailure = {
+    ok: false;
+    reason: "not_found" | "forbidden" | "invalid";
+    message?: string;
+};
+
+export type UpdateIssueResult =
+    { ok: true; issue: Awaited<ReturnType<typeof update_issue_row>> } | IssueMutationFailure;
+
+export type DeleteIssueResult = { ok: true } | IssueMutationFailure;
+
+function update_issue_row(tx: Prisma.TransactionClient, id: string, data: Prisma.IssueUpdateInput) {
+    return tx.issue.update({
+        where: { id },
+        data,
+        include: {
+            creator: true,
+            assignees: true,
+            tags: true,
+            customColumn: { select: { id: true, label: true } },
+        },
+    });
+}
 
 export default class IssueService {
     static async create_issue(input: CreateIssueInput) {
@@ -98,5 +146,260 @@ export default class IssueService {
         }
 
         return full_issue;
+    }
+
+    static async update_issue(
+        actor: IssueActor,
+        id: string,
+        patch: IssuePatch,
+    ): Promise<UpdateIssueResult> {
+        const issue = await prisma.issue.findUnique({
+            where: { id },
+            select: {
+                projectId: true,
+                status: true,
+                priority: true,
+                title: true,
+                description: true,
+                startDate: true,
+                targetDate: true,
+                customColumnId: true,
+                customColumn: { select: { id: true, label: true } },
+                createdById: true,
+                assignees: { select: { id: true, name: true, image: true } },
+                tags: { select: { id: true, name: true, color: true } },
+            },
+        });
+        if (!issue) return { ok: false, reason: "not_found" };
+
+        const role = await Access.project(actor.id, issue.projectId);
+        if (!role || !Permissions.project(role, Action.project.triage_issue)) {
+            return { ok: false, reason: "forbidden" };
+        }
+
+        if (patch.custom_column_id) {
+            const column = await prisma.customColumn.findFirst({
+                where: { id: patch.custom_column_id, projectId: issue.projectId },
+                select: { id: true },
+            });
+            if (!column) {
+                return {
+                    ok: false,
+                    reason: "invalid",
+                    message: "Column not found in this project",
+                };
+            }
+        }
+
+        if (patch.tag_ids?.length) {
+            const tag_count = await prisma.tag.count({
+                where: { id: { in: patch.tag_ids }, projectId: issue.projectId },
+            });
+            if (tag_count !== patch.tag_ids.length) {
+                return {
+                    ok: false,
+                    reason: "invalid",
+                    message: "One or more tags are not in this project",
+                };
+            }
+        }
+
+        if (patch.assignee_ids?.length) {
+            const assignee_roles = await Promise.all(
+                patch.assignee_ids.map((assignee_id) =>
+                    Access.project(assignee_id, issue.projectId),
+                ),
+            );
+            if (assignee_roles.some((assignee_role) => !assignee_role)) {
+                return {
+                    ok: false,
+                    reason: "invalid",
+                    message: "One or more assignees are not project members",
+                };
+            }
+        }
+
+        const next_column_id =
+            patch.custom_column_id !== undefined ? patch.custom_column_id : issue.customColumnId;
+
+        let next_status: IssueStatus;
+        if (next_column_id !== null) {
+            next_status = IssueStatus.Parked;
+        } else if (patch.status && patch.status !== IssueStatus.Parked) {
+            next_status = patch.status;
+        } else if (issue.status === IssueStatus.Parked) {
+            next_status = IssueStatus.Todo;
+        } else {
+            next_status = issue.status;
+        }
+
+        const references =
+            patch.description !== undefined
+                ? await DescriptionReferenceService.resolve(patch.description, issue.projectId)
+                : null;
+
+        const { updated, activities } = await prisma.$transaction(async (tx) => {
+            const updated = await update_issue_row(tx, id, {
+                title: patch.title,
+                description: references ? references.message : undefined,
+                priority: patch.priority,
+                status: next_status,
+                customColumn:
+                    next_column_id === null
+                        ? { disconnect: true }
+                        : { connect: { id: next_column_id } },
+                startDate: patch.start_date,
+                targetDate: patch.target_date,
+                tags: patch.tag_ids
+                    ? { set: patch.tag_ids.map((tag_id) => ({ id: tag_id })) }
+                    : undefined,
+                assignees: patch.assignee_ids
+                    ? { set: patch.assignee_ids.map((user_id) => ({ id: user_id })) }
+                    : undefined,
+            });
+
+            const activities = await ActivityService.emit(tx, {
+                issueId: id,
+                actor: { type: ActorType.User, userId: actor.id, name: actor.name },
+                events: diff_issue(issue, updated),
+            });
+
+            return { updated, activities };
+        });
+
+        if (references) await DescriptionReferenceService.write(id, references);
+
+        const channel_name = server_services.publisher.get_channel_name(issue.projectId);
+        await server_services.publisher.publish_message(
+            channel_name,
+            JSON.stringify({
+                type: OutboundSocketMessageType.ISSUE_UPDATED,
+                projectId: issue.projectId,
+                payload: updated,
+            }),
+        );
+        await ActivityService.publish(issue.projectId, id, activities);
+        await IssueService.notify_update(actor.id, issue, updated, next_status, next_column_id);
+
+        return { ok: true, issue: updated };
+    }
+
+    static async delete_issue(actor: IssueActor, id: string): Promise<DeleteIssueResult> {
+        const issue = await prisma.issue.findUnique({
+            where: { id },
+            select: {
+                projectId: true,
+                number: true,
+                title: true,
+                assignees: { select: { id: true } },
+                project: { select: { slug: true, organization: { select: { slug: true } } } },
+            },
+        });
+        if (!issue) return { ok: false, reason: "not_found" };
+
+        const role = await Access.project(actor.id, issue.projectId);
+        if (!role || !Permissions.project(role, Action.project.close_issue)) {
+            return { ok: false, reason: "forbidden" };
+        }
+
+        await prisma.issue.delete({ where: { id } });
+
+        for (const assignee of issue.assignees) {
+            if (assignee.id === actor.id) continue;
+            await server_services.notifications.enqueue({
+                action: "issue.deleted",
+                issueId: id,
+                recipientId: assignee.id,
+                actorId: actor.id,
+                issueNumber: issue.number,
+                issueTitle: issue.title,
+                projectId: issue.projectId,
+                projectSlug: issue.project.slug,
+                orgSlug: issue.project.organization.slug,
+            });
+        }
+
+        return { ok: true };
+    }
+
+    private static async notify_update(
+        actor_id: string,
+        before: {
+            status: IssueStatus;
+            priority: number;
+            customColumnId: string | null;
+            createdById: string;
+            assignees: { id: string }[];
+        },
+        after: { id: string; priority: number; assignees: { id: string }[] },
+        next_status: IssueStatus,
+        next_column_id: string | null,
+    ) {
+        const before_assignees = new Set(before.assignees.map((assignee) => assignee.id));
+        const after_assignees = new Set(after.assignees.map((assignee) => assignee.id));
+
+        for (const assignee_id of after_assignees) {
+            if (assignee_id === actor_id || before_assignees.has(assignee_id)) continue;
+            await server_services.notifications.enqueue({
+                action: "issue.assigned",
+                issueId: after.id,
+                assigneeId: assignee_id,
+                actorId: actor_id,
+            });
+        }
+
+        for (const assignee_id of before_assignees) {
+            if (assignee_id === actor_id || after_assignees.has(assignee_id)) continue;
+            await server_services.notifications.enqueue({
+                action: "issue.unassigned",
+                issueId: after.id,
+                assigneeId: assignee_id,
+                actorId: actor_id,
+            });
+        }
+
+        const recipients = issue_recipients({
+            assigneeIds: [...after_assignees],
+            creatorId: before.createdById,
+            exclude: [actor_id],
+        });
+
+        const column_changed = next_column_id !== before.customColumnId;
+
+        if (column_changed) {
+            for (const recipient_id of recipients) {
+                await server_services.notifications.enqueue({
+                    action: "issue.moved",
+                    issueId: after.id,
+                    recipientId: recipient_id,
+                    actorId: actor_id,
+                    toColumnId: next_column_id,
+                });
+            }
+        } else if (next_status !== before.status) {
+            for (const recipient_id of recipients) {
+                await server_services.notifications.enqueue({
+                    action: "issue.status_changed",
+                    issueId: after.id,
+                    recipientId: recipient_id,
+                    actorId: actor_id,
+                    fromStatus: before.status,
+                    toStatus: next_status,
+                });
+            }
+        }
+
+        if (after.priority === 1 && before.priority !== 1) {
+            for (const assignee_id of after_assignees) {
+                if (assignee_id === actor_id) continue;
+                await server_services.notifications.enqueue({
+                    action: "issue.priority_changed",
+                    issueId: after.id,
+                    recipientId: assignee_id,
+                    actorId: actor_id,
+                    priority: after.priority,
+                });
+            }
+        }
     }
 }

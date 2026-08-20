@@ -14,6 +14,7 @@ import {
 import KeyCombo from "@/components/ui/KeyCombo";
 import { useCommandMenuStore } from "@/store/command/useCommandMenuStore";
 import { useCommandContextStore } from "@/store/command/useCommandContextStore";
+import { useIssueSelectionStore } from "@/store/issues/useIssueSelectionStore";
 import { useIssueActions } from "@/hooks/issues/useIssueActions";
 import {
     COMMAND_ENTRIES,
@@ -52,7 +53,8 @@ function CommandMenuBody({ onDone }: { onDone: () => void }) {
     const setPage = useCommandMenuStore((s) => s.setPage);
     const [query, setQuery] = useState("");
 
-    const actions = useIssueActions(issueId);
+    const selectedIds = useIssueSelectionStore((s) => s.ids);
+    const actions = useIssueActions(selectedIds.length ? selectedIds : issueId);
     const context = useMemo(() => ({ orgSlug, projectId, issueId }), [orgSlug, projectId, issueId]);
 
     const groups = useMemo(
@@ -63,10 +65,10 @@ function CommandMenuBody({ onDone }: { onDone: () => void }) {
                     (entry) =>
                         entry.kind === kind &&
                         entry.combo !== "mod+k" &&
-                        (kind !== CommandKind.Issue || Boolean(issueId)),
+                        (kind !== CommandKind.Issue || Boolean(issueId) || selectedIds.length > 0),
                 ),
             })).filter((group) => group.entries.length > 0),
-        [issueId],
+        [issueId, selectedIds.length],
     );
 
     function back() {
@@ -120,7 +122,11 @@ function CommandMenuBody({ onDone }: { onDone: () => void }) {
                 />
             </div>
 
-            <IssueContextHeader title={actions.issue?.title} number={actions.issue?.number} />
+            <IssueTargetHeader
+                count={actions.count}
+                title={actions.issue?.title}
+                number={actions.issue?.number}
+            />
 
             {page ? (
                 <CommandIssuePage page={page} actions={actions} onDone={onDone} />
@@ -167,13 +173,27 @@ function CommandMenuBody({ onDone }: { onDone: () => void }) {
     );
 }
 
-function IssueContextHeader({ title, number }: { title?: string; number?: number }) {
-    if (!title) return null;
+function IssueTargetHeader({
+    count,
+    title,
+    number,
+}: {
+    count: number;
+    title?: string;
+    number?: number;
+}) {
+    if (!count) return null;
     return (
         <div className="flex items-center gap-2 px-4 pt-3 text-[12.5px] text-neutral-500">
-            <span className="shrink-0 font-medium">#{number}</span>
-            <span aria-hidden>·</span>
-            <span className="truncate">{title}</span>
+            {count > 1 ? (
+                <span className="font-medium text-neutral-400">{count} issues selected</span>
+            ) : (
+                <>
+                    <span className="shrink-0 font-medium">#{number}</span>
+                    <span aria-hidden>·</span>
+                    <span className="truncate">{title}</span>
+                </>
+            )}
         </div>
     );
 }

@@ -432,6 +432,19 @@
         padding: 0;
     }
 
+    .tiptap a {
+        color: var(--color-primary);
+        text-decoration: underline;
+        text-decoration-color: color-mix(in srgb, var(--color-primary) 60%, transparent);
+        text-decoration-thickness: 1px;
+        text-underline-offset: 2px;
+        cursor: pointer;
+    }
+
+    .tiptap a:hover {
+        text-decoration-color: var(--color-primary);
+    }
+
     .tiptap .timestamp-chip {
         display: inline-block;
         border-radius: 0.4rem;

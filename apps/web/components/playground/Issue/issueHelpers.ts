@@ -31,7 +31,7 @@ export const PRIORITY_OPTIONS: PriorityOption[] = [
         label: "Urgent",
         icon: BsExclamationSquareFill,
         rank: 1,
-        iconClassName: "text-[#FF2C56]",
+        iconClassName: "size-3! text-[#FF2C56]",
     },
     { value: "high", label: "High", icon: RiSignalCellular3Fill, rank: 2 },
     { value: "medium", label: "Medium", icon: RiSignalCellular2Fill, rank: 3 },

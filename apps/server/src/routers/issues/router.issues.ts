@@ -13,6 +13,8 @@ import IssueUnassignController from "../../controllers/issues/controller.unassig
 import IssueSearchController from "../../controllers/issues/controller.search_issues";
 import IssueReferencesGetController from "../../controllers/issues/controller.get_issue_references";
 import IssueActivityListController from "../../controllers/issues/controller.list_activity";
+import IssueBulkUpdateController from "../../controllers/issues/controller.bulk_update_issues";
+import IssueBulkDeleteController from "../../controllers/issues/controller.bulk_delete_issues";
 
 const issues_router: Router = Router();
 
@@ -24,6 +26,9 @@ issues_router.post("/columns", require_auth, ColumnCreateController.process);
 issues_router.patch("/columns/reorder", require_auth, ColumnReorderController.process);
 issues_router.patch("/columns/:id", require_auth, ColumnUpdateController.process);
 issues_router.delete("/columns/:id", require_auth, ColumnDeleteController.process);
+
+issues_router.patch("/bulk", require_auth, IssueBulkUpdateController.process);
+issues_router.post("/bulk/delete", require_auth, IssueBulkDeleteController.process);
 
 issues_router.patch("/:id", require_auth, IssueUpdateController.process);
 issues_router.delete("/:id", require_auth, IssueDeleteController.process);

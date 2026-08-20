@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import SubmitWarningToast from "./SubmitWarningToast";
 import type { IssueFormState } from "./useIssueForm";
-import IconWrapper from "@/components/ui/IconWrapper";
 
 export default function IssueSubmitAction({
     form,

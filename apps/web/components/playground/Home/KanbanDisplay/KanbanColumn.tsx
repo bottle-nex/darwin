@@ -1,10 +1,17 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { MdAdd, MdMoreHoriz } from "react-icons/md";
+import { MdAdd, MdChecklist, MdClose, MdMoreHoriz } from "react-icons/md";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useDroppable } from "@dnd-kit/core";
 import { cn } from "@/lib/utils";
 import { IssueStatus } from "@trymatcha/types";
 import { useIssueStore } from "@/store/issues/useIssueStore";
+import { useIssueSelectionStore } from "@/store/issues/useIssueSelectionStore";
 import { MatchaLogo } from "@/components/logo/MatchaLogo";
 import type { Issue, KanbanColumnDef } from "@/types/kanban";
 import CardRenderer from "./cards/CardRenderer";
@@ -30,6 +37,9 @@ export default function KanbanColumn({
 }: KanbanColumnProps) {
     const { setNodeRef } = useDroppable({ id: column.status, disabled: !droppable });
     const openCreate = useIssueStore((s) => s.openCreate);
+    const selectedIds = useIssueSelectionStore((s) => s.ids);
+    const replaceSelection = useIssueSelectionStore((s) => s.replace);
+    const clearSelection = useIssueSelectionStore((s) => s.clear);
     const { title } = column;
     const grid = layout === "grid";
     const canAddCard = column.status === IssueStatus.Todo;
@@ -56,14 +66,42 @@ export default function KanbanColumn({
                             <MdAdd className="size-4" aria-hidden />
                         </Button>
                     )}
-                    <Button
-                        variant="unstyled"
-                        type="button"
-                        aria-label={`${title} options`}
-                        className="flex size-6 cursor-pointer items-center justify-center rounded text-neutral-400 opacity-0 transition-opacity hover:bg-white/10 hover:text-neutral-200 focus-visible:opacity-100 group-hover:opacity-100"
-                    >
-                        <MdMoreHoriz className="size-4" aria-hidden />
-                    </Button>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button
+                                variant="unstyled"
+                                type="button"
+                                aria-label={`${title} options`}
+                                className="flex size-6 cursor-pointer items-center justify-center rounded text-neutral-400 opacity-0 transition-opacity hover:bg-white/10 hover:text-neutral-200 focus-visible:opacity-100 group-hover:opacity-100 data-[state=open]:opacity-100"
+                            >
+                                <MdMoreHoriz className="size-4" aria-hidden />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-52">
+                            <DropdownMenuItem
+                                disabled={issues.length === 0}
+                                onSelect={() =>
+                                    replaceSelection(
+                                        "kanban",
+                                        issues.map((issue) => issue.id),
+                                    )
+                                }
+                            >
+                                <MdChecklist className="size-3.5" aria-hidden />
+                                <span className="flex-1">Select issues</span>
+                                <span className="text-[11px] text-neutral-500">
+                                    {issues.length}
+                                </span>
+                            </DropdownMenuItem>
+
+                            {selectedIds.length > 0 && (
+                                <DropdownMenuItem onSelect={clearSelection}>
+                                    <MdClose className="size-3.5" aria-hidden />
+                                    <span className="flex-1">Clear selection</span>
+                                </DropdownMenuItem>
+                            )}
+                        </DropdownMenuContent>
+                    </DropdownMenu>
                 </div>
             </div>
 
