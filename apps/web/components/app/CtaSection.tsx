@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { RiRocketFill, RiTeamFill } from "react-icons/ri";
 import { cn } from "@/lib/utils";
-import { azeretMono } from "@/components/ui/button";
+import { azeretMono } from "@/lib/fonts";
 import HeroBuddy from "@/components/landing/v2/HeroBuddy";
 import { useUserSessionStore } from "@/store/user/useUserSessionStore";
 

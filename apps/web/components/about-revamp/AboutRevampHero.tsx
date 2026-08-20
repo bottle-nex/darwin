@@ -2,7 +2,8 @@
 import Link from "next/link";
 import { FaXTwitter } from "react-icons/fa6";
 import { cn } from "@/lib/utils";
-import { azeretMono, Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
+import { azeretMono } from "@/lib/fonts";
 import Reveal from "@/components/utility/Reveal";
 import HeroBuddy from "@/components/landing/v2/HeroBuddy";
 import GridBackdrop from "./GridBackdrop";

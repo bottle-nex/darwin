@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { FaLinkedinIn, FaXTwitter } from "react-icons/fa6";
 import { cn } from "@/lib/utils";
-import { azeretMono } from "@/components/ui/button";
+import { azeretMono } from "@/lib/fonts";
 import Eyebrow from "./Eyebrow";
 import Reveal from "@/components/utility/Reveal";
 import { founders } from "./data";

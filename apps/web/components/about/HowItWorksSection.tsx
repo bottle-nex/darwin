@@ -2,7 +2,7 @@
 import { useRef } from "react";
 import { motion, useScroll } from "motion/react";
 import { cn } from "@/lib/utils";
-import { azeretMono } from "@/components/ui/button";
+import { azeretMono } from "@/lib/fonts";
 import Eyebrow from "./Eyebrow";
 import Reveal from "@/components/utility/Reveal";
 import { steps } from "./data";
