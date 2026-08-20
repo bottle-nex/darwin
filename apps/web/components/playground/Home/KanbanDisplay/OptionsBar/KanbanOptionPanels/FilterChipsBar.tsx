@@ -1,8 +1,9 @@
 "use client";
+import { forwardRef, type ComponentProps } from "react";
 import { format, parseISO } from "date-fns";
 import { MdClose } from "react-icons/md";
 import { Button } from "@/components/ui/button";
-import { CapsuleTrigger } from "@/components/playground/Issue/Capsule";
+import IconWrapper from "@/components/ui/IconWrapper";
 import { cn } from "@/lib/utils";
 import { activeFacetKeys } from "@/lib/kanban/boardFilter";
 import { useKanbanFilterStore } from "@/store/kanban/useKanbanFilterStore";
@@ -18,8 +19,6 @@ import FilterFacetMenu from "./FilterFacetMenu";
 import FilterDateMenu from "./FilterDateMenu";
 import FilterQueryMenu from "./FilterQueryMenu";
 
-const CHIP = "py-0.5! text-neutral-200";
-
 function isListFacet(key: FacetKey): key is ListFacetKey {
     return (LIST_FACET_KEYS as readonly FacetKey[]).includes(key);
 }
@@ -28,20 +27,28 @@ function isDateFacet(key: FacetKey): key is DateFacetKey {
     return (DATE_FACET_KEYS as readonly FacetKey[]).includes(key);
 }
 
-function ChipLabel({ facetKey, value }: { facetKey: FacetKey; value: string }) {
+type FilterChipProps = ComponentProps<"button"> & { facetKey: FacetKey; value: string };
+
+const FilterChip = forwardRef<HTMLButtonElement, FilterChipProps>(function FilterChip(
+    { facetKey, value, className, ...props },
+    ref,
+) {
     const meta = FACET_META[facetKey];
+
     return (
-        <>
-            <meta.icon
-                className={cn("size-3.5 text-neutral-400", meta.iconClassName)}
-                aria-hidden
-            />
-            <span className="truncate">
+        <Button
+            variant="unstyled"
+            type="button"
+            ref={ref}
+            className={cn("group flex shrink-0 cursor-pointer rounded-sm", className)}
+            {...props}
+        >
+            <IconWrapper icon={meta.icon} iconClassName={meta.iconClassName}>
                 {meta.label}: <span className="text-neutral-100">{value}</span>
-            </span>
-        </>
+            </IconWrapper>
+        </Button>
     );
-}
+});
 
 function ListChip({ facetKey }: { facetKey: ListFacetKey }) {
     const filters = useKanbanFilterStore((s) => s.filters);
@@ -53,12 +60,10 @@ function ListChip({ facetKey }: { facetKey: ListFacetKey }) {
         <FilterFacetMenu
             facetKey={facetKey}
             trigger={
-                <CapsuleTrigger className={CHIP}>
-                    <ChipLabel
-                        facetKey={facetKey}
-                        value={facetSummary(options, values, meta.plural)}
-                    />
-                </CapsuleTrigger>
+                <FilterChip
+                    facetKey={facetKey}
+                    value={facetSummary(options, values, meta.plural)}
+                />
             }
         />
     );
@@ -74,11 +79,7 @@ function DateChip({ facetKey }: { facetKey: DateFacetKey }) {
     return (
         <FilterDateMenu
             facetKey={facetKey}
-            trigger={
-                <CapsuleTrigger className={CHIP}>
-                    <ChipLabel facetKey={facetKey} value={summary} />
-                </CapsuleTrigger>
-            }
+            trigger={<FilterChip facetKey={facetKey} value={summary} />}
         />
     );
 }
@@ -86,15 +87,7 @@ function DateChip({ facetKey }: { facetKey: DateFacetKey }) {
 function QueryChip() {
     const query = useKanbanFilterStore((s) => s.filters.query);
 
-    return (
-        <FilterQueryMenu
-            trigger={
-                <CapsuleTrigger className={CHIP}>
-                    <ChipLabel facetKey="query" value={query.trim()} />
-                </CapsuleTrigger>
-            }
-        />
-    );
+    return <FilterQueryMenu trigger={<FilterChip facetKey="query" value={query.trim()} />} />;
 }
 
 export default function FilterChipsBar() {
@@ -106,9 +99,9 @@ export default function FilterChipsBar() {
     if (active.length === 0) return null;
 
     return (
-        <div className="flex min-w-0 items-center gap-1 overflow-x-auto">
+        <div className="flex min-w-0 items-center gap-1 overflow-x-auto p-0.5">
             {active.map((key) => (
-                <span key={key} className="inline-flex shrink-0 items-center gap-1">
+                <span key={key} className="inline-flex shrink-0 items-center gap-0.5">
                     {isListFacet(key) ? (
                         <ListChip facetKey={key} />
                     ) : isDateFacet(key) ? (
@@ -121,9 +114,14 @@ export default function FilterChipsBar() {
                         type="button"
                         onClick={() => clearFacet(key)}
                         aria-label={`Remove ${FACET_META[key].label} filter`}
-                        className="cursor-pointer text-neutral-400 opacity-70 hover:opacity-100"
+                        className="group shrink-0 cursor-pointer rounded-full"
                     >
-                        <MdClose className="size-2.5" aria-hidden />
+                        <IconWrapper
+                            icon={MdClose}
+                            variant="ghost"
+                            className="size-6"
+                            iconClassName="size-3"
+                        />
                     </Button>
                 </span>
             ))}
