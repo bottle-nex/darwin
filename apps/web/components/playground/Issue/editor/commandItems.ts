@@ -17,6 +17,7 @@ import {
     LuHeading,
     LuListTree,
     LuTable,
+    LuLink,
 } from "react-icons/lu";
 
 export interface SlashCommandItem {
@@ -88,7 +89,7 @@ function insertImage(editor: Editor, range: Range) {
     input.click();
 }
 
-const HEADING_ITEMS: SlashCommandItem[] = [
+export const HEADING_ITEMS: SlashCommandItem[] = [
     {
         title: "Heading 1",
         icon: LuHeading1,
@@ -109,7 +110,7 @@ const HEADING_ITEMS: SlashCommandItem[] = [
     },
 ];
 
-const LIST_ITEMS: SlashCommandItem[] = [
+export const LIST_ITEMS: SlashCommandItem[] = [
     {
         title: "Bulleted list",
         icon: LuList,
@@ -150,6 +151,12 @@ const TABLE_ENTRY: SlashCommandSizedInsert = {
 };
 
 const BLOCK_ITEMS: SlashCommandItem[] = [
+    {
+        title: "Link",
+        icon: LuLink,
+        command: ({ editor, range }) =>
+            editor.chain().focus().deleteRange(range).openLinkPrompt().run(),
+    },
     {
         title: "Insert media",
         icon: LuImage,

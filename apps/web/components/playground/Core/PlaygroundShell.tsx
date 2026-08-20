@@ -27,6 +27,7 @@ import { useSidebarWidthStore } from "@/store/playground/useSidebarWidthStore";
 import { useCommandContextStore } from "@/store/command/useCommandContextStore";
 import CommandMenu from "@/components/command/CommandMenu";
 import CommandDialogs from "@/components/command/CommandDialogs";
+import IssueSelectionBar from "@/components/playground/Core/components/IssueSelectionBar";
 import BackgroundLighting from "./BackgroundLighting";
 
 export default function PlaygroundShell() {
@@ -87,6 +88,7 @@ export default function PlaygroundShell() {
                     )}
                 </PlaygroundPaneFrame>
                 <NotificationsPanel />
+                <IssueSelectionBar />
             </section>
             <PlaygroundSheetSidebar />
             <CreateProjectDialog />

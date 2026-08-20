@@ -8,6 +8,7 @@ import TagsDisplay from "@/components/playground/Home/TagsDisplay/TagsDisplay";
 import ChatsDisplay from "@/components/playground/Home/panes/ChatsDisplay";
 import ReviewsDisplay from "@/components/playground/Home/panes/ReviewsDisplay";
 import MyIssuesDisplay from "@/components/playground/Home/MyIssuesDisplay/MyIssuesDisplay";
+import InboxDisplay from "@/components/playground/Home/InboxDisplay/InboxDisplay";
 import SettingsDisplay from "@/components/playground/Home/SettingsDisplay/SettingsDisplay";
 import TeamDetailDisplay from "@/components/playground/Team/TeamDisplay";
 import LogoLoader from "@/components/app/LogoLoader";
@@ -47,6 +48,8 @@ function TabPane({ tab }: { tab: string }) {
             return <SettingsDisplay section="env" />;
         case PlaygroundTab.Chats:
             return <ChatsDisplay />;
+        case PlaygroundTab.Inbox:
+            return <InboxDisplay />;
 
         case PlaygroundTab.Kanban:
         default:

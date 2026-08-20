@@ -1,4 +1,5 @@
 "use client";
+import { useIssueSelection } from "@/hooks/issues/useIssueSelection";
 import { useIssueNavigation } from "@/components/playground/Issue/useIssueNavigation";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
 import { PlaygroundTab } from "@/components/playground/playgroundTabs";
@@ -49,6 +50,8 @@ export default function CardRenderer({
 }) {
     const { openIssue } = useIssueNavigation();
     const setTab = usePlaygroundNavStore((s) => s.setTab);
+    const { isSelected, handleSelectClick } = useIssueSelection("kanban");
+    const selected = isSelected(issue.id);
 
     const open =
         issue.status === KanbanStatus.InReview
@@ -60,8 +63,13 @@ export default function CardRenderer({
             role="button"
             tabIndex={0}
             data-issue-id={issue.id}
-            className="cursor-pointer"
-            onClick={open}
+            data-selection-scope="kanban"
+            data-selected={selected}
+            className="group/card cursor-pointer rounded-md"
+            onClick={(event) => {
+                if (handleSelectClick(event, issue.id)) return;
+                open();
+            }}
             onKeyDown={(e) => {
                 if (e.key === "Enter" || e.key === " ") {
                     e.preventDefault();

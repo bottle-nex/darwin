@@ -30,8 +30,8 @@ export default function CommandIssuePage({
     actions: IssueActions;
     onDone: () => void;
 }) {
-    const { issue, editable } = actions;
-    if (!issue) return null;
+    const { issue, editable, count } = actions;
+    if (!count) return null;
 
     function pick(run: () => void, closes = true) {
         run();
@@ -59,7 +59,7 @@ export default function CommandIssuePage({
                                 />
                                 {column.title}
                             </span>
-                            {issue.status === column.status && <Tick />}
+                            {actions.sharedStatus === column.status && <Tick />}
                         </CommandItem>
                     ))}
                 </CommandGroup>
@@ -82,7 +82,9 @@ export default function CommandIssuePage({
                                 />
                                 {option.label}
                             </span>
-                            {issue.priority === PRIORITY_TO_NUMBER[option.value] && <Tick />}
+                            {actions.sharedPriority === PRIORITY_TO_NUMBER[option.value] && (
+                                <Tick />
+                            )}
                         </CommandItem>
                     ))}
                 </CommandGroup>
@@ -167,7 +169,7 @@ export default function CommandIssuePage({
 
             {page === "move" && (
                 <CommandGroup>
-                    {issue.customColumnId && (
+                    {actions.sharedColumnId && (
                         <CommandItem
                             value="Back to board"
                             disabled={!editable}
@@ -178,7 +180,7 @@ export default function CommandIssuePage({
                         </CommandItem>
                     )}
                     {actions.columns
-                        .filter((column) => column.id !== issue.customColumnId)
+                        .filter((column) => column.id !== actions.sharedColumnId)
                         .map((column) => (
                             <CommandItem
                                 key={column.id}
@@ -190,13 +192,13 @@ export default function CommandIssuePage({
                                 <span className="truncate">{column.title}</span>
                             </CommandItem>
                         ))}
-                    {actions.columns.length === 0 && !issue.customColumnId && (
+                    {actions.columns.length === 0 && !actions.sharedColumnId && (
                         <CommandItem disabled>No columns</CommandItem>
                     )}
                 </CommandGroup>
             )}
 
-            {page === "copy" && (
+            {page === "copy" && issue && (
                 <CommandGroup>
                     {COPY_FIELDS.map((field) => (
                         <CommandItem

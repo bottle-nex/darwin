@@ -32,29 +32,29 @@ export type NotificationView = {
 type NotificationTheme = { icon: IconType; tint: string };
 
 const THEME: Record<NotificationType, NotificationTheme> = {
-    [NotificationType.IssueAssigned]: { icon: HiOutlineUserPlus, tint: "text-violet-300" },
+    [NotificationType.IssueAssigned]: { icon: HiOutlineUserPlus, tint: "text-primary" },
     [NotificationType.IssueUnassigned]: { icon: HiOutlineUserMinus, tint: "text-neutral-400" },
-    [NotificationType.ChatMention]: { icon: HiOutlineAtSymbol, tint: "text-sky-300" },
-    [NotificationType.ProjectChatMention]: { icon: HiOutlineAtSymbol, tint: "text-emerald-300" },
-    [NotificationType.IssueStatusChanged]: { icon: HiOutlineArrowPath, tint: "text-amber-300" },
+    [NotificationType.ChatMention]: { icon: HiOutlineAtSymbol, tint: "text-primary" },
+    [NotificationType.ProjectChatMention]: { icon: HiOutlineAtSymbol, tint: "text-matcha" },
+    [NotificationType.IssueStatusChanged]: { icon: HiOutlineArrowPath, tint: "text-matcha" },
     [NotificationType.IssuePriorityChanged]: {
         icon: HiOutlineExclamationTriangle,
-        tint: "text-rose-300",
+        tint: "text-brick-foreground",
     },
-    [NotificationType.IssueMoved]: { icon: HiOutlineArrowsRightLeft, tint: "text-sky-300" },
+    [NotificationType.IssueMoved]: { icon: HiOutlineArrowsRightLeft, tint: "text-primary" },
     [NotificationType.IssueCommented]: {
         icon: HiOutlineChatBubbleLeftRight,
-        tint: "text-indigo-300",
+        tint: "text-primary",
     },
-    [NotificationType.IssueReferenced]: { icon: HiOutlineHashtag, tint: "text-sky-300" },
+    [NotificationType.IssueReferenced]: { icon: HiOutlineHashtag, tint: "text-primary" },
     [NotificationType.IssueDeleted]: { icon: HiOutlineTrash, tint: "text-neutral-400" },
-    [NotificationType.InviteAccepted]: { icon: HiOutlineCheckBadge, tint: "text-emerald-300" },
-    [NotificationType.AddedToProject]: { icon: HiOutlineRectangleGroup, tint: "text-violet-300" },
-    [NotificationType.AddedToTeam]: { icon: HiOutlineUserGroup, tint: "text-violet-300" },
+    [NotificationType.InviteAccepted]: { icon: HiOutlineCheckBadge, tint: "text-matcha" },
+    [NotificationType.AddedToProject]: { icon: HiOutlineRectangleGroup, tint: "text-primary" },
+    [NotificationType.AddedToTeam]: { icon: HiOutlineUserGroup, tint: "text-primary" },
     [NotificationType.RemovedFromTeam]: { icon: HiOutlineUserMinus, tint: "text-neutral-400" },
-    [NotificationType.RemovedFromOrg]: { icon: HiOutlineNoSymbol, tint: "text-rose-300" },
-    [NotificationType.RoleChanged]: { icon: HiOutlineKey, tint: "text-amber-300" },
-    [NotificationType.MessageReacted]: { icon: HiOutlineFaceSmile, tint: "text-amber-300" },
+    [NotificationType.RemovedFromOrg]: { icon: HiOutlineNoSymbol, tint: "text-brick-foreground" },
+    [NotificationType.RoleChanged]: { icon: HiOutlineKey, tint: "text-primary" },
+    [NotificationType.MessageReacted]: { icon: HiOutlineFaceSmile, tint: "text-matcha" },
 };
 
 const FALLBACK_THEME: NotificationTheme = { icon: HiOutlineBell, tint: "text-neutral-400" };

@@ -11,6 +11,8 @@ import {
 } from "@/components/playground/Home/KanbanDisplay/cards/IssueCardFace";
 import { DATE_ICON_COLOR, PRIORITY_OPTIONS } from "@/components/playground/Issue/issueHelpers";
 import { useIssueNavigation } from "@/components/playground/Issue/useIssueNavigation";
+import { useIssueRoute } from "@/components/playground/Issue/useIssueRoute";
+import { useIssueSelection } from "@/hooks/issues/useIssueSelection";
 import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
 import { KanbanMappers } from "@/lib/kanban/KanbanMappers";
 import { cn } from "@/lib/utils";
@@ -50,6 +52,9 @@ export default function MyIssueRow({
     projectName: string;
 }) {
     const { openIssue } = useIssueNavigation();
+    // const { openIssue } = useIssueRoute();
+    const { isSelected, handleSelectClick } = useIssueSelection("my-issues");
+    const selected = isSelected(issue.id);
     const status = KanbanBoard.columnFor(issue.status);
     const StatusIcon = status?.icon ?? LuColumns3;
     const priority = PRIORITY_OPTIONS.find((option) => option.rank === issue.priority);
@@ -57,8 +62,19 @@ export default function MyIssueRow({
     const row = (
         <button
             type="button"
-            onClick={() => openIssue(issue.id)}
-            className="group flex w-full min-w-0 cursor-pointer items-center gap-2.5 border-b border-white/5 bg-neutral-900/20 px-3 py-2.5 text-left transition-colors last:border-b-0 hover:bg-white/[0.035] focus-visible:bg-white/[0.035] focus-visible:outline-none"
+            data-issue-id={issue.id}
+            data-selection-scope="my-issues"
+            data-selected={selected}
+            onClick={(event) => {
+                if (handleSelectClick(event, issue.id)) return;
+                openIssue(issue.id);
+            }}
+            className={cn(
+                "group flex w-full min-w-0 cursor-pointer items-center gap-2.5 border-b border-white/5 px-3 py-2.5 text-left transition-colors last:border-b-0 focus-visible:bg-white/[0.035] focus-visible:outline-none",
+                selected
+                    ? "bg-primary/12 hover:bg-primary/15"
+                    : "bg-neutral-900/20 hover:bg-white/[0.035]",
+            )}
         >
             <StatusIcon
                 className={cn("size-4 shrink-0", status?.titleBox ?? "text-neutral-400")}
