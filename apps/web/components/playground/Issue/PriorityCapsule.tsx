@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { MdCheck } from "react-icons/md";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
@@ -19,11 +19,13 @@ export default function PriorityCapsule({
     onChange,
     disabled,
     className,
+    trigger,
 }: {
     value?: Priority;
     onChange?: (value: Priority) => void;
     disabled?: boolean;
     className?: string;
+    trigger?: ReactNode;
 }) {
     const [open, setOpen] = useState(false);
 
@@ -38,14 +40,19 @@ export default function PriorityCapsule({
     return (
         <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
-                <CapsuleTrigger disabled={disabled} className={className}>
-                    {CurrentIcon && (
-                        <CurrentIcon
-                            className={cn("size-3.5! ml-1 text-white/60", current?.iconClassName)}
-                        />
-                    )}
-                    {current?.label ?? "Priority"}
-                </CapsuleTrigger>
+                {trigger ?? (
+                    <CapsuleTrigger disabled={disabled} className={className}>
+                        {CurrentIcon && (
+                            <CurrentIcon
+                                className={cn(
+                                    "size-3.5! ml-1 text-white/60",
+                                    current?.iconClassName,
+                                )}
+                            />
+                        )}
+                        {current?.label ?? "Priority"}
+                    </CapsuleTrigger>
+                )}
             </PopoverTrigger>
             <PopoverContent className="w-52 p-0">
                 <Command>

@@ -3,6 +3,8 @@ import { useParams, useRouter } from "next/navigation";
 import { useMarkNotificationsRead } from "@/hooks/notifications/useNotifications";
 import { useNotificationsPanelStore } from "@/store/playground/useNotificationsPanelStore";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
+import { useIssueRoute } from "@/components/playground/Issue/useIssueRoute";
+import { PlaygroundTab } from "@/components/playground/playgroundTabs";
 import type { Notification } from "@trymatcha/types";
 import { notification_target } from "./notificationView";
 
@@ -13,7 +15,8 @@ export function useSelectNotification() {
         orgSlug?: string;
         projectSlug?: string;
     }>();
-    const openThread = usePlaygroundNavStore((s) => s.openThread);
+    const setTab = usePlaygroundNavStore((s) => s.setTab);
+    const { openIssue } = useIssueRoute();
     const close = useNotificationsPanelStore((s) => s.close);
 
     return function select(notification: Notification) {
@@ -23,17 +26,22 @@ export function useSelectNotification() {
         if (!target) return;
 
         close();
-        if (!target.thread) {
-            router.push(`/playground/${target.orgSlug}/${target.projectSlug}`);
+        const base = `/playground/${target.orgSlug}/${target.projectSlug}`;
+        if (!target.destination) {
+            router.push(base);
             return;
         }
-        if (target.orgSlug === currentOrgSlug && target.projectSlug === currentProjectSlug) {
-            openThread(target.thread, target.projectSlug);
+
+        const isCurrentProject =
+            target.orgSlug === currentOrgSlug && target.projectSlug === currentProjectSlug;
+
+        if (target.destination.kind === "chats") {
+            if (isCurrentProject) setTab(PlaygroundTab.Chats);
+            else router.push(`${base}?tab=${PlaygroundTab.Chats}`);
             return;
         }
-        const thread_param = target.thread.kind === "project" ? "project" : target.thread.issueId;
-        router.push(
-            `/playground/${target.orgSlug}/${target.projectSlug}?tab=thread-detail&thread=${thread_param}`,
-        );
+
+        if (isCurrentProject) openIssue(target.destination.issueId);
+        else router.push(`${base}/issue/${target.destination.issueId}`);
     };
 }

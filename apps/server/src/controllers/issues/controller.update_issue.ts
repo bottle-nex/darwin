@@ -2,6 +2,7 @@ import { ActorType, IssueStatus, prisma } from "@trymatcha/database";
 import { Request, Response } from "express";
 import z from "zod";
 import ResponseWriter from "../../services/service.response";
+import DescriptionReferenceService from "../../services/service.description-references";
 import Access from "../../access-control/access";
 import { Action, Permissions } from "@trymatcha/access-control";
 import { issue_recipients } from "../../notifications/recipients";
@@ -130,12 +131,20 @@ export default class IssueUpdateController {
                 next_status = issue.status;
             }
 
+            const references =
+                body_data.description !== undefined
+                    ? await DescriptionReferenceService.resolve(
+                          body_data.description,
+                          issue.projectId,
+                      )
+                    : null;
+
             const { updated, activities } = await prisma.$transaction(async (tx) => {
                 const updated = await tx.issue.update({
                     where: { id },
                     data: {
                         title: body_data.title,
-                        description: body_data.description,
+                        description: references ? references.message : undefined,
                         priority: body_data.priority,
                         status: next_status,
                         customColumnId: next_column_id,
@@ -164,6 +173,8 @@ export default class IssueUpdateController {
 
                 return { updated, activities };
             });
+
+            if (references) await DescriptionReferenceService.write(id, references);
 
             const channel_name = server_services.publisher.get_channel_name(issue.projectId);
             await server_services.publisher.publish_message(

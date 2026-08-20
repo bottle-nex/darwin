@@ -50,7 +50,7 @@ export default class ChatMentionNotification {
         const projectId = chat.issue.projectId;
         const orgSlug = chat.issue.project.organization.slug;
         const projectSlug = chat.issue.project.slug;
-        const url = `${ENV.SERVER_WEB_URL}/playground/${orgSlug}/${projectSlug}?tab=thread-detail&thread=${chat.issueId}`;
+        const url = `${ENV.SERVER_WEB_URL}/playground/${orgSlug}/${projectSlug}/issue/${chat.issueId}`;
 
         const notification = await prisma.notification.create({
             data: {

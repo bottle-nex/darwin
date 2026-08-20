@@ -22,7 +22,6 @@ import { useIssueRoute } from "@/components/playground/Issue/useIssueRoute";
 import { useGetDashboard } from "@/hooks/dashboard/useGetDashboard";
 import { useGetProject } from "@/hooks/project/useGetProject";
 import { useSetLastVisited } from "@/hooks/user/useSetLastVisited";
-import { useIssueThreads } from "@/hooks/chats/useIssueThreads";
 import { usePlaygroundUrlSync } from "./usePlaygroundUrlSync";
 import { useSubscribeEventHandlers } from "@/hooks/socket/useSubscribeEventHandlers";
 import usePlaygroundShortcuts from "@/hooks/shortcuts/usePlaygroundShortcuts";
@@ -43,7 +42,6 @@ export default function PlaygroundShell() {
         ? dashboard?.projects.find((p) => p.slug === projectSlug)
         : undefined;
     const { data: project, isPending: isProjectPending } = useGetProject(activeProject?.id);
-    const { data: issueThreads } = useIssueThreads(activeProject?.id);
 
     useSubscribeEventHandlers(activeProject?.id);
 
@@ -54,7 +52,7 @@ export default function PlaygroundShell() {
         }
     }, [orgSlug, activeProject, setLastVisited]);
 
-    usePlaygroundUrlSync(project?.teams, issueThreads);
+    usePlaygroundUrlSync(project?.teams);
     const { mode } = useIssueRoute({ sync: true });
     usePlaygroundShortcuts();
 

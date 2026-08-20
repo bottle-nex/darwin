@@ -8,10 +8,7 @@ import PlaygroundAvatar, {
     toneFor,
 } from "@/components/playground/Core/components/PlaygroundAvatar";
 import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
-import type { KanbanStatus } from "@/types/kanban";
 import type { ReferenceSuggestion } from "./referenceMention";
-
-const STATUS_STYLE = new Map(KanbanBoard.COLUMNS.map((column) => [column.status, column]));
 
 function keyOf(item: ReferenceSuggestion): string {
     return `${item.kind}:${item.id}`;
@@ -27,11 +24,10 @@ interface ReferenceSuggestionListProps {
 }
 
 function IssueRow({ item }: { item: Extract<ReferenceSuggestion, { kind: "issue" }> }) {
-    const style = STATUS_STYLE.get(item.issue.status as KanbanStatus);
-    const Icon = style?.icon;
+    const { icon: Icon, titleBox } = KanbanBoard.glyphFor(item.issue.status);
     return (
         <>
-            {Icon && <Icon className={cn("size-3.5 shrink-0", style?.titleBox)} />}
+            <Icon className={cn("size-3.5 shrink-0", titleBox)} />
             <span className="shrink-0 font-medium text-neutral-400">#{item.issue.number}</span>
             <span className="truncate">{item.issue.title}</span>
         </>

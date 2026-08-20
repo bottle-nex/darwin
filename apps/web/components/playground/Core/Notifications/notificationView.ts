@@ -19,7 +19,6 @@ import {
     HiOutlineUserPlus,
 } from "react-icons/hi2";
 import { NotificationType, type Notification } from "@trymatcha/types";
-import type { SelectedThread } from "@/store/playground/usePlaygroundNavStore";
 
 export type NotificationView = {
     actorId: string;
@@ -235,9 +234,12 @@ export function notification_view(notification: Notification): NotificationView 
     }
 }
 
+/** Where selecting a notification takes you: an issue, the project chat, or just the project. */
+export type NotificationDestination = { kind: "issue"; issueId: string } | { kind: "chats" };
+
 export function notification_target(
     notification: Notification,
-): { orgSlug: string; projectSlug: string; thread: SelectedThread | null } | null {
+): { orgSlug: string; projectSlug: string; destination: NotificationDestination | null } | null {
     const payload = notification.payload as Record<string, string | number>;
     if (!payload.orgSlug || !payload.projectSlug) return null;
     const orgSlug = String(payload.orgSlug);
@@ -256,29 +258,20 @@ export function notification_target(
             return {
                 orgSlug,
                 projectSlug,
-                thread: {
-                    kind: "issue",
-                    issueId: String(payload.issueId),
-                    issueNumber: Number(payload.issueNumber),
-                    issueTitle: String(payload.issueTitle),
-                },
+                destination: { kind: "issue", issueId: String(payload.issueId) },
             };
         case NotificationType.ProjectChatMention:
-            return { orgSlug, projectSlug, thread: { kind: "project" } };
+            return { orgSlug, projectSlug, destination: { kind: "chats" } };
         case NotificationType.MessageReacted:
             if (payload.issueId) {
                 return {
                     orgSlug,
                     projectSlug,
-                    thread: {
-                        kind: "issue",
-                        issueId: String(payload.issueId),
-                        issueNumber: Number(payload.issueNumber),
-                        issueTitle: String(payload.issueTitle),
-                    },
+                    destination: { kind: "issue", issueId: String(payload.issueId) },
                 };
             }
-            if (payload.projectChatId) return { orgSlug, projectSlug, thread: { kind: "project" } };
+            if (payload.projectChatId)
+                return { orgSlug, projectSlug, destination: { kind: "chats" } };
             return null;
         case NotificationType.IssueDeleted:
         case NotificationType.InviteAccepted:
@@ -286,7 +279,7 @@ export function notification_target(
         case NotificationType.AddedToTeam:
         case NotificationType.RemovedFromTeam:
         case NotificationType.RoleChanged:
-            return { orgSlug, projectSlug, thread: null };
+            return { orgSlug, projectSlug, destination: null };
         default:
             return null;
     }

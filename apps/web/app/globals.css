@@ -453,10 +453,13 @@
         overflow-x: auto;
     }
 
+    /* Separate cells so each tile can round its own corners; the spacing is the
+       gap between them, which is why the cells draw no border of their own. */
     .tiptap table {
         width: 100%;
         table-layout: fixed;
-        border-collapse: collapse;
+        border-collapse: separate;
+        border-spacing: 2px;
         font-size: 0.9rem;
     }
 

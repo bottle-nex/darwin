@@ -1,11 +1,14 @@
 import Mention, { type MentionNodeAttrs } from "@tiptap/extension-mention";
 import { PluginKey } from "@tiptap/pm/state";
-import { ReactRenderer } from "@tiptap/react";
+import { ReactNodeViewRenderer, ReactRenderer } from "@tiptap/react";
 import type { SuggestionOptions } from "@tiptap/suggestion";
 import type { QueryClient } from "@tanstack/react-query";
+import { parse_reference_token, reference_key } from "@trymatcha/types";
 import { displayNameOf } from "@/components/playground/Core/components/PlaygroundAvatar";
 import { search_issues, search_members, type IssueSuggestion } from "@/lib/referenceSearch";
 import type { ProjectMember } from "@/hooks/project/useProjectMembers";
+import ReferenceChip from "./ReferenceChip";
+import { ISSUE_TRIGGER, MEMBER_TRIGGER, kindFor } from "./referenceTriggers";
 import ReferenceSuggestionList, {
     type ReferenceSuggestionListHandle,
 } from "./ReferenceSuggestionList";
@@ -19,8 +22,7 @@ type ReferenceSuggestionOptions = Omit<
     "editor"
 >;
 
-export const MEMBER_TRIGGER = "@";
-export const ISSUE_TRIGGER = "#";
+export { ISSUE_TRIGGER, MEMBER_TRIGGER } from "./referenceTriggers";
 
 export const SUGGESTION_KEYS = [new PluginKey("memberReference"), new PluginKey("issueReference")];
 
@@ -71,6 +73,50 @@ const insert_reference: ReferenceSuggestionOptions["command"] = ({ editor, range
         ])
         .run();
 };
+
+function referenceToken(char: string, id: string): string {
+    return `${char}[${reference_key(kindFor(char), id)}]`;
+}
+
+/**
+ * The id is the only thing stored. Labels are resolved live by the node view, so
+ * a renamed member or retitled issue never leaves a stale chip behind.
+ */
+const ReferenceMentionNode = Mention.extend({
+    addAttributes() {
+        const parent = (this.parent?.() ?? {}) as Record<string, Record<string, unknown>>;
+        return {
+            ...parent,
+            id: {
+                ...parent.id,
+                parseHTML: (element: HTMLElement) =>
+                    element.getAttribute("data-id") ??
+                    parse_reference_token(element.textContent ?? "")?.id ??
+                    null,
+            },
+            label: {
+                ...parent.label,
+                parseHTML: (element: HTMLElement) =>
+                    element.getAttribute("data-label") ??
+                    (parse_reference_token(element.textContent ?? "")
+                        ? null
+                        : (element.textContent?.replace(/^[@#]/, "") ?? null)),
+            },
+            mentionSuggestionChar: {
+                ...parent.mentionSuggestionChar,
+                parseHTML: (element: HTMLElement) =>
+                    element.getAttribute("data-mention-suggestion-char") ??
+                    (element.textContent?.startsWith(ISSUE_TRIGGER)
+                        ? ISSUE_TRIGGER
+                        : MEMBER_TRIGGER),
+            },
+        };
+    },
+
+    addNodeView() {
+        return ReactNodeViewRenderer(ReferenceChip);
+    },
+});
 
 export type ReferenceTrigger = "member" | "issue";
 
@@ -139,20 +185,34 @@ export function createReferenceMention({
         },
     };
 
-    return Mention.configure({
+    return ReferenceMentionNode.configure({
         HTMLAttributes: { class: "reference-chip" },
-        renderText: ({ node }) =>
-            `${node.attrs.mentionSuggestionChar ?? MEMBER_TRIGGER}${node.attrs.label}`,
-        renderHTML: ({ node }) => [
-            "span",
-            {
-                "data-type": "mention",
-                "data-kind":
-                    node.attrs.mentionSuggestionChar === ISSUE_TRIGGER ? "issue" : "member",
-                class: "reference-chip",
-            },
-            `${node.attrs.mentionSuggestionChar ?? MEMBER_TRIGGER}${node.attrs.label}`,
-        ],
+        renderText: ({ node }) => {
+            const char = node.attrs.mentionSuggestionChar ?? MEMBER_TRIGGER;
+            return node.attrs.id
+                ? referenceToken(char, node.attrs.id)
+                : `${char}${node.attrs.label ?? ""}`;
+        },
+        /**
+         * The stored text is the shared reference token, so `reference_ids` and
+         * `filter_reference_tokens` read an issue description exactly the way
+         * they already read a chat message.
+         */
+        renderHTML: ({ node }) => {
+            const char = node.attrs.mentionSuggestionChar ?? MEMBER_TRIGGER;
+            const id = node.attrs.id as string | null;
+            return [
+                "span",
+                {
+                    "data-type": "mention",
+                    "data-kind": kindFor(char),
+                    ...(id ? { "data-id": id } : {}),
+                    "data-mention-suggestion-char": char,
+                    class: "reference-chip",
+                },
+                id ? referenceToken(char, id) : `${char}${node.attrs.label ?? ""}`,
+            ];
+        },
         suggestions: triggers.map((trigger) =>
             trigger === "member" ? member_suggestion : issue_suggestion,
         ),

@@ -89,9 +89,11 @@ export default function CustomKanbanCard({ card, preview = false }: CustomKanban
             >
                 <IssueCardFace
                     identifier={issueIdentifier(project?.name, card.number ?? "")}
+                    issueId={preview ? undefined : card.id}
                     title={card.title}
                     status={card.status}
                     priority={card.priority}
+                    tags={card.tags}
                     targetDate={card.targetDate}
                     createdAt={card.createdAt}
                     assignees={card.assignees}

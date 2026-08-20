@@ -95,37 +95,54 @@ export default function CustomKanbanColumn({ column, draggable = true }: CustomK
                         </span>
                     </div>
                 )}
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button
-                            variant="unstyled"
-                            type="button"
-                            aria-label={`${column.title} options`}
-                            className="flex size-6 cursor-pointer items-center justify-center rounded text-neutral-400 opacity-0 transition-opacity hover:bg-white/10 hover:text-neutral-200 focus-visible:opacity-100 group-hover:opacity-100 data-[state=open]:opacity-100"
-                        >
-                            <MdMoreHoriz className="size-4" aria-hidden />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-44">
-                        <DropdownMenuItem
-                            onSelect={() => {
-                                setDraftTitle(column.title);
-                                setRenaming(true);
-                            }}
-                        >
-                            <MdEdit className="size-3.5" aria-hidden />
-                            <span className="flex-1">Rename list</span>
-                        </DropdownMenuItem>
+                <div className="flex items-center gap-1">
+                    <Button
+                        variant="unstyled"
+                        type="button"
+                        onClick={() =>
+                            openCreate({
+                                board: "custom",
+                                columnId: column.id,
+                                columnTitle: column.title,
+                            })
+                        }
+                        aria-label={`Add an issue to ${column.title}`}
+                        className="flex size-6 cursor-pointer items-center justify-center rounded text-neutral-400 opacity-0 transition-opacity hover:bg-white/10 hover:text-neutral-200 focus-visible:opacity-100 group-hover:opacity-100"
+                    >
+                        <MdAdd className="size-4" aria-hidden />
+                    </Button>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button
+                                variant="unstyled"
+                                type="button"
+                                aria-label={`${column.title} options`}
+                                className="flex size-6 cursor-pointer items-center justify-center rounded text-neutral-400 opacity-0 transition-opacity hover:bg-white/10 hover:text-neutral-200 focus-visible:opacity-100 group-hover:opacity-100 data-[state=open]:opacity-100"
+                            >
+                                <MdMoreHoriz className="size-4" aria-hidden />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-44">
+                            <DropdownMenuItem
+                                onSelect={() => {
+                                    setDraftTitle(column.title);
+                                    setRenaming(true);
+                                }}
+                            >
+                                <MdEdit className="size-3.5" aria-hidden />
+                                <span className="flex-1">Rename list</span>
+                            </DropdownMenuItem>
 
-                        <DropdownMenuItem
-                            onSelect={() => removeColumn(column.id)}
-                            variant="destructive"
-                        >
-                            <MdDelete className="size-3.5" aria-hidden />
-                            <span className="flex-1">Delete list</span>
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                            <DropdownMenuItem
+                                onSelect={() => removeColumn(column.id)}
+                                variant="destructive"
+                            >
+                                <MdDelete className="size-3.5" aria-hidden />
+                                <span className="flex-1">Delete list</span>
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                </div>
             </div>
 
             <SortableContext
@@ -140,6 +157,22 @@ export default function CustomKanbanColumn({ column, draggable = true }: CustomK
                         <SortableCustomCard key={card.id} card={card} />
                     ))}
 
+                    <Button
+                        variant="unstyled"
+                        type="button"
+                        onClick={() =>
+                            openCreate({
+                                board: "custom",
+                                columnId: column.id,
+                                columnTitle: column.title,
+                            })
+                        }
+                        className="flex shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-[9px] px-2 py-1.5 text-center text-[13px] font-medium text-neutral-400 opacity-0 transition-opacity hover:bg-white/5 hover:text-neutral-200 focus-visible:opacity-100 group-hover:opacity-100"
+                    >
+                        <MdAdd className="size-3.5" aria-hidden />
+                        Add a card
+                    </Button>
+
                     {column.cards.length === 0 && (
                         <div className="flex h-full flex-col items-center justify-center gap-2 px-2">
                             <MatchaLogo className="h-6 w-auto text-neutral-800" />
@@ -148,22 +181,6 @@ export default function CustomKanbanColumn({ column, draggable = true }: CustomK
                     )}
                 </div>
             </SortableContext>
-
-            <Button
-                variant="unstyled"
-                type="button"
-                onClick={() =>
-                    openCreate({
-                        board: "custom",
-                        columnId: column.id,
-                        columnTitle: column.title,
-                    })
-                }
-                className="mt-2 flex items-center justify-center gap-1.5 rounded-[9px] px-2 py-1.5 text-[13px] text-center font-medium text-neutral-400 transition-colors hover:bg-white/5 hover:text-neutral-200 cursor-pointer"
-            >
-                <MdAdd className="size-3.5" aria-hidden />
-                Add a card
-            </Button>
         </div>
     );
 }
