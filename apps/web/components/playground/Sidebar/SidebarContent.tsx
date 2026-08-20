@@ -4,25 +4,19 @@ import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore"
 import { PANE_TOP_BAR_HEIGHT } from "@/components/playground/Core/components/PlaygroundPaneFrame";
 import PlaygroundLeadBar from "@/components/playground/Core/TopBar/PlaygroundLeadBar";
 import PlaygroundUserMenu from "@/components/playground/Core/TopBar/PlaygroundUserMenu";
-import { PlaygroundTab } from "../playgroundTabs";
+import { isSettingsTab } from "../playgroundTabs";
 import BoardSection from "./BoardSection";
 import ForYouSection from "./ForYouSection";
 import TeamsSection from "./TeamsSection";
 import SettingsNavSection from "./SettingsNavSection";
 import SidebarActions from "./SidebarActions";
 
-const SETTINGS_TABS: string[] = [
-    PlaygroundTab.SettingsProject,
-    PlaygroundTab.SettingsTemplates,
-    PlaygroundTab.SettingsEnv,
-];
-
 export default function SidebarContent() {
     const selectedRowId = usePlaygroundNavStore((s) => s.tab);
     const setTab = usePlaygroundNavStore((s) => s.setTab);
     const returnFromSettings = usePlaygroundNavStore((s) => s.returnFromSettings);
 
-    const inSettings = SETTINGS_TABS.includes(selectedRowId);
+    const inSettings = isSettingsTab(selectedRowId);
     const section = {
         selectedRowId,
         onSelect: (id: string) => setTab(id),

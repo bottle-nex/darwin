@@ -5,6 +5,15 @@ enum SidebarTheme {
   Neutral
 }
 
+enum BackgroundLightingColor {
+  Violet
+  Matcha
+  Blue
+  Amber
+  Rose
+  Neutral
+}
+
 model User {
   id            String    @id @default(cuid())
   name          String?
@@ -46,6 +55,15 @@ model User {
   notifications      Notification[]
   issueActivities    IssueActivity[]     @relation(name: "ActivityActor")
   apiKeys            ApiKey[]
+  config             UserConfig?
+}
+
+model UserConfig {
+  id                        String                  @id @default(cuid())
+  userId                    String                  @unique
+  user                      User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  backgroundLightingEnabled Boolean                 @default(true)
+  backgroundLightingColor   BackgroundLightingColor @default(Violet)
 }
 
 model GithubAccount {

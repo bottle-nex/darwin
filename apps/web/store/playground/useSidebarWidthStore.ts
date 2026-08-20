@@ -6,13 +6,17 @@ export const SIDEBAR_MAX_WIDTH = 320;
 export const SIDEBAR_DEFAULT_WIDTH = 240;
 export const SIDEBAR_COLLAPSE_THRESHOLD = 30;
 export const SIDEBAR_WIDTH_CSS_VAR = "--playground-sidebar-width";
+export const SIDEBAR_PANEL_WIDTH_CSS_VAR = "--playground-sidebar-panel-width";
 export const SIDEBAR_WIDTH_STORAGE_KEY = "playground-sidebar-width";
 
 const clampWidth = (width: number) =>
     Math.min(SIDEBAR_MAX_WIDTH, Math.max(SIDEBAR_MIN_WIDTH, width));
 
-const applyWidthVar = (width: number) =>
-    document.documentElement.style.setProperty(SIDEBAR_WIDTH_CSS_VAR, `${width}px`);
+const applyWidthVars = (width: number, collapsed: boolean) => {
+    const root = document.documentElement.style;
+    root.setProperty(SIDEBAR_WIDTH_CSS_VAR, `${collapsed ? 0 : width}px`);
+    root.setProperty(SIDEBAR_PANEL_WIDTH_CSS_VAR, `${width}px`);
+};
 
 interface SidebarWidthState {
     width: number;
@@ -37,15 +41,15 @@ export const useSidebarWidthStore = create<SidebarWidthState>()(
             sheetOpen: false,
             setWidth: (width) => {
                 const clamped = clampWidth(width);
-                applyWidthVar(clamped);
+                applyWidthVars(clamped, false);
                 set({ width: clamped, collapsed: false, sheetOpen: false });
             },
             collapse: () => {
-                applyWidthVar(0);
+                applyWidthVars(get().width, true);
                 set({ collapsed: true });
             },
             expand: () => {
-                applyWidthVar(get().width);
+                applyWidthVars(get().width, false);
                 set({ collapsed: false, sheetOpen: false });
             },
             toggle: () => (get().collapsed ? get().expand() : get().collapse()),
@@ -58,7 +62,7 @@ export const useSidebarWidthStore = create<SidebarWidthState>()(
             skipHydration: true,
             partialize: (state) => ({ width: state.width, collapsed: state.collapsed }),
             onRehydrateStorage: () => (state) => {
-                if (state) applyWidthVar(state.collapsed ? 0 : state.width);
+                if (state) applyWidthVars(state.width, state.collapsed);
             },
         },
     ),

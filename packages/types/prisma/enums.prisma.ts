@@ -185,3 +185,14 @@ export const SidebarTheme = {
     Neutral: "Neutral",
 } as const;
 export type SidebarTheme = (typeof SidebarTheme)[keyof typeof SidebarTheme];
+
+export const BackgroundLightingColor = {
+    Violet: "Violet",
+    Matcha: "Matcha",
+    Blue: "Blue",
+    Amber: "Amber",
+    Rose: "Rose",
+    Neutral: "Neutral",
+} as const;
+export type BackgroundLightingColor =
+    (typeof BackgroundLightingColor)[keyof typeof BackgroundLightingColor];

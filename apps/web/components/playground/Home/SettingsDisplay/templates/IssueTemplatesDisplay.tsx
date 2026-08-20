@@ -12,6 +12,7 @@ import { useUpdateTemplate } from "@/hooks/templates/useUpdateTemplate";
 import { useDeleteTemplate } from "@/hooks/templates/useDeleteTemplate";
 import type { IssueTemplate } from "@/types/issueTemplate";
 import CreateTemplateDisplay from "./CreateTemplateDisplay";
+import SettingsSectionHeader from "../SettingsSectionHeader";
 
 type View = { kind: "list" } | { kind: "edit"; template?: IssueTemplate };
 
@@ -64,14 +65,10 @@ export default function IssueTemplatesDisplay({ projectId }: { projectId: string
     return (
         <section className="flex flex-col gap-4">
             <header className="flex items-start justify-between gap-3">
-                <hgroup>
-                    <h2 className="text-[13px] font-semibold text-neutral-100">Issue templates</h2>
-                    <p className="mt-1 text-[12px] text-neutral-500">
-                        A pre-written issue body. Write it the way you&rsquo;d want issues filed,
-                        mark one as the default, and everyone starts from it. Every project also has
-                        built-in starters, which show up in the picker on their own.
-                    </p>
-                </hgroup>
+                <SettingsSectionHeader
+                    title="Issue templates"
+                    description="A pre-written issue body. Write it the way you'd want issues filed, mark one as the default, and everyone starts from it. Every project also has built-in starters, which show up in the picker on their own."
+                />
                 <Button
                     type="button"
                     size="sm"

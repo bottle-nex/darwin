@@ -169,7 +169,7 @@ export const COMBINATIONS: Record<string, CommandAction> = {
         label: "Open Settings",
         icon: HiOutlineCog6Tooth,
         isAvailable: inProject,
-        run: () => openTab(PlaygroundTab.SettingsProject),
+        run: () => openTab(PlaygroundTab.SettingsAppearance),
     },
     "o n": {
         kind: CommandKind.Open,

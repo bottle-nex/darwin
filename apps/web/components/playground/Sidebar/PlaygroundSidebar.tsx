@@ -4,13 +4,14 @@ import { motion } from "motion/react";
 import { cn } from "@/lib/utils";
 import {
     SIDEBAR_DEFAULT_WIDTH,
+    SIDEBAR_PANEL_WIDTH_CSS_VAR,
     SIDEBAR_WIDTH_CSS_VAR,
     useSidebarWidthStore,
 } from "@/store/playground/useSidebarWidthStore";
 import SidebarContent from "./SidebarContent";
 
 export default function PlaygroundSidebar() {
-    const { width, collapsed, dragging } = useSidebarWidthStore();
+    const { collapsed, dragging } = useSidebarWidthStore();
     const [hydrated, setHydrated] = useState(false);
 
     useEffect(() => {
@@ -36,7 +37,10 @@ export default function PlaygroundSidebar() {
                 initial={false}
                 animate={collapsed ? { rotateY: -32, scale: 0.9 } : { rotateY: 0, scale: 1 }}
                 transition={{ duration: instant ? 0 : 0.35, ease: [0.22, 1, 0.36, 1] }}
-                style={{ width, transformOrigin: "left center" }}
+                style={{
+                    width: `var(${SIDEBAR_PANEL_WIDTH_CSS_VAR}, ${SIDEBAR_DEFAULT_WIDTH}px)`,
+                    transformOrigin: "left center",
+                }}
                 className={cn(
                     "relative h-full min-h-0 overflow-hidden rounded-lg border-[1.5px] border-snow/5 bg-charcoal/70",
                     collapsed && "pointer-events-none",

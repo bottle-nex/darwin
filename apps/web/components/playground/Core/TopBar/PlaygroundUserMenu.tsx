@@ -15,31 +15,19 @@ import {
     DropdownMenuSubTrigger,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-    MdAdd,
-    MdCheck,
-    MdFolderOpen,
-    MdKeyboardArrowRight,
-    MdLogout,
-    MdPerson,
-    MdSettings,
-    MdWindow,
-} from "react-icons/md";
+import { MdAdd, MdCheck, MdKeyboardArrowRight, MdLogout, MdSettings } from "react-icons/md";
 import { type IconType } from "react-icons";
 import { useUserSessionStore } from "@/store/user/useUserSessionStore";
 import { useFetchOrganizations } from "@/hooks/playground/useFetchOrganizations";
 import PlaygroundAvatar from "@/components/playground/Core/components/PlaygroundAvatar";
 import SessionServices from "@/lib/session";
 import CreateOrganizationModal from "@/components/playground/landing/CreateOrganizationModal";
-import SettingsPanel from "@/components/playground/Core/TopBar/SettingsPanel";
-import BackgroundLightingControl from "@/components/playground/Sidebar/BackgroundLightingControl";
 import { TooltipComponent } from "@/components/ui/tooltip-component";
 import { SIDEBAR_ICON_BUTTON_CLASS } from "@/components/playground/Sidebar/shared";
+import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
+import { PlaygroundTab } from "@/components/playground/playgroundTabs";
 
 const MENU_ITEMS: { id: string; label: string; icon: IconType }[] = [
-    { id: "personal", label: "Personal info", icon: MdPerson },
-    { id: "Projects", label: "Projects", icon: MdFolderOpen },
-    { id: "Teams", label: "Teams", icon: MdWindow },
     { id: "settings", label: "Settings", icon: MdSettings },
 ];
 
@@ -104,7 +92,11 @@ function OrgSwitcherSubMenu({ onCreateOrg }: { onCreateOrg: () => void }) {
 export default function PlaygroundUserMenu() {
     const user = useUserSessionStore((s) => s.session?.user);
     const [isCreateOrgOpen, setIsCreateOrgOpen] = useState(false);
-    const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+    const setTab = usePlaygroundNavStore((s) => s.setTab);
+
+    function openSettings() {
+        setTab(PlaygroundTab.SettingsAppearance);
+    }
 
     const name = user?.name?.trim() || user?.email?.split("@")[0] || "User";
     const handle = `@${(user?.email?.split("@")[0] || name).toLowerCase().replace(/\s+/g, "")}`;
@@ -177,14 +169,7 @@ export default function PlaygroundUserMenu() {
 
                         <div className="p-1">
                             {MENU_ITEMS.map((item) => (
-                                <DropdownMenuItem
-                                    key={item.id}
-                                    onSelect={
-                                        item.id === "settings"
-                                            ? () => setIsSettingsOpen(true)
-                                            : undefined
-                                    }
-                                >
+                                <DropdownMenuItem key={item.id} onSelect={openSettings}>
                                     <item.icon className="size-4 text-neutral-400" aria-hidden />
                                     {item.label}
                                 </DropdownMenuItem>
@@ -215,19 +200,16 @@ export default function PlaygroundUserMenu() {
                         <Button
                             variant="unstyled"
                             type="button"
-                            onClick={() => setIsSettingsOpen(true)}
+                            onClick={openSettings}
                             aria-label="Settings"
                             className={SIDEBAR_ICON_BUTTON_CLASS}
                         >
                             <MdSettings className="size-4" aria-hidden />
                         </Button>
                     </TooltipComponent>
-
-                    <BackgroundLightingControl />
                 </div>
             </div>
             <CreateOrganizationModal open={isCreateOrgOpen} onOpenChange={setIsCreateOrgOpen} />
-            <SettingsPanel open={isSettingsOpen} onOpenChange={setIsSettingsOpen} />
         </>
     );
 }

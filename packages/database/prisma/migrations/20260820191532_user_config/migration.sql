@@ -1,0 +1,18 @@
+-- CreateEnum
+CREATE TYPE "BackgroundLightingColor" AS ENUM ('Violet', 'Matcha', 'Blue', 'Amber', 'Rose', 'Neutral');
+
+-- CreateTable
+CREATE TABLE "UserConfig" (
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "backgroundLightingEnabled" BOOLEAN NOT NULL DEFAULT true,
+    "backgroundLightingColor" "BackgroundLightingColor" NOT NULL DEFAULT 'Violet',
+
+    CONSTRAINT "UserConfig_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateIndex
+CREATE UNIQUE INDEX "UserConfig_userId_key" ON "UserConfig"("userId");
+
+-- AddForeignKey
+ALTER TABLE "UserConfig" ADD CONSTRAINT "UserConfig_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;

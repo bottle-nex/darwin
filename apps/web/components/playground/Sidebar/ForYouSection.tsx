@@ -22,7 +22,7 @@ const FOR_YOU_ROWS: { id: string; label: string; icon: React.ComponentType }[] =
     },
     { id: PlaygroundTab.Chats, label: "Chats", icon: HiOutlineAnnotation },
     { id: PlaygroundTab.Reviews, label: "Reviews", icon: HiOutlineCheckCircle },
-    { id: PlaygroundTab.SettingsProject, label: "Settings", icon: HiOutlineCog6Tooth },
+    { id: PlaygroundTab.SettingsAppearance, label: "Settings", icon: HiOutlineCog6Tooth },
 ];
 
 export default function PlaygroundSidebarForYouSection({

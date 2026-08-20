@@ -1,7 +1,6 @@
 "use client";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
@@ -11,6 +10,7 @@ import { useCreateApiKey } from "@/hooks/apiKeys/useCreateApiKey";
 import { useRevokeApiKey } from "@/hooks/apiKeys/useRevokeApiKey";
 import type { CreatedApiKey } from "@/types/apiKey.type";
 import { MdContentCopy, MdKey } from "react-icons/md";
+import SettingsSectionHeader from "./SettingsSectionHeader";
 
 function formatDate(value: string | null) {
     if (!value) return "Never";
@@ -88,7 +88,7 @@ function CreatedKeyBanner({
     );
 }
 
-function ApiKeysSection() {
+export default function ApiKeysSettingsSection() {
     const { data: apiKeys, isLoading } = useApiKeys();
     const createApiKey = useCreateApiKey();
     const revokeApiKey = useRevokeApiKey();
@@ -113,12 +113,10 @@ function ApiKeysSection() {
 
     return (
         <div className="flex flex-col gap-y-4">
-            <div className="flex flex-col gap-y-1">
-                <h2 className="text-sm font-semibold text-neutral-100">Claude MCP</h2>
-                <p className="text-xs text-neutral-500">
-                    Create an api key to let Claude create issues on your projects via MCP.
-                </p>
-            </div>
+            <SettingsSectionHeader
+                title="API keys"
+                description="Create an api key to let Claude create issues on your projects via MCP."
+            />
 
             <div className="flex items-center gap-x-2">
                 <code className="min-w-0 flex-1 truncate rounded-md bg-charcoal px-2.5 py-1.5 text-[12px] text-neutral-400">
@@ -202,37 +200,5 @@ function ApiKeysSection() {
                 ))}
             </div>
         </div>
-    );
-}
-
-export default function SettingsPanel({
-    open,
-    onOpenChange,
-}: {
-    open: boolean;
-    onOpenChange: (open: boolean) => void;
-}) {
-    if (!open) return null;
-    return (
-        <Dialog open onOpenChange={onOpenChange}>
-            <DialogContent
-                className={cn(
-                    "flex max-h-[80vh] w-140 max-w-none flex-col gap-0 overflow-hidden p-0 sm:max-w-none",
-                    "rounded-3xl",
-                )}
-            >
-                <DialogTitle className="border-b border-white/5 px-6 py-4 text-base font-semibold text-neutral-100">
-                    Settings
-                </DialogTitle>
-                <div
-                    data-lenis-prevent
-                    className="no-scrollbar flex flex-1 flex-col divide-y divide-white/5 overflow-y-auto px-6"
-                >
-                    <div className="py-5">
-                        <ApiKeysSection />
-                    </div>
-                </div>
-            </DialogContent>
-        </Dialog>
     );
 }

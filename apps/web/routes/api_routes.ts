@@ -11,6 +11,7 @@ export const CREATE_ORG = API_URL + "/org/create";
 
 export const LAST_VISITED_URL = API_URL + "/user/last-visited";
 export const SIDEBAR_THEME_URL = API_URL + "/user/sidebar-theme";
+export const USER_CONFIG_URL = API_URL + "/user/config";
 export const PLAYGROUND_URL = API_URL + "/playground";
 export const PRELOAD_URL = PLAYGROUND_URL + "/preload";
 export const DASHBOARD_URL = (orgSlug: string) => `${PLAYGROUND_URL}/dashboard/${orgSlug}`;

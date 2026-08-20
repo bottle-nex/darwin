@@ -9,6 +9,7 @@ import parse_env from "@/lib/env_parser";
 import { useProjectSecrets } from "@/hooks/project/useProjectSecrets";
 import { useSetProjectSecrets } from "@/hooks/project/useSetProjectSecrets";
 import { useDeleteProjectSecret } from "@/hooks/project/useDeleteProjectSecret";
+import SettingsSectionHeader from "./SettingsSectionHeader";
 
 const FIELD =
     "border-white/10 bg-white/5 text-neutral-200 placeholder:text-neutral-500 focus-visible:border-matcha focus-visible:ring-matcha/30";
@@ -70,15 +71,10 @@ export default function ProjectSettingsEnvSection({
     return (
         <div className="flex flex-col gap-4">
             <div className="flex items-start justify-between gap-3">
-                <div>
-                    <h2 className="text-[13px] font-semibold text-neutral-100">
-                        Environment variables
-                    </h2>
-                    <p className="mt-1 text-[12px] text-neutral-500">
-                        Encrypted at rest and write-only, you can add, overwrite, or delete them,
-                        but they&rsquo;re never shown again.
-                    </p>
-                </div>
+                <SettingsSectionHeader
+                    title="Environment variables"
+                    description="Encrypted at rest and write-only, you can add, overwrite, or delete them, but they're never shown again."
+                />
                 <Button
                     type="button"
                     size="sm"

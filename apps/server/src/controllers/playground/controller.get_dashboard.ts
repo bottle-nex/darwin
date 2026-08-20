@@ -3,10 +3,16 @@ import ResponseWriter from "../../services/service.response";
 import z from "zod";
 import { Action, Permissions } from "@trymatcha/access-control";
 import { prisma } from "@trymatcha/database";
+import { BackgroundLightingColor } from "@trymatcha/types";
 
 const params_schema = z.object({
     org_slug: z.string().min(1),
 });
+
+const DEFAULT_USER_CONFIG = {
+    backgroundLightingEnabled: true,
+    backgroundLightingColor: BackgroundLightingColor.Violet,
+};
 
 export default class GetDashboardController {
     static async process(req: Request, res: Response) {
@@ -62,9 +68,15 @@ export default class GetDashboardController {
                 orderBy: { createdAt: "desc" },
             });
 
+            const config = await prisma.userConfig.findUnique({
+                where: { userId: user_id },
+                select: { backgroundLightingEnabled: true, backgroundLightingColor: true },
+            });
+
             ResponseWriter.success(res, {
                 org: membership.organization,
                 projects,
+                userConfig: config ?? DEFAULT_USER_CONFIG,
             });
         } catch (error) {
             console.error("error in get_dashboard controller:", error);

@@ -11,6 +11,10 @@ const PaneSlotsContext = createContext<PaneSlots>({ lead: null, actions: null })
 
 export const PaneSlotsProvider = PaneSlotsContext.Provider;
 
+export function usePaneSlots() {
+    return useContext(PaneSlotsContext);
+}
+
 export function PaneLeadSlot({ children }: { children: ReactNode }) {
     const { lead } = useContext(PaneSlotsContext);
     return lead && createPortal(children, lead);

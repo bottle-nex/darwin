@@ -21,6 +21,7 @@ import type { KanbanOptionView, ProjectDetail } from "@/types/project";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import ProjectSettingsBoardSection from "./ProjectSettingsBoardSection";
+import SettingsSectionHeader from "./SettingsSectionHeader";
 
 const FIELD =
     "border-white/10 bg-white/5 text-neutral-200 placeholder:text-neutral-500 focus-visible:border-matcha focus-visible:ring-matcha/30";
@@ -83,12 +84,10 @@ export default function ProjectSettingsGeneralSection({
 
     return (
         <div className="flex flex-col gap-4">
-            <div>
-                <h2 className="text-[13px] font-semibold text-neutral-100">Project</h2>
-                <p className="mt-1 text-[12px] text-neutral-500">
-                    Change the name, slug, or description.
-                </p>
-            </div>
+            <SettingsSectionHeader
+                title="Project"
+                description="Change the name, slug, or description."
+            />
 
             <div>
                 <label className="text-[12px] text-neutral-300">Name</label>

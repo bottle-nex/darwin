@@ -1,6 +1,6 @@
 "use client";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
-import { PlaygroundTab } from "@/components/playground/playgroundTabs";
+import { isSettingsTab, PlaygroundTab } from "@/components/playground/playgroundTabs";
 import { cn } from "@/lib/utils";
 import OverviewDisplay from "@/components/playground/Home/OverviewDisplay/OverviewDisplay";
 import KanbanDisplay from "@/components/playground/Home/KanbanDisplay/KanbanDisplay";
@@ -11,9 +11,17 @@ import ReviewsDisplay from "@/components/playground/Home/panes/ReviewsDisplay";
 import MyIssuesDisplay from "@/components/playground/Home/MyIssuesDisplay/MyIssuesDisplay";
 import InboxDisplay from "@/components/playground/Home/InboxDisplay/InboxDisplay";
 import SettingsDisplay from "@/components/playground/Home/SettingsDisplay/SettingsDisplay";
+import AppearanceSettingsSection from "@/components/playground/Home/SettingsDisplay/AppearanceSettingsSection";
+import ApiKeysSettingsSection from "@/components/playground/Home/SettingsDisplay/ApiKeysSettingsSection";
+import SettingsPaneShell from "@/components/playground/Home/SettingsDisplay/SettingsPaneShell";
+import SettingsBreadcrumb from "@/components/playground/Home/SettingsDisplay/SettingsBreadcrumb";
 import TeamDetailDisplay from "@/components/playground/Team/TeamDisplay";
 import LogoLoader from "@/components/app/LogoLoader";
 import { PLAYGROUND_PANE_SHELL } from "@/components/playground/Core/components/paneBar";
+import {
+    PaneSlotsProvider,
+    usePaneSlots,
+} from "@/components/playground/Core/components/PlaygroundPaneSlots";
 
 function TabPane({ tab }: { tab: string }) {
     switch (tab) {
@@ -58,6 +66,18 @@ function TabPane({ tab }: { tab: string }) {
 
 function SettingsPane({ tab }: { tab: string }) {
     switch (tab) {
+        case PlaygroundTab.SettingsAppearance:
+            return (
+                <SettingsPaneShell sectionKey={tab}>
+                    <AppearanceSettingsSection />
+                </SettingsPaneShell>
+            );
+        case PlaygroundTab.SettingsApiKeys:
+            return (
+                <SettingsPaneShell sectionKey={tab}>
+                    <ApiKeysSettingsSection />
+                </SettingsPaneShell>
+            );
         case PlaygroundTab.SettingsProject:
             return <SettingsDisplay section="project" />;
         case PlaygroundTab.SettingsTemplates:
@@ -69,11 +89,15 @@ function SettingsPane({ tab }: { tab: string }) {
     }
 }
 
-function isSettingsTab(tab: string) {
+const EMPTY_PANE_SLOTS = { lead: null, actions: null };
+
+function RetainedWorkspacePane({ tab, hidden }: { tab: string; hidden: boolean }) {
+    const paneSlots = usePaneSlots();
+
     return (
-        tab === PlaygroundTab.SettingsProject ||
-        tab === PlaygroundTab.SettingsTemplates ||
-        tab === PlaygroundTab.SettingsEnv
+        <PaneSlotsProvider value={hidden ? EMPTY_PANE_SLOTS : paneSlots}>
+            <TabPane tab={tab} />
+        </PaneSlotsProvider>
     );
 }
 
@@ -92,9 +116,14 @@ export default function PlaygroundDisplay({ isLoading }: { isLoading?: boolean }
                         aria-hidden={inSettings}
                         className={cn("flex min-h-0 flex-1 flex-col", inSettings && "hidden")}
                     >
-                        <TabPane tab={lastWorkspaceTab} />
+                        <RetainedWorkspacePane tab={lastWorkspaceTab} hidden={inSettings} />
                     </div>
-                    {inSettings && <SettingsPane tab={tab} />}
+                    {inSettings && (
+                        <>
+                            <SettingsBreadcrumb tab={tab} />
+                            <SettingsPane tab={tab} />
+                        </>
+                    )}
                 </>
             )}
         </main>

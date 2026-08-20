@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { PLAYGROUND_DEFAULT_TAB, PlaygroundTab } from "@/components/playground/playgroundTabs";
+import { isSettingsTab, PLAYGROUND_DEFAULT_TAB } from "@/components/playground/playgroundTabs";
 import { useIssueStore } from "@/store/issues/useIssueStore";
 import type { ProjectTeam } from "@/types/project";
 
@@ -8,12 +8,6 @@ import type { ProjectTeam } from "@/types/project";
  * Mirrors `PlaygroundTab.TeamDetail`.
  */
 export const TEAM_DETAIL_TAB = "team-detail";
-
-const SETTINGS_TABS = new Set<string>([
-    PlaygroundTab.SettingsProject,
-    PlaygroundTab.SettingsTemplates,
-    PlaygroundTab.SettingsEnv,
-]);
 
 /**
  * Central navigation state for the playground workspace.
@@ -45,7 +39,7 @@ export const usePlaygroundNavStore = create<PlaygroundNavState>((set) => ({
         useIssueStore.getState().close();
         set((state) => ({
             tab: tabId,
-            lastWorkspaceTab: SETTINGS_TABS.has(tabId) ? state.lastWorkspaceTab : tabId,
+            lastWorkspaceTab: isSettingsTab(tabId) ? state.lastWorkspaceTab : tabId,
         }));
     },
     returnFromSettings: () => {
