@@ -1,4 +1,4 @@
-import "dotenv/config";
+import "./load-env";
 import { prisma } from "./client";
 
 import type { User } from "../generated/client";

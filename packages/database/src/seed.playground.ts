@@ -1,20 +1,52 @@
-import "dotenv/config";
+import "./load-env";
 import { prisma } from "./client";
 import {
+    ActivitySurface,
     ActivityType,
     ActorType,
     AgentSessionStatus,
+    InvitationStatus,
     IssueStatus,
+    KanbanOptionView,
+    NotificationType,
     OrgRole,
+    PlanStatus,
+    PostKind,
+    PostStatus,
+    ProductDiffStatus,
     ProjectRole,
+    ReleaseChannel,
+    SetupQuestionStatus,
+    SetupQuestionType,
+    SetupStatus,
     TeamRole,
+    WorkerStatus,
 } from "../generated/client";
+import type { CustomColumn } from "../generated/client";
 
-const ORG_SLUG = process.argv[2] ?? "appx";
-const PROJECT_SLUG = process.argv[3] ?? "nocturn";
+const ORG = {
+    slug: "appx",
+    name: "Appx",
+    description: "Ships Nocturn, a scheduling product that runs on matcha for its own bug queue.",
+};
 
-const ISSUE_COUNT = 84;
-const PROJECT_CHAT_COUNT = 46;
+const PROJECT = {
+    slug: "nocturn",
+    name: "Nocturn",
+    summary: "Scheduling product — the repo matcha's runners clone, build and open PRs against.",
+    description:
+        "Nocturn is the target project. Issues filed on this board get picked up by an agent, run inside a sandboxed runner against this repo, and come back as a pull request.",
+    color: "#9bc24f",
+    repoFullName: "appx/nocturn",
+    repoUrl: "https://github.com/appx/nocturn",
+    defaultBranch: "main",
+    repoId: 812449301,
+};
+
+const SEED_EMAIL_DOMAIN = "nocturn.dev";
+const ISSUE_COUNT = 96;
+const PROJECT_CHAT_COUNT = 52;
+const NOTIFICATIONS_PER_USER = 44;
 
 let seed = 0x9bc24f;
 function random(): number {
@@ -39,10 +71,13 @@ function between(min: number, max: number): number {
     return min + Math.floor(random() * (max - min + 1));
 }
 
-const NOW = Date.UTC(2026, 7, 20, 12, 0, 0);
+const NOW = Date.now();
 const DAY = 86_400_000;
 function daysAgo(days: number, jitterMinutes = 0): Date {
     return new Date(NOW - days * DAY + jitterMinutes * 60_000);
+}
+function minutesAgo(minutes: number): Date {
+    return new Date(NOW - minutes * 60_000);
 }
 
 const PEOPLE = [
@@ -118,6 +153,53 @@ const TAGS = [
 ] as const;
 
 const COLUMNS = ["Icebox", "Needs Triage", "Waiting on Review", "Someday"] as const;
+
+const SPECIALIZATIONS = ["frontend", "backend", "infra", "agent"] as const;
+
+const TEMPLATES = [
+    {
+        name: "Bug report",
+        icon: { kind: "emoji", char: "🐛" },
+        isDefault: true,
+        description:
+            "<h2>What happened</h2><p></p><h2>Expected</h2><p></p><h2>Steps to reproduce</h2><ol><li><p></p></li></ol><h2>Environment</h2><p>Browser, OS, project size.</p>",
+    },
+    {
+        name: "Feature request",
+        icon: { kind: "emoji", char: "✨" },
+        isDefault: false,
+        description:
+            "<h2>Problem</h2><p></p><h2>Proposal</h2><p></p><h2>Out of scope</h2><ul><li><p></p></li></ul>",
+    },
+    {
+        name: "Agent task",
+        icon: { kind: "emoji", char: "🤖" },
+        isDefault: false,
+        description:
+            "<h2>Brief</h2><p>Written for the agent — say what to change, not how you would change it.</p><h2>Acceptance</h2><ul><li><p>A failing test exists before the fix.</p></li><li><p>The suite is green on the branch.</p></li></ul><h2>Files worth reading first</h2><p><code></code></p>",
+    },
+    {
+        name: "Incident follow-up",
+        icon: { kind: "emoji", char: "🚨" },
+        isDefault: false,
+        description:
+            "<h2>Incident</h2><p></p><h2>Contributing cause</h2><p></p><h2>Action</h2><ul><li><p></p></li></ul>",
+    },
+    {
+        name: "Performance regression",
+        icon: { kind: "emoji", char: "📉" },
+        isDefault: false,
+        description:
+            "<h2>Numbers</h2><p>Before, after, and how they were measured.</p><h2>Suspected window</h2><p></p><h2>Wanted</h2><p>Instrument first, then change behaviour.</p>",
+    },
+    {
+        name: "Migration",
+        icon: { kind: "emoji", char: "🗃️" },
+        isDefault: false,
+        description:
+            "<h2>Schema change</h2><p></p><h2>Backfill</h2><p>Must run against a live table without taking a lock.</p><h2>Rollback</h2><p></p>",
+    },
+] as const;
 
 const AREAS = [
     {
@@ -304,7 +386,7 @@ const MARQUEE = [
     },
 ];
 
-type Person = { id: string; name: string; image: string | null };
+type Person = { id: string; name: string; image: string | null; email: string };
 
 function slugify(name: string): string {
     return name
@@ -403,7 +485,18 @@ const PROJECT_CHAT_LINES = [
 
 const EMOJIS = ["👍", "🎉", "👀", "🚀", "🔥", "😅", "✅", "🙏"];
 
-const STATUS_FLOW: Record<string, IssueStatus[]> = {
+const STATUS_PLAN: Array<[IssueStatus, number]> = [
+    [IssueStatus.Todo, 18],
+    [IssueStatus.Queued, 9],
+    [IssueStatus.InProgress, 11],
+    [IssueStatus.InReview, 10],
+    [IssueStatus.Done, 24],
+    [IssueStatus.Failed, 7],
+    [IssueStatus.Cancelled, 5],
+    [IssueStatus.Parked, 12],
+];
+
+const STATUS_FLOW: Record<IssueStatus, IssueStatus[]> = {
     [IssueStatus.Todo]: [],
     [IssueStatus.Queued]: [IssueStatus.Queued],
     [IssueStatus.InProgress]: [IssueStatus.Queued, IssueStatus.InProgress],
@@ -426,125 +519,396 @@ const AGENT_WORKED_STATUSES: IssueStatus[] = [
     IssueStatus.Failed,
 ];
 
-const STATUS_WEIGHTS: IssueStatus[] = [
-    ...Array(16).fill(IssueStatus.Todo),
-    ...Array(6).fill(IssueStatus.Queued),
-    ...Array(10).fill(IssueStatus.InProgress),
-    ...Array(9).fill(IssueStatus.InReview),
-    ...Array(22).fill(IssueStatus.Done),
-    ...Array(4).fill(IssueStatus.Failed),
-    ...Array(3).fill(IssueStatus.Cancelled),
-    ...Array(5).fill(IssueStatus.Parked),
-];
+const POSTS = [
+    {
+        kind: PostKind.Blog,
+        slug: "why-the-agent-runs-your-code",
+        title: "Why the agent runs your code before it opens a PR",
+        summary:
+            "A patch that compiles in the model's head is a guess. We made the runner the referee.",
+        tags: ["engineering", "runners"],
+        status: PostStatus.Published,
+        publishedDaysAgo: 4,
+        content:
+            "<p>The first version of matcha wrote patches straight from the issue text. It was fast, it read well, and roughly half of what it produced did not build.</p><h2>The referee</h2><p>Now every attempt gets a sandboxed container that clones the target repo and runs the project's own toolchain. If the suite is red, there is no pull request — the attempt is recorded as failed with the output attached, and the next attempt starts from what the last one learned.</p><p>It is slower per attempt and dramatically cheaper per merged fix.</p>",
+    },
+    {
+        kind: PostKind.Blog,
+        slug: "the-board-is-the-api",
+        title: "The board is the API",
+        summary: "Filing an issue is the only integration surface we ask a team to learn.",
+        tags: ["product", "design"],
+        status: PostStatus.Published,
+        publishedDaysAgo: 12,
+        content:
+            "<p>Every autonomous coding tool eventually invents a control plane. Ours is a Kanban board, because that is the one your team already keeps open.</p><h2>What that buys</h2><ul><li><p>Priority is a column position, not a config file.</p></li><li><p>Ownership is an assignee, not a routing rule.</p></li><li><p>Cancelling work is a drag, not an API call.</p></li></ul>",
+    },
+    {
+        kind: PostKind.Blog,
+        slug: "reading-an-activity-feed",
+        title: "How to read an agent's activity feed",
+        summary: "Every attempt leaves a trail. Here is what each row actually means.",
+        tags: ["engineering", "observability"],
+        status: PostStatus.Published,
+        publishedDaysAgo: 21,
+        content:
+            "<p>An attempt produces between eight and sixty rows of activity. Most of it is noise until you know which rows carry the decisions.</p><h2>The rows that matter</h2><p><code>RunStarted</code> tells you which worker took the issue. <code>BugReproduced</code> is the single strongest predictor of a merged PR. <code>AttemptFailed</code> carries the reason, and it is almost always one of three.</p>",
+    },
+    {
+        kind: PostKind.Blog,
+        slug: "budgets-before-autonomy",
+        title: "Budgets before autonomy",
+        summary: "Nineteen attempts overnight taught us to put a ceiling on ambition.",
+        tags: ["reliability", "cost"],
+        status: PostStatus.Published,
+        publishedDaysAgo: 33,
+        content:
+            "<p>A flaky test suite met a retry policy with no ceiling, and by morning one issue had consumed more compute than the previous week.</p><h2>What we changed</h2><p>Spend is now a per-project ceiling with a warning at eighty percent and a hard stop at a hundred. The hard stop aborts in-flight attempts rather than letting them finish.</p>",
+    },
+    {
+        kind: PostKind.Blog,
+        slug: "sandbox-escape-review",
+        title: "What we look for in a sandbox escape review",
+        summary: "The runner holds a real checkout and real secrets. That deserves paranoia.",
+        tags: ["security"],
+        status: PostStatus.Published,
+        publishedDaysAgo: 48,
+        content:
+            "<p>A runner is a container with a clone of your repository, a scoped token and whatever secrets your build needs. Treat every one of those as a thing an attempt might try to exfiltrate.</p><h2>The checklist</h2><ul><li><p>Scopes are requested per attempt and expire with the lease.</p></li><li><p>Secrets are injected as environment variables and never written to disk.</p></li><li><p>Outbound network is default-deny with an allowlist per project.</p></li></ul>",
+    },
+    {
+        kind: PostKind.Blog,
+        slug: "hiring-engineers-who-review-agents",
+        title: "We are hiring engineers who like reviewing agents",
+        summary: "The job is less writing code and more deciding whether code is right.",
+        tags: ["team"],
+        status: PostStatus.Draft,
+        publishedDaysAgo: null,
+        content:
+            "<p>The interesting half of this product is the review loop. If you enjoy reading a diff and asking what it does not handle, we should talk.</p>",
+    },
+    {
+        kind: PostKind.Changelog,
+        slug: "changelog-2-4-0",
+        title: "Grouped board view and per-column counts",
+        summary: "The board can group by status or stay flat, and every column carries a count.",
+        tags: ["board"],
+        status: PostStatus.Published,
+        publishedDaysAgo: 2,
+        version: "2.4.0",
+        channel: ReleaseChannel.Stable,
+        content:
+            "<h2>Added</h2><ul><li><p>Grouped board view, toggled per project.</p></li><li><p>Issue counts on every column header.</p></li></ul><h2>Fixed</h2><ul><li><p>Column order no longer clobbers a concurrent drag.</p></li></ul>",
+    },
+    {
+        kind: PostKind.Changelog,
+        slug: "changelog-2-3-1",
+        title: "Mentions, reactions and a quieter activity feed",
+        summary: "Chat learned @member and #issue references. Noisy rows moved behind a toggle.",
+        tags: ["chat", "activity"],
+        status: PostStatus.Published,
+        publishedDaysAgo: 9,
+        version: "2.3.1",
+        channel: ReleaseChannel.Stable,
+        content:
+            "<h2>Added</h2><ul><li><p><code>@member</code> and <code>#issue</code> references in issue and project chat.</p></li><li><p>One reaction per person per message.</p></li></ul><h2>Changed</h2><ul><li><p>Build and test rows are secondary and hide behind show details.</p></li></ul>",
+    },
+    {
+        kind: PostKind.Changelog,
+        slug: "changelog-2-3-0",
+        title: "Product diffs for agent pull requests",
+        summary: "See the rendered before and after for a PR the agent opened.",
+        tags: ["product-diff"],
+        status: PostStatus.Published,
+        publishedDaysAgo: 18,
+        version: "2.3.0",
+        channel: ReleaseChannel.Beta,
+        content:
+            "<h2>Added</h2><ul><li><p>Product diffs, generated per pull request and opt-in per project.</p></li></ul><h2>Known gaps</h2><ul><li><p>Only routes reachable without authentication are captured.</p></li></ul>",
+    },
+    {
+        kind: PostKind.Changelog,
+        slug: "changelog-2-2-0",
+        title: "Worker pool sizing and queue positions",
+        summary: "Projects can run more than one worker, and queued issues show their place.",
+        tags: ["runners", "queue"],
+        status: PostStatus.Published,
+        publishedDaysAgo: 27,
+        version: "2.2.0",
+        channel: ReleaseChannel.Stable,
+        content:
+            "<h2>Added</h2><ul><li><p>Configurable worker count per project.</p></li><li><p>Queue position on every queued issue.</p></li></ul>",
+    },
+    {
+        kind: PostKind.Changelog,
+        slug: "changelog-2-5-0-rc",
+        title: "Spend ceilings",
+        summary: "A hard stop when a project runs through its budget.",
+        tags: ["cost"],
+        status: PostStatus.Draft,
+        publishedDaysAgo: null,
+        version: "2.5.0",
+        channel: ReleaseChannel.Beta,
+        content:
+            "<h2>Added</h2><ul><li><p>Per-project spend ceiling with a warning threshold and a hard stop.</p></li></ul>",
+    },
+] as const;
+
+function plainText(html: string): string {
+    return html
+        .replace(/<[^>]+>/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+}
+
+function readingTime(text: string): number {
+    return Math.max(1, Math.round(text.split(" ").length / 220));
+}
+
+async function reset() {
+    const org = await prisma.organization.findUnique({ where: { slug: ORG.slug } });
+    if (org) await prisma.organization.delete({ where: { id: org.id } });
+
+    await prisma.notification.deleteMany({
+        where: { payload: { path: ["orgSlug"], equals: ORG.slug } },
+    });
+    await prisma.post.deleteMany({ where: { slug: { in: POSTS.map((post) => post.slug) } } });
+    await prisma.apiKey.deleteMany({ where: { label: { startsWith: "Nocturn " } } });
+    await prisma.user.deleteMany({ where: { email: { endsWith: `@${SEED_EMAIL_DOMAIN}` } } });
+}
 
 async function main() {
-    const project = await prisma.project.findFirst({
-        where: { slug: PROJECT_SLUG, organization: { slug: ORG_SLUG } },
-        include: { organization: true },
-    });
-    if (!project) throw new Error(`No project ${ORG_SLUG}/${PROJECT_SLUG}`);
+    await reset();
 
-    const orgId = project.organization.id;
+    const humans = await prisma.user.findMany({
+        where: { email: { not: { endsWith: `@${SEED_EMAIL_DOMAIN}` } } },
+        select: { id: true, name: true, email: true, image: true },
+        orderBy: { createdAt: "asc" },
+    });
+
+    const cast: Person[] = [];
+    for (const name of PEOPLE) {
+        const email = `${slugify(name)}@${SEED_EMAIL_DOMAIN}`;
+        const user = await prisma.user.create({
+            data: {
+                name,
+                email,
+                emailVerified: daysAgo(between(40, 300)),
+                setupComplete: true,
+            },
+            select: { id: true, name: true, image: true, email: true },
+        });
+        cast.push({ id: user.id, name: user.name ?? name, image: user.image, email: user.email });
+    }
+
+    const people: Person[] = [
+        ...humans.map((human) => ({
+            id: human.id,
+            name: human.name ?? human.email,
+            image: human.image,
+            email: human.email,
+        })),
+        ...cast,
+    ];
+    const lead = people[0];
+
+    const organization = await prisma.organization.create({
+        data: {
+            name: ORG.name,
+            slug: ORG.slug,
+            description: ORG.description,
+            createdById: lead.id,
+            createdAt: daysAgo(210),
+            members: {
+                create: people.map((person, index) => ({
+                    userId: person.id,
+                    role:
+                        index === 0 || humans.some((human) => human.id === person.id)
+                            ? OrgRole.Owner
+                            : index % 9 === 0
+                              ? OrgRole.Admin
+                              : index % 17 === 0
+                                ? OrgRole.Billing
+                                : OrgRole.Member,
+                })),
+            },
+        },
+    });
+    const orgId = organization.id;
+
+    const project = await prisma.project.create({
+        data: {
+            orgId,
+            name: PROJECT.name,
+            slug: PROJECT.slug,
+            summary: PROJECT.summary,
+            description: PROJECT.description,
+            color: PROJECT.color,
+            ownerId: lead.id,
+            createdById: lead.id,
+            tourCompleted: true,
+            githubRepoId: PROJECT.repoId,
+            githubRepoFullName: PROJECT.repoFullName,
+            githubRepoUrl: PROJECT.repoUrl,
+            githubDefaultBranch: PROJECT.defaultBranch,
+            maxWorkers: 3,
+            createdAt: daysAgo(196),
+            planStatus: PlanStatus.Ready,
+            planCommitSha: "8f31c0ade4b17c2d9a55e6b0f4c81d7e2ab93f10",
+            planGeneratedAt: daysAgo(6),
+            planMd: [
+                "# Nocturn — agent plan",
+                "",
+                "## Stack",
+                "Bun workspaces. `apps/api` is Express on Bun, `apps/dashboard` is Next.js, `packages/db` is Prisma against Postgres 16.",
+                "",
+                "## Commands",
+                "- install: `bun install`",
+                "- build: `bun run build`",
+                "- test: `bun run test`",
+                "- lint: `bun run lint`",
+                "",
+                "## Conventions",
+                "Four-space indent, double quotes, no code comments. Every endpoint answers through the response envelope in `apps/api/src/services/response.ts`.",
+                "",
+                "## Verification",
+                "An attempt is only green when `bun run test` and `bun run lint` both pass on the branch.",
+            ].join("\n"),
+            projectConfig: {
+                create: {
+                    kanbanOptionView: KanbanOptionView.FLAT,
+                    productDiffEnabled: true,
+                },
+            },
+            members: {
+                create: people.map((person, index) => ({
+                    userId: person.id,
+                    role:
+                        index === 0 || humans.some((human) => human.id === person.id)
+                            ? ProjectRole.Admin
+                            : pick([
+                                  ProjectRole.Write,
+                                  ProjectRole.Write,
+                                  ProjectRole.Maintain,
+                                  ProjectRole.Triage,
+                                  ProjectRole.Read,
+                              ]),
+                })),
+            },
+        },
+    });
     const projectId = project.id;
 
-    const users: Person[] = [];
-    for (const name of PEOPLE) {
-        const email = `${slugify(name)}@nocturn.dev`;
-        const user = await prisma.user.upsert({
-            where: { email },
-            update: { name },
-            create: { name, email, emailVerified: daysAgo(between(40, 300)), setupComplete: true },
-            select: { id: true, name: true, image: true },
-        });
-        users.push({ id: user.id, name: user.name ?? name, image: user.image });
-    }
-
-    const existingMembers = await prisma.projectMember.findMany({
-        where: { projectId },
-        select: { userId: true },
-    });
-    for (const person of users) {
-        await prisma.orgMember.upsert({
-            where: { orgId_userId: { orgId, userId: person.id } },
-            update: {},
-            create: { orgId, userId: person.id, role: pick([OrgRole.Member, OrgRole.Admin]) },
-        });
-        await prisma.projectMember.upsert({
-            where: { projectId_userId: { projectId, userId: person.id } },
-            update: {},
-            create: {
-                projectId,
-                userId: person.id,
-                role: pick([
-                    ProjectRole.Write,
-                    ProjectRole.Write,
-                    ProjectRole.Maintain,
-                    ProjectRole.Triage,
-                    ProjectRole.Read,
-                    ProjectRole.Admin,
-                ]),
-            },
-        });
-    }
-    const allMemberIds = [
-        ...existingMembers.map((m) => m.userId),
-        ...users.map((u) => u.id),
-    ].filter((id, index, ids) => ids.indexOf(id) === index);
     const memberRows = await prisma.projectMember.findMany({
         where: { projectId },
         select: { id: true, userId: true },
     });
     const memberIdByUser: Record<string, string> = {};
     for (const row of memberRows) memberIdByUser[row.userId] = row.id;
-    const owner = users[0];
 
+    const HUMAN_TEAMS = ["runners", "agent-core", "web"];
     for (const [name, slug, description] of TEAMS) {
-        const team = await prisma.team.upsert({
-            where: { projectId_slug: { projectId, slug } },
-            update: { name, description },
-            create: { projectId, name, slug, description },
-        });
-        for (const person of pickMany(users, between(4, 9))) {
-            await prisma.teamMember.upsert({
-                where: { teamId_userId: { teamId: team.id, userId: person.id } },
-                update: {},
-                create: {
-                    teamId: team.id,
-                    userId: person.id,
-                    role: chance(0.25) ? TeamRole.Maintainer : TeamRole.Member,
+        const roster = pickMany(cast, between(4, 9));
+        const humanRoster = HUMAN_TEAMS.includes(slug) ? humans : [];
+        await prisma.team.create({
+            data: {
+                projectId,
+                name,
+                slug,
+                description,
+                createdAt: daysAgo(between(60, 190)),
+                members: {
+                    create: [
+                        ...humanRoster.map((human) => ({
+                            userId: human.id,
+                            role: TeamRole.Maintainer,
+                        })),
+                        ...roster.map((person) => ({
+                            userId: person.id,
+                            role: chance(0.25) ? TeamRole.Maintainer : TeamRole.Member,
+                        })),
+                    ],
                 },
-            });
-        }
+            },
+        });
     }
 
     const tags = [];
     for (const [name, color] of TAGS) {
-        tags.push(
-            await prisma.tag.upsert({
-                where: { projectId_name: { projectId, name } },
-                update: { color },
-                create: { projectId, name, color },
-            }),
-        );
+        tags.push(await prisma.tag.create({ data: { projectId, name, color } }));
     }
 
-    const existingColumns = await prisma.customColumn.findMany({ where: { projectId } });
-    const columns = [...existingColumns];
+    const columns: CustomColumn[] = [];
     for (let index = 0; index < COLUMNS.length; index++) {
-        const label = COLUMNS[index];
-        if (columns.some((column) => column.label === label)) continue;
         columns.push(
             await prisma.customColumn.create({
-                data: { projectId, label, order: existingColumns.length + index + 1 },
+                data: { projectId, label: COLUMNS[index], order: index + 1 },
             }),
         );
     }
 
-    const highest = await prisma.issue.aggregate({
-        where: { projectId },
-        _max: { number: true },
-    });
-    let nextNumber = (highest._max.number ?? 0) + 1;
+    for (const human of humans) {
+        await prisma.customColumnOrder.createMany({
+            data: [
+                { userId: human.id, projectId, columnId: columns[1].id, order: 1 },
+                { userId: human.id, projectId, columnId: columns[0].id, order: 2 },
+            ],
+        });
+    }
+
+    for (const template of TEMPLATES) {
+        await prisma.issueTemplate.create({
+            data: {
+                projectId,
+                name: template.name,
+                description: template.description,
+                icon: template.icon,
+                isDefault: template.isDefault,
+                createdAt: daysAgo(between(20, 150)),
+            },
+        });
+    }
+
+    const workers = [];
+    const workerPlan = [
+        { status: WorkerStatus.Busy, specialization: "backend", sandboxId: "sbx_7fc19ad3e2" },
+        { status: WorkerStatus.Busy, specialization: "frontend", sandboxId: "sbx_2b40e7c918" },
+        { status: WorkerStatus.Idle, specialization: "infra", sandboxId: "sbx_9de0142ab7" },
+        { status: WorkerStatus.Booting, specialization: "agent", sandboxId: null },
+        { status: WorkerStatus.Dead, specialization: "backend", sandboxId: null },
+    ] as const;
+    for (const plan of workerPlan) {
+        workers.push(
+            await prisma.worker.create({
+                data: {
+                    projectId,
+                    status: plan.status,
+                    specialization: plan.specialization,
+                    sandboxId: plan.sandboxId,
+                    nextQueuePos: 1,
+                    leaseExpiresAt:
+                        plan.status === WorkerStatus.Busy ? minutesAgo(-between(4, 45)) : null,
+                    contextSummary: {
+                        queuedCount: between(0, 6),
+                        currentSpecialization: plan.specialization,
+                        recentFilesEdited: [
+                            "apps/api/src/services/queue.ts",
+                            "packages/db/prisma/schema.prisma",
+                            "apps/dashboard/components/Board.tsx",
+                        ].slice(0, between(1, 3)),
+                        lastIssueFixed: `Fixed the ${plan.specialization} retry path`,
+                    },
+                    contextBlobUrl:
+                        plan.status === WorkerStatus.Dead
+                            ? null
+                            : `https://artifacts.trymatcha.dev/workers/${plan.sandboxId ?? "pending"}/context.jsonl`,
+                    createdAt: daysAgo(between(1, 20)),
+                },
+            }),
+        );
+    }
+    const busyWorkers = workers.filter((worker) => worker.status === WorkerStatus.Busy);
+    const idleWorker = workers.find((worker) => worker.status === WorkerStatus.Idle)!;
 
     const specs = MARQUEE.map((entry) => ({ ...entry, area: pick(AREAS) }));
     while (specs.length < ISSUE_COUNT) {
@@ -557,13 +921,30 @@ async function main() {
         });
     }
 
+    const statusRoll: IssueStatus[] = [];
+    for (const [status, count] of STATUS_PLAN) {
+        for (let index = 0; index < count; index++) statusRoll.push(status);
+    }
+
+    type CreatedIssue = {
+        id: string;
+        number: number;
+        title: string;
+        status: IssueStatus;
+        prUrl: string | null;
+        assigneeIds: string[];
+        creatorId: string;
+    };
+
     const activityRows: Array<{
         issueId: string;
         type: ActivityType;
         payload: object;
         actorType: ActorType;
         actorUserId: string | null;
+        actorWorkerId: string | null;
         sessionId: string | null;
+        surface: ActivitySurface;
         createdAt: Date;
     }> = [];
     const chatSeeds: Array<{
@@ -573,26 +954,55 @@ async function main() {
         createdAt: Date;
         replies: Array<{ senderId: string; message: string; createdAt: Date }>;
     }> = [];
-    const createdIssues: Array<{ id: string; number: number; title: string }> = [];
+    const createdIssues: CreatedIssue[] = [];
 
-    for (const spec of specs) {
-        const status = pick(STATUS_WEIGHTS);
+    let parkedIndex = 0;
+    let queuePosition = 1;
+
+    for (let index = 0; index < specs.length; index++) {
+        const spec = specs[index];
+        const status = statusRoll[index] ?? IssueStatus.Todo;
         const openedDaysAgo = between(1, 120);
         const createdAt = daysAgo(openedDaysAgo, between(0, 600));
-        const creator = pick(users);
-        const assignees = pickMany(users, between(0, 3));
+        const humanTurn = humans.length ? index % (humans.length * 7) : -1;
+        const creator =
+            humanTurn >= 0 && humanTurn < humans.length
+                ? people[humanTurn]
+                : pick(people.slice(humans.length));
+        const assignees = pickMany(people, between(0, 3));
+        for (const human of humans) {
+            if (index % 6 === humans.indexOf(human) && !assignees.some((a) => a.id === human.id)) {
+                const match = people.find((person) => person.id === human.id);
+                if (match) assignees.push(match);
+            }
+        }
         const issueTags = pickMany(tags, between(1, 4));
-        const column = status === IssueStatus.Parked ? pick(columns) : null;
+        const column =
+            status === IssueStatus.Parked ? columns[parkedIndex++ % columns.length] : null;
         const priority = pick([1, 2, 2, 3, 3, 3, 4]);
         const hasDates = chance(0.55);
         const startDate = hasDates ? daysAgo(openedDaysAgo - between(0, 3)) : null;
         const targetDate = hasDates ? daysAgo(openedDaysAgo - between(6, 40)) : null;
         const resolved = status === IssueStatus.Done;
+        const hasPr = status === IssueStatus.InReview || resolved;
+        const prUrl = hasPr ? `${PROJECT.repoUrl}/pull/${between(120, 980)}` : null;
+        const specialization = AGENT_WORKED_STATUSES.includes(status)
+            ? pick(SPECIALIZATIONS)
+            : chance(0.3)
+              ? pick(SPECIALIZATIONS)
+              : null;
+
+        const worker =
+            status === IssueStatus.Queued
+                ? idleWorker
+                : status === IssueStatus.InProgress
+                  ? busyWorkers[index % busyWorkers.length]
+                  : null;
 
         const issue = await prisma.issue.create({
             data: {
                 projectId,
-                number: nextNumber++,
+                number: index + 1,
                 createdById: creator.id,
                 title: spec.title,
                 description: spec.body,
@@ -603,22 +1013,28 @@ async function main() {
                 customColumnId: column?.id ?? null,
                 createdAt,
                 resolvedAt: resolved ? daysAgo(Math.max(0, openedDaysAgo - between(1, 12))) : null,
-                prUrl:
-                    status === IssueStatus.InReview || resolved
-                        ? `https://github.com/appx/nocturn/pull/${between(120, 980)}`
-                        : null,
-                prBranch:
-                    status === IssueStatus.InReview || resolved
-                        ? `matcha/issue-${nextNumber - 1}`
-                        : null,
+                agentDoneAt: hasPr ? daysAgo(Math.max(0, openedDaysAgo - between(1, 10))) : null,
+                prUrl,
+                prBranch: hasPr ? `matcha/issue-${index + 1}` : null,
+                specialization,
+                assignerWorkerId: worker?.id ?? null,
+                queuePosition: worker ? queuePosition++ : null,
                 assignees: { connect: assignees.map((person) => ({ id: person.id })) },
                 tags: { connect: issueTags.map((tag) => ({ id: tag.id })) },
             },
             select: { id: true, number: true, title: true },
         });
-        createdIssues.push(issue);
+        createdIssues.push({
+            id: issue.id,
+            number: issue.number,
+            title: issue.title,
+            status,
+            prUrl,
+            assigneeIds: assignees.map((person) => person.id),
+            creatorId: creator.id,
+        });
 
-        const actorSnapshot = (person: Person) => ({ name: person.name, image: person.image });
+        const snapshot = (person: Person) => ({ name: person.name, image: person.image });
         let cursor = createdAt.getTime();
         const step = () => {
             cursor += between(20, 400) * 60_000;
@@ -628,35 +1044,79 @@ async function main() {
             type: ActivityType,
             payload: object,
             person: Person,
-            sessionId: string | null = null,
+            surface: ActivitySurface = ActivitySurface.Primary,
         ) =>
             activityRows.push({
                 issueId: issue.id,
                 type,
-                payload: { ...payload, actor: actorSnapshot(person) },
+                payload: { ...payload, actor: snapshot(person) },
                 actorType: ActorType.User,
                 actorUserId: person.id,
-                sessionId,
+                actorWorkerId: null,
+                sessionId: null,
+                surface,
                 createdAt: step(),
             });
-        const agentRow = (type: ActivityType, payload: object, sessionId: string | null) =>
+        const agentRow = (
+            type: ActivityType,
+            payload: object,
+            sessionId: string | null,
+            workerId: string | null,
+            surface: ActivitySurface = ActivitySurface.Primary,
+        ) =>
             activityRows.push({
                 issueId: issue.id,
                 type,
                 payload: { ...payload, actor: { name: "matcha", image: null } },
                 actorType: ActorType.Agent,
                 actorUserId: null,
+                actorWorkerId: workerId,
                 sessionId,
+                surface,
+                createdAt: step(),
+            });
+        const systemRow = (
+            type: ActivityType,
+            payload: object,
+            surface: ActivitySurface = ActivitySurface.Primary,
+        ) =>
+            activityRows.push({
+                issueId: issue.id,
+                type,
+                payload,
+                actorType: ActorType.System,
+                actorUserId: null,
+                actorWorkerId: null,
+                sessionId: null,
+                surface,
+                createdAt: step(),
+            });
+        const githubRow = (
+            type: ActivityType,
+            payload: object,
+            surface: ActivitySurface = ActivitySurface.Primary,
+        ) =>
+            activityRows.push({
+                issueId: issue.id,
+                type,
+                payload,
+                actorType: ActorType.Github,
+                actorUserId: null,
+                actorWorkerId: null,
+                sessionId: null,
+                surface,
                 createdAt: step(),
             });
 
         activityRows.push({
             issueId: issue.id,
             type: ActivityType.IssueCreated,
-            payload: { actor: actorSnapshot(creator) },
+            payload: { actor: snapshot(creator) },
             actorType: ActorType.User,
             actorUserId: creator.id,
+            actorWorkerId: null,
             sessionId: null,
+            surface: ActivitySurface.Primary,
             createdAt,
         });
 
@@ -671,7 +1131,7 @@ async function main() {
             humanRow(
                 ActivityType.AssigneeAdded,
                 { user: { id: person.id, name: person.name, image: person.image } },
-                pick(users),
+                pick(people),
             );
         }
         if (hasDates) {
@@ -684,28 +1144,58 @@ async function main() {
                         targetDate: targetDate?.toISOString() ?? null,
                     },
                 },
-                pick(users),
+                pick(people),
             );
         }
         if (chance(0.4)) {
-            humanRow(ActivityType.PriorityChanged, { from: 3, to: priority }, pick(users));
+            humanRow(ActivityType.PriorityChanged, { from: 3, to: priority }, pick(people));
         }
         if (chance(0.25)) {
             humanRow(ActivityType.DescriptionChanged, {}, creator);
         }
+        if (chance(0.18)) {
+            humanRow(
+                ActivityType.TitleChanged,
+                { from: `${spec.title} (draft)`, to: spec.title },
+                creator,
+            );
+        }
+        if (chance(0.14) && assignees.length) {
+            const dropped = assignees[0];
+            humanRow(
+                ActivityType.AssigneeRemoved,
+                { user: { id: dropped.id, name: dropped.name, image: dropped.image } },
+                pick(people),
+            );
+        }
+        if (chance(0.12) && issueTags.length > 1) {
+            const dropped = issueTags[issueTags.length - 1];
+            humanRow(
+                ActivityType.LabelRemoved,
+                { label: { id: dropped.id, name: dropped.name, color: dropped.color } },
+                pick(people),
+            );
+        }
+        if (specialization && chance(0.3)) {
+            humanRow(ActivityType.SpecializationChanged, { to: specialization }, pick(people));
+        }
+        if (chance(0.2)) {
+            systemRow(
+                ActivityType.RelationAdded,
+                { relation: "blocks", issueNumber: between(1, ISSUE_COUNT) },
+                ActivitySurface.Secondary,
+            );
+        }
 
-        const flow = STATUS_FLOW[status] ?? [];
-        let previous: IssueStatus = IssueStatus.Todo;
-        for (const next of flow) {
+        for (const next of STATUS_FLOW[status] ?? []) {
             humanRow(
                 ActivityType.StatusChanged,
                 {
-                    from: { kind: "status", status: previous },
+                    from: { kind: "status", status: IssueStatus.Todo },
                     to: { kind: "status", status: next },
                 },
-                pick(users),
+                pick(people),
             );
-            previous = next;
         }
         if (column) {
             humanRow(
@@ -714,19 +1204,28 @@ async function main() {
                     from: { kind: "status", status: IssueStatus.Todo },
                     to: { kind: "column", id: column.id, label: column.label },
                 },
-                pick(users),
+                pick(people),
+            );
+        }
+        if (worker) {
+            systemRow(ActivityType.Queued, { queuePosition: queuePosition - 1 });
+            systemRow(
+                ActivityType.Routed,
+                { workerId: worker.id, specialization: worker.specialization },
+                ActivitySurface.Secondary,
             );
         }
 
-        const agentWorked = AGENT_WORKED_STATUSES.includes(status);
-        if (agentWorked) {
+        if (AGENT_WORKED_STATUSES.includes(status)) {
             const attempts = status === IssueStatus.Failed ? between(2, 3) : between(1, 2);
             for (let attempt = 1; attempt <= attempts; attempt++) {
                 const failed = status === IssueStatus.Failed || attempt < attempts;
+                const runner = worker ?? pick(workers);
                 const session = await prisma.agentSession.create({
                     data: {
-                        id: `seed-${issue.id}-${attempt}`,
+                        id: `${issue.id}-attempt-${attempt}`,
                         issueId: issue.id,
+                        workerId: runner.id,
                         attemptNumber: attempt,
                         status: failed ? AgentSessionStatus.Failed : AgentSessionStatus.Succeeded,
                         summary: failed
@@ -742,14 +1241,56 @@ async function main() {
                             totalCostUsd: Number((random() * 4 + 0.2).toFixed(2)),
                             sandboxSeconds: between(120, 2400),
                         },
+                        traceUrl: `https://artifacts.trymatcha.dev/sessions/${issue.id}-${attempt}/trace.jsonl`,
                         error: failed ? "verification_failed" : null,
                         startedAt: step(),
                         endedAt: step(),
                     },
                 });
-                agentRow(ActivityType.RunStarted, { attemptNumber: attempt }, session.id);
-                agentRow(ActivityType.BranchCreated, {}, session.id);
+                agentRow(
+                    ActivityType.RunStarted,
+                    { attemptNumber: attempt },
+                    session.id,
+                    runner.id,
+                );
+                agentRow(ActivityType.BranchCreated, {}, session.id, runner.id);
+                if (chance(0.5)) {
+                    agentRow(
+                        ActivityType.ScopeRequested,
+                        { scope: "packages/db write" },
+                        session.id,
+                        runner.id,
+                        ActivitySurface.Secondary,
+                    );
+                    agentRow(
+                        ActivityType.ScopeGranted,
+                        { scope: "packages/db write" },
+                        session.id,
+                        runner.id,
+                        ActivitySurface.Audit,
+                    );
+                }
+                agentRow(
+                    chance(0.75) ? ActivityType.BugReproduced : ActivityType.BugNotReproduced,
+                    {},
+                    session.id,
+                    runner.id,
+                );
+                agentRow(
+                    ActivityType.BuildResult,
+                    { ok: !failed },
+                    session.id,
+                    runner.id,
+                    ActivitySurface.Secondary,
+                );
                 if (failed) {
+                    agentRow(
+                        ActivityType.TestResult,
+                        { ok: false, failed: between(1, 4) },
+                        session.id,
+                        runner.id,
+                        ActivitySurface.Secondary,
+                    );
                     agentRow(
                         ActivityType.AttemptFailed,
                         {
@@ -761,38 +1302,86 @@ async function main() {
                             ]),
                         },
                         session.id,
+                        runner.id,
                     );
+                    if (chance(0.3)) {
+                        systemRow(ActivityType.WorkerHandoff, {
+                            fromWorkerId: runner.id,
+                            toWorkerId: pick(workers).id,
+                        });
+                    }
                 } else {
-                    agentRow(ActivityType.CommitsPushed, {}, session.id);
-                    agentRow(ActivityType.TestResult, {}, session.id);
+                    agentRow(
+                        ActivityType.CommitsPushed,
+                        { count: between(1, 5) },
+                        session.id,
+                        runner.id,
+                        ActivitySurface.Secondary,
+                    );
+                    agentRow(
+                        ActivityType.TestResult,
+                        { ok: true, passed: between(40, 320) },
+                        session.id,
+                        runner.id,
+                        ActivitySurface.Secondary,
+                    );
+                    agentRow(
+                        ActivityType.AcceptanceChecked,
+                        {},
+                        session.id,
+                        runner.id,
+                        ActivitySurface.Secondary,
+                    );
                     agentRow(
                         ActivityType.RunCompleted,
                         { attemptNumber: attempt, summary: session.summary ?? undefined },
                         session.id,
+                        runner.id,
                     );
-                    if (status === IssueStatus.InReview || resolved) {
-                        agentRow(
-                            ActivityType.PrOpened,
-                            {
-                                url: `https://github.com/appx/nocturn/pull/${between(120, 980)}`,
-                            },
-                            session.id,
-                        );
+                    if (prUrl) {
+                        agentRow(ActivityType.PrOpened, { url: prUrl }, session.id, runner.id);
                     }
                 }
             }
+            if (chance(0.22)) {
+                systemRow(
+                    ActivityType.BudgetThresholdCrossed,
+                    { threshold: 0.8 },
+                    ActivitySurface.Secondary,
+                );
+            }
+            if (chance(0.08)) {
+                systemRow(ActivityType.GuardrailHit, { guardrail: "network_allowlist" });
+            }
+        }
+
+        if (prUrl) {
+            if (chance(0.6)) githubRow(ActivityType.PrReviewReceived, { url: prUrl });
+            if (chance(0.3)) {
+                githubRow(ActivityType.PrChecksFailed, { url: prUrl }, ActivitySurface.Secondary);
+                agentRow(ActivityType.PrFeedbackAddressed, { url: prUrl }, null, null);
+            }
         }
         if (resolved) {
-            humanRow(ActivityType.PrMerged, {}, pick(users));
-            humanRow(ActivityType.IssueResolved, {}, pick(users));
+            githubRow(ActivityType.PrMerged, { url: prUrl ?? "" });
+            humanRow(ActivityType.IssueResolved, {}, pick(people));
+            if (chance(0.1)) {
+                humanRow(ActivityType.IssueReopened, {}, pick(people));
+            }
         }
         if (status === IssueStatus.Cancelled) {
-            humanRow(ActivityType.IssueCancelled, {}, pick(users));
+            humanRow(ActivityType.IssueCancelled, {}, pick(people));
+        }
+        if (status === IssueStatus.Failed && chance(0.4)) {
+            humanRow(ActivityType.HumanTookOver, {}, pick(people));
+        }
+        if (status === IssueStatus.Queued && chance(0.3)) {
+            systemRow(ActivityType.Starved, { waitingMinutes: between(30, 900) });
         }
 
         const commentCount = between(0, 5);
-        for (let index = 0; index < commentCount; index++) {
-            const sender = pick(users);
+        for (let comment = 0; comment < commentCount; comment++) {
+            const sender = pick(people);
             const at = step();
             chatSeeds.push({
                 issueId: issue.id,
@@ -800,7 +1389,7 @@ async function main() {
                 message: pick(CHAT_LINES),
                 createdAt: at,
                 replies: Array.from({ length: chance(0.45) ? between(1, 3) : 0 }, () => ({
-                    senderId: pick(users).id,
+                    senderId: pick(people).id,
                     message: pick(REPLY_LINES),
                     createdAt: new Date(at.getTime() + between(5, 900) * 60_000),
                 })),
@@ -811,22 +1400,41 @@ async function main() {
     activityRows.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
     await prisma.issueActivity.createMany({ data: activityRows });
 
+    const chats: Array<{ id: string; issueId: string; senderId: string; message: string }> = [];
     for (const seedChat of chatSeeds) {
-        const withMention =
-            chance(0.22) && memberRows.length
-                ? `${seedChat.message} @[member:${memberIdByUser[pick(users).id]}]`
-                : chance(0.15) && createdIssues.length
-                  ? `${seedChat.message} #[issue:${pick(createdIssues).id}]`
-                  : seedChat.message;
+        const mentionedMemberId = chance(0.24) ? memberIdByUser[pick(people).id] : undefined;
+        const referencedIssue = chance(0.16) ? pick(createdIssues) : undefined;
+        const message = [
+            seedChat.message,
+            mentionedMemberId ? `@[member:${mentionedMemberId}]` : null,
+            referencedIssue ? `#[issue:${referencedIssue.id}]` : null,
+        ]
+            .filter(Boolean)
+            .join(" ");
+
         const root = await prisma.chat.create({
             data: {
                 issueId: seedChat.issueId,
                 senderId: seedChat.senderId,
-                message: withMention,
+                message,
+                isDeleted: chance(0.04),
                 createdAt: seedChat.createdAt,
+                references: {
+                    create: [
+                        ...(mentionedMemberId ? [{ memberId: mentionedMemberId }] : []),
+                        ...(referencedIssue ? [{ issueId: referencedIssue.id }] : []),
+                    ],
+                },
             },
             select: { id: true },
         });
+        chats.push({
+            id: root.id,
+            issueId: seedChat.issueId,
+            senderId: seedChat.senderId,
+            message: seedChat.message,
+        });
+
         for (const reply of seedChat.replies) {
             await prisma.chat.create({
                 data: {
@@ -838,60 +1446,621 @@ async function main() {
                 },
             });
         }
-        for (const reactor of pickMany(users, chance(0.5) ? between(1, 4) : 0)) {
-            await prisma.chatReaction.upsert({
-                where: { chatId_userId: { chatId: root.id, userId: reactor.id } },
-                update: {},
-                create: { chatId: root.id, userId: reactor.id, emoji: pick(EMOJIS) },
+        for (const reactor of pickMany(people, chance(0.5) ? between(1, 4) : 0)) {
+            await prisma.chatReaction.create({
+                data: { chatId: root.id, userId: reactor.id, emoji: pick(EMOJIS) },
             });
         }
     }
 
+    const projectChats: Array<{ id: string; senderId: string; message: string }> = [];
     for (let index = 0; index < PROJECT_CHAT_COUNT; index++) {
-        const sender = pick(users);
+        const sender = pick(people);
         const at = daysAgo(between(0, 45), between(0, 900));
+        const mentionedMemberId = chance(0.28) ? memberIdByUser[pick(people).id] : undefined;
+        const referencedIssue = chance(0.22) ? pick(createdIssues) : undefined;
+        const body = pick(PROJECT_CHAT_LINES);
+        const message = [
+            body,
+            mentionedMemberId ? `@[member:${mentionedMemberId}]` : null,
+            referencedIssue ? `#[issue:${referencedIssue.id}]` : null,
+        ]
+            .filter(Boolean)
+            .join(" ");
+
         const root = await prisma.projectChat.create({
             data: {
                 projectId,
                 senderId: sender.id,
-                message: pick(PROJECT_CHAT_LINES),
+                message,
                 createdAt: at,
+                references: {
+                    create: [
+                        ...(mentionedMemberId ? [{ memberId: mentionedMemberId }] : []),
+                        ...(referencedIssue ? [{ issueId: referencedIssue.id }] : []),
+                    ],
+                },
             },
             select: { id: true },
         });
-        for (let reply = 0; reply < (chance(0.4) ? between(1, 3) : 0); reply++) {
+        projectChats.push({ id: root.id, senderId: sender.id, message: body });
+
+        const replyCount = chance(0.4) ? between(1, 3) : 0;
+        for (let reply = 0; reply < replyCount; reply++) {
             await prisma.projectChat.create({
                 data: {
                     projectId,
-                    senderId: pick(users).id,
+                    senderId: pick(people).id,
                     message: pick(REPLY_LINES),
                     repliedToId: root.id,
                     createdAt: new Date(at.getTime() + between(3, 600) * 60_000),
                 },
             });
         }
-        for (const reactor of pickMany(users, chance(0.45) ? between(1, 3) : 0)) {
-            await prisma.projectChatReaction.upsert({
-                where: { projectChatId_userId: { projectChatId: root.id, userId: reactor.id } },
-                update: {},
-                create: { projectChatId: root.id, userId: reactor.id, emoji: pick(EMOJIS) },
+        for (const reactor of pickMany(people, chance(0.45) ? between(1, 3) : 0)) {
+            await prisma.projectChatReaction.create({
+                data: { projectChatId: root.id, userId: reactor.id, emoji: pick(EMOJIS) },
             });
         }
+    }
+
+    let descriptionReferenceCount = 0;
+    for (const issue of pickMany(createdIssues, 16)) {
+        const target = pick(createdIssues.filter((candidate) => candidate.id !== issue.id));
+        const memberId = memberIdByUser[pick(people).id];
+        if (!target || !memberId) continue;
+        const current = await prisma.issue.findUnique({
+            where: { id: issue.id },
+            select: { description: true },
+        });
+        if (!current) continue;
+        await prisma.issue.update({
+            where: { id: issue.id },
+            data: {
+                description: `${current.description}<p>Blocked on #[issue:${target.id}] — @[member:${memberId}] has the context.</p>`,
+                descriptionReferences: {
+                    create: [{ referencedIssueId: target.id }, { memberId }],
+                },
+            },
+        });
+        descriptionReferenceCount += 2;
+    }
+
+    const prIssues = createdIssues.filter((issue) => issue.prUrl);
+    const diffPlan = [
+        ProductDiffStatus.Ready,
+        ProductDiffStatus.Generating,
+        ProductDiffStatus.Pending,
+        ProductDiffStatus.Failed,
+        ProductDiffStatus.Stale,
+        ProductDiffStatus.Pending,
+        ProductDiffStatus.Generating,
+    ];
+    let diffCount = 0;
+    for (let index = 0; index < diffPlan.length && index < prIssues.length; index++) {
+        const issue = prIssues[index];
+        const status = diffPlan[index];
+        const pullNumber = Number(issue.prUrl!.split("/").pop());
+        await prisma.productDiff.create({
+            data: {
+                issueId: issue.id,
+                pullNumber,
+                baseSha: `${index}fa3c17be9d40a2e5c8b1706d3f4ab29c05e81d`.slice(0, 40),
+                headSha: `${index}9b7e42dc10f5a836be04c19d7f2a5308ce16b4`.slice(0, 40),
+                status,
+                artifactPrefix:
+                    status === ProductDiffStatus.Ready
+                        ? `product-diffs/${issue.id}/${pullNumber}`
+                        : null,
+                manifest:
+                    status === ProductDiffStatus.Ready
+                        ? {
+                              targets: [
+                                  {
+                                      id: "board",
+                                      label: "Board",
+                                      states: [
+                                          { id: "default", label: "Default" },
+                                          { id: "grouped", label: "Grouped view" },
+                                      ],
+                                  },
+                                  {
+                                      id: "issue",
+                                      label: "Issue detail",
+                                      states: [{ id: "default", label: "Default" }],
+                                  },
+                              ],
+                              warnings: index === 0 ? ["Authenticated routes were skipped."] : [],
+                          }
+                        : undefined,
+                error:
+                    status === ProductDiffStatus.Failed
+                        ? "Dashboard build exited 1 before any route could be captured."
+                        : null,
+                createdAt: daysAgo(between(1, 14)),
+            },
+        });
+        diffCount++;
+    }
+
+    const setupSession = await prisma.setupSession.create({
+        data: {
+            projectId,
+            status: SetupStatus.WaitingOnUser,
+            sandboxId: "sbx_setup_41c8ae02",
+            snapshotId: null,
+            infrastructureMd: [
+                "# infrastructure.md",
+                "",
+                "## Detected",
+                "- Bun workspaces with three packages",
+                "- Postgres 16 required at `DATABASE_URL`",
+                "- Redis required at `REDIS_URL`",
+                "",
+                "## Boot",
+                "1. `bun install`",
+                "2. `bun run db:migrate:deploy`",
+                "3. `bun run dev`",
+                "",
+                "## Baseline",
+                "`bun run test` — 284 passing, 0 failing.",
+            ].join("\n"),
+            startedAt: daysAgo(1, 30),
+            createdAt: daysAgo(1, 30),
+            questions: {
+                create: [
+                    {
+                        type: SetupQuestionType.NeedSecret,
+                        key: "DATABASE_URL",
+                        prompt: "The API will not boot without a Postgres connection string. Which database should the sandbox point at?",
+                        options: [],
+                        status: SetupQuestionStatus.Answered,
+                        askedAt: daysAgo(1, 25),
+                        answeredAt: daysAgo(1, 10),
+                    },
+                    {
+                        type: SetupQuestionType.NeedChoice,
+                        key: "START_COMMAND",
+                        prompt: "Two dev scripts exist. Which one brings up the full stack?",
+                        options: ["bun run dev", "bun run dev:api", "bun run start"],
+                        status: SetupQuestionStatus.Answered,
+                        answerValue: "bun run dev",
+                        askedAt: daysAgo(1, 20),
+                        answeredAt: daysAgo(1, 8),
+                    },
+                    {
+                        type: SetupQuestionType.DefineSuccess,
+                        key: "VERIFICATION",
+                        prompt: "What counts as a green run for this repo?",
+                        options: [],
+                        status: SetupQuestionStatus.Waiting,
+                        askedAt: minutesAgo(38),
+                    },
+                    {
+                        type: SetupQuestionType.ApproveCost,
+                        key: "SANDBOX_BUDGET",
+                        prompt: "The baseline build takes about nine minutes of sandbox time. Approve?",
+                        options: ["Approve", "Reduce scope"],
+                        status: SetupQuestionStatus.Waiting,
+                        askedAt: minutesAgo(22),
+                    },
+                    {
+                        type: SetupQuestionType.NeedAccess,
+                        key: "PRIVATE_REGISTRY",
+                        prompt: "Two dependencies resolve from a private registry the sandbox cannot reach.",
+                        options: [],
+                        status: SetupQuestionStatus.Cancelled,
+                        askedAt: daysAgo(1, 5),
+                    },
+                ],
+            },
+        },
+    });
+
+    const SECRETS = ["DATABASE_URL", "REDIS_URL", "NPM_TOKEN", "STRIPE_SECRET_KEY"];
+    for (const key of SECRETS) {
+        await prisma.projectSecret.create({
+            data: {
+                projectId,
+                key,
+                ciphertext: Buffer.from(`seeded-${key}-value`).toString("base64"),
+                iv: Buffer.from(`iv-${key}`).toString("base64").slice(0, 16),
+                authTag: Buffer.from(`tag-${key}`).toString("base64").slice(0, 22),
+            },
+        });
+    }
+
+    const INVITES = [
+        { email: "noor.abbasi@example.com", status: InvitationStatus.Pending },
+        { email: "greg.holloway@example.com", status: InvitationStatus.Pending },
+        { email: "yuki.tanaka@example.com", status: InvitationStatus.Pending },
+        { email: "sara.mendes@example.com", status: InvitationStatus.Accepted },
+        { email: "will.byrne@example.com", status: InvitationStatus.Rejected },
+    ];
+    const teams = await prisma.team.findMany({ where: { projectId } });
+    for (let index = 0; index < INVITES.length; index++) {
+        const invite = INVITES[index];
+        await prisma.invitation.create({
+            data: {
+                email: invite.email,
+                status: invite.status,
+                expiresAt: daysAgo(-between(3, 12)),
+                invitedById: lead.id,
+                orgId,
+                projectId,
+                role: pick([ProjectRole.Write, ProjectRole.Triage, ProjectRole.Read]),
+                teamId: index % 2 === 0 ? teams[index % teams.length].id : null,
+                createdAt: daysAgo(between(1, 9)),
+            },
+        });
+    }
+
+    const notifications: Array<{
+        userId: string;
+        type: NotificationType;
+        payload: object;
+        readAt: Date | null;
+        createdAt: Date;
+    }> = [];
+
+    for (const human of humans) {
+        const actorFor = () => {
+            const actor = pick(cast);
+            return { id: actor.id, name: actor.name };
+        };
+        const issueBase = (issue: CreatedIssue) => ({
+            issueId: issue.id,
+            issueTitle: issue.title,
+            issueNumber: issue.number,
+            projectId,
+            projectSlug: PROJECT.slug,
+            orgSlug: ORG.slug,
+        });
+
+        const builders: Array<() => { type: NotificationType; payload: object }> = [
+            () => {
+                const issue = pick(createdIssues);
+                const actor = actorFor();
+                return {
+                    type: NotificationType.IssueAssigned,
+                    payload: {
+                        ...issueBase(issue),
+                        actorId: actor.id,
+                        actorName: actor.name,
+                    },
+                };
+            },
+            () => {
+                const issue = pick(createdIssues);
+                const actor = actorFor();
+                return {
+                    type: NotificationType.IssueUnassigned,
+                    payload: { ...issueBase(issue), actorId: actor.id, actorName: actor.name },
+                };
+            },
+            () => {
+                const chat = pick(chats);
+                const issue =
+                    createdIssues.find((candidate) => candidate.id === chat.issueId) ??
+                    createdIssues[0];
+                const actor = actorFor();
+                return {
+                    type: NotificationType.ChatMention,
+                    payload: {
+                        chatId: chat.id,
+                        ...issueBase(issue),
+                        senderId: actor.id,
+                        senderName: actor.name,
+                        message: `${chat.message} @${human.name ?? human.email}`,
+                    },
+                };
+            },
+            () => {
+                const chat = pick(projectChats);
+                const actor = actorFor();
+                return {
+                    type: NotificationType.ProjectChatMention,
+                    payload: {
+                        projectChatId: chat.id,
+                        projectId,
+                        projectSlug: PROJECT.slug,
+                        orgSlug: ORG.slug,
+                        senderId: actor.id,
+                        senderName: actor.name,
+                        message: `${chat.message} @${human.name ?? human.email}`,
+                    },
+                };
+            },
+            () => {
+                const issue = pick(createdIssues);
+                const actor = actorFor();
+                return {
+                    type: NotificationType.IssueStatusChanged,
+                    payload: {
+                        ...issueBase(issue),
+                        actorId: actor.id,
+                        actorName: actor.name,
+                        fromStatus: IssueStatus.InProgress,
+                        toStatus: issue.status,
+                    },
+                };
+            },
+            () => {
+                const issue = pick(createdIssues);
+                const actor = actorFor();
+                return {
+                    type: NotificationType.IssuePriorityChanged,
+                    payload: {
+                        ...issueBase(issue),
+                        actorId: actor.id,
+                        actorName: actor.name,
+                        priority: between(1, 4),
+                    },
+                };
+            },
+            () => {
+                const issue = pick(createdIssues);
+                const actor = actorFor();
+                return {
+                    type: NotificationType.IssueMoved,
+                    payload: {
+                        ...issueBase(issue),
+                        actorId: actor.id,
+                        actorName: actor.name,
+                        toColumnLabel: pick(columns).label,
+                    },
+                };
+            },
+            () => {
+                const chat = pick(chats);
+                const issue =
+                    createdIssues.find((candidate) => candidate.id === chat.issueId) ??
+                    createdIssues[0];
+                const actor = actorFor();
+                return {
+                    type: NotificationType.IssueCommented,
+                    payload: {
+                        chatId: chat.id,
+                        ...issueBase(issue),
+                        senderId: actor.id,
+                        senderName: actor.name,
+                        message: chat.message,
+                    },
+                };
+            },
+            () => {
+                const issue = pick(createdIssues);
+                const actor = actorFor();
+                return {
+                    type: NotificationType.IssueReferenced,
+                    payload: {
+                        ...issueBase(issue),
+                        senderId: actor.id,
+                        senderName: actor.name,
+                        message: `Same root cause as #${issue.number} ${issue.title}`,
+                    },
+                };
+            },
+            () => {
+                const issue = pick(createdIssues);
+                const actor = actorFor();
+                return {
+                    type: NotificationType.IssueDeleted,
+                    payload: { ...issueBase(issue), actorId: actor.id, actorName: actor.name },
+                };
+            },
+            () => {
+                const actor = actorFor();
+                return {
+                    type: NotificationType.AddedToProject,
+                    payload: {
+                        projectId,
+                        projectName: PROJECT.name,
+                        projectSlug: PROJECT.slug,
+                        orgId,
+                        orgName: ORG.name,
+                        orgSlug: ORG.slug,
+                        role: ProjectRole.Admin,
+                        actorId: actor.id,
+                        actorName: actor.name,
+                    },
+                };
+            },
+            () => {
+                const team = pick(teams);
+                const actor = actorFor();
+                return {
+                    type: NotificationType.AddedToTeam,
+                    payload: {
+                        teamId: team.id,
+                        teamName: team.name,
+                        projectId,
+                        projectName: PROJECT.name,
+                        projectSlug: PROJECT.slug,
+                        orgName: ORG.name,
+                        orgSlug: ORG.slug,
+                        actorId: actor.id,
+                        actorName: actor.name,
+                    },
+                };
+            },
+            () => {
+                const team = pick(teams);
+                const actor = actorFor();
+                return {
+                    type: NotificationType.RemovedFromTeam,
+                    payload: {
+                        teamId: team.id,
+                        teamName: team.name,
+                        projectId,
+                        projectSlug: PROJECT.slug,
+                        orgName: ORG.name,
+                        orgSlug: ORG.slug,
+                        actorId: actor.id,
+                        actorName: actor.name,
+                    },
+                };
+            },
+            () => {
+                const team = pick(teams);
+                const actor = actorFor();
+                return {
+                    type: NotificationType.RoleChanged,
+                    payload: {
+                        teamId: team.id,
+                        teamName: team.name,
+                        projectId,
+                        projectSlug: PROJECT.slug,
+                        orgSlug: ORG.slug,
+                        role: TeamRole.Maintainer,
+                        previousRole: TeamRole.Member,
+                        actorId: actor.id,
+                        actorName: actor.name,
+                    },
+                };
+            },
+            () => {
+                const actor = actorFor();
+                return {
+                    type: NotificationType.RemovedFromOrg,
+                    payload: {
+                        orgId,
+                        orgName: ORG.name,
+                        orgSlug: ORG.slug,
+                        actorId: actor.id,
+                        actorName: actor.name,
+                    },
+                };
+            },
+            () => {
+                const actor = actorFor();
+                const team = pick(teams);
+                return {
+                    type: NotificationType.InviteAccepted,
+                    payload: {
+                        invitationId: `seeded-invite-${between(1000, 9999)}`,
+                        orgId,
+                        orgName: ORG.name,
+                        orgSlug: ORG.slug,
+                        projectId,
+                        projectName: PROJECT.name,
+                        projectSlug: PROJECT.slug,
+                        teamId: team.id,
+                        teamName: team.name,
+                        accepterId: actor.id,
+                        accepterName: actor.name,
+                    },
+                };
+            },
+            () => {
+                const chat = pick(chats);
+                const issue =
+                    createdIssues.find((candidate) => candidate.id === chat.issueId) ??
+                    createdIssues[0];
+                const actor = actorFor();
+                return {
+                    type: NotificationType.MessageReacted,
+                    payload: {
+                        chatId: chat.id,
+                        ...issueBase(issue),
+                        actorId: actor.id,
+                        actorName: actor.name,
+                        emoji: pick(EMOJIS),
+                    },
+                };
+            },
+        ];
+
+        for (let index = 0; index < NOTIFICATIONS_PER_USER; index++) {
+            const built = builders[index % builders.length]();
+            const minutes = index * between(20, 260) + between(2, 40);
+            notifications.push({
+                userId: human.id,
+                type: built.type,
+                payload: built.payload,
+                readAt: index > 11 && chance(0.7) ? minutesAgo(Math.max(1, minutes - 30)) : null,
+                createdAt: minutesAgo(minutes),
+            });
+        }
+    }
+    await prisma.notification.createMany({ data: notifications });
+
+    let apiKeyCount = 0;
+    for (const human of humans) {
+        const keys = [
+            { label: "Nocturn CI", lastUsedDaysAgo: 0, revoked: false },
+            { label: "Nocturn local", lastUsedDaysAgo: 3, revoked: false },
+            { label: "Nocturn old laptop", lastUsedDaysAgo: 61, revoked: true },
+        ];
+        for (let index = 0; index < keys.length; index++) {
+            const key = keys[index];
+            const suffix = `${human.id.slice(-4)}${index}`;
+            await prisma.apiKey.create({
+                data: {
+                    userId: human.id,
+                    label: key.label,
+                    prefix: `mch_live_${suffix.padEnd(8, "x").slice(0, 8)}`,
+                    hashedKey: `$2a$10$seededseededseededseeded${suffix}`,
+                    lastUsedAt: daysAgo(key.lastUsedDaysAgo),
+                    revokedAt: key.revoked ? daysAgo(30) : null,
+                    createdAt: daysAgo(between(40, 120)),
+                },
+            });
+            apiKeyCount++;
+        }
+    }
+
+    for (const post of POSTS) {
+        const text = plainText(post.content);
+        await prisma.post.create({
+            data: {
+                kind: post.kind,
+                slug: post.slug,
+                title: post.title,
+                summary: post.summary,
+                content: post.content,
+                plainText: text,
+                author: pick(cast).name,
+                tags: [...post.tags],
+                version: "version" in post ? post.version : null,
+                channel: "channel" in post ? post.channel : null,
+                status: post.status,
+                readingTime: readingTime(text),
+                publishedAt: post.publishedDaysAgo === null ? null : daysAgo(post.publishedDaysAgo),
+                createdAt: daysAgo(post.publishedDaysAgo ?? 1),
+            },
+        });
     }
 
     console.log(
         JSON.stringify(
             {
-                project: `${ORG_SLUG}/${PROJECT_SLUG}`,
-                owner: owner.name,
-                members: allMemberIds.length,
+                url: `/playground/${ORG.slug}/${PROJECT.slug}`,
+                humansAttached: humans.map((human) => human.email),
+                castMembers: cast.length,
                 teams: TEAMS.length,
                 tags: tags.length,
-                columns: columns.length,
+                customColumns: columns.length,
+                issueTemplates: TEMPLATES.length,
+                workers: workers.length,
                 issues: createdIssues.length,
                 activities: activityRows.length,
-                issueComments: chatSeeds.length,
-                projectChats: PROJECT_CHAT_COUNT,
+                agentSessions: await prisma.agentSession.count({
+                    where: { issue: { projectId } },
+                }),
+                issueChats: await prisma.chat.count({ where: { issue: { projectId } } }),
+                projectChats: await prisma.projectChat.count({ where: { projectId } }),
+                messageReferences: await prisma.messageReference.count(),
+                descriptionReferences: descriptionReferenceCount,
+                notifications: notifications.length,
+                invitations: INVITES.length,
+                productDiffs: diffCount,
+                setupQuestions: await prisma.setupQuestion.count({
+                    where: { sessionId: setupSession.id },
+                }),
+                projectSecrets: SECRETS.length,
+                apiKeys: apiKeyCount,
+                posts: POSTS.length,
             },
             null,
             2,
