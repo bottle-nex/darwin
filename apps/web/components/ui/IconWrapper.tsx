@@ -34,7 +34,7 @@ const SURFACE: Record<
         active: "bg-white/8",
     },
     outline: {
-        shape: "rounded-full border border-white/10",
+        shape: "rounded-full ring-[0.5px] ring-white/10",
         glyph: "size-3.5",
         rest: "bg-transparent",
         hover: "hover:border-white/20 hover:bg-white/5",

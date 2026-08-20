@@ -6,7 +6,6 @@ import {
     SIDEBAR_WIDTH_CSS_VAR,
     SIDEBAR_WIDTH_STORAGE_KEY,
 } from "@/store/playground/useSidebarWidthStore";
-import { SIDEBAR_GRADIENT_BOOTSTRAP_SCRIPT } from "@/lib/sidebarTheme";
 
 const restoreSidebarWidthScript = `try{var s=JSON.parse(localStorage.getItem("${SIDEBAR_WIDTH_STORAGE_KEY}")).state;var w=s.collapsed?0:Math.min(${SIDEBAR_MAX_WIDTH},Math.max(${SIDEBAR_MIN_WIDTH},s.width));if(typeof w==="number")document.documentElement.style.setProperty("${SIDEBAR_WIDTH_CSS_VAR}",w+"px")}catch(e){}`;
 
@@ -15,7 +14,6 @@ export default function PlaygroundLayout({ children }: { children: React.ReactNo
         <AccessControlProvider>
             <TooltipProvider>
                 <script dangerouslySetInnerHTML={{ __html: restoreSidebarWidthScript }} />
-                <script dangerouslySetInnerHTML={{ __html: SIDEBAR_GRADIENT_BOOTSTRAP_SCRIPT }} />
                 <div className="theme-playground h-dvh overflow-hidden overscroll-none bg-ink">
                     {children}
                 </div>

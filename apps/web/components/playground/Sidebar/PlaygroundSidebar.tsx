@@ -26,7 +26,7 @@ export default function PlaygroundSidebar() {
             aria-label="Sidebar"
             style={{ width: `var(${SIDEBAR_WIDTH_CSS_VAR}, ${SIDEBAR_DEFAULT_WIDTH}px)` }}
             className={cn(
-                "h-full min-h-0 shrink-0 overflow-visible perspective-distant",
+                "h-full min-h-0 shrink-0 overflow-hidden perspective-distant",
                 instant
                     ? "transition-none"
                     : "transition-[width] duration-350 ease-[cubic-bezier(0.22,1,0.36,1)]",
@@ -34,11 +34,7 @@ export default function PlaygroundSidebar() {
         >
             <motion.div
                 initial={false}
-                animate={
-                    collapsed
-                        ? { rotateY: -32, scale: 0.9, opacity: 0 }
-                        : { rotateY: 0, scale: 1, opacity: 1 }
-                }
+                animate={collapsed ? { rotateY: -32, scale: 0.9 } : { rotateY: 0, scale: 1 }}
                 transition={{ duration: instant ? 0 : 0.35, ease: [0.22, 1, 0.36, 1] }}
                 style={{ width, transformOrigin: "left center" }}
                 className={cn("relative h-full min-h-0", collapsed && "pointer-events-none")}

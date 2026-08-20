@@ -3,6 +3,7 @@ import { useMemo, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { HiOutlineBell, HiOutlineMagnifyingGlass, HiXMark } from "react-icons/hi2";
 import { Input } from "@/components/ui/input";
+import { PANE_TOP_BAR_HEIGHT } from "@/components/playground/Core/components/PlaygroundPaneFrame";
 import { useNotificationsPanelStore } from "@/store/playground/useNotificationsPanelStore";
 import { useMarkNotificationsRead, useNotifications } from "@/hooks/notifications/useNotifications";
 import NotificationRow from "./NotificationRow";
@@ -49,9 +50,12 @@ export default function NotificationsPanel() {
                 >
                     <div
                         style={{ width: PANEL_WIDTH - 8 }}
-                        className="ml-2 flex h-full flex-col rounded-lg border border-white/5 bg-ink"
+                        className="ml-2 flex h-full flex-col rounded-lg bg-charcoal ring-1 ring-graphite/80"
                     >
-                        <header className="flex h-11 shrink-0 items-center gap-2 border-b border-white/5 pr-1.5 pl-3">
+                        <header
+                            style={{ height: PANE_TOP_BAR_HEIGHT }}
+                            className="flex shrink-0 items-center gap-2 border-b border-border pr-1.5 pl-3"
+                        >
                             <h2 className="text-[14px] font-medium text-neutral-200">
                                 Notifications
                             </h2>
@@ -91,14 +95,14 @@ export default function NotificationsPanel() {
                                     value={query}
                                     onChange={(e) => setQuery(e.target.value)}
                                     placeholder="Search notifications"
-                                    className="h-8 rounded-md bg-charcoal pr-8 pl-8 text-[12.5px] shadow-none hover:bg-charcoal"
+                                    className="h-8 rounded-md bg-cement pr-8 pl-8 text-[12.5px] shadow-none hover:bg-graphite"
                                 />
                                 {query && (
                                     <button
                                         type="button"
                                         onClick={() => setQuery("")}
                                         aria-label="Clear search"
-                                        className="absolute top-1/2 right-2 flex size-4 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-white/10 text-neutral-400 transition-colors hover:bg-white/20 hover:text-neutral-100"
+                                        className="absolute top-1/2 right-2 flex size-4 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-white/8 text-neutral-400 transition-colors hover:bg-white/15 hover:text-neutral-100"
                                     >
                                         <HiXMark className="size-2.5" aria-hidden />
                                     </button>
@@ -140,7 +144,7 @@ function EmptyState({ query }: { query: string }) {
     return (
         <div className="flex flex-1 flex-col items-center justify-center px-6 pb-10 text-center">
             <span
-                className="flex size-11 items-center justify-center rounded-xl bg-cement text-neutral-500 ring-1 ring-white/10"
+                className="flex size-11 items-center justify-center rounded-xl bg-cement text-neutral-500 ring-1 ring-graphite"
                 aria-hidden
             >
                 <HiOutlineBell className="size-5" />
