@@ -2,9 +2,12 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { HiXMark } from "react-icons/hi2";
+import { cn } from "@/lib/utils";
 import PlaygroundAvatar, {
     toneFor,
 } from "@/components/playground/Core/components/PlaygroundAvatar";
+import { BLURRED_BG_TWO } from "@/components/playground/Home/KanbanDisplay/cardStyles";
+import { useUserConfig } from "@/hooks/user/useUserConfig";
 import { useFloatNotificationsStore } from "@/store/playground/useFloatNotificationsStore";
 import { useNotificationsPanelStore } from "@/store/playground/useNotificationsPanelStore";
 import type { Notification } from "@trymatcha/types";
@@ -19,6 +22,7 @@ export default function FloatNotifications() {
     const clear = useFloatNotificationsStore((s) => s.clear);
     const isPanelOpen = useNotificationsPanelStore((s) => s.isOpen);
     const select = useSelectNotification();
+    const glass = useUserConfig().backgroundLightingEnabled;
 
     useEffect(() => {
         if (isPanelOpen) clear();
@@ -34,6 +38,7 @@ export default function FloatNotifications() {
                     <FloatNotificationCard
                         key={notification.id}
                         notification={notification}
+                        glass={glass}
                         onSelect={select}
                     />
                 ))}
@@ -44,10 +49,11 @@ export default function FloatNotifications() {
 
 type FloatNotificationCardProps = {
     notification: Notification;
+    glass: boolean;
     onSelect: (notification: Notification) => void;
 };
 
-function FloatNotificationCard({ notification, onSelect }: FloatNotificationCardProps) {
+function FloatNotificationCard({ notification, glass, onSelect }: FloatNotificationCardProps) {
     const dismiss = useFloatNotificationsStore((s) => s.dismiss);
     const [paused, setPaused] = useState<boolean>(false);
     const reduceMotion = useReducedMotion();
@@ -75,7 +81,10 @@ function FloatNotificationCard({ notification, onSelect }: FloatNotificationCard
             onMouseLeave={() => setPaused(false)}
             onFocusCapture={() => setPaused(true)}
             onBlurCapture={() => setPaused(false)}
-            className="group pointer-events-auto relative overflow-hidden rounded-xl gradient-border before:z-10 bg-graphite backdrop-blur-lg shadow-lg"
+            className={cn(
+                "group pointer-events-auto relative overflow-hidden rounded-xl gradient-border before:z-10 shadow-lg",
+                BLURRED_BG_TWO(glass),
+            )}
         >
             {clickable && (
                 <button
@@ -105,26 +114,26 @@ function FloatNotificationCard({ notification, onSelect }: FloatNotificationCard
                 </span>
 
                 <span className="flex min-w-0 flex-1 flex-col">
-                    <span className="truncate text-[12.5px] text-neutral-400">
+                    <span className="truncate text-[12.5px] text-neutral-300">
                         <span className="font-medium text-neutral-100">{actorName}</span> {action}
                     </span>
 
                     {body && (
-                        <span className="mt-1 line-clamp-2 text-[12.5px] leading-[1.45] text-neutral-500">
+                        <span className="mt-1 line-clamp-2 text-[12.5px] leading-[1.45] text-neutral-400">
                             {body}
                         </span>
                     )}
 
                     {(issueRef || projectSlug) && (
-                        <span className="mt-1.5 flex items-center gap-1.5 text-[11px] text-neutral-600">
+                        <span className="mt-1.5 flex items-center gap-1.5 text-[11px] text-neutral-500">
                             {issueRef && (
-                                <span className="truncate font-medium text-neutral-500">
+                                <span className="truncate font-medium text-neutral-400">
                                     {issueRef}
                                 </span>
                             )}
                             {issueRef && projectSlug && (
                                 <span
-                                    className="size-0.5 shrink-0 rounded-full bg-white/25"
+                                    className="size-0.5 shrink-0 rounded-full bg-white/20"
                                     aria-hidden
                                 />
                             )}
@@ -138,7 +147,7 @@ function FloatNotificationCard({ notification, onSelect }: FloatNotificationCard
                 type="button"
                 onClick={() => dismiss(id)}
                 aria-label="Dismiss notification"
-                className="absolute top-2 right-2 flex size-5 cursor-pointer items-center justify-center rounded-md text-neutral-600 opacity-0 transition-opacity group-hover:opacity-100 hover:bg-white/6 hover:text-neutral-200 focus-visible:opacity-100 focus-visible:outline-none"
+                className="absolute top-2 right-2 flex size-5 cursor-pointer items-center justify-center rounded-md text-neutral-500 opacity-0 transition-opacity group-hover:opacity-100 hover:bg-white/7 hover:text-neutral-100 focus-visible:opacity-100 focus-visible:outline-none"
             >
                 <HiXMark className="size-3" aria-hidden />
             </button>

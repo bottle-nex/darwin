@@ -9,3 +9,6 @@ export const BLURRED_BG_ONE = (value: boolean) =>
 
 export const BLURRED_BG_TWO = (value: boolean) =>
     cn(value ? "bg-graphite/80 backdrop-blur-xl" : "bg-graphite");
+
+export const BLURRED_BG_PANEL = (value: boolean) =>
+    cn(value ? "bg-charcoal/70 backdrop-blur-xl" : "bg-charcoal");

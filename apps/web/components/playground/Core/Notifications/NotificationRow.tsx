@@ -34,9 +34,9 @@ export default function NotificationRow({
             data-selected={selected}
             className={cn(
                 "group flex w-full items-start gap-2.5 rounded-lg px-2 py-2.5 text-left transition-colors duration-150",
-                selected && "bg-cement",
+                selected && "bg-white/7",
                 clickable
-                    ? "cursor-pointer hover:bg-cement focus-visible:bg-cement focus-visible:outline-none"
+                    ? "cursor-pointer hover:bg-white/4 focus-visible:bg-white/4 focus-visible:outline-none"
                     : "cursor-default",
             )}
         >
@@ -48,7 +48,7 @@ export default function NotificationRow({
                 />
                 <span
                     className={cn(
-                        "absolute -right-1 -bottom-1 flex size-3.5 items-center justify-center rounded-full bg-charcoal ring-2 ring-charcoal transition-colors duration-150 group-hover:bg-cement group-hover:ring-cement group-data-[selected=true]:bg-cement group-data-[selected=true]:ring-cement",
+                        "absolute -right-1 -bottom-1 flex size-3.5 items-center justify-center rounded-full bg-charcoal ring-2 ring-charcoal",
                         tint,
                     )}
                     aria-hidden
@@ -59,11 +59,11 @@ export default function NotificationRow({
 
             <span className="flex min-w-0 flex-1 flex-col">
                 <span className="flex items-baseline gap-2">
-                    <span className="min-w-0 flex-1 truncate text-[13.5px] text-neutral-400">
+                    <span className="min-w-0 flex-1 truncate text-[13.5px] text-neutral-300">
                         <span className="font-medium text-neutral-100">{actorName}</span> {action}
                     </span>
                     <span
-                        className="flex shrink-0 items-center gap-1.5 text-[11.5px] tabular-nums text-neutral-600"
+                        className="flex shrink-0 items-center gap-1.5 text-[11.5px] tabular-nums text-neutral-500"
                         title={format(createdAt, "PPpp")}
                     >
                         {short_age(createdAt)}
@@ -77,21 +77,21 @@ export default function NotificationRow({
                 </span>
 
                 {body && (
-                    <span className="mt-1 line-clamp-2 text-[13px] leading-[1.5] text-neutral-500">
+                    <span className="mt-1 line-clamp-2 text-[13px] leading-[1.5] text-neutral-400">
                         {body}
                     </span>
                 )}
 
                 {(issueRef || projectSlug) && (
-                    <span className="mt-1.5 flex items-center gap-1.5 text-[11.5px] text-neutral-600">
+                    <span className="mt-1.5 flex items-center gap-1.5 text-[11.5px] text-neutral-500">
                         {issueRef && (
-                            <span className="truncate font-medium text-neutral-500">
+                            <span className="truncate font-medium text-neutral-400">
                                 {issueRef}
                             </span>
                         )}
                         {issueRef && projectSlug && (
                             <span
-                                className="size-0.5 shrink-0 rounded-full bg-white/25"
+                                className="size-0.5 shrink-0 rounded-full bg-white/20"
                                 aria-hidden
                             />
                         )}
