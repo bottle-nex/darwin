@@ -50,7 +50,7 @@ export default function NotificationsPanel() {
                 >
                     <div
                         style={{ width: PANEL_WIDTH - 8 }}
-                        className="ml-2 flex h-full flex-col rounded-lg border border-white/6 bg-charcoal/80 backdrop-blur-lg"
+                        className="ml-2 flex h-full flex-col rounded-lg border border-graphite/80 bg-charcoal"
                     >
                         <header
                             style={{ height: PANE_TOP_BAR_HEIGHT }}
@@ -116,7 +116,7 @@ export default function NotificationsPanel() {
                             <div className="flex-1 overflow-y-auto overscroll-contain px-1.5 pb-2">
                                 {groups.map((group) => (
                                     <section key={group.label} className="">
-                                        <h3 className="sticky top-0 z-10 bg-charcoal/95 px-2 py-1.5 text-[10px] font-medium tracking-[0.08em] text-neutral-600 uppercase backdrop-blur-sm">
+                                        <h3 className="sticky top-0 z-10 bg-charcoal px-2 py-1.5 text-[10px] font-medium tracking-[0.08em] text-neutral-600 uppercase">
                                             {group.label}
                                         </h3>
                                         {group.items.map((notification) => (

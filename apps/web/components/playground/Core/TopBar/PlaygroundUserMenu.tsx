@@ -32,9 +32,9 @@ import PlaygroundAvatar from "@/components/playground/Core/components/Playground
 import SessionServices from "@/lib/session";
 import CreateOrganizationModal from "@/components/playground/landing/CreateOrganizationModal";
 import SettingsPanel from "@/components/playground/Core/TopBar/SettingsPanel";
+import BackgroundLightingControl from "@/components/playground/Sidebar/BackgroundLightingControl";
 import { TooltipComponent } from "@/components/ui/tooltip-component";
 import { SIDEBAR_ICON_BUTTON_CLASS } from "@/components/playground/Sidebar/shared";
-import BackgroundLightingControl from "@/components/playground/Sidebar/BackgroundLightingControl";
 
 const MENU_ITEMS: { id: string; label: string; icon: IconType }[] = [
     { id: "personal", label: "Personal info", icon: MdPerson },

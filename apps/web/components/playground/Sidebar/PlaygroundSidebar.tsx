@@ -38,7 +38,7 @@ export default function PlaygroundSidebar() {
                 transition={{ duration: instant ? 0 : 0.35, ease: [0.22, 1, 0.36, 1] }}
                 style={{ width, transformOrigin: "left center" }}
                 className={cn(
-                    "relative h-full min-h-0 overflow-hidden rounded-lg border border-white/6 bg-charcoal/80 backdrop-blur-lg",
+                    "relative h-full min-h-0 overflow-hidden rounded-lg border-[1.5px] border-snow/5 bg-charcoal/70",
                     collapsed && "pointer-events-none",
                 )}
             >

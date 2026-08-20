@@ -48,7 +48,7 @@ export default function SidebarResizeHandle() {
             onPointerUp={onPointerUp}
             className={cn(
                 "group relative flex shrink-0 cursor-col-resize items-center justify-center",
-                collapsed ? "w-0" : "w-2",
+                collapsed ? "w-0" : "w-1.5",
             )}
         >
             <span className="absolute inset-y-0 -left-1 -right-1" aria-hidden />

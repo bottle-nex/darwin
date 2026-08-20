@@ -160,7 +160,7 @@ const ChatComposer = forwardRef<ChatComposerHandle, ChatComposerProps>(function 
     return (
         <div
             className={cn(
-                "rounded-lg bg-[#1a1a1a] shadow-[inset_0_1px_0_0_var(--color-edge)]",
+                "rounded-lg bg-graphite/40 shadow-[inset_0_1px_0_0_var(--color-edge)]",
                 className,
             )}
         >
@@ -173,7 +173,7 @@ const ChatComposer = forwardRef<ChatComposerHandle, ChatComposerProps>(function 
                 <EditorContent
                     editor={editor}
                     data-lenis-prevent
-                    className="no-scrollbar max-h-28 overflow-y-auto"
+                    className="no-scrollbar max-h-28 overflow-y-auto "
                 />
                 <Button
                     variant="unstyled"

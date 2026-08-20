@@ -35,7 +35,7 @@ export default function PlaygroundSheetSidebar() {
                     className="top-3 bottom-3 left-0 h-auto max-w-[calc(100%-1.5rem)] gap-0 border-0 bg-transparent p-0 pl-3 text-neutral-100 shadow-none will-change-transform ease-[cubic-bezier(0.32,0.72,0,1)] data-[state=closed]:duration-200 data-[state=open]:duration-300"
                 >
                     <SheetTitle className="sr-only">Sidebar</SheetTitle>
-                    <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-lg border border-white/6 bg-charcoal/80 py-2 backdrop-blur-lg">
+                    <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-lg border border-graphite/80 bg-charcoal py-2">
                         <SidebarContent />
                     </div>
                 </SheetContent>

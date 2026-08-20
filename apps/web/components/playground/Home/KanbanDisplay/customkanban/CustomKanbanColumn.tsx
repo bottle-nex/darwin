@@ -52,7 +52,7 @@ export default function CustomKanbanColumn({ column, draggable = true }: CustomK
             ref={setNodeRef}
             style={style}
             className={cn(
-                "group flex max-h-full min-h-0 w-84 shrink-0 flex-col self-stretch rounded-lg bg-ink/60 p-2 ring-1 ring-white/1 transition-colors",
+                "group flex max-h-full min-h-0 w-84 shrink-0 flex-col self-stretch rounded-lg bg-ink/20 p-2 ring-1 ring-snow/3 transition-colors",
                 isDragging && "opacity-40",
             )}
         >

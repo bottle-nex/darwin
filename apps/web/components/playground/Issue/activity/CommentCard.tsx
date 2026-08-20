@@ -178,7 +178,7 @@ export default function CommentCard({
     }
 
     return (
-        <li className="my-3 overflow-hidden rounded-[8px] border border-snow/3 bg-graphite">
+        <li className="my-3 overflow-hidden rounded-[8px] border border-snow/3 bg-graphite/40">
             <CommentContent
                 comment={root}
                 avatarSize="lg"

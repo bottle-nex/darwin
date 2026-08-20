@@ -94,12 +94,12 @@ export default function IssueDescriptionEditor({
                 table: { resizable: true },
                 tableHeader: {
                     HTMLAttributes: {
-                        class: "rounded-sm bg-graphite px-4 py-3 text-left align-top font-medium text-snow",
+                        class: "rounded-sm bg-snow/3 px-4 py-3 text-left align-top font-medium text-snow",
                     },
                 },
                 tableCell: {
                     HTMLAttributes: {
-                        class: "rounded-sm bg-cement px-4 py-3 align-top text-neutral-200",
+                        class: "rounded-sm bg-snow/5 px-4 py-3 align-top text-neutral-200",
                     },
                 },
             }),
