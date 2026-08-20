@@ -27,6 +27,8 @@ import { useSidebarWidthStore } from "@/store/playground/useSidebarWidthStore";
 import { useCommandContextStore } from "@/store/command/useCommandContextStore";
 import CommandMenu from "@/components/command/CommandMenu";
 import CommandDialogs from "@/components/command/CommandDialogs";
+import BackgroundLighting from "@/components/playground/Core/BackgroundLighting";
+import { useBackgroundLightingStore } from "@/store/playground/useBackgroundLightingStore";
 
 export default function PlaygroundShell() {
     const { orgSlug, projectSlug } = useParams<{
@@ -63,14 +65,16 @@ export default function PlaygroundShell() {
     }, [orgSlug, activeProject?.id, mode, setCommandContext]);
     useLayoutEffect(() => {
         useSidebarWidthStore.persist.rehydrate();
+        useBackgroundLightingStore.persist.rehydrate();
     }, []);
 
     const loading = isDashboardPending || (activeProject ? isProjectPending : false);
     const showOnboarding = !loading && !!project && !project.tourCompleted;
 
     return (
-        <main className="relative flex h-screen flex-col overflow-hidden text-neutral-100 select-none tracking-wide">
-            <section className="relative flex flex-1 min-h-0 p-2">
+        <main className="relative flex h-screen flex-col overflow-hidden bg-ink text-neutral-100 select-none tracking-wide">
+            <BackgroundLighting />
+            <section className="relative z-10 flex flex-1 min-h-0 p-2">
                 <PlaygroundSidebar />
                 <SidebarResizeHandle />
                 <PlaygroundPaneFrame lead={<PlaygroundCollapsedLead />}>

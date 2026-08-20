@@ -34,6 +34,7 @@ import CreateOrganizationModal from "@/components/playground/landing/CreateOrgan
 import SettingsPanel from "@/components/playground/Core/TopBar/SettingsPanel";
 import { TooltipComponent } from "@/components/ui/tooltip-component";
 import { SIDEBAR_ICON_BUTTON_CLASS } from "@/components/playground/Sidebar/shared";
+import BackgroundLightingControl from "@/components/playground/Sidebar/BackgroundLightingControl";
 
 const MENU_ITEMS: { id: string; label: string; icon: IconType }[] = [
     { id: "personal", label: "Personal info", icon: MdPerson },
@@ -222,17 +223,7 @@ export default function PlaygroundUserMenu() {
                         </Button>
                     </TooltipComponent>
 
-                    <TooltipComponent content="Log out" side="top" delayDuration={500}>
-                        <Button
-                            variant="unstyled"
-                            type="button"
-                            onClick={() => signOut({ callbackUrl: "/" })}
-                            aria-label="Log out"
-                            className={SIDEBAR_ICON_BUTTON_CLASS}
-                        >
-                            <MdLogout className="size-4" aria-hidden />
-                        </Button>
-                    </TooltipComponent>
+                    <BackgroundLightingControl />
                 </div>
             </div>
             <CreateOrganizationModal open={isCreateOrgOpen} onOpenChange={setIsCreateOrgOpen} />

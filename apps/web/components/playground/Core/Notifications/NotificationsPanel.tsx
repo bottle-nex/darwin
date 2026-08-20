@@ -50,7 +50,7 @@ export default function NotificationsPanel() {
                 >
                     <div
                         style={{ width: PANEL_WIDTH - 8 }}
-                        className="ml-2 flex h-full flex-col rounded-lg bg-charcoal border border-graphite/80"
+                        className="ml-2 flex h-full flex-col rounded-lg border border-white/6 bg-charcoal/80 backdrop-blur-lg"
                     >
                         <header
                             style={{ height: PANE_TOP_BAR_HEIGHT }}
