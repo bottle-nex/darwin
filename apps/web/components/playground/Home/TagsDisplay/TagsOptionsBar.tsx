@@ -42,6 +42,8 @@ type TagsOptionsBarProps = {
     onEditSelected: () => void;
     /** Delete every checked tag. */
     onDeleteSelected: () => void;
+    /** Uncheck every row. */
+    onClearSelection: () => void;
 };
 
 /** Tags toolbar: count, slide-in search, sort menu, and the New tag button. */
@@ -51,6 +53,7 @@ export default function TagsOptionsBar({
     selectedCount,
     onEditSelected,
     onDeleteSelected,
+    onClearSelection,
 }: TagsOptionsBarProps) {
     const { searchOpen, search, setSearch, openSearch, closeSearch, sort, setSort } =
         useTagsOptionsStore();
@@ -88,6 +91,11 @@ export default function TagsOptionsBar({
                                 label="Delete tag"
                                 icon={MdDelete}
                                 onClick={onDeleteSelected}
+                            />
+                            <OptionButton
+                                label="Clear selection"
+                                icon={MdClose}
+                                onClick={onClearSelection}
                             />
                             <div className="mx-1 h-4 w-px bg-white/8" />
                         </>

@@ -1,5 +1,5 @@
 "use client";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { MdCheck, MdLabel } from "react-icons/md";
 import { useParams } from "next/navigation";
 import { formatDate } from "@/lib/format";
@@ -55,6 +55,17 @@ export default function TagsDisplay() {
         setFormOpen(true);
     }
 
+    useEffect(() => {
+        if (!selectedIds.length) return;
+
+        function clearOnEscape(event: KeyboardEvent) {
+            if (event.key === "Escape") setSelectedIds([]);
+        }
+
+        window.addEventListener("keydown", clearOnEscape);
+        return () => window.removeEventListener("keydown", clearOnEscape);
+    }, [selectedIds.length]);
+
     function toggleSelect(tagId: string) {
         setSelectedIds((current) =>
             current.includes(tagId) ? current.filter((id) => id !== tagId) : [...current, tagId],
@@ -83,6 +94,7 @@ export default function TagsDisplay() {
                 selectedCount={selectedTags.length}
                 onEditSelected={editSelected}
                 onDeleteSelected={deleteSelected}
+                onClearSelection={() => setSelectedIds([])}
             />
 
             <section
