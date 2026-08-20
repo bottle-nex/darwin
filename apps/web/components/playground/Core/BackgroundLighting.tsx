@@ -3,7 +3,7 @@
 import { useBackgroundLightingStore } from "@/store/playground/useBackgroundLightingStore";
 
 const GLOW_RGB = "132, 114, 245";
-const GLOW_PEAK_ALPHA = 0.145;
+const GLOW_PEAK_ALPHA = 0.111;
 const GLOW_STOP_COUNT = 40;
 
 const glowStops = Array.from({ length: GLOW_STOP_COUNT + 1 }, (_, index) => {
@@ -23,7 +23,7 @@ export default function BackgroundLighting() {
     return (
         <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden bg-ink">
             <div className="absolute inset-0" style={{ background }} />
-            <div className="grain absolute inset-0 opacity-[0.16]" />
+            <div className="grain absolute inset-0 opacity-[0.01]" />
         </div>
     );
 }
