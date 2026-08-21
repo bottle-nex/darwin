@@ -5,6 +5,7 @@ import GithubService from "./service.github";
 import StorageService from "./service.storage";
 
 const FRONTEND_EXTENSIONS = new Set([".tsx", ".jsx", ".vue", ".svelte", ".css", ".scss", ".html"]);
+const STALE_GENERATING_MS = 90 * 60 * 1000;
 
 type ProductDiffSummaryRow = {
     id: string;
@@ -109,5 +110,24 @@ export default class ProductDiffService {
         }
 
         return productDiff.status === "Pending" ? { id: productDiff.id } : null;
+    }
+
+    /**
+     * Fails Product Diff rows that have been generating for longer than any run can legitimately take.
+     *
+     * A worker that dies mid-run never writes a finishing status, so the row stays Generating and
+     * the reviews panel polls it every three seconds forever. Screenshot runs take tens of minutes,
+     * which makes a single restart enough to strand rows, so this sweep runs on boot and hourly.
+     *
+     * @example
+     * await ProductDiffService.reap_stale_generating(); // 2 — two abandoned rows were closed out
+     */
+    static async reap_stale_generating(): Promise<number> {
+        const cutoff = new Date(Date.now() - STALE_GENERATING_MS);
+        const reaped = await prisma.productDiff.updateMany({
+            where: { status: "Generating", updatedAt: { lt: cutoff } },
+            data: { status: "Failed", error: "Generation did not finish" },
+        });
+        return reaped.count;
     }
 }

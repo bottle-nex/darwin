@@ -4,6 +4,7 @@ import { Client as MinioClient } from "minio";
 import { ENV } from "../configs/env";
 
 const SIGNED_URL_TTL_MS = 5 * 60 * 1000;
+const ARTIFACT_URL_TTL_MS = 15 * 60 * 1000;
 
 const EXTENSIONS: Record<string, string> = {
     "image/png": "png",
@@ -106,5 +107,32 @@ export default class StorageService {
             key,
             SIGNED_URL_TTL_MS / 1000,
         );
+    }
+
+    /**
+     * Signs several Product Diff screenshots in one request.
+     *
+     * A screenshot preview shows many images and the reader clicks between targets and screen sizes
+     * for minutes at a time, so signing them one at a time would mean a round trip per image. The
+     * longer window exists for the same reason: a link that expires while someone is still reading
+     * the page is just a broken image.
+     *
+     * @example
+     * await StorageService.signed_product_diff_urls(["product-diffs/p1/42/a-b/pd1/shots/nav/default/desktop/head.png"]);
+     * // { "product-diffs/.../head.png": "https://minio.local/...?X-Amz-Signature=..." }
+     */
+    static async signed_product_diff_urls(keys: string[]): Promise<Record<string, string>> {
+        const client = this.minio();
+        const signed = await Promise.all(
+            keys.map(async (key) => [
+                key,
+                await client.presignedGetObject(
+                    ENV.SERVER_PRODUCT_DIFF_BUCKET!,
+                    key,
+                    ARTIFACT_URL_TTL_MS / 1000,
+                ),
+            ]),
+        );
+        return Object.fromEntries(signed);
     }
 }

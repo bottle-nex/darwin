@@ -1,6 +1,6 @@
 import { Action, Permissions } from "@trymatcha/access-control";
 import { prisma } from "@trymatcha/database";
-import type { ProductDiffManifest } from "@trymatcha/types";
+import { is_product_diff_manifest_v2, type ProductDiffManifest } from "@trymatcha/types";
 import { Request, Response } from "express";
 import z from "zod";
 import Access from "../../access-control/access";
@@ -69,21 +69,26 @@ export default async function get_product_diff_controller(req: Request, res: Res
             }
         }
 
-        const urls =
-            status === "Ready" && product_diff.artifactPrefix
-                ? await Promise.all([
-                      StorageService.signed_product_diff_url(
-                          `${product_diff.artifactPrefix}/base.html`,
-                      ),
-                      StorageService.signed_product_diff_url(
-                          `${product_diff.artifactPrefix}/head.html`,
-                      ),
-                  ])
-                : [null, null];
+        const manifest = product_diff.manifest as ProductDiffManifest | null;
+        const serves_html =
+            status === "Ready" &&
+            Boolean(product_diff.artifactPrefix) &&
+            !is_product_diff_manifest_v2(manifest);
+
+        const urls = serves_html
+            ? await Promise.all([
+                  StorageService.signed_product_diff_url(
+                      `${product_diff.artifactPrefix}/base.html`,
+                  ),
+                  StorageService.signed_product_diff_url(
+                      `${product_diff.artifactPrefix}/head.html`,
+                  ),
+              ])
+            : [null, null];
 
         ResponseWriter.success(res, {
             ...ProductDiffService.to_summary({ ...product_diff, status }),
-            manifest: product_diff.manifest as ProductDiffManifest | null,
+            manifest,
             baseUrl: urls[0],
             headUrl: urls[1],
         });

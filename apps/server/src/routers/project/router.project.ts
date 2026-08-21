@@ -21,6 +21,7 @@ import update_project_config_controller from "../../controllers/project/controll
 import list_product_diffs_controller from "../../controllers/project/controller.list_product_diffs";
 import get_product_diff_controller from "../../controllers/project/controller.get_product_diff";
 import regenerate_product_diff_controller from "../../controllers/project/controller.regenerate_product_diff";
+import product_diff_artifact_urls_controller from "../../controllers/project/controller.product_diff_artifact_urls";
 import start_setup from "../../controllers/setup/controller.start_setup";
 
 const project_router: Router = Router();
@@ -38,6 +39,11 @@ project_router.get(
     "/:project_id/product-diffs/:product_diff_id",
     require_auth,
     get_product_diff_controller,
+);
+project_router.post(
+    "/:project_id/product-diffs/:product_diff_id/artifact-urls",
+    require_auth,
+    product_diff_artifact_urls_controller,
 );
 project_router.post(
     "/:project_id/product-diffs/:issue_id/regenerate",
