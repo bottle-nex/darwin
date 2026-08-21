@@ -38,6 +38,8 @@ export const PRODUCT_DIFF_URL = (project_id: string, product_diff_id: string) =>
     `${PRODUCT_DIFFS_URL(project_id)}/${product_diff_id}`;
 export const REGENERATE_PRODUCT_DIFF_URL = (project_id: string, issue_id: string) =>
     `${PRODUCT_DIFFS_URL(project_id)}/${issue_id}/regenerate`;
+export const PRODUCT_DIFF_ARTIFACT_URLS_URL = (project_id: string, product_diff_id: string) =>
+    `${PRODUCT_DIFFS_URL(project_id)}/${product_diff_id}/artifact-urls`;
 
 export const LIST_TAGS_URL = (project_id: string) => `${PROJECT_URL}/${project_id}/tags`;
 export const CREATE_TAG_URL = (project_id: string) => `${PROJECT_URL}/${project_id}/tags`;

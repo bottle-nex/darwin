@@ -15,25 +15,39 @@ const log = Logger.scope("template");
  *
  * Run with: bun run template
  *
- * Prerequisite: `packages/sandbox-mcp/dist/index.js` must be current, since the Dockerfile
- * copies it in — build it first with `bun run build --filter=@trymatcha/sandbox-mcp`.
+ * Prerequisite: `packages/sandbox-mcp/dist/index.js` and `packages/preview-runner/dist/index.js`
+ * must be current, since the Dockerfile copies them in — build them first with
+ * `bun run build --filter=@trymatcha/sandbox-mcp --filter=@trymatcha/preview-runner`.
  */
 
 const TEMPLATE_NAME = "node-py-claude-template";
 const REPO_ROOT = new URL("../../../../", import.meta.url).pathname;
 const DOCKERFILE = `${REPO_ROOT}docker/e2b.Dockerfile`;
-const SANDBOX_MCP_BUNDLE = `${REPO_ROOT}packages/sandbox-mcp/dist/index.js`;
+const BUNDLES: { name: string; path: string; filter: string }[] = [
+    {
+        name: "sandbox-mcp",
+        path: `${REPO_ROOT}packages/sandbox-mcp/dist/index.js`,
+        filter: "@trymatcha/sandbox-mcp",
+    },
+    {
+        name: "preview-runner",
+        path: `${REPO_ROOT}packages/preview-runner/dist/index.js`,
+        filter: "@trymatcha/preview-runner",
+    },
+];
 
 async function main() {
-    try {
-        readFileSync(SANDBOX_MCP_BUNDLE);
-    } catch {
-        log.error(
-            "sandbox-mcp bundle is missing — build it before building the template",
-            undefined,
-            { expected: SANDBOX_MCP_BUNDLE },
-        );
-        process.exit(1);
+    for (const bundle of BUNDLES) {
+        try {
+            readFileSync(bundle.path);
+        } catch {
+            log.error(
+                `${bundle.name} bundle is missing — build it before building the template`,
+                undefined,
+                { expected: bundle.path, build_with: `bun run build --filter=${bundle.filter}` },
+            );
+            process.exit(1);
+        }
     }
 
     const dockerfile = readFileSync(DOCKERFILE, "utf8");

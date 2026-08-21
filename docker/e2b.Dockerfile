@@ -36,3 +36,50 @@ RUN pipx install "graphifyy==${GRAPHIFY_VERSION}" \
 COPY packages/sandbox-mcp/dist/index.js /opt/matcha/sandbox-mcp/index.js
 COPY docker/sandbox-mcp.runtime.package.json /opt/matcha/sandbox-mcp/package.json
 RUN cd /opt/matcha/sandbox-mcp && npm install --omit=dev
+
+# Product Diff renders a project's real components in a real browser, so the template carries
+# Chromium and the fonts it needs. Without the font packages every glyph renders as a tofu box
+# on both revisions — the diff comes out clean and tells you nothing.
+#
+# Browsers go where Playwright looks by default for the sandbox user, not somewhere in /opt that a
+# runtime env var would have to point at. Dockerfile ENV does not reach the processes E2B runs, so
+# an /opt install builds fine and then fails every launch with "Executable doesn't exist" — a
+# failure that surfaces hours later, nowhere near its cause. The image builds as root and sandboxes
+# run as `user`, hence the chmod below.
+ENV PLAYWRIGHT_BROWSERS_PATH=/home/user/.cache/ms-playwright
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+       unzip fonts-liberation fonts-dejavu-core fonts-noto-core fonts-noto-color-emoji \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY packages/preview-runner/dist/index.js /opt/matcha/preview-runner/index.js
+COPY docker/preview-runner.runtime.package.json /opt/matcha/preview-runner/package.json
+RUN cd /opt/matcha/preview-runner \
+    && npm install --omit=dev \
+    && npx playwright install --with-deps chromium \
+    && chmod -R a+rX /opt/matcha/preview-runner /home/user/.cache/ms-playwright
+
+COPY docker/preview-check.sh /usr/local/bin/preview-check
+RUN chmod 0755 /usr/local/bin/preview-check
+
+# Prepared at build time rather than on demand: a sandbox may have no registry reach at the
+# moment it needs to install a project, and corepack would otherwise try to download the manager
+# then. Pins are ENV for the same reason the others are — the parser has no ARG.
+ENV PNPM_VERSION=11.22.0
+ENV YARN_VERSION=4.18.0
+RUN corepack enable \
+    && corepack prepare "pnpm@${PNPM_VERSION}" --activate \
+    && corepack prepare "yarn@${YARN_VERSION}" --activate
+
+# Placed in /usr/local/bin the same way gh is, rather than trusting an ENV PATH line: bun's
+# installer picks its own destination, and a PATH that is subtly wrong produces an image where
+# every bun project silently fails to install.
+ENV BUN_VERSION=1.3.2
+ENV BUN_INSTALL=/opt/matcha/bun
+RUN curl -fsSL https://bun.sh/install | bash -s "bun-v${BUN_VERSION}" \
+    && BUN_BIN="$(find /opt /root /home /usr/local -maxdepth 4 -type f -name bun 2>/dev/null | head -1)" \
+    && test -n "${BUN_BIN}" \
+    && install -m 0755 "${BUN_BIN}" /usr/local/bin/bun \
+    && chmod -R a+rX /opt/matcha/bun \
+    && bun --version

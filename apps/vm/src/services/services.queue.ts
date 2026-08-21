@@ -12,6 +12,8 @@ import {
 import ProductDiffRunner from "./service.product_diff";
 
 const log = Logger.scope("queue");
+const PRODUCT_DIFF_LOCK_MS = 60_000;
+const PRODUCT_DIFF_STALL_CHECK_MS = 30_000;
 
 export default class QueueService {
     private onboard_consumer: Worker<OnboardJobData> | null = null;
@@ -95,7 +97,13 @@ export default class QueueService {
         this.product_diff_consumer = new Worker<ProductDiffJobData>(
             QueueName.ProductDiff,
             async (job: Job<ProductDiffJobData>) => ProductDiffRunner.run(job.data.productDiffId),
-            { connection: queue_config.connection!, concurrency: 1 },
+            {
+                connection: queue_config.connection!,
+                concurrency: ENV.SERVER_PRODUCT_DIFF_CONCURRENCY,
+                lockDuration: PRODUCT_DIFF_LOCK_MS,
+                stalledInterval: PRODUCT_DIFF_STALL_CHECK_MS,
+                maxStalledCount: 0,
+            },
         );
 
         this.product_diff_consumer.on("completed", (job) => {
@@ -111,7 +119,12 @@ export default class QueueService {
         await this.product_diff_producer.add(
             "generate",
             { productDiffId: product_diff_id },
-            { jobId: product_diff_id, removeOnComplete: true, removeOnFail: true },
+            {
+                jobId: product_diff_id,
+                attempts: 1,
+                removeOnComplete: true,
+                removeOnFail: true,
+            },
         );
         log.info("product diff enqueued", { productDiff: product_diff_id });
     }

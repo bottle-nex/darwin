@@ -17,6 +17,7 @@ const log = Logger.scope("template");
 
 const TEMPLATE_NAME = "node-py-claude-template";
 const SANDBOX_MCP_ENTRY = "/opt/matcha/sandbox-mcp/index.js";
+const PREVIEW_RUNNER_ENTRY = "/opt/matcha/preview-runner/index.js";
 
 interface Requirement {
     name: string;
@@ -40,6 +41,19 @@ const REQUIREMENTS: Requirement[] = [
         command: "graphify --version",
         needed_for: "building and querying the code graph",
     },
+    {
+        name: "preview-runner",
+        command: `node ${PREVIEW_RUNNER_ENTRY} doctor | jq -e '.ok' > /dev/null && node ${PREVIEW_RUNNER_ENTRY} doctor | jq -r '.chromiumVersion'`,
+        needed_for: "launching Chromium to screenshot Product Diff targets",
+    },
+    {
+        name: "preview-check",
+        command: "preview-check --help",
+        needed_for: "the harness agent's render oracle",
+    },
+    { name: "pnpm", command: "pnpm --version", needed_for: "installing pnpm-lock.yaml projects" },
+    { name: "yarn", command: "yarn --version", needed_for: "installing yarn.lock projects" },
+    { name: "bun", command: "bun --version", needed_for: "installing bun.lock projects" },
 ];
 
 async function main() {

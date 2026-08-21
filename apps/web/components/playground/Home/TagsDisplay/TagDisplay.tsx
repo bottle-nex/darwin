@@ -10,7 +10,7 @@ export default function TagDisplay({ name, color, className }: TagDisplayProps) 
     return (
         <span
             className={cn(
-                "inline-flex h-5 max-w-full items-center gap-1.5 rounded-full px-2 text-[12px] leading-none text-neutral-200 ring-[0.25px] ring-graphite",
+                "inline-flex h-5 max-w-full items-center gap-1.5 rounded-full px-2 text-[12px] leading-none text-neutral-200 ring-[0.5px] ring-white/10",
                 className,
             )}
         >

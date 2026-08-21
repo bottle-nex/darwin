@@ -8,12 +8,16 @@ const envSchema = z.object({
     DATABASE_URL: z.string().min(1, "Database URL is required"),
     SERVER_REDIS_URL: z.url("Invalid Redis URL"),
     SERVER_E2B_API_KEY: z.string().nonempty(),
+    SERVER_SANDBOX_TEMPLATE: z.string().min(1).default("node-py-claude-template"),
     SERVER_CLAUDE_CODE_OAUTH_TOKEN: z.string().min(1, "Claude Code OAuth token is required"),
     SERVER_BRIEF_MODEL: z.string().default("claude-sonnet-5"),
     SERVER_BRIEF_EFFORT: z.enum(["low", "medium", "high", "xhigh", "max"]).default("low"),
     SERVER_SOLVE_MODEL: z.string().default("claude-sonnet-5"),
     SERVER_SOLVE_EFFORT: z.enum(["low", "medium", "high", "xhigh", "max"]).default("high"),
     SERVER_VM_DISPATCH_CONCURRENCY: z.coerce.number().int().min(1).default(10),
+    SERVER_PRODUCT_DIFF_CONCURRENCY: z.coerce.number().int().min(1).default(2),
+    SERVER_PREVIEW_MODEL: z.string().default("claude-sonnet-5"),
+    SERVER_PREVIEW_EFFORT: z.enum(["low", "medium", "high", "xhigh", "max"]).default("high"),
     SERVER_SECRET_ENCRYPTION_KEY: z
         .string()
         .regex(/^[0-9a-fA-F]{64}$/, "Must be a 64-character hex string (32 bytes for AES-256)"),

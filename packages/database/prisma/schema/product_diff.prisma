@@ -23,4 +23,5 @@ enum ProductDiffStatus {
   Ready
   Failed
   Stale
+  Unsupported
 }

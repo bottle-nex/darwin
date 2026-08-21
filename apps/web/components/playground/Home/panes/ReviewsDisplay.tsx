@@ -1,26 +1,55 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import { FiExternalLink, FiGitPullRequest, FiRefreshCw } from "react-icons/fi";
+import {
+    is_product_diff_manifest_v2,
+    type ProductDiffShot,
+    type ProductDiffViewport,
+} from "@trymatcha/types";
 import { Button } from "@/components/ui/button";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { useProductDiff } from "@/hooks/project/useProductDiff";
+import { useProductDiffArtifacts } from "@/hooks/project/useProductDiffArtifacts";
 import { useProductDiffs } from "@/hooks/project/useProductDiffs";
 import { useRegenerateProductDiff } from "@/hooks/project/useRegenerateProductDiff";
 import { cn } from "@/lib/utils";
 
 const SELECT =
     "h-8 rounded-md border border-white/10 bg-white/5 px-2 text-[11px] text-neutral-200 outline-none focus:border-primary/50";
-
-const VIEWPORTS = {
+const LEGACY_VIEWPORTS = {
     Desktop: "100%",
     Tablet: "768px",
     Mobile: "390px",
 } as const;
 
-function postState(frame: HTMLIFrameElement | null, targetId?: string, stateId?: string) {
-    if (!targetId || !stateId) return;
-    frame?.contentWindow?.postMessage({ type: "product-diff-state", targetId, stateId }, "*");
+const COMPARE_MODES = [
+    { id: "split", label: "Side by side" },
+    { id: "overlay", label: "Overlay" },
+    { id: "diff", label: "Diff only" },
+] as const;
+type CompareMode = (typeof COMPARE_MODES)[number]["id"];
+
+const OUTCOME_SUFFIX: Record<string, string> = {
+    Added: " · added",
+    Removed: " · removed",
+    Unavailable: " · unavailable",
+};
+
+function change_tone(percentage: number | null): string {
+    if (percentage === null) return "border-white/10 bg-white/5 text-neutral-400";
+    if (percentage < 0.1) return "border-emerald-400/20 bg-emerald-400/8 text-emerald-200";
+    if (percentage < 5) return "border-amber-400/20 bg-amber-400/8 text-amber-200";
+    return "border-rose-400/20 bg-rose-400/8 text-rose-200";
+}
+
+function change_label(shot: ProductDiffShot | undefined): string {
+    if (!shot) return "no capture";
+    if (shot.outcome === "Added") return "added in this PR";
+    if (shot.outcome === "Removed") return "removed in this PR";
+    if (shot.outcome === "Unavailable") return "could not render";
+    if (shot.diffPercentage === null) return "not compared";
+    return `${shot.diffPercentage.toFixed(2)}% changed`;
 }
 
 export default function ReviewsDisplay() {
@@ -32,24 +61,33 @@ export default function ReviewsDisplay() {
         : (diffs[0]?.id ?? null);
     const { data: detail, isPending: detailPending } = useProductDiff(project?.id, selected);
     const regenerate = useRegenerateProductDiff();
+
     const [targetId, setTargetId] = useState("");
     const [stateId, setStateId] = useState("");
-    const [viewport, setViewport] = useState<keyof typeof VIEWPORTS>("Desktop");
-    const baseFrame = useRef<HTMLIFrameElement>(null);
-    const headFrame = useRef<HTMLIFrameElement>(null);
+    const [viewportId, setViewportId] = useState("");
+    const [mode, setMode] = useState<CompareMode>("split");
+    const [overlay, setOverlay] = useState(100);
 
-    const target =
-        detail?.manifest?.targets.find((item) => item.id === targetId) ??
-        detail?.manifest?.targets[0];
+    const stored = detail?.manifest ?? null;
+    const manifest = is_product_diff_manifest_v2(stored) ? stored : null;
+    const target = manifest?.targets.find((item) => item.id === targetId) ?? manifest?.targets[0];
     const state = target?.states.find((item) => item.id === stateId) ?? target?.states[0];
+    const viewport: ProductDiffViewport | undefined =
+        manifest?.viewports.find((item) => item.id === viewportId) ?? manifest?.viewports[0];
+    const shot = target?.shots.find(
+        (item) => item.stateId === state?.id && item.viewportId === viewport?.id,
+    );
 
-    useEffect(() => {
-        postState(baseFrame.current, target?.id, state?.id);
-        postState(headFrame.current, target?.id, state?.id);
-    }, [state?.id, target?.id]);
+    const keys = useMemo(() => {
+        if (!target) return [];
+        return target.shots
+            .flatMap((item) => [item.baseKey, item.headKey, item.diffKey])
+            .filter((key): key is string => key !== null);
+    }, [target]);
+    const { data: urls = {} } = useProductDiffArtifacts(project?.id, selected, keys);
 
     function changeTarget(nextId: string) {
-        const next = detail?.manifest?.targets.find((item) => item.id === nextId);
+        const next = manifest?.targets.find((item) => item.id === nextId);
         setTargetId(nextId);
         setStateId(next?.states[0]?.id ?? "");
     }
@@ -134,63 +172,104 @@ export default function ReviewsDisplay() {
                                 </Button>
                             </div>
 
-                            {detail.status === "Ready" && target && state && (
-                                <div className="mt-4 flex flex-wrap items-center gap-3">
-                                    <label className="flex items-center gap-2 text-[11px] text-neutral-500">
-                                        Target
-                                        <select
-                                            className={SELECT}
-                                            value={target.id}
-                                            onChange={(event) => changeTarget(event.target.value)}
-                                        >
-                                            {detail.manifest?.targets.map((item) => (
-                                                <option key={item.id} value={item.id}>
+                            {detail.status === "Ready" &&
+                                manifest &&
+                                target &&
+                                state &&
+                                viewport && (
+                                    <div className="mt-4 flex flex-wrap items-center gap-3">
+                                        <label className="flex items-center gap-2 text-[11px] text-neutral-500">
+                                            Target
+                                            <select
+                                                className={SELECT}
+                                                value={target.id}
+                                                onChange={(event) =>
+                                                    changeTarget(event.target.value)
+                                                }
+                                            >
+                                                {manifest.targets.map((item) => (
+                                                    <option key={item.id} value={item.id}>
+                                                        {item.label}
+                                                        {OUTCOME_SUFFIX[item.outcome] ?? ""}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </label>
+                                        <label className="flex items-center gap-2 text-[11px] text-neutral-500">
+                                            State
+                                            <select
+                                                className={SELECT}
+                                                value={state.id}
+                                                onChange={(event) => setStateId(event.target.value)}
+                                            >
+                                                {target.states.map((item) => (
+                                                    <option key={item.id} value={item.id}>
+                                                        {item.label}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </label>
+                                        <label className="flex items-center gap-2 text-[11px] text-neutral-500">
+                                            Viewport
+                                            <select
+                                                className={SELECT}
+                                                value={viewport.id}
+                                                onChange={(event) =>
+                                                    setViewportId(event.target.value)
+                                                }
+                                            >
+                                                {manifest.viewports.map((item) => (
+                                                    <option key={item.id} value={item.id}>
+                                                        {item.label} · {item.width}×{item.height}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </label>
+                                        <div className="flex overflow-hidden rounded-md border border-white/10">
+                                            {COMPARE_MODES.map((item) => (
+                                                <button
+                                                    key={item.id}
+                                                    type="button"
+                                                    onClick={() => setMode(item.id)}
+                                                    className={cn(
+                                                        "px-2.5 py-1.5 text-[11px]",
+                                                        mode === item.id
+                                                            ? "bg-primary/15 text-primary"
+                                                            : "text-neutral-400 hover:bg-white/5",
+                                                    )}
+                                                >
                                                     {item.label}
-                                                </option>
+                                                </button>
                                             ))}
-                                        </select>
-                                    </label>
-                                    <label className="flex items-center gap-2 text-[11px] text-neutral-500">
-                                        State
-                                        <select
-                                            className={SELECT}
-                                            value={state.id}
-                                            onChange={(event) => setStateId(event.target.value)}
+                                        </div>
+                                        <span
+                                            className={cn(
+                                                "rounded-full border px-2.5 py-1 text-[10px]",
+                                                change_tone(shot?.diffPercentage ?? null),
+                                            )}
                                         >
-                                            {target.states.map((item) => (
-                                                <option key={item.id} value={item.id}>
-                                                    {item.label}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </label>
-                                    <label className="flex items-center gap-2 text-[11px] text-neutral-500">
-                                        Viewport
-                                        <select
-                                            className={SELECT}
-                                            value={viewport}
-                                            onChange={(event) =>
-                                                setViewport(
-                                                    event.target.value as keyof typeof VIEWPORTS,
-                                                )
-                                            }
-                                        >
-                                            {Object.keys(VIEWPORTS).map((name) => (
-                                                <option key={name}>{name}</option>
-                                            ))}
-                                        </select>
-                                    </label>
-                                    <span className="ml-auto rounded-full border border-amber-400/20 bg-amber-400/8 px-2.5 py-1 text-[10px] text-amber-200">
-                                        Visual approximation
-                                    </span>
-                                </div>
-                            )}
+                                            {change_label(shot)}
+                                        </span>
+                                        <span className="ml-auto rounded-full border border-emerald-400/20 bg-emerald-400/8 px-2.5 py-1 text-[10px] text-emerald-200">
+                                            Rendered from source · {manifest.framework}
+                                        </span>
+                                    </div>
+                                )}
                         </header>
 
                         {(detail.status === "Pending" || detail.status === "Generating") && (
                             <Status
                                 title="Generating Product Diff"
-                                body="One clean preview sandbox is working. This page refreshes automatically."
+                                body="A clean sandbox is building both revisions and photographing them. This page refreshes automatically."
+                            />
+                        )}
+                        {detail.status === "Unsupported" && (
+                            <Status
+                                title="Not supported yet"
+                                body={
+                                    detail.error ??
+                                    "Product Diff currently supports Next.js projects only."
+                                }
                             />
                         )}
                         {(detail.status === "Failed" || detail.status === "Stale") && (
@@ -210,13 +289,8 @@ export default function ReviewsDisplay() {
                                         onClick={() =>
                                             project &&
                                             regenerate.mutate(
-                                                {
-                                                    projectId: project.id,
-                                                    issueId: detail.issueId,
-                                                },
-                                                {
-                                                    onSuccess: ({ id }) => setSelectedId(id),
-                                                },
+                                                { projectId: project.id, issueId: detail.issueId },
+                                                { onSuccess: ({ id }) => setSelectedId(id) },
                                             )
                                         }
                                     >
@@ -226,35 +300,34 @@ export default function ReviewsDisplay() {
                                 }
                             />
                         )}
-                        {detail.status === "Ready" && detail.baseUrl && detail.headUrl && (
+                        {detail.status === "Ready" && manifest && (
                             <main className="min-h-0 flex-1 overflow-auto p-4">
-                                <div className="grid min-w-[720px] grid-cols-2 gap-4">
-                                    <Preview
-                                        title="Base"
-                                        url={detail.baseUrl}
-                                        frameRef={baseFrame}
-                                        width={VIEWPORTS[viewport]}
-                                        onLoad={() =>
-                                            postState(baseFrame.current, target?.id, state?.id)
-                                        }
+                                {shot ? (
+                                    <Triptych
+                                        shot={shot}
+                                        urls={urls}
+                                        mode={mode}
+                                        overlay={overlay}
+                                        onOverlayChange={setOverlay}
                                     />
-                                    <Preview
-                                        title="Head"
-                                        url={detail.headUrl}
-                                        frameRef={headFrame}
-                                        width={VIEWPORTS[viewport]}
-                                        onLoad={() =>
-                                            postState(headFrame.current, target?.id, state?.id)
-                                        }
-                                    />
-                                </div>
-                                {detail.manifest?.warnings.map((warning) => (
+                                ) : (
+                                    <p className="text-[11px] text-neutral-500">
+                                        Nothing was captured for this combination.
+                                    </p>
+                                )}
+                                {manifest.warnings.map((warning) => (
                                     <p key={warning} className="mt-2 text-[10px] text-amber-300/80">
                                         {warning}
                                     </p>
                                 ))}
                             </main>
                         )}
+                        {detail.status === "Ready" &&
+                            !manifest &&
+                            detail.baseUrl &&
+                            detail.headUrl && (
+                                <LegacyPreview baseUrl={detail.baseUrl} headUrl={detail.headUrl} />
+                            )}
                     </>
                 )}
             </section>
@@ -280,35 +353,127 @@ function Status({
     );
 }
 
-function Preview({
-    title,
-    url,
-    frameRef,
-    width,
-    onLoad,
-}: {
-    title: string;
-    url: string;
-    frameRef: React.RefObject<HTMLIFrameElement | null>;
-    width: string;
-    onLoad: () => void;
-}) {
+function Shot({ title, src, absent }: { title: string; src: string | undefined; absent: string }) {
     return (
         <article className="min-w-0 overflow-hidden rounded-lg border border-white/8 bg-white/[0.025]">
             <div className="border-b border-white/7 px-3 py-2 text-[10px] font-medium text-neutral-400">
                 {title}
             </div>
-            <div className="h-[560px] overflow-auto bg-neutral-900 p-2">
-                <iframe
-                    ref={frameRef}
-                    src={url}
-                    sandbox="allow-scripts"
-                    title={`${title} Product Diff`}
-                    onLoad={onLoad}
-                    style={{ width, maxWidth: "100%" }}
-                    className="mx-auto h-full border-0 bg-white"
-                />
+            <div className="flex min-h-[220px] items-start justify-center bg-neutral-900 p-2">
+                {src ? (
+                    <img src={src} alt={title} className="max-w-full" />
+                ) : (
+                    <p className="self-center text-[11px] text-neutral-500">{absent}</p>
+                )}
             </div>
         </article>
+    );
+}
+
+function Triptych({
+    shot,
+    urls,
+    mode,
+    overlay,
+    onOverlayChange,
+}: {
+    shot: ProductDiffShot;
+    urls: Record<string, string>;
+    mode: CompareMode;
+    overlay: number;
+    onOverlayChange: (value: number) => void;
+}) {
+    const base = shot.baseKey ? urls[shot.baseKey] : undefined;
+    const head = shot.headKey ? urls[shot.headKey] : undefined;
+    const diff = shot.diffKey ? urls[shot.diffKey] : undefined;
+
+    if (mode === "diff") {
+        return (
+            <Shot
+                title="What changed"
+                src={diff}
+                absent={shot.error ?? "No visual change between the two revisions."}
+            />
+        );
+    }
+
+    if (mode === "overlay") {
+        return (
+            <div className="space-y-3">
+                <div className="relative overflow-hidden rounded-lg border border-white/8 bg-neutral-900">
+                    {base && <img src={base} alt="Base" className="max-w-full" />}
+                    {head && (
+                        <img
+                            src={head}
+                            alt="Head"
+                            className="absolute inset-0 max-w-full"
+                            style={{ opacity: overlay / 100 }}
+                        />
+                    )}
+                    {!base && !head && (
+                        <p className="p-6 text-[11px] text-neutral-500">Nothing to overlay.</p>
+                    )}
+                </div>
+                <label className="flex items-center gap-3 text-[11px] text-neutral-500">
+                    Base
+                    <input
+                        type="range"
+                        min={0}
+                        max={100}
+                        value={overlay}
+                        onChange={(event) => onOverlayChange(Number(event.target.value))}
+                        className="h-1 flex-1 accent-primary"
+                    />
+                    Head
+                </label>
+            </div>
+        );
+    }
+
+    return (
+        <div className="grid min-w-[720px] grid-cols-3 gap-4">
+            <Shot title="Base" src={base} absent="Added in this PR" />
+            <Shot title="Head" src={head} absent="Removed in this PR" />
+            <Shot
+                title="What changed"
+                src={diff}
+                absent={shot.error ?? "No visual change between the two revisions."}
+            />
+        </div>
+    );
+}
+
+function LegacyPreview({ baseUrl, headUrl }: { baseUrl: string; headUrl: string }) {
+    return (
+        <main className="min-h-0 flex-1 overflow-auto p-4">
+            <p className="mb-3 text-[10px] text-amber-300/80">
+                This preview was generated with an older approximation-based format. Regenerate it
+                to get screenshots of the real components.
+            </p>
+            <div className="grid min-w-[720px] grid-cols-2 gap-4">
+                {[
+                    { title: "Base", url: baseUrl },
+                    { title: "Head", url: headUrl },
+                ].map((frame) => (
+                    <article
+                        key={frame.title}
+                        className="min-w-0 overflow-hidden rounded-lg border border-white/8 bg-white/[0.025]"
+                    >
+                        <div className="border-b border-white/7 px-3 py-2 text-[10px] font-medium text-neutral-400">
+                            {frame.title}
+                        </div>
+                        <div className="h-[560px] overflow-auto bg-neutral-900 p-2">
+                            <iframe
+                                src={frame.url}
+                                sandbox="allow-scripts"
+                                title={`${frame.title} Product Diff`}
+                                style={{ width: LEGACY_VIEWPORTS.Desktop, maxWidth: "100%" }}
+                                className="mx-auto h-full border-0 bg-white"
+                            />
+                        </div>
+                    </article>
+                ))}
+            </div>
+        </main>
     );
 }

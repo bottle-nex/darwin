@@ -45,6 +45,10 @@ model Project {
   workers    Worker[]
   maxWorkers Int      @default(1)
 
+  previewSnapshotId String?
+  previewDepsHash   String?
+  previewSnapshotAt DateTime?
+
   projectConfig ProjectConfig?
 
   @@unique([orgId, slug])

@@ -136,6 +136,7 @@ export const ProductDiffStatus = {
     Ready: "Ready",
     Failed: "Failed",
     Stale: "Stale",
+    Unsupported: "Unsupported",
 } as const;
 export type ProductDiffStatus = (typeof ProductDiffStatus)[keyof typeof ProductDiffStatus];
 
