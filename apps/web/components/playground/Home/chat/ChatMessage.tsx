@@ -10,9 +10,8 @@ import PlaygroundAvatar, {
 import {
     reference_issues,
     to_plain_text,
-    type Chat,
-    type ProjectChat,
     type ReferencedIssueLabel,
+    type ThreadMessage,
 } from "@trymatcha/types";
 import MessageBody from "./MessageBody";
 import IssueReferenceCard from "./IssueReferenceCard";
@@ -21,7 +20,7 @@ import MessageReactions from "./MessageReactions";
 import { OPTIMISTIC_ID_PREFIX } from "@/hooks/chats/useChats";
 import { useReactionPending } from "@/hooks/chats/useMessageReactions";
 
-type AnyChat = Chat | ProjectChat;
+type AnyChat = ThreadMessage;
 
 const NAME_TONE_TEXT: Record<AvatarTone, string> = {
     indigo: "text-indigo-300",

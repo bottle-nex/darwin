@@ -54,6 +54,12 @@ export type NotificationJobData =
           mentionedById: string;
       }
     | {
+          action: "team_chat.mention";
+          teamChatId: string;
+          memberId: string;
+          mentionedById: string;
+      }
+    | {
           action: "issue.status_changed";
           issueId: string;
           recipientId: string;
@@ -83,6 +89,7 @@ export type NotificationJobData =
           actorId: string;
           chatId?: string;
           projectChatId?: string;
+          teamChatId?: string;
       }
     | {
           action: "issue.deleted";
@@ -122,4 +129,5 @@ export type NotificationJobData =
           emoji: string;
           chatId?: string;
           projectChatId?: string;
+          teamChatId?: string;
       };

@@ -117,6 +117,60 @@ export default class MessageReactionService {
         );
     }
 
+    static async change_team_chat_reaction(team_chat_id: string, user_id: string, emoji: string) {
+        return MessageReactionService.with_serializable_retry(() =>
+            prisma.$transaction(
+                async (transaction): Promise<ReactionMutation> => {
+                    const existing = await transaction.teamChatReaction.findUnique({
+                        where: {
+                            teamChatId_userId: {
+                                teamChatId: team_chat_id,
+                                userId: user_id,
+                            },
+                        },
+                        select: { id: true, emoji: true },
+                    });
+                    const is_removal = existing?.emoji === emoji;
+                    const reaction = is_removal
+                        ? null
+                        : await transaction.teamChatReaction.upsert({
+                              where: {
+                                  teamChatId_userId: {
+                                      teamChatId: team_chat_id,
+                                      userId: user_id,
+                                  },
+                              },
+                              update: { emoji },
+                              create: { teamChatId: team_chat_id, userId: user_id, emoji },
+                              select: { id: true },
+                          });
+                    if (is_removal && existing) {
+                        await transaction.teamChatReaction.delete({ where: { id: existing.id } });
+                    }
+
+                    const affected_emojis =
+                        existing && existing.emoji !== emoji ? [existing.emoji, emoji] : [emoji];
+                    const groups = await transaction.teamChatReaction.groupBy({
+                        by: ["emoji"],
+                        where: { teamChatId: team_chat_id, emoji: { in: affected_emojis } },
+                        _count: { _all: true },
+                    });
+                    const counts = new Map(groups.map((group) => [group.emoji, group._count._all]));
+
+                    return {
+                        updates: affected_emojis.map((affected_emoji) => ({
+                            emoji: affected_emoji,
+                            count: counts.get(affected_emoji) ?? 0,
+                            actorReacted: !is_removal && affected_emoji === emoji,
+                        })),
+                        reactionId: reaction?.id,
+                    };
+                },
+                { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
+            ),
+        );
+    }
+
     static async chat_summaries(chat_ids: string[], viewer_id: string) {
         if (chat_ids.length === 0) return new Map<string, ReactionSummary[]>();
 
@@ -168,6 +222,34 @@ export default class MessageReactionService {
             })),
             viewer_reactions.map((reaction) => ({
                 messageId: reaction.projectChatId,
+                emoji: reaction.emoji,
+            })),
+        );
+    }
+
+    static async team_chat_summaries(chat_ids: string[], viewer_id: string) {
+        if (chat_ids.length === 0) return new Map<string, ReactionSummary[]>();
+
+        const [groups, viewer_reactions] = await Promise.all([
+            prisma.teamChatReaction.groupBy({
+                by: ["teamChatId", "emoji"],
+                where: { teamChatId: { in: chat_ids } },
+                _count: { _all: true },
+            }),
+            prisma.teamChatReaction.findMany({
+                where: { teamChatId: { in: chat_ids }, userId: viewer_id },
+                select: { teamChatId: true, emoji: true },
+            }),
+        ]);
+
+        return MessageReactionService.to_summaries(
+            groups.map((group) => ({
+                messageId: group.teamChatId,
+                emoji: group.emoji,
+                count: group._count._all,
+            })),
+            viewer_reactions.map((reaction) => ({
+                messageId: reaction.teamChatId,
                 emoji: reaction.emoji,
             })),
         );

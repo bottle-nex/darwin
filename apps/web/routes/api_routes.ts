@@ -97,6 +97,7 @@ export const CHAT_URL = (issue_id: string) => `${CHATS_URL}/${issue_id}`;
 
 export const PROJECT_CHATS_URL = API_URL + "/project-chats";
 export const PROJECT_CHAT_URL = (project_id: string) => `${PROJECT_CHATS_URL}/${project_id}`;
+export const TEAM_CHAT_URL = (team_id: string) => `${PROJECT_CHATS_URL}/team/${team_id}`;
 
 export const NOTIFICATIONS_URL = API_URL + "/notifications";
 export const NOTIFICATIONS_READ_URL = NOTIFICATIONS_URL + "/read";

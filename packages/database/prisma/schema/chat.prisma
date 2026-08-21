@@ -43,10 +43,10 @@ model ProjectChat {
   isDeleted   Boolean @default(false)
   repliedToId String?
 
-  project    Project            @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  sender     User?              @relation(fields: [senderId], references: [id], onDelete: SetNull)
-  repliedTo  ProjectChat?       @relation("ProjectChatReplies", fields: [repliedToId], references: [id], onDelete: SetNull)
-  replies    ProjectChat[]      @relation("ProjectChatReplies")
+  project    Project               @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  sender     User?                 @relation(fields: [senderId], references: [id], onDelete: SetNull)
+  repliedTo  ProjectChat?          @relation("ProjectChatReplies", fields: [repliedToId], references: [id], onDelete: SetNull)
+  replies    ProjectChat[]         @relation("ProjectChatReplies")
   references MessageReference[]
   reactions  ProjectChatReaction[]
 
@@ -72,6 +72,43 @@ model ProjectChatReaction {
   @@index([userId])
 }
 
+model TeamChat {
+  id          String  @id @default(cuid())
+  teamId      String
+  senderId    String?
+  message     String  @db.Text
+  isDeleted   Boolean @default(false)
+  repliedToId String?
+
+  team       Team               @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  sender     User?              @relation(fields: [senderId], references: [id], onDelete: SetNull)
+  repliedTo  TeamChat?          @relation("TeamChatReplies", fields: [repliedToId], references: [id], onDelete: SetNull)
+  replies    TeamChat[]         @relation("TeamChatReplies")
+  references MessageReference[]
+  reactions  TeamChatReaction[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([teamId])
+}
+
+model TeamChatReaction {
+  id         String @id @default(cuid())
+  teamChatId String
+  userId     String
+  emoji      String @db.VarChar(32)
+
+  teamChat TeamChat @relation(fields: [teamChatId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([teamChatId, userId])
+  @@index([teamChatId])
+  @@index([userId])
+}
+
 /// An entity tagged inside a message body. The body stores an opaque
 /// `@[member:<id>]` / `#[issue:<id>]` token, so this row carries no offset —
 /// it exists to make the reverse lookup ("where is this issue discussed?")
@@ -82,11 +119,13 @@ model MessageReference {
   id            String  @id @default(cuid())
   chatId        String?
   projectChatId String?
+  teamChatId    String?
   memberId      String?
   issueId       String?
 
   chat        Chat?          @relation(fields: [chatId], references: [id], onDelete: Cascade)
   projectChat ProjectChat?   @relation(fields: [projectChatId], references: [id], onDelete: Cascade)
+  teamChat    TeamChat?      @relation(fields: [teamChatId], references: [id], onDelete: Cascade)
   member      ProjectMember? @relation(fields: [memberId], references: [id], onDelete: Cascade)
   issue       Issue?         @relation(fields: [issueId], references: [id], onDelete: Cascade)
 
@@ -94,6 +133,7 @@ model MessageReference {
 
   @@index([chatId])
   @@index([projectChatId])
+  @@index([teamChatId])
   @@index([memberId])
   @@index([issueId])
 }

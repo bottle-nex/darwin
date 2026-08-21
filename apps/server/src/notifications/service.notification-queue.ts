@@ -5,6 +5,7 @@ import IssueAssignedNotification from "./actions/action.issue-assigned";
 import IssueUnassignedNotification from "./actions/action.issue-unassigned";
 import ChatMentionNotification from "./actions/action.chat-mention";
 import ProjectChatMentionNotification from "./actions/action.project-chat-mention";
+import TeamChatMentionNotification from "./actions/action.team-chat-mention";
 import IssueStatusChangedNotification from "./actions/action.issue-status-changed";
 import IssuePriorityChangedNotification from "./actions/action.issue-priority-changed";
 import IssueMovedNotification from "./actions/action.issue-moved";
@@ -55,6 +56,8 @@ export default class NotificationQueueService {
                 return ChatMentionNotification.handle(data);
             case "project_chat.mention":
                 return ProjectChatMentionNotification.handle(data);
+            case "team_chat.mention":
+                return TeamChatMentionNotification.handle(data);
             case "issue.status_changed":
                 return IssueStatusChangedNotification.handle(data);
             case "issue.priority_changed":
@@ -105,6 +108,8 @@ export default class NotificationQueueService {
                 return `${data.action}:${data.chatId}:${data.memberId}`;
             case "project_chat.mention":
                 return `${data.action}:${data.projectChatId}:${data.memberId}`;
+            case "team_chat.mention":
+                return `${data.action}:${data.teamChatId}:${data.memberId}`;
             case "issue.status_changed":
                 return `${data.action}:${data.issueId}:${data.recipientId}~${data.toStatus}`;
             case "issue.priority_changed":
@@ -114,7 +119,7 @@ export default class NotificationQueueService {
             case "issue.commented":
                 return `${data.action}:${data.chatId}:${data.recipientId}`;
             case "issue.referenced":
-                return `${data.action}:${data.chatId ?? data.projectChatId}:${data.issueId}:${data.recipientId}`;
+                return `${data.action}:${data.chatId ?? data.projectChatId ?? data.teamChatId}:${data.issueId}:${data.recipientId}`;
             case "issue.deleted":
                 return `${data.action}:${data.issueId}:${data.recipientId}`;
             case "invite.accepted":

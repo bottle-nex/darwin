@@ -1,4 +1,4 @@
-import { BackgroundLightingColor, ProjectRole } from "@trymatcha/types";
+import { BackgroundLightingColor, ProjectRole, TeamRole } from "@trymatcha/types";
 
 export type PlanStatus = "Pending" | "Generating" | "Ready" | "Failed";
 
@@ -35,6 +35,7 @@ export interface ProjectTeam {
     id: string;
     name: string;
     slug: string;
+    viewerRole: TeamRole | null;
 }
 
 export interface ProjectDetail {

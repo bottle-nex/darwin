@@ -4,13 +4,13 @@ import type { ComponentProps } from "react";
 import { MdContentCopy } from "react-icons/md";
 import { BsReply } from "react-icons/bs";
 import { HiOutlineFaceSmile } from "react-icons/hi2";
-import { to_plain_text, type Chat, type ProjectChat } from "@trymatcha/types";
+import { to_plain_text, type ThreadMessage } from "@trymatcha/types";
 import { Button } from "@/components/ui/button";
 import EmojiPicker from "@/components/ui/EmojiPicker";
 import { cn } from "@/lib/utils";
 import { HiOutlineTrash } from "react-icons/hi";
 
-type AnyChat = Chat | ProjectChat;
+type AnyChat = ThreadMessage;
 
 export function ActionButton({ className, ...props }: ComponentProps<typeof Button>) {
     return (

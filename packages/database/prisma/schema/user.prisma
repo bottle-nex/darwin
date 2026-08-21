@@ -44,12 +44,14 @@ model User {
   assignedIssues Issue[] @relation(name: "IssueAssignees")
   createdTags    Tag[]   @relation(name: "TagCreator")
 
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  chats        Chat[]
-  projectChats ProjectChat[]
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @updatedAt
+  chats                Chat[]
+  projectChats         ProjectChat[]
+  teamChats            TeamChat[]
   chatReactions        ChatReaction[]
   projectChatReactions ProjectChatReaction[]
+  teamChatReactions    TeamChatReaction[]
 
   customColumnOrders CustomColumnOrder[]
   notifications      Notification[]

@@ -60,29 +60,81 @@ export default class MessageReactedNotification {
             return;
         }
 
-        if (!data.projectChatId) return;
-        const project_chat = await prisma.projectChat.findUnique({
-            where: { id: data.projectChatId },
+        if (data.projectChatId) {
+            const project_chat = await prisma.projectChat.findUnique({
+                where: { id: data.projectChatId },
+                select: {
+                    id: true,
+                    isDeleted: true,
+                    projectId: true,
+                    project: {
+                        select: { slug: true, organization: { select: { slug: true } } },
+                    },
+                },
+            });
+            if (!project_chat || project_chat.isDeleted) return;
+
+            const notification = await prisma.notification.create({
+                data: {
+                    userId: data.recipientId,
+                    type: NotificationType.MessageReacted,
+                    payload: {
+                        projectChatId: project_chat.id,
+                        projectId: project_chat.projectId,
+                        projectSlug: project_chat.project.slug,
+                        orgSlug: project_chat.project.organization.slug,
+                        actorId: data.actorId,
+                        actorName: actor.name ?? actor.email,
+                        emoji: data.emoji,
+                    },
+                },
+            });
+            await MessageReactedNotification.publish(notification);
+            return;
+        }
+
+        if (!data.teamChatId) return;
+        const team_chat = await prisma.teamChat.findUnique({
+            where: { id: data.teamChatId },
             select: {
                 id: true,
                 isDeleted: true,
-                projectId: true,
-                project: {
-                    select: { slug: true, organization: { select: { slug: true } } },
+                teamId: true,
+                team: {
+                    select: {
+                        name: true,
+                        project: {
+                            select: {
+                                id: true,
+                                slug: true,
+                                organization: { select: { slug: true } },
+                            },
+                        },
+                    },
                 },
             },
         });
-        if (!project_chat || project_chat.isDeleted) return;
+        if (!team_chat || team_chat.isDeleted) return;
+
+        const membership = await prisma.teamMember.findUnique({
+            where: {
+                teamId_userId: { teamId: team_chat.teamId, userId: data.recipientId },
+            },
+            select: { id: true },
+        });
+        if (!membership) return;
 
         const notification = await prisma.notification.create({
             data: {
                 userId: data.recipientId,
                 type: NotificationType.MessageReacted,
                 payload: {
-                    projectChatId: project_chat.id,
-                    projectId: project_chat.projectId,
-                    projectSlug: project_chat.project.slug,
-                    orgSlug: project_chat.project.organization.slug,
+                    teamChatId: team_chat.id,
+                    teamId: team_chat.teamId,
+                    teamName: team_chat.team.name,
+                    projectId: team_chat.team.project.id,
+                    projectSlug: team_chat.team.project.slug,
+                    orgSlug: team_chat.team.project.organization.slug,
                     actorId: data.actorId,
                     actorName: actor.name ?? actor.email,
                     emoji: data.emoji,

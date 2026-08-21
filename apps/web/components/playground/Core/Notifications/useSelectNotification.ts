@@ -5,6 +5,7 @@ import { useNotificationsPanelStore } from "@/store/playground/useNotificationsP
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
 import { useIssueNavigation } from "@/components/playground/Issue/useIssueNavigation";
 import { PlaygroundTab } from "@/components/playground/playgroundTabs";
+import { useChatThreadStore } from "@/store/playground/useChatThreadStore";
 import type { Notification } from "@trymatcha/types";
 import { notification_target } from "./notificationView";
 
@@ -16,6 +17,8 @@ export function useSelectNotification() {
         projectSlug?: string;
     }>();
     const setTab = usePlaygroundNavStore((s) => s.setTab);
+    const selectProjectChat = useChatThreadStore((s) => s.selectProject);
+    const selectTeamChat = useChatThreadStore((s) => s.selectTeam);
     const { openIssue } = useIssueNavigation();
     const close = useNotificationsPanelStore((s) => s.close);
 
@@ -36,8 +39,22 @@ export function useSelectNotification() {
             target.orgSlug === currentOrgSlug && target.projectSlug === currentProjectSlug;
 
         if (target.destination.kind === "chats") {
-            if (isCurrentProject) setTab(PlaygroundTab.Chats);
-            else router.push(`${base}?tab=${PlaygroundTab.Chats}`);
+            const teamId = target.destination.teamId;
+            if (teamId) selectTeamChat(teamId);
+            else selectProjectChat();
+
+            if (isCurrentProject) {
+                const params = new URLSearchParams(window.location.search);
+                params.set("tab", PlaygroundTab.Chats);
+                if (teamId) params.set("teamChat", teamId);
+                else params.delete("teamChat");
+                window.history.replaceState(null, "", `${base}?${params.toString()}`);
+                setTab(PlaygroundTab.Chats);
+            } else {
+                const params = new URLSearchParams({ tab: PlaygroundTab.Chats });
+                if (teamId) params.set("teamChat", teamId);
+                router.push(`${base}?${params.toString()}`);
+            }
             return;
         }
 

@@ -39,6 +39,7 @@ const Action = {
         add_member: "add_member",
         remove_member: "remove_member",
         change_member_role: "change_member_role",
+        delete_any_chat: "delete_any_chat",
         write_envs: "write_env_access",
         read_envs: "read_envs",
     },

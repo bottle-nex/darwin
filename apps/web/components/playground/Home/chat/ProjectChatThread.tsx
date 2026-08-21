@@ -6,9 +6,8 @@ import { MdChat } from "react-icons/md";
 import {
     ProjectRole,
     to_plain_text,
-    type Chat,
     type LabelledReference,
-    type ProjectChat,
+    type ThreadMessage,
 } from "@trymatcha/types";
 import { Button } from "@/components/ui/button";
 import SessionServices from "@/lib/session";
@@ -19,7 +18,7 @@ import ChatMessage from "./ChatMessage";
 import ChatComposer, { type ChatComposerHandle } from "./ChatComposer";
 
 type ChatThreadProps = {
-    chats: (Chat | ProjectChat)[] | undefined;
+    chats: ThreadMessage[] | undefined;
     projectId: string | undefined;
     placeholder?: string;
     emptyMessage: string;
@@ -27,16 +26,13 @@ type ChatThreadProps = {
     disabled?: boolean;
     /** True while the initial page of chats is still being fetched. */
     loading?: boolean;
+    canDeleteAny?: boolean;
+    memberUserIds?: readonly string[];
     onSend: (message: string, references: LabelledReference[], repliedToId?: string) => void;
-    onDelete: (chat: Chat | ProjectChat) => void;
-    onReaction: (chat: Chat | ProjectChat, emoji: string) => void;
+    onDelete: (chat: ThreadMessage) => void;
+    onReaction: (chat: ThreadMessage, emoji: string) => void;
 };
 
-/**
- * The scrollable message list + composer shared by every chat surface (issue
- * comments, project chat). Callers own the outer frame/header and pass a `key`
- * that changes with the conversation, so switching threads resets the draft.
- */
 export default function ChatThread({
     chats,
     projectId,
@@ -44,15 +40,18 @@ export default function ChatThread({
     emptyMessage,
     disabled,
     loading,
+    canDeleteAny,
+    memberUserIds,
     onSend,
     onDelete,
     onReaction,
 }: ChatThreadProps) {
-    const [replyTo, setReplyTo] = useState<Chat | ProjectChat | null>(null);
+    const [replyTo, setReplyTo] = useState<ThreadMessage | null>(null);
     const currentUserId = SessionServices.get_user()?.id;
-    const { data: members } = useProjectMembers(projectId);
+    const { data: members } = useProjectMembers(canDeleteAny === undefined ? projectId : undefined);
     const viewerIsAdmin =
         members?.some((m) => m.id === currentUserId && m.role === ProjectRole.Admin) ?? false;
+    const viewerCanDeleteAny = canDeleteAny ?? viewerIsAdmin;
     const activeReplyTo =
         replyTo && !chats?.some((c) => c.id === replyTo.id && c.isDeleted) ? replyTo : null;
     const scrollRef = useRef<HTMLDivElement>(null);
@@ -117,7 +116,7 @@ export default function ChatThread({
                                     Boolean(currentUserId) &&
                                     !chat.id.startsWith(OPTIMISTIC_ID_PREFIX) &&
                                     !chat.isDeleted &&
-                                    (chat.senderId === currentUserId || viewerIsAdmin)
+                                    (chat.senderId === currentUserId || viewerCanDeleteAny)
                                 }
                                 onReply={setReplyTo}
                                 onDelete={onDelete}
@@ -144,6 +143,7 @@ export default function ChatThread({
                     projectId={projectId}
                     placeholder={placeholder}
                     disabled={disabled}
+                    memberUserIds={memberUserIds}
                     onSend={handleSend}
                 >
                     {activeReplyTo && (

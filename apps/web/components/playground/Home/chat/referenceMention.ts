@@ -143,12 +143,19 @@ export function createReferenceMention({
     projectId,
     container,
     triggers = ["member", "issue"],
+    memberUserIds,
 }: {
     queryClient: QueryClient;
     projectId: string;
     container?: string;
     triggers?: ReferenceTrigger[];
+    memberUserIds?: readonly string[];
 }) {
+    const allowed_member_ids = memberUserIds ? new Set(memberUserIds) : null;
+    const allowed_members = (members: ProjectMember[]) =>
+        allowed_member_ids
+            ? members.filter((member) => allowed_member_ids.has(member.id))
+            : members;
     const shared = {
         ...(container ? { container } : { floatingUi: { strategy: "fixed" as const } }),
         allowSpaces: false,
@@ -162,11 +169,13 @@ export function createReferenceMention({
         pluginKey: SUGGESTION_KEYS[0],
         items: async ({ query }: { query: string }) => {
             const roster = await search_members(queryClient, projectId, "");
-            const narrowed = roster.filter((member) => member_matches(member, query));
+            const narrowed = allowed_members(roster).filter((member) =>
+                member_matches(member, query),
+            );
             if (narrowed.length || !query.trim()) return narrowed.map(to_member_item);
 
             const searched = await search_members(queryClient, projectId, query);
-            return searched.map(to_member_item);
+            return allowed_members(searched).map(to_member_item);
         },
     };
 

@@ -98,6 +98,7 @@ const TEAM_PERMISSIONS: Record<TeamRole, Set<TeamAction>> = {
         Action.team.add_member,
         Action.team.remove_member,
         Action.team.change_member_role,
+        Action.team.delete_any_chat,
         Action.team.write_envs,
         Action.team.read_envs,
     ]),

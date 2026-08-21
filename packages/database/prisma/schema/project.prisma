@@ -15,13 +15,13 @@ model Project {
   githubRepoUrl       String?
   githubDefaultBranch String?
 
-  organization Organization    @relation(fields: [orgId], references: [id], onDelete: Cascade)
-  owner        User            @relation("ProjectOwner", fields: [ownerId], references: [id], onDelete: Restrict)
-  createdBy    User?           @relation("ProjectCreator", fields: [createdById], references: [id], onDelete: SetNull)
-  teams        Team[]
-  members      ProjectMember[]
-  invitations  Invitation[]
-  lastVisitedByUsers User[] @relation("UserLastVisitedProject")
+  organization       Organization    @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  owner              User            @relation("ProjectOwner", fields: [ownerId], references: [id], onDelete: Restrict)
+  createdBy          User?           @relation("ProjectCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  teams              Team[]
+  members            ProjectMember[]
+  invitations        Invitation[]
+  lastVisitedByUsers User[]          @relation("UserLastVisitedProject")
 
   githubInstallationId String?
   githubInstallation   GithubInstallation? @relation(fields: [githubInstallationId], references: [id], onDelete: SetNull)
@@ -89,6 +89,7 @@ model Team {
   project     Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
   members     TeamMember[]
   invitations Invitation[]
+  teamChats   TeamChat[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

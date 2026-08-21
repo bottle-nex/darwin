@@ -1,7 +1,15 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { HiOutlineAnnotation } from "react-icons/hi";
 import { HiOutlinePlus, HiOutlineTrash } from "react-icons/hi2";
+import { MdMoreHoriz } from "react-icons/md";
 import { useParams } from "next/navigation";
 import { cn } from "@/lib/utils";
 import Row from "./SidebarRow";
@@ -12,6 +20,8 @@ import { useNewTeamStore } from "@/store/team/useNewTeamStore";
 import { useDeleteTeamStore } from "@/store/team/useDeleteTeamStore";
 import { rowLeading } from "./shared";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
+import { useChatThreadStore } from "@/store/playground/useChatThreadStore";
+import { PlaygroundTab } from "../playgroundTabs";
 
 export default function PlaygroundSidebarTeamsSection() {
     const { orgSlug, projectSlug } = useParams<{ orgSlug: string; projectSlug?: string }>();
@@ -26,6 +36,8 @@ export default function PlaygroundSidebarTeamsSection() {
     const isAdmin = project?.viewerRole === "Admin";
     const selectedTeam = usePlaygroundNavStore((s) => s.selectedTeam);
     const openTeam = usePlaygroundNavStore((s) => s.openTeam);
+    const setTab = usePlaygroundNavStore((s) => s.setTab);
+    const selectTeamChat = useChatThreadStore((s) => s.selectTeam);
     const teams = project?.teams ?? [];
 
     function openCreateTeam() {
@@ -34,13 +46,28 @@ export default function PlaygroundSidebarTeamsSection() {
         setOpen(true);
     }
 
+    function openTeamChat(teamId: string) {
+        selectTeamChat(teamId);
+        setTab(PlaygroundTab.Chats);
+
+        const params = new URLSearchParams(window.location.search);
+        params.set("tab", PlaygroundTab.Chats);
+        params.set("teamChat", teamId);
+        params.delete("team");
+        window.history.replaceState(null, "", `${window.location.pathname}?${params.toString()}`);
+    }
+
     return (
         <Section title="Teams">
             {teams.map((t) => {
                 const isActive = selectedTeam?.id === t.id;
                 return (
-                    <div key={t.id} className="group relative">
+                    <div key={t.id} className="group/team relative">
                         <Row
+                            className={cn(
+                                !isActive &&
+                                    "group-hover/team:bg-white/3 group-hover/team:text-neutral-100",
+                            )}
                             label={t.name}
                             leading={rowLeading({
                                 kind: "avatar",
@@ -50,18 +77,42 @@ export default function PlaygroundSidebarTeamsSection() {
                             active={isActive}
                             onClick={() => openTeam(t, projectSlug ?? "")}
                         />
-                        <Button
-                            variant="unstyled"
-                            type="button"
-                            aria-label={`Delete ${t.name}`}
-                            onClick={() => requestDelete(t)}
-                            className={cn(
-                                "absolute top-1/2 right-2 size-6 -translate-y-1/2 items-center justify-center rounded text-neutral-400 hover:bg-neutral-700/50 hover:text-red-500 cursor-pointer ring-inset focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-hidden",
-                                isActive ? "flex" : "hidden group-hover:flex",
-                            )}
-                        >
-                            <HiOutlineTrash className="size-3.5" aria-hidden />
-                        </Button>
+                        {(t.viewerRole || isAdmin) && (
+                            <DropdownMenu modal={false}>
+                                <DropdownMenuTrigger asChild>
+                                    <Button
+                                        variant="unstyled"
+                                        type="button"
+                                        aria-label={`${t.name} actions`}
+                                        className={cn(
+                                            "absolute top-1/2 right-1 flex size-6 -translate-y-1/2 cursor-pointer items-center justify-center rounded text-neutral-400 ring-inset transition-opacity hover:bg-white/5 hover:text-neutral-200 focus-visible:pointer-events-auto focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-hidden group-hover/team:pointer-events-auto group-hover/team:opacity-100 data-[state=open]:pointer-events-auto data-[state=open]:opacity-100",
+                                            isActive
+                                                ? "opacity-100"
+                                                : "pointer-events-none opacity-0",
+                                        )}
+                                    >
+                                        <MdMoreHoriz className="size-4" aria-hidden />
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end" className="w-40">
+                                    {t.viewerRole && (
+                                        <DropdownMenuItem onSelect={() => openTeamChat(t.id)}>
+                                            <HiOutlineAnnotation className="size-3.5" aria-hidden />
+                                            <span className="flex-1">Chat</span>
+                                        </DropdownMenuItem>
+                                    )}
+                                    {isAdmin && (
+                                        <DropdownMenuItem
+                                            variant="destructive"
+                                            onSelect={() => requestDelete(t)}
+                                        >
+                                            <HiOutlineTrash className="size-3.5" aria-hidden />
+                                            <span className="flex-1">Delete</span>
+                                        </DropdownMenuItem>
+                                    )}
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        )}
                     </div>
                 );
             })}

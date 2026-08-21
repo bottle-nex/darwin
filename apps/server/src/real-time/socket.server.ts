@@ -1,4 +1,4 @@
-import { WebSocketServer, WebSocket } from "ws";
+import { WebSocketServer, WebSocket, type RawData } from "ws";
 import { IncomingMessage, Server } from "http";
 import SubscriberSystem from "./subscriber.system";
 import { verifySessionJwt } from "../services/service.jwt";
@@ -13,6 +13,7 @@ import Access from "../access-control/access";
 import type { AuthUser } from "../types/express.d";
 import ChatSocketHandler from "./chat.handler";
 import ProjectChatSocketHandler from "./project-chat.handler";
+import TeamChatSocketHandler from "./team-chat.handler";
 
 export default class SocketServer {
     private wss: WebSocketServer;
@@ -37,6 +38,16 @@ export default class SocketServer {
 
     private init_connection() {
         this.wss.on("connection", async (ws: WebSocket, req: IncomingMessage) => {
+            const pending_messages: RawData[] = [];
+            const queue_message = (raw: RawData) => {
+                if (pending_messages.length >= 100) {
+                    ws.close(StandardSocketCloseCode.POLICY_VIOLATION, "Too many pending messages");
+                    return;
+                }
+                pending_messages.push(raw);
+            };
+            ws.on("message", queue_message);
+
             const { success, project_id, user } = this.validate_connection(req);
             if (!success || !user) {
                 return ws.close(AppSocketCloseCode.UNAUTHORIZED, "Invalid connection");
@@ -53,6 +64,7 @@ export default class SocketServer {
                 console.error("Socket connection access check error:", error);
                 return ws.close(StandardSocketCloseCode.INTERNAL_ERROR, "Something went wrong");
             }
+            if (ws.readyState !== WebSocket.OPEN) return;
             let connections = this.project_connections.get(project_id);
             if (!connections) {
                 connections = new Set();
@@ -70,40 +82,14 @@ export default class SocketServer {
             user_sockets.add(ws);
 
             this.connection_users.set(ws, user);
+            ws.off("message", queue_message);
             this.add_listeners(ws, project_id);
+            for (const raw of pending_messages) await this.handle_message(ws, project_id, raw);
         });
     }
 
     private add_listeners(ws: WebSocket, project_id: string) {
-        ws.on("message", async (raw: string) => {
-            try {
-                const message = JSON.parse(raw.toString()) as InboundSocketMessage;
-                switch (message.type) {
-                    case InboundSocketMessageType.CHAT_CREATE:
-                        await this.create_chat(ws, project_id, message);
-                        return;
-                    case InboundSocketMessageType.CHAT_DELETE:
-                        await this.delete_chat(ws, project_id, message);
-                        return;
-                    case InboundSocketMessageType.CHAT_REACTION_TOGGLE:
-                        await this.toggle_chat_reaction(ws, project_id, message);
-                        return;
-                    case InboundSocketMessageType.PROJECT_CHAT_CREATE:
-                        await this.create_project_chat(ws, project_id, message);
-                        return;
-                    case InboundSocketMessageType.PROJECT_CHAT_DELETE:
-                        await this.delete_project_chat(ws, project_id, message);
-                        return;
-                    case InboundSocketMessageType.PROJECT_CHAT_REACTION_TOGGLE:
-                        await this.toggle_project_chat_reaction(ws, project_id, message);
-                        return;
-                    default:
-                        return;
-                }
-            } catch (error) {
-                console.error("Socket message handler error:", error);
-            }
-        });
+        ws.on("message", (raw) => void this.handle_message(ws, project_id, raw));
         ws.on("close", (message: string) => {
             console.log(`Connection closed: ${message}`);
             this.remove_connection(ws, project_id);
@@ -111,6 +97,43 @@ export default class SocketServer {
         ws.on("error", (error: Error) => {
             console.error(`Connection error: ${error.message}`);
         });
+    }
+
+    private async handle_message(ws: WebSocket, project_id: string, raw: RawData) {
+        try {
+            const message = JSON.parse(raw.toString()) as InboundSocketMessage;
+            switch (message.type) {
+                case InboundSocketMessageType.CHAT_CREATE:
+                    await this.create_chat(ws, project_id, message);
+                    return;
+                case InboundSocketMessageType.CHAT_DELETE:
+                    await this.delete_chat(ws, project_id, message);
+                    return;
+                case InboundSocketMessageType.CHAT_REACTION_TOGGLE:
+                    await this.toggle_chat_reaction(ws, project_id, message);
+                    return;
+                case InboundSocketMessageType.PROJECT_CHAT_CREATE:
+                    await this.create_project_chat(ws, project_id, message);
+                    return;
+                case InboundSocketMessageType.PROJECT_CHAT_DELETE:
+                    await this.delete_project_chat(ws, project_id, message);
+                    return;
+                case InboundSocketMessageType.PROJECT_CHAT_REACTION_TOGGLE:
+                    await this.toggle_project_chat_reaction(ws, project_id, message);
+                    return;
+                case InboundSocketMessageType.TEAM_CHAT_CREATE:
+                    await this.create_team_chat(ws, project_id, message);
+                    return;
+                case InboundSocketMessageType.TEAM_CHAT_DELETE:
+                    await this.delete_team_chat(ws, project_id, message);
+                    return;
+                case InboundSocketMessageType.TEAM_CHAT_REACTION_TOGGLE:
+                    await this.toggle_team_chat_reaction(ws, project_id, message);
+                    return;
+            }
+        } catch (error) {
+            console.error("Socket message handler error:", error);
+        }
     }
 
     private broadcast_message(project_id: string, message: string) {
@@ -183,6 +206,21 @@ export default class SocketServer {
         );
     }
 
+    private async toggle_team_chat_reaction(
+        ws: WebSocket,
+        project_id: string,
+        message: InboundSocketMessage,
+    ) {
+        const user = this.connection_users.get(ws);
+        if (!user) return;
+        await TeamChatSocketHandler.handle_team_chat_reaction(
+            ws,
+            user,
+            project_id,
+            message.payload,
+        );
+    }
+
     private async create_chat(ws: WebSocket, project_id: string, message: InboundSocketMessage) {
         const user = this.connection_users.get(ws);
         if (!user) return;
@@ -204,6 +242,26 @@ export default class SocketServer {
             message.payload,
         );
         return;
+    }
+
+    private async create_team_chat(
+        ws: WebSocket,
+        project_id: string,
+        message: InboundSocketMessage,
+    ) {
+        const user = this.connection_users.get(ws);
+        if (!user) return;
+        await TeamChatSocketHandler.handle_team_chat_create(ws, user, project_id, message.payload);
+    }
+
+    private async delete_team_chat(
+        ws: WebSocket,
+        project_id: string,
+        message: InboundSocketMessage,
+    ) {
+        const user = this.connection_users.get(ws);
+        if (!user) return;
+        await TeamChatSocketHandler.handle_team_chat_delete(ws, user, project_id, message.payload);
     }
 
     private remove_connection(ws: WebSocket, project_id: string) {

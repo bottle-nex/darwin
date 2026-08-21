@@ -67,7 +67,7 @@ export default function IssueFields({
     const targetDate = (
         <Capsule
             type="calendar"
-            placeholder="Target date"
+            placeholder="End date"
             value={fields.targetDate}
             onChange={fields.setTargetDate}
             className={capsuleClass}

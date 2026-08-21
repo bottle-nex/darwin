@@ -5,6 +5,7 @@ import { HiOutlineLockClosed } from "react-icons/hi2";
 import { cn } from "@/lib/utils";
 
 type RowProps = {
+    className?: string;
     leading?:
         | { kind: "icon"; icon: React.ComponentType<React.SVGProps<SVGSVGElement>> }
         | { kind: "node"; node: React.ReactNode };
@@ -20,6 +21,7 @@ type RowProps = {
 };
 
 export default function PlaygroundSidebarRow({
+    className,
     leading,
     label,
     suffix,
@@ -43,6 +45,7 @@ export default function PlaygroundSidebarRow({
                 active
                     ? "bg-white/7 text-neutral-50"
                     : "text-neutral-300 hover:bg-white/3 hover:text-neutral-100",
+                className,
             )}
             style={{ paddingLeft: 8 + indent * 16 }}
         >

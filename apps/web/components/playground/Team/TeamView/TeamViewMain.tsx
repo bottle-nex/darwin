@@ -90,13 +90,16 @@ export default function PlaygroundTeamViewMain({ team }: PlaygroundTeamViewProps
                 onOpenChange={setInviteOpen}
                 sender={{ name: user?.name, email: user?.email, image: user?.image }}
                 orgName={dashboard?.org.name ?? ""}
+                projectId={activeProject?.id ?? ""}
                 projectName={activeProject?.name ?? ""}
                 teamName={team.name}
-                onSubmit={({ emails, role, message }) => {
+                teamMemberIds={teamData?.members.map((member) => member.user.id) ?? []}
+                onSubmit={({ emails, userIds, role, message }) => {
                     if (!dashboard?.org.id || !activeProject?.id) return;
                     invite.mutate(
                         {
                             emails,
+                            userIds,
                             message,
                             role,
                             orgId: dashboard.org.id,
@@ -104,7 +107,14 @@ export default function PlaygroundTeamViewMain({ team }: PlaygroundTeamViewProps
                             teamId: team.id,
                         },
                         {
-                            onSuccess: ({ invited, failed }) => {
+                            onSuccess: ({ added, invited, failed }) => {
+                                if (added.length) {
+                                    toast.success(
+                                        `Added ${added.length} ${
+                                            added.length === 1 ? "person" : "people"
+                                        } to ${team.name}`,
+                                    );
+                                }
                                 if (invited.length) {
                                     toast.success(
                                         `Invited ${invited.length} ${
@@ -117,13 +127,13 @@ export default function PlaygroundTeamViewMain({ team }: PlaygroundTeamViewProps
                                         `Skipped ${failed.length}: ${failed
                                             .map(
                                                 (f) =>
-                                                    `${f.email} (${f.reason.replace(/_/g, " ")})`,
+                                                    `${f.email ?? "project member"} (${f.reason.replace(/_/g, " ")})`,
                                             )
                                             .join(", ")}`,
                                     );
                                 }
-                                if (!invited.length && !failed.length) {
-                                    toast.info("No invitations were sent");
+                                if (!added.length && !invited.length && !failed.length) {
+                                    toast.info("No members were added");
                                 }
                                 setInviteOpen(false);
                             },

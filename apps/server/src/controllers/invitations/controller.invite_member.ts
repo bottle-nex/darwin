@@ -7,15 +7,32 @@ import { ENV } from "../../configs/env";
 import { inviteMember } from "../../services/service.email";
 import Access from "../../access-control/access";
 import { Action, Permissions } from "@trymatcha/access-control";
+import { server_services } from "../..";
+import TeamMemberService from "../../services/service.team-members";
+
+type FailedTarget = {
+    email?: string;
+    userId?: string;
+    reason: string;
+};
 
 const body_schema = z
     .object({
-        emails: z.array(z.email()).min(1).max(50),
+        emails: z.array(z.email()).max(50).default([]),
+        userIds: z.array(z.string().min(1)).max(50).default([]),
         orgId: z.string(),
         projectId: z.string().optional(),
         teamId: z.string().optional(),
         role: z.enum(ProjectRole).optional(),
         message: z.string().trim().max(500).optional(),
+    })
+    .refine((d) => d.emails.length + d.userIds.length > 0, {
+        message: "at least one recipient is required",
+        path: ["emails"],
+    })
+    .refine((d) => d.emails.length + d.userIds.length <= 50, {
+        message: "a maximum of 50 recipients is allowed",
+        path: ["emails"],
     })
     .refine((d) => Boolean(d.projectId) === Boolean(d.teamId), {
         message: "projectId and teamId must be provided together",
@@ -24,6 +41,10 @@ const body_schema = z
     .refine((d) => Boolean(d.projectId) === Boolean(d.role), {
         message: "role must be provided when inviting to a project",
         path: ["role"],
+    })
+    .refine((d) => d.userIds.length === 0 || Boolean(d.teamId), {
+        message: "existing users can only be added directly to a team",
+        path: ["userIds"],
     });
 
 export default class InviteMembersController {
@@ -34,7 +55,7 @@ export default class InviteMembersController {
         }
 
         try {
-            const { emails, orgId, projectId, teamId, role, message } = parsed.data;
+            const { emails, userIds, orgId, projectId, teamId, role, message } = parsed.data;
             const invitedById = req.user.id;
             const is_team_invite = Boolean(teamId);
 
@@ -70,7 +91,42 @@ export default class InviteMembersController {
                 }
             }
 
-            const requested_emails = [...new Set(emails.map((e) => e.toLowerCase()))];
+            const added: string[] = [];
+            const failed: FailedTarget[] = [];
+            const direct_emails = new Set<string>();
+
+            if (team && userIds.length > 0) {
+                const result = await TeamMemberService.add_project_members({
+                    teamId: team.id,
+                    projectId: projectId!,
+                    orgId,
+                    userIds,
+                });
+                added.push(...result.addedUserIds);
+                failed.push(...result.failed);
+                result.recognizedEmails.forEach((email) => direct_emails.add(email));
+
+                await Promise.all(
+                    result.addedUserIds
+                        .filter((userId) => userId !== invitedById)
+                        .map((recipientId) =>
+                            server_services.notifications.enqueue({
+                                action: "member.added_to_team",
+                                teamId: team.id,
+                                recipientId,
+                                actorId: invitedById,
+                            }),
+                        ),
+                );
+            }
+
+            const requested_emails = [
+                ...new Set(
+                    emails
+                        .map((email) => email.toLowerCase())
+                        .filter((email) => !direct_emails.has(email)),
+                ),
+            ];
             const users = await prisma.user.findMany({
                 where: { email: { in: requested_emails } },
                 select: { id: true, email: true },
@@ -104,7 +160,6 @@ export default class InviteMembersController {
             );
 
             const invited: string[] = [];
-            const failed: { email: string; reason: string }[] = [];
             const to_process: {
                 email: string;
                 raw_token: string;
@@ -203,7 +258,7 @@ export default class InviteMembersController {
                 }
             }
 
-            return ResponseWriter.success(res, { invited, failed }, "invitations processed");
+            return ResponseWriter.success(res, { added, invited, failed }, "invitations processed");
         } catch (error) {
             console.error("failed at InviteMembersController", error);
             ResponseWriter.system_error(res);

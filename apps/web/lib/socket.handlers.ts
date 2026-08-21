@@ -1,12 +1,18 @@
 import type { QueryClient } from "@tanstack/react-query";
-import { OutboundSocketMessageType, type OutboundSocketMessage } from "@trymatcha/types";
+import {
+    NotificationType,
+    OutboundSocketMessageType,
+    type OutboundSocketMessage,
+} from "@trymatcha/types";
 import { toast } from "@/lib/toast";
 import { upsertBoardIssue, updateBoardIssue } from "@/hooks/issues/useBoard";
 import { upsert_chat, mark_chat_deleted } from "@/hooks/chats/useChats";
 import { upsert_project_chat, mark_project_chat_deleted } from "@/hooks/chats/useProjectChat";
+import { upsert_team_chat, mark_team_chat_deleted } from "@/hooks/chats/useTeamChat";
 import {
     reconcile_chat_reaction,
     reconcile_project_chat_reaction,
+    reconcile_team_chat_reaction,
     rollback_reaction,
 } from "@/hooks/chats/useMessageReactions";
 import SessionServices from "@/lib/session";
@@ -14,6 +20,8 @@ import { upsert_notification } from "@/hooks/notifications/useNotifications";
 import { useNotificationsPanelStore } from "@/store/playground/useNotificationsPanelStore";
 import { useFloatNotificationsStore } from "@/store/playground/useFloatNotificationsStore";
 import { append_activities, update_agent_session } from "@/hooks/activity/useActivity";
+import { PROJECT_QUERY_KEY } from "@/hooks/project/useGetProject";
+import { TEAM_MEMBERS_QUERY_KEY } from "@/hooks/team/useGetTeamMembers";
 
 export class SocketHandlers {
     static handle_issue_created(queryClient: QueryClient, message: OutboundSocketMessage) {
@@ -52,6 +60,16 @@ export class SocketHandlers {
         mark_project_chat_deleted(queryClient, message.payload);
     }
 
+    static handle_team_chat_created(queryClient: QueryClient, message: OutboundSocketMessage) {
+        if (message.type !== OutboundSocketMessageType.TEAM_CHAT_CREATED) return;
+        upsert_team_chat(queryClient, message.payload);
+    }
+
+    static handle_team_chat_deleted(queryClient: QueryClient, message: OutboundSocketMessage) {
+        if (message.type !== OutboundSocketMessageType.TEAM_CHAT_DELETED) return;
+        mark_team_chat_deleted(queryClient, message.payload);
+    }
+
     static handle_chat_reaction_updated(queryClient: QueryClient, message: OutboundSocketMessage) {
         if (message.type !== OutboundSocketMessageType.CHAT_REACTION_UPDATED) return;
         const currentUserId = SessionServices.get_user()?.id ?? undefined;
@@ -77,9 +95,32 @@ export class SocketHandlers {
         );
     }
 
+    static handle_team_chat_reaction_updated(
+        queryClient: QueryClient,
+        message: OutboundSocketMessage,
+    ) {
+        if (message.type !== OutboundSocketMessageType.TEAM_CHAT_REACTION_UPDATED) return;
+        reconcile_team_chat_reaction(
+            queryClient,
+            message.teamId,
+            message.payload,
+            SessionServices.get_user()?.id ?? undefined,
+        );
+    }
+
     static handle_notification_created(queryClient: QueryClient, message: OutboundSocketMessage) {
         if (message.type !== OutboundSocketMessageType.NOTIFICATION_CREATED) return;
         upsert_notification(queryClient, message.payload);
+        if (
+            message.payload.type === NotificationType.AddedToTeam ||
+            message.payload.type === NotificationType.RemovedFromTeam
+        ) {
+            queryClient.invalidateQueries({ queryKey: PROJECT_QUERY_KEY });
+            const teamId = message.payload.payload.teamId;
+            if (typeof teamId === "string") {
+                queryClient.invalidateQueries({ queryKey: [...TEAM_MEMBERS_QUERY_KEY, teamId] });
+            }
+        }
         if (!useNotificationsPanelStore.getState().isOpen) {
             useFloatNotificationsStore.getState().push(message.payload);
         }

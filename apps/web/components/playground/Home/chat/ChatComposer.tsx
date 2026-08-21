@@ -26,6 +26,7 @@ interface ChatComposerProps {
     placeholder: string;
     disabled?: boolean;
     className?: string;
+    memberUserIds?: readonly string[];
     onSend: (message: string, references: LabelledReference[]) => void;
     children?: React.ReactNode;
 }
@@ -74,7 +75,7 @@ function draft_references(editor: Editor): LabelledReference[] {
 }
 
 const ChatComposer = forwardRef<ChatComposerHandle, ChatComposerProps>(function ChatComposer(
-    { projectId, placeholder, disabled, className, onSend, children },
+    { projectId, placeholder, disabled, className, memberUserIds, onSend, children },
     ref,
 ) {
     const queryClient = useQueryClient();
@@ -113,6 +114,7 @@ const ChatComposer = forwardRef<ChatComposerHandle, ChatComposerProps>(function 
                           queryClient,
                           projectId,
                           container: `[data-slot="${portalSlot}"]`,
+                          memberUserIds,
                       }),
                   ]
                 : []),
@@ -132,7 +134,7 @@ const ChatComposer = forwardRef<ChatComposerHandle, ChatComposerProps>(function 
                 },
             }),
         ],
-        [projectId, placeholder, portalSlot, queryClient],
+        [projectId, placeholder, portalSlot, queryClient, memberUserIds],
     );
 
     const editor = useEditor(

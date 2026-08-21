@@ -4,6 +4,7 @@ import {
     InboundSocketMessageType,
     type Chat,
     type ProjectChat,
+    type TeamChat,
     apply_reaction_deltas,
     apply_reaction_updates,
     get_reaction_selection,
@@ -13,6 +14,7 @@ import {
 import { send_socket_message } from "@/hooks/socket/useWebSocket";
 import { CHATS_QUERY_KEY } from "./useChats";
 import { PROJECT_CHATS_QUERY_KEY } from "./useProjectChat";
+import { TEAM_CHATS_QUERY_KEY } from "./useTeamChat";
 
 type ReactionEvent = {
     chatId: string;
@@ -23,7 +25,7 @@ type ReactionEvent = {
 
 type PendingReaction = {
     queryClient: QueryClient;
-    kind: "chat" | "project";
+    kind: "chat" | "project" | "team";
     conversationId: string;
     chatId: string;
     rollback: ReactionDelta[];
@@ -91,11 +93,29 @@ function set_project_chat_reactions(
     );
 }
 
+function set_team_chat_reactions(
+    queryClient: QueryClient,
+    teamId: string,
+    chatId: string,
+    reactions: ReactionSummary[],
+) {
+    queryClient.setQueryData<TeamChat[]>([...TEAM_CHATS_QUERY_KEY, teamId], (previous) =>
+        previous?.map((chat) => (chat.id === chatId ? { ...chat, reactions } : chat)),
+    );
+}
+
 function set_reactions(pending: PendingReaction, reactions: ReactionSummary[]) {
     if (pending.kind === "chat") {
         set_chat_reactions(pending.queryClient, pending.conversationId, pending.chatId, reactions);
-    } else {
+    } else if (pending.kind === "project") {
         set_project_chat_reactions(
+            pending.queryClient,
+            pending.conversationId,
+            pending.chatId,
+            reactions,
+        );
+    } else {
+        set_team_chat_reactions(
             pending.queryClient,
             pending.conversationId,
             pending.chatId,
@@ -108,7 +128,7 @@ function optimistic_toggle(
     queryClient: QueryClient,
     kind: PendingReaction["kind"],
     conversationId: string,
-    chat: Chat | ProjectChat,
+    chat: Chat | ProjectChat | TeamChat,
     emoji: string,
 ) {
     if (is_reaction_pending(chat.id)) return null;
@@ -149,6 +169,17 @@ export function toggle_project_chat_reaction(
     if (!operationId) return false;
     const sent = send_socket_message({
         type: InboundSocketMessageType.PROJECT_CHAT_REACTION_TOGGLE,
+        payload: { chatId: chat.id, emoji, operationId },
+    });
+    if (!sent) rollback_reaction(operationId);
+    return sent;
+}
+
+export function toggle_team_chat_reaction(queryClient: QueryClient, chat: TeamChat, emoji: string) {
+    const operationId = optimistic_toggle(queryClient, "team", chat.teamId, chat, emoji);
+    if (!operationId) return false;
+    const sent = send_socket_message({
+        type: InboundSocketMessageType.TEAM_CHAT_REACTION_TOGGLE,
         payload: { chatId: chat.id, emoji, operationId },
     });
     if (!sent) rollback_reaction(operationId);
@@ -215,6 +246,36 @@ export function reconcile_project_chat_reaction(
     settle_reaction(event.operationId);
 }
 
+export function reconcile_team_chat_reaction(
+    queryClient: QueryClient,
+    teamId: string,
+    event: ReactionEvent,
+    viewerId?: string,
+) {
+    queryClient.setQueryData<TeamChat[]>([...TEAM_CHATS_QUERY_KEY, teamId], (previous) =>
+        previous?.map((chat) => {
+            if (chat.id !== event.chatId) return chat;
+            const existing = chat.reactions ?? [];
+            return {
+                ...chat,
+                reactions: apply_reaction_updates(
+                    existing,
+                    event.updates.map((update) => ({
+                        emoji: update.emoji,
+                        count: update.count,
+                        reactedByViewer:
+                            event.actorId === viewerId
+                                ? update.actorReacted
+                                : (existing.find((reaction) => reaction.emoji === update.emoji)
+                                      ?.reactedByViewer ?? false),
+                    })),
+                ),
+            };
+        }),
+    );
+    settle_reaction(event.operationId);
+}
+
 export function rollback_reaction(operationId: string) {
     const pending = settle_reaction(operationId);
     if (!pending) return;
@@ -234,9 +295,25 @@ export function rollback_reaction(operationId: string) {
                         : chat,
                 ),
         );
-    } else {
+    } else if (pending.kind === "project") {
         pending.queryClient.setQueryData<ProjectChat[]>(
             [...PROJECT_CHATS_QUERY_KEY, pending.conversationId],
+            (previous) =>
+                previous?.map((chat) =>
+                    chat.id === pending.chatId
+                        ? {
+                              ...chat,
+                              reactions: apply_reaction_deltas(
+                                  chat.reactions ?? [],
+                                  pending.rollback,
+                              ),
+                          }
+                        : chat,
+                ),
+        );
+    } else {
+        pending.queryClient.setQueryData<TeamChat[]>(
+            [...TEAM_CHATS_QUERY_KEY, pending.conversationId],
             (previous) =>
                 previous?.map((chat) =>
                     chat.id === pending.chatId

@@ -144,6 +144,7 @@ export const NotificationType = {
     IssueUnassigned: "IssueUnassigned",
     ChatMention: "ChatMention",
     ProjectChatMention: "ProjectChatMention",
+    TeamChatMention: "TeamChatMention",
     IssueStatusChanged: "IssueStatusChanged",
     IssuePriorityChanged: "IssuePriorityChanged",
     IssueMoved: "IssueMoved",

@@ -16,7 +16,8 @@ type IssueReference = {
     sender: { id: string; name: string | null; email: string; image: string | null } | null;
     thread:
         | { kind: "issue"; issueId: string; issueNumber: number; issueTitle: string }
-        | { kind: "project" };
+        | { kind: "project" }
+        | { kind: "team"; teamId: string; teamName: string };
 };
 
 export default class IssueReferencesGetController {
@@ -47,7 +48,16 @@ export default class IssueReferencesGetController {
             const rows = await prisma.messageReference.findMany({
                 where: {
                     issueId: issue.id,
-                    OR: [{ chat: { isDeleted: false } }, { projectChat: { isDeleted: false } }],
+                    OR: [
+                        { chat: { isDeleted: false } },
+                        { projectChat: { isDeleted: false } },
+                        {
+                            teamChat: {
+                                isDeleted: false,
+                                team: { members: { some: { userId: user.id } } },
+                            },
+                        },
+                    ],
                 },
                 orderBy: { createdAt: "desc" },
                 take: 50,
@@ -69,6 +79,15 @@ export default class IssueReferencesGetController {
                             id: true,
                             message: true,
                             sender: SENDER_SELECT,
+                            references: { include: MESSAGE_REFERENCE_INCLUDE },
+                        },
+                    },
+                    teamChat: {
+                        select: {
+                            id: true,
+                            message: true,
+                            sender: SENDER_SELECT,
+                            team: { select: { id: true, name: true } },
                             references: { include: MESSAGE_REFERENCE_INCLUDE },
                         },
                     },
@@ -105,6 +124,22 @@ export default class IssueReferencesGetController {
                             ),
                             sender: row.projectChat.sender,
                             thread: { kind: "project" as const },
+                        },
+                    ];
+                }
+                if (row.teamChat) {
+                    return [
+                        {
+                            id: row.id,
+                            createdAt: row.createdAt,
+                            messageId: row.teamChat.id,
+                            message: to_plain_text(row.teamChat.message, row.teamChat.references),
+                            sender: row.teamChat.sender,
+                            thread: {
+                                kind: "team" as const,
+                                teamId: row.teamChat.team.id,
+                                teamName: row.teamChat.team.name,
+                            },
                         },
                     ];
                 }

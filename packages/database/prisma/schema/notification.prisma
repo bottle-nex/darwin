@@ -16,6 +16,7 @@ enum NotificationType {
   IssueUnassigned
   ChatMention
   ProjectChatMention
+  TeamChatMention
   IssueStatusChanged
   IssuePriorityChanged
   IssueMoved

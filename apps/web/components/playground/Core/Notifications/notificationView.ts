@@ -36,6 +36,7 @@ const THEME: Record<NotificationType, NotificationTheme> = {
     [NotificationType.IssueUnassigned]: { icon: HiOutlineUserMinus, tint: "text-neutral-400" },
     [NotificationType.ChatMention]: { icon: HiOutlineAtSymbol, tint: "text-primary" },
     [NotificationType.ProjectChatMention]: { icon: HiOutlineAtSymbol, tint: "text-matcha" },
+    [NotificationType.TeamChatMention]: { icon: HiOutlineAtSymbol, tint: "text-matcha" },
     [NotificationType.IssueStatusChanged]: { icon: HiOutlineArrowPath, tint: "text-matcha" },
     [NotificationType.IssuePriorityChanged]: {
         icon: HiOutlineExclamationTriangle,
@@ -110,6 +111,15 @@ export function notification_view(notification: Notification): NotificationView 
                 actorId: String(payload.senderId ?? ""),
                 actorName: String(payload.senderName),
                 action: "mentioned you in project chat",
+                body: String(payload.message),
+                issueRef: null,
+                projectSlug,
+            };
+        case NotificationType.TeamChatMention:
+            return {
+                actorId: String(payload.senderId ?? ""),
+                actorName: String(payload.senderName),
+                action: `mentioned you in ${String(payload.teamName)} chat`,
                 body: String(payload.message),
                 issueRef: null,
                 projectSlug,
@@ -235,7 +245,8 @@ export function notification_view(notification: Notification): NotificationView 
 }
 
 /** Where selecting a notification takes you: an issue, the project chat, or just the project. */
-export type NotificationDestination = { kind: "issue"; issueId: string } | { kind: "chats" };
+export type NotificationDestination =
+    { kind: "issue"; issueId: string } | { kind: "chats"; teamId?: string };
 
 export function notification_target(
     notification: Notification,
@@ -262,6 +273,13 @@ export function notification_target(
             };
         case NotificationType.ProjectChatMention:
             return { orgSlug, projectSlug, destination: { kind: "chats" } };
+        case NotificationType.TeamChatMention:
+            if (!payload.teamId) return null;
+            return {
+                orgSlug,
+                projectSlug,
+                destination: { kind: "chats", teamId: String(payload.teamId) },
+            };
         case NotificationType.MessageReacted:
             if (payload.issueId) {
                 return {
@@ -272,6 +290,13 @@ export function notification_target(
             }
             if (payload.projectChatId)
                 return { orgSlug, projectSlug, destination: { kind: "chats" } };
+            if (payload.teamChatId && payload.teamId) {
+                return {
+                    orgSlug,
+                    projectSlug,
+                    destination: { kind: "chats", teamId: String(payload.teamId) },
+                };
+            }
             return null;
         case NotificationType.IssueDeleted:
         case NotificationType.InviteAccepted:

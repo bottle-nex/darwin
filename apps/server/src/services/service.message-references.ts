@@ -23,14 +23,28 @@ export type ResolvedReferences = {
 };
 
 export default class MessageReferenceService {
-    static async resolve(message: string, project_id: string): Promise<ResolvedReferences> {
+    static async resolve(
+        message: string,
+        project_id: string,
+        team_id?: string,
+    ): Promise<ResolvedReferences> {
         const member_ids = reference_ids(message, "member");
         const issue_ids = reference_ids(message, "issue");
 
         const [members, issues] = await Promise.all([
             member_ids.length
                 ? prisma.projectMember.findMany({
-                      where: { id: { in: member_ids }, projectId: project_id },
+                      where: {
+                          id: { in: member_ids },
+                          projectId: project_id,
+                          ...(team_id
+                              ? {
+                                    user: {
+                                        teamMemberships: { some: { teamId: team_id } },
+                                    },
+                                }
+                              : {}),
+                      },
                       select: { id: true },
                   })
                 : [],

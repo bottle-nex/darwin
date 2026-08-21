@@ -11,6 +11,7 @@ import { CapsuleTrigger } from "@/components/playground/Issue/Capsule";
 import PlaygroundAvatar from "@/components/playground/Core/components/PlaygroundAvatar";
 import { ProjectRole } from "@trymatcha/types";
 import { cn } from "@/lib/utils";
+import ProjectTeamMemberPicker from "./ProjectTeamMemberPicker";
 
 const PROJECT_ROLES = Object.values(ProjectRole);
 
@@ -23,7 +24,7 @@ const ROLE_HINTS: Record<ProjectRole, string> = {
 };
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const MAX_EMAILS = 50;
+const MAX_RECIPIENTS = 50;
 
 function isValidEmail(value: string) {
     return EMAIL_RE.test(value.trim().toLowerCase());
@@ -52,10 +53,17 @@ type InviteToTeamDialogProps = {
     sender: Sender;
     /** Context shown to the inviter so they know what they're inviting into. */
     orgName: string;
+    projectId: string;
     projectName: string;
     teamName: string;
+    teamMemberIds: string[];
     /** You own this — wire it to your invite mutation. */
-    onSubmit: (payload: { emails: string[]; role: ProjectRole; message?: string }) => void;
+    onSubmit: (payload: {
+        emails: string[];
+        userIds: string[];
+        role: ProjectRole;
+        message?: string;
+    }) => void;
     isPending?: boolean;
 };
 
@@ -64,8 +72,10 @@ export default function InviteToTeamDialog({
     onOpenChange,
     sender,
     orgName,
+    projectId,
     projectName,
     teamName,
+    teamMemberIds,
     onSubmit,
     isPending = false,
 }: InviteToTeamDialogProps) {
@@ -87,8 +97,10 @@ export default function InviteToTeamDialog({
                 <InviteForm
                     sender={sender}
                     orgName={orgName}
+                    projectId={projectId}
                     projectName={projectName}
                     teamName={teamName}
+                    teamMemberIds={teamMemberIds}
                     onSubmit={onSubmit}
                     isPending={isPending}
                 />
@@ -100,12 +112,15 @@ export default function InviteToTeamDialog({
 function InviteForm({
     sender,
     orgName,
+    projectId,
     projectName,
     teamName,
+    teamMemberIds,
     onSubmit,
     isPending,
 }: Omit<InviteToTeamDialogProps, "open" | "onOpenChange"> & { isPending: boolean }) {
     const [emails, setEmails] = React.useState<string[]>([]);
+    const [selectedUserIds, setSelectedUserIds] = React.useState<string[]>([]);
     const [draft, setDraft] = React.useState("");
     const [message, setMessage] = React.useState("");
     const [role, setRole] = React.useState<ProjectRole>(ProjectRole.Write);
@@ -113,27 +128,32 @@ function InviteForm({
 
     const debouncedDraft = useDebouncedValue(draft, 300);
     const draftLooksInvalid = debouncedDraft.trim().length > 0 && !isValidEmail(debouncedDraft);
-    const atLimit = emails.length >= MAX_EMAILS;
+    const recipientCount = emails.length + selectedUserIds.length;
+    const atLimit = recipientCount >= MAX_RECIPIENTS;
+    const maxProjectSelections = MAX_RECIPIENTS - emails.length;
 
-    const addEmails = React.useCallback((raw: string) => {
-        const candidates = raw
-            .split(/[\s,;]+/)
-            .map((e) => e.trim().toLowerCase())
-            .filter(Boolean);
+    const addEmails = React.useCallback(
+        (raw: string) => {
+            const candidates = raw
+                .split(/[\s,;]+/)
+                .map((e) => e.trim().toLowerCase())
+                .filter(Boolean);
 
-        setEmails((prev) => {
-            const seen = new Set(prev);
-            const next = [...prev];
-            for (const email of candidates) {
-                if (next.length >= MAX_EMAILS) break;
-                if (isValidEmail(email) && !seen.has(email)) {
-                    seen.add(email);
-                    next.push(email);
+            setEmails((prev) => {
+                const seen = new Set(prev);
+                const next = [...prev];
+                for (const email of candidates) {
+                    if (next.length + selectedUserIds.length >= MAX_RECIPIENTS) break;
+                    if (isValidEmail(email) && !seen.has(email)) {
+                        seen.add(email);
+                        next.push(email);
+                    }
                 }
-            }
-            return next;
-        });
-    }, []);
+                return next;
+            });
+        },
+        [selectedUserIds.length],
+    );
 
     const commitDraft = React.useCallback(() => {
         if (!draft.trim()) return;
@@ -169,13 +189,29 @@ function InviteForm({
 
     function handleSubmit() {
         // Fold a still-typed valid email into the batch before sending.
-        const pending = isValidEmail(draft) ? [draft.trim().toLowerCase()] : [];
-        const finalEmails = [...new Set([...emails, ...pending])];
-        if (finalEmails.length === 0) return;
-        onSubmit({ emails: finalEmails, role, message: message.trim() || undefined });
+        const canAddDraft = isValidEmail(draft) && recipientCount < MAX_RECIPIENTS;
+        const pending = canAddDraft ? [draft.trim().toLowerCase()] : [];
+        const finalEmails = [...new Set([...emails, ...pending])].slice(
+            0,
+            MAX_RECIPIENTS - selectedUserIds.length,
+        );
+        if (finalEmails.length === 0 && selectedUserIds.length === 0) return;
+        onSubmit({
+            emails: finalEmails,
+            userIds: selectedUserIds,
+            role,
+            message: message.trim() || undefined,
+        });
     }
 
-    const canSubmit = !isPending && (emails.length > 0 || isValidEmail(draft));
+    const hasEmailRecipients = emails.length > 0 || (isValidEmail(draft) && !atLimit);
+    const canSubmit = !isPending && (selectedUserIds.length > 0 || hasEmailRecipients);
+    const submitLabel =
+        selectedUserIds.length > 0 && hasEmailRecipients
+            ? "Add and invite"
+            : selectedUserIds.length > 0
+              ? "Add members"
+              : "Send invites";
     const senderLetter = (sender.name || sender.email || "?").trim().charAt(0).toUpperCase();
 
     return (
@@ -207,7 +243,7 @@ function InviteForm({
                 <p className="min-h-3.5 text-[11px]">
                     {atLimit ? (
                         <span className="text-amber-400">
-                            Maximum of {MAX_EMAILS} emails reached.
+                            Maximum of {MAX_RECIPIENTS} recipients reached.
                         </span>
                     ) : draftLooksInvalid ? (
                         <span className="text-rose-400">
@@ -215,10 +251,24 @@ function InviteForm({
                         </span>
                     ) : (
                         <span className="text-neutral-500">
-                            Press Enter or comma to add multiple.
+                            Select project members or invite by email.
                         </span>
                     )}
                 </p>
+                <ProjectTeamMemberPicker
+                    projectId={projectId}
+                    excludedUserIds={teamMemberIds}
+                    selectedUserIds={selectedUserIds}
+                    onChange={setSelectedUserIds}
+                    maxSelections={maxProjectSelections}
+                />
+                <div className="flex w-full items-center gap-3 py-1">
+                    <span className="h-px flex-1 bg-white/5" />
+                    <span className="text-[10px] font-medium tracking-wide text-neutral-600 uppercase">
+                        Or invite by email
+                    </span>
+                    <span className="h-px flex-1 bg-white/5" />
+                </div>
                 <div className="flex w-full flex-wrap items-center gap-1.5">
                     {emails.map((email) => (
                         <span
@@ -318,7 +368,7 @@ function InviteForm({
                         loading={isPending}
                         disabled={!canSubmit}
                     >
-                        Send invites
+                        {submitLabel}
                     </Button>
                 </div>
             </section>

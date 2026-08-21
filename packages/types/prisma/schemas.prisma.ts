@@ -246,6 +246,27 @@ export interface ProjectChat {
     updatedAt: Date;
 }
 
+export interface TeamChat {
+    id: string;
+    teamId: string;
+    message: string;
+    isDeleted: boolean;
+
+    senderId: string | null;
+    sender: User | null;
+
+    repliedToId: string | null;
+    repliedTo?: TeamChat | null;
+
+    references: MessageReference[];
+    reactions: ReactionSummary[];
+
+    createdAt: Date;
+    updatedAt: Date;
+}
+
+export type ThreadMessage = Chat | ProjectChat | TeamChat;
+
 export interface ReferencedIssue {
     id: string;
     number: number;
@@ -258,6 +279,7 @@ export interface MessageReference {
     id: string;
     chatId: string | null;
     projectChatId: string | null;
+    teamChatId: string | null;
     memberId: string | null;
     issueId: string | null;
     description: string | null;

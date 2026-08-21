@@ -55,6 +55,10 @@ export default async function get_project_controller(req: Request, res: Response
                         id: true,
                         name: true,
                         slug: true,
+                        members: {
+                            where: { userId: user.id },
+                            select: { role: true },
+                        },
                     },
                 },
             },
@@ -65,7 +69,14 @@ export default async function get_project_controller(req: Request, res: Response
             return;
         }
 
-        ResponseWriter.success(res, { ...project, viewerRole: project_role });
+        ResponseWriter.success(res, {
+            ...project,
+            teams: project.teams.map(({ members, ...team }) => ({
+                ...team,
+                viewerRole: members[0]?.role ?? null,
+            })),
+            viewerRole: project_role,
+        });
     } catch (error) {
         console.error("error in get_project_controller:", error);
         ResponseWriter.system_error(res);

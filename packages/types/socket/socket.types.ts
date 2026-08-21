@@ -5,6 +5,7 @@ import type {
     IssueActivity,
     Notification,
     ProjectChat,
+    TeamChat,
 } from "../prisma/schemas.prisma";
 
 export enum InboundSocketMessageType {
@@ -15,6 +16,9 @@ export enum InboundSocketMessageType {
     PROJECT_CHAT_CREATE = "PROJECT_CHAT_CREATE",
     PROJECT_CHAT_DELETE = "PROJECT_CHAT_DELETE",
     PROJECT_CHAT_REACTION_TOGGLE = "PROJECT_CHAT_REACTION_TOGGLE",
+    TEAM_CHAT_CREATE = "TEAM_CHAT_CREATE",
+    TEAM_CHAT_DELETE = "TEAM_CHAT_DELETE",
+    TEAM_CHAT_REACTION_TOGGLE = "TEAM_CHAT_REACTION_TOGGLE",
 }
 
 export type InboundSocketMessage =
@@ -57,6 +61,18 @@ export type InboundSocketMessage =
     | {
           type: InboundSocketMessageType.PROJECT_CHAT_REACTION_TOGGLE;
           payload: { chatId: string; emoji: string; operationId: string };
+      }
+    | {
+          type: InboundSocketMessageType.TEAM_CHAT_CREATE;
+          payload: { teamId: string; message: string; repliedToId?: string };
+      }
+    | {
+          type: InboundSocketMessageType.TEAM_CHAT_DELETE;
+          payload: { chatId: string };
+      }
+    | {
+          type: InboundSocketMessageType.TEAM_CHAT_REACTION_TOGGLE;
+          payload: { chatId: string; emoji: string; operationId: string };
       };
 
 export enum OutboundSocketMessageType {
@@ -69,6 +85,9 @@ export enum OutboundSocketMessageType {
     PROJECT_CHAT_CREATED = "PROJECT_CHAT_CREATED",
     PROJECT_CHAT_DELETED = "PROJECT_CHAT_DELETED",
     PROJECT_CHAT_REACTION_UPDATED = "PROJECT_CHAT_REACTION_UPDATED",
+    TEAM_CHAT_CREATED = "TEAM_CHAT_CREATED",
+    TEAM_CHAT_DELETED = "TEAM_CHAT_DELETED",
+    TEAM_CHAT_REACTION_UPDATED = "TEAM_CHAT_REACTION_UPDATED",
     NOTIFICATION_CREATED = "NOTIFICATION_CREATED",
     ACTIVITY_CREATED = "ACTIVITY_CREATED",
     AGENT_SESSION_UPDATED = "AGENT_SESSION_UPDATED",
@@ -123,6 +142,29 @@ export type OutboundSocketMessage =
     | {
           type: OutboundSocketMessageType.PROJECT_CHAT_REACTION_UPDATED;
           projectId: string;
+          payload: {
+              chatId: string;
+              updates: { emoji: string; count: number; actorReacted: boolean }[];
+              actorId: string;
+              operationId: string;
+          };
+      }
+    | {
+          type: OutboundSocketMessageType.TEAM_CHAT_CREATED;
+          projectId: string;
+          teamId: string;
+          payload: TeamChat;
+      }
+    | {
+          type: OutboundSocketMessageType.TEAM_CHAT_DELETED;
+          projectId: string;
+          teamId: string;
+          payload: TeamChat;
+      }
+    | {
+          type: OutboundSocketMessageType.TEAM_CHAT_REACTION_UPDATED;
+          projectId: string;
+          teamId: string;
           payload: {
               chatId: string;
               updates: { emoji: string; count: number; actorReacted: boolean }[];

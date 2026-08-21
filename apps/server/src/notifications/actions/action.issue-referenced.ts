@@ -80,6 +80,9 @@ export default class IssueReferencedNotification {
         if (data.projectChatId) {
             return prisma.projectChat.findUnique({ where: { id: data.projectChatId }, select });
         }
+        if (data.teamChatId) {
+            return prisma.teamChat.findUnique({ where: { id: data.teamChatId }, select });
+        }
         return null;
     }
 }
