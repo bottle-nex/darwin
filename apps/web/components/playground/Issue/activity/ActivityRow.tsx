@@ -7,10 +7,13 @@ import PlaygroundAvatar, {
     toneFor,
 } from "@/components/playground/Core/components/PlaygroundAvatar";
 import HeroBuddy from "@/components/landing/v2/HeroBuddy";
+import InfoTooltip from "@/components/ui/InfoTooltip";
+import UserInfoCard from "@/components/playground/Core/components/UserInfoCard";
 import { activity_entry } from "./activity.registry";
 
 export type ActivityActorView = {
     id: string;
+    userId: string | null;
     name: string;
     image: string | null;
     isAgent: boolean;
@@ -26,6 +29,7 @@ export function actor_of(activity: IssueActivity): ActivityActorView {
     if (activity.actorType === ActorType.Agent) {
         return {
             id: activity.actorWorkerId ?? "agent",
+            userId: null,
             name: frozen?.name ?? "matcha",
             image: null,
             isAgent: true,
@@ -33,6 +37,7 @@ export function actor_of(activity: IssueActivity): ActivityActorView {
     }
     return {
         id: activity.actorUserId ?? activity.id,
+        userId: activity.actorUserId,
         name: activity.actorUser?.name ?? frozen?.name ?? "Someone",
         image: activity.actorUser?.image ?? frozen?.image ?? null,
         isAgent: false,
@@ -72,6 +77,28 @@ export function ActorAvatar({
 
 const RAIL_CLASS = "absolute left-[10.5px] w-px bg-edge";
 
+const ACTOR_NAME_CLASS =
+    "font-medium text-snow/60 hover:text-snow transition-colors transform duration-200";
+
+function ActorName({ actor }: { actor: ActivityActorView }) {
+    const name = <span className={ACTOR_NAME_CLASS}>{actor.name}</span>;
+    if (!actor.userId) return name;
+
+    return (
+        <InfoTooltip
+            content={
+                <UserInfoCard
+                    userId={actor.userId}
+                    fallbackName={actor.name}
+                    fallbackImage={actor.image}
+                />
+            }
+        >
+            {name}
+        </InfoTooltip>
+    );
+}
+
 /**
  * One timeline entry. `rail` says which neighbours are activity rows too, so the
  * connector stops cleanly wherever a comment breaks the run.
@@ -90,21 +117,17 @@ export default function ActivityRow({
     const predicate = render(activity.payload);
 
     return (
-        <div className="relative flex items-start gap-x-2.5 py-1">
+        <div className="relative flex items-start gap-x-2.5 pt-1.5 pb-1">
             {rail.above && <span aria-hidden className={cn(RAIL_CLASS, "top-0 h-1.5")} />}
             {rail.below && <span aria-hidden className={cn(RAIL_CLASS, "top-7 bottom-0")} />}
             <span
                 aria-hidden
-                className={cn(
-                    "relative z-10 mt-0.5 flex size-[22px] shrink-0 items-center justify-center rounded-full bg-",
-                    iconClassName,
-                )}
+                className="relative z-10 flex size-[22px] shrink-0 items-center justify-center rounded-full"
             >
-                <Icon className="size-3.5" />
+                <Icon className={cn("size-3.5", iconClassName)} />
             </span>
-            <p className="min-w-0 flex-1 text-[13px] leading-[22px] wrap-anywhere text-neutral-500">
-                <ActorAvatar actor={actor} className="mr-1.5 -mt-px align-middle" />
-                <span className="font-medium text-neutral-300">{actor.name}</span>{" "}
+            <p className="min-w-0 flex-1 text-[12.5px] leading-[22px] wrap-anywhere text-neutral-500">
+                <ActorName actor={actor} />{" "}
                 {detail ? (
                     <HoverCard openDelay={120} closeDelay={80}>
                         <HoverCardTrigger asChild>
