@@ -130,6 +130,8 @@ export const TEAM_CHAT_URL = (team_id: string, cursor: string | null, limit: num
 export const NOTIFICATIONS_URL = API_URL + "/notifications";
 export const NOTIFICATIONS_READ_URL = NOTIFICATIONS_URL + "/read";
 
+export const GLOBAL_SEARCH_URL = (project_id: string) => `${API_URL}/search/${project_id}`;
+
 export const API_KEYS_URL = API_URL + "/claude-mcp/api-keys";
 export const REVOKE_API_KEY_URL = (id: string) => `${API_KEYS_URL}/${id}`;
 export const CLAUDE_MCP_URL = API_URL + "/claude-mcp/mcp";

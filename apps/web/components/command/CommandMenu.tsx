@@ -5,7 +5,6 @@ import { cn } from "@/lib/utils";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import {
     Command,
-    CommandEmpty,
     CommandGroup,
     CommandInput,
     CommandItem,
@@ -21,8 +20,15 @@ import {
     comboToKeys,
     isCommandAvailable,
 } from "@/hooks/shortcuts/usePlaygroundShortcuts";
+import { useDebouncedValue } from "@/hooks/useDebouncedValue";
+import { isSearchableQuery, useGlobalSearch } from "@/hooks/search/useGlobalSearch";
 import { COMMAND_KIND_ORDER, CommandKind, type CommandEntry } from "@/types/command.type";
 import CommandIssuePage, { ISSUE_PAGE_TITLE } from "./CommandIssuePage";
+import CommandSearchResults from "./CommandSearchResults";
+import { commandEntryValue, filterCommandGroups } from "./commandFilter";
+import { commandMenuView } from "./commandMenuView";
+
+const SEARCH_DEBOUNCE_MS = 200;
 
 export default function CommandMenu() {
     const isOpen = useCommandMenuStore((s) => s.isOpen);
@@ -57,7 +63,7 @@ function CommandMenuBody({ onDone }: { onDone: () => void }) {
     const actions = useIssueActions(selectedIds.length ? selectedIds : issueId);
     const context = useMemo(() => ({ orgSlug, projectId, issueId }), [orgSlug, projectId, issueId]);
 
-    const groups = useMemo(
+    const availableGroups = useMemo(
         () =>
             COMMAND_KIND_ORDER.map((kind) => ({
                 kind,
@@ -70,6 +76,26 @@ function CommandMenuBody({ onDone }: { onDone: () => void }) {
             })).filter((group) => group.entries.length > 0),
         [issueId, selectedIds.length],
     );
+
+    const groups = useMemo(
+        () => filterCommandGroups(availableGroups, query),
+        [availableGroups, query],
+    );
+
+    const searchQuery = useDebouncedValue(query, SEARCH_DEBOUNCE_MS).trim();
+    const canSearch = !page && Boolean(projectId);
+    const searchArmed = canSearch && isSearchableQuery(query.trim());
+    const searchSettled = canSearch && isSearchableQuery(searchQuery);
+    const search = useGlobalSearch(projectId, searchQuery, searchSettled);
+    const searchResult = searchSettled ? search.data : undefined;
+    const { showSearchGroups, showNoResults } = commandMenuView({
+        commandGroupCount: groups.length,
+        searchArmed,
+        searchSettled,
+        hasResult: Boolean(searchResult),
+        hasHits: Boolean(searchResult?.issues.length || searchResult?.messages.length),
+        isError: searchSettled && search.isError,
+    });
 
     function back() {
         setPage(null);
@@ -87,6 +113,7 @@ function CommandMenuBody({ onDone }: { onDone: () => void }) {
     return (
         <Command
             loop
+            shouldFilter={page !== null}
             className="bg-transparent"
             onKeyDown={(event) => {
                 if (!page) return;
@@ -135,7 +162,9 @@ function CommandMenuBody({ onDone }: { onDone: () => void }) {
                     data-lenis-prevent
                     className="no-scrollbar max-h-[min(60vh,26rem)] px-2 pt-1 pb-2"
                 >
-                    <CommandEmpty>No matching commands.</CommandEmpty>
+                    {showNoResults && (
+                        <div className="py-6 text-center text-sm text-neutral-500">No results.</div>
+                    )}
                     {groups.map((group) => (
                         <CommandGroup key={group.kind} heading={group.kind}>
                             {group.entries.map((entry) => {
@@ -143,7 +172,7 @@ function CommandMenuBody({ onDone }: { onDone: () => void }) {
                                 return (
                                     <CommandItem
                                         key={entry.combo}
-                                        value={`${entry.kind} ${entry.label} ${entry.combo}`}
+                                        value={commandEntryValue(entry)}
                                         disabled={!available}
                                         onSelect={() => run(entry)}
                                         className={cn(
@@ -167,6 +196,14 @@ function CommandMenuBody({ onDone }: { onDone: () => void }) {
                             })}
                         </CommandGroup>
                     ))}
+                    {showSearchGroups && (
+                        <CommandSearchResults
+                            result={searchResult}
+                            isFetching={search.isFetching}
+                            isError={searchSettled && search.isError}
+                            onDone={onDone}
+                        />
+                    )}
                 </CommandList>
             )}
         </Command>
