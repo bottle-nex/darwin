@@ -4,7 +4,7 @@ import { server_services } from "..";
 import ActivityService, { type ActivityEvent } from "./service.activity";
 import { location_of } from "./service.activity-diff";
 import AgentSessionService from "./service.agent-session";
-import GithubService from "./service.github";
+import GithubPullsService from "./service.github_pulls";
 import ProductDiffService from "./service.product_diff";
 
 type PrOpened = Extract<IssueOutcomeJobData, { kind: "pr_opened" }>;
@@ -196,7 +196,7 @@ export default class IssueOutcomeService {
         const [owner, repo] = githubRepoFullName.split("/");
         if (!owner || !repo) return null;
 
-        return GithubService.findOpenPullRequestByBranch(
+        return GithubPullsService.findOpenPullRequestByBranch(
             Number(githubInstallation.installationId),
             owner,
             repo,

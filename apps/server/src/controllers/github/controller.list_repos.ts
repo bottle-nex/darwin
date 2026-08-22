@@ -4,7 +4,7 @@ import { Action, Permissions } from "@trymatcha/access-control";
 import { prisma } from "@trymatcha/database";
 import Access from "../../access-control/access";
 import ResponseWriter from "../../services/service.response";
-import GithubService from "../../services/service.github";
+import GithubAppService from "../../services/service.github_app";
 
 const params_schema = z.object({
     orgId: z.string().min(1),
@@ -48,7 +48,7 @@ export default class ListReposController {
                 );
             }
 
-            const repos = await GithubService.listInstallationRepos(
+            const repos = await GithubAppService.listInstallationRepos(
                 Number(installation.installationId),
             );
             return ResponseWriter.success(res, repos, "Repositories fetched");

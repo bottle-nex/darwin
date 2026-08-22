@@ -21,7 +21,7 @@ import { useShortcutSheetStore } from "@/store/playground/useShortcutSheetStore"
 import { PlaygroundTab } from "@/components/playground/playgroundTabs";
 import { useSidebarWidthStore } from "@/store/playground/useSidebarWidthStore";
 import { useNotificationsPanelStore } from "@/store/playground/useNotificationsPanelStore";
-import { useIssueStore } from "@/store/issues/useIssueStore";
+import { useCreateIssueStore } from "@/store/issues/useCreateIssueStore";
 import { useNewProjectStore } from "@/store/project/useNewProjectStore";
 import { useNewTeamStore } from "@/store/team/useNewTeamStore";
 import { useCommandMenuStore } from "@/store/command/useCommandMenuStore";
@@ -167,7 +167,7 @@ export const COMBINATIONS: Record<string, CommandAction> = {
         label: "New Issue",
         icon: HiOutlineRectangleStack,
         isAvailable: inProject,
-        run: () => useIssueStore.getState().openCreate({ board: "llm" }),
+        run: () => useCreateIssueStore.getState().open({ board: "llm" }),
     },
     "n p": {
         kind: CommandKind.New,

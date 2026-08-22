@@ -5,7 +5,7 @@ import { LuColumns3 } from "react-icons/lu";
 import PlaygroundAvatar from "@/components/playground/Core/components/PlaygroundAvatar";
 import SelectableRow from "@/components/playground/Core/components/SelectableRow";
 import { IssueSelectionOrderProvider, useIssueSelection } from "@/hooks/issues/useIssueSelection";
-import { useIssueNavigation } from "@/components/playground/Issue/useIssueNavigation";
+import { usePaneRouteStore } from "@/store/playground/usePaneRouteStore";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { useBoardFeed } from "@/hooks/issues/useBoard";
 import { useBoardColumns } from "@/hooks/issues/useBoardColumns";
@@ -213,7 +213,7 @@ function ListGroupHeader({ group }: { group: ListGroup }) {
 }
 
 function ListRow({ issue, selectionScope }: { issue: Issue; selectionScope: SelectionScope }) {
-    const { openIssue } = useIssueNavigation();
+    const openIssue = usePaneRouteStore((s) => s.openIssue);
     const { selectedIds, isSelected, toggleSelection, handleSelectClick } =
         useIssueSelection(selectionScope);
     const selected = isSelected(issue.id);

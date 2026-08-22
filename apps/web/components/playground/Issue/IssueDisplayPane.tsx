@@ -1,7 +1,6 @@
 "use client";
 import { useState } from "react";
 import type { BoardColumn, BoardIssue } from "@/types/board";
-import { cn } from "@/lib/utils";
 import { PLAYGROUND_PANE_SHELL } from "@/components/playground/Core/components/paneBar";
 import {
     PaneActionsSlot,
@@ -9,16 +8,15 @@ import {
 } from "@/components/playground/Core/components/PlaygroundPaneSlots";
 import PlaygroundBreadcrumb from "@/components/playground/Core/components/PlaygroundBreadcrumb";
 import { PANE_TOP_BAR_HEIGHT } from "@/components/playground/Core/components/PlaygroundPaneFrame";
+import PaneColumns from "@/components/playground/Core/components/PaneColumns";
 import IssueDropdown from "@/components/playground/Home/KanbanDisplay/IssueDropdown";
 import ConfirmDialog from "@/components/utility/ConfirmDialog";
 import { useEscapeExit } from "@/hooks/shortcuts/useEscapeExit";
-import DiffDisplay from "./diff/DiffDisplay";
 import IssueDetailBody from "./IssueDetailBody";
 import IssueProperties from "./IssueProperties";
 import IssueSubmitAction from "./IssueSubmitAction";
 import { isEditable, targetForIssue } from "./issueHelpers";
-import { useIssueNavigation } from "./useIssueNavigation";
-import { useIssueRoute } from "./useIssueRoute";
+import { usePaneRouteStore } from "@/store/playground/usePaneRouteStore";
 import { useIssueForm } from "./useIssueForm";
 
 export default function IssueDisplayPane({
@@ -32,11 +30,9 @@ export default function IssueDisplayPane({
     embedded?: boolean;
     onDismiss?: () => void;
 }) {
-    const { close: closeRoute, showIssueDetail } = useIssueNavigation();
-    const { issueView } = useIssueRoute();
-    const close = onDismiss ?? closeRoute;
+    const openBoard = usePaneRouteStore((s) => s.openBoard);
+    const close = onDismiss ?? openBoard;
     const [confirmingClose, setConfirmingClose] = useState(false);
-    const inDiff = !embedded && issueView === "diff";
 
     const form = useIssueForm({
         target: targetForIssue(issue, columns),
@@ -49,9 +45,9 @@ export default function IssueDisplayPane({
 
     useEscapeExit({
         enabled: !confirmingClose,
-        isDirty: inDiff ? false : isDirty,
+        isDirty,
         editor: form.editorRef.current,
-        onExit: inDiff ? showIssueDetail : close,
+        onExit: close,
         onDirtyExit: () => setConfirmingClose(true),
     });
 
@@ -75,34 +71,17 @@ export default function IssueDisplayPane({
                 ) : (
                     <>
                         <PaneLeadSlot>
-                            <PlaygroundBreadcrumb
-                                issue={issue}
-                                trailing={inDiff ? "Diff" : undefined}
-                            />
+                            <PlaygroundBreadcrumb issue={issue} />
                         </PaneLeadSlot>
 
-                        {!inDiff && (
-                            <PaneActionsSlot>
-                                <IssueSubmitAction form={form} warningPlacement="below" />
-                            </PaneActionsSlot>
-                        )}
+                        <PaneActionsSlot>
+                            <IssueSubmitAction form={form} warningPlacement="below" />
+                        </PaneActionsSlot>
                     </>
                 )}
-                <div
-                    className={cn(
-                        "grid min-h-0 min-w-0 flex-1 grid-cols-[minmax(0,50rem)_16rem]",
-                        embedded ? "m-2" : "m-4",
-                    )}
-                >
-                    <div className="flex min-h-0 min-w-0 flex-col">
-                        {inDiff ? (
-                            <DiffDisplay issue={issue} />
-                        ) : (
-                            <IssueDetailBody form={form} issueId={issue.id} embedded={embedded} />
-                        )}
-                    </div>
-                    <IssueProperties form={form} issue={issue} />
-                </div>
+                <PaneColumns tight={embedded} aside={<IssueProperties form={form} issue={issue} />}>
+                    <IssueDetailBody form={form} issueId={issue.id} embedded={embedded} />
+                </PaneColumns>
                 <ConfirmDialog
                     open={confirmingClose}
                     onOpenChange={setConfirmingClose}

@@ -31,6 +31,8 @@ const issue = (
     startDate: null,
     targetDate: null,
     prUrl: null,
+    prNumber: null,
+    prTitle: null,
     creator: null,
     assignees: [],
     tags: [],

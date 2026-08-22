@@ -9,14 +9,14 @@ import LogoLoader from "@/components/app/LogoLoader";
 import { PLAYGROUND_PANE_SHELL } from "@/components/playground/Core/components/paneBar";
 import { PaneLeadSlot } from "@/components/playground/Core/components/PlaygroundPaneSlots";
 import PlaygroundBreadcrumb from "@/components/playground/Core/components/PlaygroundBreadcrumb";
-import { useIssueNavigation } from "./useIssueNavigation";
+import { usePaneRouteStore } from "@/store/playground/usePaneRouteStore";
 import IssueDisplayPane from "./IssueDisplayPane";
 
 export default function IssueDisplay({ issueId }: { issueId: string }) {
     const projectId = useActiveProject()?.id;
     const { data: issue, isPending, isError, error, refetch } = useIssue(projectId, issueId);
     const { data: metadata } = useBoardColumns(projectId);
-    const { close } = useIssueNavigation();
+    const close = usePaneRouteStore((s) => s.openBoard);
     const showsDetail = Boolean(issue);
 
     useEscapeExit({ enabled: !showsDetail, onExit: close });

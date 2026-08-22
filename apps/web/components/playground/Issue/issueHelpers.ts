@@ -3,7 +3,7 @@ import { LuEllipsis } from "react-icons/lu";
 import { BsExclamationSquareFill } from "react-icons/bs";
 import { IssueStatus } from "@trymatcha/types";
 import type { BoardColumn, BoardIssue } from "@/types/board";
-import type { IssueTarget } from "@/store/issues/useIssueStore";
+import type { IssueTarget } from "@/store/issues/useCreateIssueStore";
 import type { Priority } from "@/types/kanban";
 import {
     RiSignalCellular1Fill,

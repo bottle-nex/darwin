@@ -9,7 +9,7 @@ import { KanbanMappers } from "@/lib/kanban/KanbanMappers";
 import { PRIORITY_TO_NUMBER } from "@/components/playground/Home/KanbanDisplay/customkanban/data";
 import type { Priority } from "@/types/kanban";
 import type { BoardIssue } from "@/types/board";
-import type { IssueTarget } from "@/store/issues/useIssueStore";
+import type { IssueTarget } from "@/store/issues/useCreateIssueStore";
 import { useIssueDescription } from "./useIssueDescription";
 import { useSubmitWarning } from "./SubmitWarningToast";
 

@@ -1,6 +1,6 @@
 "use client";
 import { useIssueSelection } from "@/hooks/issues/useIssueSelection";
-import { useIssueNavigation } from "@/components/playground/Issue/useIssueNavigation";
+import { usePaneRouteStore } from "@/store/playground/usePaneRouteStore";
 import { KanbanStatus, type Issue } from "@/types/kanban";
 import IssueDropdown from "../IssueDropdown";
 import TodoCard from "./TodoCard";
@@ -44,7 +44,7 @@ export default function CardRenderer({
     issue: Issue;
     preview?: boolean;
 }) {
-    const { openIssue } = useIssueNavigation();
+    const openIssue = usePaneRouteStore((s) => s.openIssue);
     const { isSelected, handleSelectClick } = useIssueSelection("kanban");
     const selected = isSelected(issue.id);
 

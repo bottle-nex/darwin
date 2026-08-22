@@ -1,5 +1,5 @@
 import PlaygroundShell from "@/components/playground/Core/PlaygroundShell";
 
-export default function IssueDiffDeepLinkPage() {
+export default function ReviewDeepLinkPage() {
     return <PlaygroundShell />;
 }

@@ -4,7 +4,8 @@ import { Action, Permissions } from "@trymatcha/access-control";
 import { prisma } from "@trymatcha/database";
 import Access from "../../access-control/access";
 import ResponseWriter from "../../services/service.response";
-import GithubService from "../../services/service.github";
+import GithubAppService from "../../services/service.github_app";
+import GithubUserService from "../../services/service.github_user";
 
 const body_schema = z.object({
     orgId: z.string().min(1),
@@ -50,10 +51,10 @@ export default class ConnectStartController {
                 );
             }
 
-            const state = await GithubService.create_state({ orgId, userId });
+            const state = await GithubUserService.create_state({ orgId, userId });
             return ResponseWriter.redirect(
                 res,
-                GithubService.buildInstallUrl(state),
+                GithubAppService.buildInstallUrl(state),
                 "Redirect to GitHub to install the app",
             );
         } catch (error) {

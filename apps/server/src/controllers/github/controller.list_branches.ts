@@ -4,7 +4,7 @@ import { Action, Permissions } from "@trymatcha/access-control";
 import { prisma } from "@trymatcha/database";
 import Access from "../../access-control/access";
 import ResponseWriter from "../../services/service.response";
-import GithubService from "../../services/service.github";
+import GithubAppService from "../../services/service.github_app";
 
 const params_schema = z.object({
     orgId: z.string().min(1),
@@ -45,7 +45,7 @@ export default class ListBranchesController {
                 );
             }
 
-            const branches = await GithubService.listRepoBranches(
+            const branches = await GithubAppService.listRepoBranches(
                 Number(installation.installationId),
                 owner,
                 repo,

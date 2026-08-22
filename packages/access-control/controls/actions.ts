@@ -23,6 +23,7 @@ const Action = {
         close_issue: "close_issue",
         delete_any_chat: "delete_any_chat",
         assign_issue: "assign_issue",
+        comment_review: "comment_review",
         manage_columns: "manage_columns",
         manage_tags: "manage_tags",
         manage_templates: "manage_templates",

@@ -3,7 +3,7 @@ import { apiClient } from "@/lib/axios";
 import { PRODUCT_DIFF_ARTIFACT_URLS_URL } from "@/routes/api_routes";
 import { useUserSessionStore } from "@/store/user/useUserSessionStore";
 import type { ApiResponse } from "@/types/api";
-import { PRODUCT_DIFF_QUERY_KEY } from "./useProductDiffs";
+import { PRODUCT_DIFF_QUERY_KEY } from "./useProductDiff";
 
 const REFRESH_MS = 4 * 60_000;
 const STALE_MS = 3.5 * 60_000;

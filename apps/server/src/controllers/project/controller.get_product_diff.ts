@@ -4,7 +4,7 @@ import { is_product_diff_manifest_v2, type ProductDiffManifest } from "@trymatch
 import { Request, Response } from "express";
 import z from "zod";
 import Access from "../../access-control/access";
-import GithubService from "../../services/service.github";
+import GithubPullsService from "../../services/service.github_pulls";
 import ProductDiffService from "../../services/service.product_diff";
 import ResponseWriter from "../../services/service.response";
 import StorageService from "../../services/service.storage";
@@ -49,7 +49,7 @@ export default async function get_product_diff_controller(req: Request, res: Res
         if (status === "Ready" && project.githubRepoFullName && project.githubInstallation) {
             const [owner, repo] = project.githubRepoFullName.split("/");
             if (owner && repo) {
-                const pull = await GithubService.getPullRequest(
+                const pull = await GithubPullsService.getPullRequest(
                     Number(project.githubInstallation.installationId),
                     owner,
                     repo,

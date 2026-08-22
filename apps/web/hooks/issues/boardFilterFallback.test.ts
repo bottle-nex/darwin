@@ -19,6 +19,8 @@ const issue = (id: string, title: string): BoardIssue => ({
     startDate: null,
     targetDate: null,
     prUrl: null,
+    prNumber: null,
+    prTitle: null,
     creator: null,
     assignees: [],
     tags: [],

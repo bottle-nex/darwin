@@ -229,6 +229,8 @@ export function toBoardIssue(issue: Issue | BoardIssue): BoardIssue {
         startDate: issue.startDate ? new Date(issue.startDate).toISOString() : null,
         targetDate: issue.targetDate ? new Date(issue.targetDate).toISOString() : null,
         prUrl: issue.prUrl,
+        prNumber: issue.prNumber,
+        prTitle: issue.prTitle,
         creator: issue.creator ?? null,
         assignees: issue.assignees,
         tags: issue.tags,

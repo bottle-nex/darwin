@@ -1,5 +1,5 @@
 "use client";
-import type { IssueTarget } from "@/store/issues/useIssueStore";
+import type { IssueTarget } from "@/store/issues/useCreateIssueStore";
 import TemplatePicker from "./TemplatePicker";
 import IssueTitleField from "./IssueTitleField";
 import IssueFields from "./IssueFields";

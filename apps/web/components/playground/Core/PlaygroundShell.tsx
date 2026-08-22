@@ -16,7 +16,8 @@ import IssueDisplay from "@/components/playground/Issue/IssueDisplay";
 import PlaygroundShortcutSheet from "@/components/playground/Sidebar/PlaygroundShortcutSheet";
 import NotificationsPanel from "@/components/playground/Core/Notifications/NotificationsPanel";
 import FloatNotifications from "@/components/playground/Core/Notifications/FloatNotifications";
-import { useIssueRoute } from "@/components/playground/Issue/useIssueRoute";
+import { usePaneRoute } from "@/hooks/playground/usePaneRoute";
+import ReviewDisplay from "@/components/playground/Review/ReviewDisplay";
 import { useGetDashboard } from "@/hooks/dashboard/useGetDashboard";
 import { useGetProject } from "@/hooks/project/useGetProject";
 import { useSetLastVisited } from "@/hooks/user/useSetLastVisited";
@@ -56,7 +57,8 @@ export default function PlaygroundShell() {
 
     const activeTab = usePlaygroundNavStore((s) => s.tab);
     usePlaygroundUrlSync(project?.teams);
-    const { openIssueId } = useIssueRoute({ sync: true });
+    const paneRoute = usePaneRoute({ sync: true });
+    const openIssueId = paneRoute.kind === "issue" ? paneRoute.issueId : null;
     usePlaygroundShortcuts();
 
     const setCommandContext = useCommandContextStore((s) => s.setContext);
@@ -87,6 +89,8 @@ export default function PlaygroundShell() {
                         <div className="flex min-h-0 flex-1 flex-col">
                             <OnboardingDisplay project={project} orgId={dashboard!.org.id} />
                         </div>
+                    ) : paneRoute.kind === "review" ? (
+                        <ReviewDisplay route={paneRoute} />
                     ) : openIssueId ? (
                         <IssueDisplay issueId={openIssueId} />
                     ) : (

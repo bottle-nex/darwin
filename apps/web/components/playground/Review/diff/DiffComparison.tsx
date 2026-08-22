@@ -65,9 +65,7 @@ function Side({
                         className="rounded-md"
                     />
                 ) : (
-                    <p className="px-4 py-10 text-center text-[11.5px] text-neutral-500">
-                        {absent}
-                    </p>
+                    <p className="px-4 py-10 text-center text-[13px] text-neutral-500">{absent}</p>
                 )}
             </div>
         </section>

@@ -10,7 +10,7 @@ import {
 import { useDroppable } from "@dnd-kit/core";
 import { cn } from "@/lib/utils";
 import { IssueStatus } from "@trymatcha/types";
-import { useIssueStore } from "@/store/issues/useIssueStore";
+import { useCreateIssueStore } from "@/store/issues/useCreateIssueStore";
 import { useIssueSelectionStore } from "@/store/issues/useIssueSelectionStore";
 import { MatchaLogo } from "@/components/logo/MatchaLogo";
 import { useActiveProject } from "@/hooks/useActiveProject";
@@ -42,7 +42,7 @@ export default function KanbanColumn({
     draggableCards = false,
 }: KanbanColumnProps) {
     const { setNodeRef } = useDroppable({ id: column.status, disabled: !droppable });
-    const openCreate = useIssueStore((s) => s.openCreate);
+    const openCreate = useCreateIssueStore((s) => s.open);
     const selectedIds = useIssueSelectionStore((s) => s.ids);
     const replaceSelection = useIssueSelectionStore((s) => s.replace);
     const clearSelection = useIssueSelectionStore((s) => s.clear);

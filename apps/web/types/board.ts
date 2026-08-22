@@ -38,6 +38,8 @@ export type BoardIssue = {
     startDate: string | null;
     targetDate: string | null;
     prUrl: string | null;
+    prNumber: number | null;
+    prTitle: string | null;
     creator: BoardAssignee | null;
     assignees: BoardAssignee[];
     tags: BoardTag[];

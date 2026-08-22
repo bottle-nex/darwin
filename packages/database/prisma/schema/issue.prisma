@@ -31,6 +31,8 @@ model Issue {
   queuePosition  Int?
   specialization String?
   prUrl          String?
+  prNumber       Int?
+  prTitle        String?
   prBranch       String?
   agentDoneAt    DateTime?
 

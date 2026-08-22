@@ -3,7 +3,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useMarkNotificationsRead } from "@/hooks/notifications/useNotifications";
 import { useNotificationsPanelStore } from "@/store/playground/useNotificationsPanelStore";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
-import { useIssueNavigation } from "@/components/playground/Issue/useIssueNavigation";
+import { usePaneRouteStore } from "@/store/playground/usePaneRouteStore";
 import { PlaygroundTab } from "@/components/playground/playgroundTabs";
 import { useChatThreadStore } from "@/store/playground/useChatThreadStore";
 import type { Notification } from "@trymatcha/types";
@@ -19,7 +19,7 @@ export function useSelectNotification() {
     const setTab = usePlaygroundNavStore((s) => s.setTab);
     const selectProjectChat = useChatThreadStore((s) => s.selectProject);
     const selectTeamChat = useChatThreadStore((s) => s.selectTeam);
-    const { openIssue } = useIssueNavigation();
+    const openIssue = usePaneRouteStore((s) => s.openIssue);
     const close = useNotificationsPanelStore((s) => s.close);
 
     return function select(notification: Notification) {

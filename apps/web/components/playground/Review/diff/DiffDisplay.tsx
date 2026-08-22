@@ -2,7 +2,6 @@
 import { useMemo, useState, type ReactNode } from "react";
 import { FiRefreshCw } from "react-icons/fi";
 import { is_screenshot_product_review_manifest } from "@trymatcha/types";
-import type { BoardIssue } from "@/types/board";
 import { Button } from "@/components/ui/button";
 import {
     Select,
@@ -14,7 +13,6 @@ import {
 import LogoLoader from "@/components/app/LogoLoader";
 import { PaneActionsSlot } from "@/components/playground/Core/components/PlaygroundPaneSlots";
 import { useActiveProject } from "@/hooks/useActiveProject";
-import { useIssueProductDiff } from "@/hooks/project/useIssueProductDiff";
 import { useProductDiff } from "@/hooks/project/useProductDiff";
 import { useProductDiffArtifacts } from "@/hooks/project/useProductDiffArtifacts";
 import { useRegenerateProductDiff } from "@/hooks/project/useRegenerateProductDiff";
@@ -26,10 +24,15 @@ const OUTCOME_SUFFIX: Record<string, string> = {
     Unavailable: " · unavailable",
 };
 
-export default function DiffDisplay({ issue }: { issue: BoardIssue }) {
+export default function DiffDisplay({
+    productDiffId,
+    issueId,
+}: {
+    productDiffId: string | null;
+    issueId: string;
+}) {
     const projectId = useActiveProject()?.id;
-    const { diff, isPending: listPending } = useIssueProductDiff(projectId, issue.id);
-    const { data: detail } = useProductDiff(projectId, diff?.id ?? null);
+    const { data: detail } = useProductDiff(projectId, productDiffId);
     const regenerate = useRegenerateProductDiff();
 
     const [targetId, setTargetId] = useState("");
@@ -50,7 +53,7 @@ export default function DiffDisplay({ issue }: { issue: BoardIssue }) {
             .flatMap((item) => [item.baseKey, item.headKey])
             .filter((key): key is string => key !== null);
     }, [target]);
-    const { data: urls = {} } = useProductDiffArtifacts(projectId, diff?.id ?? null, keys);
+    const { data: urls = {} } = useProductDiffArtifacts(projectId, productDiffId, keys);
 
     function changeTarget(nextId: string) {
         const next = manifest?.targets.find((item) => item.id === nextId);
@@ -60,7 +63,7 @@ export default function DiffDisplay({ issue }: { issue: BoardIssue }) {
 
     function retry() {
         if (!projectId) return;
-        regenerate.mutate({ projectId, issueId: issue.id });
+        regenerate.mutate({ projectId, issueId });
     }
 
     return (
@@ -90,14 +93,13 @@ export default function DiffDisplay({ issue }: { issue: BoardIssue }) {
                 </div>
             </PaneActionsSlot>
 
-            {!diff && listPending && <LogoLoader className="h-full w-full text-snow" />}
-            {!diff && !listPending && (
+            {!productDiffId && (
                 <DiffStatus
                     title="No diff yet"
                     body="A diff is captured once the agent opens a frontend pull request for this issue."
                 />
             )}
-            {diff && !detail && <LogoLoader className="h-full w-full text-snow" />}
+            {productDiffId && !detail && <LogoLoader className="h-full w-full text-snow" />}
             {detail && detail.status === "Pending" && (
                 <DiffStatus
                     title="Queued"
@@ -164,7 +166,7 @@ function Picker({
 }) {
     return (
         <Select value={value} onValueChange={onChange}>
-            <SelectTrigger size="sm" className="max-w-52 text-[12.5px]">
+            <SelectTrigger size="sm" className="max-w-52 text-[14px]">
                 <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -182,7 +184,7 @@ function DiffStatus({ title, body, action }: { title: string; body: string; acti
     return (
         <div className="flex flex-1 flex-col items-center justify-center gap-3 px-6 text-center">
             <h2 className="text-sm font-medium text-neutral-200">{title}</h2>
-            <p className="max-w-md text-[11.5px] leading-relaxed text-neutral-500">{body}</p>
+            <p className="max-w-md text-[13px] leading-relaxed text-neutral-500">{body}</p>
             {action}
         </div>
     );

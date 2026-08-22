@@ -10,7 +10,7 @@ import {
     shortDate,
 } from "@/components/playground/Home/KanbanDisplay/cards/IssueCardFace";
 import { DATE_ICON_COLOR, PRIORITY_OPTIONS } from "@/components/playground/Issue/issueHelpers";
-import { useIssueNavigation } from "@/components/playground/Issue/useIssueNavigation";
+import { usePaneRouteStore } from "@/store/playground/usePaneRouteStore";
 import { useIssueSelection } from "@/hooks/issues/useIssueSelection";
 import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
 import { KanbanMappers } from "@/lib/kanban/KanbanMappers";
@@ -50,7 +50,7 @@ export default function MyIssueRow({
     issue: BoardIssue;
     projectName: string;
 }) {
-    const { openIssue } = useIssueNavigation();
+    const openIssue = usePaneRouteStore((s) => s.openIssue);
     const { isSelected, handleSelectClick } = useIssueSelection("my-issues");
     const selected = isSelected(issue.id);
     const status = KanbanBoard.columnFor(issue.status);
@@ -107,9 +107,5 @@ export default function MyIssueRow({
         </button>
     );
 
-    return (
-        <IssueDropdown issueId={issue.id} issue={issue}>
-            {row}
-        </IssueDropdown>
-    );
+    return <IssueDropdown issueId={issue.id}>{row}</IssueDropdown>;
 }

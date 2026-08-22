@@ -6,22 +6,32 @@ import { FaCircleCheck, FaCircleXmark } from "react-icons/fa6";
 import { RiLoader4Line } from "react-icons/ri";
 import { Button } from "@/components/ui/button";
 import { useCompleteGithubConnect } from "@/hooks/github/useCompleteGithubConnect";
+import { GITHUB_LINK_RETURN_KEY, useCompleteGithubLink } from "@/hooks/github/useGithubLink";
 import { useUserSessionStore } from "@/store/user/useUserSessionStore";
 
 type Status = "loading" | "success" | "error";
 
-const COPY: Record<Status, { title: string; hint: string }> = {
-    loading: {
-        title: "Connecting GitHub",
-        hint: "Linking your organization — this only takes a moment.",
+type Flow = "install" | "link";
+
+const COPY: Record<Flow, Record<Status, { title: string; hint: string }>> = {
+    install: {
+        loading: {
+            title: "Connecting GitHub",
+            hint: "Linking your organization — this only takes a moment.",
+        },
+        success: { title: "GitHub connected", hint: "Taking you back to your workspace…" },
+        error: {
+            title: "Couldn't connect GitHub",
+            hint: "Something went wrong finishing the connection. Please try again.",
+        },
     },
-    success: {
-        title: "GitHub connected",
-        hint: "Taking you back to your workspace…",
-    },
-    error: {
-        title: "Couldn't connect GitHub",
-        hint: "Something went wrong finishing the connection. Please try again.",
+    link: {
+        loading: { title: "Linking GitHub", hint: "Confirming your account — one moment." },
+        success: { title: "GitHub linked", hint: "Taking you back…" },
+        error: {
+            title: "Couldn't link GitHub",
+            hint: "Something went wrong finishing the link. Please try again.",
+        },
     },
 };
 
@@ -34,13 +44,15 @@ function StatusIcon({ status }: { status: Status }) {
 function GithubCallback() {
     const router = useRouter();
     const params = useSearchParams();
-    const complete = useCompleteGithubConnect();
+    const completeConnect = useCompleteGithubConnect();
+    const completeLink = useCompleteGithubLink();
     const token = useUserSessionStore((s) => s.session?.user?.token);
 
     const installationId = params.get("installation_id");
     const code = params.get("code");
     const state = params.get("state");
-    const hasParams = Boolean(installationId && code && state);
+    const flow: Flow = installationId ? "install" : "link";
+    const hasParams = Boolean(code && state);
 
     const [status, setStatus] = useState<Status>(hasParams ? "loading" : "error");
     const [hint, setHint] = useState<string | null>(
@@ -51,31 +63,50 @@ function GithubCallback() {
     const started = useRef(false);
 
     useEffect(() => {
-        if (started.current || !installationId || !code || !state || !token) return;
+        if (started.current || !code || !state || !token) return;
         started.current = true;
 
-        complete.mutate(
-            { installationId, code, state },
+        const leaveTo = (target: string) => setTimeout(() => router.replace(target), 1200);
+        const fail = () => {
+            setStatus("error");
+            setHint(null);
+        };
+
+        if (installationId) {
+            completeConnect.mutate(
+                { installationId, code, state },
+                {
+                    onSuccess: (data) => {
+                        setStatus("success");
+                        setHint(
+                            data.accountLogin
+                                ? `Connected ${data.accountLogin}. Taking you back…`
+                                : null,
+                        );
+                        leaveTo(data.orgSlug ? `/playground/${data.orgSlug}` : "/playground");
+                    },
+                    onError: fail,
+                },
+            );
+            return;
+        }
+
+        completeLink.mutate(
+            { code, state },
             {
                 onSuccess: (data) => {
                     setStatus("success");
-                    setHint(
-                        data.accountLogin
-                            ? `Connected ${data.accountLogin}. Taking you back…`
-                            : null,
-                    );
-                    const target = data.orgSlug ? `/playground/${data.orgSlug}` : "/playground";
-                    setTimeout(() => router.replace(target), 1200);
+                    setHint(`Linked ${data.githubLogin}. Taking you back…`);
+                    const back = sessionStorage.getItem(GITHUB_LINK_RETURN_KEY);
+                    sessionStorage.removeItem(GITHUB_LINK_RETURN_KEY);
+                    leaveTo(back ?? "/playground");
                 },
-                onError: () => {
-                    setStatus("error");
-                    setHint(null);
-                },
+                onError: fail,
             },
         );
-    }, [installationId, code, state, token, complete, router]);
+    }, [installationId, code, state, token, completeConnect, completeLink, router]);
 
-    const copy = COPY[status];
+    const copy = COPY[flow][status];
 
     return (
         <main className="flex h-dvh items-center justify-center bg-charcoal px-6 text-neutral-100">

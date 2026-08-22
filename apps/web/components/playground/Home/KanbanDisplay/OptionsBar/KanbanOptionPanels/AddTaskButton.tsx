@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { TooltipComponent } from "@/components/ui/tooltip-component";
 import { useAddCustomColumnStore } from "@/store/kanban/useAddCustomColumnStore";
-import { useIssueStore } from "@/store/issues/useIssueStore";
+import { useCreateIssueStore } from "@/store/issues/useCreateIssueStore";
 import OptionButton from "./OptionButton";
 import { IoPencilSharp } from "react-icons/io5";
 
@@ -20,7 +20,7 @@ const TASK_OPTIONS = [
 ];
 
 export default function AddTaskButton() {
-    const openCreate = useIssueStore((s) => s.openCreate);
+    const openCreate = useCreateIssueStore((s) => s.open);
     const setAddColumnOpen = useAddCustomColumnStore((s) => s.setOpen);
     const onAddTask = () => openCreate({ board: "llm" });
 

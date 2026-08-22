@@ -1,7 +1,15 @@
 "use client";
+import { isValidElement, type ReactNode } from "react";
 import ReactMarkdown, { type Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { cn } from "@/lib/utils";
+import MermaidDiagram from "./MermaidDiagram";
+
+function textOf(node: ReactNode): string {
+    if (typeof node === "string") return node;
+    if (Array.isArray(node)) return node.map(textOf).join("");
+    return "";
+}
 
 const COMPONENTS: Components = {
     h1: ({ children }) => (
@@ -52,6 +60,9 @@ const COMPONENTS: Components = {
     ),
     hr: () => <hr className="my-4 border-white/5" />,
     code: ({ className, children }) => {
+        if (/language-mermaid/.test(className ?? "")) {
+            return <MermaidDiagram source={textOf(children).trimEnd()} />;
+        }
         const isBlock = /language-/.test(className ?? "");
         return (
             <code
@@ -66,11 +77,14 @@ const COMPONENTS: Components = {
             </code>
         );
     },
-    pre: ({ children }) => (
-        <pre className="my-3 overflow-x-auto rounded-md bg-black/30 p-3 leading-[1.6] shadow-[inset_0_1px_0_0_var(--color-edge)]">
-            {children}
-        </pre>
-    ),
+    pre: ({ children }) => {
+        if (isMermaidBlock(children)) return <>{children}</>;
+        return (
+            <pre className="my-3 overflow-x-auto rounded-md bg-black/30 p-3 leading-[1.6] shadow-[inset_0_1px_0_0_var(--color-edge)]">
+                {children}
+            </pre>
+        );
+    },
     table: ({ children }) => (
         <div className="my-3 overflow-x-auto">
             <table className="w-full border-collapse text-left">{children}</table>
@@ -85,6 +99,11 @@ const COMPONENTS: Components = {
         <td className="border-b border-white/5 px-2 py-1.5 text-neutral-400">{children}</td>
     ),
 };
+
+function isMermaidBlock(children: ReactNode): boolean {
+    if (!isValidElement<{ className?: string }>(children)) return false;
+    return /language-mermaid/.test(children.props.className ?? "");
+}
 
 /** Renders GitHub-flavored markdown styled for the dark playground surfaces. */
 export default function Markdown({

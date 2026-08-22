@@ -4,6 +4,7 @@ import { ENV } from "../conf/config.env";
 export interface PullRequestSummary {
     number: number;
     htmlUrl: string;
+    title: string;
 }
 
 /** GitHub access needed by coding and Product Diff workers. Full OAuth stays in the server. */
@@ -90,10 +91,12 @@ export default class GithubService {
         const pulls = (await response.json()) as Array<{
             number: number;
             html_url: string;
+            title: string;
         }>;
         return pulls.map((pull) => ({
             number: pull.number,
             htmlUrl: pull.html_url,
+            title: pull.title,
         }));
     }
 
@@ -118,7 +121,11 @@ export default class GithubService {
                 `GitHub pull request creation failed (${response.status})${detail?.message ? `: ${detail.message}` : ""}`,
             );
         }
-        const created = (await response.json()) as { number: number; html_url: string };
-        return { number: created.number, htmlUrl: created.html_url };
+        const created = (await response.json()) as {
+            number: number;
+            html_url: string;
+            title: string;
+        };
+        return { number: created.number, htmlUrl: created.html_url, title: created.title };
     }
 }

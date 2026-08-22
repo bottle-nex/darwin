@@ -22,6 +22,8 @@ export const BOARD_ISSUE_SELECT = {
     startDate: true,
     targetDate: true,
     prUrl: true,
+    prNumber: true,
+    prTitle: true,
     creator: {
         select: {
             id: true,

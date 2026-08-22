@@ -4,7 +4,8 @@ import { Action, Permissions } from "@trymatcha/access-control";
 import { Prisma, prisma } from "@trymatcha/database";
 import Access from "../../access-control/access";
 import ResponseWriter from "../../services/service.response";
-import GithubService from "../../services/service.github";
+import GithubAppService from "../../services/service.github_app";
+import GithubUserService from "../../services/service.github_user";
 
 const body_schema = z.object({
     installationId: z.coerce.number().int().positive(),
@@ -31,8 +32,8 @@ export default class ConnectCompleteController {
             const { installationId, code, state } = parsed.data;
             const userId = req.user.id;
 
-            const stored = await GithubService.consume_state(state);
-            if (!stored || stored.userId !== userId) {
+            const stored = await GithubUserService.consume_state(state);
+            if (!stored?.orgId || stored.userId !== userId) {
                 const existing = await prisma.githubInstallation.findUnique({
                     where: { installationId: BigInt(installationId) },
                     select: {
@@ -74,7 +75,7 @@ export default class ConnectCompleteController {
 
             let account;
             try {
-                account = await GithubService.getInstallation(installationId);
+                account = await GithubAppService.getInstallation(installationId);
             } catch (err) {
                 console.error("[github] getInstallation failed", err);
                 return ResponseWriter.custom(
@@ -86,8 +87,8 @@ export default class ConnectCompleteController {
                 );
             }
 
-            const oauth = await GithubService.exchangeOAuthCode(code);
-            const ghUser = await GithubService.getAuthenticatedUser(oauth.accessToken);
+            const oauth = await GithubUserService.exchangeOAuthCode(code);
+            const ghUser = await GithubUserService.getAuthenticatedUser(oauth.accessToken);
 
             const org = await prisma.$transaction(async (tx) => {
                 await tx.githubAccount.upsert({

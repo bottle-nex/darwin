@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { isSettingsTab, PLAYGROUND_DEFAULT_TAB } from "@/components/playground/playgroundTabs";
-import { useIssueStore } from "@/store/issues/useIssueStore";
+import { useCreateIssueStore } from "@/store/issues/useCreateIssueStore";
+import { usePaneRouteStore } from "@/store/playground/usePaneRouteStore";
 import type { ProjectTeam } from "@/types/project";
 
 /**
@@ -30,24 +31,29 @@ interface PlaygroundNavState {
     clearTeam: () => void;
 }
 
+function leave_pane() {
+    usePaneRouteStore.getState().openBoard();
+    useCreateIssueStore.getState().close();
+}
+
 export const usePlaygroundNavStore = create<PlaygroundNavState>((set) => ({
     tab: PLAYGROUND_DEFAULT_TAB,
     lastWorkspaceTab: PLAYGROUND_DEFAULT_TAB,
     selectedTeam: null,
     selectedTeamProjectSlug: null,
     setTab: (tabId) => {
-        useIssueStore.getState().close();
+        leave_pane();
         set((state) => ({
             tab: tabId,
             lastWorkspaceTab: isSettingsTab(tabId) ? state.lastWorkspaceTab : tabId,
         }));
     },
     returnFromSettings: () => {
-        useIssueStore.getState().close();
+        leave_pane();
         set((state) => ({ tab: state.lastWorkspaceTab }));
     },
     openTeam: (team, projectSlug) => {
-        useIssueStore.getState().close();
+        leave_pane();
         set({
             selectedTeam: team,
             selectedTeamProjectSlug: projectSlug,

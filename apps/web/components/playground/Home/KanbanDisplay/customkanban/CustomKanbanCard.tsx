@@ -17,7 +17,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog";
-import { useIssueNavigation } from "@/components/playground/Issue/useIssueNavigation";
+import { usePaneRouteStore } from "@/store/playground/usePaneRouteStore";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { useCustomCardActions } from "@/hooks/kanban/useCustomCardActions";
 import { useIssueSelection } from "@/hooks/issues/useIssueSelection";
@@ -41,7 +41,7 @@ export default function CustomKanbanCard({ card, preview = false }: CustomKanban
     const [confirmOpen, setConfirmOpen] = useState(false);
     const [assignOpen, setAssignOpen] = useState(false);
     const canAssign = Boolean(projectId) && !preview;
-    const { openIssue } = useIssueNavigation();
+    const openIssue = usePaneRouteStore((s) => s.openIssue);
     const { isSelected, handleSelectClick } = useIssueSelection("custom-kanban");
     const selected = !preview && isSelected(card.id);
 

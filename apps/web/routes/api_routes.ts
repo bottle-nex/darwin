@@ -41,6 +41,13 @@ export const REGENERATE_PRODUCT_DIFF_URL = (project_id: string, issue_id: string
 export const PRODUCT_DIFF_ARTIFACT_URLS_URL = (project_id: string, product_diff_id: string) =>
     `${PRODUCT_DIFFS_URL(project_id)}/${product_diff_id}/artifact-urls`;
 
+export const REVIEW_URL = (project_id: string, pull_number: number) =>
+    `${PROJECT_URL}/${project_id}/review/${pull_number}`;
+export const REVIEW_FILES_URL = (project_id: string, pull_number: number) =>
+    `${REVIEW_URL(project_id, pull_number)}/files`;
+export const REVIEW_COMMENTS_URL = (project_id: string, pull_number: number) =>
+    `${REVIEW_URL(project_id, pull_number)}/comments`;
+
 export const LIST_TAGS_URL = (project_id: string) => `${PROJECT_URL}/${project_id}/tags`;
 export const CREATE_TAG_URL = (project_id: string) => `${PROJECT_URL}/${project_id}/tags`;
 export const UPDATE_TAG_URL = (project_id: string, tagId: string) =>
@@ -65,6 +72,9 @@ export const GITHUB_URL = API_URL + "/github";
 export const GITHUB_CONNECT_START = GITHUB_URL + "/connect/start";
 export const GITHUB_CONNECT_COMPLETE = GITHUB_URL + "/connect/complete";
 export const GITHUB_DISCONNECT = (orgId: string) => `${GITHUB_URL}/connect/${orgId}`;
+export const GITHUB_LINK = GITHUB_URL + "/link";
+export const GITHUB_LINK_START = GITHUB_LINK + "/start";
+export const GITHUB_LINK_COMPLETE = GITHUB_LINK + "/complete";
 export const GITHUB_REPOS = (orgId: string) => `${GITHUB_URL}/installations/${orgId}/repos`;
 export const GITHUB_REPO_BRANCHES = (orgId: string, owner: string, repo: string) =>
     `${GITHUB_URL}/installations/${orgId}/repos/${owner}/${repo}/branches`;

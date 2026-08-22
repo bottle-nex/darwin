@@ -371,7 +371,11 @@ export default class E2B {
 
                 const issueWithPr = await prisma.issue.update({
                     where: { id: issue.id },
-                    data: { prUrl: pull_request.htmlUrl },
+                    data: {
+                        prUrl: pull_request.htmlUrl,
+                        prNumber: pull_request.number,
+                        prTitle: pull_request.title,
+                    },
                 });
 
                 console.log("issueWithPr", issueWithPr);

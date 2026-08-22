@@ -1,7 +1,7 @@
 "use client";
 import { toast } from "@/lib/toast";
+import { htmlToMarkdown } from "@/lib/markdown";
 import { isAxiosError } from "axios";
-import TurndownService from "turndown";
 import type { IconType } from "react-icons";
 import { LuFingerprint, LuHash, LuLink, LuType } from "react-icons/lu";
 import { TbFileInvoiceFilled } from "react-icons/tb";
@@ -27,8 +27,6 @@ export const DATE_PRESETS: { label: string; days: number | null }[] = [
     { label: "Clear", days: null },
 ];
 
-const turndown = new TurndownService({ headingStyle: "atx", codeBlockStyle: "fenced" });
-
 export const COPY_FIELDS: {
     label: string;
     icon: IconType;
@@ -41,7 +39,7 @@ export const COPY_FIELDS: {
     {
         label: "description as markdown",
         icon: TbFileInvoiceFilled,
-        value: (issue) => turndown.turndown(issue.description ?? ""),
+        value: (issue) => htmlToMarkdown(issue.description),
     },
 ];
 

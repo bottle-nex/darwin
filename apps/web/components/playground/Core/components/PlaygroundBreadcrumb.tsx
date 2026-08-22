@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { PlaygroundTab } from "@/components/playground/playgroundTabs";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { cn } from "@/lib/utils";
-import { useIssueNavigation } from "@/components/playground/Issue/useIssueNavigation";
+import { usePaneRouteStore } from "@/store/playground/usePaneRouteStore";
 import { useKanbanOptionsStore } from "@/store/kanban/useKanbanOptionsStore";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
 import type { BoardIssue } from "@/types/board";
@@ -39,12 +39,13 @@ export default function PlaygroundBreadcrumb({
     trail,
     trailing,
 }: {
-    issue?: Pick<BoardIssue, "number" | "title" | "customColumnId">;
+    issue?: Pick<BoardIssue, "id" | "number" | "title" | "customColumnId">;
     trail?: PlaygroundBreadcrumbSegment[];
     trailing?: string;
 }) {
     const project = useActiveProject();
-    const { close, showIssueDetail } = useIssueNavigation();
+    const openBoard = usePaneRouteStore((state) => state.openBoard);
+    const openIssue = usePaneRouteStore((state) => state.openIssue);
     const tab = usePlaygroundNavStore((state) => state.tab) as PlaygroundTab;
     const boardView = useKanbanOptionsStore((state) => state.boardView);
     const inIssue = issue !== undefined;
@@ -55,7 +56,10 @@ export default function PlaygroundBreadcrumb({
         ? [
               issue.customColumnId ? "My Board" : "Agent",
               trailing
-                  ? { label: `${issueIdentifier} ${issue.title}`, onClick: showIssueDetail }
+                  ? {
+                        label: `${issueIdentifier} ${issue.title}`,
+                        onClick: () => openIssue(issue.id),
+                    }
                   : `${issueIdentifier} ${issue.title}`,
               ...(trailing ? [trailing] : []),
           ]
@@ -78,7 +82,7 @@ export default function PlaygroundBreadcrumb({
                         variant="unstyled"
                         type="button"
                         aria-label="Back"
-                        onClick={close}
+                        onClick={openBoard}
                         className="flex size-6 shrink-0 cursor-pointer items-center justify-center rounded-md text-neutral-500 transition-colors hover:bg-white/5 hover:text-neutral-200"
                     >
                         <HiOutlineArrowLeft className="size-3.5" aria-hidden />

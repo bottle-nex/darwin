@@ -4,7 +4,8 @@ import { apiClient } from "@/lib/axios";
 import { PRODUCT_DIFF_URL } from "@/routes/api_routes";
 import { useUserSessionStore } from "@/store/user/useUserSessionStore";
 import type { ApiResponse } from "@/types/api";
-import { PRODUCT_DIFF_QUERY_KEY } from "./useProductDiffs";
+
+export const PRODUCT_DIFF_QUERY_KEY = ["product-diffs"] as const;
 
 export function useProductDiff(projectId: string | undefined, productDiffId: string | null) {
     const token = useUserSessionStore((s) => s.session?.user?.token);

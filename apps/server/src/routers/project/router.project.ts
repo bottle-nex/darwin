@@ -22,6 +22,10 @@ import list_product_diffs_controller from "../../controllers/project/controller.
 import get_product_diff_controller from "../../controllers/project/controller.get_product_diff";
 import regenerate_product_diff_controller from "../../controllers/project/controller.regenerate_product_diff";
 import product_diff_artifact_urls_controller from "../../controllers/project/controller.product_diff_artifact_urls";
+import get_review_controller from "../../controllers/project/controller.get_review";
+import list_review_files_controller from "../../controllers/project/controller.list_review_files";
+import list_review_comments_controller from "../../controllers/project/controller.list_review_comments";
+import create_review_comment_controller from "../../controllers/project/controller.create_review_comment";
 import start_setup from "../../controllers/setup/controller.start_setup";
 
 const project_router: Router = Router();
@@ -49,6 +53,22 @@ project_router.post(
     "/:project_id/product-diffs/:issue_id/regenerate",
     require_auth,
     regenerate_product_diff_controller,
+);
+project_router.get("/:project_id/review/:pull_number", require_auth, get_review_controller);
+project_router.get(
+    "/:project_id/review/:pull_number/files",
+    require_auth,
+    list_review_files_controller,
+);
+project_router.get(
+    "/:project_id/review/:pull_number/comments",
+    require_auth,
+    list_review_comments_controller,
+);
+project_router.post(
+    "/:project_id/review/:pull_number/comments",
+    require_auth,
+    create_review_comment_controller,
 );
 project_router.get("/:project_id/secrets", require_auth, list_secrets_controller);
 project_router.post("/:project_id/secrets", require_auth, set_secrets_controller);

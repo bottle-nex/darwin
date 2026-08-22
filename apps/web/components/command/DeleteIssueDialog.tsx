@@ -5,7 +5,7 @@ import { useActiveProject } from "@/hooks/useActiveProject";
 import { useIssues } from "@/hooks/issues/useIssue";
 import { useBulkDeleteIssues } from "@/hooks/issues/useBulkDeleteIssues";
 import { useDeleteIssueStore } from "@/store/issues/useDeleteIssueStore";
-import { useIssueStore } from "@/store/issues/useIssueStore";
+import { usePaneRouteStore } from "@/store/playground/usePaneRouteStore";
 import { useIssueSelectionStore } from "@/store/issues/useIssueSelectionStore";
 
 export default function DeleteIssueDialog() {
@@ -34,8 +34,8 @@ export default function DeleteIssueDialog() {
                     );
                     close();
                     useIssueSelectionStore.getState().clear();
-                    if (useIssueStore.getState().mode?.kind === "open") {
-                        useIssueStore.getState().close();
+                    if (usePaneRouteStore.getState().route.kind === "issue") {
+                        usePaneRouteStore.getState().openBoard();
                     }
                 },
             },

@@ -11,7 +11,7 @@ import {
 import { cn } from "@/lib/utils";
 import { urlSplitPattern, withProtocol } from "@/lib/urls";
 import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
-import { useIssueNavigation } from "@/components/playground/Issue/useIssueNavigation";
+import { usePaneRouteStore } from "@/store/playground/usePaneRouteStore";
 
 const TOMBSTONE_LABEL = { member: "@unknown", issue: "#deleted issue" } as const;
 
@@ -49,7 +49,7 @@ export default function MessageBody({
     references: LabelledReference[];
     isMine: boolean;
 }) {
-    const { openIssue } = useIssueNavigation();
+    const openIssue = usePaneRouteStore((s) => s.openIssue);
     const labels = reference_labels(references);
     const issues = reference_issues(references);
     return (

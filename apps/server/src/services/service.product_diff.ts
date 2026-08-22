@@ -1,7 +1,7 @@
 import { extname } from "node:path";
 import { prisma } from "@trymatcha/database";
 import type { ProductDiffStatus, ProductDiffSummary } from "@trymatcha/types";
-import GithubService from "./service.github";
+import GithubPullsService from "./service.github_pulls";
 import StorageService from "./service.storage";
 
 const FRONTEND_EXTENSIONS = new Set([".tsx", ".jsx", ".vue", ".svelte", ".css", ".scss", ".html"]);
@@ -87,10 +87,14 @@ export default class ProductDiffService {
         const pullNumber = this.pull_number_from_url(issue.prUrl);
         const installationId = Number(project.githubInstallation.installationId);
         const [pull, files] = await Promise.all([
-            GithubService.getPullRequest(installationId, owner, repo, pullNumber),
-            GithubService.listPullRequestFiles(installationId, owner, repo, pullNumber),
+            GithubPullsService.getPullRequest(installationId, owner, repo, pullNumber),
+            GithubPullsService.listPullRequestFiles({ installationId, owner, repo, pullNumber }),
         ]);
-        if (pull.state !== "open" || !this.has_frontend_candidate(files)) return null;
+        if (
+            pull.state !== "open" ||
+            !this.has_frontend_candidate(files.map((file) => file.filename))
+        )
+            return null;
 
         let productDiff = await prisma.productDiff.upsert({
             where: {

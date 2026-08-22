@@ -135,6 +135,8 @@ export interface Issue {
     startDate: Date | null;
     targetDate: Date | null;
     prUrl: string | null;
+    prNumber: number | null;
+    prTitle: string | null;
 
     creator: User;
     assignees: User[];

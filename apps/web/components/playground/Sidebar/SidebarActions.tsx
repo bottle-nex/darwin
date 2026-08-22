@@ -7,13 +7,13 @@ import { TooltipComponent } from "@/components/ui/tooltip-component";
 import { useNotifications } from "@/hooks/notifications/useNotifications";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { cn } from "@/lib/utils";
-import { useIssueStore } from "@/store/issues/useIssueStore";
+import { useCreateIssueStore } from "@/store/issues/useCreateIssueStore";
 import { useNotificationsPanelStore } from "@/store/playground/useNotificationsPanelStore";
 import { SIDEBAR_ICON_BUTTON_CLASS } from "./shared";
 
 export default function SidebarActions() {
     const activeProject = useActiveProject();
-    const openCreate = useIssueStore((state) => state.openCreate);
+    const openCreate = useCreateIssueStore((state) => state.open);
     const notificationsOpen = useNotificationsPanelStore((state) => state.isOpen);
     const toggleNotifications = useNotificationsPanelStore((state) => state.toggle);
     const { data } = useNotifications();

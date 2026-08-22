@@ -21,7 +21,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { MatchaLogo } from "@/components/logo/MatchaLogo";
-import { useIssueStore } from "@/store/issues/useIssueStore";
+import { useCreateIssueStore } from "@/store/issues/useCreateIssueStore";
 import { useIssueSelectionStore } from "@/store/issues/useIssueSelectionStore";
 import { useCustomColumnActions } from "@/hooks/kanban/useCustomColumnActions";
 import { useActiveProject } from "@/hooks/useActiveProject";
@@ -38,7 +38,7 @@ type CustomKanbanColumnProps = {
 };
 
 export default function CustomKanbanColumn({ column, draggable = true }: CustomKanbanColumnProps) {
-    const openCreate = useIssueStore((s) => s.openCreate);
+    const openCreate = useCreateIssueStore((s) => s.open);
     const hasSelection = useIssueSelectionStore(
         (state) => state.scope === "custom-kanban" && state.ids.length > 0,
     );

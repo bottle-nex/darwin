@@ -46,22 +46,25 @@ export type IssueMutationFailure = {
     message?: string;
 };
 
-export type UpdateIssueResult =
-    { ok: true; issue: Awaited<ReturnType<typeof update_issue_row>> } | IssueMutationFailure;
+const ISSUE_ROW_INCLUDE = {
+    creator: true,
+    assignees: true,
+    tags: true,
+    customColumn: { select: { id: true, label: true } },
+} satisfies Prisma.IssueInclude;
+
+export type IssueRow = Prisma.IssueGetPayload<{ include: typeof ISSUE_ROW_INCLUDE }>;
+
+export type UpdateIssueResult = { ok: true; issue: IssueRow } | IssueMutationFailure;
 
 export type DeleteIssueResult = { ok: true } | IssueMutationFailure;
 
-function update_issue_row(tx: Prisma.TransactionClient, id: string, data: Prisma.IssueUpdateInput) {
-    return tx.issue.update({
-        where: { id },
-        data,
-        include: {
-            creator: true,
-            assignees: true,
-            tags: true,
-            customColumn: { select: { id: true, label: true } },
-        },
-    });
+function update_issue_row(
+    tx: Prisma.TransactionClient,
+    id: string,
+    data: Prisma.IssueUpdateInput,
+): Promise<IssueRow> {
+    return tx.issue.update({ where: { id }, data, include: ISSUE_ROW_INCLUDE });
 }
 
 export default class IssueService {
