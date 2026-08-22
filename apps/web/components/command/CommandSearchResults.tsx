@@ -8,7 +8,7 @@ import type {
 import { cn } from "@/lib/utils";
 import { CommandGroup, CommandItem } from "@/components/ui/command";
 import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
-import { useIssueNavigation } from "@/components/playground/Issue/useIssueNavigation";
+import { usePaneRouteStore } from "@/store/playground/usePaneRouteStore";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
 import { useChatThreadStore } from "@/store/playground/useChatThreadStore";
 import { PlaygroundTab } from "@/components/playground/playgroundTabs";
@@ -26,7 +26,7 @@ export default function CommandSearchResults({
     isError: boolean;
     onDone: () => void;
 }) {
-    const { openIssue } = useIssueNavigation();
+    const openIssue = usePaneRouteStore((s) => s.openIssue);
     const openThread = useOpenSearchThread(openIssue);
 
     if (isError) {
