@@ -1,19 +1,41 @@
 "use client";
 import { Fragment } from "react";
-import { motion } from "motion/react";
-import { HiOutlineArrowLeft } from "react-icons/hi2";
 import { MdChevronRight } from "react-icons/md";
 import { Button } from "@/components/ui/button";
 import { PlaygroundTab } from "@/components/playground/playgroundTabs";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { cn } from "@/lib/utils";
 import { usePaneRouteStore } from "@/store/playground/usePaneRouteStore";
-import { useKanbanOptionsStore } from "@/store/kanban/useKanbanOptionsStore";
+import { NO_FOCUS, useKanbanOptionsStore } from "@/store/kanban/useKanbanOptionsStore";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
 import type { BoardIssue } from "@/types/board";
 import type { BoardView } from "@/types/kanban";
 
-export type PlaygroundBreadcrumbSegment = string | { label: string; onClick: () => void };
+export type PlaygroundBreadcrumbTarget = {
+    tab: PlaygroundTab;
+    boardView?: BoardView;
+};
+
+export type PlaygroundBreadcrumbSegment =
+    | string
+    | { label: string; onClick: () => void }
+    | { label: string; target: PlaygroundBreadcrumbTarget };
+
+export const PROJECT_BREADCRUMB_TARGET: PlaygroundBreadcrumbTarget = {
+    tab: PlaygroundTab.Kanban,
+    boardView: "default",
+};
+
+export const SETTINGS_BREADCRUMB_TARGET: PlaygroundBreadcrumbTarget = {
+    tab: PlaygroundTab.SettingsAppearance,
+};
+
+export function breadcrumbTargetForBoard(custom: boolean): PlaygroundBreadcrumbTarget {
+    return {
+        tab: PlaygroundTab.Kanban,
+        boardView: custom ? "custom" : "llm",
+    };
+}
 
 const TAB_TRAILS: Partial<Record<PlaygroundTab, PlaygroundBreadcrumbSegment[]>> = {
     [PlaygroundTab.Kanban]: ["Kanban"],
@@ -22,11 +44,26 @@ const TAB_TRAILS: Partial<Record<PlaygroundTab, PlaygroundBreadcrumbSegment[]>> 
     [PlaygroundTab.Inbox]: ["Inbox"],
     [PlaygroundTab.Chats]: ["Chats"],
     [PlaygroundTab.AssignedToMe]: ["My issues"],
-    [PlaygroundTab.SettingsAppearance]: ["Settings", "Appearance"],
-    [PlaygroundTab.SettingsApiKeys]: ["Settings", "API keys"],
-    [PlaygroundTab.SettingsProject]: ["Settings", "General"],
-    [PlaygroundTab.SettingsTemplates]: ["Settings", "Issue templates"],
-    [PlaygroundTab.SettingsEnv]: ["Settings", "Environment variables"],
+    [PlaygroundTab.SettingsAppearance]: [
+        { label: "Settings", target: SETTINGS_BREADCRUMB_TARGET },
+        "Appearance",
+    ],
+    [PlaygroundTab.SettingsApiKeys]: [
+        { label: "Settings", target: SETTINGS_BREADCRUMB_TARGET },
+        "API keys",
+    ],
+    [PlaygroundTab.SettingsProject]: [
+        { label: "Settings", target: SETTINGS_BREADCRUMB_TARGET },
+        "General",
+    ],
+    [PlaygroundTab.SettingsTemplates]: [
+        { label: "Settings", target: SETTINGS_BREADCRUMB_TARGET },
+        "Issue templates",
+    ],
+    [PlaygroundTab.SettingsEnv]: [
+        { label: "Settings", target: SETTINGS_BREADCRUMB_TARGET },
+        "Environment variables",
+    ],
 };
 
 const KANBAN_BOARD_LABELS: Partial<Record<BoardView, string>> = {
@@ -44,17 +81,22 @@ export default function PlaygroundBreadcrumb({
     trailing?: string;
 }) {
     const project = useActiveProject();
-    const openBoard = usePaneRouteStore((state) => state.openBoard);
     const openIssue = usePaneRouteStore((state) => state.openIssue);
     const tab = usePlaygroundNavStore((state) => state.tab) as PlaygroundTab;
+    const setTab = usePlaygroundNavStore((state) => state.setTab);
     const boardView = useKanbanOptionsStore((state) => state.boardView);
+    const setBoardView = useKanbanOptionsStore((state) => state.setBoardView);
+    const setFocus = useKanbanOptionsStore((state) => state.setFocus);
     const inIssue = issue !== undefined;
     const issueIdentifier = issue
         ? `${(project?.name ?? "ISS").slice(0, 3).toUpperCase()}-${issue.number}`
         : undefined;
     const issueTrail: PlaygroundBreadcrumbSegment[] = issue
         ? [
-              issue.customColumnId ? "My Board" : "Agent",
+              {
+                  label: issue.customColumnId ? "My Board" : "Agent",
+                  target: breadcrumbTargetForBoard(Boolean(issue.customColumnId)),
+              },
               trailing
                   ? {
                         label: `${issueIdentifier} ${issue.title}`,
@@ -69,41 +111,40 @@ export default function PlaygroundBreadcrumb({
         ? issueTrail
         : (trail ?? (tab === PlaygroundTab.Kanban ? kanbanTrail : (TAB_TRAILS[tab] ?? [])));
 
+    function navigate(target: PlaygroundBreadcrumbTarget) {
+        if (target.boardView) {
+            setFocus(NO_FOCUS);
+            setBoardView(target.boardView);
+        }
+        setTab(target.tab);
+    }
+
     return (
         <nav className="flex min-w-0 items-center gap-0.5 text-[13px]">
-            {inIssue && (
-                <motion.span
-                    className="flex shrink-0"
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
-                >
-                    <Button
-                        variant="unstyled"
-                        type="button"
-                        aria-label="Back"
-                        onClick={openBoard}
-                        className="flex size-6 shrink-0 cursor-pointer items-center justify-center rounded-md text-neutral-500 transition-colors hover:bg-white/5 hover:text-neutral-200"
-                    >
-                        <HiOutlineArrowLeft className="size-3.5" aria-hidden />
-                    </Button>
-                </motion.span>
-            )}
             {!project ? (
                 <span className="h-3 w-24 animate-pulse rounded bg-white/5" />
-            ) : (
-                <span
-                    className={cn(
-                        "truncate font-medium capitalize",
-                        segments.length ? "text-neutral-400" : "text-neutral-200",
-                    )}
+            ) : segments.length ? (
+                <Button
+                    variant="unstyled"
+                    type="button"
+                    onClick={() => navigate(PROJECT_BREADCRUMB_TARGET)}
+                    className="truncate font-medium capitalize text-neutral-400 transition-colors hover:text-neutral-100"
                 >
+                    {project.name}
+                </Button>
+            ) : (
+                <span className="truncate font-medium capitalize text-neutral-200">
                     {project.name}
                 </span>
             )}
             {segments.map((segment, index) => {
                 const label = typeof segment === "string" ? segment : segment.label;
-                const onClick = typeof segment === "string" ? undefined : segment.onClick;
+                const onClick =
+                    typeof segment === "string"
+                        ? undefined
+                        : "onClick" in segment
+                          ? segment.onClick
+                          : () => navigate(segment.target);
                 const current = index === segments.length - 1;
 
                 return (
@@ -123,7 +164,6 @@ export default function PlaygroundBreadcrumb({
                             </Button>
                         ) : (
                             <span
-                                title={label}
                                 aria-current={current ? "page" : undefined}
                                 className={cn(
                                     "min-w-0 truncate font-medium",
