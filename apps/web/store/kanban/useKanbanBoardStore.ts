@@ -1,18 +1,15 @@
 import { create } from "zustand";
 import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
-import { KanbanMappers } from "@/lib/kanban/KanbanMappers";
 import { KanbanStatus, type BoardState, type Issue } from "@/types/kanban";
-import type { BoardResponse } from "@/types/board";
 import type { CustomCard } from "@/types/kanban-custom";
 
 interface KanbanBoardState {
     board: BoardState;
-    seededBoard: BoardResponse | undefined;
+    overlayActive: boolean;
     /** Running issue number for cards filed from the Custom Kanban. */
     nextNumber: number;
-    /** Seed (and re-seed) the lanes from the server board — the status lanes hold
-     *  issues that aren't parked in a custom column (`customColumnId === null`). */
-    seed: (serverBoard: BoardResponse, projectName: string) => void;
+    beginOverlay: (board: BoardState) => void;
+    clearOverlay: () => void;
     /** File a Custom Kanban card into the given column as a new issue. */
     addIssue: (status: KanbanStatus, card: CustomCard) => void;
     /** Remove an issue (when dragged onto the Custom board) from its column. */
@@ -25,18 +22,13 @@ interface KanbanBoardState {
     moveIssue: (id: string, toStatus: KanbanStatus) => void;
 }
 
-export const useKanbanBoardStore = create<KanbanBoardState>((set, get) => ({
+export const useKanbanBoardStore = create<KanbanBoardState>((set) => ({
     board: KanbanBoard.emptyBoard(),
-    seededBoard: undefined,
+    overlayActive: false,
     nextNumber: 500,
 
-    seed: (serverBoard, projectName) => {
-        if (serverBoard === get().seededBoard) return;
-        set({
-            seededBoard: serverBoard,
-            board: KanbanMappers.boardIssuesToLlmBoard(serverBoard, projectName),
-        });
-    },
+    beginOverlay: (board) => set({ board, overlayActive: true }),
+    clearOverlay: () => set({ board: KanbanBoard.emptyBoard(), overlayActive: false }),
 
     addIssue: (status, card) =>
         set((s) => {

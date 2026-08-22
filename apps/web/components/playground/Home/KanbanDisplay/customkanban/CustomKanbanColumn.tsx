@@ -24,7 +24,12 @@ import { MatchaLogo } from "@/components/logo/MatchaLogo";
 import { useIssueStore } from "@/store/issues/useIssueStore";
 import { useIssueSelectionStore } from "@/store/issues/useIssueSelectionStore";
 import { useCustomColumnActions } from "@/hooks/kanban/useCustomColumnActions";
+import { useActiveProject } from "@/hooks/useActiveProject";
+import { useBoardLaneModel } from "@/hooks/issues/useBoard";
+import { useCustomKanbanStore } from "@/store/kanban/useCustomKanbanStore";
 import SortableCustomCard from "./SortableCustomCard";
+import { BoardLanePaginationView } from "../BoardLanePagination";
+import VirtualizedIssueCards from "../VirtualizedIssueCards";
 import type { CustomColumn } from "@/types/kanban-custom";
 
 type CustomKanbanColumnProps = {
@@ -39,6 +44,10 @@ export default function CustomKanbanColumn({ column, draggable = true }: CustomK
     );
     const replaceSelection = useIssueSelectionStore((state) => state.replace);
     const clearSelection = useIssueSelectionStore((state) => state.clear);
+    const projectId = useActiveProject()?.id;
+    const dragActive = useCustomKanbanStore((state) => state.overlayActive);
+    const lane = useBoardLaneModel(projectId, { type: "custom", columnId: column.id });
+    const fallbackPagination = lane.source === "fallback";
     const { removeColumn, renameColumn } = useCustomColumnActions();
 
     const [renaming, setRenaming] = useState(false);
@@ -147,7 +156,7 @@ export default function CustomKanbanColumn({ column, draggable = true }: CustomK
                                 }
                             >
                                 <MdChecklist className="size-3.5" aria-hidden />
-                                <span className="flex-1">Select issues</span>
+                                <span className="flex-1">Select loaded issues</span>
                                 <span className="text-[11px] text-neutral-500">
                                     {column.cards.length}
                                 </span>
@@ -186,38 +195,72 @@ export default function CustomKanbanColumn({ column, draggable = true }: CustomK
                 items={column.cards.map((c) => c.id)}
                 strategy={verticalListSortingStrategy}
             >
-                <div
-                    data-lenis-prevent
-                    className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto rounded-lg p-0.5 no-scrollbar"
-                >
-                    {column.cards.map((card) => (
-                        <SortableCustomCard key={card.id} card={card} />
-                    ))}
-
-                    <Button
-                        variant="unstyled"
-                        type="button"
-                        onClick={() =>
-                            openCreate({
-                                board: "custom",
-                                columnId: column.id,
-                                columnTitle: column.title,
-                            })
-                        }
-                        className="flex shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-[9px] px-2 py-1.5 text-center text-[13px] font-medium text-neutral-400 opacity-0 transition-opacity hover:bg-white/5 hover:text-neutral-200 focus-visible:opacity-100 group-hover:opacity-100"
-                    >
-                        <MdAdd className="size-3.5" aria-hidden />
-                        Add a card
-                    </Button>
-
-                    {column.cards.length === 0 && (
-                        <div className="flex h-full flex-col items-center justify-center gap-2 px-2">
+                <VirtualizedIssueCards
+                    items={column.cards}
+                    knownTotal={lane.source === "base" ? lane.serverTotal : undefined}
+                    estimateSize={156}
+                    className="min-h-0 flex-1 rounded-lg p-0.5 no-scrollbar"
+                    renderItem={(card) => <SortableCustomCard card={card} />}
+                    status={{
+                        label: lane.fallbackPending
+                            ? `Searching all issues in ${column.title}`
+                            : lane.lanePending
+                              ? `Loading issues in ${column.title}`
+                              : lane.laneError || lane.basePageError || lane.fallbackError
+                                ? `Issues in ${column.title} could not be loaded. Retry is available.`
+                                : column.cards.length === 0
+                                  ? `No issues in ${column.title}`
+                                  : `${column.cards.length} loaded issues in ${column.title}`,
+                    }}
+                    autoFill={{
+                        key: `${column.id}:${lane.source}`,
+                        hasNextPage: Boolean(
+                            fallbackPagination ? lane.hasNextFallbackPage : lane.hasNextBasePage,
+                        ),
+                        fetchingNextPage: fallbackPagination
+                            ? lane.isFetchingNextFallbackPage
+                            : lane.isFetchingNextBasePage,
+                        pageError: fallbackPagination
+                            ? lane.fallbackError
+                            : lane.laneError || lane.basePageError,
+                        paused: dragActive,
+                        onLoadMore: () =>
+                            fallbackPagination
+                                ? lane.fetchNextFallbackPage()
+                                : lane.fetchNextBasePage(),
+                    }}
+                    footer={
+                        <Button
+                            variant="unstyled"
+                            type="button"
+                            onClick={() =>
+                                openCreate({
+                                    board: "custom",
+                                    columnId: column.id,
+                                    columnTitle: column.title,
+                                })
+                            }
+                            className="flex shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-[9px] px-2 py-1.5 text-center text-[13px] font-medium text-neutral-400 opacity-0 transition-opacity hover:bg-white/5 hover:text-neutral-200 focus-visible:opacity-100 group-hover:opacity-100"
+                        >
+                            <MdAdd className="size-3.5" aria-hidden />
+                            Add a card
+                        </Button>
+                    }
+                    emptyState={
+                        <div className="flex min-h-32 flex-col items-center justify-center gap-2 px-2">
                             <MatchaLogo className="h-6 w-auto text-neutral-800" />
-                            <p className="text-[12px] text-neutral-600">No issues currently</p>
+                            <p className="text-[12px] text-neutral-600">
+                                {lane.lanePending || lane.fallbackPending
+                                    ? "Loading issues…"
+                                    : lane.laneError || lane.fallbackError
+                                      ? "Couldn’t load issues"
+                                      : "No issues currently"}
+                            </p>
                         </div>
-                    )}
-                </div>
+                    }
+                />
             </SortableContext>
+            <BoardLanePaginationView lane={lane} />
         </div>
     );
 }

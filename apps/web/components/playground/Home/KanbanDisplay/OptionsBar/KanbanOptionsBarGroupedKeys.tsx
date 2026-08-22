@@ -76,71 +76,79 @@ export default function KanbanOptionsBarGroupedKeys() {
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-48 [direction:ltr]">
-                            <EagerSubmenu
-                                className={`${FILTERS_PANEL_WIDTH} [direction:ltr]`}
-                                trigger={
-                                    <>
-                                        <LuListFilter
-                                            className="size-3.5 text-neutral-400"
-                                            aria-hidden
-                                        />
-                                        <span className="flex-1">Filter</span>
-                                        {activeCount > 0 && (
-                                            <span className="text-[11px] text-neutral-500">
-                                                {activeCount}
-                                            </span>
-                                        )}
-                                    </>
-                                }
-                            >
-                                <FiltersPanelItems />
-                            </EagerSubmenu>
+                            <>
+                                <EagerSubmenu
+                                    className={`${FILTERS_PANEL_WIDTH} [direction:ltr]`}
+                                    trigger={
+                                        <>
+                                            <LuListFilter
+                                                className="size-3.5 text-neutral-400"
+                                                aria-hidden
+                                            />
+                                            <span className="flex-1">Filter</span>
+                                            {activeCount > 0 && (
+                                                <span className="text-[11px] text-neutral-500">
+                                                    {activeCount}
+                                                </span>
+                                            )}
+                                        </>
+                                    }
+                                >
+                                    <FiltersPanelItems />
+                                </EagerSubmenu>
 
-                            <EagerSubmenu
-                                className={`${FOCUS_PANEL_WIDTH} [direction:ltr]`}
-                                trigger={
-                                    <>
-                                        <LuColumns3
-                                            className="size-3.5 text-neutral-400"
-                                            aria-hidden
-                                        />
-                                        <span className="flex-1">Focus</span>
-                                    </>
-                                }
-                            >
-                                <FocusPanelItems
-                                    value={focus}
-                                    onChange={setFocus}
-                                    customColumns={customColumns}
-                                />
-                            </EagerSubmenu>
+                                <EagerSubmenu
+                                    className={`${FOCUS_PANEL_WIDTH} [direction:ltr]`}
+                                    trigger={
+                                        <>
+                                            <LuColumns3
+                                                className="size-3.5 text-neutral-400"
+                                                aria-hidden
+                                            />
+                                            <span className="flex-1">Focus</span>
+                                        </>
+                                    }
+                                >
+                                    <FocusPanelItems
+                                        value={focus}
+                                        onChange={setFocus}
+                                        customColumns={customColumns}
+                                    />
+                                </EagerSubmenu>
 
-                            <EagerSubmenu
-                                className={`${BOARD_VIEW_PANEL_WIDTH} [direction:ltr]`}
-                                trigger={
-                                    <>
-                                        <LuEye className="size-3.5 text-neutral-400" aria-hidden />
-                                        <span className="flex-1">Board</span>
-                                    </>
-                                }
-                            >
-                                <BoardViewPanelItems value={boardView} onChange={setBoardView} />
-                            </EagerSubmenu>
+                                <EagerSubmenu
+                                    className={`${BOARD_VIEW_PANEL_WIDTH} [direction:ltr]`}
+                                    trigger={
+                                        <>
+                                            <LuEye
+                                                className="size-3.5 text-neutral-400"
+                                                aria-hidden
+                                            />
+                                            <span className="flex-1">Board</span>
+                                        </>
+                                    }
+                                >
+                                    <BoardViewPanelItems
+                                        value={boardView}
+                                        onChange={setBoardView}
+                                    />
+                                </EagerSubmenu>
 
-                            <EagerSubmenu
-                                className={`${VIEWS_PANEL_WIDTH} [direction:ltr]`}
-                                trigger={
-                                    <>
-                                        <LuSlidersHorizontal
-                                            className="size-3.5 text-neutral-400"
-                                            aria-hidden
-                                        />
-                                        <span className="flex-1">Views</span>
-                                    </>
-                                }
-                            >
-                                <ViewsPanelItems value={kanbanView} onChange={setKanbanView} />
-                            </EagerSubmenu>
+                                <EagerSubmenu
+                                    className={`${VIEWS_PANEL_WIDTH} [direction:ltr]`}
+                                    trigger={
+                                        <>
+                                            <LuSlidersHorizontal
+                                                className="size-3.5 text-neutral-400"
+                                                aria-hidden
+                                            />
+                                            <span className="flex-1">Views</span>
+                                        </>
+                                    }
+                                >
+                                    <ViewsPanelItems value={kanbanView} onChange={setKanbanView} />
+                                </EagerSubmenu>
+                            </>
 
                             <DropdownMenuSeparator className="my-1 h-px bg-white/5" />
 

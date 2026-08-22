@@ -1,14 +1,35 @@
 "use client";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { OutboundSocketMessageType } from "@trymatcha/types";
 import { SocketHandlers } from "@/lib/socket.handlers";
 import { useWebSocket } from "./useWebSocket";
 import type { MessageHandler } from "@/socket/socket.client";
+import { reconcileBoardProject } from "@/hooks/issues/boardCache";
 
 export function useSubscribeEventHandlers(project_id: string | undefined) {
-    const { subscribe, unsubscribe } = useWebSocket(project_id);
+    const { is_connected, subscribe, unsubscribe } = useWebSocket(project_id);
     const queryClient = useQueryClient();
+    const wasConnected = useRef(false);
+
+    useEffect(() => {
+        if (!project_id) return;
+        if (is_connected && !wasConnected.current) {
+            reconcileBoardProject(queryClient, project_id);
+        }
+        wasConnected.current = is_connected;
+    }, [is_connected, project_id, queryClient]);
+
+    useEffect(() => {
+        if (!project_id) return;
+        const reconcileVisibleProject = () => {
+            if (document.visibilityState === "visible") {
+                reconcileBoardProject(queryClient, project_id);
+            }
+        };
+        document.addEventListener("visibilitychange", reconcileVisibleProject);
+        return () => document.removeEventListener("visibilitychange", reconcileVisibleProject);
+    }, [project_id, queryClient]);
 
     useEffect(() => {
         if (!project_id) return;
@@ -25,7 +46,7 @@ export function useSubscribeEventHandlers(project_id: string | undefined) {
             [OutboundSocketMessageType.CHAT_REACTION_UPDATED]: (message) =>
                 SocketHandlers.handle_chat_reaction_updated(queryClient, message),
             [OutboundSocketMessageType.CHAT_ERROR]: (message) =>
-                SocketHandlers.handle_chat_error(message),
+                SocketHandlers.handle_chat_error(queryClient, message),
             [OutboundSocketMessageType.PROJECT_CHAT_CREATED]: (message) =>
                 SocketHandlers.handle_project_chat_created(queryClient, message),
             [OutboundSocketMessageType.PROJECT_CHAT_DELETED]: (message) =>

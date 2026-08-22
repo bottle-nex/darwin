@@ -1,12 +1,13 @@
 "use client";
 
-import type { MouseEvent } from "react";
+import { createContext, createElement, useContext, type MouseEvent, type ReactNode } from "react";
 import {
     useIssueSelectionStore,
     type IssueSelectionScope,
 } from "@/store/issues/useIssueSelectionStore";
 
 const EMPTY: string[] = [];
+const IssueSelectionOrderContext = createContext<string[] | null>(null);
 
 function renderedIssueIds(scope: IssueSelectionScope): string[] {
     return Array.from(
@@ -15,6 +16,7 @@ function renderedIssueIds(scope: IssueSelectionScope): string[] {
 }
 
 export function useIssueSelection(scope: IssueSelectionScope) {
+    const loadedIssueIds = useContext(IssueSelectionOrderContext);
     const selectedIds = useIssueSelectionStore((s) => (s.scope === scope ? s.ids : EMPTY));
     const toggle = useIssueSelectionStore((s) => s.toggle);
     const extendTo = useIssueSelectionStore((s) => s.extendTo);
@@ -27,7 +29,7 @@ export function useIssueSelection(scope: IssueSelectionScope) {
         }
         if (event.shiftKey) {
             event.preventDefault();
-            extendTo(scope, issueId, renderedIssueIds(scope));
+            extendTo(scope, issueId, loadedIssueIds ?? renderedIssueIds(scope));
             return true;
         }
         if (event.metaKey || event.ctrlKey) {
@@ -41,6 +43,17 @@ export function useIssueSelection(scope: IssueSelectionScope) {
     return {
         selectedIds,
         isSelected: (issueId: string) => selectedIds.includes(issueId),
+        toggleSelection: (issueId: string) => toggle(scope, issueId),
         handleSelectClick,
     };
+}
+
+export function IssueSelectionOrderProvider({
+    issueIds,
+    children,
+}: {
+    issueIds: string[];
+    children: ReactNode;
+}) {
+    return createElement(IssueSelectionOrderContext.Provider, { value: issueIds }, children);
 }

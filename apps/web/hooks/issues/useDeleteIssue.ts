@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/lib/axios";
 import { ISSUE_URL } from "@/routes/api_routes";
-import { BOARD_QUERY_KEY } from "@/hooks/issues/useBoard";
+import { removeBoardIssueCaches } from "@/hooks/issues/boardCache";
 import type { ApiResponse } from "@/types/api";
 
 export interface DeleteIssueInput {
@@ -17,9 +17,7 @@ export function useDeleteIssue() {
             return res.data.data;
         },
         onSuccess: (_data, variables) => {
-            queryClient.invalidateQueries({
-                queryKey: [...BOARD_QUERY_KEY, variables.project_id],
-            });
+            removeBoardIssueCaches(queryClient, variables.project_id, variables.id);
         },
     });
 }

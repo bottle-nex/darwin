@@ -63,7 +63,7 @@ export default function AgentSessionCard({
     const startedAt = new Date(session.startedAt);
 
     return (
-        <li className={cn("my-2 overflow-hidden rounded-lg border border-edge bg-snow/4")}>
+        <div className={cn("my-2 overflow-hidden rounded-lg border border-edge bg-snow/4")}>
             <Button
                 variant="unstyled"
                 type="button"
@@ -121,17 +121,18 @@ export default function AgentSessionCard({
                             {session.error ?? session.summary}
                         </p>
                     )}
-                    <ul className="flex flex-col">
+                    <div role="list" className="flex flex-col">
                         {rows.map((row, index) => (
-                            <ActivityRow
-                                key={row.id}
-                                activity={row}
-                                rail={{ above: index > 0, below: index < rows.length - 1 }}
-                            />
+                            <div key={row.id} role="listitem">
+                                <ActivityRow
+                                    activity={row}
+                                    rail={{ above: index > 0, below: index < rows.length - 1 }}
+                                />
+                            </div>
                         ))}
-                    </ul>
+                    </div>
                 </div>
             )}
-        </li>
+        </div>
     );
 }

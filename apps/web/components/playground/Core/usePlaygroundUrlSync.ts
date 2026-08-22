@@ -3,6 +3,7 @@ import { useEffect, useRef } from "react";
 import { useParams } from "next/navigation";
 import type { ProjectTeam } from "@/types/project";
 import { TEAM_DETAIL_TAB, usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
+import { isPlaygroundTab, PLAYGROUND_DEFAULT_TAB } from "@/components/playground/playgroundTabs";
 
 /**
  * Keeps the playground's navigation state and the browser URL in sync, so a
@@ -42,7 +43,7 @@ export function usePlaygroundUrlSync(teams: ProjectTeam[] | undefined) {
             team: params.get("team"), // team slug, when the tab is team-detail
         };
         const { tab: tabParam } = initialRef.current;
-        if (tabParam) setTab(tabParam);
+        if (tabParam) setTab(isPlaygroundTab(tabParam) ? tabParam : PLAYGROUND_DEFAULT_TAB);
         hydratedRef.current = true;
     }, [setTab]);
 

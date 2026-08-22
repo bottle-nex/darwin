@@ -8,6 +8,7 @@ export class CustomKanbanMappers {
     static boardIssueToCard(issue: BoardIssue): CustomCard {
         return {
             id: issue.id,
+            boardIssue: issue,
             number: issue.number,
             title: issue.title,
             tags: issue.tags,

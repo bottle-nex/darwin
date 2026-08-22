@@ -74,5 +74,9 @@ export default function CardRenderer({
     );
 
     if (preview) return card;
-    return <IssueDropdown issueId={issue.id}>{card}</IssueDropdown>;
+    return (
+        <IssueDropdown issueId={issue.id} issue={issue.boardIssue}>
+            {card}
+        </IssueDropdown>
+    );
 }

@@ -15,17 +15,7 @@ function Divider() {
 
 export default function KanbanBothBoards({ board, kanbanView }: KanbanBothBoardsProps) {
     if (kanbanView === "list") {
-        return (
-            <div className="flex min-h-0 flex-1">
-                <div className="flex min-w-0 flex-1 items-start gap-4 overflow-x-auto px-3 pt-3 pb-3">
-                    <CustomKanbanBoard />
-                </div>
-                <Divider />
-                <div className="min-w-0 flex-1">
-                    <KanbanListView board={board} />
-                </div>
-            </div>
-        );
+        return <KanbanListView board={board} includeCustom />;
     }
 
     return (

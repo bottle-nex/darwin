@@ -38,26 +38,18 @@ export default function IssueSelectionBar() {
                     }}
                     className="pointer-events-none absolute inset-x-0 bottom-6 z-40 flex justify-center"
                 >
-                    <div className="pointer-events-auto flex items-center gap-1 rounded-full border border-edge bg-cement/95 py-1.5 pr-2 pl-5 shadow-[0_8px_24px_rgba(0,0,0,0.45)] backdrop-blur">
+                    <div className="pointer-events-auto flex items-center gap-1 rounded-full bg-cement py-1.75 pr-2 pl-5 shadow-xl shadow-black/20">
                         <span className="text-[13px] text-snow/90">{ids.length} selected</span>
                         <span className="hidden text-[12px] text-neutral-500 sm:inline">
-                            · click or press X to add
+                            · press X to add
                         </span>
                         <Button
                             variant="unstyled"
                             type="button"
                             onClick={openCommandMenu}
-                            className="ml-2 flex cursor-pointer items-center gap-2 rounded-full bg-snow/4 py-1.25 pr-3.5 pl-3 text-[11px] text-neutral-100 transition-colors hover:bg-snow/6"
+                            className="ml-2 flex cursor-pointer items-center gap-1.25 rounded-full bg-snow/4 py-1.25 pr-3.5 pl-3 text-[11px] text-snow transition-colors hover:bg-snow/6 border border-snow/5 shadow-sm shadow-black/7"
                         >
-                            {/* not using key component here because of custom details */}
-                            <div className="flex items-center gap-1">
-                                <kbd className="flex h-4.5 w-4.5 items-center justify-center rounded border border-white/7 text-[14px] leading-none">
-                                    ⌘
-                                </kbd>
-                                <kbd className="flex h-4.5 w-4.5 items-center justify-center rounded border border-white/7 text-[11.5px] leading-none">
-                                    K
-                                </kbd>
-                            </div>
+                            <kbd className="rounded text-[18px] leading-none pt-0.5">⌘</kbd>
                             Actions
                         </Button>
                         <Button

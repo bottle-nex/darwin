@@ -27,6 +27,7 @@ import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
 import { PRIORITY_TO_NUMBER } from "./customkanban/data";
 import { PRIORITY_OPTIONS } from "@/components/playground/Issue/issueHelpers";
 import { COPY_FIELDS, DATE_PRESETS, useIssueActions } from "@/hooks/issues/useIssueActions";
+import type { BoardIssue } from "@/types/board";
 
 const ICON = "size-3.5 text-snow/50!";
 
@@ -65,12 +66,14 @@ function Submenu({
 
 export default function IssueDropdown({
     issueId,
+    issue: boardIssue,
     children,
 }: {
     issueId: string;
+    issue?: BoardIssue;
     children: ReactNode;
 }) {
-    const actions = useIssueActions(issueId);
+    const actions = useIssueActions(boardIssue ?? issueId);
     const { issue, editable } = actions;
 
     if (!issue) return <>{children}</>;

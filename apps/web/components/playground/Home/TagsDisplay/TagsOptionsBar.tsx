@@ -24,6 +24,7 @@ import {
     PaneActionsSlot,
     PaneLeadSlot,
 } from "@/components/playground/Core/components/PlaygroundPaneSlots";
+import PlaygroundBreadcrumb from "@/components/playground/Core/components/PlaygroundBreadcrumb";
 import { useTagsOptionsStore, type TagSort } from "@/store/tags/useTagsOptionsStore";
 
 const SORTS: { id: TagSort; label: string; icon: typeof MdSortByAlpha }[] = [
@@ -62,7 +63,7 @@ export default function TagsOptionsBar({
         <>
             <PaneLeadSlot>
                 <div className="flex min-w-0 items-center gap-2">
-                    <span className="shrink-0 text-[13px] font-medium text-neutral-200">Tags</span>
+                    <PlaygroundBreadcrumb />
                     <span className="shrink-0 text-[12px] text-neutral-500">
                         {selectedCount ? `${selectedCount} selected` : count}
                     </span>

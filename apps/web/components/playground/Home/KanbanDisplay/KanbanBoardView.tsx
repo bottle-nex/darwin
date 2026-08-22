@@ -1,7 +1,8 @@
 "use client";
-import type { ReactNode } from "react";
+import { useMemo, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
+import { IssueSelectionOrderProvider } from "@/hooks/issues/useIssueSelection";
 import type { BoardState } from "@/types/kanban";
 import KanbanColumn from "./KanbanColumn";
 
@@ -22,6 +23,11 @@ type KanbanBoardViewProps = {
  * DndContext lives in `KanbanDisplay`.
  */
 export default function KanbanBoardView({ board, leading, startAligned }: KanbanBoardViewProps) {
+    const loadedIssueIds = useMemo(
+        () => KanbanBoard.STATUSES.flatMap((status) => board[status].map((issue) => issue.id)),
+        [board],
+    );
+
     return (
         <div
             data-kanban-scroll-row
@@ -31,15 +37,17 @@ export default function KanbanBoardView({ board, leading, startAligned }: Kanban
             )}
         >
             {leading}
-            {KanbanBoard.COLUMNS.map((column) => (
-                <KanbanColumn
-                    key={column.status}
-                    column={column}
-                    issues={board[column.status]}
-                    droppable={KanbanBoard.isBridgeStatus(column.status)}
-                    draggableCards={KanbanBoard.isBridgeStatus(column.status)}
-                />
-            ))}
+            <IssueSelectionOrderProvider issueIds={loadedIssueIds}>
+                {KanbanBoard.COLUMNS.map((column) => (
+                    <KanbanColumn
+                        key={column.status}
+                        column={column}
+                        issues={board[column.status]}
+                        droppable={KanbanBoard.isBridgeStatus(column.status)}
+                        draggableCards={KanbanBoard.isBridgeStatus(column.status)}
+                    />
+                ))}
+            </IssueSelectionOrderProvider>
         </div>
     );
 }

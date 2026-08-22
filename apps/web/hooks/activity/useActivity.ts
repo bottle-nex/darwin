@@ -1,49 +1,56 @@
-import { useQuery, type QueryClient } from "@tanstack/react-query";
+import { useInfiniteQuery, type QueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/lib/axios";
 import { ISSUE_ACTIVITY_URL } from "@/routes/api_routes";
 import type { ApiResponse } from "@/types/api";
 import type { AgentSession, IssueActivity } from "@trymatcha/types";
+import {
+    activityPageParams,
+    appendActivitiesToNewestPage,
+    updateAgentSessionInPages,
+    type ActivityInfiniteData,
+    type ActivityPage,
+} from "./activityCache";
 
 export const ACTIVITY_QUERY_KEY = ["activity"] as const;
 
-/** The most recent page of an issue's timeline, oldest first. */
 export function useActivity(issueId: string | undefined) {
-    return useQuery({
+    return useInfiniteQuery({
         queryKey: [...ACTIVITY_QUERY_KEY, issueId],
         enabled: Boolean(issueId),
-        queryFn: async () => {
-            const res = await apiClient.get<ApiResponse<{ activities: IssueActivity[] }>>(
+        initialPageParam: null as string | null,
+        queryFn: async ({ pageParam, signal }) => {
+            const res = await apiClient.get<ApiResponse<ActivityPage>>(
                 ISSUE_ACTIVITY_URL(issueId!),
+                { params: activityPageParams(pageParam), signal },
             );
-            return res.data.data.activities;
+            return res.data.data;
         },
+        getNextPageParam: (page) => (page.hasMore ? page.nextCursor : undefined),
     });
 }
 
-/**
- * Appends a broadcast batch, skipping rows already held — the emitter's own
- * PATCH response can race the socket message it triggered.
- */
 export function append_activities(
     queryClient: QueryClient,
     issueId: string,
     activities: IssueActivity[],
 ) {
-    queryClient.setQueryData<IssueActivity[]>([...ACTIVITY_QUERY_KEY, issueId], (prev) => {
-        if (!prev) return prev;
-        const held = new Set(prev.map((row) => row.id));
-        const incoming = activities.filter((row) => !held.has(row.id));
-        if (!incoming.length) return prev;
-        return [...prev, ...incoming].sort((a, b) => Number(BigInt(a.seq) - BigInt(b.seq)));
-    });
+    const queryKey = [...ACTIVITY_QUERY_KEY, issueId] as const;
+    if (!queryClient.getQueryData(queryKey)) {
+        queryClient.invalidateQueries({ queryKey, exact: true });
+        return;
+    }
+    queryClient.setQueryData<ActivityInfiniteData>(queryKey, (previous) =>
+        previous ? appendActivitiesToNewestPage(previous, activities) : previous,
+    );
 }
 
-/**
- * A session mutates for the whole time it runs, so its card reads through the
- * `RunStarted` row it hangs off rather than off a row of its own.
- */
 export function update_agent_session(queryClient: QueryClient, session: AgentSession) {
-    queryClient.setQueryData<IssueActivity[]>([...ACTIVITY_QUERY_KEY, session.issueId], (prev) =>
-        prev?.map((row) => (row.sessionId === session.id ? { ...row, session } : row)),
+    const queryKey = [...ACTIVITY_QUERY_KEY, session.issueId] as const;
+    if (!queryClient.getQueryData(queryKey)) {
+        queryClient.invalidateQueries({ queryKey, exact: true });
+        return;
+    }
+    queryClient.setQueryData<ActivityInfiniteData>(queryKey, (previous) =>
+        previous ? updateAgentSessionInPages(previous, session) : previous,
     );
 }

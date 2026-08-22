@@ -1,6 +1,6 @@
 import type { IconType } from "react-icons";
 import { IssueStatus } from "@trymatcha/types";
-import type { BoardTag } from "@/types/board";
+import type { BoardIssue, BoardTag } from "@/types/board";
 import type { AvatarTone } from "@/components/playground/Core/components/PlaygroundAvatar";
 
 export const KanbanStatus = {
@@ -31,6 +31,7 @@ export type PullRequest = {
 
 export type Issue = {
     id: string;
+    boardIssue?: BoardIssue;
     number: string;
     title: string;
     project: string;

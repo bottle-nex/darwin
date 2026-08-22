@@ -2,7 +2,7 @@
 import { toast } from "@/lib/toast";
 import ConfirmDialog from "@/components/utility/ConfirmDialog";
 import { useActiveProject } from "@/hooks/useActiveProject";
-import { useBoard } from "@/hooks/issues/useBoard";
+import { useIssues } from "@/hooks/issues/useIssue";
 import { useBulkDeleteIssues } from "@/hooks/issues/useBulkDeleteIssues";
 import { useDeleteIssueStore } from "@/store/issues/useDeleteIssueStore";
 import { useIssueStore } from "@/store/issues/useIssueStore";
@@ -11,13 +11,10 @@ import { useIssueSelectionStore } from "@/store/issues/useIssueSelectionStore";
 export default function DeleteIssueDialog() {
     const { issueIds, close } = useDeleteIssueStore();
     const projectId = useActiveProject()?.id;
-    const { data: board } = useBoard(projectId);
+    const { issues, isPending, isError, isComplete, retry } = useIssues(projectId, issueIds);
     const deleteIssues = useBulkDeleteIssues();
 
-    const issues = issueIds
-        .map((id) => board?.issues.find((row) => row.id === id))
-        .filter((row) => Boolean(row));
-    const many = issues.length > 1;
+    const many = issueIds.length > 1;
 
     function dismiss() {
         close();
@@ -25,9 +22,9 @@ export default function DeleteIssueDialog() {
     }
 
     function confirmDelete() {
-        if (!issues.length || !projectId) return;
+        if (!isComplete || !issues.length || !projectId) return;
         deleteIssues.mutate(
-            { issue_ids: issues.map((row) => row!.id), project_id: projectId },
+            { issue_ids: issueIds, project_id: projectId },
             {
                 onSuccess: (data) => {
                     toast.success(
@@ -47,14 +44,14 @@ export default function DeleteIssueDialog() {
 
     return (
         <ConfirmDialog
-            open={issues.length > 0}
+            open={issueIds.length > 0}
             onOpenChange={(next) => !next && dismiss()}
-            title={many ? `Delete ${issues.length} issues?` : "Delete issue?"}
+            title={many ? `Delete ${issueIds.length} issues?` : "Delete issue?"}
             description={
                 many ? (
                     <>
                         This permanently deletes all{" "}
-                        <span className="font-medium text-neutral-200">{issues.length}</span>{" "}
+                        <span className="font-medium text-neutral-200">{issueIds.length}</span>{" "}
                         selected issues. You can&apos;t undo this.
                     </>
                 ) : (
@@ -68,14 +65,20 @@ export default function DeleteIssueDialog() {
                 )
             }
             cancel={{ label: "Cancel", variant: "tertiary", onClick: dismiss }}
-            confirm={{ label: "Delete", variant: "destructive", onClick: confirmDelete }}
-            pending={deleteIssues.isPending}
+            confirm={
+                isError
+                    ? { label: "Retry", variant: "tertiary", onClick: () => void retry() }
+                    : { label: "Delete", variant: "destructive", onClick: confirmDelete }
+            }
+            pending={isPending || deleteIssues.isPending}
             error={
-                deleteIssues.isError
-                    ? many
-                        ? "Couldn't delete those issues. Try again."
-                        : "Couldn't delete the issue. Try again."
-                    : undefined
+                isError
+                    ? "Some issues couldn't be loaded. Retry before deleting."
+                    : deleteIssues.isError
+                      ? many
+                          ? "Couldn't delete those issues. Try again."
+                          : "Couldn't delete the issue. Try again."
+                      : undefined
             }
         />
     );

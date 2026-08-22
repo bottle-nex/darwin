@@ -1,14 +1,13 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
-import { MdCheck, MdLabel } from "react-icons/md";
+import { MdLabel } from "react-icons/md";
 import { useParams } from "next/navigation";
 import { formatDate } from "@/lib/format";
-import { cn } from "@/lib/utils";
 import { useGetDashboard } from "@/hooks/dashboard/useGetDashboard";
 import { useListTags } from "@/hooks/tags/useListTags";
-import { Button } from "@/components/ui/button";
 import LogoLoader from "@/components/app/LogoLoader";
 import PaneEmptyState from "@/components/playground/Core/components/PaneEmptyState";
+import SelectableRow from "@/components/playground/Core/components/SelectableRow";
 import NoResource from "@/components/utility/NoResource";
 import ProjectsGlyph from "@/components/utility/ProjectsGlyph";
 import type { Tag } from "@/types/tags";
@@ -165,55 +164,37 @@ type TagRowProps = {
 
 function TagRow({ tag, selected, selectionActive, onToggleSelect }: TagRowProps) {
     return (
-        <div
-            onClick={selectionActive ? onToggleSelect : undefined}
-            className={cn(
-                "group grid grid-cols-[1fr_180px_140px] items-center gap-4 rounded-md px-2.5 py-3 hover:bg-snow/5",
-                selectionActive && "cursor-pointer select-none",
-                selected && "bg-snow/5",
-            )}
+        <SelectableRow
+            selected={selected}
+            selectionActive={selectionActive}
+            selectionLabel={`Select ${tag.name}`}
+            onToggleSelection={onToggleSelect}
+            className="px-2.5 py-3"
         >
-            <div className="flex min-w-0 items-center gap-3">
-                <Button
-                    type="button"
-                    variant="unstyled"
-                    role="checkbox"
-                    aria-checked={selected}
-                    aria-label={`Select ${tag.name}`}
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        onToggleSelect();
-                    }}
-                    className={cn(
-                        "flex size-3.5 shrink-0 cursor-pointer items-center justify-center rounded border transition-colors",
-                        selected
-                            ? "border-neutral-200 bg-neutral-200 text-neutral-900"
-                            : "invisible border-white/25 group-hover:visible",
-                    )}
-                >
-                    {selected && <MdCheck className="size-2.5" aria-hidden />}
-                </Button>
-                <TagDisplay name={tag.name} color={tag.color} />
-            </div>
-
-            {tag.creator ? (
-                <div className="flex min-w-0 items-center gap-2">
-                    <PlaygroundAvatar
-                        size="sm"
-                        className="rounded-full"
-                        src={tag.creator.image}
-                        letter={initialOf(tag.creator.name, tag.creator.id)}
-                        tone={toneFor(tag.creator.id)}
-                    />
-                    <span className="truncate text-[12px] text-neutral-300">
-                        {tag.creator.name ?? "Unknown"}
-                    </span>
+            <div className="grid min-w-0 flex-1 grid-cols-[1fr_180px_140px] items-center gap-4">
+                <div className="flex min-w-0 items-center">
+                    <TagDisplay name={tag.name} color={tag.color} />
                 </div>
-            ) : (
-                <span className="text-[12px] text-neutral-500">—</span>
-            )}
 
-            <span className="text-[12px] text-neutral-400">{formatDate(tag.createdAt)}</span>
-        </div>
+                {tag.creator ? (
+                    <div className="flex min-w-0 items-center gap-2">
+                        <PlaygroundAvatar
+                            size="sm"
+                            className="rounded-full"
+                            src={tag.creator.image}
+                            letter={initialOf(tag.creator.name, tag.creator.id)}
+                            tone={toneFor(tag.creator.id)}
+                        />
+                        <span className="truncate text-[12px] text-neutral-300">
+                            {tag.creator.name ?? "Unknown"}
+                        </span>
+                    </div>
+                ) : (
+                    <span className="text-[12px] text-neutral-500">—</span>
+                )}
+
+                <span className="text-[12px] text-neutral-400">{formatDate(tag.createdAt)}</span>
+            </div>
+        </SelectableRow>
     );
 }

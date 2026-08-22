@@ -1,9 +1,10 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/lib/axios";
 import { BULK_UPDATE_ISSUES_URL } from "@/routes/api_routes";
-import { BOARD_QUERY_KEY } from "@/hooks/issues/useBoard";
+import { patchBoardIssueCaches } from "@/hooks/issues/boardCache";
 import type { ApiResponse } from "@/types/api";
 import type { UpdateIssueInput } from "@/hooks/issues/useUpdateIssue";
+import type { BoardIssue, BoardLane } from "@/types/board";
 
 export interface BulkUpdateIssuesInput extends Omit<
     UpdateIssueInput,
@@ -19,6 +20,11 @@ export interface BulkUpdateIssuesInput extends Omit<
 export interface BulkIssueResult {
     updated: string[];
     failed: string[];
+    changes: {
+        issue: BoardIssue;
+        beforeLane: BoardLane;
+        afterLane: BoardLane;
+    }[];
 }
 
 export function useBulkUpdateIssues() {
@@ -44,10 +50,12 @@ export function useBulkUpdateIssues() {
             );
             return res.data.data;
         },
-        onSuccess: (_data, variables) => {
-            queryClient.invalidateQueries({
-                queryKey: [...BOARD_QUERY_KEY, variables.project_id],
-            });
+        onSuccess: (data, variables) => {
+            for (const change of data.changes) {
+                patchBoardIssueCaches(queryClient, variables.project_id, change.issue, {
+                    beforeLane: change.beforeLane,
+                });
+            }
         },
     });
 }

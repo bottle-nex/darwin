@@ -32,6 +32,7 @@ import type { KanbanStatus } from "@/types/kanban";
 import { useIssueFlightStore } from "@/store/kanban/useIssueFlightStore";
 import { useKanbanBoardStore } from "@/store/kanban/useKanbanBoardStore";
 import { useKanbanOptionsStore } from "@/store/kanban/useKanbanOptionsStore";
+import { useFilteredKanbanBoard } from "@/hooks/kanban/useFilteredKanbanBoard";
 
 /**
  * Stand-in for the future server-pushed status-change trigger: pick an issue and
@@ -48,7 +49,7 @@ export default function IssueFlightTrigger() {
     const [targetStatus, setTargetStatus] = useState<KanbanStatus | null>(null);
     const flightInProgress = useIssueFlightStore((s) => s.flight !== null);
     const start = useIssueFlightStore((s) => s.start);
-    const board = useKanbanBoardStore((s) => s.board);
+    const board = useFilteredKanbanBoard();
     const boardView = useKanbanOptionsStore((s) => s.boardView);
     const kanbanView = useKanbanOptionsStore((s) => s.kanbanView);
 
@@ -85,6 +86,7 @@ export default function IssueFlightTrigger() {
 
     function handleSubmit() {
         if (!selectedIssue || !targetStatus) return;
+        useKanbanBoardStore.getState().beginOverlay(board);
         setOpen(false);
         start(selectedIssue, targetStatus);
     }

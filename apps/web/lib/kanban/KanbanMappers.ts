@@ -42,6 +42,7 @@ export class KanbanMappers {
     private static toLlmIssue(issue: BoardIssue, status: KanbanStatus, projectName: string): Issue {
         return {
             id: issue.id,
+            boardIssue: issue,
             number: `#${issue.number}`,
             title: issue.title,
             project: projectName,

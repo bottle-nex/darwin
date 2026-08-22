@@ -2,7 +2,6 @@
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
 import { isSettingsTab, PlaygroundTab } from "@/components/playground/playgroundTabs";
 import { cn } from "@/lib/utils";
-import OverviewDisplay from "@/components/playground/Home/OverviewDisplay/OverviewDisplay";
 import KanbanDisplay from "@/components/playground/Home/KanbanDisplay/KanbanDisplay";
 import GanttDisplay from "@/components/playground/Home/GanttDisplay/GanttDisplay";
 import TagsDisplay from "@/components/playground/Home/TagsDisplay/TagsDisplay";
@@ -24,12 +23,6 @@ import {
 
 function TabPane({ tab }: { tab: string }) {
     switch (tab) {
-        case PlaygroundTab.Overview:
-            return (
-                <div className="flex min-h-0 flex-1 flex-col">
-                    <OverviewDisplay />
-                </div>
-            );
         case PlaygroundTab.Tags:
             return (
                 <div className="flex min-h-0 flex-1 flex-col">
@@ -117,7 +110,7 @@ export default function PlaygroundDisplay({ isLoading }: { isLoading?: boolean }
                     </div>
                     {inSettings && (
                         <>
-                            <SettingsBreadcrumb tab={tab} />
+                            <SettingsBreadcrumb />
                             <SettingsPane tab={tab} />
                         </>
                     )}

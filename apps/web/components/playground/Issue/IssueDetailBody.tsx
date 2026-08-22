@@ -1,4 +1,5 @@
 "use client";
+import { useState } from "react";
 import { cn } from "@/lib/utils";
 import IssueTitleField from "./IssueTitleField";
 import IssueBody from "./IssueBody";
@@ -14,8 +15,11 @@ export default function IssueDetailBody({
     issueId: string;
     embedded: boolean;
 }) {
+    const [scrollElement, setScrollElement] = useState<HTMLDivElement | null>(null);
+
     return (
         <div
+            ref={setScrollElement}
             data-lenis-prevent
             className={cn(
                 "no-scrollbar min-h-0 flex-1 overflow-y-auto",
@@ -30,7 +34,7 @@ export default function IssueDetailBody({
                     <IssueBody form={form} />
                 </div>
                 <div className="h-px w-full bg-snow/7" />
-                <ActivityFeed issueId={issueId} />
+                <ActivityFeed issueId={issueId} scrollElement={scrollElement} />
             </div>
         </div>
     );

@@ -16,6 +16,7 @@ export default function BaseCard({ issue, children, className }: BaseCardProps) 
             <IssueCardFace
                 identifier={issueIdentifier(issue.project, issue.number)}
                 issueId={issue.id}
+                boardIssue={issue.boardIssue}
                 title={issue.title}
                 status={issue.status}
                 priority={issue.priority}

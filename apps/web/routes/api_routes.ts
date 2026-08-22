@@ -73,6 +73,9 @@ export const ISSUES_URL = API_URL + "/issues";
 export const CREATE_ISSUE_URL = ISSUES_URL + "/create";
 export const CREATE_COLUMN_URL = ISSUES_URL + "/columns";
 export const BOARD_URL = (project_id: string) => `${ISSUES_URL}/board/${project_id}`;
+export const BOARD_COLUMNS_URL = (project_id: string) => `${BOARD_URL(project_id)}/columns`;
+export const BOARD_SEARCH_URL = (project_id: string) => `${BOARD_URL(project_id)}/search`;
+export const MY_ISSUES_URL = (project_id: string) => `${BOARD_URL(project_id)}/my`;
 export const ISSUE_URL = (id: string) => `${ISSUES_URL}/${id}`;
 export const BULK_UPDATE_ISSUES_URL = ISSUES_URL + "/bulk";
 export const BULK_DELETE_ISSUES_URL = ISSUES_URL + "/bulk/delete";
@@ -95,11 +98,21 @@ export const INVITE_MEMBER_URL = INVITATIONS_URL + "/invite";
 export const INVITES_PREVIEW_URL = (token: string) => `${INVITATIONS_URL}/${token}`;
 
 export const CHATS_URL = API_URL + "/chats";
-export const CHAT_URL = (issue_id: string) => `${CHATS_URL}/${issue_id}`;
+const HISTORY_QUERY = (cursor: string | null, limit: number) => {
+    const params = new URLSearchParams({ limit: String(limit) });
+    if (cursor) params.set("cursor", cursor);
+    return params.toString();
+};
+export const CHAT_URL = (issue_id: string, cursor: string | null, limit: number) =>
+    `${CHATS_URL}/${issue_id}?${HISTORY_QUERY(cursor, limit)}`;
 
 export const PROJECT_CHATS_URL = API_URL + "/project-chats";
-export const PROJECT_CHAT_URL = (project_id: string) => `${PROJECT_CHATS_URL}/${project_id}`;
-export const TEAM_CHAT_URL = (team_id: string) => `${PROJECT_CHATS_URL}/team/${team_id}`;
+export const CHAT_CONVERSATION_PREVIEWS_URL = (project_id: string) =>
+    `${PROJECT_CHATS_URL}/conversations/${project_id}`;
+export const PROJECT_CHAT_URL = (project_id: string, cursor: string | null, limit: number) =>
+    `${PROJECT_CHATS_URL}/${project_id}?${HISTORY_QUERY(cursor, limit)}`;
+export const TEAM_CHAT_URL = (team_id: string, cursor: string | null, limit: number) =>
+    `${PROJECT_CHATS_URL}/team/${team_id}?${HISTORY_QUERY(cursor, limit)}`;
 
 export const NOTIFICATIONS_URL = API_URL + "/notifications";
 export const NOTIFICATIONS_READ_URL = NOTIFICATIONS_URL + "/read";

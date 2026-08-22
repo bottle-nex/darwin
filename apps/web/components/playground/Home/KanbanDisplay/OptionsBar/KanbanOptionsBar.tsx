@@ -1,6 +1,7 @@
 "use client";
 import { useGetProjectConfig } from "@/hooks/project/useGetProjectConfig";
 import { useActiveProject } from "@/hooks/useActiveProject";
+import PlaygroundBreadcrumb from "@/components/playground/Core/components/PlaygroundBreadcrumb";
 import {
     PaneActionsSlot,
     PaneLeadSlot,
@@ -12,7 +13,7 @@ function KanbanOptionsBarSkeleton() {
     return (
         <>
             <PaneLeadSlot>
-                <div className="h-5 w-40 animate-pulse rounded-md bg-white/5" />
+                <PlaygroundBreadcrumb />
             </PaneLeadSlot>
             <PaneActionsSlot>
                 <div className="flex items-center gap-1.5">
