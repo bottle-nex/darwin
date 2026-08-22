@@ -4,6 +4,7 @@
    imported by both apps/web and apps/admin so they cannot drift. */
 @import "../../../packages/theme/theme.css";
 @import "../../../node_modules/react-diff-view/style/index.css";
+@import "../../../node_modules/prism-themes/themes/prism-cb.css";
 
 @source "../**/*.{ts,tsx}";
 @source "../../../packages/editorial/**/*.tsx";
@@ -566,123 +567,62 @@
 }
 
 .review-diff {
-    --diff-background-color: transparent;
-    --diff-text-color: var(--color-neutral-300);
-    --diff-font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
-    --diff-selection-background-color: color-mix(in oklab, var(--color-sky-400) 30%, transparent);
+    --diff-add: var(--color-emerald-500);
+    --diff-remove: var(--color-rose-500);
 
-    --diff-gutter-insert-background-color: color-mix(in oklab, var(--color-green-500) 12%, transparent);
-    --diff-gutter-delete-background-color: color-mix(in oklab, var(--color-rose-500) 12%, transparent);
-    --diff-gutter-insert-text-color: var(--color-green-300);
+    --diff-background-color: transparent;
+    --diff-text-color: #e6e6e6;
+    --diff-font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
+    --diff-selection-background-color: color-mix(in oklab, var(--color-sky-400) 24%, transparent);
+
+    --diff-gutter-insert-background-color: color-mix(in oklab, var(--diff-add) 20%, transparent);
+    --diff-gutter-delete-background-color: color-mix(in oklab, var(--diff-remove) 20%, transparent);
+    --diff-gutter-insert-text-color: var(--color-emerald-300);
     --diff-gutter-delete-text-color: var(--color-rose-300);
 
-    --diff-code-insert-background-color: color-mix(in oklab, var(--color-green-500) 9%, transparent);
-    --diff-code-delete-background-color: color-mix(in oklab, var(--color-rose-500) 9%, transparent);
+    --diff-code-insert-background-color: color-mix(in oklab, var(--diff-add) 13%, transparent);
+    --diff-code-delete-background-color: color-mix(in oklab, var(--diff-remove) 13%, transparent);
     --diff-code-insert-text-color: inherit;
     --diff-code-delete-text-color: inherit;
-    --diff-code-insert-edit-background-color: color-mix(in oklab, var(--color-green-500) 24%, transparent);
-    --diff-code-delete-edit-background-color: color-mix(in oklab, var(--color-rose-500) 24%, transparent);
+    --diff-code-insert-edit-background-color: color-mix(in oklab, var(--diff-add) 32%, transparent);
+    --diff-code-delete-edit-background-color: color-mix(
+        in oklab,
+        var(--diff-remove) 32%,
+        transparent
+    );
 
-    font-size: 13px;
+    font-size: 14px;
+    letter-spacing: 0.01em;
 }
 
 .review-diff .diff-line {
-    line-height: 1.65;
+    line-height: 1.7;
+}
+
+.review-diff .diff-gutter-col {
+    width: 3.5rem;
 }
 
 .review-diff .diff-gutter {
-    width: 3.5rem;
     cursor: default;
     color: var(--color-neutral-600);
     padding-right: 0.75rem;
+    font-variant-numeric: tabular-nums;
 }
 
 .review-diff .diff-code {
     padding-left: 0.75rem;
+    padding-right: 0.75rem;
 }
 
-.review-diff .diff-code-insert {
-    box-shadow: inset 2px 0 0 0 color-mix(in oklab, var(--color-green-500) 70%, transparent);
+.review-diff .diff-gutter-insert {
+    box-shadow: inset 2px 0 0 0 var(--diff-add);
 }
 
-.review-diff .diff-code-delete {
-    box-shadow: inset 2px 0 0 0 color-mix(in oklab, var(--color-rose-500) 70%, transparent);
-}
-
-.review-diff .diff-decoration {
-    background-color: color-mix(in oklab, var(--color-snow) 3%, transparent);
-    border-block: 1px solid var(--color-border);
+.review-diff .diff-gutter-delete {
+    box-shadow: inset 2px 0 0 0 var(--diff-remove);
 }
 
 .review-diff .diff-decoration-content {
     padding: 0;
-}
-
-.review-diff .token.comment,
-.review-diff .token.prolog,
-.review-diff .token.cdata {
-    color: #6a9955;
-}
-
-.review-diff .token.punctuation {
-    color: #9a9a9a;
-}
-
-.review-diff .token.keyword,
-.review-diff .token.atrule,
-.review-diff .token.rule,
-.review-diff .token.important {
-    color: #569cd6;
-}
-
-.review-diff .token.string,
-.review-diff .token.char,
-.review-diff .token.attr-value,
-.review-diff .token.regex,
-.review-diff .token.inserted {
-    color: #ce9178;
-}
-
-.review-diff .token.function,
-.review-diff .token.function-variable {
-    color: #dcdcaa;
-}
-
-.review-diff .token.class-name,
-.review-diff .token.maybe-class-name,
-.review-diff .token.builtin {
-    color: #4ec9b0;
-}
-
-.review-diff .token.number,
-.review-diff .token.boolean,
-.review-diff .token.constant,
-.review-diff .token.symbol {
-    color: #b5cea8;
-}
-
-.review-diff .token.property,
-.review-diff .token.variable,
-.review-diff .token.parameter {
-    color: #9cdcfe;
-}
-
-.review-diff .token.tag,
-.review-diff .token.selector,
-.review-diff .token.deleted {
-    color: #569cd6;
-}
-
-.review-diff .token.attr-name {
-    color: #9cdcfe;
-}
-
-.review-diff .token.operator,
-.review-diff .token.entity,
-.review-diff .token.url {
-    color: #d4d4d4;
-}
-
-.review-diff .token.namespace {
-    opacity: 0.7;
 }

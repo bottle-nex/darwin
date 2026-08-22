@@ -88,3 +88,9 @@ export interface ReviewComment {
     line: number | null;
     diffHunk: string | null;
 }
+
+export interface ReviewFileSource {
+    path: string;
+    source: string | null;
+    lines: number;
+}

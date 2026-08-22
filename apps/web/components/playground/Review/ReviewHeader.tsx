@@ -6,7 +6,7 @@ import { LiaGithub } from "react-icons/lia";
 
 export default function ReviewHeader({ tab, htmlUrl }: { tab: ReviewTab; htmlUrl: string }) {
     return (
-        <header className="flex shrink-0 items-center gap-1.5 px-3 pt-3 pb-2">
+        <header className="flex shrink-0 items-center gap-1.5 px-3 pt-3">
             <ReviewTabBar active={tab} />
             <a
                 href={htmlUrl}

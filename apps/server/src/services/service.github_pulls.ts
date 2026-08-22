@@ -126,6 +126,27 @@ export default class GithubPullsService {
         }));
     }
 
+    static async getFileSource(
+        ref: Omit<PullRequestRef, "pullNumber">,
+        path: string,
+        commitSha: string,
+    ): Promise<string | null> {
+        const octokit = await GithubAppService.octokitFor(ref.installationId);
+        try {
+            const { data } = await octokit.rest.repos.getContent({
+                owner: ref.owner,
+                repo: ref.repo,
+                path,
+                ref: commitSha,
+            });
+            if (Array.isArray(data) || data.type !== "file") return null;
+            if (data.encoding !== "base64" || !data.content) return null;
+            return Buffer.from(data.content, "base64").toString("utf8");
+        } catch {
+            return null;
+        }
+    }
+
     static async listTimeline(ref: PullRequestRef): Promise<ReviewComment[]> {
         const octokit = await GithubAppService.octokitFor(ref.installationId);
         const target = { owner: ref.owner, repo: ref.repo };

@@ -50,6 +50,7 @@
         "cmdk": "^1.1.1",
         "date-fns": "^4.4.0",
         "mermaid": "^11.17.0",
+        "prism-themes": "^1.9.0",
         "react-day-picker": "^10.0.1",
         "react-diff-view": "^3.3.3",
         "refractor": "3",

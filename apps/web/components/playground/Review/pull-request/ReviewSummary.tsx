@@ -1,13 +1,10 @@
 "use client";
 import type { ReactNode } from "react";
-import {
-    GoComment,
-    GoGitCommit,
-    GoGitMerge,
-    GoGitPullRequest,
-    GoGitPullRequestClosed,
-} from "react-icons/go";
+import type { IconType } from "react-icons";
+import { BiChat } from "react-icons/bi";
+import { GoGitCommit, GoGitMerge, GoGitPullRequest, GoGitPullRequestClosed } from "react-icons/go";
 import { LuFileDiff } from "react-icons/lu";
+import { MdChevronLeft } from "react-icons/md";
 import type { ReviewHeader, ReviewState } from "@trymatcha/types";
 import { cn } from "@/lib/utils";
 import { formatRelativeTime } from "@/lib/format";
@@ -18,10 +15,7 @@ const META = "text-[12.5px] leading-none text-neutral-400";
 const MONO = "font-mono text-[11.5px] leading-none tracking-tight text-neutral-500";
 const QUIET = "text-neutral-500";
 
-const STATE_STYLE: Record<
-    ReviewState,
-    { icon: typeof GoGitPullRequest; label: string; tone: string }
-> = {
+const STATE_STYLE: Record<ReviewState, { icon: IconType; label: string; tone: string }> = {
     open: { icon: GoGitPullRequest, label: "Open", tone: "bg-green-500/12 text-green-400" },
     merged: { icon: GoGitMerge, label: "Merged", tone: "bg-violet-500/12 text-violet-400" },
     closed: { icon: GoGitPullRequestClosed, label: "Closed", tone: "bg-rose-500/12 text-rose-400" },
@@ -61,8 +55,15 @@ export default function ReviewSummary({ review }: { review: ReviewHeader }) {
                     {review.repo}#{review.pullNumber}
                 </span>
                 <Dot />
-                <span className={cn(MONO, "truncate")}>
-                    {review.baseBranch} ← {review.headBranch}
+                <span
+                    className={cn(
+                        MONO,
+                        "flex min-w-0 items-center gap-0.5 rounded-full px-2 py-1.5 ring-[0.5px] ring-snow/5",
+                    )}
+                >
+                    <span className="truncate">{review.baseBranch}</span>
+                    <MdChevronLeft className="size-3.5 shrink-0 text-neutral-600" aria-hidden />
+                    <span className="truncate">{review.headBranch}</span>
                 </span>
                 <Dot />
                 <span className={QUIET}>opened {formatRelativeTime(review.createdAt)}</span>
@@ -73,15 +74,15 @@ export default function ReviewSummary({ review }: { review: ReviewHeader }) {
                     <span className="tabular-nums">{review.changedFiles}</span>
                     <span className={QUIET}>{review.changedFiles === 1 ? "file" : "files"}</span>
                     <span className="tabular-nums">
-                        <span className="text-green-400">+{review.additions}</span>{" "}
-                        <span className="text-rose-400">−{review.deletions}</span>
+                        <span className="text-green-500">+{review.additions}</span>{" "}
+                        <span className="text-rose-500">−{review.deletions}</span>
                     </span>
                 </Stat>
                 <Stat icon={GoGitCommit}>
                     <span className="tabular-nums">{review.commits}</span>
                     <span className={QUIET}>{review.commits === 1 ? "commit" : "commits"}</span>
                 </Stat>
-                <Stat icon={GoComment}>
+                <Stat icon={BiChat}>
                     <span className="tabular-nums">{review.comments}</span>
                     <span className={QUIET}>{review.comments === 1 ? "comment" : "comments"}</span>
                 </Stat>
@@ -127,7 +128,7 @@ function MetaRow({ className, children }: { className?: string; children: ReactN
     );
 }
 
-function Stat({ icon: Icon, children }: { icon: typeof GoComment; children: ReactNode }) {
+function Stat({ icon: Icon, children }: { icon: IconType; children: ReactNode }) {
     return (
         <span className="flex items-center gap-1.5">
             <Icon className="size-3.5 shrink-0 text-neutral-600" />

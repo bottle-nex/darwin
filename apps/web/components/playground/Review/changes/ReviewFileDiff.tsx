@@ -1,52 +1,111 @@
 "use client";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import {
     Decoration,
     Diff,
     getCollapsedLinesCountBetween,
     Hunk,
     parseDiff,
+    expandFromRawCode,
     tokenize,
     type HunkData,
 } from "react-diff-view";
 import { GoFileCode } from "react-icons/go";
 import { LuChevronsUpDown, LuExternalLink } from "react-icons/lu";
 import type { ReviewFile } from "@trymatcha/types";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { useReviewFileSource } from "@/hooks/review/useReviewFileSource";
 import { languageFor, refractor } from "./diffLanguage";
 import { splitPath } from "./ReviewFileRow";
 
-export default function ReviewFileDiff({ file }: { file: ReviewFile }) {
+const MAX_EXPANDABLE_LINES = 2000;
+
+export default function ReviewFileDiff({
+    file,
+    projectId,
+    pullNumber,
+}: {
+    file: ReviewFile;
+    projectId: string | undefined;
+    pullNumber: number;
+}) {
     const { name, directory } = splitPath(file.filename);
+    const [wholeFile, setWholeFile] = useState(false);
+    const [ranges, setRanges] = useState<Array<[number, number]>>([]);
+    const wantsSource = wholeFile || ranges.length > 0;
 
     const parsed = useMemo(
         () =>
             file.patch ? (parseDiff(toGitDiff(file), { nearbySequences: "zip" })[0] ?? null) : null,
         [file],
     );
-
     const hunks: HunkData[] = useMemo(() => parsed?.hunks ?? [], [parsed]);
+
+    const expandable = file.status !== "added" && Boolean(file.patch);
+    const { data: fileSource, isPending: sourcePending } = useReviewFileSource(
+        projectId,
+        pullNumber,
+        file.filename,
+        wantsSource && expandable,
+    );
+    const tooLarge = (fileSource?.lines ?? 0) > MAX_EXPANDABLE_LINES;
+    const sourceLines = useMemo(() => {
+        if (!fileSource?.source || tooLarge) return null;
+        return fileSource.source.split("\n");
+    }, [fileSource, tooLarge]);
+
+    const renderedHunks = useMemo(() => {
+        if (!sourceLines) return hunks;
+        if (wholeFile) return expandFromRawCode(hunks, sourceLines, 1, sourceLines.length);
+        return ranges.reduce(
+            (current, [from, to]) => expandFromRawCode(current, sourceLines, from, to),
+            hunks,
+        );
+    }, [hunks, sourceLines, wholeFile, ranges]);
 
     const tokens = useMemo(() => {
         const language = languageFor(file.filename);
-        if (!hunks.length || !language) return null;
+        if (!renderedHunks.length || !language) return null;
         try {
-            return tokenize(hunks, { highlight: true, refractor, language });
+            return tokenize(renderedHunks, { highlight: true, refractor, language });
         } catch {
             return null;
         }
-    }, [hunks, file.filename]);
+    }, [renderedHunks, file.filename]);
 
     return (
-        <section className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-lg border border-border">
-            <header className="flex shrink-0 items-center gap-2 border-b border-border bg-white/[0.02] px-3 py-2">
+        <section className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-lg border border-border bg-white/2">
+            <header className="flex shrink-0 items-center gap-2 px-3 py-2.5">
                 <GoFileCode className="size-3.5 shrink-0 text-neutral-500" />
-                <span className="shrink-0 text-[14px] font-medium text-neutral-100">{name}</span>
-                <span className="min-w-0 flex-1 truncate text-[12.5px] text-neutral-600">
+                <span className="shrink-0 font-headline text-[14px] font-medium text-neutral-100">
+                    {name}
+                </span>
+                <span className="min-w-0 flex-1 truncate font-headline text-[12.5px] text-neutral-600">
                     {file.previousFilename ? `renamed from ${file.previousFilename}` : directory}
                 </span>
+
+                {expandable && (
+                    <Button
+                        variant="unstyled"
+                        onClick={() => {
+                            setRanges([]);
+                            setWholeFile(!wholeFile);
+                        }}
+                        loading={wantsSource && sourcePending}
+                        className="shrink-0 cursor-pointer rounded-md px-2 py-1 font-headline text-[12px] text-neutral-500 transition-colors hover:bg-white/5 hover:text-neutral-200"
+                    >
+                        {tooLarge
+                            ? "Too large to expand"
+                            : wholeFile
+                              ? "Changes only"
+                              : "Whole file"}
+                    </Button>
+                )}
+
                 <span className="shrink-0 text-[12.5px] tabular-nums">
                     {file.additions > 0 && (
-                        <span className="text-green-400">+{file.additions}</span>
+                        <span className="text-emerald-400">+{file.additions}</span>
                     )}
                     {file.deletions > 0 && (
                         <span className="text-rose-400"> −{file.deletions}</span>
@@ -65,8 +124,8 @@ export default function ReviewFileDiff({ file }: { file: ReviewFile }) {
                 )}
             </header>
 
-            {hunks.length === 0 ? (
-                <p className="px-3 py-4 text-[13px] text-neutral-500">
+            {renderedHunks.length === 0 ? (
+                <p className="px-3 py-4 font-headline text-[13px] text-neutral-500">
                     {file.patch === null
                         ? "This file is too large or too binary to show here — open it on GitHub."
                         : "No textual changes in this file."}
@@ -76,25 +135,34 @@ export default function ReviewFileDiff({ file }: { file: ReviewFile }) {
                     <Diff
                         viewType="unified"
                         diffType={parsed!.type}
-                        hunks={hunks}
+                        hunks={renderedHunks}
                         tokens={tokens}
                         className="review-diff"
                     >
                         {(rendered) =>
-                            rendered.flatMap((hunk, index) => [
-                                <HunkGap
-                                    key={`gap-${hunk.content}`}
-                                    skipped={
-                                        index === 0
-                                            ? hunk.oldStart - 1
-                                            : getCollapsedLinesCountBetween(
-                                                  rendered[index - 1],
-                                                  hunk,
-                                              )
-                                    }
-                                />,
-                                <Hunk key={`hunk-${hunk.content}`} hunk={hunk} />,
-                            ])
+                            rendered.flatMap((hunk, index) => {
+                                const previous = index === 0 ? null : rendered[index - 1];
+                                const skipped = getCollapsedLinesCountBetween(previous, hunk);
+                                return [
+                                    <HunkGap
+                                        key={`gap-${hunk.content}`}
+                                        skipped={skipped}
+                                        onExpand={
+                                            expandable && !tooLarge && !wholeFile
+                                                ? () =>
+                                                      setRanges((current) => [
+                                                          ...current,
+                                                          [
+                                                              hunk.oldStart - skipped,
+                                                              hunk.oldStart - 1,
+                                                          ],
+                                                      ])
+                                                : undefined
+                                        }
+                                    />,
+                                    <Hunk key={`hunk-${hunk.content}`} hunk={hunk} />,
+                                ];
+                            })
                         }
                     </Diff>
                 </div>
@@ -115,14 +183,24 @@ function toGitDiff(file: ReviewFile): string {
     ].join("\n");
 }
 
-function HunkGap({ skipped }: { skipped: number }) {
+function HunkGap({ skipped, onExpand }: { skipped: number; onExpand?: () => void }) {
     if (skipped <= 0) return null;
+    const label = `${skipped} unchanged ${skipped === 1 ? "line" : "lines"}`;
+
     return (
         <Decoration>
-            <span className="flex items-center justify-center gap-1.5 py-1 text-[12.5px] text-neutral-500">
+            <Button
+                variant="unstyled"
+                disabled={!onExpand}
+                onClick={onExpand}
+                className={cn(
+                    "flex w-full items-center justify-center gap-1.5 py-1 font-headline text-[12.5px] text-neutral-500 transition-colors",
+                    onExpand && "cursor-pointer hover:bg-white/4 hover:text-neutral-300",
+                )}
+            >
                 <LuChevronsUpDown className="size-3" />
-                {skipped} unchanged {skipped === 1 ? "line" : "lines"}
-            </span>
+                {label}
+            </Button>
         </Decoration>
     );
 }

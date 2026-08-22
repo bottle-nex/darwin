@@ -168,7 +168,10 @@ function escape_like(value: string) {
 }
 
 export default class BoardIssueService {
-    static find_project_column(project_id: string, column_id: string) {
+    static find_project_column(
+        project_id: string,
+        column_id: string,
+    ): Promise<{ id: string } | null> {
         return prisma.customColumn.findFirst({
             where: { id: column_id, projectId: project_id },
             select: { id: true },

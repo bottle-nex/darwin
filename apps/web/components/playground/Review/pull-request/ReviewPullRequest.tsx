@@ -18,7 +18,7 @@ export default function ReviewPullRequest({
     const { data: comments, isPending } = useReviewComments(projectId, review.pullNumber);
 
     return (
-        <div className="no-scrollbar min-h-0 flex-1 overflow-y-auto px-6 py-5" data-lenis-prevent>
+        <div className="no-scrollbar min-h-0 flex-1 overflow-y-auto px-6" data-lenis-prevent>
             <div className="flex flex-col gap-7">
                 <ReviewSummary review={review} />
 

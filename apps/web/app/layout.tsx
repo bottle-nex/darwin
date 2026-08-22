@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist_Mono, Google_Sans_Flex, Titillium_Web } from "next/font/google";
+import { Geist_Mono, Google_Sans_Flex, JetBrains_Mono, Titillium_Web } from "next/font/google";
 import "./globals.css";
 import QueryProvider from "@/providers/QueryProvider";
 import SessionSetter from "@/components/utility/SessionSetter";
@@ -10,6 +10,11 @@ import { authOption } from "./api/auth/[...nextauth]/options";
 
 const geistMono = Geist_Mono({
     variable: "--font-geist-mono",
+    subsets: ["latin"],
+});
+
+const jetBrainsMono = JetBrains_Mono({
+    variable: "--font-jetbrains-mono",
     subsets: ["latin"],
 });
 
@@ -40,7 +45,7 @@ export default async function RootLayout({
         <html
             lang="en"
             suppressHydrationWarning
-            className={`${googleSansFlex.variable} ${geistMono.variable} ${titilliumWeb.variable} h-full antialiased`}
+            className={`${googleSansFlex.variable} ${geistMono.variable} ${jetBrainsMono.variable} ${titilliumWeb.variable} h-full antialiased`}
         >
             <body className="min-h-full flex flex-col">
                 <ThemeScope />

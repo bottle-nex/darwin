@@ -24,6 +24,7 @@ import regenerate_product_diff_controller from "../../controllers/project/contro
 import product_diff_artifact_urls_controller from "../../controllers/project/controller.product_diff_artifact_urls";
 import get_review_controller from "../../controllers/project/controller.get_review";
 import list_review_files_controller from "../../controllers/project/controller.list_review_files";
+import get_review_file_controller from "../../controllers/project/controller.get_review_file";
 import list_review_comments_controller from "../../controllers/project/controller.list_review_comments";
 import create_review_comment_controller from "../../controllers/project/controller.create_review_comment";
 import start_setup from "../../controllers/setup/controller.start_setup";
@@ -59,6 +60,11 @@ project_router.get(
     "/:project_id/review/:pull_number/files",
     require_auth,
     list_review_files_controller,
+);
+project_router.get(
+    "/:project_id/review/:pull_number/file",
+    require_auth,
+    get_review_file_controller,
 );
 project_router.get(
     "/:project_id/review/:pull_number/comments",

@@ -35,18 +35,18 @@ export default function ReviewFileRow({
             <GoFileCode className="size-3.5 shrink-0 text-neutral-500" />
             <span
                 className={cn(
-                    "shrink-0 truncate text-[14px]",
+                    "shrink-0 truncate font-headline text-[14px]",
                     selected ? "text-neutral-100" : "text-neutral-400",
                 )}
             >
                 {name}
             </span>
-            <span className="min-w-0 flex-1 truncate text-[12.5px] text-neutral-600">
+            <span className="min-w-0 flex-1 truncate font-headline text-[12.5px] text-neutral-600">
                 {directory}
             </span>
             <span className="shrink-0 text-[12.5px] tabular-nums">
-                {file.additions > 0 && <span className="text-green-400">+{file.additions}</span>}
-                {file.deletions > 0 && <span className="text-rose-400"> −{file.deletions}</span>}
+                {file.additions > 0 && <span className="text-green-500">+{file.additions}</span>}
+                {file.deletions > 0 && <span className="text-rose-500"> −{file.deletions}</span>}
             </span>
         </Button>
     );

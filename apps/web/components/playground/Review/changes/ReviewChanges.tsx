@@ -19,7 +19,7 @@ export default function ReviewChanges({
     if (isPending) return <LogoLoader className="h-full w-full text-snow" />;
     if (!files?.length) {
         return (
-            <p className="flex flex-1 items-center justify-center text-[13.5px] text-neutral-500">
+            <p className="flex flex-1 items-center justify-center font-headline text-[13.5px] text-neutral-500">
                 This pull request changes no files.
             </p>
         );
@@ -30,10 +30,10 @@ export default function ReviewChanges({
     return (
         <div className="grid min-h-0 min-w-0 flex-1 grid-cols-[20rem_minmax(0,1fr)] gap-4 px-10 py-4">
             <aside className="flex min-h-0 flex-col gap-2 overflow-y-auto pr-1" data-lenis-prevent>
-                <p className="px-2 text-[12.5px] text-neutral-500 tabular-nums">
+                <p className="px-2 font-headline text-[12.5px] text-neutral-500 tabular-nums">
                     {files.length} {files.length === 1 ? "file" : "files"} changed{" "}
-                    <span className="text-green-400">+{review.additions}</span>{" "}
-                    <span className="text-rose-400">−{review.deletions}</span>
+                    <span className="text-green-500">+{review.additions}</span>{" "}
+                    <span className="text-rose-500">−{review.deletions}</span>
                 </p>
                 {files.map((file) => (
                     <ReviewFileRow
@@ -45,7 +45,12 @@ export default function ReviewChanges({
                 ))}
             </aside>
 
-            <ReviewFileDiff key={active.filename} file={active} />
+            <ReviewFileDiff
+                key={active.filename}
+                file={active}
+                projectId={projectId}
+                pullNumber={review.pullNumber}
+            />
         </div>
     );
 }
