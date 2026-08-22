@@ -4,11 +4,8 @@ import Capsule from "./Capsule";
 import MembersCapsule from "./MembersCapsule";
 import TagsCapsule from "./TagsCapsule";
 import PriorityCapsule from "./PriorityCapsule";
-import { DATE_ICON_COLOR } from "./issueHelpers";
+import { DATE_ICON_COLOR, STACKED_CAPSULE } from "./issueHelpers";
 import type { IssueFormState } from "./useIssueForm";
-
-const STACKED_CAPSULE =
-    "w-full rounded-md bg-transparent px-1.5 py-1.5 text-[13.5px] text-neutral-200 ring-0 [&_svg]:size-[18px] hover:bg-white/5 disabled:cursor-default disabled:text-neutral-400 disabled:hover:bg-transparent";
 
 export default function IssueFields({
     form,

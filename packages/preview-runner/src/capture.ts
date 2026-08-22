@@ -91,7 +91,7 @@ async function capture_one(
             await page
                 .locator(`[${HARNESS_ROOT_ATTRIBUTE}]`)
                 .first()
-                .screenshot({ animations: "disabled", caret: "hide", scale: "css" }),
+                .screenshot({ animations: "disabled", caret: "hide", scale: "device" }),
         );
 
         return { ...base, status: "ok", file: `${relativeDir}/${input.side}.png`, error: null };

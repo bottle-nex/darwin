@@ -12,16 +12,16 @@ import { PANE_TOP_BAR_HEIGHT } from "@/components/playground/Core/components/Pla
 import IssueDropdown from "@/components/playground/Home/KanbanDisplay/IssueDropdown";
 import ConfirmDialog from "@/components/utility/ConfirmDialog";
 import { useEscapeExit } from "@/hooks/shortcuts/useEscapeExit";
-import IssueTitleField from "./IssueTitleField";
-import IssueBody from "./IssueBody";
-import IssueSubmitAction from "./IssueSubmitAction";
+import DiffDisplay from "./diff/DiffDisplay";
+import IssueDetailBody from "./IssueDetailBody";
 import IssueProperties from "./IssueProperties";
-import ActivityFeed from "./activity/ActivityFeed";
+import IssueSubmitAction from "./IssueSubmitAction";
 import { isEditable, targetForIssue } from "./issueHelpers";
 import { useIssueNavigation } from "./useIssueNavigation";
+import { useIssueRoute } from "./useIssueRoute";
 import { useIssueForm } from "./useIssueForm";
 
-export default function IssueDetail({
+export default function IssueDisplayPane({
     issue,
     columns,
     embedded = false,
@@ -32,9 +32,12 @@ export default function IssueDetail({
     embedded?: boolean;
     onDismiss?: () => void;
 }) {
-    const { close: closeRoute } = useIssueNavigation();
+    const { close: closeRoute, showIssueDetail } = useIssueNavigation();
+    const { issueView } = useIssueRoute();
     const close = onDismiss ?? closeRoute;
     const [confirmingClose, setConfirmingClose] = useState(false);
+
+    const inDiff = !embedded && issueView === "diff";
 
     const form = useIssueForm({
         target: targetForIssue(issue, columns),
@@ -47,9 +50,9 @@ export default function IssueDetail({
 
     useEscapeExit({
         enabled: !confirmingClose,
-        isDirty,
+        isDirty: inDiff ? false : isDirty,
         editor: form.editorRef.current,
-        onExit: close,
+        onExit: inDiff ? showIssueDetail : close,
         onDirtyExit: () => setConfirmingClose(true),
     });
 
@@ -73,36 +76,31 @@ export default function IssueDetail({
                 ) : (
                     <>
                         <PaneLeadSlot>
-                            <PlaygroundBreadcrumb issueNumber={issue.number} />
+                            <PlaygroundBreadcrumb
+                                issueNumber={issue.number}
+                                trailing={inDiff ? "Diff" : undefined}
+                            />
                         </PaneLeadSlot>
 
-                        <PaneActionsSlot>
-                            <IssueSubmitAction form={form} warningPlacement="below" />
-                        </PaneActionsSlot>
+                        {!inDiff && (
+                            <PaneActionsSlot>
+                                <IssueSubmitAction form={form} warningPlacement="below" />
+                            </PaneActionsSlot>
+                        )}
                     </>
                 )}
                 <div
-                    className={cn("flex min-h-0 min-w-0 flex-1 flex-row", embedded ? "m-2" : "m-4")}
+                    className={cn(
+                        "grid min-h-0 min-w-0 flex-1 grid-cols-[minmax(0,50rem)_16rem]",
+                        embedded ? "m-2" : "m-4",
+                    )}
                 >
-                    <div className="flex min-h-0 w-full min-w-0 max-w-200 flex-col">
-                        <div
-                            data-lenis-prevent
-                            className={cn(
-                                "no-scrollbar min-h-0 flex-1 overflow-y-auto",
-                                embedded ? "px-6 py-5" : "px-10 py-8",
-                            )}
-                        >
-                            <div className="flex w-full flex-col gap-y-4">
-                                <div onContextMenu={(event) => event.stopPropagation()}>
-                                    <IssueTitleField form={form} />
-                                </div>
-                                <div onContextMenu={(event) => event.stopPropagation()}>
-                                    <IssueBody form={form} />
-                                </div>
-                                <div className="h-px w-full bg-white/7" />
-                                <ActivityFeed issueId={issue.id} />
-                            </div>
-                        </div>
+                    <div className="flex min-h-0 min-w-0 flex-col">
+                        {inDiff ? (
+                            <DiffDisplay issue={issue} />
+                        ) : (
+                            <IssueDetailBody form={form} issueId={issue.id} embedded={embedded} />
+                        )}
                     </div>
                     <IssueProperties form={form} issue={issue} />
                 </div>

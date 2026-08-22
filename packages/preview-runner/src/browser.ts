@@ -16,6 +16,7 @@ const TRANSPARENT_PIXEL = Buffer.from(
 );
 const LOOPBACK_HOSTS = new Set(["127.0.0.1", "localhost", "[::1]", "0.0.0.0"]);
 const SETTLE_TIMEOUT_MS = 5_000;
+const CAPTURE_DEVICE_SCALE_FACTOR = 2;
 const QUIET_STYLES = `*, *::before, *::after {
     animation: none !important;
     transition: none !important;
@@ -96,7 +97,7 @@ export async function open_deterministic_context(
 ): Promise<BrowserContext> {
     const context = await browser.newContext({
         viewport,
-        deviceScaleFactor: 1,
+        deviceScaleFactor: CAPTURE_DEVICE_SCALE_FACTOR,
         isMobile: false,
         hasTouch: false,
         colorScheme: "light",

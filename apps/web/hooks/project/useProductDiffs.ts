@@ -18,6 +18,11 @@ export function useProductDiffs(projectId: string | undefined) {
             );
             return res.data.data;
         },
-        refetchInterval: 5_000,
+        refetchInterval: (query) =>
+            query.state.data?.some(
+                (diff) => diff.status === "Pending" || diff.status === "Generating",
+            )
+                ? 5_000
+                : false,
     });
 }

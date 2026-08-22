@@ -5,9 +5,19 @@ import { Button } from "@/components/ui/button";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { useIssueNavigation } from "@/components/playground/Issue/useIssueNavigation";
 
-export default function PlaygroundBreadcrumb({ issueNumber }: { issueNumber?: number }) {
+const CRUMB_LINK =
+    "cursor-pointer truncate font-medium text-neutral-400 transition-colors hover:text-neutral-100 capitalize";
+const CRUMB_LEAF = "shrink-0 font-medium text-neutral-100 capitalize";
+
+export default function PlaygroundBreadcrumb({
+    issueNumber,
+    trailing,
+}: {
+    issueNumber?: number;
+    trailing?: string;
+}) {
     const project = useActiveProject();
-    const { close } = useIssueNavigation();
+    const { close, showIssueDetail } = useIssueNavigation();
     const inIssue = issueNumber !== undefined;
 
     return (
@@ -18,14 +28,9 @@ export default function PlaygroundBreadcrumb({ issueNumber }: { issueNumber?: nu
                 letter={project?.name.slice(0, 2).toUpperCase() ?? "?"}
             />
             {!project ? (
-                <span className="h-3 w-24 animate-pulse rounded bg-white/5" />
+                <span className="h-3 w-24 animate-pulse rounded bg-snow/5" />
             ) : inIssue ? (
-                <Button
-                    variant="unstyled"
-                    type="button"
-                    onClick={close}
-                    className="cursor-pointer truncate font-medium text-neutral-400 transition-colors hover:text-neutral-100 capitalize"
-                >
+                <Button variant="unstyled" type="button" onClick={close} className={CRUMB_LINK}>
                     {project.name}
                 </Button>
             ) : (
@@ -35,12 +40,31 @@ export default function PlaygroundBreadcrumb({ issueNumber }: { issueNumber?: nu
             )}
             {inIssue && (
                 <>
-                    <MdChevronRight className="size-3.5 shrink-0 text-neutral-600" aria-hidden />
-                    <span className="shrink-0 font-medium text-neutral-100 capitalize">
-                        #{issueNumber}
-                    </span>
+                    <Separator />
+                    {trailing ? (
+                        <Button
+                            variant="unstyled"
+                            type="button"
+                            onClick={showIssueDetail}
+                            className={CRUMB_LINK}
+                        >
+                            #{issueNumber}
+                        </Button>
+                    ) : (
+                        <span className={CRUMB_LEAF}>#{issueNumber}</span>
+                    )}
+                </>
+            )}
+            {trailing && (
+                <>
+                    <Separator />
+                    <span className={CRUMB_LEAF}>{trailing}</span>
                 </>
             )}
         </nav>
     );
+}
+
+function Separator() {
+    return <MdChevronRight className="size-3.5 shrink-0 text-neutral-600" aria-hidden />;
 }

@@ -8,7 +8,7 @@ import { PLAYGROUND_PANE_SHELL } from "@/components/playground/Core/components/p
 import { PaneLeadSlot } from "@/components/playground/Core/components/PlaygroundPaneSlots";
 import PlaygroundBreadcrumb from "@/components/playground/Core/components/PlaygroundBreadcrumb";
 import { useIssueNavigation } from "./useIssueNavigation";
-import IssueDetail from "./IssueDetail";
+import IssueDisplayPane from "./IssueDisplayPane";
 
 export default function IssueDisplay({ issueId }: { issueId: string }) {
     const projectId = useActiveProject()?.id;
@@ -21,7 +21,7 @@ export default function IssueDisplay({ issueId }: { issueId: string }) {
     useEscapeExit({ enabled: !showsDetail, onExit: close });
 
     if (board && issue) {
-        return <IssueDetail key={issue.id} issue={issue} columns={board.columns} />;
+        return <IssueDisplayPane key={issue.id} issue={issue} columns={board.columns} />;
     }
 
     return (

@@ -16,6 +16,9 @@ export const DATE_ICON_COLOR = {
     target: "text-orange-400",
 } as const;
 
+export const STACKED_CAPSULE =
+    "w-full rounded-md bg-transparent px-1.5 py-1.5 text-[13.5px] text-neutral-200 ring-0 [&_svg]:size-[18px] hover:bg-snow/5 disabled:cursor-default disabled:text-neutral-400 disabled:hover:bg-transparent";
+
 export type PriorityOption = {
     value: Priority;
     label: string;

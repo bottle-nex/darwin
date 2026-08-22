@@ -3,7 +3,6 @@ import {
     HiMiniCubeTransparent,
     HiOutlineBell,
     HiOutlineBriefcase,
-    HiOutlineCheckCircle,
     HiOutlineCog6Tooth,
     HiOutlineCommandLine,
     HiOutlineFolder,
@@ -156,13 +155,6 @@ export const COMBINATIONS: Record<string, CommandAction> = {
         icon: HiOutlineAnnotation,
         isAvailable: inProject,
         run: () => openTab(PlaygroundTab.Chats),
-    },
-    "o r": {
-        kind: CommandKind.Open,
-        label: "Open Reviews",
-        icon: HiOutlineCheckCircle,
-        isAvailable: inProject,
-        run: () => openTab(PlaygroundTab.Reviews),
     },
     "o s": {
         kind: CommandKind.Open,

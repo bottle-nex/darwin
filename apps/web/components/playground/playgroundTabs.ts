@@ -10,7 +10,6 @@ export enum PlaygroundTab {
     Overview = "overview",
     Gantt = "gantt",
     Tags = "tags",
-    Reviews = "reviews",
     AssignedToMe = "assigned-to-me",
     TeamDetail = "team-detail",
     SettingsAppearance = "settings-appearance",

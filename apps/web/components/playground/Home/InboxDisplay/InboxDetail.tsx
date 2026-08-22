@@ -10,7 +10,7 @@ import {
 import { useMemo } from "react";
 import PaneEmptyState from "@/components/playground/Core/components/PaneEmptyState";
 import ProjectChatThread from "@/components/playground/Home/chat/ProjectChatThread";
-import IssueDetail from "@/components/playground/Issue/IssueDetail";
+import IssueDisplayPane from "@/components/playground/Issue/IssueDisplayPane";
 import { notification_target } from "@/components/playground/Core/Notifications/notificationView";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { useBoard } from "@/hooks/issues/useBoard";
@@ -54,7 +54,7 @@ export default function InboxDetail({ notification }: { notification: Notificati
             );
         }
         return (
-            <IssueDetail
+            <IssueDisplayPane
                 key={issue.id}
                 issue={issue}
                 columns={board.columns}

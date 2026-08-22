@@ -1,6 +1,5 @@
 "use client";
 import {
-    HiOutlineCheckCircle,
     HiOutlineClipboardDocumentList,
     HiOutlineCog6Tooth,
     HiOutlineInbox,
@@ -21,7 +20,6 @@ const FOR_YOU_ROWS: { id: string; label: string; icon: React.ComponentType }[] =
         icon: HiOutlineClipboardDocumentList,
     },
     { id: PlaygroundTab.Chats, label: "Chats", icon: HiOutlineAnnotation },
-    { id: PlaygroundTab.Reviews, label: "Reviews", icon: HiOutlineCheckCircle },
     { id: PlaygroundTab.SettingsAppearance, label: "Settings", icon: HiOutlineCog6Tooth },
 ];
 
