@@ -1,27 +1,27 @@
 "use client";
 
-import { useMemo, type ReactNode } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import { HiOutlineClipboardDocumentList } from "react-icons/hi2";
 import { Button } from "@/components/ui/button";
 import LogoLoader from "@/components/app/LogoLoader";
 import PaneEmptyState from "@/components/playground/Core/components/PaneEmptyState";
+import IssueListGroupHeader from "@/components/playground/Home/KanbanDisplay/IssueListGroupHeader";
+import IssueListRow from "@/components/playground/Home/KanbanDisplay/IssueListRow";
 import { VirtualizedRows } from "@/components/playground/Home/KanbanDisplay/VirtualizedRows";
 import { flattenGroupedIssueRows } from "@/components/playground/Home/KanbanDisplay/virtualizedIssueRows";
 import { IssueSelectionOrderProvider } from "@/hooks/issues/useIssueSelection";
-import { cn } from "@/lib/utils";
+import { KanbanMappers } from "@/lib/kanban/KanbanMappers";
 import type {
     MyIssuesGroup,
     MyIssuesOrder,
     MyIssuesView,
 } from "@/store/issues/useMyIssuesOptionsStore";
 import type { BoardIssue } from "@/types/board";
-import MyIssueRow from "./MyIssueRow";
 import { groupIssues } from "./myIssues";
 
 type MyIssuesListProps = {
     issues: BoardIssue[];
     total: number;
-    projectName: string;
     view: MyIssuesView;
     groupBy: MyIssuesGroup;
     orderBy: MyIssuesOrder;
@@ -39,7 +39,6 @@ type MyIssuesListProps = {
 export default function MyIssuesList({
     issues,
     total,
-    projectName,
     view,
     groupBy,
     orderBy,
@@ -53,8 +52,12 @@ export default function MyIssuesList({
     fetchingNextPage,
     onLoadMore,
 }: MyIssuesListProps) {
+    const [collapsedGroupKeys, setCollapsedGroupKeys] = useState<Set<string>>(() => new Set());
     const groups = useMemo(() => groupIssues(issues, groupBy, orderBy), [issues, groupBy, orderBy]);
-    const rows = useMemo(() => flattenGroupedIssueRows(groups, (issue) => issue.id), [groups]);
+    const rows = useMemo(
+        () => flattenGroupedIssueRows(groups, (issue) => issue.id, false, collapsedGroupKeys),
+        [collapsedGroupKeys, groups],
+    );
     const loadedIssueIds = useMemo(() => issues.map((issue) => issue.id), [issues]);
     const issuePositions = useMemo(
         () => new Map(loadedIssueIds.map((issueId, index) => [issueId, index + 1])),
@@ -67,6 +70,13 @@ export default function MyIssuesList({
         });
         return indexes;
     }, [rows]);
+    const stickyGroupRows = useMemo(
+        () =>
+            groupBy === "none"
+                ? []
+                : rows.flatMap((row, index) => (row.kind === "group" ? [index] : [])),
+        [groupBy, rows],
+    );
     const emptyState = resolveEmptyState({
         loading,
         error,
@@ -76,15 +86,25 @@ export default function MyIssuesList({
         onRetry,
     });
 
+    function toggleGroup(groupKey: string) {
+        setCollapsedGroupKeys((current) => {
+            const next = new Set(current);
+            if (next.has(groupKey)) next.delete(groupKey);
+            else next.add(groupKey);
+            return next;
+        });
+    }
+
     return (
         <IssueSelectionOrderProvider issueIds={loadedIssueIds}>
             <VirtualizedRows
                 rows={rows}
                 getRowKey={(row) => row.key}
-                estimateSize={43}
-                className="min-h-0 flex-1 px-4 py-2"
+                estimateSize={44}
+                className="mt-2 min-h-0 flex-1 px-3 pb-2"
                 contentRole="list"
                 findIssueRow={(issueId) => issueRows.get(issueId) ?? -1}
+                stickyRowIndexes={stickyGroupRows}
                 emptyState={emptyState}
                 footer={
                     issues.length > 0 ? (
@@ -133,13 +153,15 @@ export default function MyIssuesList({
                     if (row.kind === "group") {
                         if (groupBy === "none") return <div aria-hidden />;
                         return (
-                            <div className="flex items-center gap-2 px-2 py-2 text-[12px] font-medium text-neutral-300">
-                                <row.group.icon
-                                    className={cn("size-3.5", row.group.iconClassName)}
-                                    aria-hidden
+                            <div className="pb-1">
+                                <IssueListGroupHeader
+                                    title={row.group.label}
+                                    icon={row.group.icon}
+                                    iconClassName={row.group.iconClassName}
+                                    count={row.group.issues.length}
+                                    collapsed={collapsedGroupKeys.has(row.group.key)}
+                                    onToggle={() => toggleGroup(row.group.key)}
                                 />
-                                <span>{row.group.label}</span>
-                                <span className="text-neutral-600">{row.group.issues.length}</span>
                             </div>
                         );
                     }
@@ -149,9 +171,19 @@ export default function MyIssuesList({
                             role="listitem"
                             aria-posinset={issuePositions.get(row.issue.id)}
                             aria-setsize={total}
-                            className="overflow-hidden rounded-lg ring-1 ring-white/7"
+                            className="overflow-hidden"
                         >
-                            <MyIssueRow issue={row.issue} projectName={projectName} />
+                            <IssueListRow
+                                issueId={row.issue.id}
+                                number={`#${row.issue.number}`}
+                                title={row.issue.title}
+                                status={row.issue.status}
+                                tags={row.issue.tags}
+                                assignees={row.issue.assignees.map(KanbanMappers.toAssignee)}
+                                createdAt={row.issue.createdAt}
+                                boardIssue={row.issue}
+                                selectionScope="my-issues"
+                            />
                         </div>
                     );
                 }}
