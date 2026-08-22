@@ -1,8 +1,5 @@
 "use client";
-import {
-    HiOutlineCog6Tooth,
-    HiOutlineInbox,
-} from "react-icons/hi2";
+import { HiOutlineCog6Tooth, HiOutlineInbox } from "react-icons/hi2";
 import { HiOutlineAnnotation } from "react-icons/hi";
 import { useNotifications } from "@/hooks/notifications/useNotifications";
 import Row from "./SidebarRow";
