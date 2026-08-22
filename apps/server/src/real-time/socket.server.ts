@@ -14,6 +14,9 @@ import type { AuthUser } from "../types/express.d";
 import ChatSocketHandler from "./chat.handler";
 import ProjectChatSocketHandler from "./project-chat.handler";
 import TeamChatSocketHandler from "./team-chat.handler";
+import PresenceService from "../services/service.presence";
+
+const PRESENCE_HEARTBEAT_MS = 30_000;
 
 export default class SocketServer {
     private wss: WebSocketServer;
@@ -27,6 +30,16 @@ export default class SocketServer {
         this.subscriber_system = new SubscriberSystem();
         this.init_connection();
         this.start_listening();
+        this.start_presence_heartbeat();
+    }
+
+    private start_presence_heartbeat() {
+        const timer = setInterval(() => {
+            PresenceService.refresh([...this.user_connections.keys()]).catch((error) => {
+                console.error("Presence heartbeat failed:", error);
+            });
+        }, PRESENCE_HEARTBEAT_MS);
+        timer.unref();
     }
 
     private start_listening() {
@@ -80,6 +93,9 @@ export default class SocketServer {
                 this.subscriber_system.subscribe_user(user.id);
             }
             user_sockets.add(ws);
+            PresenceService.mark_online(user.id).catch((error) => {
+                console.error("Presence mark_online failed:", error);
+            });
 
             this.connection_users.set(ws, user);
             ws.off("message", queue_message);
@@ -284,6 +300,9 @@ export default class SocketServer {
             if (user_sockets.size === 0) {
                 this.user_connections.delete(user.id);
                 this.subscriber_system.unsubscribe_user(user.id);
+                PresenceService.mark_offline(user.id).catch((error) => {
+                    console.error("Presence mark_offline failed:", error);
+                });
             }
         }
     }
