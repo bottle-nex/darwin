@@ -8,10 +8,10 @@ import {
 
 const EMPTY: string[] = [];
 
-function renderedIssueIds(): string[] {
-    return Array.from(document.querySelectorAll<HTMLElement>("[data-issue-id]")).map(
-        (element) => element.dataset.issueId!,
-    );
+function renderedIssueIds(scope: IssueSelectionScope): string[] {
+    return Array.from(
+        document.querySelectorAll<HTMLElement>(`[data-issue-id][data-selection-scope="${scope}"]`),
+    ).map((element) => element.dataset.issueId!);
 }
 
 export function useIssueSelection(scope: IssueSelectionScope) {
@@ -27,7 +27,7 @@ export function useIssueSelection(scope: IssueSelectionScope) {
         }
         if (event.shiftKey) {
             event.preventDefault();
-            extendTo(scope, issueId, renderedIssueIds());
+            extendTo(scope, issueId, renderedIssueIds(scope));
             return true;
         }
         if (event.metaKey || event.ctrlKey) {

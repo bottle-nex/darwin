@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-export type IssueSelectionScope = "kanban" | "my-issues";
+export type IssueSelectionScope = "kanban" | "custom-kanban" | "my-issues";
 
 interface IssueSelectionState {
     scope: IssueSelectionScope | null;

@@ -7,6 +7,7 @@ import { useKanbanBoardStore } from "@/store/kanban/useKanbanBoardStore";
 import { useCustomKanbanStore } from "@/store/kanban/useCustomKanbanStore";
 import { useKanbanOptionsStore } from "@/store/kanban/useKanbanOptionsStore";
 import { useKanbanFilterUrlSync } from "./useKanbanFilterUrlSync";
+import { useKanbanBoardViewUrlSync } from "./useKanbanBoardViewUrlSync";
 import { useCustomKanbanDnd } from "./useCustomKanbanDnd";
 
 export function useKanbanPane() {
@@ -17,6 +18,7 @@ export function useKanbanPane() {
 
     useListTemplates(activeProject?.id);
     useKanbanFilterUrlSync(projectId);
+    useKanbanBoardViewUrlSync();
 
     useEffect(() => {
         if (!board) return;

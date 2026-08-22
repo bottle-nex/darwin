@@ -1,7 +1,15 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import { MdMoreHoriz, MdAdd, MdDelete, MdEdit, MdDragIndicator } from "react-icons/md";
+import {
+    MdMoreHoriz,
+    MdAdd,
+    MdDelete,
+    MdEdit,
+    MdDragIndicator,
+    MdChecklist,
+    MdClose,
+} from "react-icons/md";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -14,6 +22,7 @@ import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { MatchaLogo } from "@/components/logo/MatchaLogo";
 import { useIssueStore } from "@/store/issues/useIssueStore";
+import { useIssueSelectionStore } from "@/store/issues/useIssueSelectionStore";
 import { useCustomColumnActions } from "@/hooks/kanban/useCustomColumnActions";
 import SortableCustomCard from "./SortableCustomCard";
 import type { CustomColumn } from "@/types/kanban-custom";
@@ -25,6 +34,11 @@ type CustomKanbanColumnProps = {
 
 export default function CustomKanbanColumn({ column, draggable = true }: CustomKanbanColumnProps) {
     const openCreate = useIssueStore((s) => s.openCreate);
+    const hasSelection = useIssueSelectionStore(
+        (state) => state.scope === "custom-kanban" && state.ids.length > 0,
+    );
+    const replaceSelection = useIssueSelectionStore((state) => state.replace);
+    const clearSelection = useIssueSelectionStore((state) => state.clear);
     const { removeColumn, renameColumn } = useCustomColumnActions();
 
     const [renaming, setRenaming] = useState(false);
@@ -122,7 +136,30 @@ export default function CustomKanbanColumn({ column, draggable = true }: CustomK
                                 <MdMoreHoriz className="size-4" aria-hidden />
                             </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-44">
+                        <DropdownMenuContent align="end" className="w-52">
+                            <DropdownMenuItem
+                                disabled={column.cards.length === 0}
+                                onSelect={() =>
+                                    replaceSelection(
+                                        "custom-kanban",
+                                        column.cards.map((card) => card.id),
+                                    )
+                                }
+                            >
+                                <MdChecklist className="size-3.5" aria-hidden />
+                                <span className="flex-1">Select issues</span>
+                                <span className="text-[11px] text-neutral-500">
+                                    {column.cards.length}
+                                </span>
+                            </DropdownMenuItem>
+
+                            {hasSelection && (
+                                <DropdownMenuItem onSelect={clearSelection}>
+                                    <MdClose className="size-3.5" aria-hidden />
+                                    <span className="flex-1">Clear selection</span>
+                                </DropdownMenuItem>
+                            )}
+
                             <DropdownMenuItem
                                 onSelect={() => {
                                     setDraftTitle(column.title);

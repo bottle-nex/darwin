@@ -15,7 +15,7 @@ export const MENU_ALIGN = "start" as const;
 
 export const MENU_SURFACE = cn(
     "z-50 min-w-[8rem] rounded-[14px] border border-white/5 p-1 shadow-[0_4px_12px_rgba(0,0,0,0.35)] duration-75 animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95",
-    BLURRED_BG_TWO(true),
+    BLURRED_BG_TWO(false),
 );
 
 /**

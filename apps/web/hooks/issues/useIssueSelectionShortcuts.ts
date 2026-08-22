@@ -16,13 +16,20 @@ function hoveredIssue(): { id: string; scope: IssueSelectionScope } | null {
     return { id, scope };
 }
 
+function blurFocusedIssue() {
+    const focused = document.activeElement;
+    if (focused instanceof HTMLElement && focused.closest("[data-issue-id]")) focused.blur();
+}
+
 export function useIssueSelectionShortcuts() {
     useEffect(() => {
         function onKeyDown(event: KeyboardEvent) {
             if (isTyping(event.target) || event.metaKey || event.ctrlKey || event.altKey) return;
 
             if (event.key === "Escape") {
+                event.preventDefault();
                 useIssueSelectionStore.getState().clear();
+                blurFocusedIssue();
                 return;
             }
             if (event.key.toLowerCase() !== "x") return;
