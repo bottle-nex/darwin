@@ -4,8 +4,9 @@ import ResponseWriter from "../../services/service.response";
 import Access from "../../access-control/access";
 import { Action, Permissions } from "@trymatcha/access-control";
 import { prisma } from "@trymatcha/database";
-import { MESSAGE_REFERENCE_INCLUDE } from "../../services/service.message-references";
-import MessageReactionService from "../../services/service.message-reactions";
+import ChatHistoryService, {
+    InvalidChatHistoryCursorError,
+} from "../../services/service.chat-history";
 
 export default class ChatGetController {
     static params_schema = z.object({
@@ -20,14 +21,15 @@ export default class ChatGetController {
                 return;
             }
 
-            const { data, success } = ChatGetController.params_schema.safeParse(req.params);
-            if (!success) {
+            const params = ChatGetController.params_schema.safeParse(req.params);
+            const query = ChatHistoryService.query_schema.safeParse(req.query);
+            if (!params.success || !query.success) {
                 ResponseWriter.invalid_data(res);
                 return;
             }
 
             const issue = await prisma.issue.findUnique({
-                where: { id: data.id },
+                where: { id: params.data.id },
                 select: { id: true, projectId: true },
             });
             if (!issue) {
@@ -41,31 +43,17 @@ export default class ChatGetController {
                 return;
             }
 
-            const chats = await prisma.chat.findMany({
-                where: { issueId: issue.id },
-                orderBy: { createdAt: "asc" },
-                include: {
-                    sender: true,
-                    repliedTo: { include: { sender: true } },
-                    references: { include: MESSAGE_REFERENCE_INCLUDE },
-                },
-            });
-
-            const reactions = await MessageReactionService.chat_summaries(
-                chats.map((chat) => chat.id),
+            const page = await ChatHistoryService.list_issue_comments(
+                issue.id,
                 user.id,
+                query.data,
             );
-            const chats_with_reactions = chats.map((chat) => ({
-                ...chat,
-                reactions: reactions.get(chat.id) ?? [],
-            }));
-
-            ResponseWriter.success(
-                res,
-                { chats: chats_with_reactions },
-                "Comments fetched successfully",
-            );
+            ResponseWriter.success(res, page, "Comments fetched successfully");
         } catch (err) {
+            if (err instanceof InvalidChatHistoryCursorError) {
+                ResponseWriter.invalid_data(res, "Invalid cursor");
+                return;
+            }
             console.error("ChatGetController error: ", err);
             ResponseWriter.system_error(res);
         }

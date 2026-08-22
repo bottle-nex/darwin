@@ -17,6 +17,7 @@ model Chat {
   updatedAt DateTime @updatedAt
 
   @@index([issueId])
+  @@index([issueId, createdAt, id])
 }
 
 model ChatReaction {
@@ -54,6 +55,7 @@ model ProjectChat {
   updatedAt DateTime @updatedAt
 
   @@index([projectId])
+  @@index([projectId, createdAt, id])
 }
 
 model ProjectChatReaction {
@@ -91,6 +93,7 @@ model TeamChat {
   updatedAt DateTime @updatedAt
 
   @@index([teamId])
+  @@index([teamId, createdAt, id])
 }
 
 model TeamChatReaction {

@@ -65,11 +65,13 @@ export default class IssueActivityListController {
 
             const has_more = rows.length > limit;
             const page = has_more ? rows.slice(0, limit) : rows;
+            const oldest_row = page.at(-1);
 
             ResponseWriter.success(
                 res,
                 {
                     activities: page.reverse().map(ActivityService.to_wire),
+                    nextCursor: has_more && oldest_row ? oldest_row.seq.toString() : null,
                     hasMore: has_more,
                 },
                 "Activity fetched",

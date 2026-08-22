@@ -16,6 +16,7 @@ export default class ProjectChatSocketHandler {
     static payload_schema = z.object({
         message: z.string().trim().min(1).max(5000),
         repliedToId: z.string().min(1).optional(),
+        operationId: z.string().uuid(),
     });
 
     static delete_payload_schema = z.object({
@@ -170,14 +171,22 @@ export default class ProjectChatSocketHandler {
     ) {
         const parsed = ProjectChatSocketHandler.payload_schema.safeParse(raw_payload);
         if (!parsed.success) {
-            ProjectChatSocketHandler.send_error(ws, "Invalid chat data provided");
+            ProjectChatSocketHandler.send_error(
+                ws,
+                "Invalid chat data provided",
+                pending_operation_id(raw_payload),
+            );
             return;
         }
-        const { message, repliedToId } = parsed.data;
+        const { message, repliedToId, operationId } = parsed.data;
         try {
             const role = await Access.project(user.id, project_id);
             if (!role || !Permissions.project(role, Action.project.read)) {
-                ProjectChatSocketHandler.send_error(ws, "You dont have access to this project");
+                ProjectChatSocketHandler.send_error(
+                    ws,
+                    "You dont have access to this project",
+                    operationId,
+                );
                 return;
             }
 
@@ -187,14 +196,18 @@ export default class ProjectChatSocketHandler {
                     select: { projectId: true },
                 });
                 if (!replied_to || replied_to.projectId !== project_id) {
-                    ProjectChatSocketHandler.send_error(ws, "Replied message not found");
+                    ProjectChatSocketHandler.send_error(
+                        ws,
+                        "Replied message not found",
+                        operationId,
+                    );
                     return;
                 }
             }
 
             const resolved = await MessageReferenceService.resolve(message, project_id);
             if (!resolved.message) {
-                ProjectChatSocketHandler.send_error(ws, "Message is empty");
+                ProjectChatSocketHandler.send_error(ws, "Message is empty", operationId);
                 return;
             }
 
@@ -218,6 +231,7 @@ export default class ProjectChatSocketHandler {
                 type: OutboundSocketMessageType.PROJECT_CHAT_CREATED,
                 projectId: project_id,
                 payload: { ...chat, reactions: [] },
+                operationId,
             };
             await server_services.publisher.publish_message(
                 channel_name,
@@ -262,7 +276,7 @@ export default class ProjectChatSocketHandler {
             );
         } catch (error) {
             console.error("ProjectChatSocketHandler error: ", error);
-            ProjectChatSocketHandler.send_error(ws, "Something went wrong");
+            ProjectChatSocketHandler.send_error(ws, "Something went wrong", operationId);
         }
     }
 

@@ -3,9 +3,9 @@ import z from "zod";
 import ResponseWriter from "../../services/service.response";
 import Access from "../../access-control/access";
 import { Action, Permissions } from "@trymatcha/access-control";
-import { prisma } from "@trymatcha/database";
-import { MESSAGE_REFERENCE_INCLUDE } from "../../services/service.message-references";
-import MessageReactionService from "../../services/service.message-reactions";
+import ChatHistoryService, {
+    InvalidChatHistoryCursorError,
+} from "../../services/service.chat-history";
 
 export default class ProjectChatGetController {
     static params_schema = z.object({
@@ -20,43 +20,30 @@ export default class ProjectChatGetController {
                 return;
             }
 
-            const { data, success } = ProjectChatGetController.params_schema.safeParse(req.params);
-            if (!success) {
+            const params = ProjectChatGetController.params_schema.safeParse(req.params);
+            const query = ChatHistoryService.query_schema.safeParse(req.query);
+            if (!params.success || !query.success) {
                 ResponseWriter.invalid_data(res);
                 return;
             }
 
-            const role = await Access.project(user.id, data.projectId);
+            const role = await Access.project(user.id, params.data.projectId);
             if (!role || !Permissions.project(role, Action.project.read)) {
                 ResponseWriter.not_authorized(res, "You dont have access to this project");
                 return;
             }
 
-            const chats = await prisma.projectChat.findMany({
-                where: { projectId: data.projectId },
-                orderBy: { createdAt: "asc" },
-                include: {
-                    sender: true,
-                    repliedTo: { include: { sender: true } },
-                    references: { include: MESSAGE_REFERENCE_INCLUDE },
-                },
-            });
-
-            const reactions = await MessageReactionService.project_chat_summaries(
-                chats.map((chat) => chat.id),
+            const page = await ChatHistoryService.list_project_chats(
+                params.data.projectId,
                 user.id,
+                query.data,
             );
-            const chats_with_reactions = chats.map((chat) => ({
-                ...chat,
-                reactions: reactions.get(chat.id) ?? [],
-            }));
-
-            ResponseWriter.success(
-                res,
-                { chats: chats_with_reactions },
-                "Project chats fetched successfully",
-            );
+            ResponseWriter.success(res, page, "Project chats fetched successfully");
         } catch (err) {
+            if (err instanceof InvalidChatHistoryCursorError) {
+                ResponseWriter.invalid_data(res, "Invalid cursor");
+                return;
+            }
             console.error("ProjectChatGetController error: ", err);
             ResponseWriter.system_error(res);
         }

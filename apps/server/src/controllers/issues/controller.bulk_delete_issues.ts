@@ -2,6 +2,12 @@ import { Request, Response } from "express";
 import z from "zod";
 import ResponseWriter from "../../services/service.response";
 import IssueService, { BULK_ISSUE_LIMIT } from "../../services/service.issue";
+import { prisma } from "@trymatcha/database";
+import BoardIssueService, {
+    BOARD_ISSUE_SELECT,
+    type BoardIssueRow,
+    type IssueLane,
+} from "../../services/service.board-issues";
 
 export default class IssueBulkDeleteController {
     static body_schema = z.object({
@@ -23,12 +29,27 @@ export default class IssueBulkDeleteController {
 
         try {
             const deleted: string[] = [];
+            const changes: {
+                issue: BoardIssueRow;
+                beforeLane: IssueLane;
+            }[] = [];
             const failed: string[] = [];
+            const issues = await prisma.issue.findMany({
+                where: { id: { in: data.issue_ids } },
+                select: BOARD_ISSUE_SELECT,
+            });
+            const issues_by_id = new Map(issues.map((issue) => [issue.id, issue]));
 
             for (const id of data.issue_ids) {
+                const issue = issues_by_id.get(id);
                 const result = await IssueService.delete_issue(user, id);
-                if (result.ok) deleted.push(id);
-                else failed.push(id);
+                if (result.ok && issue) {
+                    deleted.push(id);
+                    changes.push({
+                        issue,
+                        beforeLane: BoardIssueService.issue_lane(issue),
+                    });
+                } else failed.push(id);
             }
 
             if (!deleted.length) {
@@ -38,7 +59,7 @@ export default class IssueBulkDeleteController {
 
             ResponseWriter.success(
                 res,
-                { deleted, failed },
+                { deleted, failed, changes },
                 `Deleted ${deleted.length} ${deleted.length === 1 ? "issue" : "issues"}`,
             );
         } catch (error) {

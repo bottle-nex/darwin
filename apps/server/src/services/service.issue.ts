@@ -276,6 +276,10 @@ export default class IssueService {
                 type: OutboundSocketMessageType.ISSUE_UPDATED,
                 projectId: issue.projectId,
                 payload: updated,
+                previous: {
+                    status: issue.status,
+                    customColumnId: issue.customColumnId,
+                },
             }),
         );
         await ActivityService.publish(issue.projectId, id, activities);

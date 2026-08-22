@@ -73,7 +73,7 @@ export default class IssueOutcomeService {
 
         console.log("completion : ", completion);
 
-        await this.broadcast(completion);
+        await this.broadcast(completion, issue);
 
         try {
             const product_diff = await ProductDiffService.prepare(data.issueId);
@@ -124,7 +124,7 @@ export default class IssueOutcomeService {
             });
         });
 
-        await this.broadcast(completion);
+        await this.broadcast(completion, issue);
     }
 
     static async reconcile(issueId: string): Promise<void> {
@@ -215,6 +215,7 @@ export default class IssueOutcomeService {
             select: {
                 assignerWorkerId: true,
                 status: true,
+                customColumnId: true,
                 prUrl: true,
                 prBranch: true,
                 customColumn: { select: { id: true, label: true } },
@@ -252,11 +253,14 @@ export default class IssueOutcomeService {
         return { issue, transitioned: true, activities };
     }
 
-    private static async broadcast(completion: {
-        issue: { projectId: string; id: string };
-        transitioned: boolean;
-        activities: { seq: bigint }[];
-    }) {
+    private static async broadcast(
+        completion: {
+            issue: { projectId: string; id: string };
+            transitioned: boolean;
+            activities: { seq: bigint }[];
+        },
+        previous: { status: IssueStatus; customColumnId: string | null },
+    ) {
         if (!completion.transitioned) return;
 
         const project_id = completion.issue.projectId;
@@ -266,6 +270,7 @@ export default class IssueOutcomeService {
                 type: OutboundSocketMessageType.ISSUE_UPDATED,
                 projectId: project_id,
                 payload: completion.issue,
+                previous,
             }),
         );
         await ActivityService.publish(project_id, completion.issue.id, completion.activities);

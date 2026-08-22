@@ -4,9 +4,9 @@ import z from "zod";
 import Access from "../../access-control/access";
 import BoardIssueService, { InvalidBoardCursorError } from "../../services/service.board-issues";
 import ResponseWriter from "../../services/service.response";
-import { board_lane_query_schema } from "./board-query.schema";
+import { board_search_query_schema } from "./board-query.schema";
 
-export default class IssueGetController {
+export default class BoardIssuesSearchController {
     static params_schema = z.object({ project_id: z.string().min(1) });
 
     static async process(req: Request, res: Response) {
@@ -16,8 +16,8 @@ export default class IssueGetController {
             return;
         }
 
-        const params = IssueGetController.params_schema.safeParse(req.params);
-        const query = board_lane_query_schema.safeParse(req.query);
+        const params = BoardIssuesSearchController.params_schema.safeParse(req.params);
+        const query = board_search_query_schema.safeParse(req.query);
         if (!params.success || !query.success) {
             ResponseWriter.invalid_data(res);
             return;
@@ -30,30 +30,19 @@ export default class IssueGetController {
         }
 
         try {
-            if (query.data.lane_type === "custom") {
-                const column = await BoardIssueService.find_project_column(
-                    params.data.project_id,
-                    query.data.column_id,
-                );
-                if (!column) {
-                    ResponseWriter.not_found(res, "Column not found");
-                    return;
-                }
-            }
-
-            const page = await BoardIssueService.list_lane(
+            const page = await BoardIssueService.search_board(
                 params.data.project_id,
-                query.data,
+                query.data.filters,
                 query.data.cursor,
                 query.data.limit,
             );
-            ResponseWriter.success(res, page, "Issues fetched successfully");
+            ResponseWriter.success(res, page, "Board issues searched successfully");
         } catch (error) {
             if (error instanceof InvalidBoardCursorError) {
                 ResponseWriter.invalid_data(res, "Invalid cursor");
                 return;
             }
-            console.error("IssueGetController error: ", error);
+            console.error("BoardIssuesSearchController error: ", error);
             ResponseWriter.system_error(res);
         }
     }
