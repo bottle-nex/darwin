@@ -240,7 +240,7 @@ export default function CustomKanbanColumn({ column, draggable = true }: CustomK
                                     columnTitle: column.title,
                                 })
                             }
-                            className="flex shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-[9px] px-2 py-1.5 text-center text-[13px] font-medium text-neutral-400 opacity-0 transition-opacity hover:bg-white/5 hover:text-neutral-200 focus-visible:opacity-100 group-hover:opacity-100"
+                            className="w-full mt-2 flex shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-[9px] px-2 py-1.5 text-center text-[13px] font-medium text-neutral-400 opacity-0 transition-opacity hover:bg-white/5 hover:text-neutral-200 focus-visible:opacity-100 group-hover:opacity-100"
                         >
                             <MdAdd className="size-3.5" aria-hidden />
                             Add a card

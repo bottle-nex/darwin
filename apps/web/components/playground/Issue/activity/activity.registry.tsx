@@ -26,6 +26,7 @@ import {
 import { formatDate } from "@/lib/format";
 import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
 import { DATE_ICON_COLOR, PRIORITY_OPTIONS } from "../issueHelpers";
+import TagDisplay from "@/components/playground/Home/TagsDisplay/TagDisplay";
 import TextDiff from "./TextDiff";
 
 /** Every other status already reads as a word. */
@@ -91,16 +92,7 @@ function Strong({ children }: { children: ReactNode }) {
 
 function LabelChip({ label }: { label: { name: string; color: string } | undefined }) {
     if (!label) return <Pill>a label</Pill>;
-    return (
-        <span className="inline-flex items-center gap-x-1.5 rounded-[4px] bg-graphite px-1.5 py-0.5 text-[12px] font-medium text-neutral-300">
-            <span
-                aria-hidden
-                className="size-1.5 shrink-0 rounded-full"
-                style={{ backgroundColor: label.color }}
-            />
-            {label.name}
-        </span>
-    );
+    return <TagDisplay name={label.name} color={label.color} className="align-middle" />;
 }
 
 type DateRange = { startDate: string | null; targetDate: string | null };
@@ -203,7 +195,7 @@ const REGISTRY: { [K in ActivityType]?: ActivityEntry<K> } = {
     },
     [ActivityType.AssigneeRemoved]: {
         icon: LuUserMinus,
-        iconClassName: "text-emerald-300",
+        iconClassName: "text-green-500",
         render: (payload) => (
             <>
                 unassigned <Strong>{payload.user?.name ?? "someone"}</Strong>
