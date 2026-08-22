@@ -65,8 +65,7 @@ export default function PlaygroundSidebarRow({
             </span>
 
             {badge !== undefined && (
-                <span className="inline-flex h-4 min-w-4 items-center justify-center rounded text-[7px] font-medium text-neutral-400">
-                    <span className="mr-0.5 size-2.5 rounded-sm bg-neutral-700" aria-hidden />
+                <span className="inline-flex size-4 shrink-0 items-center justify-center rounded-full bg-neutral-700 text-[8px] font-medium tabular-nums text-neutral-300">
                     {badge}
                 </span>
             )}

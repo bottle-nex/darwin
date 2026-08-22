@@ -65,6 +65,25 @@ describe("virtualized issue rows", () => {
         ]);
     });
 
+    test("keeps collapsed group headers while omitting their issues and pagination row", () => {
+        const rows = flattenGroupedIssueRows(
+            [
+                { key: "todo", issues: [{ id: "1" }, { id: "2" }] },
+                { key: "done", issues: [{ id: "3" }] },
+            ],
+            (issue) => issue.id,
+            true,
+            new Set(["todo"]),
+        );
+
+        expect(rows.map((row) => row.key)).toEqual([
+            "group:todo",
+            "group:done",
+            "issue:3",
+            "group-end:done",
+        ]);
+    });
+
     test("selects each displayed loaded issue once and never infers unloaded rows", () => {
         const loaded = [{ id: "1" }, { id: "2" }, { id: "2" }, { id: "3" }];
 

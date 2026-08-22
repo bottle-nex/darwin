@@ -24,6 +24,7 @@ export const UPDATE_PROJECT_URL = PROJECT_URL + "/update";
 export const DELETE_PROJECT_URL = PROJECT_URL + "/delete";
 export const LIST_PROJECT_MEMBERS_URL = (project_id: string, query?: string) =>
     `${PROJECT_URL}/${project_id}/members${query !== undefined ? `?q=${encodeURIComponent(query)}` : ""}`;
+export const PROJECT_PRESENCE_URL = (project_id: string) => `${PROJECT_URL}/${project_id}/presence`;
 export const SET_PROJECT_SECRET = (project_id: string) => `${PROJECT_URL}/${project_id}/secrets`;
 export const LIST_PROJECT_SECRETS_URL = (project_id: string) =>
     `${PROJECT_URL}/${project_id}/secrets`;
@@ -128,6 +129,8 @@ export const TEAM_CHAT_URL = (team_id: string, cursor: string | null, limit: num
 
 export const NOTIFICATIONS_URL = API_URL + "/notifications";
 export const NOTIFICATIONS_READ_URL = NOTIFICATIONS_URL + "/read";
+
+export const GLOBAL_SEARCH_URL = (project_id: string) => `${API_URL}/search/${project_id}`;
 
 export const API_KEYS_URL = API_URL + "/claude-mcp/api-keys";
 export const REVOKE_API_KEY_URL = (id: string) => `${API_KEYS_URL}/${id}`;

@@ -35,6 +35,7 @@ export default function ExpandableSearchBar({
             <Input
                 autoFocus
                 value={value}
+                variant={"ghost"}
                 onChange={(event) => onChange(event.target.value)}
                 onKeyDown={(event) => {
                     if (event.key !== "Escape") return;
@@ -43,7 +44,7 @@ export default function ExpandableSearchBar({
                     onClose();
                 }}
                 placeholder={placeholder}
-                className="h-8 rounded-md bg-cement pr-9 pl-8 text-[12.5px] shadow-[inset_0_1px_0_0_var(--color-edge)] hover:bg-cement"
+                className="h-8 rounded-md bg-cement pr-9 pl-8 text-[12.5px] hover:bg-cement"
             />
             <Button
                 variant="unstyled"

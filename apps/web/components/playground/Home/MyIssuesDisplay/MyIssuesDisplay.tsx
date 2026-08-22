@@ -31,7 +31,6 @@ export default function MyIssuesDisplay() {
             <MyIssuesList
                 issues={myIssues.issues}
                 total={myIssues.total}
-                projectName={project?.name ?? "ISS"}
                 view={view}
                 groupBy={groupBy}
                 orderBy={orderBy}

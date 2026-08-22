@@ -61,7 +61,7 @@ function ConversationRow({
                 letter={conversation.name.slice(0, 1).toUpperCase()}
                 tone={toneFor(conversation.id)}
                 size="xl"
-                className="rounded-full"
+                className="rounded-md"
             />
             <span className="min-w-0 flex-1">
                 <span className="block truncate text-[12px] leading-4 font-medium">

@@ -6,6 +6,7 @@ export * from "./queue/queue.contract";
 export * from "./mentions/token";
 export * from "./pagination/page.type";
 export * from "./product-diff/product-diff.contract";
+export * from "./search/global-search.contract";
 export * from "./chat/emojis";
 export * from "./chat/reaction";
 export * from "./chat/conversation-preview";

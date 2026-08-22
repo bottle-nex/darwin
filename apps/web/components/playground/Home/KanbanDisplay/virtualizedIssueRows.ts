@@ -36,11 +36,13 @@ export function flattenGroupedIssueRows<G extends { key: string; issues: unknown
     groups: G[],
     getIssueKey: (issue: GroupIssue<G>) => string,
     includeGroupEnd = false,
+    collapsedGroupKeys: ReadonlySet<string> = new Set(),
 ): GroupedIssueRow<GroupIssue<G>, G>[] {
     const rows: GroupedIssueRow<GroupIssue<G>, G>[] = [];
 
     for (const group of groups) {
         rows.push({ kind: "group", key: `group:${group.key}`, group });
+        if (collapsedGroupKeys.has(group.key)) continue;
         for (const issue of group.issues as GroupIssue<G>[]) {
             rows.push({ kind: "issue", key: `issue:${getIssueKey(issue)}`, issue, group });
         }
