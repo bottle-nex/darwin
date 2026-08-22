@@ -7,7 +7,6 @@ export enum PlaygroundTab {
     Inbox = "inbox",
     Chats = "chats",
     Kanban = "kanban",
-    Overview = "overview",
     Gantt = "gantt",
     Tags = "tags",
     AssignedToMe = "assigned-to-me",
@@ -36,4 +35,10 @@ export function isSettingsTab(tab: string): boolean {
     return SETTINGS_TABS.has(tab);
 }
 
-export const PLAYGROUND_DEFAULT_TAB: PlaygroundTab = PlaygroundTab.Overview;
+export const PLAYGROUND_DEFAULT_TAB: PlaygroundTab = PlaygroundTab.Kanban;
+
+const PLAYGROUND_TABS = new Set<string>(Object.values(PlaygroundTab));
+
+export function isPlaygroundTab(tab: string): tab is PlaygroundTab {
+    return PLAYGROUND_TABS.has(tab);
+}

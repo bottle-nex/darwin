@@ -180,6 +180,7 @@ export default function IssueFlightOverlay() {
 
         run().finally(() => {
             if (!cancelledRef.current) finish();
+            useKanbanBoardStore.getState().clearOverlay();
         });
 
         return () => {

@@ -1,9 +1,9 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/lib/axios";
 import { COLUMN_URL } from "@/routes/api_routes";
-import { BOARD_QUERY_KEY } from "@/hooks/issues/useBoard";
+import { boardColumnsKey } from "@/hooks/issues/boardCache";
 import type { ApiResponse } from "@/types/api";
-import type { BoardColumn } from "@/types/board";
+import type { BoardColumn, BoardMetadata } from "@/types/board";
 
 export interface UpdateColumnInput {
     id: string;
@@ -22,10 +22,17 @@ export function useUpdateColumn() {
             );
             return res.data.data.column;
         },
-        onSuccess: (_data, variables) => {
-            queryClient.invalidateQueries({
-                queryKey: [...BOARD_QUERY_KEY, variables.project_id],
-            });
+        onSuccess: (column, variables) => {
+            queryClient.setQueryData<BoardMetadata>(
+                boardColumnsKey(variables.project_id),
+                (data) => {
+                    if (!data) return data;
+                    return {
+                        ...data,
+                        columns: data.columns.map((row) => (row.id === column.id ? column : row)),
+                    };
+                },
+            );
         },
     });
 }

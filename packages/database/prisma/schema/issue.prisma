@@ -43,6 +43,8 @@ model Issue {
   @@unique([projectId, number])
   @@index([projectId, status])
   @@index([projectId, customColumnId])
+  @@index([projectId, status, createdAt, id])
+  @@index([projectId, customColumnId, createdAt, id])
   @@index([status, createdAt])
   @@index([assignerWorkerId, status, queuePosition])
 }

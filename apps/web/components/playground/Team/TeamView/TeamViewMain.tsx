@@ -11,7 +11,7 @@ import { useUserSessionStore } from "@/store/user/useUserSessionStore";
 import useInviteTeamMember from "@/hooks/invitations/useInviteTeamMember";
 import InviteToTeamDialog from "@/components/team/InviteToTeamDialog";
 import { TooltipComponent } from "@/components/ui/tooltip-component";
-import PlaygroundAvatar from "@/components/playground/Core/components/PlaygroundAvatar";
+import PlaygroundBreadcrumb from "@/components/playground/Core/components/PlaygroundBreadcrumb";
 import PlaygroundTeamMembers from "./TeamMembers";
 import { Button } from "@/components/ui/button";
 import { LuUserPlus } from "react-icons/lu";
@@ -42,21 +42,7 @@ export default function PlaygroundTeamViewMain({ team }: PlaygroundTeamViewProps
     return (
         <div className="flex min-h-0 flex-1 flex-col">
             <PaneLeadSlot>
-                <div className="flex min-w-0 items-center gap-2">
-                    <PlaygroundAvatar
-                        size="md"
-                        letter={team.name.trim().charAt(0).toUpperCase()}
-                        tone="indigo"
-                    />
-                    <div className="flex min-w-0 items-baseline gap-1.5">
-                        <h2 className="truncate text-[13px] font-semibold text-neutral-100">
-                            {team.name}
-                        </h2>
-                        <p className="shrink-0 font-mono text-[11px] text-neutral-500">
-                            @{team.slug}
-                        </p>
-                    </div>
-                </div>
+                <PlaygroundBreadcrumb trail={[team.name]} />
             </PaneLeadSlot>
 
             <PaneActionsSlot>

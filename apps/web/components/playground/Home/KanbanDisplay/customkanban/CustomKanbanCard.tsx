@@ -102,6 +102,7 @@ export default function CustomKanbanCard({ card, preview = false }: CustomKanban
                     <IssueCardFace
                         identifier={issueIdentifier(project?.name, card.number ?? "")}
                         issueId={preview ? undefined : card.id}
+                        boardIssue={card.boardIssue}
                         title={card.title}
                         status={card.status}
                         priority={card.priority}
@@ -159,5 +160,9 @@ export default function CustomKanbanCard({ card, preview = false }: CustomKanban
     );
 
     if (preview) return face;
-    return <IssueDropdown issueId={card.id}>{face}</IssueDropdown>;
+    return (
+        <IssueDropdown issueId={card.id} issue={card.boardIssue}>
+            {face}
+        </IssueDropdown>
+    );
 }

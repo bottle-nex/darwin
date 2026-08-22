@@ -45,6 +45,7 @@ const PROJECT = {
 
 const SEED_EMAIL_DOMAIN = "nocturn.dev";
 const ISSUE_COUNT = 96;
+const ISSUES_PER_BOARD_LANE = 60;
 const PROJECT_CHAT_COUNT = 52;
 const NOTIFICATIONS_PER_USER = 44;
 
@@ -1397,6 +1398,56 @@ async function main() {
         }
     }
 
+    const paginationIssueRows: Array<{
+        projectId: string;
+        number: number;
+        createdById: string;
+        title: string;
+        description: string;
+        status: IssueStatus;
+        priority: number;
+        customColumnId: string | null;
+        createdAt: Date;
+    }> = [];
+    let paginationIssueNumber = specs.length + 1;
+    const systemLanes = STATUS_PLAN.filter(([status]) => status !== IssueStatus.Parked).map(
+        ([status, count]) => ({ status, customColumnId: null, count, label: status }),
+    );
+    const customLanes = columns.map((column, index) => ({
+        status: IssueStatus.Parked,
+        customColumnId: column.id,
+        count: statusRoll
+            .filter((status) => status === IssueStatus.Parked)
+            .filter((_, parkedIndex) => parkedIndex % columns.length === index).length,
+        label: column.label,
+    }));
+
+    const paginationLanes = [...systemLanes, ...customLanes];
+    for (let laneIndex = 0; laneIndex < paginationLanes.length; laneIndex++) {
+        const lane = paginationLanes[laneIndex];
+        for (
+            let laneIssueIndex = lane.count;
+            laneIssueIndex < ISSUES_PER_BOARD_LANE;
+            laneIssueIndex++
+        ) {
+            const issueNumber = paginationIssueNumber++;
+            paginationIssueRows.push({
+                projectId,
+                number: issueNumber,
+                createdById: people[issueNumber % people.length].id,
+                title: `${lane.label} pagination fixture ${laneIssueIndex + 1}`,
+                description: paragraph(
+                    `Seeded card ${laneIssueIndex + 1} for testing automatic pagination and virtualized rendering in ${lane.label}.`,
+                ),
+                status: lane.status,
+                priority: (laneIssueIndex % 4) + 1,
+                customColumnId: lane.customColumnId,
+                createdAt: daysAgo(121 + laneIndex * ISSUES_PER_BOARD_LANE + laneIssueIndex),
+            });
+        }
+    }
+    await prisma.issue.createMany({ data: paginationIssueRows });
+
     activityRows.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
     await prisma.issueActivity.createMany({ data: activityRows });
 
@@ -2043,7 +2094,7 @@ async function main() {
                 customColumns: columns.length,
                 issueTemplates: TEMPLATES.length,
                 workers: workers.length,
-                issues: createdIssues.length,
+                issues: createdIssues.length + paginationIssueRows.length,
                 activities: activityRows.length,
                 agentSessions: await prisma.agentSession.count({
                     where: { issue: { projectId } },

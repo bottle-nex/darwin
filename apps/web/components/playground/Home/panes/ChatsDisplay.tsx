@@ -1,8 +1,16 @@
 "use client";
 import { useEffect, useMemo } from "react";
-import { TeamRole, type ProjectChat, type TeamChat, type ThreadMessage } from "@trymatcha/types";
+import {
+    ProjectRole,
+    TeamRole,
+    type ProjectChat,
+    type TeamChat,
+    type ThreadMessage,
+} from "@trymatcha/types";
 import { PaneLeadSlot } from "@/components/playground/Core/components/PlaygroundPaneSlots";
+import PlaygroundBreadcrumb from "@/components/playground/Core/components/PlaygroundBreadcrumb";
 import ProjectChatThread from "@/components/playground/Home/chat/ProjectChatThread";
+import ChatConversationSidebar from "@/components/playground/Home/chat/ChatConversationSidebar";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { useProjectChatThread } from "@/hooks/chats/useProjectChatThread";
 import { useTeamChatThread } from "@/hooks/chats/useTeamChatThread";
@@ -10,7 +18,6 @@ import { useGetProject } from "@/hooks/project/useGetProject";
 import { useGetTeamMembers } from "@/hooks/team/useGetTeamMembers";
 import SessionServices from "@/lib/session";
 import { useChatThreadStore } from "@/store/playground/useChatThreadStore";
-import ChatsBreadcrumb from "./ChatsBreadcrumb";
 
 export default function ChatsDisplay() {
     const activeProject = useActiveProject();
@@ -24,8 +31,8 @@ export default function ChatsDisplay() {
     );
     const selectedTeam = teams.find((team) => team.id === teamId);
     const projectThread = useProjectChatThread(selectedTeam ? undefined : activeProject?.id);
-    const teamThread = useTeamChatThread(selectedTeam?.id);
-    const { data: teamMembers, isError: teamMembersError } = useGetTeamMembers(selectedTeam?.id);
+    const teamThread = useTeamChatThread(selectedTeam?.id, activeProject?.id);
+    const { data: teamMembers } = useGetTeamMembers(selectedTeam?.id);
     const viewerId = SessionServices.get_user()?.id;
     const memberUserIds = useMemo(
         () =>
@@ -71,45 +78,85 @@ export default function ChatsDisplay() {
     const viewerMembership = teamMembers?.members.find((member) => member.user.id === viewerId);
     const accessLost =
         Boolean(selectedTeam) &&
-        (teamThread.isError || teamMembersError || (teamMembers && !viewerMembership));
+        (teamThread.accessDenied || Boolean(teamMembers && !viewerMembership));
 
     return (
         <div className="flex min-h-0 flex-1 flex-col">
             <PaneLeadSlot>
-                <ChatsBreadcrumb
-                    project={activeProject}
+                <PlaygroundBreadcrumb
+                    trail={
+                        selectedTeam
+                            ? [
+                                  { label: "Chats", onClick: () => selectConversation(null) },
+                                  selectedTeam.name,
+                              ]
+                            : ["Chats"]
+                    }
+                />
+            </PaneLeadSlot>
+            <div className="flex min-h-0 min-w-0 flex-1 flex-row">
+                <ChatConversationSidebar
+                    project={
+                        project
+                            ? {
+                                  id: project.id,
+                                  name: project.name,
+                                  canCreateTeam: project.viewerRole === ProjectRole.Admin,
+                              }
+                            : undefined
+                    }
                     teams={teams}
                     selectedTeamId={selectedTeam?.id ?? null}
                     onSelect={selectConversation}
                 />
-            </PaneLeadSlot>
-            <div className="flex min-h-0 min-w-0 flex-1 flex-col *:px-4 *:py-3">
-                <ProjectChatThread
-                    key={selectedTeam ? `team:${selectedTeam.id}` : `project:${activeProject?.id}`}
-                    chats={thread.chats}
-                    projectId={activeProject?.id}
-                    loading={thread.isLoading}
-                    disabled={accessLost}
-                    canDeleteAny={
-                        selectedTeam ? selectedTeam.viewerRole === TeamRole.Maintainer : undefined
-                    }
-                    memberUserIds={memberUserIds}
-                    placeholder={
-                        selectedTeam ? `Message ${selectedTeam.name}...` : "Message the project..."
-                    }
-                    emptyMessage={
-                        accessLost ? "You no longer have access to this team." : "No messages yet."
-                    }
-                    onSend={thread.send}
-                    onDelete={(chat: ThreadMessage) => {
-                        if (selectedTeam) teamThread.remove(chat as TeamChat);
-                        else projectThread.remove(chat as ProjectChat);
-                    }}
-                    onReaction={(chat: ThreadMessage, emoji: string) => {
-                        if (selectedTeam) teamThread.react(chat as TeamChat, emoji);
-                        else projectThread.react(chat as ProjectChat, emoji);
-                    }}
-                />
+                <div className="flex min-h-0 min-w-0 flex-1 flex-col *:px-4 *:py-3">
+                    <ProjectChatThread
+                        key={
+                            selectedTeam
+                                ? `team:${selectedTeam.id}`
+                                : `project:${activeProject?.id}`
+                        }
+                        historyKey={
+                            selectedTeam
+                                ? `team:${selectedTeam.id}`
+                                : `project:${activeProject?.id}`
+                        }
+                        chats={thread.chats}
+                        projectId={activeProject?.id}
+                        loading={thread.isLoading}
+                        initialError={thread.isInitialError && !accessLost}
+                        pageError={thread.isPageError}
+                        fetchingOlder={thread.isFetchingOlder}
+                        hasOlder={thread.hasOlder}
+                        pageCount={thread.pageCount}
+                        disabled={accessLost}
+                        canDeleteAny={
+                            selectedTeam
+                                ? selectedTeam.viewerRole === TeamRole.Maintainer
+                                : undefined
+                        }
+                        memberUserIds={memberUserIds}
+                        placeholder={
+                            selectedTeam
+                                ? `Message ${selectedTeam.name}...`
+                                : "Message the project..."
+                        }
+                        emptyMessage={
+                            accessLost ? "You no longer have access to this team." : "Say Hi!"
+                        }
+                        onLoadOlder={thread.fetchOlder}
+                        onRetry={thread.retry}
+                        onSend={thread.send}
+                        onDelete={(chat: ThreadMessage) => {
+                            if (selectedTeam) teamThread.remove(chat as TeamChat);
+                            else projectThread.remove(chat as ProjectChat);
+                        }}
+                        onReaction={(chat: ThreadMessage, emoji: string) => {
+                            if (selectedTeam) teamThread.react(chat as TeamChat, emoji);
+                            else projectThread.react(chat as ProjectChat, emoji);
+                        }}
+                    />
+                </div>
             </div>
         </div>
     );

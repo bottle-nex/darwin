@@ -1,8 +1,5 @@
 import { create } from "zustand";
 import { arrayMove } from "@dnd-kit/sortable";
-import { INITIAL_CUSTOM_COLUMNS } from "@/components/playground/Home/KanbanDisplay/customkanban/data";
-import { CustomKanbanMappers } from "@/lib/kanban/CustomKanbanMappers";
-import type { BoardResponse } from "@/types/board";
 import type { CustomCard, CustomColumn } from "@/types/kanban-custom";
 import type { Issue } from "@/types/kanban";
 
@@ -14,10 +11,10 @@ export type ActiveItem =
 
 interface CustomKanbanState {
     columns: CustomColumn[];
-    seededBoard: BoardResponse | undefined;
+    overlayActive: boolean;
     activeItem: ActiveItem | null;
-    /** Seed (and re-seed) the columns from the server board. */
-    seed: (board: BoardResponse) => void;
+    beginOverlay: (columns: CustomColumn[]) => void;
+    clearOverlay: () => void;
     setActiveItem: (item: ActiveItem | null) => void;
     addColumnLocal: (column: CustomColumn) => void;
     removeColumnLocal: (columnId: string) => void;
@@ -38,21 +35,13 @@ interface CustomKanbanState {
     reorderColumn: (activeId: string, overColumnId: string) => void;
 }
 
-/**
- * Column/card state for the user-built Custom Kanban. Cards reorder and move
- * freely between custom columns; which LLM columns bridge with it is decided by
- * `BRIDGE_STATUSES` (see `customkanban/data.ts`) — this store stays status-agnostic,
- * `useCustomKanban` decides when a card crosses into/out of the LLM board.
- */
-export const useCustomKanbanStore = create<CustomKanbanState>((set, get) => ({
-    columns: INITIAL_CUSTOM_COLUMNS,
-    seededBoard: undefined,
+export const useCustomKanbanStore = create<CustomKanbanState>((set) => ({
+    columns: [],
+    overlayActive: false,
     activeItem: null,
 
-    seed: (board) => {
-        if (board === get().seededBoard) return;
-        set({ seededBoard: board, columns: CustomKanbanMappers.boardToColumns(board) });
-    },
+    beginOverlay: (columns) => set({ columns, overlayActive: true }),
+    clearOverlay: () => set({ columns: [], overlayActive: false, activeItem: null }),
 
     setActiveItem: (activeItem) => set({ activeItem }),
 

@@ -2,7 +2,7 @@
 import { NodeViewWrapper, type NodeViewProps } from "@tiptap/react";
 import { displayNameOf } from "@/components/playground/Core/components/PlaygroundAvatar";
 import { useActiveProject } from "@/hooks/useActiveProject";
-import { useBoard } from "@/hooks/issues/useBoard";
+import { useIssue } from "@/hooks/issues/useIssue";
 import { useProjectMembers } from "@/hooks/project/useProjectMembers";
 import { ISSUE_TRIGGER, MEMBER_TRIGGER, kindFor } from "./referenceTriggers";
 
@@ -16,10 +16,12 @@ export default function ReferenceChip({ node }: NodeViewProps) {
     const isIssue = char === ISSUE_TRIGGER;
     const id = node.attrs.id as string | null;
 
-    const { data: board } = useBoard(isIssue ? projectId : undefined);
+    const { data: issue, isPending: issuePending } = useIssue(
+        projectId,
+        isIssue ? (id ?? undefined) : undefined,
+    );
     const { data: members } = useProjectMembers(isIssue ? undefined : projectId);
 
-    const issue = isIssue ? board?.issues.find((row) => row.id === id) : undefined;
     const member = isIssue ? undefined : members?.find((row) => row.memberId === id);
 
     const resolved = issue
@@ -28,7 +30,7 @@ export default function ReferenceChip({ node }: NodeViewProps) {
           ? displayNameOf(member.name, member.email)
           : null;
 
-    const pending = isIssue ? !board : !members;
+    const pending = isIssue ? issuePending : !members;
     const label = resolved ?? (node.attrs.label as string | null) ?? (pending ? "…" : "unknown");
 
     return (

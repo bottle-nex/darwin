@@ -1,4 +1,5 @@
 "use client";
+import { useMemo } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import {
     InboundSocketMessageType,
@@ -19,10 +20,15 @@ import {
     useChats,
     OPTIMISTIC_ID_PREFIX,
 } from "./useChats";
+import { flattenChatPages } from "./chatCache";
 
 export function useIssueComments(issueId: string | undefined) {
     const queryClient = useQueryClient();
-    const { data: comments, isLoading } = useChats(issueId);
+    const history = useChats(issueId);
+    const comments = useMemo(
+        () => (history.data ? flattenChatPages(history.data.pages) : undefined),
+        [history.data],
+    );
     const projectId = useActiveProject()?.id;
     const { data: members } = useProjectMembers(projectId);
     const viewerId = SessionServices.get_user()?.id;
@@ -32,9 +38,10 @@ export function useIssueComments(issueId: string | undefined) {
 
     function send(message: string, references: LabelledReference[], repliedToId?: string) {
         if (!issueId) return;
+        const operationId = crypto.randomUUID();
         const sent = send_socket_message({
             type: InboundSocketMessageType.CHAT_CREATE,
-            payload: { issueId, message, repliedToId },
+            payload: { issueId, message, repliedToId, operationId },
         });
         if (!sent) {
             toast.error("Couldn't add your comment.");
@@ -48,12 +55,13 @@ export function useIssueComments(issueId: string | undefined) {
             : null;
         add_chat(
             queryClient,
-            build_optimistic_chat(issueId, message, references, repliedTo, {
+            build_optimistic_chat(issueId, operationId, message, references, repliedTo, {
                 id: viewer.id,
                 name: viewer.name ?? null,
                 email: viewer.email,
                 image: viewer.image ?? null,
             }),
+            () => toast.error("Couldn't confirm your comment. Try sending it again."),
         );
     }
 
@@ -85,5 +93,21 @@ export function useIssueComments(issueId: string | undefined) {
         );
     }
 
-    return { comments, isLoading, projectId, viewerId, send, remove, react, canDelete };
+    return {
+        comments,
+        pages: history.data,
+        isLoading: history.isLoading,
+        isInitialError: history.isError && !history.data,
+        isPageError: history.isFetchNextPageError,
+        isFetchingOlder: history.isFetchingNextPage,
+        hasOlder: Boolean(history.hasNextPage),
+        fetchOlder: history.fetchNextPage,
+        retry: history.refetch,
+        projectId,
+        viewerId,
+        send,
+        remove,
+        react,
+        canDelete,
+    };
 }

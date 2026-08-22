@@ -18,6 +18,7 @@ export default class ChatSocketHandler {
         issueId: z.string().min(1),
         message: z.string().trim().min(1).max(5000),
         repliedToId: z.string().min(1).optional(),
+        operationId: z.string().uuid(),
     });
 
     static delete_payload_schema = z.object({
@@ -177,10 +178,14 @@ export default class ChatSocketHandler {
     ) {
         const parsed = ChatSocketHandler.payload_schema.safeParse(raw_payload);
         if (!parsed.success) {
-            ChatSocketHandler.send_error(ws, "Invalid chat data provided");
+            ChatSocketHandler.send_error(
+                ws,
+                "Invalid chat data provided",
+                pending_operation_id(raw_payload),
+            );
             return;
         }
-        const { issueId, message, repliedToId } = parsed.data;
+        const { issueId, message, repliedToId, operationId } = parsed.data;
 
         try {
             const issue = await prisma.issue.findUnique({
@@ -193,13 +198,17 @@ export default class ChatSocketHandler {
                 },
             });
             if (!issue || issue.projectId !== project_id) {
-                ChatSocketHandler.send_error(ws, "Issue not found");
+                ChatSocketHandler.send_error(ws, "Issue not found", operationId);
                 return;
             }
 
             const role = await Access.project(user.id, issue.projectId);
             if (!role || !Permissions.project(role, Action.project.read)) {
-                ChatSocketHandler.send_error(ws, "You dont have access to this project");
+                ChatSocketHandler.send_error(
+                    ws,
+                    "You dont have access to this project",
+                    operationId,
+                );
                 return;
             }
 
@@ -210,7 +219,7 @@ export default class ChatSocketHandler {
                     select: { issueId: true, repliedToId: true },
                 });
                 if (!replied_to || replied_to.issueId !== issue.id) {
-                    ChatSocketHandler.send_error(ws, "Replied message not found");
+                    ChatSocketHandler.send_error(ws, "Replied message not found", operationId);
                     return;
                 }
                 thread_root_id = replied_to.repliedToId ?? repliedToId;
@@ -218,7 +227,7 @@ export default class ChatSocketHandler {
 
             const resolved = await MessageReferenceService.resolve(message, issue.projectId);
             if (!resolved.message) {
-                ChatSocketHandler.send_error(ws, "Message is empty");
+                ChatSocketHandler.send_error(ws, "Message is empty", operationId);
                 return;
             }
 
@@ -242,6 +251,7 @@ export default class ChatSocketHandler {
                 type: OutboundSocketMessageType.CHAT_CREATED,
                 projectId: issue.projectId,
                 payload: { ...chat, reactions: [] },
+                operationId,
             };
             await server_services.publisher.publish_message(
                 channel_name,
@@ -304,7 +314,7 @@ export default class ChatSocketHandler {
             );
         } catch (error) {
             console.error("ChatSocketHandler error: ", error);
-            ChatSocketHandler.send_error(ws, "Something went wrong");
+            ChatSocketHandler.send_error(ws, "Something went wrong", operationId);
         }
     }
 

@@ -15,10 +15,17 @@ import IssueReferencesGetController from "../../controllers/issues/controller.ge
 import IssueActivityListController from "../../controllers/issues/controller.list_activity";
 import IssueBulkUpdateController from "../../controllers/issues/controller.bulk_update_issues";
 import IssueBulkDeleteController from "../../controllers/issues/controller.bulk_delete_issues";
+import BoardColumnsGetController from "../../controllers/issues/controller.get_board_columns";
+import IssueGetByIdController from "../../controllers/issues/controller.get_issue";
+import MyIssuesListController from "../../controllers/issues/controller.list_my_issues";
+import BoardIssuesSearchController from "../../controllers/issues/controller.search_board_issues";
 
 const issues_router: Router = Router();
 
 issues_router.post("/create", require_auth, IssueCreateController.process);
+issues_router.get("/board/:project_id/columns", require_auth, BoardColumnsGetController.process);
+issues_router.get("/board/:project_id/search", require_auth, BoardIssuesSearchController.process);
+issues_router.get("/board/:project_id/my", require_auth, MyIssuesListController.process);
 issues_router.get("/board/:project_id", require_auth, IssueGetController.process);
 issues_router.get("/search/:project_id", require_auth, IssueSearchController.process);
 
@@ -29,6 +36,8 @@ issues_router.delete("/columns/:id", require_auth, ColumnDeleteController.proces
 
 issues_router.patch("/bulk", require_auth, IssueBulkUpdateController.process);
 issues_router.post("/bulk/delete", require_auth, IssueBulkDeleteController.process);
+
+issues_router.get("/:id", require_auth, IssueGetByIdController.process);
 
 issues_router.patch("/:id", require_auth, IssueUpdateController.process);
 issues_router.delete("/:id", require_auth, IssueDeleteController.process);

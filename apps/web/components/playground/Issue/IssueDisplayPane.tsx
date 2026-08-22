@@ -36,7 +36,6 @@ export default function IssueDisplayPane({
     const { issueView } = useIssueRoute();
     const close = onDismiss ?? closeRoute;
     const [confirmingClose, setConfirmingClose] = useState(false);
-
     const inDiff = !embedded && issueView === "diff";
 
     const form = useIssueForm({
@@ -61,7 +60,7 @@ export default function IssueDisplayPane({
     }
 
     return (
-        <IssueDropdown issueId={issue.id}>
+        <IssueDropdown issueId={issue.id} issue={issue}>
             <main className={PLAYGROUND_PANE_SHELL}>
                 {embedded ? (
                     <div
@@ -77,7 +76,7 @@ export default function IssueDisplayPane({
                     <>
                         <PaneLeadSlot>
                             <PlaygroundBreadcrumb
-                                issueNumber={issue.number}
+                                issue={issue}
                                 trailing={inDiff ? "Diff" : undefined}
                             />
                         </PaneLeadSlot>

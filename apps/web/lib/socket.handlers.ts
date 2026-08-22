@@ -10,6 +10,13 @@ import { upsert_chat, mark_chat_deleted } from "@/hooks/chats/useChats";
 import { upsert_project_chat, mark_project_chat_deleted } from "@/hooks/chats/useProjectChat";
 import { upsert_team_chat, mark_team_chat_deleted } from "@/hooks/chats/useTeamChat";
 import {
+    CHAT_CONVERSATION_PREVIEWS_QUERY_KEY,
+    mark_project_conversation_preview_deleted,
+    mark_team_conversation_preview_deleted,
+    update_project_conversation_preview,
+    update_team_conversation_preview,
+} from "@/hooks/chats/useChatConversationPreviews";
+import {
     reconcile_chat_reaction,
     reconcile_project_chat_reaction,
     reconcile_team_chat_reaction,
@@ -22,6 +29,7 @@ import { useFloatNotificationsStore } from "@/store/playground/useFloatNotificat
 import { append_activities, update_agent_session } from "@/hooks/activity/useActivity";
 import { PROJECT_QUERY_KEY } from "@/hooks/project/useGetProject";
 import { TEAM_MEMBERS_QUERY_KEY } from "@/hooks/team/useGetTeamMembers";
+import { rollbackPendingChatCreate } from "@/hooks/chats/chatCache";
 
 export class SocketHandlers {
     static handle_issue_created(queryClient: QueryClient, message: OutboundSocketMessage) {
@@ -31,12 +39,12 @@ export class SocketHandlers {
 
     static handle_issue_updated(queryClient: QueryClient, message: OutboundSocketMessage) {
         if (message.type !== OutboundSocketMessageType.ISSUE_UPDATED) return;
-        updateBoardIssue(queryClient, message.projectId, message.payload);
+        updateBoardIssue(queryClient, message.projectId, message.payload, message.previous);
     }
 
     static handle_chat_created(queryClient: QueryClient, message: OutboundSocketMessage) {
         if (message.type !== OutboundSocketMessageType.CHAT_CREATED) return;
-        upsert_chat(queryClient, message.payload);
+        upsert_chat(queryClient, message.payload, message.operationId);
     }
 
     static handle_chat_deleted(queryClient: QueryClient, message: OutboundSocketMessage) {
@@ -44,30 +52,49 @@ export class SocketHandlers {
         mark_chat_deleted(queryClient, message.payload);
     }
 
-    static handle_chat_error(message: OutboundSocketMessage) {
+    static handle_chat_error(queryClient: QueryClient, message: OutboundSocketMessage) {
         if (message.type !== OutboundSocketMessageType.CHAT_ERROR) return;
-        if (message.operationId) rollback_reaction(message.operationId);
+        if (message.operationId) {
+            const rolledBackCreate = rollbackPendingChatCreate(queryClient, message.operationId);
+            if (rolledBackCreate?.previewProjectId) {
+                queryClient.invalidateQueries({
+                    queryKey: [
+                        ...CHAT_CONVERSATION_PREVIEWS_QUERY_KEY,
+                        rolledBackCreate.previewProjectId,
+                    ],
+                });
+            }
+            rollback_reaction(message.operationId);
+        }
         toast.error(message.message);
     }
 
     static handle_project_chat_created(queryClient: QueryClient, message: OutboundSocketMessage) {
         if (message.type !== OutboundSocketMessageType.PROJECT_CHAT_CREATED) return;
-        upsert_project_chat(queryClient, message.payload);
+        upsert_project_chat(queryClient, message.payload, message.operationId);
+        update_project_conversation_preview(queryClient, message.projectId, message.payload);
     }
 
     static handle_project_chat_deleted(queryClient: QueryClient, message: OutboundSocketMessage) {
         if (message.type !== OutboundSocketMessageType.PROJECT_CHAT_DELETED) return;
         mark_project_chat_deleted(queryClient, message.payload);
+        mark_project_conversation_preview_deleted(
+            queryClient,
+            message.projectId,
+            message.payload.id,
+        );
     }
 
     static handle_team_chat_created(queryClient: QueryClient, message: OutboundSocketMessage) {
         if (message.type !== OutboundSocketMessageType.TEAM_CHAT_CREATED) return;
-        upsert_team_chat(queryClient, message.payload);
+        upsert_team_chat(queryClient, message.payload, message.operationId);
+        update_team_conversation_preview(queryClient, message.projectId, message.payload);
     }
 
     static handle_team_chat_deleted(queryClient: QueryClient, message: OutboundSocketMessage) {
         if (message.type !== OutboundSocketMessageType.TEAM_CHAT_DELETED) return;
         mark_team_chat_deleted(queryClient, message.payload);
+        mark_team_conversation_preview_deleted(queryClient, message.projectId, message.payload);
     }
 
     static handle_chat_reaction_updated(queryClient: QueryClient, message: OutboundSocketMessage) {

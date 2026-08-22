@@ -54,11 +54,13 @@ function QuotedMessage({
     quote,
     isMine,
     viewerId,
+    searching,
     onQuoteClick,
 }: {
     quote: AnyChat | null | undefined;
     isMine: boolean;
     viewerId?: string;
+    searching: boolean;
     onQuoteClick: (chatId: string) => void;
 }) {
     const readable = quote && !quote.isDeleted;
@@ -102,6 +104,11 @@ function QuotedMessage({
                     >
                         {to_plain_text(quote.message, quote.references ?? [])}
                     </span>
+                    {searching ? (
+                        <span className="mt-0.5 text-[10px] text-neutral-300" role="status">
+                            Searching older messages...
+                        </span>
+                    ) : null}
                 </span>
             ) : (
                 <span
@@ -200,6 +207,10 @@ export default function ChatMessage({
     endsGroup,
     viewerId,
     canDelete,
+    position,
+    setSize,
+    identified,
+    searchingQuoteId,
     onReply,
     onDelete,
     onQuoteClick,
@@ -211,6 +222,10 @@ export default function ChatMessage({
     endsGroup: boolean;
     viewerId?: string;
     canDelete: boolean;
+    position: number;
+    setSize?: number;
+    identified: boolean;
+    searchingQuoteId?: string;
     onReply: (chat: AnyChat) => void;
     onDelete: (chat: AnyChat) => void;
     onQuoteClick: (chatId: string) => void;
@@ -225,8 +240,12 @@ export default function ChatMessage({
     const reactionDisabled = reactionPending || chat.id.startsWith(OPTIMISTIC_ID_PREFIX);
     const taggedIssues = chat.isDeleted ? [] : taggedIssuesOf(chat);
     return (
-        <motion.li
-            id={`chat-${chat.id}`}
+        <motion.div
+            role="listitem"
+            data-chat-id={chat.id}
+            tabIndex={-1}
+            aria-posinset={position}
+            aria-setsize={setSize}
             initial={isFresh ? { opacity: 0, x: isMine ? 32 : -32, scale: 0.6 } : false}
             animate={{ opacity: 1, x: 0, scale: 1 }}
             transition={{ type: "spring", stiffness: 400, damping: 26 }}
@@ -234,7 +253,8 @@ export default function ChatMessage({
             className={cn(
                 "group/message relative flex flex-col rounded-lg transition-colors duration-300",
                 isMine ? "items-end" : "items-start",
-                startsGroup ? "mt-5 first:mt-0" : "mt-1.5",
+                startsGroup && position > 1 && "pt-3",
+                identified && "bg-white/10 ring-1 ring-white/15",
             )}
         >
             <div
@@ -298,6 +318,7 @@ export default function ChatMessage({
                                 quote={chat.repliedTo}
                                 isMine={isMine}
                                 viewerId={viewerId}
+                                searching={searchingQuoteId === chat.repliedToId}
                                 onQuoteClick={onQuoteClick}
                             />
                         )}
@@ -381,6 +402,6 @@ export default function ChatMessage({
                     onReact={(emoji) => onReaction(chat, emoji)}
                 />
             )}
-        </motion.li>
+        </motion.div>
     );
 }

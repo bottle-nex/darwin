@@ -1,4 +1,5 @@
 "use client";
+import { useMemo } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import {
     InboundSocketMessageType,
@@ -16,16 +17,27 @@ import {
     mark_project_chat_deleted,
     useProjectChat,
 } from "./useProjectChat";
+import {
+    CHAT_CONVERSATION_PREVIEWS_QUERY_KEY,
+    mark_project_conversation_preview_deleted,
+    update_project_conversation_preview,
+} from "./useChatConversationPreviews";
+import { flattenChatPages } from "./chatCache";
 
 export function useProjectChatThread(projectId: string | undefined) {
     const queryClient = useQueryClient();
-    const { data: chats, isLoading } = useProjectChat(projectId);
+    const history = useProjectChat(projectId);
+    const chats = useMemo(
+        () => (history.data ? flattenChatPages(history.data.pages) : undefined),
+        [history.data],
+    );
 
     function send(message: string, references: LabelledReference[], repliedToId?: string) {
         if (!projectId) return;
+        const operationId = crypto.randomUUID();
         const sent = send_socket_message({
             type: InboundSocketMessageType.PROJECT_CHAT_CREATE,
-            payload: { message, repliedToId },
+            payload: { message, repliedToId, operationId },
         });
         if (!sent) {
             toast.error("Couldn't send your message.");
@@ -35,15 +47,26 @@ export function useProjectChatThread(projectId: string | undefined) {
         const viewer = SessionServices.get_user();
         if (!viewer?.id || !viewer.email) return;
         const repliedTo = repliedToId ? (chats?.find((c) => c.id === repliedToId) ?? null) : null;
-        add_project_chat(
-            queryClient,
-            build_optimistic_project_chat(projectId, message, references, repliedTo, {
+        const optimistic_chat = build_optimistic_project_chat(
+            projectId,
+            operationId,
+            message,
+            references,
+            repliedTo,
+            {
                 id: viewer.id,
                 name: viewer.name ?? null,
                 email: viewer.email,
                 image: viewer.image ?? null,
-            }),
+            },
         );
+        add_project_chat(queryClient, optimistic_chat, () => {
+            queryClient.invalidateQueries({
+                queryKey: [...CHAT_CONVERSATION_PREVIEWS_QUERY_KEY, projectId],
+            });
+            toast.error("Couldn't confirm your message. Try sending it again.");
+        });
+        update_project_conversation_preview(queryClient, projectId, optimistic_chat);
     }
 
     function remove(chat: ProjectChat) {
@@ -56,6 +79,7 @@ export function useProjectChatThread(projectId: string | undefined) {
             return;
         }
         mark_project_chat_deleted(queryClient, chat);
+        if (projectId) mark_project_conversation_preview_deleted(queryClient, projectId, chat.id);
     }
 
     function react(chat: ProjectChat, emoji: string) {
@@ -65,5 +89,18 @@ export function useProjectChatThread(projectId: string | undefined) {
         }
     }
 
-    return { chats, isLoading, send, remove, react };
+    return {
+        chats,
+        isLoading: history.isLoading,
+        isInitialError: history.isError && !history.data,
+        isPageError: history.isFetchNextPageError,
+        isFetchingOlder: history.isFetchingNextPage,
+        hasOlder: Boolean(history.hasNextPage),
+        pageCount: history.data?.pages.length ?? 0,
+        fetchOlder: history.fetchNextPage,
+        retry: history.refetch,
+        send,
+        remove,
+        react,
+    };
 }

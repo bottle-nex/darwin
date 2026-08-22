@@ -6,12 +6,12 @@ import type { IconType } from "react-icons";
 import { LuFingerprint, LuHash, LuLink, LuType } from "react-icons/lu";
 import { TbFileInvoiceFilled } from "react-icons/tb";
 import { useActiveProject } from "@/hooks/useActiveProject";
-import { useBoard } from "@/hooks/issues/useBoard";
+import { useIssues } from "@/hooks/issues/useIssue";
+import { useBoardColumns } from "@/hooks/issues/useBoardColumns";
 import { useCreateIssue, type CreateIssueInput } from "@/hooks/issues/useCreateIssue";
 import { useUpdateIssue, type UpdateIssueInput } from "@/hooks/issues/useUpdateIssue";
 import { useBulkUpdateIssues } from "@/hooks/issues/useBulkUpdateIssues";
 import { useAssignIssue, useUnassignIssue } from "@/hooks/issues/useAssignIssue";
-import { useFilteredCustomColumns } from "@/hooks/kanban/useFilteredCustomColumns";
 import { useProjectMembers } from "@/hooks/project/useProjectMembers";
 import { useListTags } from "@/hooks/tags/useListTags";
 import { useDeleteIssueStore } from "@/store/issues/useDeleteIssueStore";
@@ -55,6 +55,19 @@ function presetToIso(days: number | null): string | null {
 
 export type IssueActions = ReturnType<typeof useIssueActions>;
 
+type IssueActionTarget = BoardIssue | BoardIssue[] | string | string[] | null | undefined;
+
+function resolveIssueActionTarget(target: IssueActionTarget) {
+    if (!target) return { issueIds: [], suppliedIssues: [] };
+    if (typeof target === "string") return { issueIds: [target], suppliedIssues: [] };
+    if (!Array.isArray(target)) return { issueIds: [target.id], suppliedIssues: [target] };
+    if (target.every((item) => typeof item === "string")) {
+        return { issueIds: target, suppliedIssues: [] };
+    }
+    const suppliedIssues = target as BoardIssue[];
+    return { issueIds: suppliedIssues.map((issue) => issue.id), suppliedIssues };
+}
+
 function shared<T>(issues: BoardIssue[], read: (issue: BoardIssue) => T): T | undefined {
     if (!issues.length) return undefined;
     const first = read(issues[0]);
@@ -75,17 +88,20 @@ function sharedMembership(issues: BoardIssue[], read: (issue: BoardIssue) => { i
  * menu and the command menu drive issues through the same handlers. Given many
  * ids it drives them all through the bulk endpoints.
  */
-export function useIssueActions(target: string | string[] | null | undefined) {
+export function useIssueActions(target: IssueActionTarget) {
     const projectId = useActiveProject()?.id;
-    const { data: board } = useBoard(projectId);
-
-    const issueIds = target ? (Array.isArray(target) ? target : [target]) : [];
-    const issues = issueIds
-        .map((id) => board?.issues.find((row) => row.id === id))
-        .filter((row): row is BoardIssue => Boolean(row));
+    const { issueIds, suppliedIssues } = resolveIssueActionTarget(target);
+    const issueQuery = useIssues(projectId, suppliedIssues.length ? [] : issueIds);
+    const issues = suppliedIssues.length ? suppliedIssues : issueQuery.issues;
+    const isComplete = suppliedIssues.length > 0 || issueQuery.isComplete;
     const issue = issues.length === 1 ? issues[0] : undefined;
 
-    const columns = useFilteredCustomColumns();
+    const { data: metadata } = useBoardColumns(projectId);
+    const columns = (metadata?.columns ?? []).map((column) => ({
+        id: column.id,
+        title: column.label,
+        cards: [],
+    }));
     const { data: members } = useProjectMembers(projectId);
     const { data: tags } = useListTags(projectId);
 
@@ -96,8 +112,8 @@ export function useIssueActions(target: string | string[] | null | undefined) {
     const unassignIssue = useUnassignIssue();
     const requestDelete = useDeleteIssueStore((s) => s.requestDelete);
 
-    const ready = Boolean(issues.length && projectId);
-    const editable = issues.length > 0 && issues.every(isEditable);
+    const ready = Boolean(isComplete && issues.length && projectId);
+    const editable = ready && issues.every(isEditable);
     const assigneeIds = sharedMembership(issues, (row) => row.assignees);
     const tagIds = sharedMembership(issues, (row) => row.tags);
 
@@ -228,6 +244,6 @@ export function useIssueActions(target: string | string[] | null | undefined) {
             );
         },
 
-        requestDelete: () => issues.length && requestDelete(issues.map((row) => row.id)),
+        requestDelete: () => ready && requestDelete(issueIds),
     };
 }

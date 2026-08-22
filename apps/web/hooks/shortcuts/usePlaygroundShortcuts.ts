@@ -1,6 +1,5 @@
 import { useEffect, useRef } from "react";
 import {
-    HiMiniCubeTransparent,
     HiOutlineBell,
     HiOutlineBriefcase,
     HiOutlineCog6Tooth,
@@ -120,13 +119,6 @@ export const COMBINATIONS: Record<string, CommandAction> = {
         icon: LuCopy,
         isAvailable: onIssue,
         run: openMenuPage("copy"),
-    },
-    "o o": {
-        kind: CommandKind.Open,
-        label: "Open Overview",
-        icon: HiMiniCubeTransparent,
-        isAvailable: inProject,
-        run: () => openTab(PlaygroundTab.Overview),
     },
     "o k": {
         kind: CommandKind.Open,

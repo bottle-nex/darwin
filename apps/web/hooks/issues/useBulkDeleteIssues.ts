@@ -1,8 +1,15 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/lib/axios";
 import { BULK_DELETE_ISSUES_URL } from "@/routes/api_routes";
-import { BOARD_QUERY_KEY } from "@/hooks/issues/useBoard";
+import { removeBoardIssueCaches } from "@/hooks/issues/boardCache";
 import type { ApiResponse } from "@/types/api";
+import type { BoardIssue, BoardLane } from "@/types/board";
+
+type BulkDeleteResult = {
+    deleted: string[];
+    failed: string[];
+    changes: { issue: BoardIssue; beforeLane: BoardLane }[];
+};
 
 export interface BulkDeleteIssuesInput {
     issue_ids: string[];
@@ -14,16 +21,21 @@ export function useBulkDeleteIssues() {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: async (input: BulkDeleteIssuesInput) => {
-            const res = await apiClient.post<ApiResponse<{ deleted: string[]; failed: string[] }>>(
+            const res = await apiClient.post<ApiResponse<BulkDeleteResult>>(
                 BULK_DELETE_ISSUES_URL,
                 { issue_ids: input.issue_ids },
             );
             return res.data.data;
         },
-        onSuccess: (_data, variables) => {
-            queryClient.invalidateQueries({
-                queryKey: [...BOARD_QUERY_KEY, variables.project_id],
-            });
+        onSuccess: (data, variables) => {
+            for (const change of data.changes) {
+                removeBoardIssueCaches(
+                    queryClient,
+                    variables.project_id,
+                    change.issue.id,
+                    change.beforeLane,
+                );
+            }
         },
     });
 }

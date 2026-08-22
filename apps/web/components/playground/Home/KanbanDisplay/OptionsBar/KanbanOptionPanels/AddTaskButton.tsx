@@ -38,7 +38,7 @@ export default function AddTaskButton() {
                 <DropdownMenuTrigger asChild>
                     <OptionButton label="More task options" icon={LuChevronDown} />
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-52">
+                <DropdownMenuContent align="end" className="w-48">
                     {TASK_OPTIONS.map((option) => {
                         const disabled = option.id === "import";
                         return (

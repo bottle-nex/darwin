@@ -13,10 +13,16 @@ import { IssueStatus } from "@trymatcha/types";
 import { useIssueStore } from "@/store/issues/useIssueStore";
 import { useIssueSelectionStore } from "@/store/issues/useIssueSelectionStore";
 import { MatchaLogo } from "@/components/logo/MatchaLogo";
+import { useActiveProject } from "@/hooks/useActiveProject";
+import { useBoardLaneModel } from "@/hooks/issues/useBoard";
+import { useKanbanBoardStore } from "@/store/kanban/useKanbanBoardStore";
+import { useIssueFlightStore } from "@/store/kanban/useIssueFlightStore";
 import type { Issue, KanbanColumnDef } from "@/types/kanban";
 import CardRenderer from "./cards/CardRenderer";
 import DraggableIssue from "./DraggableIssue";
 import LLMIssueStatusTicker from "./LLMIssueStatusTicker";
+import { BoardLanePaginationView } from "./BoardLanePagination";
+import VirtualizedIssueCards from "./VirtualizedIssueCards";
 
 type KanbanColumnProps = {
     column: KanbanColumnDef;
@@ -40,9 +46,14 @@ export default function KanbanColumn({
     const selectedIds = useIssueSelectionStore((s) => s.ids);
     const replaceSelection = useIssueSelectionStore((s) => s.replace);
     const clearSelection = useIssueSelectionStore((s) => s.clear);
+    const projectId = useActiveProject()?.id;
+    const dragActive = useKanbanBoardStore((state) => state.overlayActive);
+    const flightIssueId = useIssueFlightStore((state) => state.flight?.issue.id ?? null);
+    const lane = useBoardLaneModel(projectId, { type: "system", status: column.status });
     const { title } = column;
     const grid = layout === "grid";
     const canAddCard = column.status === IssueStatus.Todo;
+    const fallbackPagination = lane.source === "fallback";
 
     return (
         <div
@@ -88,7 +99,7 @@ export default function KanbanColumn({
                                 }
                             >
                                 <MdChecklist className="size-3.5" aria-hidden />
-                                <span className="flex-1">Select issues</span>
+                                <span className="flex-1">Select loaded issues</span>
                                 <span className="text-[11px] text-neutral-500">
                                     {issues.length}
                                 </span>
@@ -105,52 +116,84 @@ export default function KanbanColumn({
                 </div>
             </div>
 
-            <div
-                data-lenis-prevent
-                data-column-list={column.status}
-                ref={setNodeRef}
-                className={cn(
-                    "min-h-0 flex-1 overflow-y-auto rounded-lg p-0.5 no-scrollbar",
-                    grid
-                        ? "grid grid-cols-1 content-start gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
-                        : "flex flex-col gap-2",
-                )}
-            >
-                {issues.map((issue) =>
+            <VirtualizedIssueCards
+                items={issues}
+                knownTotal={lane.source === "base" ? lane.serverTotal : undefined}
+                columns={grid ? "responsive" : 1}
+                estimateSize={156}
+                className="min-h-0 flex-1 rounded-lg p-0.5 no-scrollbar"
+                scrollElementRef={setNodeRef}
+                dataColumnList={column.status}
+                pinnedIssueId={flightIssueId}
+                renderItem={(issue) =>
                     draggableCards ? (
-                        <DraggableIssue key={issue.id} issue={issue} />
+                        <DraggableIssue issue={issue} />
                     ) : (
-                        <CardRenderer key={issue.id} issue={issue} />
+                        <CardRenderer issue={issue} />
+                    )
+                }
+                status={{
+                    label: lane.fallbackPending
+                        ? `Searching all issues in ${title}`
+                        : lane.lanePending
+                          ? `Loading issues in ${title}`
+                          : lane.laneError || lane.basePageError || lane.fallbackError
+                            ? `Issues in ${title} could not be loaded. Retry is available.`
+                            : issues.length === 0
+                              ? `No issues in ${title}`
+                              : `${issues.length} loaded issues in ${title}`,
+                }}
+                autoFill={{
+                    key: `${column.status}:${lane.source}`,
+                    hasNextPage: Boolean(
+                        fallbackPagination ? lane.hasNextFallbackPage : lane.hasNextBasePage,
                     ),
-                )}
-
-                {canAddCard && (
-                    <Button
-                        variant="unstyled"
-                        type="button"
-                        onClick={() => openCreate({ board: "llm" })}
-                        className={cn(
-                            "flex shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-[9px] px-2 py-1.5 text-center text-[13px] font-medium text-neutral-400 opacity-0 transition-opacity hover:bg-white/5 hover:text-neutral-200 focus-visible:opacity-100 group-hover:opacity-100",
-                            grid && "col-span-full",
-                        )}
-                    >
-                        <MdAdd className="size-3.5" aria-hidden />
-                        Add an Issue
-                    </Button>
-                )}
-
-                {issues.length === 0 && (
+                    fetchingNextPage: fallbackPagination
+                        ? lane.isFetchingNextFallbackPage
+                        : lane.isFetchingNextBasePage,
+                    pageError: fallbackPagination
+                        ? lane.fallbackError
+                        : lane.laneError || lane.basePageError,
+                    paused: dragActive,
+                    onLoadMore: () =>
+                        fallbackPagination
+                            ? lane.fetchNextFallbackPage()
+                            : lane.fetchNextBasePage(),
+                }}
+                footer={
+                    canAddCard ? (
+                        <Button
+                            variant="unstyled"
+                            type="button"
+                            onClick={() => openCreate({ board: "llm" })}
+                            className={cn(
+                                "flex shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-[9px] px-2 py-1.5 text-center text-[13px] font-medium text-neutral-400 opacity-0 transition-opacity hover:bg-white/5 hover:text-neutral-200 focus-visible:opacity-100 group-hover:opacity-100",
+                            )}
+                        >
+                            <MdAdd className="size-3.5" aria-hidden />
+                            Add an Issue
+                        </Button>
+                    ) : undefined
+                }
+                emptyState={
                     <div
                         className={cn(
                             "flex flex-1 h-full flex-col items-center justify-center gap-2",
-                            grid ? "col-span-full" : "px-2",
+                            "min-h-32 px-2",
                         )}
                     >
                         <MatchaLogo className="h-6 w-auto text-neutral-800" />
-                        <p className="text-[12px] text-neutral-600">No issues currently</p>
+                        <p className="text-[12px] text-neutral-600">
+                            {lane.lanePending || lane.fallbackPending
+                                ? "Loading issues…"
+                                : lane.laneError || lane.fallbackError
+                                  ? "Couldn’t load issues"
+                                  : "No issues currently"}
+                        </p>
                     </div>
-                )}
-            </div>
+                }
+            />
+            <BoardLanePaginationView lane={lane} />
         </div>
     );
 }

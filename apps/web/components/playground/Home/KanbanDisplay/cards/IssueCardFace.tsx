@@ -5,7 +5,7 @@ import { HiCalendar } from "react-icons/hi2";
 import { cn } from "@/lib/utils";
 import PlaygroundAvatar from "@/components/playground/Core/components/PlaygroundAvatar";
 import type { Assignee, Priority } from "@/types/kanban";
-import type { BoardTag } from "@/types/board";
+import type { BoardIssue, BoardTag } from "@/types/board";
 import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
 import { DATE_ICON_COLOR, PRIORITY_OPTIONS } from "@/components/playground/Issue/issueHelpers";
 import PriorityChipMenu from "./PriorityChipMenu";
@@ -68,6 +68,7 @@ function AssigneeStack({ assignees, onClick }: { assignees: Assignee[]; onClick?
 export default function IssueCardFace({
     identifier,
     issueId,
+    boardIssue,
     title,
     status,
     priority,
@@ -80,6 +81,7 @@ export default function IssueCardFace({
 }: {
     identifier: string;
     issueId?: string;
+    boardIssue?: BoardIssue;
     title: string;
     status?: string;
     priority: Priority;
@@ -127,7 +129,9 @@ export default function IssueCardFace({
             {priorityChip || targetDate || tags.length ? (
                 <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
                     {priorityChip && issueId ? (
-                        <PriorityChipMenu issueId={issueId}>{priorityChip}</PriorityChipMenu>
+                        <PriorityChipMenu issueId={issueId} issue={boardIssue}>
+                            {priorityChip}
+                        </PriorityChipMenu>
                     ) : (
                         priorityChip
                     )}

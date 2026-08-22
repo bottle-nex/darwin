@@ -1,41 +1,48 @@
-import { useQuery, type QueryClient } from "@tanstack/react-query";
+import { useInfiniteQuery, type QueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/lib/axios";
 import { CHAT_URL } from "@/routes/api_routes";
 import type { ApiResponse } from "@/types/api";
-import type { Chat, LabelledReference } from "@trymatcha/types";
+import type { Chat, CursorPage, LabelledReference } from "@trymatcha/types";
+import {
+    CHAT_PAGE_LIMIT,
+    OPTIMISTIC_ID_PREFIX,
+    addOptimisticChat,
+    chatQueryKey,
+    deleteChatFromCache,
+    receiveChat,
+    type ChatCacheItem,
+} from "./chatCache";
 
 export const CHATS_QUERY_KEY = ["chats"] as const;
+export { OPTIMISTIC_ID_PREFIX };
 
-/** load all comments (chats) for one issue, oldest first. */
 export function useChats(issueId: string | undefined) {
-    return useQuery({
-        queryKey: [...CHATS_QUERY_KEY, issueId],
+    return useInfiniteQuery({
+        queryKey: chatQueryKey("issue", issueId),
         enabled: Boolean(issueId),
-        queryFn: async () => {
-            const res = await apiClient.get<ApiResponse<{ chats: Chat[] }>>(CHAT_URL(issueId!));
-            return res.data.data.chats;
+        initialPageParam: null as string | null,
+        queryFn: async ({ pageParam, signal }) => {
+            const response = await apiClient.get<ApiResponse<CursorPage<Chat>>>(
+                CHAT_URL(issueId!, pageParam, CHAT_PAGE_LIMIT),
+                { signal },
+            );
+            return response.data.data;
         },
+        getNextPageParam: (page) => (page.hasMore ? page.nextCursor : undefined),
     });
 }
 
-/** Marks a chat as a local echo not yet confirmed by the CHAT_CREATED broadcast. */
-export const OPTIMISTIC_ID_PREFIX = "optimistic:";
-
-/**
- * Builds the chat shown the instant the commenter hits send, before the
- * server confirms it. `sender` only needs the fields the chat bubble renders
- * — the rest of `User` is stubbed since this row is replaced wholesale once
- * the real broadcast lands.
- */
 export function build_optimistic_chat(
     issueId: string,
+    operationId: string,
     message: string,
     references: LabelledReference[],
     repliedTo: Chat | null,
     sender: { id: string; name: string | null; email: string; image: string | null },
-): Chat {
+): ChatCacheItem<Chat> {
     return {
-        id: `${OPTIMISTIC_ID_PREFIX}${crypto.randomUUID()}`,
+        id: `${OPTIMISTIC_ID_PREFIX}${operationId}`,
+        operationId,
         issueId,
         message,
         isDeleted: false,
@@ -50,50 +57,18 @@ export function build_optimistic_chat(
     };
 }
 
-/** Appends the commenter's own optimistic chat into the cached list right away. */
-export function add_chat(queryClient: QueryClient, chat: Chat) {
-    queryClient.setQueryData<Chat[]>([...CHATS_QUERY_KEY, chat.issueId], (prev) =>
-        prev ? [...prev, chat] : prev,
-    );
+export function add_chat(
+    queryClient: QueryClient,
+    chat: ChatCacheItem<Chat>,
+    onTimeout?: () => void,
+) {
+    addOptimisticChat(queryClient, "issue", chat.issueId, chat, undefined, onTimeout);
 }
 
-/**
- * Append a chat into an issue's cached list, idempotently (by id). Called by
- * the socket CHAT_CREATED handler — replaces the commenter's own pending
- * optimistic echo (same sender + message) if one is waiting, otherwise just
- * appends. No-ops if the issue's list isn't loaded, it'll be fetched fresh
- * when the issue is opened.
- */
-/**
- * Flags a chat as deleted in place and flips the embedded quote copy on any
- * replies to it, so quotes switch to the "Message deleted" rendering. Shared
- * by the deleter's optimistic update and the CHAT_DELETED broadcast handler —
- * idempotent, so running both is fine.
- */
 export function mark_chat_deleted(queryClient: QueryClient, chat: Chat) {
-    queryClient.setQueryData<Chat[]>([...CHATS_QUERY_KEY, chat.issueId], (prev) =>
-        prev?.map((existing) => {
-            const next = existing.id === chat.id ? { ...existing, isDeleted: true } : existing;
-            return next.repliedToId === chat.id && next.repliedTo
-                ? { ...next, repliedTo: { ...next.repliedTo, isDeleted: true } }
-                : next;
-        }),
-    );
+    deleteChatFromCache<Chat>(queryClient, "issue", chat.issueId, chat.id);
 }
 
-export function upsert_chat(queryClient: QueryClient, chat: Chat) {
-    queryClient.setQueryData<Chat[]>([...CHATS_QUERY_KEY, chat.issueId], (prev) => {
-        if (!prev) return prev;
-        if (prev.some((existing) => existing.id === chat.id)) return prev;
-        const pendingIndex = prev.findIndex(
-            (existing) =>
-                existing.id.startsWith(OPTIMISTIC_ID_PREFIX) &&
-                existing.senderId === chat.senderId &&
-                existing.message === chat.message,
-        );
-        if (pendingIndex === -1) return [...prev, chat];
-        const next = [...prev];
-        next[pendingIndex] = chat;
-        return next;
-    });
+export function upsert_chat(queryClient: QueryClient, chat: Chat, operationId?: string) {
+    receiveChat(queryClient, "issue", chat.issueId, chat, operationId);
 }

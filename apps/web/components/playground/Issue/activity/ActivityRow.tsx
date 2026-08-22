@@ -70,13 +70,7 @@ export function ActorAvatar({
     );
 }
 
-/** The 17px offsets are the distance from the row's top edge to its icon centre. */
-function railClass(above: boolean, below: boolean): string | null {
-    if (above && below) return "top-0 h-full";
-    if (above) return "top-0 h-[17px]";
-    if (below) return "top-[17px] bottom-0";
-    return null;
-}
+const RAIL_CLASS = "absolute left-[10.5px] w-px bg-edge";
 
 /**
  * One timeline entry. `rail` says which neighbours are activity rows too, so the
@@ -93,22 +87,20 @@ export default function ActivityRow({
     const { icon: Icon, iconClassName } = glyph(activity.payload);
     const actor = actor_of(activity);
     const at = new Date(activity.createdAt);
-    const railSpan = railClass(rail.above, rail.below);
     const predicate = render(activity.payload);
 
     return (
-        <li className="relative flex items-start gap-x-2.5 py-1">
-            {railSpan && (
-                <span aria-hidden className={cn("absolute left-[10.5px] w-px bg-edge", railSpan)} />
-            )}
+        <div className="relative flex items-start gap-x-2.5 py-1">
+            {rail.above && <span aria-hidden className={cn(RAIL_CLASS, "top-0 h-1.5")} />}
+            {rail.below && <span aria-hidden className={cn(RAIL_CLASS, "top-7 bottom-0")} />}
             <span
                 aria-hidden
                 className={cn(
-                    "relative z-10 mt-0.5 flex size-[22px] shrink-0 items-center justify-center rounded-full bg-snow/4",
+                    "relative z-10 mt-0.5 flex size-[22px] shrink-0 items-center justify-center rounded-full bg-",
                     iconClassName,
                 )}
             >
-                <Icon className="size-4" />
+                <Icon className="size-3.5" />
             </span>
             <p className="min-w-0 flex-1 text-[13px] leading-[22px] wrap-anywhere text-neutral-500">
                 <ActorAvatar actor={actor} className="mr-1.5 -mt-px align-middle" />
@@ -135,6 +127,6 @@ export default function ActivityRow({
                     {formatRelativeTime(at)}
                 </time>
             </p>
-        </li>
+        </div>
     );
 }

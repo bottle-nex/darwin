@@ -3,6 +3,10 @@ import z from "zod";
 import ResponseWriter from "../../services/service.response";
 import { prisma } from "@trymatcha/database";
 import IssueService, { BULK_ISSUE_LIMIT, ISSUE_PATCH_SCHEMA } from "../../services/service.issue";
+import BoardIssueService, {
+    type BoardIssueRow,
+    type IssueLane,
+} from "../../services/service.board-issues";
 
 export default class IssueBulkUpdateController {
     static body_schema = ISSUE_PATCH_SCHEMA.omit({ tag_ids: true, assignee_ids: true }).extend({
@@ -45,19 +49,29 @@ export default class IssueBulkUpdateController {
 
         try {
             const updated: string[] = [];
+            const changes: {
+                issue: BoardIssueRow;
+                beforeLane: IssueLane;
+                afterLane: IssueLane;
+            }[] = [];
             const failed: string[] = [];
 
             const memberships = await prisma.issue.findMany({
                 where: { id: { in: issue_ids } },
                 select: {
                     id: true,
+                    status: true,
+                    customColumnId: true,
                     tags: { select: { id: true } },
                     assignees: { select: { id: true } },
                 },
             });
+            const memberships_by_id = new Map(
+                memberships.map((membership) => [membership.id, membership]),
+            );
 
             for (const id of issue_ids) {
-                const current = memberships.find((issue) => issue.id === id);
+                const current = memberships_by_id.get(id);
                 if (!current) {
                     failed.push(id);
                     continue;
@@ -76,8 +90,14 @@ export default class IssueBulkUpdateController {
                         remove_assignee_ids,
                     ),
                 });
-                if (result.ok) updated.push(id);
-                else failed.push(id);
+                if (result.ok) {
+                    updated.push(id);
+                    changes.push({
+                        issue: result.issue,
+                        beforeLane: BoardIssueService.issue_lane(current),
+                        afterLane: BoardIssueService.issue_lane(result.issue),
+                    });
+                } else failed.push(id);
             }
 
             if (!updated.length) {
@@ -87,7 +107,7 @@ export default class IssueBulkUpdateController {
 
             ResponseWriter.success(
                 res,
-                { updated, failed },
+                { updated, failed, changes },
                 `Updated ${updated.length} ${updated.length === 1 ? "issue" : "issues"}`,
             );
         } catch (error) {

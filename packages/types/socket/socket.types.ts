@@ -33,6 +33,7 @@ export type InboundSocketMessage =
               issueId: string;
               message: string;
               repliedToId?: string;
+              operationId: string;
           };
       }
     | {
@@ -50,6 +51,7 @@ export type InboundSocketMessage =
           payload: {
               message: string;
               repliedToId?: string;
+              operationId: string;
           };
       }
     | {
@@ -64,7 +66,7 @@ export type InboundSocketMessage =
       }
     | {
           type: InboundSocketMessageType.TEAM_CHAT_CREATE;
-          payload: { teamId: string; message: string; repliedToId?: string };
+          payload: { teamId: string; message: string; repliedToId?: string; operationId: string };
       }
     | {
           type: InboundSocketMessageType.TEAM_CHAT_DELETE;
@@ -103,11 +105,13 @@ export type OutboundSocketMessage =
           type: OutboundSocketMessageType.ISSUE_UPDATED;
           projectId: string;
           payload: Issue;
+          previous: Pick<Issue, "status" | "customColumnId">;
       }
     | {
           type: OutboundSocketMessageType.CHAT_CREATED;
           projectId: string;
           payload: Chat;
+          operationId: string;
       }
     | {
           type: OutboundSocketMessageType.CHAT_ERROR;
@@ -133,6 +137,7 @@ export type OutboundSocketMessage =
           type: OutboundSocketMessageType.PROJECT_CHAT_CREATED;
           projectId: string;
           payload: ProjectChat;
+          operationId: string;
       }
     | {
           type: OutboundSocketMessageType.PROJECT_CHAT_DELETED;
@@ -154,6 +159,7 @@ export type OutboundSocketMessage =
           projectId: string;
           teamId: string;
           payload: TeamChat;
+          operationId: string;
       }
     | {
           type: OutboundSocketMessageType.TEAM_CHAT_DELETED;

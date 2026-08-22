@@ -1,5 +1,5 @@
 import type { Assignee, Priority } from "@/types/kanban";
-import type { BoardTag } from "@/types/board";
+import type { BoardIssue, BoardTag } from "@/types/board";
 
 /**
  * The Custom Kanban is a Trello-style board the user builds by hand: free-form
@@ -14,6 +14,7 @@ import type { BoardTag } from "@/types/board";
  */
 export type CustomCard = {
     id: string;
+    boardIssue?: BoardIssue;
     number?: number;
     title: string;
     tags: BoardTag[];

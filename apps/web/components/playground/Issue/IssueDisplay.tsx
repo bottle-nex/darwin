@@ -1,6 +1,8 @@
 "use client";
+import { isAxiosError } from "axios";
+import { useIssue } from "@/hooks/issues/useIssue";
+import { useBoardColumns } from "@/hooks/issues/useBoardColumns";
 import { useActiveProject } from "@/hooks/useActiveProject";
-import { useBoard } from "@/hooks/issues/useBoard";
 import { useEscapeExit } from "@/hooks/shortcuts/useEscapeExit";
 import { Button } from "@/components/ui/button";
 import LogoLoader from "@/components/app/LogoLoader";
@@ -12,16 +14,15 @@ import IssueDisplayPane from "./IssueDisplayPane";
 
 export default function IssueDisplay({ issueId }: { issueId: string }) {
     const projectId = useActiveProject()?.id;
-    const { data: board } = useBoard(projectId);
+    const { data: issue, isPending, isError, error, refetch } = useIssue(projectId, issueId);
+    const { data: metadata } = useBoardColumns(projectId);
     const { close } = useIssueNavigation();
-
-    const issue = board?.issues.find((i) => i.id === issueId);
-    const showsDetail = Boolean(board && issue);
+    const showsDetail = Boolean(issue);
 
     useEscapeExit({ enabled: !showsDetail, onExit: close });
 
-    if (board && issue) {
-        return <IssueDisplayPane key={issue.id} issue={issue} columns={board.columns} />;
+    if (issue) {
+        return <IssueDisplayPane key={issue.id} issue={issue} columns={metadata?.columns ?? []} />;
     }
 
     return (
@@ -29,8 +30,15 @@ export default function IssueDisplay({ issueId }: { issueId: string }) {
             <PaneLeadSlot>
                 <PlaygroundBreadcrumb />
             </PaneLeadSlot>
-            {!board ? (
+            {isPending ? (
                 <LogoLoader className="h-full w-full text-snow" />
+            ) : isError && !(isAxiosError(error) && error.response?.status === 404) ? (
+                <div className="flex flex-1 flex-col items-center justify-center gap-y-3">
+                    <p className="text-[13px] text-neutral-500">This issue could not be loaded.</p>
+                    <Button size="xs" variant="tertiary" onClick={() => void refetch()}>
+                        Retry
+                    </Button>
+                </div>
             ) : (
                 <div className="flex flex-1 flex-col items-center justify-center gap-y-3">
                     <p className="text-[13px] text-neutral-500">This issue no longer exists.</p>

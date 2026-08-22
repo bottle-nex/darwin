@@ -22,6 +22,7 @@ export default class TeamChatSocketHandler {
         teamId: z.string().min(1),
         message: z.string().trim().min(1).max(5000),
         repliedToId: z.string().min(1).optional(),
+        operationId: z.string().uuid(),
     });
 
     static delete_payload_schema = z.object({
@@ -181,10 +182,14 @@ export default class TeamChatSocketHandler {
     ) {
         const parsed = TeamChatSocketHandler.payload_schema.safeParse(raw_payload);
         if (!parsed.success) {
-            TeamChatSocketHandler.send_error(ws, "Invalid chat data provided");
+            TeamChatSocketHandler.send_error(
+                ws,
+                "Invalid chat data provided",
+                pending_operation_id(raw_payload),
+            );
             return;
         }
-        const { teamId, message, repliedToId } = parsed.data;
+        const { teamId, message, repliedToId, operationId } = parsed.data;
 
         try {
             const context = await TeamChatSocketHandler.team_context(teamId, user.id);
@@ -193,7 +198,11 @@ export default class TeamChatSocketHandler {
                 context.projectId !== project_id ||
                 !Permissions.team(context.role, Action.team.read)
             ) {
-                TeamChatSocketHandler.send_error(ws, "You dont have access to this team");
+                TeamChatSocketHandler.send_error(
+                    ws,
+                    "You dont have access to this team",
+                    operationId,
+                );
                 return;
             }
 
@@ -203,14 +212,14 @@ export default class TeamChatSocketHandler {
                     select: { teamId: true },
                 });
                 if (!replied_to || replied_to.teamId !== teamId) {
-                    TeamChatSocketHandler.send_error(ws, "Replied message not found");
+                    TeamChatSocketHandler.send_error(ws, "Replied message not found", operationId);
                     return;
                 }
             }
 
             const resolved = await MessageReferenceService.resolve(message, project_id, teamId);
             if (!resolved.message) {
-                TeamChatSocketHandler.send_error(ws, "Message is empty");
+                TeamChatSocketHandler.send_error(ws, "Message is empty", operationId);
                 return;
             }
 
@@ -235,6 +244,7 @@ export default class TeamChatSocketHandler {
                     projectId: project_id,
                     teamId,
                     payload: { ...chat, reactions: [] },
+                    operationId,
                 }),
             );
 
@@ -276,7 +286,7 @@ export default class TeamChatSocketHandler {
             );
         } catch (error) {
             console.error("TeamChatSocketHandler error: ", error);
-            TeamChatSocketHandler.send_error(ws, "Something went wrong");
+            TeamChatSocketHandler.send_error(ws, "Something went wrong", operationId);
         }
     }
 

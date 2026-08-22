@@ -12,9 +12,7 @@ import {
     type ReactionSummary,
 } from "@trymatcha/types";
 import { send_socket_message } from "@/hooks/socket/useWebSocket";
-import { CHATS_QUERY_KEY } from "./useChats";
-import { PROJECT_CHATS_QUERY_KEY } from "./useProjectChat";
-import { TEAM_CHATS_QUERY_KEY } from "./useTeamChat";
+import { updateChatReactions } from "./chatCache";
 
 type ReactionEvent = {
     chatId: string;
@@ -77,9 +75,7 @@ function set_chat_reactions(
     chatId: string,
     reactions: ReactionSummary[],
 ) {
-    queryClient.setQueryData<Chat[]>([...CHATS_QUERY_KEY, issueId], (previous) =>
-        previous?.map((chat) => (chat.id === chatId ? { ...chat, reactions } : chat)),
-    );
+    updateChatReactions<Chat>(queryClient, "issue", issueId, chatId, () => reactions);
 }
 
 function set_project_chat_reactions(
@@ -88,9 +84,7 @@ function set_project_chat_reactions(
     chatId: string,
     reactions: ReactionSummary[],
 ) {
-    queryClient.setQueryData<ProjectChat[]>([...PROJECT_CHATS_QUERY_KEY, projectId], (previous) =>
-        previous?.map((chat) => (chat.id === chatId ? { ...chat, reactions } : chat)),
-    );
+    updateChatReactions<ProjectChat>(queryClient, "project", projectId, chatId, () => reactions);
 }
 
 function set_team_chat_reactions(
@@ -99,9 +93,7 @@ function set_team_chat_reactions(
     chatId: string,
     reactions: ReactionSummary[],
 ) {
-    queryClient.setQueryData<TeamChat[]>([...TEAM_CHATS_QUERY_KEY, teamId], (previous) =>
-        previous?.map((chat) => (chat.id === chatId ? { ...chat, reactions } : chat)),
-    );
+    updateChatReactions<TeamChat>(queryClient, "team", teamId, chatId, () => reactions);
 }
 
 function set_reactions(pending: PendingReaction, reactions: ReactionSummary[]) {
@@ -192,26 +184,19 @@ export function reconcile_chat_reaction(
     event: ReactionEvent,
     viewerId?: string,
 ) {
-    queryClient.setQueryData<Chat[]>([...CHATS_QUERY_KEY, issueId], (previous) =>
-        previous?.map((chat) => {
-            if (chat.id !== event.chatId) return chat;
-            const existing = chat.reactions ?? [];
-            return {
-                ...chat,
-                reactions: apply_reaction_updates(
-                    existing,
-                    event.updates.map((update) => ({
-                        emoji: update.emoji,
-                        count: update.count,
-                        reactedByViewer:
-                            event.actorId === viewerId
-                                ? update.actorReacted
-                                : (existing.find((reaction) => reaction.emoji === update.emoji)
-                                      ?.reactedByViewer ?? false),
-                    })),
-                ),
-            };
-        }),
+    updateChatReactions<Chat>(queryClient, "issue", issueId, event.chatId, (existing) =>
+        apply_reaction_updates(
+            existing,
+            event.updates.map((update) => ({
+                emoji: update.emoji,
+                count: update.count,
+                reactedByViewer:
+                    event.actorId === viewerId
+                        ? update.actorReacted
+                        : (existing.find((reaction) => reaction.emoji === update.emoji)
+                              ?.reactedByViewer ?? false),
+            })),
+        ),
     );
     settle_reaction(event.operationId);
 }
@@ -222,26 +207,19 @@ export function reconcile_project_chat_reaction(
     event: ReactionEvent,
     viewerId?: string,
 ) {
-    queryClient.setQueryData<ProjectChat[]>([...PROJECT_CHATS_QUERY_KEY, projectId], (previous) =>
-        previous?.map((chat) => {
-            if (chat.id !== event.chatId) return chat;
-            const existing = chat.reactions ?? [];
-            return {
-                ...chat,
-                reactions: apply_reaction_updates(
-                    existing,
-                    event.updates.map((update) => ({
-                        emoji: update.emoji,
-                        count: update.count,
-                        reactedByViewer:
-                            event.actorId === viewerId
-                                ? update.actorReacted
-                                : (existing.find((reaction) => reaction.emoji === update.emoji)
-                                      ?.reactedByViewer ?? false),
-                    })),
-                ),
-            };
-        }),
+    updateChatReactions<ProjectChat>(queryClient, "project", projectId, event.chatId, (existing) =>
+        apply_reaction_updates(
+            existing,
+            event.updates.map((update) => ({
+                emoji: update.emoji,
+                count: update.count,
+                reactedByViewer:
+                    event.actorId === viewerId
+                        ? update.actorReacted
+                        : (existing.find((reaction) => reaction.emoji === update.emoji)
+                              ?.reactedByViewer ?? false),
+            })),
+        ),
     );
     settle_reaction(event.operationId);
 }
@@ -252,26 +230,19 @@ export function reconcile_team_chat_reaction(
     event: ReactionEvent,
     viewerId?: string,
 ) {
-    queryClient.setQueryData<TeamChat[]>([...TEAM_CHATS_QUERY_KEY, teamId], (previous) =>
-        previous?.map((chat) => {
-            if (chat.id !== event.chatId) return chat;
-            const existing = chat.reactions ?? [];
-            return {
-                ...chat,
-                reactions: apply_reaction_updates(
-                    existing,
-                    event.updates.map((update) => ({
-                        emoji: update.emoji,
-                        count: update.count,
-                        reactedByViewer:
-                            event.actorId === viewerId
-                                ? update.actorReacted
-                                : (existing.find((reaction) => reaction.emoji === update.emoji)
-                                      ?.reactedByViewer ?? false),
-                    })),
-                ),
-            };
-        }),
+    updateChatReactions<TeamChat>(queryClient, "team", teamId, event.chatId, (existing) =>
+        apply_reaction_updates(
+            existing,
+            event.updates.map((update) => ({
+                emoji: update.emoji,
+                count: update.count,
+                reactedByViewer:
+                    event.actorId === viewerId
+                        ? update.actorReacted
+                        : (existing.find((reaction) => reaction.emoji === update.emoji)
+                              ?.reactedByViewer ?? false),
+            })),
+        ),
     );
     settle_reaction(event.operationId);
 }
@@ -280,52 +251,28 @@ export function rollback_reaction(operationId: string) {
     const pending = settle_reaction(operationId);
     if (!pending) return;
     if (pending.kind === "chat") {
-        pending.queryClient.setQueryData<Chat[]>(
-            [...CHATS_QUERY_KEY, pending.conversationId],
-            (previous) =>
-                previous?.map((chat) =>
-                    chat.id === pending.chatId
-                        ? {
-                              ...chat,
-                              reactions: apply_reaction_deltas(
-                                  chat.reactions ?? [],
-                                  pending.rollback,
-                              ),
-                          }
-                        : chat,
-                ),
+        updateChatReactions<Chat>(
+            pending.queryClient,
+            "issue",
+            pending.conversationId,
+            pending.chatId,
+            (reactions) => apply_reaction_deltas(reactions, pending.rollback),
         );
     } else if (pending.kind === "project") {
-        pending.queryClient.setQueryData<ProjectChat[]>(
-            [...PROJECT_CHATS_QUERY_KEY, pending.conversationId],
-            (previous) =>
-                previous?.map((chat) =>
-                    chat.id === pending.chatId
-                        ? {
-                              ...chat,
-                              reactions: apply_reaction_deltas(
-                                  chat.reactions ?? [],
-                                  pending.rollback,
-                              ),
-                          }
-                        : chat,
-                ),
+        updateChatReactions<ProjectChat>(
+            pending.queryClient,
+            "project",
+            pending.conversationId,
+            pending.chatId,
+            (reactions) => apply_reaction_deltas(reactions, pending.rollback),
         );
     } else {
-        pending.queryClient.setQueryData<TeamChat[]>(
-            [...TEAM_CHATS_QUERY_KEY, pending.conversationId],
-            (previous) =>
-                previous?.map((chat) =>
-                    chat.id === pending.chatId
-                        ? {
-                              ...chat,
-                              reactions: apply_reaction_deltas(
-                                  chat.reactions ?? [],
-                                  pending.rollback,
-                              ),
-                          }
-                        : chat,
-                ),
+        updateChatReactions<TeamChat>(
+            pending.queryClient,
+            "team",
+            pending.conversationId,
+            pending.chatId,
+            (reactions) => apply_reaction_deltas(reactions, pending.rollback),
         );
     }
 }

@@ -1,5 +1,6 @@
 "use client";
 import { useRef } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import {
     type DragEndEvent,
     type DragOverEvent,
@@ -19,17 +20,23 @@ import {
     findCardInColumns,
     useCustomKanbanStore,
 } from "@/store/kanban/useCustomKanbanStore";
+import type { BoardState } from "@/types/kanban";
+import type { CustomColumn } from "@/types/kanban-custom";
+import { moveBoardIssueCaches, reconcileBoardProject } from "@/hooks/issues/boardCache";
 
-export function useCustomKanbanDnd() {
+export function useCustomKanbanDnd(board: BoardState, sourceColumns: CustomColumn[]) {
     const projectId = useActiveProject()?.id;
     const updateIssue = useUpdateIssue();
     const reorderColumns = useReorderColumns();
+    const queryClient = useQueryClient();
 
     const dragOriginColumn = useRef<string | null>(null);
 
     const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
 
     function onDragStart(event: DragStartEvent) {
+        useKanbanBoardStore.getState().beginOverlay(board);
+        useCustomKanbanStore.getState().beginOverlay(sourceColumns);
         const id = String(event.active.id);
         const columns = useCustomKanbanStore.getState().columns;
 
@@ -67,7 +74,7 @@ export function useCustomKanbanDnd() {
         useCustomKanbanStore.getState().moveCardBetweenColumns(activeId, from, to, overId);
     }
 
-    function onDragEnd(event: DragEndEvent) {
+    function completeDrag(event: DragEndEvent) {
         useCustomKanbanStore.getState().setActiveItem(null);
         const { active, over } = event;
         if (!over) return;
@@ -95,6 +102,9 @@ export function useCustomKanbanDnd() {
                 toCustomColumn,
                 {
                     id: activeId,
+                    boardIssue: issue.boardIssue
+                        ? { ...issue.boardIssue, customColumnId: toCustomColumn }
+                        : undefined,
                     title: issue.title,
                     tags: issue.tags,
                     priority: issue.priority,
@@ -122,11 +132,33 @@ export function useCustomKanbanDnd() {
         }
     }
 
+    function clearDrag() {
+        useKanbanBoardStore.getState().clearOverlay();
+        useCustomKanbanStore.getState().clearOverlay();
+        dragOriginColumn.current = null;
+    }
+
+    function onDragEnd(event: DragEndEvent) {
+        try {
+            completeDrag(event);
+        } finally {
+            clearDrag();
+        }
+    }
+
+    function onDragCancel() {
+        clearDrag();
+    }
+
     function persistMove(cardId: string, columnId: string | null) {
         if (!projectId) return;
+        moveBoardIssueCaches(queryClient, projectId, cardId, columnId);
         updateIssue
             .mutateAsync({ id: cardId, project_id: projectId, custom_column_id: columnId })
-            .catch(() => toast.error("Couldn't move the issue."));
+            .catch(() => {
+                reconcileBoardProject(queryClient, projectId);
+                toast.error("Couldn't move the issue.");
+            });
     }
 
     function persistColumnOrder() {
@@ -137,5 +169,5 @@ export function useCustomKanbanDnd() {
             .catch(() => toast.error("Couldn't save the new column order."));
     }
 
-    return { sensors, onDragStart, onDragOver, onDragEnd };
+    return { sensors, onDragStart, onDragOver, onDragEnd, onDragCancel };
 }

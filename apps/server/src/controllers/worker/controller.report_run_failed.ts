@@ -50,55 +50,61 @@ export default class ReportRunFailed {
                 return;
             }
 
-            const { session, updated_issue, activities } = await prisma.$transaction(async (tx) => {
-                const before = await tx.issue.findUniqueOrThrow({
-                    where: { id: data.issue_id },
-                    select: { status: true, customColumn: { select: { id: true, label: true } } },
-                });
-
-                const session = await tx.agentSession.update({
-                    where: { id: data.run_id },
-                    data: {
-                        status: AgentSessionStatus.Failed,
-                        error: data.reason,
-                        stats: AgentSessionService.to_stats(data.stats),
-                        cost: AgentSessionService.to_cost(data.cost),
-                        endedAt: new Date(),
-                    },
-                });
-
-                const updated_issue = await tx.issue.update({
-                    where: { id: data.issue_id },
-                    data: { status: IssueStatus.Failed },
-                    include: { creator: true, assignees: true, tags: true },
-                });
-
-                const activities = await ActivityService.emit(tx, {
-                    issueId: data.issue_id,
-                    actor: { type: ActorType.Agent, workerId: worker_id },
-                    sessionId: session.id,
-                    events: [
-                        {
-                            type: ActivityType.AttemptFailed,
-                            payload: {
-                                attemptNumber: session.attemptNumber,
-                                reason: data.reason,
-                            },
-                            dedupeKey: `run:${session.id}:failed`,
+            const { before, session, updated_issue, activities } = await prisma.$transaction(
+                async (tx) => {
+                    const before = await tx.issue.findUniqueOrThrow({
+                        where: { id: data.issue_id },
+                        select: {
+                            status: true,
+                            customColumnId: true,
+                            customColumn: { select: { id: true, label: true } },
                         },
-                        {
-                            type: ActivityType.StatusChanged,
-                            payload: {
-                                from: location_of(before.status, before.customColumn),
-                                to: { kind: "status", status: IssueStatus.Failed },
-                            },
-                            dedupeKey: `run:${session.id}:status-failed`,
-                        },
-                    ],
-                });
+                    });
 
-                return { session, updated_issue, activities };
-            });
+                    const session = await tx.agentSession.update({
+                        where: { id: data.run_id },
+                        data: {
+                            status: AgentSessionStatus.Failed,
+                            error: data.reason,
+                            stats: AgentSessionService.to_stats(data.stats),
+                            cost: AgentSessionService.to_cost(data.cost),
+                            endedAt: new Date(),
+                        },
+                    });
+
+                    const updated_issue = await tx.issue.update({
+                        where: { id: data.issue_id },
+                        data: { status: IssueStatus.Failed },
+                        include: { creator: true, assignees: true, tags: true },
+                    });
+
+                    const activities = await ActivityService.emit(tx, {
+                        issueId: data.issue_id,
+                        actor: { type: ActorType.Agent, workerId: worker_id },
+                        sessionId: session.id,
+                        events: [
+                            {
+                                type: ActivityType.AttemptFailed,
+                                payload: {
+                                    attemptNumber: session.attemptNumber,
+                                    reason: data.reason,
+                                },
+                                dedupeKey: `run:${session.id}:failed`,
+                            },
+                            {
+                                type: ActivityType.StatusChanged,
+                                payload: {
+                                    from: location_of(before.status, before.customColumn),
+                                    to: { kind: "status", status: IssueStatus.Failed },
+                                },
+                                dedupeKey: `run:${session.id}:status-failed`,
+                            },
+                        ],
+                    });
+
+                    return { before, session, updated_issue, activities };
+                },
+            );
 
             const project_id = existing.issue.projectId;
             await server_services.publisher.publish_message(
@@ -107,6 +113,10 @@ export default class ReportRunFailed {
                     type: OutboundSocketMessageType.ISSUE_UPDATED,
                     projectId: project_id,
                     payload: updated_issue,
+                    previous: {
+                        status: before.status,
+                        customColumnId: before.customColumnId,
+                    },
                 }),
             );
             await ActivityService.publish(project_id, data.issue_id, activities);

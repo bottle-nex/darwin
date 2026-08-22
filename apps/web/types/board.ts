@@ -1,4 +1,5 @@
-import type { IssueStatus } from "@trymatcha/types";
+import type { CursorPage, IssueStatus } from "@trymatcha/types";
+import type { BoardFilters } from "@/types/boardFilter";
 
 /**
  * Shapes returned by `GET /issues/board/:project_id`. These mirror the server's
@@ -53,4 +54,25 @@ export type BoardColumn = {
 export type BoardResponse = {
     columns: BoardColumn[];
     issues: BoardIssue[];
+};
+
+export type BoardLaneSelector =
+    { type: "system"; status: ServerIssueStatus } | { type: "custom"; columnId: string };
+
+export type BoardLane =
+    { type: "system"; status: ServerIssueStatus } | { type: "custom"; columnId: string };
+
+export type BoardMetadata = {
+    columns: BoardColumn[];
+    totals: {
+        system: Partial<Record<ServerIssueStatus, number>>;
+        custom: Record<string, number>;
+    };
+};
+
+export type BoardIssuePage = CursorPage<BoardIssue>;
+
+export type BoardSearchKey = {
+    filters: BoardFilters;
+    snapshot: string;
 };
