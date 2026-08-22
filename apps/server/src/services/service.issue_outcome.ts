@@ -17,6 +17,7 @@ export class IssueOutcomeConflict extends Error {}
 export default class IssueOutcomeService {
     static async pr_opened(data: PrOpened): Promise<void> {
         const issue = await this.owned_issue(data.issueId, data.workerId);
+        console.log("recieeeeewed the event ::::::::::::: ");
         if (issue.prBranch !== data.branch) {
             throw new IssueOutcomeConflict("PR branch does not match the expected issue branch");
         }
@@ -70,10 +71,16 @@ export default class IssueOutcomeService {
             });
         });
 
+        console.log("completion : ", completion);
+
         await this.broadcast(completion);
 
         try {
-            await ProductDiffService.prepare(data.issueId);
+            const product_diff = await ProductDiffService.prepare(data.issueId);
+            console.log("product diff : ", product_diff);
+            if (product_diff) {
+                await server_services.queue.enqueue_product_diff(product_diff.id);
+            }
         } catch (error) {
             console.error("product diff preparation failed", error);
         }

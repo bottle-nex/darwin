@@ -132,12 +132,13 @@ export default class E2B {
         }
     }
 
-    public static async run_worker_loop(worker_id: string): Promise<string[]> {
+    public static async run_worker_loop(worker_id: string): Promise<void> {
         const log = Logger.scope(`vm:${worker_id.slice(-8)}`);
         const worker = await prisma.worker.findUniqueOrThrow({
             where: { id: worker_id },
             include: { project: { include: { githubInstallation: true } } },
         });
+        console.log("worker is 1 : ", worker);
 
         const { project } = worker;
         if (
@@ -151,11 +152,12 @@ export default class E2B {
                 undefined,
                 { worker: worker_id, project: project.id },
             );
-            await prisma.worker.update({
+            const worker = await prisma.worker.update({
                 where: { id: worker_id },
                 data: { status: WorkerStatus.Dead },
             });
-            return [];
+            console.log("worker is 2 : ", worker);
+            return;
         }
 
         const repo_url = project.githubRepoUrl;
@@ -167,7 +169,6 @@ export default class E2B {
         this.validate_branch(branch);
 
         let sandbox_id = worker.sandboxId;
-        let pending_product_diff_ids: string[] = [];
         let teardown_succeeded = false;
         log.step("worker loop starting", { worker: worker_id, project: project.id, branch });
 
@@ -176,10 +177,11 @@ export default class E2B {
                 log.info("no live sandbox — creating one");
                 sandbox_id = await E2B.create(WORKER_SANDBOX_TIMEOUT_MS);
                 log.info("sandbox created", { sandbox: sandbox_id });
-                await prisma.worker.update({
+                const worker = await prisma.worker.update({
                     where: { id: worker_id },
                     data: { sandboxId: sandbox_id },
                 });
+                console.log("worker is 3 : ", worker);
 
                 log.info("cloning repo into sandbox", { repo: repo_url });
                 await E2B.clone_repo(
@@ -225,10 +227,12 @@ export default class E2B {
             );
 
             log.info("worker marked Busy");
-            await prisma.worker.update({
+            const worker = await prisma.worker.update({
                 where: { id: worker_id },
                 data: { status: WorkerStatus.Busy },
             });
+
+            console.log("worker is 4 : ", worker);
 
             const model = ENV.SERVER_SOLVE_MODEL;
             const effort = ENV.SERVER_SOLVE_EFFORT;
@@ -248,11 +252,15 @@ export default class E2B {
                     issue.prBranch,
                     branch,
                 );
+
+                console.log("existing_pull", existing_pull);
                 const already_pushed = await E2B.prepare_issue_branch(
                     sandbox,
                     issue.prBranch,
                     branch,
                 );
+
+                console.log("already_pushed", already_pushed);
 
                 // Minted after the claim lands, and used as the AgentSession id so a
                 // retried report is an upsert rather than a second attempt row. A resumed
@@ -330,10 +338,12 @@ export default class E2B {
                     log.block("final message from claude", report.result ?? "(empty)");
                 }
 
-                await prisma.issue.update({
+                const agentDoneIssue = await prisma.issue.update({
                     where: { id: issue.id },
                     data: { agentDoneAt: new Date() },
                 });
+
+                console.log("agentDoneIssue", agentDoneIssue);
 
                 let pull_request: PullRequestSummary;
                 try {
@@ -347,6 +357,7 @@ export default class E2B {
                             issue,
                             branch,
                         ));
+                    console.log("pull request : ", pull_request);
                 } catch (error) {
                     await OutcomeReporter.publish({
                         kind: "failed",
@@ -358,10 +369,12 @@ export default class E2B {
                     throw error;
                 }
 
-                await prisma.issue.update({
+                const issueWithPr = await prisma.issue.update({
                     where: { id: issue.id },
                     data: { prUrl: pull_request.htmlUrl },
                 });
+
+                console.log("issueWithPr", issueWithPr);
 
                 log.info(`PR ready for issue #${issue.number}`, { pull: pull_request.number });
                 await OutcomeReporter.publish({
@@ -399,19 +412,6 @@ export default class E2B {
                 log.error("could not mark worker Dead", e, { worker: worker_id });
             }
         } finally {
-            try {
-                const pending_product_diffs = await prisma.productDiff.findMany({
-                    where: {
-                        status: "Pending",
-                        issue: { assignerWorkerId: worker_id },
-                    },
-                    select: { id: true },
-                });
-                pending_product_diff_ids = pending_product_diffs.map(({ id }) => id);
-            } catch (e) {
-                log.error("could not collect pending product diffs", e, { worker: worker_id });
-            }
-
             if (sandbox_id) {
                 log.info("tearing down sandbox", { sandbox: sandbox_id });
                 try {
@@ -435,18 +435,7 @@ export default class E2B {
             } else {
                 teardown_succeeded = true;
             }
-
-            if (!teardown_succeeded) {
-                await prisma.productDiff.updateMany({
-                    where: { id: { in: pending_product_diff_ids }, status: "Pending" },
-                    data: {
-                        status: "Failed",
-                        error: "Coding sandbox teardown failed; Product Diff was not started",
-                    },
-                });
-            }
         }
-        return teardown_succeeded ? pending_product_diff_ids : [];
     }
 
     private static build_issue_prompt(

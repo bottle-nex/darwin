@@ -229,7 +229,7 @@ export function scaffold(input: ScaffoldInput): ScaffoldOutput {
         routeFiles.push(to_posix(relative(workspaceRoot, pageFile)));
     } else {
         const pagesRoot = usePagesEscape
-            ? join(appAbsoluteDir, "pages")
+            ? join(workspaceRoot, dirname(detected.routeDir), "pages")
             : join(workspaceRoot, detected.routeDir);
         const routeDir = join(pagesRoot, PREVIEW_ROUTE_SEGMENT);
         const pageFile = join(routeDir, "[targetId].tsx");

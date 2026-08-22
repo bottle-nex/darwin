@@ -1,8 +1,8 @@
 import type Logger from "@trymatcha/logger";
-import type { Sandbox } from "e2b";
+import type { CommandHandle, Sandbox } from "e2b";
 
-const READY_POLL_MS = 2_000;
 const READY_TIMEOUT_MS = 4 * 60_000;
+const READY_GRACE_MS = 30_000;
 const LOG_TAIL_LINES = 20;
 const PROBE_PATH = "/matcha-preview/matcha-probe";
 
@@ -17,6 +17,7 @@ export interface PreviewServerHandle {
     url: string;
     logPath: string;
     port: number;
+    process: CommandHandle;
 }
 
 function app_directory(options: PreviewServerOptions): string {
@@ -54,12 +55,12 @@ export default class PreviewServer {
             throw new Error(`the ${options.label} revision has no installed next binary`);
         }
 
-        await sandbox.commands.run(
-            `cd ${appDir} && nohup ${nextBinary} dev --hostname 127.0.0.1 --port ${options.port} > ${logPath} 2>&1 &`,
+        const process = await sandbox.commands.run(
+            `cd ${appDir} && ${nextBinary} dev --hostname 127.0.0.1 --port ${options.port} > ${logPath} 2>&1`,
             { background: true, envs },
         );
 
-        return { url: `http://127.0.0.1:${options.port}`, logPath, port: options.port };
+        return { url: `http://127.0.0.1:${options.port}`, logPath, port: options.port, process };
     }
 
     /**
@@ -78,19 +79,15 @@ export default class PreviewServer {
         server: PreviewServerHandle,
         log: Logger,
     ): Promise<boolean> {
-        const deadline = Date.now() + READY_TIMEOUT_MS;
+        const seconds = Math.floor(READY_TIMEOUT_MS / 1000);
+        const probe = `curl -sf -o /dev/null --max-time 10 ${server.url}${PROBE_PATH}`;
+        const waited = await sandbox.commands
+            .run(`timeout ${seconds} bash -c 'until ${probe}; do sleep 1; done'`, {
+                timeoutMs: READY_TIMEOUT_MS + READY_GRACE_MS,
+            })
+            .catch(() => null);
 
-        while (Date.now() < deadline) {
-            const probe = await sandbox.commands
-                .run(
-                    `curl -s -o /dev/null -w '%{http_code}' --max-time 10 ${server.url}${PROBE_PATH}`,
-                    { timeoutMs: 20_000 },
-                )
-                .catch(() => null);
-
-            if (probe && probe.stdout.trim() === "200") return true;
-            await new Promise((resolve) => setTimeout(resolve, READY_POLL_MS));
-        }
+        if (waited && waited.exitCode === 0) return true;
 
         log.warn("dev server never answered the probe", { port: server.port });
         return false;
@@ -111,14 +108,16 @@ export default class PreviewServer {
     }
 
     /**
-     * Stops whatever is listening on a revision's port.
+     * Stops one revision's dev server by killing the exact process that was started.
+     *
+     * The handle returned when the server was launched is what makes this safe. Hunting for the
+     * process by matching text in command lines is how a shutdown command ends up matching itself
+     * and taking down the shell it is running in.
      *
      * @example
-     * await PreviewServer.stop(sandbox, 41337);
+     * await PreviewServer.stop(server);
      */
-    static async stop(sandbox: Sandbox, port: number): Promise<void> {
-        await sandbox.commands
-            .run(`fuser -k ${port}/tcp 2>/dev/null || pkill -f "port ${port}" || true`)
-            .catch(() => undefined);
+    static async stop(server: PreviewServerHandle): Promise<void> {
+        await server.process.kill().catch(() => undefined);
     }
 }

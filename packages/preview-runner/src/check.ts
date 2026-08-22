@@ -1,5 +1,5 @@
 import { join } from "node:path";
-import type { Browser } from "playwright";
+import type { Browser, Locator } from "playwright";
 import { open_browser, open_deterministic_context, settle_page } from "./browser";
 import {
     HARNESS_ROOT_ATTRIBUTE,
@@ -36,6 +36,17 @@ function fail(
     };
 }
 
+export async function next_error_overlay_detail(
+    portal: Pick<Locator, "evaluate">,
+): Promise<string> {
+    return portal
+        .evaluate(
+            (element) =>
+                element.shadowRoot?.textContent?.trim() || element.textContent?.trim() || "",
+        )
+        .catch(() => "");
+}
+
 async function check_one(
     browser: Browser,
     baseUrl: string,
@@ -48,6 +59,7 @@ async function check_one(
     const page = await context.newPage();
     const pageErrors: string[] = [];
     const consoleErrors: string[] = [];
+    const warnings: string[] = [];
 
     page.on("pageerror", (error) => pageErrors.push(error.stack ?? error.message));
     page.on("console", (message) => {
@@ -85,23 +97,14 @@ async function check_one(
 
         await settle_page(page, 150);
 
-        if ((await page.locator("nextjs-portal").count()) > 0) {
-            const overlay = await page
-                .locator("nextjs-portal")
-                .innerText()
-                .catch(() => "");
-            return fail(
-                targetId,
-                stateId,
-                url,
-                "NextErrorOverlay",
-                overlay || "Next.js reported an error",
-                httpStatus,
-            );
-        }
+        const portal = page.locator("nextjs-portal");
+        const overlay = (await portal.count()) > 0 ? await next_error_overlay_detail(portal) : "";
 
         const root = page.locator(`[${HARNESS_ROOT_ATTRIBUTE}]`).first();
         if ((await root.count()) === 0) {
+            if (overlay) {
+                return fail(targetId, stateId, url, "NextErrorOverlay", overlay, httpStatus);
+            }
             return fail(
                 targetId,
                 stateId,
@@ -114,6 +117,9 @@ async function check_one(
 
         const box = await root.boundingBox();
         if (!box || box.width <= 0 || box.height <= 0) {
+            if (overlay) {
+                return fail(targetId, stateId, url, "NextErrorOverlay", overlay, httpStatus);
+            }
             return fail(
                 targetId,
                 stateId,
@@ -126,18 +132,22 @@ async function check_one(
         if (pageErrors.length > 0) {
             return fail(targetId, stateId, url, "PageError", pageErrors.join("\n\n"), httpStatus);
         }
+        if (overlay) {
+            warnings.push(overlay);
+        }
         if (consoleErrors.length > 0) {
-            return fail(
-                targetId,
-                stateId,
-                url,
-                "ConsoleError",
-                consoleErrors.join("\n"),
-                httpStatus,
-            );
+            warnings.push(...consoleErrors);
         }
 
-        return { targetId, stateId, url, ok: true, httpStatus, problem: null, detail: null };
+        return {
+            targetId,
+            stateId,
+            url,
+            ok: true,
+            httpStatus,
+            problem: null,
+            detail: [...new Set(warnings)].join("\n\n") || null,
+        };
     } catch (error) {
         const message = error instanceof Error ? error.message : String(error);
         const problem: CheckProblem = message.toLowerCase().includes("timeout")
@@ -196,5 +206,10 @@ export async function check(input: CheckInput): Promise<CheckOutput> {
         await browser.close().catch(() => undefined);
     }
 
-    return { ok: results.every((result) => result.ok), results };
+    const warnings = results.flatMap((result) =>
+        result.ok && result.detail
+            ? [`${result.targetId}/${result.stateId}: ${result.detail}`]
+            : [],
+    );
+    return { ok: results.every((result) => result.ok), results, warnings };
 }

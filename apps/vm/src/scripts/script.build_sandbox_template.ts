@@ -21,6 +21,13 @@ const log = Logger.scope("template");
  */
 
 const TEMPLATE_NAME = "node-py-claude-template";
+const TEMPLATE_TAG = "stable";
+// E2B's default is 976 MB, of which roughly 700 MB is free once the box has booted. Webpack
+// compiling a real Next.js app's root layout wants more than that, so Next's own memory watchdog
+// restarts the dev server in a loop and no route ever finishes compiling. Raising this is what
+// makes Product Diff able to run a customer's app at all.
+const SANDBOX_MEMORY_MB = 4096;
+const SANDBOX_CPU_COUNT = 4;
 const REPO_ROOT = new URL("../../../../", import.meta.url).pathname;
 const DOCKERFILE = `${REPO_ROOT}docker/e2b.Dockerfile`;
 const BUNDLES: { name: string; path: string; filter: string }[] = [
@@ -60,10 +67,13 @@ async function main() {
 
     await Template.build(template, TEMPLATE_NAME, {
         apiKey: ENV.SERVER_E2B_API_KEY,
+        tags: [TEMPLATE_TAG],
+        memoryMB: SANDBOX_MEMORY_MB,
+        cpuCount: SANDBOX_CPU_COUNT,
         onBuildLogs: defaultBuildLogger(),
     });
 
-    log.success("template built", { name: TEMPLATE_NAME });
+    log.success("template built", { name: `${TEMPLATE_NAME}:${TEMPLATE_TAG}` });
     log.info("verify with: bun run src/scripts/script.verify_sandbox_template.ts");
 }
 

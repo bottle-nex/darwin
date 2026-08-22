@@ -59,7 +59,34 @@ export interface ProductDiffManifestV2 {
     warnings: string[];
 }
 
-export type ProductDiffManifest = ProductDiffManifestV1 | ProductDiffManifestV2;
+export interface ProductReviewShot {
+    stateId: string;
+    viewportId: string;
+    outcome: ProductDiffShotOutcome;
+    baseKey: string | null;
+    headKey: string | null;
+    error: string | null;
+}
+
+export interface ProductReviewTarget {
+    id: string;
+    label: string;
+    sourcePath: string;
+    outcome: ProductDiffShotOutcome;
+    states: { id: string; label: string }[];
+    shots: ProductReviewShot[];
+}
+
+export interface ProductDiffManifestV3 {
+    version: 3;
+    framework: ProductDiffFramework;
+    viewports: ProductDiffViewport[];
+    targets: ProductReviewTarget[];
+    warnings: string[];
+}
+
+export type ProductDiffManifest =
+    ProductDiffManifestV1 | ProductDiffManifestV2 | ProductDiffManifestV3;
 
 export interface ProductDiffSummary {
     id: string;
@@ -96,6 +123,18 @@ export function is_product_diff_manifest_v2(
     return manifest !== null && "version" in manifest && manifest.version === 2;
 }
 
+export function is_product_diff_manifest_v3(
+    manifest: ProductDiffManifest | null,
+): manifest is ProductDiffManifestV3 {
+    return manifest !== null && "version" in manifest && manifest.version === 3;
+}
+
+export function is_screenshot_product_review_manifest(
+    manifest: ProductDiffManifest | null,
+): manifest is ProductDiffManifestV2 | ProductDiffManifestV3 {
+    return is_product_diff_manifest_v2(manifest) || is_product_diff_manifest_v3(manifest);
+}
+
 /**
  * Collects every artifact key a manifest points at, so callers can check a requested key is real.
  *
@@ -108,11 +147,22 @@ export function is_product_diff_manifest_v2(
  */
 export function product_diff_artifact_keys(manifest: ProductDiffManifest | null): Set<string> {
     const keys = new Set<string>();
-    if (!is_product_diff_manifest_v2(manifest)) return keys;
+    if (!is_screenshot_product_review_manifest(manifest)) return keys;
+
+    if (is_product_diff_manifest_v2(manifest)) {
+        for (const target of manifest.targets) {
+            for (const shot of target.shots) {
+                for (const key of [shot.baseKey, shot.headKey, shot.diffKey]) {
+                    if (key) keys.add(key);
+                }
+            }
+        }
+        return keys;
+    }
 
     for (const target of manifest.targets) {
         for (const shot of target.shots) {
-            for (const key of [shot.baseKey, shot.headKey, shot.diffKey]) {
+            for (const key of [shot.baseKey, shot.headKey]) {
                 if (key) keys.add(key);
             }
         }

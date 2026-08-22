@@ -3,9 +3,9 @@
 import { useMemo, useState } from "react";
 import { FiExternalLink, FiGitPullRequest, FiRefreshCw } from "react-icons/fi";
 import {
-    is_product_diff_manifest_v2,
+    is_screenshot_product_review_manifest,
     type ProductDiffShot,
-    type ProductDiffViewport,
+    type ProductReviewShot,
 } from "@trymatcha/types";
 import { Button } from "@/components/ui/button";
 import { useActiveProject } from "@/hooks/useActiveProject";
@@ -23,34 +23,11 @@ const LEGACY_VIEWPORTS = {
     Mobile: "390px",
 } as const;
 
-const COMPARE_MODES = [
-    { id: "split", label: "Side by side" },
-    { id: "overlay", label: "Overlay" },
-    { id: "diff", label: "Diff only" },
-] as const;
-type CompareMode = (typeof COMPARE_MODES)[number]["id"];
-
 const OUTCOME_SUFFIX: Record<string, string> = {
     Added: " · added",
     Removed: " · removed",
     Unavailable: " · unavailable",
 };
-
-function change_tone(percentage: number | null): string {
-    if (percentage === null) return "border-white/10 bg-white/5 text-neutral-400";
-    if (percentage < 0.1) return "border-emerald-400/20 bg-emerald-400/8 text-emerald-200";
-    if (percentage < 5) return "border-amber-400/20 bg-amber-400/8 text-amber-200";
-    return "border-rose-400/20 bg-rose-400/8 text-rose-200";
-}
-
-function change_label(shot: ProductDiffShot | undefined): string {
-    if (!shot) return "no capture";
-    if (shot.outcome === "Added") return "added in this PR";
-    if (shot.outcome === "Removed") return "removed in this PR";
-    if (shot.outcome === "Unavailable") return "could not render";
-    if (shot.diffPercentage === null) return "not compared";
-    return `${shot.diffPercentage.toFixed(2)}% changed`;
-}
 
 export default function ReviewsDisplay() {
     const project = useActiveProject();
@@ -64,16 +41,12 @@ export default function ReviewsDisplay() {
 
     const [targetId, setTargetId] = useState("");
     const [stateId, setStateId] = useState("");
-    const [viewportId, setViewportId] = useState("");
-    const [mode, setMode] = useState<CompareMode>("split");
-    const [overlay, setOverlay] = useState(100);
 
     const stored = detail?.manifest ?? null;
-    const manifest = is_product_diff_manifest_v2(stored) ? stored : null;
+    const manifest = is_screenshot_product_review_manifest(stored) ? stored : null;
     const target = manifest?.targets.find((item) => item.id === targetId) ?? manifest?.targets[0];
     const state = target?.states.find((item) => item.id === stateId) ?? target?.states[0];
-    const viewport: ProductDiffViewport | undefined =
-        manifest?.viewports.find((item) => item.id === viewportId) ?? manifest?.viewports[0];
+    const viewport = manifest?.viewports[0];
     const shot = target?.shots.find(
         (item) => item.stateId === state?.id && item.viewportId === viewport?.id,
     );
@@ -81,7 +54,7 @@ export default function ReviewsDisplay() {
     const keys = useMemo(() => {
         if (!target) return [];
         return target.shots
-            .flatMap((item) => [item.baseKey, item.headKey, item.diffKey])
+            .flatMap((item) => [item.baseKey, item.headKey])
             .filter((key): key is string => key !== null);
     }, [target]);
     const { data: urls = {} } = useProductDiffArtifacts(project?.id, selected, keys);
@@ -97,7 +70,7 @@ export default function ReviewsDisplay() {
             <aside className="min-h-0 overflow-y-auto border-r border-white/7 bg-black/15 p-2">
                 <div className="px-2 py-3">
                     <p className="text-[10px] font-semibold tracking-[0.16em] text-neutral-600 uppercase">
-                        Product diffs
+                        Product reviews
                     </p>
                 </div>
                 {listPending && <p className="px-2 text-[11px] text-neutral-500">Loading…</p>}
@@ -209,49 +182,8 @@ export default function ReviewsDisplay() {
                                                 ))}
                                             </select>
                                         </label>
-                                        <label className="flex items-center gap-2 text-[11px] text-neutral-500">
-                                            Viewport
-                                            <select
-                                                className={SELECT}
-                                                value={viewport.id}
-                                                onChange={(event) =>
-                                                    setViewportId(event.target.value)
-                                                }
-                                            >
-                                                {manifest.viewports.map((item) => (
-                                                    <option key={item.id} value={item.id}>
-                                                        {item.label} · {item.width}×{item.height}
-                                                    </option>
-                                                ))}
-                                            </select>
-                                        </label>
-                                        <div className="flex overflow-hidden rounded-md border border-white/10">
-                                            {COMPARE_MODES.map((item) => (
-                                                <button
-                                                    key={item.id}
-                                                    type="button"
-                                                    onClick={() => setMode(item.id)}
-                                                    className={cn(
-                                                        "px-2.5 py-1.5 text-[11px]",
-                                                        mode === item.id
-                                                            ? "bg-primary/15 text-primary"
-                                                            : "text-neutral-400 hover:bg-white/5",
-                                                    )}
-                                                >
-                                                    {item.label}
-                                                </button>
-                                            ))}
-                                        </div>
-                                        <span
-                                            className={cn(
-                                                "rounded-full border px-2.5 py-1 text-[10px]",
-                                                change_tone(shot?.diffPercentage ?? null),
-                                            )}
-                                        >
-                                            {change_label(shot)}
-                                        </span>
-                                        <span className="ml-auto rounded-full border border-emerald-400/20 bg-emerald-400/8 px-2.5 py-1 text-[10px] text-emerald-200">
-                                            Rendered from source · {manifest.framework}
+                                        <span className="text-[11px] text-neutral-500">
+                                            Desktop · {viewport.width}×{viewport.height}
                                         </span>
                                     </div>
                                 )}
@@ -303,23 +235,12 @@ export default function ReviewsDisplay() {
                         {detail.status === "Ready" && manifest && (
                             <main className="min-h-0 flex-1 overflow-auto p-4">
                                 {shot ? (
-                                    <Triptych
-                                        shot={shot}
-                                        urls={urls}
-                                        mode={mode}
-                                        overlay={overlay}
-                                        onOverlayChange={setOverlay}
-                                    />
+                                    <ScreenshotPair shot={shot} urls={urls} />
                                 ) : (
                                     <p className="text-[11px] text-neutral-500">
                                         Nothing was captured for this combination.
                                     </p>
                                 )}
-                                {manifest.warnings.map((warning) => (
-                                    <p key={warning} className="mt-2 text-[10px] text-amber-300/80">
-                                        {warning}
-                                    </p>
-                                ))}
                             </main>
                         )}
                         {detail.status === "Ready" &&
@@ -370,75 +291,20 @@ function Shot({ title, src, absent }: { title: string; src: string | undefined; 
     );
 }
 
-function Triptych({
+function ScreenshotPair({
     shot,
     urls,
-    mode,
-    overlay,
-    onOverlayChange,
 }: {
-    shot: ProductDiffShot;
+    shot: ProductDiffShot | ProductReviewShot;
     urls: Record<string, string>;
-    mode: CompareMode;
-    overlay: number;
-    onOverlayChange: (value: number) => void;
 }) {
     const base = shot.baseKey ? urls[shot.baseKey] : undefined;
     const head = shot.headKey ? urls[shot.headKey] : undefined;
-    const diff = shot.diffKey ? urls[shot.diffKey] : undefined;
-
-    if (mode === "diff") {
-        return (
-            <Shot
-                title="What changed"
-                src={diff}
-                absent={shot.error ?? "No visual change between the two revisions."}
-            />
-        );
-    }
-
-    if (mode === "overlay") {
-        return (
-            <div className="space-y-3">
-                <div className="relative overflow-hidden rounded-lg border border-white/8 bg-neutral-900">
-                    {base && <img src={base} alt="Base" className="max-w-full" />}
-                    {head && (
-                        <img
-                            src={head}
-                            alt="Head"
-                            className="absolute inset-0 max-w-full"
-                            style={{ opacity: overlay / 100 }}
-                        />
-                    )}
-                    {!base && !head && (
-                        <p className="p-6 text-[11px] text-neutral-500">Nothing to overlay.</p>
-                    )}
-                </div>
-                <label className="flex items-center gap-3 text-[11px] text-neutral-500">
-                    Base
-                    <input
-                        type="range"
-                        min={0}
-                        max={100}
-                        value={overlay}
-                        onChange={(event) => onOverlayChange(Number(event.target.value))}
-                        className="h-1 flex-1 accent-primary"
-                    />
-                    Head
-                </label>
-            </div>
-        );
-    }
 
     return (
-        <div className="grid min-w-[720px] grid-cols-3 gap-4">
-            <Shot title="Base" src={base} absent="Added in this PR" />
-            <Shot title="Head" src={head} absent="Removed in this PR" />
-            <Shot
-                title="What changed"
-                src={diff}
-                absent={shot.error ?? "No visual change between the two revisions."}
-            />
+        <div className="grid min-w-[560px] grid-cols-2 gap-4">
+            <Shot title="Before" src={base} absent={shot.error ?? "Added in this PR"} />
+            <Shot title="After" src={head} absent={shot.error ?? "Removed in this PR"} />
         </div>
     );
 }

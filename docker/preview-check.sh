@@ -1,9 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-RUNNER=/opt/matcha/preview-runner/index.js
-PREVIEW_DIR=/home/user/preview
+RUNNER="${MATCHA_PREVIEW_RUNNER:-/opt/matcha/preview-runner/index.js}"
+PREVIEW_DIR="${MATCHA_PREVIEW_DIR:-/home/user/preview}"
 ENV_FILE="${PREVIEW_DIR}/check-env.json"
+LOG_FILE="${PREVIEW_DIR}/preview-check.log"
+TIMEOUT_SECONDS=120
+KILL_GRACE_SECONDS=10
+
+mkdir -p "${PREVIEW_DIR}"
 
 if [ "${1:-}" = "--help" ] || [ "${1:-}" = "-h" ]; then
     echo "usage: preview-check [targetId ...]"
@@ -39,7 +44,35 @@ jq -nc --arg baseUrl "${BASE_URL}" --arg root "${WORKSPACE_ROOT}" --arg appDir "
     '{baseUrl: $baseUrl, workspaceRoot: $root, nextAppDir: $appDir, navigationTimeoutMs: 45000}
      + (if $targets == null then {} else {targetIds: $targets} end)' \
     > "${PREVIEW_DIR}/check-in.json"
-node "${RUNNER}" check --input "${PREVIEW_DIR}/check-in.json" --output "${PREVIEW_DIR}/check-out.json"
+run_check() {
+    setsid bash -c 'exec node "$1" check --input "$2" --output "$3" > "$4" 2>&1' bash \
+        "${RUNNER}" "${PREVIEW_DIR}/check-in.json" "${PREVIEW_DIR}/check-out.json" "${LOG_FILE}" &
+    local check_pid=$!
+
+    (
+        sleep "${TIMEOUT_SECONDS}"
+        if kill -0 "${check_pid}" 2>/dev/null; then
+            echo "preview-check: timed out after ${TIMEOUT_SECONDS}s" >> "${LOG_FILE}"
+            kill -TERM -- "-${check_pid}" 2>/dev/null || kill -TERM "${check_pid}" 2>/dev/null || true
+            sleep "${KILL_GRACE_SECONDS}"
+            kill -KILL -- "-${check_pid}" 2>/dev/null || kill -KILL "${check_pid}" 2>/dev/null || true
+        fi
+    ) &
+    local watchdog_pid=$!
+    local status=0
+
+    if wait "${check_pid}"; then
+        status=0
+    else
+        status=$?
+    fi
+    kill "${watchdog_pid}" 2>/dev/null || true
+    wait "${watchdog_pid}" 2>/dev/null || true
+    cat "${LOG_FILE}"
+    return "${status}"
+}
+
+run_check
 
 jq -r '.results[]
     | if .ok

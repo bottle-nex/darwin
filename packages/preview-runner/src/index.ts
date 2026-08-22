@@ -1,19 +1,22 @@
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname } from "node:path";
 import { chromium } from "playwright";
+import { capture } from "./capture";
 import { check } from "./check";
 import {
+    captureInputSchema,
     checkInputSchema,
     detectInputSchema,
+    pairInputSchema,
     scaffoldInputSchema,
-    shootInputSchema,
     type DoctorOutput,
 } from "./contract";
 import { detect } from "./detect";
 import { scaffold } from "./scaffold";
-import { shoot } from "./shoot";
+import { pair } from "./pair";
 
-const COMMANDS = ["detect", "scaffold", "check", "shoot", "doctor"] as const;
+const RUNTIME_PROTOCOL_VERSION = 3;
+const COMMANDS = ["detect", "scaffold", "check", "capture", "pair", "doctor", "version"] as const;
 type Command = (typeof COMMANDS)[number];
 
 function flag(argv: string[], name: string): string | null {
@@ -45,12 +48,10 @@ async function doctor(): Promise<DoctorOutput> {
         const version = browser.version();
         await browser.close();
 
-        const odiff = await import("odiff-bin");
         return {
             ok: true,
             chromiumVersion: version,
             chromiumPath: executablePath,
-            odiff: typeof odiff.compare === "function",
             error: null,
         };
     } catch (error) {
@@ -58,7 +59,6 @@ async function doctor(): Promise<DoctorOutput> {
             ok: false,
             chromiumVersion: null,
             chromiumPath: null,
-            odiff: false,
             error: error instanceof Error ? error.message : String(error),
         };
     }
@@ -72,10 +72,14 @@ async function run(command: Command, input: unknown): Promise<unknown> {
             return scaffold(scaffoldInputSchema.parse(input));
         case "check":
             return check(checkInputSchema.parse(input));
-        case "shoot":
-            return shoot(shootInputSchema.parse(input));
+        case "capture":
+            return capture(captureInputSchema.parse(input));
+        case "pair":
+            return pair(pairInputSchema.parse(input));
         case "doctor":
             return doctor();
+        case "version":
+            return { version: RUNTIME_PROTOCOL_VERSION };
     }
 }
 

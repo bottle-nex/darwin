@@ -18,9 +18,12 @@ export default class InitService {
         this.queue = new QueueService();
         this.notifications = new NotificationQueueService();
         this.issue_outcomes = new IssueOutcomeQueueService();
-        this.product_diff_sweep = setInterval(sweep_product_diffs, PRODUCT_DIFF_SWEEP_MS);
+        this.product_diff_sweep = setInterval(
+            () => void sweep_product_diffs(this.queue),
+            PRODUCT_DIFF_SWEEP_MS,
+        );
         this.product_diff_sweep.unref();
-        void sweep_product_diffs();
+        void sweep_product_diffs(this.queue);
     }
 
     /**
@@ -34,11 +37,19 @@ export default class InitService {
     }
 }
 
-async function sweep_product_diffs(): Promise<void> {
+async function sweep_product_diffs(queue: QueueService): Promise<void> {
     try {
         const reaped = await ProductDiffService.reap_stale_generating();
         if (reaped > 0) {
             console.log(`closed out ${reaped} abandoned Product Diff run(s)`);
+        }
+
+        const orphaned = await ProductDiffService.orphaned_pending();
+        for (const product_diff_id of orphaned) {
+            await queue.enqueue_product_diff(product_diff_id);
+        }
+        if (orphaned.length > 0) {
+            console.log(`queued ${orphaned.length} forgotten Product Diff(s)`);
         }
     } catch (error) {
         console.error("Product Diff sweep failed:", error);

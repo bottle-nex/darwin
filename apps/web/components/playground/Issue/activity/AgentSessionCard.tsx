@@ -2,10 +2,10 @@
 import { useState } from "react";
 import { motion } from "motion/react";
 import { HiChevronDown } from "react-icons/hi2";
-import { LuBot } from "react-icons/lu";
 import { AgentSessionStatus, type AgentSession, type IssueActivity } from "@trymatcha/types";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import HeroBuddy from "@/components/landing/v2/HeroBuddy";
 import { formatRelativeTime } from "@/lib/format";
 import ActivityRow from "./ActivityRow";
 
@@ -63,18 +63,18 @@ export default function AgentSessionCard({
     const startedAt = new Date(session.startedAt);
 
     return (
-        <li className="my-2 overflow-hidden rounded-lg border border-edge bg-cement">
+        <li className={cn("my-2 overflow-hidden rounded-lg border border-edge bg-snow/4")}>
             <Button
                 variant="unstyled"
                 type="button"
                 onClick={() => setExpanded((prev) => !prev)}
-                className="flex w-full cursor-pointer items-center gap-x-2.5 px-3 py-2.5 text-left transition-colors hover:bg-graphite"
+                className="flex w-full cursor-pointer items-center gap-x-2.5 px-3 py-2.5 text-left transition-colors"
             >
                 <span
                     aria-hidden
-                    className="flex size-6 shrink-0 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-300 ring-1 ring-inset ring-emerald-400/25"
+                    className="flex size-6 shrink-0 items-center justify-center rounded-full"
                 >
-                    <LuBot className="size-3.5" />
+                    <HeroBuddy move={false} className="size-5" />
                 </span>
                 <span className="min-w-0 flex-1 text-[13px] leading-5 text-neutral-500">
                     <span className="font-medium text-neutral-300">matcha</span> ran attempt{" "}

@@ -6,16 +6,16 @@ import { promisify } from "node:util";
 import type Logger from "@trymatcha/logger";
 import type {
     ProductDiffFramework,
-    ProductDiffManifestV2,
-    ProductDiffShot,
+    ProductDiffManifestV3,
     ProductDiffShotOutcome,
-    ProductDiffTarget,
     ProductDiffViewport,
+    ProductReviewShot,
+    ProductReviewTarget,
 } from "@trymatcha/types";
 import type { Sandbox } from "e2b";
 import { Client as MinioClient } from "minio";
 import { ENV } from "../conf/config.env";
-import type { HarnessManifest, PreviewShoot } from "./service.preview_runner";
+import type { HarnessManifest, PreviewPair } from "./service.preview_runner";
 
 const run_command = promisify(execFile);
 const ARCHIVE_PATH = "/home/user/output/shots.tar.gz";
@@ -67,7 +67,7 @@ async function png_files(root: string): Promise<string[]> {
     return found;
 }
 
-function rollup(shots: ProductDiffShot[]): ProductDiffShotOutcome {
+function rollup(shots: ProductReviewShot[]): ProductDiffShotOutcome {
     if (shots.some((shot) => shot.outcome === "Rendered")) return "Rendered";
     if (shots.length && shots.every((shot) => shot.outcome === "Added")) return "Added";
     if (shots.length && shots.every((shot) => shot.outcome === "Removed")) return "Removed";
@@ -136,18 +136,18 @@ export default class ProductDiffArtifacts {
      * already lives on the row and holding the same string in two places is how they drift apart.
      *
      * @example
-     * ProductDiffArtifacts.build_manifest({ harness, shoot, framework: "NextAppRouter", viewports, warnings: [] });
-     * // { version: 2, targets: [{ id: "header-nav", shots: [{ headKey: "shots/header-nav/default/desktop/head.png", ... }] }] }
+     * ProductDiffArtifacts.build_manifest({ harness, pair, framework: "NextAppRouter", viewports, warnings: [] });
+     * // { version: 3, targets: [{ id: "header-nav", shots: [{ headKey: "shots/header-nav/default/desktop/head.png", ... }] }] }
      */
     static build_manifest(input: {
         harness: HarnessManifest;
-        shoot: PreviewShoot;
+        pair: PreviewPair;
         framework: ProductDiffFramework;
         viewports: ProductDiffViewport[];
         warnings: string[];
-    }): ProductDiffManifestV2 {
-        const targets: ProductDiffTarget[] = input.harness.targets.map((target) => {
-            const shots: ProductDiffShot[] = input.shoot.shots
+    }): ProductDiffManifestV3 {
+        const targets: ProductReviewTarget[] = input.harness.targets.map((target) => {
+            const shots: ProductReviewShot[] = input.pair.shots
                 .filter((shot) => shot.targetId === target.id)
                 .map((shot) => ({
                     stateId: shot.stateId,
@@ -155,8 +155,6 @@ export default class ProductDiffArtifacts {
                     outcome: shot.outcome,
                     baseKey: shot.base.file ? `shots/${shot.base.file}` : null,
                     headKey: shot.head.file ? `shots/${shot.head.file}` : null,
-                    diffKey: shot.diffFile ? `shots/${shot.diffFile}` : null,
-                    diffPercentage: shot.diffPercentage,
                     error: shot.error,
                 }));
 
@@ -171,11 +169,11 @@ export default class ProductDiffArtifacts {
         });
 
         return {
-            version: 2,
+            version: 3,
             framework: input.framework,
             viewports: input.viewports,
             targets,
-            warnings: [...input.harness.warnings, ...input.shoot.warnings, ...input.warnings],
+            warnings: [...input.harness.warnings, ...input.pair.warnings, ...input.warnings],
         };
     }
 }

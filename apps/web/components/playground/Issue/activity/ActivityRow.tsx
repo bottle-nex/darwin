@@ -1,5 +1,4 @@
 "use client";
-import { LuBot } from "react-icons/lu";
 import { ActorType, type IssueActivity } from "@trymatcha/types";
 import { cn } from "@/lib/utils";
 import { formatRelativeTime } from "@/lib/format";
@@ -7,6 +6,7 @@ import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/h
 import PlaygroundAvatar, {
     toneFor,
 } from "@/components/playground/Core/components/PlaygroundAvatar";
+import HeroBuddy from "@/components/landing/v2/HeroBuddy";
 import { activity_entry } from "./activity.registry";
 
 export type ActivityActorView = {
@@ -51,11 +51,11 @@ export function ActorAvatar({
             <span
                 aria-hidden
                 className={cn(
-                    "inline-flex size-4 shrink-0 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-300 ring-1 ring-inset ring-emerald-400/25",
+                    "inline-flex size-4 shrink-0 items-center justify-center rounded-full",
                     className,
                 )}
             >
-                <LuBot className="size-2.5" />
+                <HeroBuddy move={false} className="size-4" />
             </span>
         );
     }
@@ -104,11 +104,11 @@ export default function ActivityRow({
             <span
                 aria-hidden
                 className={cn(
-                    "relative z-10 mt-0.5 flex size-[22px] shrink-0 items-center justify-center rounded-full bg-charcoal",
+                    "relative z-10 mt-0.5 flex size-[22px] shrink-0 items-center justify-center rounded-full bg-snow/4",
                     iconClassName,
                 )}
             >
-                <Icon className="size-3.25" />
+                <Icon className="size-4" />
             </span>
             <p className="min-w-0 flex-1 text-[13px] leading-[22px] wrap-anywhere text-neutral-500">
                 <ActorAvatar actor={actor} className="mr-1.5 -mt-px align-middle" />

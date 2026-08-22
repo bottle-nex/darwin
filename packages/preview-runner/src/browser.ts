@@ -1,5 +1,4 @@
 import { chromium, type Browser, type BrowserContext, type Page } from "playwright";
-import { HARNESS_ROOT_ATTRIBUTE } from "./contract";
 
 const LAUNCH_ARGS = [
     "--no-sandbox",
@@ -16,6 +15,7 @@ const TRANSPARENT_PIXEL = Buffer.from(
     "base64",
 );
 const LOOPBACK_HOSTS = new Set(["127.0.0.1", "localhost", "[::1]", "0.0.0.0"]);
+const SETTLE_TIMEOUT_MS = 5_000;
 const QUIET_STYLES = `*, *::before, *::after {
     animation: none !important;
     transition: none !important;
@@ -137,26 +137,19 @@ export async function open_deterministic_context(
  * @example
  * await settle_page(page, 250);
  */
-export async function settle_page(page: Page, settleMs: number): Promise<void> {
-    await page.addStyleTag({ content: QUIET_STYLES }).catch(() => undefined);
+export async function settle_page(
+    page: Page,
+    settleMs: number,
+    timeoutMs = SETTLE_TIMEOUT_MS,
+): Promise<void> {
+    await Promise.race([
+        page.addStyleTag({ content: QUIET_STYLES }).catch(() => undefined),
+        new Promise<void>((resolve) => setTimeout(resolve, timeoutMs)),
+    ]);
     await page.waitForLoadState("networkidle", { timeout: 5_000 }).catch(() => undefined);
-    await page.evaluate(() => document.fonts.ready).catch(() => undefined);
+    await Promise.race([
+        page.evaluate(() => document.fonts.ready).catch(() => undefined),
+        new Promise<void>((resolve) => setTimeout(resolve, timeoutMs)),
+    ]);
     await page.waitForTimeout(settleMs);
-}
-
-/**
- * Photographs just the harness wrapper, not the whole page.
- *
- * Targets render inside the app's real root layout, so the page also contains that layout's navbar
- * and footer. Cropping to the wrapper keeps the real styling while leaving the surrounding
- * furniture out of the picture.
- *
- * @example
- * const png = await capture_harness_root(page);
- */
-export async function capture_harness_root(page: Page): Promise<Buffer> {
-    return page
-        .locator(`[${HARNESS_ROOT_ATTRIBUTE}]`)
-        .first()
-        .screenshot({ animations: "disabled", caret: "hide", scale: "css" });
 }

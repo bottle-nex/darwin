@@ -6,6 +6,7 @@ import StorageService from "./service.storage";
 
 const FRONTEND_EXTENSIONS = new Set([".tsx", ".jsx", ".vue", ".svelte", ".css", ".scss", ".html"]);
 const STALE_GENERATING_MS = 90 * 60 * 1000;
+const ORPHANED_PENDING_MS = 10 * 60 * 1000;
 
 type ProductDiffSummaryRow = {
     id: string;
@@ -122,6 +123,27 @@ export default class ProductDiffService {
      * @example
      * await ProductDiffService.reap_stale_generating(); // 2 — two abandoned rows were closed out
      */
+    /**
+     * Finds Product Diff rows that were created but never queued for work.
+     *
+     * A row is normally queued in the same breath as it is created. One that is still waiting ten
+     * minutes later was forgotten — by an older version of this code, or by a queue that was down
+     * at the wrong moment. The ten minute wait is what stops this sending a second job for a row
+     * that is simply about to be picked up.
+     *
+     * @example
+     * await ProductDiffService.orphaned_pending(); // ["cmsz4ti8l00072jv953yr0uft"]
+     */
+    static async orphaned_pending(): Promise<string[]> {
+        const cutoff = new Date(Date.now() - ORPHANED_PENDING_MS);
+        const rows = await prisma.productDiff.findMany({
+            where: { status: "Pending", createdAt: { lt: cutoff } },
+            select: { id: true },
+            take: 50,
+        });
+        return rows.map(({ id }) => id);
+    }
+
     static async reap_stale_generating(): Promise<number> {
         const cutoff = new Date(Date.now() - STALE_GENERATING_MS);
         const reaped = await prisma.productDiff.updateMany({

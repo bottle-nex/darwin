@@ -16,8 +16,10 @@ const log = Logger.scope("template");
  */
 
 const TEMPLATE_NAME = "node-py-claude-template";
+const TEMPLATE_TAG = "stable";
 const SANDBOX_MCP_ENTRY = "/opt/matcha/sandbox-mcp/index.js";
 const PREVIEW_RUNNER_ENTRY = "/opt/matcha/preview-runner/index.js";
+const PREVIEW_RUNNER_PROTOCOL_VERSION = 3;
 
 interface Requirement {
     name: string;
@@ -47,6 +49,11 @@ const REQUIREMENTS: Requirement[] = [
         needed_for: "launching Chromium to screenshot Product Diff targets",
     },
     {
+        name: "preview-runner protocol",
+        command: `node ${PREVIEW_RUNNER_ENTRY} version | jq -e '.version == ${PREVIEW_RUNNER_PROTOCOL_VERSION}' > /dev/null`,
+        needed_for: "matching the VM's Product Diff output contract",
+    },
+    {
         name: "preview-check",
         command: "preview-check --help",
         needed_for: "the harness agent's render oracle",
@@ -57,8 +64,10 @@ const REQUIREMENTS: Requirement[] = [
 ];
 
 async function main() {
-    log.step("booting sandbox to verify template", { template: TEMPLATE_NAME });
-    const sandbox = await Sandbox.create(TEMPLATE_NAME, {
+    log.step("booting sandbox to verify template", {
+        template: `${TEMPLATE_NAME}:${TEMPLATE_TAG}`,
+    });
+    const sandbox = await Sandbox.create(`${TEMPLATE_NAME}:${TEMPLATE_TAG}`, {
         apiKey: ENV.SERVER_E2B_API_KEY,
         timeoutMs: 5 * 60_000,
     });

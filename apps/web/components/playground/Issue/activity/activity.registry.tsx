@@ -4,7 +4,6 @@ import type { IconType } from "react-icons";
 import {
     LuActivity,
     LuAlignLeft,
-    LuCircleCheck,
     LuCircleDashed,
     LuCircleX,
     LuGitPullRequest,
@@ -17,6 +16,7 @@ import {
 import { RiSignalCellular2Fill } from "react-icons/ri";
 import { IoPencilSharp } from "react-icons/io5";
 import { HiCalendar } from "react-icons/hi2";
+import { MdOutlineSupportAgent } from "react-icons/md";
 import {
     ActivityType,
     type ActivityLocationRef,
@@ -245,8 +245,8 @@ const REGISTRY: { [K in ActivityType]?: ActivityEntry<K> } = {
         summary: "started an attempt",
     },
     [ActivityType.RunCompleted]: {
-        icon: LuCircleCheck,
-        iconClassName: "text-emerald-300",
+        icon: MdOutlineSupportAgent,
+        iconClassName: "text-neutral-400",
         render: (payload) => `finished attempt ${payload.attemptNumber}`,
         summary: "finished an attempt",
     },

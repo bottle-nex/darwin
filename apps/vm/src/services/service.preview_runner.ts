@@ -4,6 +4,7 @@ import { z } from "zod";
 const RUNNER_ENTRY = "/opt/matcha/preview-runner/index.js";
 const PREVIEW_DIR = "/home/user/preview";
 const COMMAND_TIMEOUT_MS = 15 * 60_000;
+const RUNTIME_PROTOCOL_VERSION = 3;
 const SAFE_ID = /^[a-z0-9][a-z0-9-]{0,48}$/;
 
 const packageManagerSchema = z.enum(["bun", "pnpm", "yarn", "npm"]);
@@ -69,13 +70,50 @@ const harnessManifestSchema = z.object({
 });
 export type HarnessManifest = z.infer<typeof harnessManifestSchema>;
 
+const captureResultSchema = z.object({
+    targetId: z.string(),
+    stateId: z.string(),
+    viewportId: z.string(),
+    status: z.enum(["ok", "failed"]),
+    file: z.string().nullable(),
+    error: z.string().nullable(),
+});
+export type PreviewCaptureResult = z.infer<typeof captureResultSchema>;
+
+const captureSchema = z.object({
+    ok: z.boolean(),
+    side: z.enum(["head", "base"]),
+    captures: z.array(captureResultSchema),
+    warnings: z.array(z.string()),
+});
+export type PreviewCapture = z.infer<typeof captureSchema>;
+
+const checkSchema = z.object({
+    ok: z.boolean(),
+    results: z.array(
+        z.object({
+            targetId: z.string(),
+            stateId: z.string(),
+            url: z.string(),
+            ok: z.boolean(),
+            httpStatus: z.number().int().nullable(),
+            problem: z.string().nullable(),
+            detail: z.string().nullable(),
+        }),
+    ),
+    warnings: z.array(z.string()),
+});
+export type PreviewCheck = z.infer<typeof checkSchema>;
+
+const runtimeVersionSchema = z.object({ version: z.literal(RUNTIME_PROTOCOL_VERSION) });
+
 const capturedSideSchema = z.object({
     status: z.enum(["ok", "failed", "absent"]),
     file: z.string().nullable(),
     error: z.string().nullable(),
 });
 
-const shootSchema = z.object({
+const pairSchema = z.object({
     ok: z.boolean(),
     shots: z.array(
         z.object({
@@ -85,14 +123,12 @@ const shootSchema = z.object({
             outcome: z.enum(["Rendered", "Added", "Removed", "Unavailable"]),
             base: capturedSideSchema,
             head: capturedSideSchema,
-            diffFile: z.string().nullable(),
-            diffPercentage: z.number().nullable(),
             error: z.string().nullable(),
         }),
     ),
     warnings: z.array(z.string()),
 });
-export type PreviewShoot = z.infer<typeof shootSchema>;
+export type PreviewPair = z.infer<typeof pairSchema>;
 
 export interface PreviewViewport {
     id: string;
@@ -101,9 +137,9 @@ export interface PreviewViewport {
     height: number;
 }
 
-export interface ShootRequest {
-    headUrl: string;
-    baseUrl: string | null;
+export interface CaptureRequest {
+    url: string;
+    side: "head" | "base";
     workspaceRoot: string;
     nextAppDir: string;
     outputDir: string;
@@ -113,6 +149,19 @@ export interface ShootRequest {
 }
 
 export default class PreviewRunner {
+    static async supports_current_protocol(sandbox: Sandbox): Promise<boolean> {
+        const result = await sandbox.commands
+            .run(`node ${RUNNER_ENTRY} version`, { timeoutMs: 10_000 })
+            .catch(() => null);
+        if (!result || result.exitCode !== 0) return false;
+
+        try {
+            return runtimeVersionSchema.safeParse(JSON.parse(result.stdout)).success;
+        } catch {
+            return false;
+        }
+    }
+
     private static async invoke<T>(
         sandbox: Sandbox,
         command: string,
@@ -168,20 +217,23 @@ export default class PreviewRunner {
     }
 
     /**
-     * Takes every screenshot and compares each base/head pair.
+     * Photographs one revision and writes a PNG per target, state and screen size.
      *
-     * Passing a null base URL is a supported outcome, not an error: when the base dev server never
-     * came up, head-only pictures still ship and every shot is reported as added.
+     * One revision per call, on purpose. Two Next.js dev servers compiling a real app at the same
+     * time need more memory than the sandbox has, and the kernel kills one of them — so the head
+     * revision is captured, stopped, and only then does the base revision start.
      *
      * @example
-     * await PreviewRunner.shoot(sandbox, { headUrl, baseUrl, workspaceRoot, nextAppDir, outputDir, viewports, frozenNowMs, maxShots });
+     * await PreviewRunner.capture(sandbox, { url: headUrl, side: "head", ... });
+     * // { ok: true, side: "head", captures: [{ file: "header-nav/default/desktop/head.png" }] }
      */
-    static async shoot(sandbox: Sandbox, request: ShootRequest): Promise<PreviewShoot> {
+    static async capture(sandbox: Sandbox, request: CaptureRequest): Promise<PreviewCapture> {
         return this.invoke(
             sandbox,
-            "shoot",
+            "capture",
             {
-                revisions: { head: request.headUrl, base: request.baseUrl },
+                url: request.url,
+                side: request.side,
                 workspaceRoot: request.workspaceRoot,
                 nextAppDir: request.nextAppDir,
                 outputDir: request.outputDir,
@@ -190,8 +242,23 @@ export default class PreviewRunner {
                 randomSeed: 1,
                 maxShots: request.maxShots,
             },
-            shootSchema,
+            captureSchema,
         );
+    }
+
+    static async check(
+        sandbox: Sandbox,
+        settings: { baseUrl: string; workspaceRoot: string; nextAppDir: string },
+    ): Promise<PreviewCheck> {
+        return this.invoke(sandbox, "check", settings, checkSchema);
+    }
+
+    static async pair(
+        sandbox: Sandbox,
+        head: PreviewCaptureResult[],
+        base: PreviewCaptureResult[],
+    ): Promise<PreviewPair> {
+        return this.invoke(sandbox, "pair", { head, base }, pairSchema);
     }
 
     /**

@@ -125,14 +125,16 @@ export type CheckResult = z.infer<typeof checkResultSchema>;
 export const checkOutputSchema = z.object({
     ok: z.boolean(),
     results: z.array(checkResultSchema),
+    warnings: z.array(z.string()),
 });
 export type CheckOutput = z.infer<typeof checkOutputSchema>;
 
-export const shootInputSchema = z.object({
-    revisions: z.object({
-        head: z.string().min(1),
-        base: z.string().min(1).nullable(),
-    }),
+export const revisionSideSchema = z.enum(["head", "base"]);
+export type RevisionSide = z.infer<typeof revisionSideSchema>;
+
+export const captureInputSchema = z.object({
+    url: z.string().min(1),
+    side: revisionSideSchema,
     workspaceRoot: z.string().min(1),
     nextAppDir: z.string().min(1),
     outputDir: z.string().min(1),
@@ -143,9 +145,26 @@ export const shootInputSchema = z.object({
     warmupTimeoutMs: z.number().int().min(1000).max(300_000).default(120_000),
     settleMs: z.number().int().min(0).max(5_000).default(250),
     maxShots: z.number().int().min(1).max(400).default(48),
-    diffThreshold: z.number().min(0).max(1).default(0.1),
 });
-export type ShootInput = z.infer<typeof shootInputSchema>;
+export type CaptureInput = z.infer<typeof captureInputSchema>;
+
+export const captureResultSchema = z.object({
+    targetId: z.string(),
+    stateId: z.string(),
+    viewportId: z.string(),
+    status: z.enum(["ok", "failed"]),
+    file: z.string().nullable(),
+    error: z.string().nullable(),
+});
+export type CaptureResult = z.infer<typeof captureResultSchema>;
+
+export const captureOutputSchema = z.object({
+    ok: z.boolean(),
+    side: revisionSideSchema,
+    captures: z.array(captureResultSchema),
+    warnings: z.array(z.string()),
+});
+export type CaptureOutput = z.infer<typeof captureOutputSchema>;
 
 export const capturedSideSchema = z.object({
     status: z.enum(["ok", "failed", "absent"]),
@@ -154,31 +173,34 @@ export const capturedSideSchema = z.object({
 });
 export type CapturedSide = z.infer<typeof capturedSideSchema>;
 
-export const shotResultSchema = z.object({
+export const pairInputSchema = z.object({
+    head: z.array(captureResultSchema),
+    base: z.array(captureResultSchema),
+});
+export type PairInput = z.infer<typeof pairInputSchema>;
+
+export const pairResultSchema = z.object({
     targetId: z.string(),
     stateId: z.string(),
     viewportId: z.string(),
     outcome: shotOutcomeSchema,
     base: capturedSideSchema,
     head: capturedSideSchema,
-    diffFile: z.string().nullable(),
-    diffPercentage: z.number().nullable(),
     error: z.string().nullable(),
 });
-export type ShotResult = z.infer<typeof shotResultSchema>;
+export type PairResult = z.infer<typeof pairResultSchema>;
 
-export const shootOutputSchema = z.object({
+export const pairOutputSchema = z.object({
     ok: z.boolean(),
-    shots: z.array(shotResultSchema),
+    shots: z.array(pairResultSchema),
     warnings: z.array(z.string()),
 });
-export type ShootOutput = z.infer<typeof shootOutputSchema>;
+export type PairOutput = z.infer<typeof pairOutputSchema>;
 
 export const doctorOutputSchema = z.object({
     ok: z.boolean(),
     chromiumVersion: z.string().nullable(),
     chromiumPath: z.string().nullable(),
-    odiff: z.boolean(),
     error: z.string().nullable(),
 });
 export type DoctorOutput = z.infer<typeof doctorOutputSchema>;
