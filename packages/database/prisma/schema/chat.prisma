@@ -18,6 +18,7 @@ model Chat {
 
   @@index([issueId])
   @@index([issueId, createdAt, id])
+  @@index([message(ops: raw("gin_trgm_ops"))], map: "Chat_message_trgm_idx", type: Gin)
 }
 
 model ChatReaction {
@@ -56,6 +57,7 @@ model ProjectChat {
 
   @@index([projectId])
   @@index([projectId, createdAt, id])
+  @@index([message(ops: raw("gin_trgm_ops"))], map: "ProjectChat_message_trgm_idx", type: Gin)
 }
 
 model ProjectChatReaction {
@@ -94,6 +96,7 @@ model TeamChat {
 
   @@index([teamId])
   @@index([teamId, createdAt, id])
+  @@index([message(ops: raw("gin_trgm_ops"))], map: "TeamChat_message_trgm_idx", type: Gin)
 }
 
 model TeamChatReaction {

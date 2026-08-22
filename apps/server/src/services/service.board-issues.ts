@@ -163,7 +163,7 @@ function next_utc_day(day: string) {
     return value;
 }
 
-function escape_like(value: string) {
+export function escape_like(value: string) {
     return value.replace(/[\\%_]/g, "\\$&");
 }
 

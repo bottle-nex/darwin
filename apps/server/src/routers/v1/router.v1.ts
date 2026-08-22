@@ -17,6 +17,7 @@ import claude_mcp_router from "../../claude-mcp/router.claude-mcp";
 import worker_router from "../worker/router.worker";
 import admin_router from "../admin/router.admin";
 import content_router from "../content/router.content";
+import search_router from "../search/router.search";
 
 const v1_router: Router = Router();
 
@@ -36,6 +37,7 @@ v1_router.use("/issues", issues_router);
 v1_router.use("/chats", chats_router);
 v1_router.use("/project-chats", project_chats_router);
 v1_router.use("/notifications", notifications_router);
+v1_router.use("/search", search_router);
 v1_router.use("/setup", mcp_router);
 v1_router.use("/claude-mcp/api-keys", claude_mcp_keys_router);
 v1_router.use("/claude-mcp/mcp", claude_mcp_router);

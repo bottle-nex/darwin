@@ -49,6 +49,8 @@ model Issue {
   @@index([projectId, customColumnId, createdAt, id])
   @@index([status, createdAt])
   @@index([assignerWorkerId, status, queuePosition])
+  @@index([title(ops: raw("gin_trgm_ops"))], map: "Issue_title_trgm_idx", type: Gin)
+  @@index([description(ops: raw("gin_trgm_ops"))], map: "Issue_description_trgm_idx", type: Gin)
 }
 
 model Tag {
