@@ -129,4 +129,23 @@ export class KanbanBoard {
             KanbanBoard.STATUSES.map((s) => [s, board[s].filter((issue) => matches(issue.id))]),
         ) as BoardState;
     }
+
+    /**
+     * Splits `COLUMNS` into what the board row should render vs. what collapses into the
+     * hidden-columns list: a column stays visible if it has issues, or if it's a bridge status
+     * (e.g. Todo) that must stay a droppable target even while empty.
+     */
+    static partitionColumns(board: BoardState): {
+        visible: KanbanColumnDef[];
+        hidden: KanbanColumnDef[];
+    } {
+        const visible: KanbanColumnDef[] = [];
+        const hidden: KanbanColumnDef[] = [];
+        for (const column of KanbanBoard.COLUMNS) {
+            const keepVisible =
+                board[column.status].length > 0 || KanbanBoard.isBridgeStatus(column.status);
+            (keepVisible ? visible : hidden).push(column);
+        }
+        return { visible, hidden };
+    }
 }

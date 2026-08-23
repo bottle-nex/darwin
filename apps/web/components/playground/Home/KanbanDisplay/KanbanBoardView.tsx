@@ -2,7 +2,7 @@
 import { useMemo, type ReactNode } from "react";
 import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
 import { IssueSelectionOrderProvider } from "@/hooks/issues/useIssueSelection";
-import type { BoardState, KanbanColumnDef } from "@/types/kanban";
+import type { BoardState } from "@/types/kanban";
 import HiddenKanbanColumn from "./HiddenKanbanColumn";
 import KanbanColumn from "./KanbanColumn";
 
@@ -21,14 +21,10 @@ type KanbanBoardViewProps = {
  * DndContext lives in `KanbanDisplay`.
  */
 export default function KanbanBoardView({ board, leading }: KanbanBoardViewProps) {
-    const { visibleColumns, hiddenColumns } = useMemo(() => {
-        const visibleColumns: KanbanColumnDef[] = [];
-        const hiddenColumns: KanbanColumnDef[] = [];
-        for (const column of KanbanBoard.COLUMNS) {
-            (board[column.status].length === 0 ? hiddenColumns : visibleColumns).push(column);
-        }
-        return { visibleColumns, hiddenColumns };
-    }, [board]);
+    const { visible: visibleColumns, hidden: hiddenColumns } = useMemo(
+        () => KanbanBoard.partitionColumns(board),
+        [board],
+    );
 
     const loadedIssueIds = useMemo(
         () => KanbanBoard.STATUSES.flatMap((status) => board[status].map((issue) => issue.id)),
