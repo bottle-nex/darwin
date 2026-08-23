@@ -1,10 +1,11 @@
-import type {
-    ReviewActor,
-    ReviewComment,
-    ReviewFile,
-    ReviewFileStatus,
-    ReviewLabel,
-    ReviewState,
+import {
+    ReviewMergeMethod,
+    type ReviewActor,
+    type ReviewComment,
+    type ReviewFile,
+    type ReviewFileStatus,
+    type ReviewLabel,
+    type ReviewState,
 } from "@trymatcha/types";
 import { Octokit } from "@octokit/rest";
 import GithubAppService from "./service.github_app";
@@ -27,6 +28,8 @@ export interface PullRequestDetail {
     headBranch: string;
     baseSha: string;
     headSha: string;
+    mergeable: boolean | null;
+    mergeableState: string;
     additions: number;
     deletions: number;
     changedFiles: number;
@@ -78,6 +81,8 @@ export default class GithubPullsService {
             headBranch: data.head.ref,
             baseSha: data.base.sha,
             headSha: data.head.sha,
+            mergeable: data.mergeable,
+            mergeableState: data.mergeable_state,
             additions: data.additions,
             deletions: data.deletions,
             changedFiles: data.changed_files,
@@ -237,5 +242,32 @@ export default class GithubPullsService {
             line: null,
             diffHunk: null,
         };
+    }
+
+    static async mergePullRequest(
+        userToken: string,
+        ref: Omit<PullRequestRef, "installationId">,
+        method: ReviewMergeMethod = ReviewMergeMethod.Squash,
+    ): Promise<void> {
+        const octokit = new Octokit({ auth: userToken });
+        await octokit.rest.pulls.merge({
+            owner: ref.owner,
+            repo: ref.repo,
+            pull_number: ref.pullNumber,
+            merge_method: method,
+        });
+    }
+
+    static async closePullRequest(
+        userToken: string,
+        ref: Omit<PullRequestRef, "installationId">,
+    ): Promise<void> {
+        const octokit = new Octokit({ auth: userToken });
+        await octokit.rest.pulls.update({
+            owner: ref.owner,
+            repo: ref.repo,
+            pull_number: ref.pullNumber,
+            state: "closed",
+        });
     }
 }

@@ -1,8 +1,8 @@
 "use client";
+import { LiaGithub } from "react-icons/lia";
 import type { ReviewTab } from "@trymatcha/types";
 import IconWrapper from "@/components/ui/IconWrapper";
 import ReviewTabBar from "./ReviewTabBar";
-import { LiaGithub } from "react-icons/lia";
 
 export default function ReviewHeader({ tab, htmlUrl }: { tab: ReviewTab; htmlUrl: string }) {
     return (

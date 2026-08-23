@@ -3,26 +3,36 @@ import { useEffect, useRef, useState } from "react";
 import type { Editor } from "@tiptap/react";
 import axios from "axios";
 import { FaGithub } from "react-icons/fa6";
+import { Action, Permissions } from "@trymatcha/access-control";
+import type { ReviewHeader } from "@trymatcha/types";
 import { Button } from "@/components/ui/button";
 import IssueDescriptionEditor from "@/components/playground/Issue/editor/IssueDescriptionEditor";
 import { htmlToMarkdown } from "@/lib/markdown";
-import { useStartGithubLink } from "@/hooks/github/useGithubLink";
+import { useGithubLink, useStartGithubLink } from "@/hooks/github/useGithubLink";
+import { useGetProject } from "@/hooks/project/useGetProject";
 import { GITHUB_NOT_LINKED, usePostReviewComment } from "@/hooks/review/usePostReviewComment";
 
 export default function ReviewComposer({
     projectId,
-    pullNumber,
+    review,
 }: {
     projectId: string | undefined;
-    pullNumber: number;
+    review: ReviewHeader;
 }) {
     const [html, setHtml] = useState("");
     const [isEmpty, setIsEmpty] = useState(true);
     const [needsLink, setNeedsLink] = useState(false);
     const [editorKey, setEditorKey] = useState(0);
     const editorRef = useRef<Editor | null>(null);
-    const post = usePostReviewComment(projectId, pullNumber);
+    const post = usePostReviewComment(projectId, review.pullNumber);
     const startLink = useStartGithubLink();
+    const { data: project, isPending: projectPending } = useGetProject(projectId);
+    const { data: link, isPending: linkPending } = useGithubLink();
+
+    const isLoading = projectPending || linkPending;
+    const githubLinked = needsLink ? false : Boolean(link);
+    const role = project?.viewerRole ?? null;
+    const canComment = role ? Permissions.project(role, Action.project.comment_review) : false;
 
     const submitRef = useRef(submit);
     useEffect(() => {
@@ -58,9 +68,21 @@ export default function ReviewComposer({
         });
     }
 
-    if (needsLink) {
+    if (isLoading) return null;
+
+    if (!canComment) {
         return (
-            <div className="flex flex-col items-start gap-2.5 rounded-xl border border-border px-4 py-4">
+            <div className="rounded-xl border border-border px-4 py-4 ml-8.5">
+                <p className="text-[14.5px] text-neutral-400">
+                    You don&apos;t have permission to comment on this pull request.
+                </p>
+            </div>
+        );
+    }
+
+    if (!githubLinked) {
+        return (
+            <div className="flex flex-col items-start gap-2.5 rounded-xl border border-border px-4 py-4 ml-8.5">
                 <p className="text-[14.5px] text-neutral-400">
                     Connect your GitHub account to reply as yourself.
                 </p>
@@ -78,7 +100,7 @@ export default function ReviewComposer({
     }
 
     return (
-        <div className="flex flex-col rounded-xl border border-border focus-within:border-white/20 bg-snow/2">
+        <div className="flex flex-col rounded-xl border border-border bg-snow/2 focus-within:border-white/20 ml-8.5">
             <div className="max-h-32 overflow-y-auto px-3 pt-1.5" data-lenis-prevent>
                 <IssueDescriptionEditor
                     key={editorKey}
@@ -94,7 +116,7 @@ export default function ReviewComposer({
             </div>
 
             <div className="flex items-center justify-end gap-2 px-3 pb-1.5">
-                {post.isError && !needsLink && (
+                {post.isError && (
                     <p className="mr-auto text-[13.5px] text-rose-400">
                         That comment didn&apos;t post. Try again.
                     </p>

@@ -29,6 +29,8 @@ interface WrittenActivityPayloads {
     RunCompleted: ActivityPayloadBase & { attemptNumber: number; summary?: string };
     AttemptFailed: ActivityPayloadBase & { attemptNumber: number; reason: string };
     PrOpened: ActivityPayloadBase & { url: string };
+    PrMerged: ActivityPayloadBase & { url: string };
+    PrClosed: ActivityPayloadBase & { url: string };
 }
 
 export interface ActivityUserRef {

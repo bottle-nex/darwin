@@ -28,6 +28,8 @@ import list_review_files_controller from "../../controllers/project/controller.l
 import get_review_file_controller from "../../controllers/project/controller.get_review_file";
 import list_review_comments_controller from "../../controllers/project/controller.list_review_comments";
 import create_review_comment_controller from "../../controllers/project/controller.create_review_comment";
+import merge_review_controller from "../../controllers/project/controller.merge_review";
+import close_review_controller from "../../controllers/project/controller.close_review";
 import start_setup from "../../controllers/setup/controller.start_setup";
 
 const project_router: Router = Router();
@@ -77,6 +79,16 @@ project_router.post(
     "/:project_id/review/:pull_number/comments",
     require_auth,
     create_review_comment_controller,
+);
+project_router.post(
+    "/:project_id/review/:pull_number/merge",
+    require_auth,
+    merge_review_controller,
+);
+project_router.post(
+    "/:project_id/review/:pull_number/close",
+    require_auth,
+    close_review_controller,
 );
 project_router.get("/:project_id/secrets", require_auth, list_secrets_controller);
 project_router.post("/:project_id/secrets", require_auth, set_secrets_controller);

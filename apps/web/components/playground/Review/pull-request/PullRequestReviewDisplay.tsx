@@ -6,6 +6,7 @@ import { useReviewComments } from "@/hooks/review/useReviewComments";
 import ReviewActorAvatar from "../ReviewActorAvatar";
 import ReviewCommentCard from "./ReviewCommentCard";
 import ReviewComposer from "./ReviewComposer";
+import ReviewMergePanel from "./ReviewMergePanel";
 import ReviewSummary from "./ReviewSummary";
 
 export default function PullRequestReviewDisplay({
@@ -51,7 +52,9 @@ export default function PullRequestReviewDisplay({
                     )}
                 </section>
 
-                <ReviewComposer projectId={projectId} pullNumber={review.pullNumber} />
+                <ReviewMergePanel review={review} projectId={projectId} />
+
+                <ReviewComposer projectId={projectId} review={review} />
             </div>
         </div>
     );

@@ -50,6 +50,10 @@ export const REVIEW_COMMENTS_URL = (project_id: string, pull_number: number) =>
     `${REVIEW_URL(project_id, pull_number)}/comments`;
 export const REVIEW_FILE_SOURCE_URL = (project_id: string, pull_number: number) =>
     `${REVIEW_URL(project_id, pull_number)}/file`;
+export const REVIEW_MERGE_URL = (project_id: string, pull_number: number) =>
+    `${REVIEW_URL(project_id, pull_number)}/merge`;
+export const REVIEW_CLOSE_URL = (project_id: string, pull_number: number) =>
+    `${REVIEW_URL(project_id, pull_number)}/close`;
 
 export const LIST_TAGS_URL = (project_id: string) => `${PROJECT_URL}/${project_id}/tags`;
 export const CREATE_TAG_URL = (project_id: string) => `${PROJECT_URL}/${project_id}/tags`;
