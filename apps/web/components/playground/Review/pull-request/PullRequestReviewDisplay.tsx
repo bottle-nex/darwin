@@ -46,14 +46,10 @@ export default function PullRequestReviewDisplay({
                             <ReviewCommentCard key={comment.id} comment={comment} />
                         ))
                     ) : (
-                        <p className="text-[14.5px] text-neutral-500">
-                            No comments on this pull request yet.
-                        </p>
+                        <></>
                     )}
                 </section>
-
                 <ReviewMergePanel review={review} projectId={projectId} />
-
                 <ReviewComposer projectId={projectId} review={review} />
             </div>
         </div>

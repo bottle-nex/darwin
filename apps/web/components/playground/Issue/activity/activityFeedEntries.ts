@@ -1,4 +1,4 @@
-import type { AgentSession, Chat, IssueActivity } from "@trymatcha/types";
+import type { Chat, IssueActivity } from "@trymatcha/types";
 import type { CommentThread } from "./CommentCard";
 
 export type TimelineStream = "activity" | "comments";
@@ -19,13 +19,6 @@ export type ActivityFeedEntry =
           key: string;
           at: number;
           activity: IssueActivity;
-      }
-    | {
-          kind: "session";
-          key: string;
-          at: number;
-          session: AgentSession;
-          rows: IssueActivity[];
       }
     | {
           kind: "comment";
@@ -172,38 +165,13 @@ export function buildActivityFeedEntries(
     comments: readonly Chat[],
 ): ActivityFeedEntry[] {
     const chronologicalActivities = deduplicateById(activities).sort(compareActivitySequence);
-    const groupedActivities = new Map<string, IssueActivity[]>();
-    for (const activity of chronologicalActivities) {
-        if (!activity.sessionId) continue;
-        const group = groupedActivities.get(activity.sessionId) ?? [];
-        group.push(activity);
-        groupedActivities.set(activity.sessionId, group);
-    }
 
-    const entries: ActivityFeedEntry[] = [];
-    const emittedSessions = new Set<string>();
-    for (const activity of chronologicalActivities) {
-        const group = activity.sessionId ? groupedActivities.get(activity.sessionId) : undefined;
-        const session = group?.find((row) => row.session)?.session;
-        if (!activity.sessionId || !group || !session) {
-            entries.push({
-                kind: "activity",
-                key: `activity:${activity.id}`,
-                at: millis(activity.createdAt),
-                activity,
-            });
-            continue;
-        }
-        if (emittedSessions.has(activity.sessionId)) continue;
-        emittedSessions.add(activity.sessionId);
-        entries.push({
-            kind: "session",
-            key: `session:${session.id}`,
-            at: Math.min(...group.map((row) => millis(row.createdAt))),
-            session,
-            rows: group,
-        });
-    }
+    const entries: ActivityFeedEntry[] = chronologicalActivities.map((activity) => ({
+        kind: "activity",
+        key: `activity:${activity.id}`,
+        at: millis(activity.createdAt),
+        activity,
+    }));
 
     for (const { thread, publishedAt } of buildCommentThreads(comments)) {
         entries.push({
@@ -216,8 +184,7 @@ export function buildActivityFeedEntries(
 
     const kindOrder: Record<ActivityFeedEntry["kind"], number> = {
         activity: 0,
-        session: 1,
-        comment: 2,
+        comment: 1,
     };
     return entries.sort(
         (left, right) =>

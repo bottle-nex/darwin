@@ -22,7 +22,6 @@ import ConfirmDialog from "@/components/utility/ConfirmDialog";
 import ChatComposer from "@/components/playground/Home/chat/ChatComposer";
 import { Button } from "@/components/ui/button";
 import ActivityRow from "./ActivityRow";
-import AgentSessionCard from "./AgentSessionCard";
 import CommentCard from "./CommentCard";
 import {
     buildActivityFeedEntries,
@@ -452,12 +451,7 @@ export default function ActivityFeed({
                                             transform: `translateY(${virtualRow.start - scrollMargin}px)`,
                                         }}
                                     >
-                                        {entry.kind === "session" ? (
-                                            <AgentSessionCard
-                                                session={entry.session}
-                                                rows={entry.rows}
-                                            />
-                                        ) : entry.kind === "comment" ? (
+                                        {entry.kind === "comment" ? (
                                             <CommentCard
                                                 thread={entry.thread}
                                                 projectId={commentsHistory.projectId}
