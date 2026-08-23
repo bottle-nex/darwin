@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import type { IconType } from "react-icons";
+import { TooltipComponent } from "@/components/ui/tooltip-component";
 
 type IconWrapperVariant = "solid" | "ghost" | "outline";
 
@@ -12,7 +13,8 @@ interface IconWrapperProps {
     active?: boolean;
     variant?: IconWrapperVariant;
     className?: string;
-    title?: string;
+    /** Shown as a tooltip on hover. Rendered through `TooltipComponent`, not the native attribute. */
+    title?: ReactNode;
 }
 
 const SURFACE: Record<
@@ -55,9 +57,8 @@ export default function IconWrapper({
     const surface = SURFACE[variant];
     const hasLabel = children !== undefined && children !== null;
 
-    return (
+    const glyph = (
         <span
-            title={title}
             className={cn(
                 "inline-flex items-center justify-center gap-1.5 transition-colors",
                 hasLabel ? "h-5 px-2 text-[11px] leading-none" : "size-6.75",
@@ -83,4 +84,6 @@ export default function IconWrapper({
             {hasLabel && <span className="truncate">{children}</span>}
         </span>
     );
+
+    return <TooltipComponent content={title}>{glyph}</TooltipComponent>;
 }

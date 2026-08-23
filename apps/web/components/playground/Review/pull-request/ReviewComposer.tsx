@@ -78,8 +78,8 @@ export default function ReviewComposer({
     }
 
     return (
-        <div className="flex flex-col rounded-xl border border-border focus-within:border-white/20">
-            <div className="max-h-80 min-h-24 overflow-y-auto px-4 pt-3" data-lenis-prevent>
+        <div className="flex flex-col rounded-xl border border-border focus-within:border-white/20 bg-snow/2">
+            <div className="max-h-32 overflow-y-auto px-3 pt-1.5" data-lenis-prevent>
                 <IssueDescriptionEditor
                     key={editorKey}
                     className="tiptap-compact"
@@ -93,14 +93,13 @@ export default function ReviewComposer({
                 />
             </div>
 
-            <div className="flex items-center justify-end gap-3 px-4 pb-3">
+            <div className="flex items-center justify-end gap-2 px-3 pb-1.5">
                 {post.isError && !needsLink && (
                     <p className="mr-auto text-[13.5px] text-rose-400">
                         That comment didn&apos;t post. Try again.
                     </p>
                 )}
-                <span className="text-[13px] text-neutral-600">⌘↵ to comment</span>
-                <Button size="sm" disabled={isEmpty} loading={post.isPending} onClick={submit}>
+                <Button size="xs" disabled={isEmpty} loading={post.isPending} onClick={submit}>
                     Comment
                 </Button>
             </div>

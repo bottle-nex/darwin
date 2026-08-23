@@ -93,7 +93,7 @@ export default function ReviewFileDiff({
                             setWholeFile(!wholeFile);
                         }}
                         loading={wantsSource && sourcePending}
-                        className="shrink-0 cursor-pointer rounded-md px-2 py-1 font-headline text-[12px] text-neutral-500 transition-colors hover:bg-white/5 hover:text-neutral-200"
+                        className="flex shrink-0 cursor-pointer items-center gap-1 rounded-md px-2 py-1 font-headline text-[12px] text-neutral-500 transition-colors hover:bg-white/5 hover:text-neutral-200"
                     >
                         {tooLarge
                             ? "Too large to expand"
