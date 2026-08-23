@@ -185,8 +185,7 @@ function CommandMenuBody({ onDone }: { onDone: () => void }) {
                                             <entry.icon
                                                 className={cn(
                                                     "size-4 text-neutral-400",
-                                                    entry.destructive &&
-                                                        "text-rose-400!",
+                                                    entry.destructive && "text-rose-400!",
                                                 )}
                                                 aria-hidden
                                             />
