@@ -8,7 +8,7 @@ import ReviewCommentCard from "./ReviewCommentCard";
 import ReviewComposer from "./ReviewComposer";
 import ReviewSummary from "./ReviewSummary";
 
-export default function ReviewPullRequest({
+export default function PullRequestReviewDisplay({
     projectId,
     review,
 }: {

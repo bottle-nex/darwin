@@ -6,7 +6,7 @@ import { useReviewFiles } from "@/hooks/review/useReviewFiles";
 import ReviewFileDiff from "./ReviewFileDiff";
 import ReviewFileRow from "./ReviewFileRow";
 
-export default function ReviewChanges({
+export default function CompareReviewDisplay({
     projectId,
     review,
 }: {
@@ -14,7 +14,7 @@ export default function ReviewChanges({
     review: ReviewHeader;
 }) {
     const { data: files, isPending } = useReviewFiles(projectId, review.pullNumber);
-    const [selected, setSelected] = useState<string | null>(null);
+    const [selectedFilename, setSelectedFilename] = useState<string | null>(null);
 
     if (isPending) return <LogoLoader className="h-full w-full text-snow" />;
     if (!files?.length) {
@@ -25,10 +25,11 @@ export default function ReviewChanges({
         );
     }
 
-    const active: ReviewFile = files.find((file) => file.filename === selected) ?? files[0];
+    const activeFile: ReviewFile =
+        files.find((file) => file.filename === selectedFilename) ?? files[0];
 
     return (
-        <div className="grid min-h-0 min-w-0 flex-1 grid-cols-[20rem_minmax(0,1fr)] gap-4 px-10 py-4">
+        <div className="grid min-h-0 min-w-0 flex-1 grid-cols-[20rem_minmax(0,1fr)] gap-4 px-4 py-4">
             <aside className="flex min-h-0 flex-col gap-2 overflow-y-auto pr-1" data-lenis-prevent>
                 <p className="px-2 font-headline text-[12.5px] text-neutral-500 tabular-nums">
                     {files.length} {files.length === 1 ? "file" : "files"} changed{" "}
@@ -39,15 +40,15 @@ export default function ReviewChanges({
                     <ReviewFileRow
                         key={file.filename}
                         file={file}
-                        selected={file.filename === active.filename}
-                        onSelect={() => setSelected(file.filename)}
+                        selected={file.filename === activeFile.filename}
+                        onSelect={() => setSelectedFilename(file.filename)}
                     />
                 ))}
             </aside>
 
             <ReviewFileDiff
-                key={active.filename}
-                file={active}
+                key={activeFile.filename}
+                file={activeFile}
                 projectId={projectId}
                 pullNumber={review.pullNumber}
             />
