@@ -1,11 +1,7 @@
 import { prisma, NotificationType } from "@trymatcha/database";
-import {
-    OutboundSocketMessageType,
-    to_plain_text,
-    type NotificationJobData,
-} from "@trymatcha/types";
+import { to_plain_text, type NotificationJobData } from "@trymatcha/types";
 import { MESSAGE_REFERENCE_INCLUDE } from "../../services/service.message-references";
-import { server_services } from "../..";
+import NotificationCreateService from "../service.notification-create";
 
 type IssueCommentedJobData = Extract<NotificationJobData, { action: "issue.commented" }>;
 
@@ -38,31 +34,23 @@ export default class IssueCommentedNotification {
         });
         if (!sender) return;
 
-        const notification = await prisma.notification.create({
-            data: {
-                userId: data.recipientId,
-                type: NotificationType.IssueCommented,
-                payload: {
-                    chatId: data.chatId,
-                    issueId: chat.issueId,
-                    issueTitle: chat.issue.title,
-                    issueNumber: chat.issue.number,
-                    projectId: chat.issue.projectId,
-                    projectSlug: chat.issue.project.slug,
-                    orgSlug: chat.issue.project.organization.slug,
-                    senderId: data.senderId,
-                    senderName: sender.name ?? sender.email,
-                    message: to_plain_text(chat.message, chat.references),
-                },
+        await NotificationCreateService.create({
+            scope: "project",
+            userId: data.recipientId,
+            projectId: chat.issue.projectId,
+            type: NotificationType.IssueCommented,
+            payload: {
+                chatId: data.chatId,
+                issueId: chat.issueId,
+                issueTitle: chat.issue.title,
+                issueNumber: chat.issue.number,
+                projectId: chat.issue.projectId,
+                projectSlug: chat.issue.project.slug,
+                orgSlug: chat.issue.project.organization.slug,
+                senderId: data.senderId,
+                senderName: sender.name ?? sender.email,
+                message: to_plain_text(chat.message, chat.references),
             },
         });
-
-        await server_services.publisher.publish_message(
-            server_services.publisher.get_user_channel_name(notification.userId),
-            JSON.stringify({
-                type: OutboundSocketMessageType.NOTIFICATION_CREATED,
-                payload: notification,
-            }),
-        );
     }
 }

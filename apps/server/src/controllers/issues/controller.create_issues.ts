@@ -27,7 +27,14 @@ export default class IssueCreateController {
         .refine((data) => data.custom_column_id || (data.assignee_ids?.length ?? 0) > 0, {
             message: "At least one assignee is required",
             path: ["assignee_ids"],
-        });
+        })
+        .refine(
+            (data) => !data.start_date || !data.target_date || data.start_date <= data.target_date,
+            {
+                message: "Start date must be on or before the end date",
+                path: ["target_date"],
+            },
+        );
 
     static async process(req: Request, res: Response) {
         console.log("[issue:create] received request to create issue");

@@ -4,7 +4,7 @@ import { HiOutlineBell } from "react-icons/hi2";
 import { IoPencilSharp } from "react-icons/io5";
 import { Button } from "@/components/ui/button";
 import { TooltipComponent } from "@/components/ui/tooltip-component";
-import { useNotifications } from "@/hooks/notifications/useNotifications";
+import { useNotificationBadges } from "@/hooks/notifications/useNotificationBadges";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { cn } from "@/lib/utils";
 import { useCreateIssueStore } from "@/store/issues/useCreateIssueStore";
@@ -16,8 +16,7 @@ export default function SidebarActions() {
     const openCreate = useCreateIssueStore((state) => state.open);
     const notificationsOpen = useNotificationsPanelStore((state) => state.isOpen);
     const toggleNotifications = useNotificationsPanelStore((state) => state.toggle);
-    const { data } = useNotifications();
-    const unreadCount = data?.unreadCount ?? 0;
+    const { memberUnread } = useNotificationBadges();
 
     return (
         <div className="flex shrink-0 items-center gap-0.5">
@@ -40,8 +39,8 @@ export default function SidebarActions() {
                     type="button"
                     onClick={toggleNotifications}
                     aria-label={
-                        unreadCount > 0
-                            ? `Toggle notifications (${unreadCount} unread)`
+                        memberUnread > 0
+                            ? `Toggle notifications (${memberUnread} unread)`
                             : "Toggle notifications"
                     }
                     aria-pressed={notificationsOpen}
@@ -51,12 +50,12 @@ export default function SidebarActions() {
                     )}
                 >
                     <HiOutlineBell className="size-3.75" aria-hidden />
-                    {unreadCount > 0 ? (
+                    {memberUnread > 0 ? (
                         <span
                             className="absolute top-0 right-0 flex h-3 min-w-3 items-center justify-center rounded-full bg-primary px-0.5 text-[8px] leading-none font-medium text-ink tabular-nums"
                             aria-hidden
                         >
-                            {unreadCount > 9 ? "9+" : unreadCount}
+                            {memberUnread > 9 ? "9+" : memberUnread}
                         </span>
                     ) : null}
                 </Button>

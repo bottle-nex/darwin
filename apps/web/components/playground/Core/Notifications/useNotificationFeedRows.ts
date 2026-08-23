@@ -1,0 +1,19 @@
+"use client";
+import { useMemo } from "react";
+import type { Notification } from "@trymatcha/types";
+import {
+    filter_notifications,
+    flattenNotificationDayRows,
+    stickyDayRowIndexes,
+} from "./notificationRows";
+
+export function useNotificationFeedRows(notifications: Notification[], query: string) {
+    const matched = useMemo(
+        () => filter_notifications(notifications, query),
+        [notifications, query],
+    );
+    const rows = useMemo(() => flattenNotificationDayRows(matched), [matched]);
+    const stickyRowIndexes = useMemo(() => stickyDayRowIndexes(rows), [rows]);
+
+    return { matched, rows, stickyRowIndexes };
+}

@@ -222,6 +222,17 @@ export default class IssueService {
             }
         }
 
+        const next_start_date = patch.start_date !== undefined ? patch.start_date : issue.startDate;
+        const next_target_date =
+            patch.target_date !== undefined ? patch.target_date : issue.targetDate;
+        if (next_start_date && next_target_date && next_start_date > next_target_date) {
+            return {
+                ok: false,
+                reason: "invalid",
+                message: "Start date must be on or before the end date",
+            };
+        }
+
         const next_column_id =
             patch.custom_column_id !== undefined ? patch.custom_column_id : issue.customColumnId;
 

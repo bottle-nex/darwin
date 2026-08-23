@@ -7,8 +7,9 @@ import { format } from "date-fns";
 import { MdCheck } from "react-icons/md";
 import { HiCalendar } from "react-icons/hi2";
 import { cn } from "@/lib/utils";
+import type { Matcher } from "react-day-picker";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
+import { Calendar, type CalendarRange } from "@/components/ui/calendar";
 
 export interface CapsuleOption {
     value: string;
@@ -116,6 +117,9 @@ interface CapsuleCalendarProps {
     className?: string;
     icon?: IconType;
     iconClassName?: string;
+    range?: CalendarRange;
+    earliest?: Date;
+    latest?: Date;
 }
 
 function CapsuleCalendar({
@@ -126,8 +130,15 @@ function CapsuleCalendar({
     className,
     icon: Icon = HiCalendar,
     iconClassName = "text-white/60",
+    range,
+    earliest,
+    latest,
 }: CapsuleCalendarProps) {
     const [open, setOpen] = useState(false);
+
+    const outOfBounds: Matcher[] = [];
+    if (earliest) outOfBounds.push({ before: earliest });
+    if (latest) outOfBounds.push({ after: latest });
 
     function handleSelect(next: Date | undefined) {
         onChange?.(next);
@@ -143,7 +154,14 @@ function CapsuleCalendar({
                 </CapsuleTrigger>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0">
-                <Calendar mode="single" selected={value} onSelect={handleSelect} />
+                <Calendar
+                    mode="single"
+                    selected={value}
+                    onSelect={handleSelect}
+                    defaultMonth={value ?? range?.from ?? range?.to}
+                    range={range}
+                    disabled={outOfBounds}
+                />
             </PopoverContent>
         </Popover>
     );

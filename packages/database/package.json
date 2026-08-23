@@ -31,6 +31,7 @@
     },
     "devDependencies": {
         "@trymatcha/eslint-config": "*",
+        "@trymatcha/types": "*",
         "@trymatcha/typescript-config": "*",
         "@types/pg": "^8.16.0",
         "@typescript-eslint/parser": "^7.1.0",

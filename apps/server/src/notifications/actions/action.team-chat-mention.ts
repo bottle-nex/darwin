@@ -1,13 +1,9 @@
 import { NotificationType, prisma } from "@trymatcha/database";
-import {
-    OutboundSocketMessageType,
-    to_plain_text,
-    type NotificationJobData,
-} from "@trymatcha/types";
-import { server_services } from "../..";
+import { to_plain_text, type NotificationJobData } from "@trymatcha/types";
 import { ENV } from "../../configs/env";
 import { sendMentionEmail } from "../../services/service.email";
 import { MESSAGE_REFERENCE_INCLUDE } from "../../services/service.message-references";
+import NotificationCreateService from "../service.notification-create";
 
 type TeamChatMentionJobData = Extract<NotificationJobData, { action: "team_chat.mention" }>;
 
@@ -58,31 +54,24 @@ export default class TeamChatMentionNotification {
         const orgSlug = chat.team.project.organization.slug;
         const projectSlug = chat.team.project.slug;
         const url = `${ENV.SERVER_WEB_URL}/playground/${orgSlug}/${projectSlug}?tab=chats&teamChat=${chat.teamId}`;
-        const notification = await prisma.notification.create({
-            data: {
-                userId: member.userId,
-                type: NotificationType.TeamChatMention,
-                payload: {
-                    teamChatId: data.teamChatId,
-                    teamId: chat.teamId,
-                    teamName: chat.team.name,
-                    projectId: chat.team.project.id,
-                    projectSlug,
-                    orgSlug,
-                    senderId: data.mentionedById,
-                    senderName,
-                    message,
-                },
+        await NotificationCreateService.create({
+            scope: "project",
+            userId: member.userId,
+            projectId: chat.team.project.id,
+            type: NotificationType.TeamChatMention,
+            payload: {
+                teamChatId: data.teamChatId,
+                teamId: chat.teamId,
+                teamName: chat.team.name,
+                projectId: chat.team.project.id,
+                projectSlug,
+                orgSlug,
+                senderId: data.mentionedById,
+                senderName,
+                message,
             },
         });
 
-        await server_services.publisher.publish_message(
-            server_services.publisher.get_user_channel_name(notification.userId),
-            JSON.stringify({
-                type: OutboundSocketMessageType.NOTIFICATION_CREATED,
-                payload: notification,
-            }),
-        );
         await sendMentionEmail(member.user.email, { senderName, message, url });
     }
 }

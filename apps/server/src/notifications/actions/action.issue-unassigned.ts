@@ -1,6 +1,6 @@
 import { prisma, NotificationType } from "@trymatcha/database";
-import { OutboundSocketMessageType, type NotificationJobData } from "@trymatcha/types";
-import { server_services } from "../..";
+import type { NotificationJobData } from "@trymatcha/types";
+import NotificationCreateService from "../service.notification-create";
 
 type IssueUnassignedJobData = Extract<NotificationJobData, { action: "issue.unassigned" }>;
 
@@ -25,29 +25,21 @@ export default class IssueUnassignedNotification {
 
         const actorName = actor.name ?? actor.email;
 
-        const notification = await prisma.notification.create({
-            data: {
-                userId: data.assigneeId,
-                type: NotificationType.IssueUnassigned,
-                payload: {
-                    issueId: data.issueId,
-                    issueTitle: issue.title,
-                    issueNumber: issue.number,
-                    projectId: issue.projectId,
-                    projectSlug: issue.project.slug,
-                    orgSlug: issue.project.organization.slug,
-                    actorId: data.actorId,
-                    actorName,
-                },
+        await NotificationCreateService.create({
+            scope: "project",
+            userId: data.assigneeId,
+            projectId: issue.projectId,
+            type: NotificationType.IssueUnassigned,
+            payload: {
+                issueId: data.issueId,
+                issueTitle: issue.title,
+                issueNumber: issue.number,
+                projectId: issue.projectId,
+                projectSlug: issue.project.slug,
+                orgSlug: issue.project.organization.slug,
+                actorId: data.actorId,
+                actorName,
             },
         });
-
-        await server_services.publisher.publish_message(
-            server_services.publisher.get_user_channel_name(notification.userId),
-            JSON.stringify({
-                type: OutboundSocketMessageType.NOTIFICATION_CREATED,
-                payload: notification,
-            }),
-        );
     }
 }

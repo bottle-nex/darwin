@@ -1,40 +1,33 @@
 "use client";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { useActiveProject } from "@/hooks/useActiveProject";
-import { useNotifications } from "@/hooks/notifications/useNotifications";
+import { useInboxFeed } from "@/hooks/notifications/useInboxFeed";
 import { useInboxStore } from "@/store/playground/useInboxStore";
-import { notification_view } from "@/components/playground/Core/Notifications/notificationView";
-import type { Notification } from "@trymatcha/types";
 
-export function useInboxNotifications(): {
-    notifications: Notification[];
-    selected: Notification | null;
-    unreadCount: number;
-} {
-    const projectSlug = useActiveProject()?.slug;
+export function useInboxNotifications() {
+    const projectId = useActiveProject()?.id;
     const filter = useInboxStore((state) => state.filter);
     const selectedId = useInboxStore((state) => state.selectedId);
-    const { data } = useNotifications();
+    const select = useInboxStore((state) => state.select);
+    const feed = useInboxFeed(projectId);
 
-    const forProject = useMemo(
-        () =>
-            (data?.notifications ?? []).filter(
-                (notification) => notification_view(notification).projectSlug === projectSlug,
-            ),
-        [data?.notifications, projectSlug],
-    );
+    useEffect(() => {
+        select(null);
+    }, [projectId, select]);
 
     const notifications = useMemo(
         () =>
             filter === "unread"
-                ? forProject.filter((notification) => !notification.readAt)
-                : forProject,
-        [forProject, filter],
+                ? feed.notifications.filter((notification) => !notification.readAt)
+                : feed.notifications,
+        [feed.notifications, filter],
     );
 
     return {
+        projectId,
+        feed,
         notifications,
-        selected: forProject.find((notification) => notification.id === selectedId) ?? null,
-        unreadCount: forProject.filter((notification) => !notification.readAt).length,
+        selected: feed.notifications.find((notification) => notification.id === selectedId) ?? null,
+        unreadCount: feed.unreadCount,
     };
 }

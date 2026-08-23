@@ -23,6 +23,10 @@ import {
     WorkerStatus,
 } from "../generated/client";
 import type { CustomColumn } from "../generated/client";
+import {
+    NOTIFICATION_SCOPE,
+    NotificationScope,
+} from "@trymatcha/types/notifications/notification-scope";
 
 const ORG = {
     slug: "appx",
@@ -1754,6 +1758,12 @@ async function main() {
         createdAt: Date;
     }> = [];
 
+    const seeded_notification_project_id = (type: NotificationType, payload: object) => {
+        if (NOTIFICATION_SCOPE[type] !== NotificationScope.Project) return null;
+        const { projectId } = payload as { projectId?: string };
+        return projectId ?? null;
+    };
+
     for (const human of humans) {
         const actorFor = () => {
             const actor = pick(cast);
@@ -2034,7 +2044,12 @@ async function main() {
             });
         }
     }
-    await prisma.notification.createMany({ data: notifications });
+    await prisma.notification.createMany({
+        data: notifications.map((notification) => ({
+            ...notification,
+            projectId: seeded_notification_project_id(notification.type, notification.payload),
+        })),
+    });
 
     let apiKeyCount = 0;
     for (const human of humans) {

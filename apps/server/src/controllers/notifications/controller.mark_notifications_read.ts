@@ -1,41 +1,45 @@
 import { Request, Response } from "express";
-import z from "zod";
 import { prisma } from "@trymatcha/database";
+import NotificationFeedService, {
+    type NotificationFeedScope,
+} from "../../services/service.notification-feed";
 import ResponseWriter from "../../services/service.response";
+import {
+    notification_read_body_schema,
+    type NotificationReadBody,
+} from "./notification-read.schema";
+
+function feed_scope(body: NotificationReadBody, viewer_id: string): NotificationFeedScope {
+    return body.scope === "project"
+        ? { kind: "project", projectId: body.projectId, viewerId: viewer_id }
+        : { kind: "member", viewerId: viewer_id };
+}
 
 export default class MarkNotificationsReadController {
-    static body_schema = z.object({
-        ids: z.array(z.string().min(1)).min(1).max(100).optional(),
-    });
-
     static async process(req: Request, res: Response) {
         const user = req.user;
-        if (!user || !user.id) {
+        if (!user?.id) {
             ResponseWriter.not_authorized(res);
             return;
         }
 
-        const { data: body_data, success } = MarkNotificationsReadController.body_schema.safeParse(
-            req.body ?? {},
-        );
-        if (!success) {
+        const body = notification_read_body_schema.safeParse(req.body ?? {});
+        if (!body.success) {
             ResponseWriter.invalid_data(res);
             return;
         }
 
+        const scope = feed_scope(body.data, user.id);
+
         try {
             const result = await prisma.notification.updateMany({
-                where: {
-                    userId: user.id,
-                    readAt: null,
-                    ...(body_data.ids ? { id: { in: body_data.ids } } : {}),
-                },
+                where: body.data.ids
+                    ? { userId: user.id, readAt: null, id: { in: body.data.ids } }
+                    : { ...NotificationFeedService.scope_filter(scope), readAt: null },
                 data: { readAt: new Date() },
             });
 
-            const unreadCount = await prisma.notification.count({
-                where: { userId: user.id, readAt: null },
-            });
+            const unreadCount = await NotificationFeedService.unread_count(scope);
 
             ResponseWriter.success(
                 res,

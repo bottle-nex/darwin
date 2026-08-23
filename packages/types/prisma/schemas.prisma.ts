@@ -295,6 +295,7 @@ export interface MessageReference {
 export interface Notification {
     id: string;
     userId: string;
+    projectId: string | null;
     type: NotificationType;
     payload: Record<string, unknown>;
     readAt: Date | null;

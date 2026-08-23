@@ -1,8 +1,8 @@
 import { prisma, NotificationType, IssueStatus } from "@trymatcha/database";
-import { OutboundSocketMessageType, type NotificationJobData } from "@trymatcha/types";
+import type { NotificationJobData } from "@trymatcha/types";
 import { ENV } from "../../configs/env";
 import { sendIssueFailedEmail } from "../../services/service.email";
-import { server_services } from "../..";
+import NotificationCreateService from "../service.notification-create";
 
 type IssueStatusChangedJobData = Extract<NotificationJobData, { action: "issue.status_changed" }>;
 
@@ -37,32 +37,24 @@ export default class IssueStatusChangedNotification {
         const orgSlug = issue.project.organization.slug;
         const projectSlug = issue.project.slug;
 
-        const notification = await prisma.notification.create({
-            data: {
-                userId: data.recipientId,
-                type: NotificationType.IssueStatusChanged,
-                payload: {
-                    issueId: data.issueId,
-                    issueTitle: issue.title,
-                    issueNumber: issue.number,
-                    projectId: issue.projectId,
-                    projectSlug,
-                    orgSlug,
-                    actorId: data.actorId,
-                    actorName,
-                    fromStatus: data.fromStatus,
-                    toStatus: data.toStatus,
-                },
+        await NotificationCreateService.create({
+            scope: "project",
+            userId: data.recipientId,
+            projectId: issue.projectId,
+            type: NotificationType.IssueStatusChanged,
+            payload: {
+                issueId: data.issueId,
+                issueTitle: issue.title,
+                issueNumber: issue.number,
+                projectId: issue.projectId,
+                projectSlug,
+                orgSlug,
+                actorId: data.actorId,
+                actorName,
+                fromStatus: data.fromStatus,
+                toStatus: data.toStatus,
             },
         });
-
-        await server_services.publisher.publish_message(
-            server_services.publisher.get_user_channel_name(notification.userId),
-            JSON.stringify({
-                type: OutboundSocketMessageType.NOTIFICATION_CREATED,
-                payload: notification,
-            }),
-        );
 
         if (data.toStatus !== IssueStatus.Failed) return;
 

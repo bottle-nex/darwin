@@ -1,7 +1,7 @@
 import { prisma, NotificationType } from "@trymatcha/database";
-import { OutboundSocketMessageType, type NotificationJobData } from "@trymatcha/types";
+import type { NotificationJobData } from "@trymatcha/types";
 import { sendRemovedFromScopeEmail } from "../../services/service.email";
-import { server_services } from "../..";
+import NotificationCreateService from "../service.notification-create";
 
 type RemovedFromTeamJobData = Extract<NotificationJobData, { action: "member.removed_from_team" }>;
 
@@ -30,30 +30,21 @@ export default class RemovedFromTeamNotification {
 
         const actorName = actor.name ?? actor.email;
 
-        const notification = await prisma.notification.create({
-            data: {
-                userId: data.recipientId,
-                type: NotificationType.RemovedFromTeam,
-                payload: {
-                    teamId: data.teamId,
-                    teamName: team.name,
-                    projectId: team.projectId,
-                    projectSlug: team.project.slug,
-                    orgName: team.project.organization.name,
-                    orgSlug: team.project.organization.slug,
-                    actorId: data.actorId,
-                    actorName,
-                },
+        await NotificationCreateService.create({
+            scope: "member",
+            userId: data.recipientId,
+            type: NotificationType.RemovedFromTeam,
+            payload: {
+                teamId: data.teamId,
+                teamName: team.name,
+                projectId: team.projectId,
+                projectSlug: team.project.slug,
+                orgName: team.project.organization.name,
+                orgSlug: team.project.organization.slug,
+                actorId: data.actorId,
+                actorName,
             },
         });
-
-        await server_services.publisher.publish_message(
-            server_services.publisher.get_user_channel_name(notification.userId),
-            JSON.stringify({
-                type: OutboundSocketMessageType.NOTIFICATION_CREATED,
-                payload: notification,
-            }),
-        );
 
         await sendRemovedFromScopeEmail(recipient.email, {
             actorName,

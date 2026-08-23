@@ -10,7 +10,10 @@ import { BLURRED_BG_TWO } from "@/components/playground/Home/KanbanDisplay/cardS
 import { useUserConfig } from "@/hooks/user/useUserConfig";
 import { useFloatNotificationsStore } from "@/store/playground/useFloatNotificationsStore";
 import { useNotificationsPanelStore } from "@/store/playground/useNotificationsPanelStore";
-import type { Notification } from "@trymatcha/types";
+import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
+import { useCommandContextStore } from "@/store/command/useCommandContextStore";
+import { PlaygroundTab } from "@/components/playground/playgroundTabs";
+import { NotificationScope, type Notification } from "@trymatcha/types";
 import { notification_target, notification_view, theme_of } from "./notificationView";
 import { useSelectNotification } from "./useSelectNotification";
 
@@ -19,14 +22,22 @@ const EASE = [0.22, 1, 0.36, 1] as const;
 
 export default function FloatNotifications() {
     const items = useFloatNotificationsStore((s) => s.items);
-    const clear = useFloatNotificationsStore((s) => s.clear);
+    const clearScope = useFloatNotificationsStore((s) => s.clearScope);
     const isPanelOpen = useNotificationsPanelStore((s) => s.isOpen);
+    const activeTab = usePlaygroundNavStore((s) => s.tab);
+    const activeProjectId = useCommandContextStore((s) => s.projectId);
     const select = useSelectNotification();
     const glass = useUserConfig().backgroundLightingEnabled;
 
     useEffect(() => {
-        if (isPanelOpen) clear();
-    }, [isPanelOpen, clear]);
+        if (isPanelOpen) clearScope(NotificationScope.Member);
+    }, [isPanelOpen, clearScope]);
+
+    useEffect(() => {
+        if (activeTab === PlaygroundTab.Inbox) {
+            clearScope(NotificationScope.Project, activeProjectId);
+        }
+    }, [activeTab, activeProjectId, clearScope]);
 
     return (
         <div

@@ -129,6 +129,13 @@ export const TEAM_CHAT_URL = (team_id: string, cursor: string | null, limit: num
 
 export const NOTIFICATIONS_URL = API_URL + "/notifications";
 export const NOTIFICATIONS_READ_URL = NOTIFICATIONS_URL + "/read";
+export const MEMBER_NOTIFICATIONS_URL = (cursor: string | null, limit: number) =>
+    `${NOTIFICATIONS_URL}?${HISTORY_QUERY(cursor, limit)}`;
+export const PROJECT_NOTIFICATIONS_URL = (
+    project_id: string,
+    cursor: string | null,
+    limit: number,
+) => `${NOTIFICATIONS_URL}/project/${project_id}?${HISTORY_QUERY(cursor, limit)}`;
 
 export const GLOBAL_SEARCH_URL = (project_id: string) => `${API_URL}/search/${project_id}`;
 

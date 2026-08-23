@@ -1,6 +1,6 @@
 import { NotificationType, prisma } from "@trymatcha/database";
-import { OutboundSocketMessageType, type NotificationJobData } from "@trymatcha/types";
-import { server_services } from "../..";
+import type { NotificationJobData } from "@trymatcha/types";
+import NotificationCreateService from "../service.notification-create";
 
 type MessageReactedJobData = Extract<NotificationJobData, { action: "message.reacted" }>;
 
@@ -38,25 +38,24 @@ export default class MessageReactedNotification {
         if (!actor) return;
 
         if (chat && !chat.isDeleted) {
-            const notification = await prisma.notification.create({
-                data: {
-                    userId: data.recipientId,
-                    type: NotificationType.MessageReacted,
-                    payload: {
-                        chatId: chat.id,
-                        issueId: chat.issueId,
-                        issueTitle: chat.issue.title,
-                        issueNumber: chat.issue.number,
-                        projectId: chat.issue.projectId,
-                        projectSlug: chat.issue.project.slug,
-                        orgSlug: chat.issue.project.organization.slug,
-                        actorId: data.actorId,
-                        actorName: actor.name ?? actor.email,
-                        emoji: data.emoji,
-                    },
+            await NotificationCreateService.create({
+                scope: "project",
+                userId: data.recipientId,
+                projectId: chat.issue.projectId,
+                type: NotificationType.MessageReacted,
+                payload: {
+                    chatId: chat.id,
+                    issueId: chat.issueId,
+                    issueTitle: chat.issue.title,
+                    issueNumber: chat.issue.number,
+                    projectId: chat.issue.projectId,
+                    projectSlug: chat.issue.project.slug,
+                    orgSlug: chat.issue.project.organization.slug,
+                    actorId: data.actorId,
+                    actorName: actor.name ?? actor.email,
+                    emoji: data.emoji,
                 },
             });
-            await MessageReactedNotification.publish(notification);
             return;
         }
 
@@ -74,22 +73,21 @@ export default class MessageReactedNotification {
             });
             if (!project_chat || project_chat.isDeleted) return;
 
-            const notification = await prisma.notification.create({
-                data: {
-                    userId: data.recipientId,
-                    type: NotificationType.MessageReacted,
-                    payload: {
-                        projectChatId: project_chat.id,
-                        projectId: project_chat.projectId,
-                        projectSlug: project_chat.project.slug,
-                        orgSlug: project_chat.project.organization.slug,
-                        actorId: data.actorId,
-                        actorName: actor.name ?? actor.email,
-                        emoji: data.emoji,
-                    },
+            await NotificationCreateService.create({
+                scope: "project",
+                userId: data.recipientId,
+                projectId: project_chat.projectId,
+                type: NotificationType.MessageReacted,
+                payload: {
+                    projectChatId: project_chat.id,
+                    projectId: project_chat.projectId,
+                    projectSlug: project_chat.project.slug,
+                    orgSlug: project_chat.project.organization.slug,
+                    actorId: data.actorId,
+                    actorName: actor.name ?? actor.email,
+                    emoji: data.emoji,
                 },
             });
-            await MessageReactedNotification.publish(notification);
             return;
         }
 
@@ -124,33 +122,22 @@ export default class MessageReactedNotification {
         });
         if (!membership) return;
 
-        const notification = await prisma.notification.create({
-            data: {
-                userId: data.recipientId,
-                type: NotificationType.MessageReacted,
-                payload: {
-                    teamChatId: team_chat.id,
-                    teamId: team_chat.teamId,
-                    teamName: team_chat.team.name,
-                    projectId: team_chat.team.project.id,
-                    projectSlug: team_chat.team.project.slug,
-                    orgSlug: team_chat.team.project.organization.slug,
-                    actorId: data.actorId,
-                    actorName: actor.name ?? actor.email,
-                    emoji: data.emoji,
-                },
+        await NotificationCreateService.create({
+            scope: "project",
+            userId: data.recipientId,
+            projectId: team_chat.team.project.id,
+            type: NotificationType.MessageReacted,
+            payload: {
+                teamChatId: team_chat.id,
+                teamId: team_chat.teamId,
+                teamName: team_chat.team.name,
+                projectId: team_chat.team.project.id,
+                projectSlug: team_chat.team.project.slug,
+                orgSlug: team_chat.team.project.organization.slug,
+                actorId: data.actorId,
+                actorName: actor.name ?? actor.email,
+                emoji: data.emoji,
             },
         });
-        await MessageReactedNotification.publish(notification);
-    }
-
-    private static async publish(notification: { id: string; userId: string }) {
-        await server_services.publisher.publish_message(
-            server_services.publisher.get_user_channel_name(notification.userId),
-            JSON.stringify({
-                type: OutboundSocketMessageType.NOTIFICATION_CREATED,
-                payload: notification,
-            }),
-        );
     }
 }

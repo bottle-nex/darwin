@@ -4,9 +4,9 @@ import type { Notification } from "@trymatcha/types";
 import { cn } from "@/lib/utils";
 import { PaneLeadSlot } from "@/components/playground/Core/components/PlaygroundPaneSlots";
 import PlaygroundBreadcrumb from "@/components/playground/Core/components/PlaygroundBreadcrumb";
-import NotificationList from "@/components/playground/Core/Notifications/NotificationList";
+import NotificationFeed from "@/components/playground/Core/Notifications/NotificationFeed";
 import NotificationSearch from "@/components/playground/Core/Notifications/NotificationSearch";
-import { useMarkNotificationsRead } from "@/hooks/notifications/useNotifications";
+import { useMarkNotificationsRead } from "@/hooks/notifications/useMarkNotificationsRead";
 import { useInboxStore, type InboxFilter } from "@/store/playground/useInboxStore";
 import InboxDetail from "./InboxDetail";
 import { useInboxNotifications } from "./useInboxNotifications";
@@ -18,14 +18,16 @@ const FILTERS: { value: InboxFilter; label: string }[] = [
 
 export default function InboxDisplay() {
     const [query, setQuery] = useState<string>("");
-    const { notifications, selected, unreadCount } = useInboxNotifications();
+    const { projectId, feed, notifications, selected, unreadCount } = useInboxNotifications();
     const filter = useInboxStore((state) => state.filter);
     const setFilter = useInboxStore((state) => state.setFilter);
     const select = useInboxStore((state) => state.select);
     const { mutate: mark_read } = useMarkNotificationsRead();
 
     function open(notification: Notification) {
-        if (!notification.readAt) mark_read({ ids: [notification.id] });
+        if (!notification.readAt && projectId) {
+            mark_read({ scope: "project", projectId, ids: [notification.id] });
+        }
         select(notification.id);
     }
 
@@ -52,10 +54,10 @@ export default function InboxDisplay() {
                             {option.label}
                         </button>
                     ))}
-                    {unreadCount > 0 && (
+                    {unreadCount > 0 && projectId && (
                         <button
                             type="button"
-                            onClick={() => mark_read({})}
+                            onClick={() => mark_read({ scope: "project", projectId })}
                             className="ml-auto cursor-pointer rounded-md px-1.5 py-1 text-[11px] text-neutral-500 transition-colors hover:bg-white/5 hover:text-neutral-200"
                         >
                             Mark all read
@@ -67,18 +69,36 @@ export default function InboxDisplay() {
                     <NotificationSearch value={query} onChange={setQuery} />
                 </div>
 
-                <NotificationList
+                <NotificationFeed
                     notifications={notifications}
+                    loadedCount={feed.notifications.length}
                     query={query}
+                    feedKey={`inbox:${projectId ?? ""}:${filter}`}
                     selectedId={selected?.id ?? null}
                     clickableRows="all"
-                    emptyTitle={query.trim() ? "No matches" : "You're all caught up"}
+                    className="min-h-0 flex-1 px-1.5 pb-2"
+                    emptyTitle={
+                        feed.accessDenied
+                            ? "No access to this project"
+                            : query.trim()
+                              ? "No matches"
+                              : "You're all caught up"
+                    }
                     emptySubtitle={
-                        query.trim()
-                            ? `Nothing matches “${query.trim()}”.`
-                            : "Assignments and mentions for this project land here."
+                        feed.accessDenied
+                            ? "You no longer have access to this project's inbox."
+                            : query.trim()
+                              ? `Nothing matches “${query.trim()}”.`
+                              : "Assignments and mentions for this project land here."
                     }
                     headerClassName="bg-charcoal/70 backdrop-blur-sm"
+                    loading={feed.isLoading}
+                    error={feed.isError}
+                    pageError={Boolean(feed.error) && notifications.length > 0}
+                    hasNextPage={Boolean(feed.hasNextPage)}
+                    fetchingNextPage={feed.isFetchingNextPage}
+                    onLoadMore={() => void feed.fetchNextPage()}
+                    onRetry={() => void feed.refetch()}
                     onSelect={open}
                 />
             </aside>
