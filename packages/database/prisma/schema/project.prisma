@@ -37,6 +37,7 @@ model Project {
   secrets            ProjectSecret[]
   tags               Tag[]
   issueTemplates     IssueTemplate[]
+  notifications      Notification[]
   planMd             String?             @db.Text
   planStatus         PlanStatus          @default(Pending)
   planCommitSha      String?
