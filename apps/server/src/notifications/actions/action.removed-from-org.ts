@@ -1,7 +1,7 @@
 import { prisma, NotificationType } from "@trymatcha/database";
-import { OutboundSocketMessageType, type NotificationJobData } from "@trymatcha/types";
+import type { NotificationJobData } from "@trymatcha/types";
 import { sendRemovedFromScopeEmail } from "../../services/service.email";
-import { server_services } from "../..";
+import NotificationCreateService from "../service.notification-create";
 
 type RemovedFromOrgJobData = Extract<NotificationJobData, { action: "member.removed_from_org" }>;
 
@@ -24,27 +24,18 @@ export default class RemovedFromOrgNotification {
 
         const actorName = actor.name ?? actor.email;
 
-        const notification = await prisma.notification.create({
-            data: {
-                userId: data.recipientId,
-                type: NotificationType.RemovedFromOrg,
-                payload: {
-                    orgId: data.orgId,
-                    orgName: organization.name,
-                    orgSlug: organization.slug,
-                    actorId: data.actorId,
-                    actorName,
-                },
+        await NotificationCreateService.create({
+            scope: "member",
+            userId: data.recipientId,
+            type: NotificationType.RemovedFromOrg,
+            payload: {
+                orgId: data.orgId,
+                orgName: organization.name,
+                orgSlug: organization.slug,
+                actorId: data.actorId,
+                actorName,
             },
         });
-
-        await server_services.publisher.publish_message(
-            server_services.publisher.get_user_channel_name(notification.userId),
-            JSON.stringify({
-                type: OutboundSocketMessageType.NOTIFICATION_CREATED,
-                payload: notification,
-            }),
-        );
 
         await sendRemovedFromScopeEmail(recipient.email, {
             actorName,

@@ -1,12 +1,7 @@
 import { prisma, NotificationType } from "@trymatcha/database";
-import {
-    OutboundSocketMessageType,
-    to_plain_text,
-    type LabelledReference,
-    type NotificationJobData,
-} from "@trymatcha/types";
+import { to_plain_text, type LabelledReference, type NotificationJobData } from "@trymatcha/types";
 import { MESSAGE_REFERENCE_INCLUDE } from "../../services/service.message-references";
-import { server_services } from "../..";
+import NotificationCreateService from "../service.notification-create";
 
 type IssueReferencedJobData = Extract<NotificationJobData, { action: "issue.referenced" }>;
 
@@ -38,31 +33,23 @@ export default class IssueReferencedNotification {
         ]);
         if (!issue || !actor) return;
 
-        const notification = await prisma.notification.create({
-            data: {
-                userId: data.recipientId,
-                type: NotificationType.IssueReferenced,
-                payload: {
-                    issueId: data.issueId,
-                    issueTitle: issue.title,
-                    issueNumber: issue.number,
-                    projectId: issue.projectId,
-                    projectSlug: issue.project.slug,
-                    orgSlug: issue.project.organization.slug,
-                    senderId: data.actorId,
-                    senderName: actor.name ?? actor.email,
-                    message: to_plain_text(source.message, source.references),
-                },
+        await NotificationCreateService.create({
+            scope: "project",
+            userId: data.recipientId,
+            projectId: issue.projectId,
+            type: NotificationType.IssueReferenced,
+            payload: {
+                issueId: data.issueId,
+                issueTitle: issue.title,
+                issueNumber: issue.number,
+                projectId: issue.projectId,
+                projectSlug: issue.project.slug,
+                orgSlug: issue.project.organization.slug,
+                senderId: data.actorId,
+                senderName: actor.name ?? actor.email,
+                message: to_plain_text(source.message, source.references),
             },
         });
-
-        await server_services.publisher.publish_message(
-            server_services.publisher.get_user_channel_name(notification.userId),
-            JSON.stringify({
-                type: OutboundSocketMessageType.NOTIFICATION_CREATED,
-                payload: notification,
-            }),
-        );
     }
 
     private static async find_source(

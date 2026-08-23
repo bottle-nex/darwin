@@ -1,8 +1,8 @@
 import { prisma, NotificationType } from "@trymatcha/database";
-import { OutboundSocketMessageType, type NotificationJobData } from "@trymatcha/types";
+import type { NotificationJobData } from "@trymatcha/types";
 import { ENV } from "../../configs/env";
 import { sendIssueAssignedEmail } from "../../services/service.email";
-import { server_services } from "../..";
+import NotificationCreateService from "../service.notification-create";
 
 type IssueAssignedJobData = Extract<NotificationJobData, { action: "issue.assigned" }>;
 
@@ -38,30 +38,22 @@ export default class IssueAssignedNotification {
         const projectSlug = issue.project.slug;
         const url = `${ENV.SERVER_WEB_URL}/playground/${orgSlug}/${projectSlug}/issue/${data.issueId}`;
 
-        const notification = await prisma.notification.create({
-            data: {
-                userId: data.assigneeId,
-                type: NotificationType.IssueAssigned,
-                payload: {
-                    issueId: data.issueId,
-                    issueTitle: issue.title,
-                    issueNumber: issue.number,
-                    projectId: issue.projectId,
-                    projectSlug,
-                    orgSlug,
-                    actorId: data.actorId,
-                    actorName,
-                },
+        await NotificationCreateService.create({
+            scope: "project",
+            userId: data.assigneeId,
+            projectId: issue.projectId,
+            type: NotificationType.IssueAssigned,
+            payload: {
+                issueId: data.issueId,
+                issueTitle: issue.title,
+                issueNumber: issue.number,
+                projectId: issue.projectId,
+                projectSlug,
+                orgSlug,
+                actorId: data.actorId,
+                actorName,
             },
         });
-
-        await server_services.publisher.publish_message(
-            server_services.publisher.get_user_channel_name(notification.userId),
-            JSON.stringify({
-                type: OutboundSocketMessageType.NOTIFICATION_CREATED,
-                payload: notification,
-            }),
-        );
 
         await sendIssueAssignedEmail(assignee.email, {
             actorName,

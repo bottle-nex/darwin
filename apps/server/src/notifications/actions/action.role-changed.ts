@@ -1,6 +1,6 @@
 import { prisma, NotificationType } from "@trymatcha/database";
-import { OutboundSocketMessageType, type NotificationJobData } from "@trymatcha/types";
-import { server_services } from "../..";
+import type { NotificationJobData } from "@trymatcha/types";
+import NotificationCreateService from "../service.notification-create";
 
 type RoleChangedJobData = Extract<NotificationJobData, { action: "member.role_changed" }>;
 
@@ -22,30 +22,21 @@ export default class RoleChangedNotification {
         });
         if (!actor) return;
 
-        const notification = await prisma.notification.create({
-            data: {
-                userId: data.recipientId,
-                type: NotificationType.RoleChanged,
-                payload: {
-                    teamId: data.teamId,
-                    teamName: team.name,
-                    projectId: team.projectId,
-                    projectSlug: team.project.slug,
-                    orgSlug: team.project.organization.slug,
-                    role: data.role,
-                    previousRole: data.previousRole,
-                    actorId: data.actorId,
-                    actorName: actor.name ?? actor.email,
-                },
+        await NotificationCreateService.create({
+            scope: "member",
+            userId: data.recipientId,
+            type: NotificationType.RoleChanged,
+            payload: {
+                teamId: data.teamId,
+                teamName: team.name,
+                projectId: team.projectId,
+                projectSlug: team.project.slug,
+                orgSlug: team.project.organization.slug,
+                role: data.role,
+                previousRole: data.previousRole,
+                actorId: data.actorId,
+                actorName: actor.name ?? actor.email,
             },
         });
-
-        await server_services.publisher.publish_message(
-            server_services.publisher.get_user_channel_name(notification.userId),
-            JSON.stringify({
-                type: OutboundSocketMessageType.NOTIFICATION_CREATED,
-                payload: notification,
-            }),
-        );
     }
 }
