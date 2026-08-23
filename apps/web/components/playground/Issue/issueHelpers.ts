@@ -6,10 +6,10 @@ import type { BoardColumn, BoardIssue } from "@/types/board";
 import type { IssueTarget } from "@/store/issues/useCreateIssueStore";
 import type { Priority } from "@/types/kanban";
 import {
-    RiSignalCellular1Fill,
-    RiSignalCellular2Fill,
-    RiSignalCellular3Fill,
-} from "react-icons/ri";
+    HighPriorityIcon,
+    MediumPriorityIcon,
+    LowPriorityIcon,
+} from "@/components/icons/PriorityIcons";
 
 export const DATE_ICON_COLOR = {
     start: "text-yellow-400",
@@ -36,9 +36,9 @@ export const PRIORITY_OPTIONS: PriorityOption[] = [
         rank: 1,
         iconClassName: "size-3! text-[#FF2C56]",
     },
-    { value: "high", label: "High", icon: RiSignalCellular3Fill, rank: 2 },
-    { value: "medium", label: "Medium", icon: RiSignalCellular2Fill, rank: 3 },
-    { value: "low", label: "Low", icon: RiSignalCellular1Fill, rank: 4 },
+    { value: "high", label: "High", icon: HighPriorityIcon, rank: 2 },
+    { value: "medium", label: "Medium", icon: MediumPriorityIcon, rank: 3 },
+    { value: "low", label: "Low", icon: LowPriorityIcon, rank: 4 },
 ];
 
 export function isEditable(issue: BoardIssue): boolean {
