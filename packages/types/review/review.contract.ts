@@ -12,6 +12,13 @@ export const ReviewState = {
 } as const;
 export type ReviewState = (typeof ReviewState)[keyof typeof ReviewState];
 
+export const ReviewMergeMethod = {
+    Merge: "merge",
+    Squash: "squash",
+    Rebase: "rebase",
+} as const;
+export type ReviewMergeMethod = (typeof ReviewMergeMethod)[keyof typeof ReviewMergeMethod];
+
 export const ReviewFileStatus = {
     Added: "added",
     Removed: "removed",
@@ -44,6 +51,7 @@ export interface ReviewHeader {
     issueId: string;
     issueNumber: number;
     issueTitle: string;
+    issueCustomColumnId: string | null;
     pullNumber: number;
     title: string;
     htmlUrl: string;
@@ -53,6 +61,8 @@ export interface ReviewHeader {
     author: ReviewActor | null;
     baseBranch: string;
     headBranch: string;
+    mergeable: boolean | null;
+    mergeableState: string;
     body: string | null;
     additions: number;
     deletions: number;

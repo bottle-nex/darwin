@@ -1,4 +1,5 @@
 import { BackgroundLightingColor, ProjectRole, TeamRole } from "@trymatcha/types";
+import type { IconPick } from "@/components/ui/IconPicker";
 
 export type PlanStatus = "Pending" | "Generating" | "Ready" | "Failed";
 
@@ -7,7 +8,7 @@ export interface Project {
     name: string;
     slug: string;
     description: string | null;
-    color: string | null;
+    icon: IconPick | null;
     githubRepoFullName: string | null;
     githubRepoUrl: string | null;
     githubDefaultBranch: string | null;
@@ -47,7 +48,7 @@ export interface ProjectDetail {
     githubRepoFullName: string | null;
     githubRepoUrl: string | null;
     githubDefaultBranch: string | null;
-    color: string | null;
+    icon: IconPick | null;
     ownerId: string;
     createdAt: string;
     updatedAt: string;

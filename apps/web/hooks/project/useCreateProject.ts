@@ -4,12 +4,14 @@ import { CREATE_PROJECT } from "@/routes/api_routes";
 import { ORGANIZATIONS_QUERY_KEY } from "@/hooks/playground/useFetchOrganizations";
 import { DASHBOARD_QUERY_KEY } from "@/hooks/dashboard/useGetDashboard";
 import type { ApiResponse } from "@/types/api";
+import type { IconPick } from "@/components/ui/IconPicker";
 
 export interface CreateProjectInput {
     org_id: string;
     name: string;
     slug: string;
     description?: string;
+    icon?: IconPick;
     repo?: {
         githubRepoId: string;
         fullName: string;
@@ -22,6 +24,7 @@ interface CreatedProject {
     id: string;
     name: string;
     slug: string;
+    icon: IconPick | null;
 }
 
 export function useCreateProject() {

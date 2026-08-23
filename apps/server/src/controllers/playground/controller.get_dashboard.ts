@@ -59,7 +59,7 @@ export default class GetDashboardController {
                     name: true,
                     slug: true,
                     description: true,
-                    color: true,
+                    icon: true,
                     githubRepoFullName: true,
                     githubRepoUrl: true,
                     githubDefaultBranch: true,

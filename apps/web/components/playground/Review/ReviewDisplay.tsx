@@ -1,5 +1,6 @@
 "use client";
-import { ReviewTab } from "@trymatcha/types";
+import { AiFillMerge } from "react-icons/ai";
+import { ReviewTab, type ReviewHeader as ReviewHeaderData } from "@trymatcha/types";
 import { Button } from "@/components/ui/button";
 import LogoLoader from "@/components/app/LogoLoader";
 import PaneColumns from "@/components/playground/Core/components/PaneColumns";
@@ -10,9 +11,9 @@ import { useActiveProject } from "@/hooks/useActiveProject";
 import { useEscapeExit } from "@/hooks/shortcuts/useEscapeExit";
 import { useReview } from "@/hooks/review/useReview";
 import { usePaneRouteStore, type PaneRoute } from "@/store/playground/usePaneRouteStore";
-import ReviewChanges from "./changes/ReviewChanges";
-import DiffDisplay from "./diff/DiffDisplay";
-import ReviewPullRequest from "./pull-request/ReviewPullRequest";
+import ChangesReviewDisplay from "./changes/ChangesReviewDisplay";
+import DiffReviewDisplay from "./diff/DiffReviewDisplay";
+import PullRequestReviewDisplay from "./pull-request/PullRequestReviewDisplay";
 import ReviewHeader from "./ReviewHeader";
 import ReviewIssueProperties from "./ReviewIssueProperties";
 
@@ -45,34 +46,52 @@ export default function ReviewDisplay({ route }: { route: ReviewRoute }) {
         <main className={PLAYGROUND_PANE_SHELL}>
             <PaneLeadSlot>
                 <PlaygroundBreadcrumb
-                    trail={[
-                        {
-                            label: `#${review.issueNumber} ${review.issueTitle}`,
-                            onClick: () => openIssue(review.issueId),
-                        },
-                        `#${review.pullNumber} ${review.title}`,
-                    ]}
+                    issue={{
+                        id: review.issueId,
+                        number: review.issueNumber,
+                        title: review.issueTitle,
+                        customColumnId: review.issueCustomColumnId,
+                    }}
+                    trailing={`#${review.pullNumber} ${review.title}`}
+                    trailingIcon={AiFillMerge}
                 />
             </PaneLeadSlot>
-
             <ReviewHeader tab={route.tab} htmlUrl={review.htmlUrl} />
-
-            {route.tab === ReviewTab.Changes ? (
-                <ReviewChanges projectId={projectId} review={review} />
-            ) : (
-                <PaneColumns aside={<ReviewIssueProperties issueId={review.issueId} />}>
-                    {route.tab === ReviewTab.Diff ? (
-                        <DiffDisplay
-                            productDiffId={review.productDiffId}
-                            issueId={review.issueId}
-                        />
-                    ) : (
-                        <ReviewPullRequest projectId={projectId} review={review} />
-                    )}
-                </PaneColumns>
-            )}
+            <ReviewTabPanels tab={route.tab} projectId={projectId} review={review} />
         </main>
     );
+}
+
+function ReviewTabPanels({
+    tab,
+    projectId,
+    review,
+}: {
+    tab: ReviewTab;
+    projectId: string | undefined;
+    review: ReviewHeaderData;
+}) {
+    switch (tab) {
+        case ReviewTab.Changes:
+            return <ChangesReviewDisplay projectId={projectId} review={review} />;
+
+        case ReviewTab.Diff:
+            return (
+                <PaneColumns aside={<ReviewIssueProperties issueId={review.issueId} />}>
+                    <DiffReviewDisplay
+                        productDiffId={review.productDiffId}
+                        issueId={review.issueId}
+                    />
+                </PaneColumns>
+            );
+
+        case ReviewTab.PullRequest:
+            return (
+                <PaneColumns aside={<ReviewIssueProperties issueId={review.issueId} />}>
+                    <PullRequestReviewDisplay projectId={projectId} review={review} />
+                </PaneColumns>
+            );
+    }
 }
 
 function ReviewFallback({ children }: { children: React.ReactNode }) {

@@ -13,6 +13,7 @@ import {
     LuUserMinus,
     LuUserPlus,
 } from "react-icons/lu";
+import { GoGitMerge, GoGitPullRequestClosed } from "react-icons/go";
 import { RiSignalCellular2Fill } from "react-icons/ri";
 import { IoPencilSharp } from "react-icons/io5";
 import { HiCalendar } from "react-icons/hi2";
@@ -269,6 +270,42 @@ const REGISTRY: { [K in ActivityType]?: ActivityEntry<K> } = {
             </>
         ),
         summary: "opened a pull request",
+    },
+    [ActivityType.PrMerged]: {
+        icon: GoGitMerge,
+        iconClassName: "text-violet-400",
+        render: (payload) => (
+            <>
+                merged{" "}
+                <a
+                    href={payload.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="font-medium text-neutral-300 underline decoration-edge underline-offset-2 hover:text-mist"
+                >
+                    a pull request
+                </a>
+            </>
+        ),
+        summary: "merged a pull request",
+    },
+    [ActivityType.PrClosed]: {
+        icon: GoGitPullRequestClosed,
+        iconClassName: "text-rose-400",
+        render: (payload) => (
+            <>
+                closed{" "}
+                <a
+                    href={payload.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="font-medium text-neutral-300 underline decoration-edge underline-offset-2 hover:text-mist"
+                >
+                    a pull request
+                </a>
+            </>
+        ),
+        summary: "closed a pull request",
     },
 };
 

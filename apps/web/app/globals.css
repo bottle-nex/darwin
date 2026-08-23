@@ -4,7 +4,7 @@
    imported by both apps/web and apps/admin so they cannot drift. */
 @import "../../../packages/theme/theme.css";
 @import "../../../node_modules/react-diff-view/style/index.css";
-@import "../../../node_modules/prism-themes/themes/prism-cb.css";
+@import "../../../node_modules/prism-themes/themes/prism-z-touch.css";
 
 @source "../**/*.{ts,tsx}";
 @source "../../../packages/editorial/**/*.tsx";
@@ -604,6 +604,16 @@
     width: 3.5rem;
 }
 
+.review-diff .diff-gutter-col:first-of-type {
+    width: 0;
+}
+
+.review-diff td.diff-gutter:first-of-type {
+    width: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
 .review-diff .diff-gutter {
     cursor: default;
     color: var(--color-neutral-600);
@@ -617,10 +627,12 @@
 }
 
 .review-diff .diff-gutter-insert {
+    color: var(--diff-gutter-insert-text-color);
     box-shadow: inset 2px 0 0 0 var(--diff-add);
 }
 
 .review-diff .diff-gutter-delete {
+    color: var(--diff-gutter-delete-text-color);
     box-shadow: inset 2px 0 0 0 var(--diff-remove);
 }
 

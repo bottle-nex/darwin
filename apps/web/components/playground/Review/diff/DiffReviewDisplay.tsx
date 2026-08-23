@@ -24,7 +24,7 @@ const OUTCOME_SUFFIX: Record<string, string> = {
     Unavailable: " · unavailable",
 };
 
-export default function DiffDisplay({
+export default function DiffReviewDisplay({
     productDiffId,
     issueId,
 }: {
@@ -47,21 +47,25 @@ export default function DiffDisplay({
         (item) => item.stateId === state?.id && item.viewportId === viewport?.id,
     );
 
-    const keys = useMemo(() => {
+    const artifactKeys = useMemo(() => {
         if (!target) return [];
         return target.shots
             .flatMap((item) => [item.baseKey, item.headKey])
             .filter((key): key is string => key !== null);
     }, [target]);
-    const { data: urls = {} } = useProductDiffArtifacts(projectId, productDiffId, keys);
+    const { data: artifactUrls = {} } = useProductDiffArtifacts(
+        projectId,
+        productDiffId,
+        artifactKeys,
+    );
 
-    function changeTarget(nextId: string) {
+    function handleTargetChange(nextId: string) {
         const next = manifest?.targets.find((item) => item.id === nextId);
         setTargetId(nextId);
         setStateId(next?.states[0]?.id ?? "");
     }
 
-    function retry() {
+    function handleRegenerate() {
         if (!projectId) return;
         regenerate.mutate({ projectId, issueId });
     }
@@ -73,7 +77,7 @@ export default function DiffDisplay({
                     {manifest && target && manifest.targets.length > 1 && (
                         <Picker
                             value={target.id}
-                            onChange={changeTarget}
+                            onChange={handleTargetChange}
                             options={manifest.targets.map((item) => ({
                                 value: item.id,
                                 label: `${item.label}${OUTCOME_SUFFIX[item.outcome] ?? ""}`,
@@ -123,7 +127,7 @@ export default function DiffDisplay({
                     title={detail.status === "Stale" ? "Out of date" : "Capture failed"}
                     body={detail.error ?? "The pull request changed after this diff was taken."}
                     action={
-                        <Button size="sm" loading={regenerate.isPending} onClick={retry}>
+                        <Button size="sm" loading={regenerate.isPending} onClick={handleRegenerate}>
                             <FiRefreshCw />
                             {detail.status === "Stale" ? "Regenerate" : "Retry"}
                         </Button>
@@ -135,7 +139,7 @@ export default function DiffDisplay({
                     title="Captured in an older format"
                     body="This diff predates screenshot capture. Regenerate it to see the real components."
                     action={
-                        <Button size="sm" loading={regenerate.isPending} onClick={retry}>
+                        <Button size="sm" loading={regenerate.isPending} onClick={handleRegenerate}>
                             <FiRefreshCw />
                             Regenerate
                         </Button>
@@ -143,7 +147,7 @@ export default function DiffDisplay({
                 />
             )}
             {detail && detail.status === "Ready" && manifest && shot && (
-                <DiffComparison shot={shot} urls={urls} />
+                <DiffComparison shot={shot} urls={artifactUrls} />
             )}
             {detail && detail.status === "Ready" && manifest && !shot && (
                 <DiffStatus

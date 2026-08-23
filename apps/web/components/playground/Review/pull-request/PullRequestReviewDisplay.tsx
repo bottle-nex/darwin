@@ -6,9 +6,10 @@ import { useReviewComments } from "@/hooks/review/useReviewComments";
 import ReviewActorAvatar from "../ReviewActorAvatar";
 import ReviewCommentCard from "./ReviewCommentCard";
 import ReviewComposer from "./ReviewComposer";
+import ReviewMergePanel from "./ReviewMergePanel";
 import ReviewSummary from "./ReviewSummary";
 
-export default function ReviewPullRequest({
+export default function PullRequestReviewDisplay({
     projectId,
     review,
 }: {
@@ -42,16 +43,19 @@ export default function ReviewPullRequest({
                         <LogoLoader className="h-24 w-full text-snow" />
                     ) : comments?.length ? (
                         comments.map((comment) => (
-                            <ReviewCommentCard key={comment.id} comment={comment} />
+                            <ReviewCommentCard
+                                key={comment.id}
+                                comment={comment}
+                                projectId={projectId}
+                                pullNumber={review.pullNumber}
+                            />
                         ))
                     ) : (
-                        <p className="text-[14.5px] text-neutral-500">
-                            No comments on this pull request yet.
-                        </p>
+                        <></>
                     )}
                 </section>
-
-                <ReviewComposer projectId={projectId} pullNumber={review.pullNumber} />
+                <ReviewMergePanel review={review} projectId={projectId} />
+                <ReviewComposer projectId={projectId} review={review} />
             </div>
         </div>
     );

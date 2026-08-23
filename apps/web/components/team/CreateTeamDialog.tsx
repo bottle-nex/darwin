@@ -9,7 +9,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { DIALOG_TITLE_FIELD, GHOST_FIELD } from "@/components/ui/fieldStyles";
 import { CapsuleTrigger } from "@/components/playground/Issue/Capsule";
-import PlaygroundAvatar from "@/components/playground/Core/components/PlaygroundAvatar";
+import PlaygroundAvatar, {
+    toneFor,
+} from "@/components/playground/Core/components/PlaygroundAvatar";
 import { cn } from "@/lib/utils";
 import { slugify } from "@/lib/format";
 import { useActiveProject } from "@/hooks/useActiveProject";
@@ -88,7 +90,8 @@ function CreateTeamForm({ projectId, onClose }: { projectId: string | null; onCl
                 <div className="flex items-center justify-start gap-x-1 text-snow text-xs">
                     <PlaygroundAvatar
                         letter={project?.name.slice(0, 2) ?? ""}
-                        tone="emerald"
+                        tone={project ? toneFor(project.id) : "emerald"}
+                        icon={project?.icon}
                         className="uppercase"
                     />
                     <span>

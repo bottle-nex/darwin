@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import type { AgentSession, Chat, IssueActivity } from "@trymatcha/types";
+import type { Chat, IssueActivity } from "@trymatcha/types";
 import {
     buildActivityFeedEntries,
     coordinateTimelineCoverage,
@@ -129,51 +129,26 @@ describe("exclusive timeline coverage", () => {
 });
 
 describe("timeline feed entries", () => {
-    test("groups sessions only after flattening duplicate rows across pages", () => {
-        const session = {
-            id: "session-1",
-            issueId: "issue-1",
-            startedAt: at(90),
-        } as AgentSession;
+    test("flattens duplicate activity rows across pages instead of grouping them", () => {
         const entries = buildActivityFeedEntries(
             [
-                activity("a-1", 100, { seq: "1", sessionId: session.id }),
-                activity("a-2", 110, { seq: "2", sessionId: session.id, session }),
-                activity("a-2", 110, { seq: "2", sessionId: session.id, session }),
+                activity("a-1", 100, { seq: "1", sessionId: "session-1" }),
+                activity("a-2", 110, { seq: "2", sessionId: "session-1" }),
+                activity("a-2", 110, { seq: "2", sessionId: "session-1" }),
             ],
             [],
         );
 
-        expect(entries).toHaveLength(1);
-        expect(entries[0].kind).toBe("session");
-        expect(entries[0].key).toBe("session:session-1");
-        expect(entries[0].kind === "session" && entries[0].rows.map((row) => row.id)).toEqual([
-            "a-1",
-            "a-2",
-        ]);
+        expect(entries.map((entry) => entry.key)).toEqual(["activity:a-1", "activity:a-2"]);
+        expect(entries.every((entry) => entry.kind === "activity")).toBe(true);
     });
 
-    test("keeps partial session rows visible until their session snapshot loads", () => {
-        const row = activity("a-1", 100, { sessionId: "session-1" });
-        expect(buildActivityFeedEntries([row], []).map((entry) => entry.key)).toEqual([
-            "activity:a-1",
-        ]);
-    });
-
-    test("does not let session or embedded-root metadata cross the published boundary", () => {
-        const session = {
-            id: "session-1",
-            issueId: "issue-1",
-            startedAt: at(80),
-        } as AgentSession;
+    test("does not let embedded-root comment metadata cross the published boundary", () => {
         const root = comment("root", 80, { isDeleted: true });
         const reply = comment("reply", 110, { repliedToId: root.id, repliedTo: root });
         const coverage = coordinateTimelineCoverage({
             activity: {
-                items: [
-                    activity("a-boundary", 100),
-                    activity("a-session", 110, { sessionId: session.id, session }),
-                ],
+                items: [activity("a-boundary", 100), activity("a-past-boundary", 110)],
                 hasMore: true,
             },
             comments: {
@@ -184,7 +159,7 @@ describe("timeline feed entries", () => {
         const entries = buildActivityFeedEntries(coverage.activities, coverage.comments);
 
         expect(entries.map((entry) => [entry.key, entry.at])).toEqual([
-            ["session:session-1", 110],
+            ["activity:a-past-boundary", 110],
             ["comment:root", 110],
         ]);
         expect(entries.every((entry) => entry.at > coverage.watermark!)).toBe(true);

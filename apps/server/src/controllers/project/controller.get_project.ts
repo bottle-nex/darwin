@@ -42,7 +42,7 @@ export default async function get_project_controller(req: Request, res: Response
                 githubRepoFullName: true,
                 githubRepoUrl: true,
                 githubDefaultBranch: true,
-                color: true,
+                icon: true,
                 ownerId: true,
                 createdAt: true,
                 tourCompleted: true,

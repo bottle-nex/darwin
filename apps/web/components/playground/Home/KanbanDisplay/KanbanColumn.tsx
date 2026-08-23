@@ -12,7 +12,6 @@ import { cn } from "@/lib/utils";
 import { IssueStatus } from "@trymatcha/types";
 import { useCreateIssueStore } from "@/store/issues/useCreateIssueStore";
 import { useIssueSelectionStore } from "@/store/issues/useIssueSelectionStore";
-import { MatchaLogo } from "@/components/logo/MatchaLogo";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { useBoardLaneModel } from "@/hooks/issues/useBoard";
 import { useKanbanBoardStore } from "@/store/kanban/useKanbanBoardStore";
@@ -59,7 +58,7 @@ export default function KanbanColumn({
         <div
             data-column-status={column.status}
             className={cn(
-                "group flex max-h-full min-h-0 flex-col self-stretch rounded-lg bg-ink/20 ring-1 ring-snow/3 p-2 transition-colors",
+                "group flex max-h-full min-h-0 flex-col rounded-lg bg-ink/20 ring-1 ring-snow/3 p-2 transition-colors",
                 fullWidth ? "min-w-0 flex-1" : "w-84 shrink-0",
             )}
         >
@@ -174,23 +173,6 @@ export default function KanbanColumn({
                             Add an Issue
                         </Button>
                     ) : undefined
-                }
-                emptyState={
-                    <div
-                        className={cn(
-                            "flex flex-1 h-full flex-col items-center justify-center gap-2",
-                            "min-h-32 px-2",
-                        )}
-                    >
-                        <MatchaLogo className="h-6 w-auto text-neutral-800" />
-                        <p className="text-[12px] text-neutral-600">
-                            {lane.lanePending || lane.fallbackPending
-                                ? "Loading issues…"
-                                : lane.laneError || lane.fallbackError
-                                  ? "Couldn’t load issues"
-                                  : "No issues currently"}
-                        </p>
-                    </div>
                 }
             />
             <BoardLanePaginationView lane={lane} />

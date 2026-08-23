@@ -1,7 +1,10 @@
 "use client";
 import { Fragment } from "react";
 import { MdChevronRight } from "react-icons/md";
+import type { IconType } from "react-icons";
 import { Button } from "@/components/ui/button";
+import IconWrapper from "@/components/ui/IconWrapper";
+import { ICONS } from "@/data/icons_bulk";
 import { PlaygroundTab } from "@/components/playground/playgroundTabs";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { cn } from "@/lib/utils";
@@ -10,6 +13,26 @@ import { NO_FOCUS, useKanbanOptionsStore } from "@/store/kanban/useKanbanOptions
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
 import type { BoardIssue } from "@/types/board";
 import type { BoardView } from "@/types/kanban";
+import type { IconPick } from "@/components/ui/IconPicker";
+
+function ProjectIcon({ pick }: { pick: IconPick }) {
+    if (pick.kind === "emoji") {
+        return (
+            <IconWrapper variant="ghost" className="size-4.25 shrink-0 px-0 text-[13px]">
+                {pick.char}
+            </IconWrapper>
+        );
+    }
+    return (
+        <IconWrapper
+            icon={ICONS[pick.name as keyof typeof ICONS]}
+            iconStyle={{ color: pick.color }}
+            variant="solid"
+            className="size-6 shrink-0"
+            iconClassName="size-4.5"
+        />
+    );
+}
 
 export type PlaygroundBreadcrumbTarget = {
     tab: PlaygroundTab;
@@ -75,10 +98,12 @@ export default function PlaygroundBreadcrumb({
     issue,
     trail,
     trailing,
+    trailingIcon,
 }: {
     issue?: Pick<BoardIssue, "id" | "number" | "title" | "customColumnId">;
     trail?: PlaygroundBreadcrumbSegment[];
     trailing?: string;
+    trailingIcon?: IconType;
 }) {
     const project = useActiveProject();
     const openIssue = usePaneRouteStore((state) => state.openIssue);
@@ -128,13 +153,15 @@ export default function PlaygroundBreadcrumb({
                     variant="unstyled"
                     type="button"
                     onClick={() => navigate(PROJECT_BREADCRUMB_TARGET)}
-                    className="truncate font-medium capitalize text-neutral-400 transition-colors hover:text-neutral-100"
+                    className="flex min-w-0 cursor-pointer items-center gap-1.5 font-medium capitalize text-neutral-400 transition-colors hover:text-neutral-100"
                 >
-                    {project.name}
+                    {project.icon && <ProjectIcon pick={project.icon} />}
+                    <span className="truncate">{project.name}</span>
                 </Button>
             ) : (
-                <span className="truncate font-medium capitalize text-neutral-200">
-                    {project.name}
+                <span className="flex min-w-0 items-center gap-1.5 font-medium capitalize text-neutral-200">
+                    {project.icon && <ProjectIcon pick={project.icon} />}
+                    <span className="truncate">{project.name}</span>
                 </span>
             )}
             {segments.map((segment, index) => {
@@ -166,11 +193,19 @@ export default function PlaygroundBreadcrumb({
                             <span
                                 aria-current={current ? "page" : undefined}
                                 className={cn(
-                                    "min-w-0 truncate font-medium",
+                                    "flex min-w-0 items-center gap-1.5 font-medium",
                                     current ? "text-neutral-100" : "shrink-0 text-neutral-400",
                                 )}
                             >
-                                {label}
+                                {current && trailingIcon && (
+                                    <IconWrapper
+                                        icon={trailingIcon}
+                                        variant="ghost"
+                                        className="size-5.25 shrink-0 hover:bg-none!"
+                                        iconClassName="size-4"
+                                    />
+                                )}
+                                <span className="truncate">{label}</span>
                             </span>
                         )}
                     </Fragment>

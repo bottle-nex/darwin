@@ -1,9 +1,9 @@
 "use client";
 import { useMemo, type ReactNode } from "react";
-import { cn } from "@/lib/utils";
 import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
 import { IssueSelectionOrderProvider } from "@/hooks/issues/useIssueSelection";
-import type { BoardState } from "@/types/kanban";
+import type { BoardState, KanbanColumnDef } from "@/types/kanban";
+import HiddenKanbanColumn from "./HiddenKanbanColumn";
 import KanbanColumn from "./KanbanColumn";
 
 type KanbanBoardViewProps = {
@@ -11,8 +11,6 @@ type KanbanBoardViewProps = {
     /** Columns to render before the LLM columns (e.g. the Custom Kanban) so both
      *  boards flow through one continuous scroll row. */
     leading?: ReactNode;
-    /** Size columns to their content (Trello-style) instead of stretching them. */
-    startAligned?: boolean;
 };
 
 /**
@@ -22,7 +20,16 @@ type KanbanBoardViewProps = {
  * single-column focus is rendered by `KanbanDisplay`, not here. The shared
  * DndContext lives in `KanbanDisplay`.
  */
-export default function KanbanBoardView({ board, leading, startAligned }: KanbanBoardViewProps) {
+export default function KanbanBoardView({ board, leading }: KanbanBoardViewProps) {
+    const { visibleColumns, hiddenColumns } = useMemo(() => {
+        const visibleColumns: KanbanColumnDef[] = [];
+        const hiddenColumns: KanbanColumnDef[] = [];
+        for (const column of KanbanBoard.COLUMNS) {
+            (board[column.status].length === 0 ? hiddenColumns : visibleColumns).push(column);
+        }
+        return { visibleColumns, hiddenColumns };
+    }, [board]);
+
     const loadedIssueIds = useMemo(
         () => KanbanBoard.STATUSES.flatMap((status) => board[status].map((issue) => issue.id)),
         [board],
@@ -31,14 +38,11 @@ export default function KanbanBoardView({ board, leading, startAligned }: Kanban
     return (
         <div
             data-kanban-scroll-row
-            className={cn(
-                "flex min-h-0 flex-1 gap-y-4 gap-x-2 overflow-x-auto px-3 pt-3 pb-3",
-                startAligned && "items-start",
-            )}
+            className="flex min-h-0 flex-1 items-start gap-y-4 gap-x-2 overflow-x-auto px-3 pt-3 pb-3"
         >
             {leading}
             <IssueSelectionOrderProvider issueIds={loadedIssueIds}>
-                {KanbanBoard.COLUMNS.map((column) => (
+                {visibleColumns.map((column) => (
                     <KanbanColumn
                         key={column.status}
                         column={column}
@@ -48,6 +52,7 @@ export default function KanbanBoardView({ board, leading, startAligned }: Kanban
                     />
                 ))}
             </IssueSelectionOrderProvider>
+            <HiddenKanbanColumn columns={hiddenColumns} />
         </div>
     );
 }

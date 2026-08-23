@@ -8,7 +8,7 @@ import IssueSubmitAction from "./IssueSubmitAction";
 import { useIssueForm } from "./useIssueForm";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { MdOutlineKeyboardArrowRight } from "react-icons/md";
-import PlaygroundAvatar from "../Core/components/PlaygroundAvatar";
+import PlaygroundAvatar, { toneFor } from "../Core/components/PlaygroundAvatar";
 
 export default function CreateIssueForm({
     target,
@@ -26,7 +26,8 @@ export default function CreateIssueForm({
                     <div className="flex items-center justify-start gap-x-1 text-snow text-xs">
                         <PlaygroundAvatar
                             letter={project?.name.slice(0, 2) ?? ""}
-                            tone="emerald"
+                            tone={project ? toneFor(project.id) : "emerald"}
+                            icon={project?.icon}
                             className="uppercase"
                         />
                         <span>

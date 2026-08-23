@@ -1,17 +1,14 @@
 "use client";
 import { useState } from "react";
 import { isAxiosError } from "axios";
-import { MdOutlineKeyboardArrowRight } from "react-icons/md";
-import { PiSmileyFill } from "react-icons/pi";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import IconPicker, { IconPickGlyph, type IconPick } from "@/components/ui/IconPicker";
+import type { IconPick } from "@/components/ui/IconPicker";
 import { DIALOG_TITLE_FIELD, GHOST_FIELD } from "@/components/ui/fieldStyles";
 import { CapsuleTrigger } from "@/components/playground/Issue/Capsule";
 import IssueDescriptionEditor from "@/components/playground/Issue/editor/IssueDescriptionEditor";
-import PlaygroundAvatar from "@/components/playground/Core/components/PlaygroundAvatar";
 import { cn } from "@/lib/utils";
 import { slugify } from "@/lib/format";
 import { useCreateProject } from "@/hooks/project/useCreateProject";
@@ -21,6 +18,7 @@ import CreateProjectDialogRepository from "./CreateProjectDialogRepository";
 
 interface Props {
     org: Organization | undefined;
+    icon: IconPick | null;
     mustCreateProject: boolean;
     onCancel: () => void;
     onCreated: (projectId: string) => void;
@@ -28,6 +26,7 @@ interface Props {
 
 export default function CreateProjectDialogDetailsStep({
     org,
+    icon,
     mustCreateProject,
     onCancel,
     onCreated,
@@ -40,8 +39,6 @@ export default function CreateProjectDialogDetailsStep({
     const [slugOpen, setSlugOpen] = useState(false);
     const [description, setDescription] = useState("");
     const [descriptionEmpty, setDescriptionEmpty] = useState(true);
-    const [icon, setIcon] = useState<IconPick | null>(null);
-    const [iconOpen, setIconOpen] = useState(false);
     const [selectedRepo, setSelectedRepo] = useState<GithubRepo | null>(null);
     const [selectedBranch, setSelectedBranch] = useState("");
 
@@ -60,6 +57,7 @@ export default function CreateProjectDialogDetailsStep({
                 name: trimmed,
                 slug: slug.trim() || slugify(trimmed),
                 description: descriptionEmpty ? undefined : description,
+                icon: icon ?? undefined,
                 repo: selectedRepo
                     ? {
                           githubRepoId: selectedRepo.id,
@@ -76,31 +74,6 @@ export default function CreateProjectDialogDetailsStep({
     return (
         <main className="flex min-h-0 min-w-0 flex-1 flex-col justify-between *:px-6">
             <section className="flex flex-col items-start gap-y-3 pt-4 pb-2">
-                <div className="flex w-full items-center justify-between">
-                    <div className="flex items-center justify-start gap-x-1 text-snow text-xs">
-                        <PlaygroundAvatar
-                            letter={org?.name.slice(0, 2) ?? ""}
-                            tone="emerald"
-                            className="uppercase"
-                        />
-                        <span>
-                            <MdOutlineKeyboardArrowRight />
-                        </span>
-                        <span className="text-sm">New Project</span>
-                    </div>
-                    <IconPicker open={iconOpen} onOpenChange={setIconOpen} onSelect={setIcon}>
-                        <CapsuleTrigger
-                            aria-label="Pick project icon"
-                            className="size-7 shrink-0 justify-center rounded-full p-0"
-                        >
-                            {icon ? (
-                                <IconPickGlyph pick={icon} className="size-3.5 text-sm" />
-                            ) : (
-                                <PiSmileyFill className="size-3.5 text-white/60" aria-hidden />
-                            )}
-                        </CapsuleTrigger>
-                    </IconPicker>
-                </div>
                 <Textarea
                     rows={1}
                     autoFocus

@@ -40,7 +40,7 @@ const PROJECT = {
     summary: "Scheduling product — the repo matcha's runners clone, build and open PRs against.",
     description:
         "Nocturn is the target project. Issues filed on this board get picked up by an agent, run inside a sandboxed runner against this repo, and come back as a pull request.",
-    color: "#9bc24f",
+    icon: { kind: "icon", name: "moon", color: "#9bc24f" } as const,
     repoFullName: "appx/nocturn",
     repoUrl: "https://github.com/appx/nocturn",
     defaultBranch: "main",
@@ -748,7 +748,7 @@ async function main() {
             slug: PROJECT.slug,
             summary: PROJECT.summary,
             description: PROJECT.description,
-            color: PROJECT.color,
+            icon: PROJECT.icon,
             ownerId: lead.id,
             createdById: lead.id,
             tourCompleted: true,

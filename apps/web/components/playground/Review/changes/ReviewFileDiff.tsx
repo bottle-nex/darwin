@@ -1,6 +1,8 @@
 "use client";
 import { useMemo, useState } from "react";
 import {
+    computeNewLineNumber,
+    computeOldLineNumber,
     Decoration,
     Diff,
     getCollapsedLinesCountBetween,
@@ -8,6 +10,7 @@ import {
     parseDiff,
     expandFromRawCode,
     tokenize,
+    type GutterOptions,
     type HunkData,
 } from "react-diff-view";
 import { GoFileCode } from "react-icons/go";
@@ -81,7 +84,7 @@ export default function ReviewFileDiff({
                 <span className="shrink-0 font-headline text-[14px] font-medium text-neutral-100">
                     {name}
                 </span>
-                <span className="min-w-0 flex-1 truncate font-headline text-[12.5px] text-neutral-600">
+                <span className="min-w-0 flex-1 truncate font-headline text-[14px] text-snow/60 pb-[1.5px]">
                     {file.previousFilename ? `renamed from ${file.previousFilename}` : directory}
                 </span>
 
@@ -103,7 +106,7 @@ export default function ReviewFileDiff({
                     </Button>
                 )}
 
-                <span className="shrink-0 text-[12.5px] tabular-nums">
+                <span className="shrink-0 font-headline text-[12.5px] tabular-nums">
                     {file.additions > 0 && (
                         <span className="text-emerald-400">+{file.additions}</span>
                     )}
@@ -137,6 +140,7 @@ export default function ReviewFileDiff({
                         diffType={parsed!.type}
                         hunks={renderedHunks}
                         tokens={tokens}
+                        renderGutter={renderGutter}
                         className="review-diff"
                     >
                         {(rendered) =>
@@ -169,6 +173,12 @@ export default function ReviewFileDiff({
             )}
         </section>
     );
+}
+
+function renderGutter({ change, side }: GutterOptions) {
+    if (side === "old") return null;
+    const lineNumber = computeNewLineNumber(change);
+    return lineNumber === -1 ? computeOldLineNumber(change) : lineNumber;
 }
 
 function toGitDiff(file: ReviewFile): string {

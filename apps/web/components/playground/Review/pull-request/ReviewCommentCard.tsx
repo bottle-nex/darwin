@@ -1,8 +1,26 @@
+"use client";
+
+import { useState } from "react";
 import { GoCheck, GoComment, GoFileDiff, GoXCircle } from "react-icons/go";
+import { IoMdCheckmark } from "react-icons/io";
+import { MdContentCopy, MdDelete, MdEdit, MdMoreHoriz } from "react-icons/md";
 import Markdown from "@/components/utility/Markdown";
+import ConfirmDialog from "@/components/utility/ConfirmDialog";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import type { ReviewComment } from "@trymatcha/types";
 import { cn } from "@/lib/utils";
 import { formatRelativeTime } from "@/lib/format";
+import { markdownToPlainText } from "@/lib/markdown";
+import { useGithubLink } from "@/hooks/github/useGithubLink";
+import { useUpdateReviewComment } from "@/hooks/review/useUpdateReviewComment";
+import { useDeleteReviewComment } from "@/hooks/review/useDeleteReviewComment";
 import ReviewActorAvatar from "../ReviewActorAvatar";
 
 const REVIEW_VERDICT: Record<string, { icon: typeof GoCheck; label: string; tone: string }> = {
@@ -11,12 +29,51 @@ const REVIEW_VERDICT: Record<string, { icon: typeof GoCheck; label: string; tone
     commented: { icon: GoComment, label: "reviewed", tone: "text-neutral-500" },
 };
 
-export default function ReviewCommentCard({ comment }: { comment: ReviewComment }) {
+export default function ReviewCommentCard({
+    comment,
+    projectId,
+    pullNumber,
+}: {
+    comment: ReviewComment;
+    projectId: string | undefined;
+    pullNumber: number;
+}) {
     const verdict = comment.state ? REVIEW_VERDICT[comment.state] : null;
     const VerdictIcon = verdict?.icon;
 
+    const { data: link } = useGithubLink();
+    const isMine = Boolean(link?.githubLogin) && comment.author?.login === link?.githubLogin;
+    const canDelete = isMine && comment.kind !== "review";
+
+    const update = useUpdateReviewComment(projectId, pullNumber);
+    const remove = useDeleteReviewComment(projectId, pullNumber);
+
+    const [isEditing, setIsEditing] = useState(false);
+    const [draft, setDraft] = useState(comment.body);
+    const [confirmOpen, setConfirmOpen] = useState(false);
+
+    function startEdit() {
+        setDraft(comment.body);
+        setIsEditing(true);
+    }
+
+    function cancelEdit() {
+        setIsEditing(false);
+        update.reset();
+    }
+
+    function saveEdit() {
+        const body = draft.trim();
+        if (!body || update.isPending) return;
+        update.mutate({ commentId: comment.id, body }, { onSuccess: () => setIsEditing(false) });
+    }
+
+    function confirmDelete() {
+        remove.mutate(comment.id, { onSuccess: () => setConfirmOpen(false) });
+    }
+
     return (
-        <article className="flex gap-3">
+        <article className="group/comment relative flex gap-3">
             <ReviewActorAvatar actor={comment.author} className="mt-0.5 size-6" />
 
             <div className="min-w-0 flex-1">
@@ -57,8 +114,109 @@ export default function ReviewCommentCard({ comment }: { comment: ReviewComment 
                     </div>
                 )}
 
-                <Markdown className="mt-2 text-[15px]">{comment.body}</Markdown>
+                {isEditing ? (
+                    <div className="mt-2 flex flex-col gap-2">
+                        <Textarea
+                            autoFocus
+                            value={draft}
+                            onChange={(e) => setDraft(e.target.value)}
+                            className="min-h-24 text-[15px]"
+                        />
+                        {update.isError && (
+                            <p className="text-[13px] text-rose-400">
+                                That comment didn&apos;t save. Try again.
+                            </p>
+                        )}
+                        <div className="flex items-center justify-end gap-2">
+                            <Button
+                                size="xs"
+                                variant="ghost"
+                                className="rounded-sm font-medium text-snow"
+                                disabled={update.isPending}
+                                onClick={cancelEdit}
+                            >
+                                Cancel
+                            </Button>
+                            <Button
+                                size="xs"
+                                variant="default"
+                                className="gap-x-1.5 rounded-sm bg-green-700 font-medium text-snow"
+                                loading={update.isPending}
+                                disabled={!draft.trim()}
+                                onClick={saveEdit}
+                            >
+                                <IoMdCheckmark />
+                                Save
+                            </Button>
+                        </div>
+                    </div>
+                ) : (
+                    <Markdown className="mt-2 text-[15px]">{comment.body}</Markdown>
+                )}
             </div>
+
+            {!isEditing && (
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button
+                            variant="unstyled"
+                            type="button"
+                            aria-label="Comment options"
+                            className="absolute top-0 right-0 flex size-6 cursor-pointer items-center justify-center rounded-md text-neutral-400 opacity-0 transition-opacity hover:bg-white/10 hover:text-neutral-100 focus-visible:opacity-100 group-hover/comment:opacity-100 data-[state=open]:opacity-100"
+                        >
+                            <MdMoreHoriz className="size-4" aria-hidden />
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-44">
+                        <DropdownMenuItem
+                            onSelect={() =>
+                                navigator.clipboard.writeText(markdownToPlainText(comment.body))
+                            }
+                        >
+                            <MdContentCopy className="size-3.5" aria-hidden />
+                            <span className="flex-1">Copy</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                            onSelect={() => navigator.clipboard.writeText(comment.body)}
+                        >
+                            <MdContentCopy className="size-3.5" aria-hidden />
+                            <span className="flex-1">Copy Markdown</span>
+                        </DropdownMenuItem>
+                        {isMine && (
+                            <DropdownMenuItem onSelect={startEdit}>
+                                <MdEdit className="size-3.5" aria-hidden />
+                                <span className="flex-1">Edit</span>
+                            </DropdownMenuItem>
+                        )}
+                        {canDelete && (
+                            <DropdownMenuItem
+                                onSelect={() => setConfirmOpen(true)}
+                                variant="destructive"
+                            >
+                                <MdDelete className="size-3.5" aria-hidden />
+                                <span className="flex-1">Delete</span>
+                            </DropdownMenuItem>
+                        )}
+                    </DropdownMenuContent>
+                </DropdownMenu>
+            )}
+
+            {canDelete && (
+                <ConfirmDialog
+                    open={confirmOpen}
+                    onOpenChange={setConfirmOpen}
+                    title="Delete comment?"
+                    description="This removes the comment from the pull request on GitHub. You can't undo this."
+                    cancel={{
+                        label: "Cancel",
+                        variant: "tertiary",
+                        onClick: () => setConfirmOpen(false),
+                    }}
+                    confirm={{ label: "Delete", variant: "destructive", onClick: confirmDelete }}
+                    pending={remove.isPending}
+                    error={remove.isError ? "That comment didn't delete. Try again." : undefined}
+                />
+            )}
         </article>
     );
 }
