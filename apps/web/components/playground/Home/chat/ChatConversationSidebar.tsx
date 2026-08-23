@@ -60,7 +60,7 @@ function ConversationRow({
             <PlaygroundAvatar
                 letter={conversation.name.slice(0, 1).toUpperCase()}
                 tone={toneFor(conversation.id)}
-                size="xl"
+                size="lg"
                 className="rounded-md"
             />
             <span className="min-w-0 flex-1">
