@@ -1,6 +1,7 @@
 "use client";
 import { useParams, useRouter } from "next/navigation";
-import { useMarkNotificationsRead } from "@/hooks/notifications/useNotifications";
+import { useMarkNotificationsRead } from "@/hooks/notifications/useMarkNotificationsRead";
+import { read_target_for } from "@/hooks/notifications/notificationCache";
 import { useNotificationsPanelStore } from "@/store/playground/useNotificationsPanelStore";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
 import { usePaneRouteStore } from "@/store/playground/usePaneRouteStore";
@@ -23,7 +24,7 @@ export function useSelectNotification() {
     const close = useNotificationsPanelStore((s) => s.close);
 
     return function select(notification: Notification) {
-        if (!notification.readAt) mark_read({ ids: [notification.id] });
+        if (!notification.readAt) mark_read(read_target_for(notification));
 
         const target = notification_target(notification);
         if (!target) return;

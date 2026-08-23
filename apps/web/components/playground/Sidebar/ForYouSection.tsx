@@ -1,7 +1,7 @@
 "use client";
 import { HiOutlineCog6Tooth, HiOutlineInbox } from "react-icons/hi2";
 import { HiOutlineAnnotation } from "react-icons/hi";
-import { useNotifications } from "@/hooks/notifications/useNotifications";
+import { useNotificationBadges } from "@/hooks/notifications/useNotificationBadges";
 import Row from "./SidebarRow";
 import Section from "./SidebarSection";
 import { type SidebarSectionProps } from "./shared";
@@ -24,8 +24,7 @@ export default function PlaygroundSidebarForYouSection({
     selectedRowId,
     onSelect,
 }: SidebarSectionProps) {
-    const { data } = useNotifications();
-    const unreadCount = data?.unreadCount ?? 0;
+    const { inboxUnread } = useNotificationBadges();
 
     return (
         <Section title="For you">
@@ -35,7 +34,7 @@ export default function PlaygroundSidebarForYouSection({
                     label={r.label}
                     leading={{ kind: "icon", icon: r.icon }}
                     badge={
-                        r.id === PlaygroundTab.Inbox && unreadCount > 0 ? unreadCount : undefined
+                        r.id === PlaygroundTab.Inbox && inboxUnread > 0 ? inboxUnread : undefined
                     }
                     active={selectedRowId === r.id}
                     onClick={() => onSelect(r.id)}

@@ -23,7 +23,10 @@ import {
     rollback_reaction,
 } from "@/hooks/chats/useMessageReactions";
 import SessionServices from "@/lib/session";
-import { upsert_notification } from "@/hooks/notifications/useNotifications";
+import { upsert_notification } from "@/hooks/notifications/notificationCache";
+import { should_float_notification } from "@/lib/notifications/floatSuppression";
+import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
+import { useCommandContextStore } from "@/store/command/useCommandContextStore";
 import { useNotificationsPanelStore } from "@/store/playground/useNotificationsPanelStore";
 import { useFloatNotificationsStore } from "@/store/playground/useFloatNotificationsStore";
 import { append_activities, update_agent_session } from "@/hooks/activity/useActivity";
@@ -148,7 +151,14 @@ export class SocketHandlers {
                 queryClient.invalidateQueries({ queryKey: [...TEAM_MEMBERS_QUERY_KEY, teamId] });
             }
         }
-        if (!useNotificationsPanelStore.getState().isOpen) {
+        if (
+            should_float_notification(
+                message.payload,
+                useNotificationsPanelStore.getState().isOpen,
+                usePlaygroundNavStore.getState().tab,
+                useCommandContextStore.getState().projectId,
+            )
+        ) {
             useFloatNotificationsStore.getState().push(message.payload);
         }
     }

@@ -1,16 +1,15 @@
 "use client";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { HiOutlineInbox, HiXMark } from "react-icons/hi2";
+import { HiXMark } from "react-icons/hi2";
 import { cn } from "@/lib/utils";
 import { PANE_TOP_BAR_HEIGHT } from "@/components/playground/Core/components/PlaygroundPaneFrame";
 import { BLURRED_BG_PANEL } from "@/components/playground/Home/KanbanDisplay/cardStyles";
-import { PlaygroundTab } from "@/components/playground/playgroundTabs";
 import { useNotificationsPanelStore } from "@/store/playground/useNotificationsPanelStore";
-import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
-import { useMarkNotificationsRead, useNotifications } from "@/hooks/notifications/useNotifications";
+import { useMemberNotifications } from "@/hooks/notifications/useMemberNotifications";
+import { useMarkNotificationsRead } from "@/hooks/notifications/useMarkNotificationsRead";
 import { useUserConfig } from "@/hooks/user/useUserConfig";
-import NotificationList from "./NotificationList";
+import NotificationFeed from "./NotificationFeed";
 import NotificationSearch from "./NotificationSearch";
 import { useSelectNotification } from "./useSelectNotification";
 
@@ -20,18 +19,11 @@ const PANEL_GUTTER = 6;
 export default function NotificationsPanel() {
     const { isOpen, close } = useNotificationsPanelStore();
     const [query, setQuery] = useState<string>("");
-    const { data } = useNotifications();
-    const notifications = useMemo(() => data?.notifications ?? [], [data]);
-    const unreadCount = data?.unreadCount ?? 0;
+    const feed = useMemberNotifications();
+    const unreadCount = feed.unreadCount;
     const { mutate: mark_read } = useMarkNotificationsRead();
     const select = useSelectNotification();
-    const setTab = usePlaygroundNavStore((s) => s.setTab);
     const glass = useUserConfig().backgroundLightingEnabled;
-
-    function openInbox() {
-        setTab(PlaygroundTab.Inbox);
-        close();
-    }
 
     return (
         <AnimatePresence>
@@ -67,7 +59,7 @@ export default function NotificationsPanel() {
                                 {unreadCount > 0 && (
                                     <button
                                         type="button"
-                                        onClick={() => mark_read({})}
+                                        onClick={() => mark_read({ scope: "member" })}
                                         className="cursor-pointer rounded-md px-1.5 py-1 text-[11px] text-neutral-400 transition-colors hover:bg-white/5 hover:text-neutral-100"
                                     >
                                         Mark all read
@@ -88,32 +80,31 @@ export default function NotificationsPanel() {
                             <NotificationSearch value={query} onChange={setQuery} />
                         </div>
 
-                        <NotificationList
-                            notifications={notifications}
+                        <NotificationFeed
+                            notifications={feed.notifications}
+                            loadedCount={feed.notifications.length}
                             query={query}
+                            feedKey="member"
                             clickableRows="navigable"
+                            className="min-h-0 flex-1 px-1.5 pb-2"
                             emptyTitle={query.trim() ? "No matches" : "You're all caught up"}
                             emptySubtitle={
                                 query.trim()
                                     ? `Nothing matches “${query.trim()}”.`
-                                    : "Assignments and mentions will show up here."
+                                    : "Team and role changes will show up here."
                             }
                             headerClassName={
                                 glass ? "bg-charcoal/70 backdrop-blur-sm" : "bg-charcoal"
                             }
+                            loading={feed.isLoading}
+                            error={feed.isError}
+                            pageError={Boolean(feed.error) && feed.notifications.length > 0}
+                            hasNextPage={Boolean(feed.hasNextPage)}
+                            fetchingNextPage={feed.isFetchingNextPage}
+                            onLoadMore={() => void feed.fetchNextPage()}
+                            onRetry={() => void feed.refetch()}
                             onSelect={select}
                         />
-
-                        <footer className="shrink-0 border-t border-border p-1.5">
-                            <button
-                                type="button"
-                                onClick={openInbox}
-                                className="flex w-full cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 text-[12px] text-neutral-300 transition-colors hover:bg-white/5 hover:text-neutral-100"
-                            >
-                                <HiOutlineInbox className="size-3.5" aria-hidden />
-                                Open inbox
-                            </button>
-                        </footer>
                     </div>
                 </motion.aside>
             )}

@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import type { Notification } from "@trymatcha/types";
+import { notification_scope, type Notification, type NotificationScope } from "@trymatcha/types";
 
 const MAX_FLOATS = 3;
 
@@ -7,7 +7,7 @@ interface FloatNotificationsState {
     items: Notification[];
     push: (notification: Notification) => void;
     dismiss: (id: string) => void;
-    clear: () => void;
+    clearScope: (scope: NotificationScope, projectId?: string | null) => void;
 }
 
 export const useFloatNotificationsStore = create<FloatNotificationsState>((set) => ({
@@ -19,5 +19,12 @@ export const useFloatNotificationsStore = create<FloatNotificationsState>((set) 
                 : { items: [notification, ...s.items].slice(0, MAX_FLOATS) },
         ),
     dismiss: (id) => set((s) => ({ items: s.items.filter((item) => item.id !== id) })),
-    clear: () => set({ items: [] }),
+    clearScope: (scope, projectId) =>
+        set((s) => ({
+            items: s.items.filter(
+                (item) =>
+                    notification_scope(item.type) !== scope ||
+                    (projectId !== undefined && item.projectId !== projectId),
+            ),
+        })),
 }));

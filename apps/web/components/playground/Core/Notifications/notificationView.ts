@@ -339,16 +339,3 @@ export function day_label(date: Date): string {
     if (isYesterday(date)) return "Yesterday";
     return format(date, "MMM d, yyyy");
 }
-
-export function group_by_day(
-    notifications: Notification[],
-): { label: string; items: Notification[] }[] {
-    const groups: { label: string; items: Notification[] }[] = [];
-    for (const notification of notifications) {
-        const label = day_label(new Date(notification.createdAt));
-        const current = groups[groups.length - 1];
-        if (current?.label === label) current.items.push(notification);
-        else groups.push({ label, items: [notification] });
-    }
-    return groups;
-}
