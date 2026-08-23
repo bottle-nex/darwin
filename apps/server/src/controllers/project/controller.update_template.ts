@@ -4,7 +4,7 @@ import ResponseWriter from "../../services/service.response";
 import { prisma, Prisma } from "@trymatcha/database";
 import Access from "../../access-control/access";
 import { Action, Permissions } from "@trymatcha/access-control";
-import { icon_schema } from "./controller.create_template";
+import { icon_schema } from "./icon.schema";
 
 const body_schema = z.object({
     name: z.string().min(1).max(60).optional(),

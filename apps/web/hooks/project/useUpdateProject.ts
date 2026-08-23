@@ -6,6 +6,7 @@ import { PROJECT_QUERY_KEY } from "./useGetProject";
 import { ORGANIZATIONS_QUERY_KEY } from "@/hooks/playground/useFetchOrganizations";
 import { DASHBOARD_QUERY_KEY } from "@/hooks/dashboard/useGetDashboard";
 import type { KanbanOptionView } from "@/types/project";
+import type { IconPick } from "@/components/ui/IconPicker";
 
 export interface UpdateProjectInput {
     project_id: string;
@@ -13,6 +14,7 @@ export interface UpdateProjectInput {
     slug?: string;
     summary?: string;
     description?: string;
+    icon?: IconPick;
     plan_md?: string;
     tour_completed?: boolean;
     kanban_option_view?: KanbanOptionView;

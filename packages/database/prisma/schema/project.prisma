@@ -7,7 +7,8 @@ model Project {
   description   String?
   ownerId       String
   createdById   String?
-  color         String?
+  /// An `IconPick`: a named icon with a colour, or an emoji. Null falls back to an initials tile.
+  icon          Json?
   tourCompleted Boolean @default(false)
 
   githubRepoId        BigInt?

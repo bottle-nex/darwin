@@ -4,15 +4,7 @@ import ResponseWriter from "../../services/service.response";
 import { prisma, Prisma } from "@trymatcha/database";
 import Access from "../../access-control/access";
 import { Action, Permissions } from "@trymatcha/access-control";
-
-export const icon_schema = z.discriminatedUnion("kind", [
-    z.object({
-        kind: z.literal("icon"),
-        name: z.string().min(1).max(64),
-        color: z.string().regex(/^#[0-9a-fA-F]{6}$/),
-    }),
-    z.object({ kind: z.literal("emoji"), char: z.string().min(1).max(8) }),
-]);
+import { icon_schema } from "./icon.schema";
 
 const body_schema = z.object({
     name: z.string().min(1).max(60),

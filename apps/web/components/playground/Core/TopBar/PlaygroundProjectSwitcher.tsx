@@ -7,7 +7,7 @@ import { MdCheck, MdKeyboardArrowDown } from "react-icons/md";
 import { cn } from "@/lib/utils";
 import { useGetDashboard } from "@/hooks/dashboard/useGetDashboard";
 import PlaygroundSearchInput from "../components/PlaygroundSearchInput";
-import PlaygroundAvatar from "../components/PlaygroundAvatar";
+import PlaygroundAvatar, { toneFor } from "../components/PlaygroundAvatar";
 
 export const DEFAULT_FOLDER_COLOR = "#6366f1";
 
@@ -45,7 +45,8 @@ export default function PlaygroundProjectSwitcher() {
                     className="flex h-7 min-w-0 cursor-pointer items-center gap-1.5 rounded-sm px-2 text-[15px] font-semibold text-neutral-100 hover:bg-white/5"
                 >
                     <PlaygroundAvatar
-                        tone="indigo"
+                        tone={active ? toneFor(active.id) : "indigo"}
+                        icon={active?.icon}
                         letter={active?.name.slice(0, 2).toUpperCase() ?? "?"}
                     />
                     <span className="min-w-0 truncate">{active?.name ?? "Select a project"}</span>
@@ -84,7 +85,8 @@ export default function PlaygroundProjectSwitcher() {
                                     )}
                                 >
                                     <PlaygroundAvatar
-                                        tone="indigo"
+                                        tone={toneFor(p.id)}
+                                        icon={p.icon}
                                         letter={p.name.slice(0, 2).toUpperCase()}
                                     />
                                     <span className="min-w-0 flex-1 truncate">{p.name}</span>

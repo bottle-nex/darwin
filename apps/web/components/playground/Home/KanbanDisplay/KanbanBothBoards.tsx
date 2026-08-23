@@ -21,7 +21,6 @@ export default function KanbanBothBoards({ board, kanbanView }: KanbanBothBoards
     return (
         <KanbanBoardView
             board={board}
-            startAligned
             leading={
                 <>
                     <CustomKanbanBoard />

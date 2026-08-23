@@ -2,6 +2,7 @@
 import Image from "next/image";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { IconPickGlyph, type IconPick } from "@/components/ui/IconPicker";
 
 const AVATAR_TONE = {
     indigo: {
@@ -31,6 +32,13 @@ const AVATAR_SIZE = {
     md: "size-5 text-[11px] rounded-[6px]",
     lg: "size-6 text-[12px] rounded-[7px]",
     xl: "size-8 text-[14px] rounded-[8px]",
+} as const;
+
+const AVATAR_ICON_SIZE = {
+    sm: "size-2.5",
+    md: "size-3",
+    lg: "size-3.5",
+    xl: "size-4.5",
 } as const;
 
 export type AvatarTone = keyof typeof AVATAR_TONE;
@@ -64,15 +72,18 @@ export function initialOf(name: string | null | undefined, email: string): strin
 type PlaygroundAvatarProps = {
     letter: string;
     tone: AvatarTone;
+    /** A chosen icon or emoji, shown instead of the letter. */
+    icon?: IconPick | null;
     src?: string | null;
     size?: AvatarSize;
     className?: string;
 };
 
-/** A photo when `src` is set, otherwise the toned letter tile. */
+/** A photo when `src` is set, an icon/emoji when `icon` is set, otherwise the toned letter tile. */
 export default function PlaygroundAvatar({
     letter,
     tone,
+    icon,
     src,
     size = "md",
     className,
@@ -94,6 +105,14 @@ export default function PlaygroundAvatar({
                     sizes="32px"
                     onError={() => setFailedSrc(photoSrc)}
                     className="object-cover"
+                />
+            ) : icon ? (
+                <IconPickGlyph
+                    pick={icon}
+                    className={cn(
+                        "relative drop-shadow-[0_1px_1px_rgba(0,0,0,0.25)]",
+                        AVATAR_ICON_SIZE[size],
+                    )}
                 />
             ) : (
                 <span className="relative drop-shadow-[0_1px_1px_rgba(0,0,0,0.25)]">{letter}</span>

@@ -1,13 +1,15 @@
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import type { IconType } from "react-icons";
 import { TooltipComponent } from "@/components/ui/tooltip-component";
 
-type IconWrapperVariant = "solid" | "ghost" | "outline";
+type IconWrapperVariant = "solid" | "ghost" | "outline" | "ring";
 
 interface IconWrapperProps {
     icon?: IconType;
     iconClassName?: string;
+    /** Inline style for the icon, e.g. a user-picked hex color Tailwind can't express as a class. */
+    iconStyle?: CSSProperties;
     dotColor?: string;
     children?: ReactNode;
     active?: boolean;
@@ -42,11 +44,19 @@ const SURFACE: Record<
         hover: "hover:border-white/20 hover:bg-white/5",
         active: "border-white/20 bg-white/8",
     },
+    ring: {
+        shape: "rounded-full ring-[0.5px] ring-snow/10",
+        glyph: "size-3.75",
+        rest: "bg-transparent",
+        hover: "hover:bg-white/8 group-hover:bg-white/8",
+        active: "bg-white/8 ring-snow/20",
+    },
 };
 
 export default function IconWrapper({
     icon: Icon,
     iconClassName,
+    iconStyle,
     dotColor,
     children,
     active,
@@ -80,7 +90,9 @@ export default function IconWrapper({
                     aria-hidden
                 />
             )}
-            {Icon && <Icon className={cn(surface.glyph, iconClassName)} aria-hidden />}
+            {Icon && (
+                <Icon className={cn(surface.glyph, iconClassName)} style={iconStyle} aria-hidden />
+            )}
             {hasLabel && <span className="truncate">{children}</span>}
         </span>
     );

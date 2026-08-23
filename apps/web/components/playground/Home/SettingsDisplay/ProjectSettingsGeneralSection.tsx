@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { isAxiosError } from "axios";
 import { MdDelete } from "react-icons/md";
+import { PiSmileyFill } from "react-icons/pi";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -20,6 +21,7 @@ import { useGetProjectConfig } from "@/hooks/project/useGetProjectConfig";
 import type { KanbanOptionView, ProjectDetail } from "@/types/project";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
+import IconPicker, { IconPickGlyph, type IconPick } from "@/components/ui/IconPicker";
 import ProjectSettingsBoardSection from "./ProjectSettingsBoardSection";
 import SettingsSectionHeader from "./SettingsSectionHeader";
 
@@ -41,6 +43,8 @@ export default function ProjectSettingsGeneralSection({
     const [name, setName] = useState(project.name);
     const [slug, setSlug] = useState(project.slug);
     const [description, setDescription] = useState(project.description ?? "");
+    const [icon, setIcon] = useState<IconPick | null>(project.icon);
+    const [iconOpen, setIconOpen] = useState(false);
     const [confirmOpen, setConfirmOpen] = useState(false);
     const [optionsBarDraft, setOptionsBarDraft] = useState<KanbanOptionView | null>(null);
     const [productDiffDraft, setProductDiffDraft] = useState<boolean | null>(null);
@@ -53,10 +57,12 @@ export default function ProjectSettingsGeneralSection({
     const productDiffEnabled = productDiffDraft ?? savedProductDiff;
     const productDiffDirty = productDiffDraft !== null && productDiffDraft !== savedProductDiff;
 
+    const iconDirty = JSON.stringify(icon) !== JSON.stringify(project.icon);
     const dirty =
         name.trim() !== project.name ||
         slug.trim() !== project.slug ||
         description.trim() !== (project.description ?? "") ||
+        iconDirty ||
         optionsBarDirty ||
         productDiffDirty;
     const canSave = name.trim().length > 0 && slug.trim().length > 0 && dirty && !update.isPending;
@@ -71,6 +77,7 @@ export default function ProjectSettingsGeneralSection({
             name: name.trim(),
             slug: slug.trim(),
             description: description.trim(),
+            ...(iconDirty && icon && { icon }),
             ...(optionsBarDirty && { kanban_option_view: optionsBarView }),
             ...(productDiffDirty && { product_diff_enabled: productDiffEnabled }),
         });
@@ -89,13 +96,42 @@ export default function ProjectSettingsGeneralSection({
                 description="Change the name, slug, or description."
             />
 
-            <div>
-                <label className="text-[12px] text-neutral-300">Name</label>
-                <Input
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    className={cn(FIELD, "mt-1.5 h-9 text-[13px]")}
-                />
+            <div className="flex gap-3">
+                <div>
+                    <label className="text-[12px] text-neutral-300">Icon</label>
+                    <IconPicker open={iconOpen} onOpenChange={setIconOpen} onSelect={setIcon}>
+                        <Button
+                            variant="unstyled"
+                            type="button"
+                            aria-label="Pick project icon"
+                            style={
+                                icon?.kind === "icon"
+                                    ? { backgroundColor: `${icon.color}33` }
+                                    : undefined
+                            }
+                            className={cn(
+                                "mt-1.5 flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-lg transition-colors",
+                                icon?.kind === "icon"
+                                    ? "hover:brightness-125"
+                                    : "bg-white/5 hover:bg-white/10",
+                            )}
+                        >
+                            {icon ? (
+                                <IconPickGlyph pick={icon} className="size-4 text-base" />
+                            ) : (
+                                <PiSmileyFill className="size-4 text-white/60" aria-hidden />
+                            )}
+                        </Button>
+                    </IconPicker>
+                </div>
+                <div className="flex-1">
+                    <label className="text-[12px] text-neutral-300">Name</label>
+                    <Input
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        className={cn(FIELD, "mt-1.5 h-9 text-[13px]")}
+                    />
+                </div>
             </div>
 
             <div>

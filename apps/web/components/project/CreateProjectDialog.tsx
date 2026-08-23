@@ -2,8 +2,12 @@
 import { useState } from "react";
 import { useParams } from "next/navigation";
 import { signOut } from "next-auth/react";
+import { MdOutlineKeyboardArrowRight } from "react-icons/md";
+import { PiSmileyFill } from "react-icons/pi";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import IconPicker, { IconPickGlyph, type IconPick } from "@/components/ui/IconPicker";
+import PlaygroundAvatar from "@/components/playground/Core/components/PlaygroundAvatar";
 import { cn } from "@/lib/utils";
 import { useNewProjectStore } from "@/store/project/useNewProjectStore";
 import { useFetchOrganizations } from "@/hooks/playground/useFetchOrganizations";
@@ -30,6 +34,8 @@ export default function CreateProjectDialog() {
     const setSecrets = useSetProjectSecrets();
 
     const [createdProjectId, setCreatedProjectId] = useState<string | null>(null);
+    const [icon, setIcon] = useState<IconPick | null>(null);
+    const [iconOpen, setIconOpen] = useState(false);
     const [envRows, setEnvRows] = useState<EnvRow[]>([{ key: "", value: "" }]);
     const [revealValues, setRevealValues] = useState(false);
 
@@ -42,6 +48,7 @@ export default function CreateProjectDialog() {
             setTargetOrgSlug(null);
             setForceCreate(false);
             setCreatedProjectId(null);
+            setIcon(null);
             setEnvRows([{ key: "", value: "" }]);
             setRevealValues(false);
             setSecrets.reset();
@@ -84,11 +91,54 @@ export default function CreateProjectDialog() {
                     {createdProjectId ? "Environment variables" : "Create project"}
                 </DialogTitle>
 
+                <section className="flex items-center gap-x-1 px-6 pt-4 pb-2 text-xs text-snow">
+                    <PlaygroundAvatar
+                        letter={org?.name.slice(0, 2) ?? ""}
+                        tone="emerald"
+                        className="uppercase"
+                    />
+                    <span>
+                        <MdOutlineKeyboardArrowRight />
+                    </span>
+                    {!createdProjectId && (
+                        <IconPicker open={iconOpen} onOpenChange={setIconOpen} onSelect={setIcon}>
+                            <Button
+                                variant="unstyled"
+                                type="button"
+                                aria-label="Pick project icon"
+                                style={
+                                    icon?.kind === "icon"
+                                        ? { backgroundColor: `${icon.color}33` }
+                                        : undefined
+                                }
+                                className={cn(
+                                    "flex size-5.5 shrink-0 cursor-pointer items-center justify-center rounded-[7px] transition-colors",
+                                    icon?.kind === "icon"
+                                        ? "hover:brightness-125"
+                                        : "bg-white/5 hover:bg-white/10",
+                                )}
+                            >
+                                {icon ? (
+                                    <IconPickGlyph pick={icon} className="size-3.5 text-sm" />
+                                ) : (
+                                    <PiSmileyFill className="size-3.5 text-white/60" aria-hidden />
+                                )}
+                            </Button>
+                        </IconPicker>
+                    )}
+                    <span>
+                        <MdOutlineKeyboardArrowRight />
+                    </span>
+                    <span className="text-sm">
+                        {createdProjectId ? "Environment variables" : "New Project"}
+                    </span>
+                </section>
+
                 {createdProjectId ? (
                     <main className="flex min-h-0 min-w-0 flex-1 flex-col justify-between *:px-6">
                         <section
                             data-lenis-prevent
-                            className="no-scrollbar flex-1 min-h-0 overflow-y-auto pt-4"
+                            className="no-scrollbar flex-1 min-h-0 overflow-y-auto"
                         >
                             <ProjectEnvStep
                                 rows={envRows}
@@ -124,6 +174,7 @@ export default function CreateProjectDialog() {
                 ) : (
                     <CreateProjectDialogDetailsStep
                         org={org}
+                        icon={icon}
                         mustCreateProject={mustCreateProject}
                         onCancel={() =>
                             mustCreateProject

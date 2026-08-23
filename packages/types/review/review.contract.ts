@@ -51,6 +51,7 @@ export interface ReviewHeader {
     issueId: string;
     issueNumber: number;
     issueTitle: string;
+    issueCustomColumnId: string | null;
     pullNumber: number;
     title: string;
     htmlUrl: string;

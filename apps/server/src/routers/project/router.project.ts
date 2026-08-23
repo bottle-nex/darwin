@@ -28,6 +28,8 @@ import list_review_files_controller from "../../controllers/project/controller.l
 import get_review_file_controller from "../../controllers/project/controller.get_review_file";
 import list_review_comments_controller from "../../controllers/project/controller.list_review_comments";
 import create_review_comment_controller from "../../controllers/project/controller.create_review_comment";
+import update_review_comment_controller from "../../controllers/project/controller.update_review_comment";
+import delete_review_comment_controller from "../../controllers/project/controller.delete_review_comment";
 import merge_review_controller from "../../controllers/project/controller.merge_review";
 import close_review_controller from "../../controllers/project/controller.close_review";
 import start_setup from "../../controllers/setup/controller.start_setup";
@@ -79,6 +81,16 @@ project_router.post(
     "/:project_id/review/:pull_number/comments",
     require_auth,
     create_review_comment_controller,
+);
+project_router.patch(
+    "/:project_id/review/:pull_number/comments/:comment_id",
+    require_auth,
+    update_review_comment_controller,
+);
+project_router.delete(
+    "/:project_id/review/:pull_number/comments/:comment_id",
+    require_auth,
+    delete_review_comment_controller,
 );
 project_router.post(
     "/:project_id/review/:pull_number/merge",

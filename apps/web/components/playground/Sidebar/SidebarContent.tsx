@@ -8,7 +8,7 @@ import { isSettingsTab } from "../playgroundTabs";
 import BoardSection from "./BoardSection";
 import ForYouSection from "./ForYouSection";
 import TeamsSection from "./TeamsSection";
-import SettingsNavSection from "./SettingsNavSection";
+import SettingsPanel from "./SettingsPanel";
 import SidebarActions from "./SidebarActions";
 
 export default function SidebarContent() {
@@ -45,7 +45,7 @@ export default function SidebarContent() {
                         className="flex flex-col gap-3 will-change-transform"
                     >
                         {inSettings ? (
-                            <SettingsNavSection {...section} onBack={returnFromSettings} />
+                            <SettingsPanel {...section} onBack={returnFromSettings} />
                         ) : (
                             <>
                                 <BoardSection {...section} />

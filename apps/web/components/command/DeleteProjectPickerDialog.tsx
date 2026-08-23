@@ -1,6 +1,8 @@
 "use client";
 import { useParams } from "next/navigation";
-import PlaygroundAvatar from "@/components/playground/Core/components/PlaygroundAvatar";
+import PlaygroundAvatar, {
+    toneFor,
+} from "@/components/playground/Core/components/PlaygroundAvatar";
 import { useGetDashboard } from "@/hooks/dashboard/useGetDashboard";
 import { useCommandActionStore } from "@/store/command/useCommandActionStore";
 import { useDeleteProjectStore } from "@/store/project/useDeleteProjectStore";
@@ -28,7 +30,8 @@ export default function DeleteProjectPickerDialog() {
                 label: project.name,
                 leading: (
                     <PlaygroundAvatar
-                        tone="indigo"
+                        tone={toneFor(project.id)}
+                        icon={project.icon}
                         size="sm"
                         letter={project.name.slice(0, 2).toUpperCase()}
                     />

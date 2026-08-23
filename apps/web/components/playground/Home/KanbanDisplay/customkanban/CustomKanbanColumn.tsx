@@ -20,7 +20,6 @@ import { SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-
 import { CSS } from "@dnd-kit/utilities";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
-import { MatchaLogo } from "@/components/logo/MatchaLogo";
 import { useCreateIssueStore } from "@/store/issues/useCreateIssueStore";
 import { useIssueSelectionStore } from "@/store/issues/useIssueSelectionStore";
 import { useCustomColumnActions } from "@/hooks/kanban/useCustomColumnActions";
@@ -75,7 +74,7 @@ export default function CustomKanbanColumn({ column, draggable = true }: CustomK
             ref={setNodeRef}
             style={style}
             className={cn(
-                "group flex max-h-full min-h-0 w-84 shrink-0 flex-col self-stretch rounded-lg bg-ink/20 p-2 ring-1 ring-snow/3 transition-colors",
+                "group flex max-h-full min-h-0 w-84 shrink-0 flex-col rounded-lg bg-ink/20 p-2 ring-1 ring-snow/3 transition-colors",
                 isDragging && "opacity-40",
             )}
         >
@@ -245,18 +244,6 @@ export default function CustomKanbanColumn({ column, draggable = true }: CustomK
                             <MdAdd className="size-3.5" aria-hidden />
                             Add a card
                         </Button>
-                    }
-                    emptyState={
-                        <div className="flex min-h-32 flex-col items-center justify-center gap-2 px-2">
-                            <MatchaLogo className="h-6 w-auto text-neutral-800" />
-                            <p className="text-[12px] text-neutral-600">
-                                {lane.lanePending || lane.fallbackPending
-                                    ? "Loading issues…"
-                                    : lane.laneError || lane.fallbackError
-                                      ? "Couldn’t load issues"
-                                      : "No issues currently"}
-                            </p>
-                        </div>
                     }
                 />
             </SortableContext>

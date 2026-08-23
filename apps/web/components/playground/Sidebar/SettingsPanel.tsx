@@ -27,7 +27,7 @@ const PROJECT_SETTINGS: SettingsItem[] = [
     { tab: PlaygroundTab.SettingsEnv, label: "Environment variables", icon: HiOutlineKey },
 ];
 
-export default function PlaygroundSidebarSettingsNavSection({
+export default function PlaygroundSidebarSettingsPanel({
     selectedRowId,
     onSelect,
     onBack,
@@ -47,14 +47,14 @@ export default function PlaygroundSidebarSettingsNavSection({
     }
 
     return (
-        <div className="mt-1 flex flex-col gap-3">
-            <div className="flex flex-col gap-0.5">
+        <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-1">
                 <Row
                     leading={{ kind: "icon", icon: HiOutlineArrowLeft }}
                     label="Back"
                     onClick={onBack}
                 />
-                <div className="my-1.5 h-px bg-white/5" />
+                <div className="h-px bg-white/5" />
             </div>
 
             <Section title="Account">{ACCOUNT_SETTINGS.map(renderItem)}</Section>

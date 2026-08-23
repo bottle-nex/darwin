@@ -51,6 +51,18 @@ function actor(user: GithubUser | null | undefined): ReviewActor | null {
     return { login: user.login, avatarUrl: user.avatar_url ?? null };
 }
 
+export class ReviewDeleteUnsupportedError extends Error {
+    constructor() {
+        super("GitHub reviews cannot be deleted, only edited or dismissed.");
+        this.name = "ReviewDeleteUnsupportedError";
+    }
+}
+
+function parseCommentId(commentId: string): { kind: string; id: number } {
+    const [kind, rawId] = commentId.split(":");
+    return { kind: kind ?? "", id: Number(rawId) };
+}
+
 export default class GithubPullsService {
     static async getPullRequest(
         installationId: number,
@@ -242,6 +254,94 @@ export default class GithubPullsService {
             line: null,
             diffHunk: null,
         };
+    }
+
+    static async updateComment(
+        userToken: string,
+        ref: Omit<PullRequestRef, "installationId">,
+        commentId: string,
+        body: string,
+    ): Promise<ReviewComment> {
+        const octokit = new Octokit({ auth: userToken });
+        const { kind, id } = parseCommentId(commentId);
+        const target = { owner: ref.owner, repo: ref.repo };
+
+        if (kind === "inline") {
+            const { data } = await octokit.rest.pulls.updateReviewComment({
+                ...target,
+                comment_id: id,
+                body,
+            });
+            return {
+                id: `inline:${data.id}`,
+                kind: "inline",
+                author: actor(data.user),
+                body: data.body ?? "",
+                createdAt: data.created_at,
+                htmlUrl: data.html_url,
+                state: null,
+                path: data.path,
+                line: data.line ?? data.original_line ?? null,
+                diffHunk: data.diff_hunk ?? null,
+            };
+        }
+
+        if (kind === "review") {
+            const { data } = await octokit.rest.pulls.updateReview({
+                ...target,
+                pull_number: ref.pullNumber,
+                review_id: id,
+                body,
+            });
+            return {
+                id: `review:${data.id}`,
+                kind: "review",
+                author: actor(data.user),
+                body: data.body ?? "",
+                createdAt: data.submitted_at ?? new Date(0).toISOString(),
+                htmlUrl: data.html_url,
+                state: data.state.toLowerCase(),
+                path: null,
+                line: null,
+                diffHunk: null,
+            };
+        }
+
+        const { data } = await octokit.rest.issues.updateComment({
+            ...target,
+            comment_id: id,
+            body,
+        });
+        return {
+            id: `conversation:${data.id}`,
+            kind: "conversation",
+            author: actor(data.user),
+            body: data.body ?? "",
+            createdAt: data.created_at,
+            htmlUrl: data.html_url,
+            state: null,
+            path: null,
+            line: null,
+            diffHunk: null,
+        };
+    }
+
+    static async deleteComment(
+        userToken: string,
+        ref: Omit<PullRequestRef, "installationId">,
+        commentId: string,
+    ): Promise<void> {
+        const { kind, id } = parseCommentId(commentId);
+        if (kind === "review") throw new ReviewDeleteUnsupportedError();
+
+        const octokit = new Octokit({ auth: userToken });
+        const target = { owner: ref.owner, repo: ref.repo };
+
+        if (kind === "inline") {
+            await octokit.rest.pulls.deleteReviewComment({ ...target, comment_id: id });
+            return;
+        }
+        await octokit.rest.issues.deleteComment({ ...target, comment_id: id });
     }
 
     static async mergePullRequest(

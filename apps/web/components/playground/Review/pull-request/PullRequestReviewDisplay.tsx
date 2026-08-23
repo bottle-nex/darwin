@@ -43,7 +43,12 @@ export default function PullRequestReviewDisplay({
                         <LogoLoader className="h-24 w-full text-snow" />
                     ) : comments?.length ? (
                         comments.map((comment) => (
-                            <ReviewCommentCard key={comment.id} comment={comment} />
+                            <ReviewCommentCard
+                                key={comment.id}
+                                comment={comment}
+                                projectId={projectId}
+                                pullNumber={review.pullNumber}
+                            />
                         ))
                     ) : (
                         <></>

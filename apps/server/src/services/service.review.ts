@@ -6,7 +6,13 @@ import GithubPullsService, { type PullRequestRef } from "./service.github_pulls"
 export interface ResolvedReview {
     ref: PullRequestRef;
     projectId: string;
-    issue: { id: string; number: number; title: string; prTitle: string | null };
+    issue: {
+        id: string;
+        number: number;
+        title: string;
+        prTitle: string | null;
+        customColumnId: string | null;
+    };
 }
 
 export default class ReviewService {
@@ -25,7 +31,7 @@ export default class ReviewService {
 
         const issue = await prisma.issue.findFirst({
             where: { projectId, prNumber: pullNumber },
-            select: { id: true, number: true, title: true, prTitle: true },
+            select: { id: true, number: true, title: true, prTitle: true, customColumnId: true },
         });
         if (!issue) return null;
 
@@ -63,6 +69,7 @@ export default class ReviewService {
             issueId: issue.id,
             issueNumber: issue.number,
             issueTitle: issue.title,
+            issueCustomColumnId: issue.customColumnId,
             pullNumber: ref.pullNumber,
             title: pull.title,
             htmlUrl: pull.htmlUrl,

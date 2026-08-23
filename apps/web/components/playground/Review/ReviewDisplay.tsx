@@ -1,4 +1,5 @@
 "use client";
+import { AiFillMerge } from "react-icons/ai";
 import { ReviewTab, type ReviewHeader as ReviewHeaderData } from "@trymatcha/types";
 import { Button } from "@/components/ui/button";
 import LogoLoader from "@/components/app/LogoLoader";
@@ -45,13 +46,14 @@ export default function ReviewDisplay({ route }: { route: ReviewRoute }) {
         <main className={PLAYGROUND_PANE_SHELL}>
             <PaneLeadSlot>
                 <PlaygroundBreadcrumb
-                    trail={[
-                        {
-                            label: `#${review.issueNumber} ${review.issueTitle}`,
-                            onClick: () => openIssue(review.issueId),
-                        },
-                        `#${review.pullNumber} ${review.title}`,
-                    ]}
+                    issue={{
+                        id: review.issueId,
+                        number: review.issueNumber,
+                        title: review.issueTitle,
+                        customColumnId: review.issueCustomColumnId,
+                    }}
+                    trailing={`#${review.pullNumber} ${review.title}`}
+                    trailingIcon={AiFillMerge}
                 />
             </PaneLeadSlot>
             <ReviewHeader tab={route.tab} htmlUrl={review.htmlUrl} />

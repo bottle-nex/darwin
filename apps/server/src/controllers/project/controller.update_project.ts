@@ -4,6 +4,7 @@ import z from "zod";
 import { Action, Permissions } from "@trymatcha/access-control";
 import Access from "../../access-control/access";
 import { Prisma, prisma } from "@trymatcha/database";
+import { icon_schema } from "./icon.schema";
 
 const body_schema = z.object({
     project_id: z.string(),
@@ -16,6 +17,7 @@ const body_schema = z.object({
         .optional(),
     summary: z.string().optional(),
     description: z.string().optional(),
+    icon: icon_schema.optional(),
     plan_md: z.string().optional(),
     tour_completed: z.boolean().optional(),
     kanban_option_view: z.enum(["FLAT", "GROUPED"]).optional(),
@@ -36,6 +38,7 @@ export default async function update_project_controller(req: Request, res: Respo
             slug,
             summary,
             description,
+            icon,
             plan_md,
             tour_completed,
             kanban_option_view,
@@ -56,6 +59,7 @@ export default async function update_project_controller(req: Request, res: Respo
                 slug,
                 summary,
                 description,
+                icon,
                 planMd: plan_md,
                 tourCompleted: tour_completed,
                 ...((kanban_option_view !== undefined || product_diff_enabled !== undefined) && {
