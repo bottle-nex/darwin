@@ -177,14 +177,16 @@ function CommandMenuBody({ onDone }: { onDone: () => void }) {
                                         onSelect={() => run(entry)}
                                         className={cn(
                                             "justify-between p-2.5 text-[13.5px]",
-                                            entry.destructive && "text-rose-300/90",
+                                            entry.destructive &&
+                                                "text-rose-400 hover:text-rose-400!",
                                         )}
                                     >
                                         <span className="flex min-w-0 items-center gap-2">
                                             <entry.icon
                                                 className={cn(
                                                     "size-4 text-neutral-400",
-                                                    entry.destructive && "text-rose-400/80",
+                                                    entry.destructive &&
+                                                        "text-rose-400!",
                                                 )}
                                                 aria-hidden
                                             />
