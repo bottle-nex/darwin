@@ -1,21 +1,21 @@
 model IssueActivity {
-  id      String @id @default(cuid())
-  
+  id String @id @default(cuid())
+
   // this stores the sequence number for each activity row (basically what happened first)
   seq     BigInt @default(autoincrement())
   issueId String
   issue   Issue  @relation(fields: [issueId], references: [id], onDelete: Cascade)
 
-  type    ActivityType
-  
+  type ActivityType
+
   // this is the most crucial point, as it stores the JSON (instead of strict DS)
   payload Json?
 
   actorType     ActorType
   actorUserId   String?
-  actorUser     User?   @relation(name: "ActivityActor", fields: [actorUserId], references: [id], onDelete: SetNull)
+  actorUser     User?     @relation(name: "ActivityActor", fields: [actorUserId], references: [id], onDelete: SetNull)
   actorWorkerId String?
-  actorWorker   Worker? @relation(name: "ActivityWorker", fields: [actorWorkerId], references: [id], onDelete: SetNull)
+  actorWorker   Worker?   @relation(name: "ActivityWorker", fields: [actorWorkerId], references: [id], onDelete: SetNull)
 
   surface ActivitySurface @default(Primary)
 

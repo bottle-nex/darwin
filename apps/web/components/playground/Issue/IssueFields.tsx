@@ -50,6 +50,7 @@ export default function IssueFields({
             tooltip={!inSidebar}
         />
     );
+    const dateRange = { from: fields.startDate, to: fields.targetDate };
     const startDate = (
         <Capsule
             type="calendar"
@@ -59,6 +60,8 @@ export default function IssueFields({
             className={capsuleClass}
             icon={HiCalendar}
             iconClassName={DATE_ICON_COLOR.start}
+            range={dateRange}
+            latest={fields.targetDate}
         />
     );
     const targetDate = (
@@ -70,6 +73,8 @@ export default function IssueFields({
             className={capsuleClass}
             icon={HiCalendar}
             iconClassName={DATE_ICON_COLOR.target}
+            range={dateRange}
+            earliest={fields.startDate}
         />
     );
 
