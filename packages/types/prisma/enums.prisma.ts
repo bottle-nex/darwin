@@ -137,6 +137,8 @@ export const ProductDiffStatus = {
     Failed: "Failed",
     Stale: "Stale",
     Unsupported: "Unsupported",
+    ConfigurationRequired: "ConfigurationRequired",
+    PreviewUnavailable: "PreviewUnavailable",
 } as const;
 export type ProductDiffStatus = (typeof ProductDiffStatus)[keyof typeof ProductDiffStatus];
 

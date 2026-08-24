@@ -6,6 +6,7 @@ model ProductDiff {
   headSha        String
   status         ProductDiffStatus @default(Pending)
   manifest       Json?
+  diagnostics    Json?
   artifactPrefix String?
   error          String?           @db.Text
   createdAt      DateTime          @default(now())
@@ -24,4 +25,6 @@ enum ProductDiffStatus {
   Failed
   Stale
   Unsupported
+  ConfigurationRequired
+  PreviewUnavailable
 }

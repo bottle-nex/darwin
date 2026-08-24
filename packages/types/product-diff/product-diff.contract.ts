@@ -9,6 +9,22 @@ export interface ProductDiffManifestV1 {
     warnings: string[];
 }
 
+export interface ProductDiffDiagnostic {
+    code: string;
+    stage: string;
+    message: string;
+    adapter: string | null;
+    applicationPath: string | null;
+    workspaceKind: string | null;
+}
+
+export interface ProductDiffPreviewConfiguration {
+    applicationPath?: string;
+    launchCommand?: string;
+    healthPath?: string;
+    visualRoutes?: string[];
+}
+
 export const ProductDiffFramework = {
     NextAppRouter: "NextAppRouter",
     NextPagesRouter: "NextPagesRouter",
