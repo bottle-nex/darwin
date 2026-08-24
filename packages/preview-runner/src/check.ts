@@ -121,6 +121,17 @@ async function check_one(
 
         await settle_page(page, 150);
 
+        if (!expected_navigation(url, page.url())) {
+            return fail(
+                targetId,
+                stateId,
+                url,
+                "Redirected",
+                `navigation changed during page settling and ended at ${page.url()}`,
+                httpStatus,
+            );
+        }
+
         if (pageErrors.length > 0) {
             return fail(targetId, stateId, url, "PageError", pageErrors.join("\n\n"), httpStatus);
         }

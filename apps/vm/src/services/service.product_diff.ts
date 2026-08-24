@@ -56,6 +56,23 @@ export function product_diff_failure_status(stage: string): "PreviewUnavailable"
     return PREVIEW_UNAVAILABLE_STAGES.has(stage) ? "PreviewUnavailable" : "Failed";
 }
 
+export function preview_check_error(
+    revision: "head" | "base",
+    failed:
+        | {
+              targetId: string;
+              stateId: string;
+              problem: string | null;
+              detail: string | null;
+          }
+        | undefined,
+): Error {
+    const target = failed ? `${failed.targetId}/${failed.stateId}` : "unknown target";
+    const problem = failed?.problem ?? "render failed";
+    const detail = failed?.detail ? `: ${failed.detail.slice(0, MAX_ERROR_OUTPUT)}` : "";
+    return new Error(`${revision} preview validation failed: ${target} ${problem}${detail}`);
+}
+
 function preview_diagnostic(
     stage: string,
     message: string,
@@ -503,9 +520,7 @@ export default class ProductDiffRunner {
             });
             if (!headCheck.ok) {
                 const failed = headCheck.results.find((result) => !result.ok);
-                throw new Error(
-                    `head preview validation failed${failed ? `: ${failed.targetId}/${failed.stateId} ${failed.problem ?? "render failed"}` : ""}`,
-                );
+                throw preview_check_error("head", failed);
             }
 
             step("photograph the head revision");
@@ -572,9 +587,7 @@ export default class ProductDiffRunner {
             });
             if (!baseCheck.ok) {
                 const failed = baseCheck.results.find((result) => !result.ok);
-                throw new Error(
-                    `base preview validation failed${failed ? `: ${failed.targetId}/${failed.stateId} ${failed.problem ?? "render failed"}` : ""}`,
-                );
+                throw preview_check_error("base", failed);
             }
 
             step("photograph the base revision");

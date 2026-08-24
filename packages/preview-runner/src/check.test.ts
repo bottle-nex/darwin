@@ -29,6 +29,7 @@ function fixture_root(): string {
 
 let consoleError = true;
 let redirected = false;
+let redirectDuringSettle = false;
 let currentUrl = "";
 
 const page = {
@@ -64,7 +65,9 @@ mock.module("./browser", () => ({
         newPage: async () => page,
         close: async () => undefined,
     }),
-    settle_page: async () => undefined,
+    settle_page: async () => {
+        if (redirectDuringSettle) currentUrl = "http://127.0.0.1:41337/sign-in";
+    },
 }));
 
 const { check } = await import("./check");
@@ -101,9 +104,27 @@ test("rejects a redirect even when it returns to the expected preview route", as
     expect(result.results[1]).toMatchObject({ problem: "Redirected" });
 });
 
+test("rejects a client-side redirect that occurs while the page settles", async () => {
+    consoleError = false;
+    redirectDuringSettle = true;
+    const root = fixture_root();
+
+    const result = await check({
+        baseUrl: "http://127.0.0.1:41337",
+        routePath: "/preview-run-a",
+        workspaceRoot: root,
+        nextAppDir: "apps/web",
+        navigationTimeoutMs: 10_000,
+    });
+
+    expect(result.ok).toBe(false);
+    expect(result.results[1]).toMatchObject({ problem: "Redirected" });
+});
+
 afterEach(() => {
     consoleError = true;
     redirected = false;
+    redirectDuringSettle = false;
     currentUrl = "";
     while (fixtureRoots.length) rmSync(fixtureRoots.pop()!, { recursive: true, force: true });
 });
