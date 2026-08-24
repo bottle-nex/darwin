@@ -1,25 +1,27 @@
 "use client";
-import { useState } from "react";
 import { useParams } from "next/navigation";
-import { toast } from "@/lib/toast";
-import { MdDelete } from "react-icons/md";
-import type { ProjectTeam } from "@/types/project";
-import { useDeleteTeamStore } from "@/store/team/useDeleteTeamStore";
-import { useGetDashboard } from "@/hooks/dashboard/useGetDashboard";
-import { useGetTeamMembers } from "@/hooks/team/useGetTeamMembers";
-import { useUserSessionStore } from "@/store/user/useUserSessionStore";
-import useInviteTeamMember from "@/hooks/invitations/useInviteTeamMember";
-import InviteToTeamDialog from "@/components/team/InviteToTeamDialog";
-import { TooltipComponent } from "@/components/ui/tooltip-component";
-import PlaygroundBreadcrumb from "@/components/playground/Core/components/PlaygroundBreadcrumb";
-import PlaygroundTeamMembers from "./TeamMembers";
-import { Button } from "@/components/ui/button";
+import { useState } from "react";
 import { LuUserPlus } from "react-icons/lu";
-import OptionButton from "../../Home/KanbanDisplay/OptionsBar/KanbanOptionPanels/OptionButton";
+import { MdDelete } from "react-icons/md";
+
+import PlaygroundBreadcrumb from "@/components/playground/Core/components/PlaygroundBreadcrumb";
 import {
     PaneActionsSlot,
     PaneLeadSlot,
 } from "@/components/playground/Core/components/PlaygroundPaneSlots";
+import InviteToTeamDialog from "@/components/team/InviteToTeamDialog";
+import { Button } from "@/components/ui/button";
+import { TooltipComponent } from "@/components/ui/tooltip-component";
+import { useGetDashboard } from "@/hooks/dashboard/useGetDashboard";
+import useInviteTeamMember from "@/hooks/invitations/useInviteTeamMember";
+import { useGetTeamMembers } from "@/hooks/team/useGetTeamMembers";
+import { toast } from "@/lib/toast";
+import { useDeleteTeamStore } from "@/store/team/useDeleteTeamStore";
+import { useUserSessionStore } from "@/store/user/useUserSessionStore";
+import type { ProjectTeam } from "@/types/project";
+
+import OptionButton from "../../Home/KanbanDisplay/OptionsBar/KanbanOptionPanels/OptionButton";
+import PlaygroundTeamMembers from "./TeamMembers";
 
 type PlaygroundTeamViewProps = {
     team: ProjectTeam;

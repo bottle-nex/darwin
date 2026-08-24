@@ -1,9 +1,10 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiClient } from "@/lib/axios";
-import type { ApiResponse } from "@/types/api";
-import { DELETE_PROJECT_URL } from "@/routes/api_routes";
-import { ORGANIZATIONS_QUERY_KEY } from "@/hooks/playground/useFetchOrganizations";
+
 import { DASHBOARD_QUERY_KEY } from "@/hooks/dashboard/useGetDashboard";
+import { ORGANIZATIONS_QUERY_KEY } from "@/hooks/playground/useFetchOrganizations";
+import { apiClient } from "@/lib/axios";
+import { DELETE_PROJECT_URL } from "@/routes/api_routes";
+import type { ApiResponse } from "@/types/api";
 
 export function useDeleteProject() {
     const queryClient = useQueryClient();

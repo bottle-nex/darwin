@@ -1,15 +1,16 @@
 "use client";
+import { type ChatPreviewMessage, to_plain_text } from "@trymatcha/types";
+import { AnimatePresence } from "motion/react";
 import { useState } from "react";
 import { HiOutlineMagnifyingGlass, HiOutlinePlus } from "react-icons/hi2";
-import { AnimatePresence } from "motion/react";
-import { to_plain_text, type ChatPreviewMessage } from "@trymatcha/types";
-import { Button } from "@/components/ui/button";
-import ExpandableSearchBar from "@/components/ui/ExpandableSearchBar";
-import { cn } from "@/lib/utils";
+
 import PlaygroundAvatar, {
     toneFor,
 } from "@/components/playground/Core/components/PlaygroundAvatar";
+import { Button } from "@/components/ui/button";
+import ExpandableSearchBar from "@/components/ui/ExpandableSearchBar";
 import { useChatConversationPreviews } from "@/hooks/chats/useChatConversationPreviews";
+import { cn } from "@/lib/utils";
 import { useNewTeamStore } from "@/store/team/useNewTeamStore";
 
 type Conversation = {
@@ -110,7 +111,7 @@ export default function ChatConversationSidebar({
     }
 
     return (
-        <aside className="flex min-h-0 w-90 max-w-[42%] shrink-0 flex-col border-r border-graphite">
+        <aside className="flex min-h-0 w-80 max-w-[42%] shrink-0 flex-col border-r border-graphite">
             <nav data-lenis-prevent className="no-scrollbar min-h-0 flex-1 overflow-y-auto p-2">
                 <section>
                     <h3 className="px-2 py-1.5 text-[12px] font-medium text-neutral-500 capitalize">

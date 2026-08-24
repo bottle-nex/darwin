@@ -1,10 +1,12 @@
 "use client";
+import type { Notification } from "@trymatcha/types";
 import { format } from "date-fns";
-import { cn } from "@/lib/utils";
+
 import PlaygroundAvatar, {
     toneFor,
 } from "@/components/playground/Core/components/PlaygroundAvatar";
-import type { Notification } from "@trymatcha/types";
+import { cn } from "@/lib/utils";
+
 import { notification_view, short_age, theme_of } from "./notificationView";
 
 type NotificationRowProps = {

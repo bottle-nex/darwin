@@ -3,12 +3,13 @@
 import {
     animate,
     motion,
+    type MotionValue,
     useAnimationFrame,
     useMotionValue,
-    type MotionValue,
 } from "framer-motion";
-import { MdStar } from "react-icons/md";
 import { useEffect, useRef } from "react";
+import { MdStar } from "react-icons/md";
+
 import Node from "./Node";
 import type { PositionedNode } from "./types";
 

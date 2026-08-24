@@ -1,12 +1,14 @@
 "use client";
 import { useEffect, useRef } from "react";
-import GanttRuler from "./GanttRuler";
-import GanttGrid from "./GanttGrid";
-import GanttSidebar from "./GanttSidebar";
-import GanttNowLine from "./GanttNowLine";
-import GanttIssueCard from "./GanttIssueCard";
-import { useGanttBoardStore } from "@/store/gantt/useGanttBoardStore";
+
 import { GanttTimeline } from "@/lib/gantt/GanttTimeline";
+import { useGanttBoardStore } from "@/store/gantt/useGanttBoardStore";
+
+import GanttGrid from "./GanttGrid";
+import GanttIssueCard from "./GanttIssueCard";
+import GanttNowLine from "./GanttNowLine";
+import GanttRuler from "./GanttRuler";
+import GanttSidebar from "./GanttSidebar";
 
 /**
  * The per-project Gantt: a read-only live preview of the project's three workers

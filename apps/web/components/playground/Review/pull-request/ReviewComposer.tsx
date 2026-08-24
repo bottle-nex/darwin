@@ -1,16 +1,17 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
 import type { Editor } from "@tiptap/react";
-import axios from "axios";
-import { FaGithub } from "react-icons/fa6";
 import { Action, Permissions } from "@trymatcha/access-control";
 import type { ReviewHeader } from "@trymatcha/types";
-import { Button } from "@/components/ui/button";
+import axios from "axios";
+import { useEffect, useRef, useState } from "react";
+import { FaGithub } from "react-icons/fa6";
+
 import IssueDescriptionEditor from "@/components/playground/Issue/editor/IssueDescriptionEditor";
-import { htmlToMarkdown } from "@/lib/markdown";
+import { Button } from "@/components/ui/button";
 import { useGithubLink, useStartGithubLink } from "@/hooks/github/useGithubLink";
 import { useGetProject } from "@/hooks/project/useGetProject";
 import { GITHUB_NOT_LINKED, usePostReviewComment } from "@/hooks/review/usePostReviewComment";
+import { htmlToMarkdown } from "@/lib/markdown";
 
 export default function ReviewComposer({
     projectId,

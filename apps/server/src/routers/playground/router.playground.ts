@@ -1,7 +1,8 @@
 import { Router } from "express";
-import { require_auth } from "../../middlewares/middleware.auth";
+
 import GetPreloadPgController from "../../controllers/org/controller.get_orgs";
 import GetDashboardController from "../../controllers/playground/controller.get_dashboard";
+import { require_auth } from "../../middlewares/middleware.auth";
 
 const playground_router: Router = Router();
 

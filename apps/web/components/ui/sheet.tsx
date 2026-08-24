@@ -1,8 +1,8 @@
 "use client";
 
+import { Dialog as SheetPrimitive } from "radix-ui";
 import * as React from "react";
 import { MdClose } from "react-icons/md";
-import { Dialog as SheetPrimitive } from "radix-ui";
 
 import { cn } from "@/lib/utils";
 
@@ -124,11 +124,11 @@ function SheetDescription({
 
 export {
     Sheet,
-    SheetTrigger,
     SheetClose,
     SheetContent,
-    SheetHeader,
-    SheetFooter,
-    SheetTitle,
     SheetDescription,
+    SheetFooter,
+    SheetHeader,
+    SheetTitle,
+    SheetTrigger,
 };

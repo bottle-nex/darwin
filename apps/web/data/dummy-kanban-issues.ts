@@ -1,6 +1,6 @@
-import type { BoardTag } from "@/types/board";
-import { KanbanStatus, type BoardState, type Issue } from "@/types/kanban";
 import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
+import type { BoardTag } from "@/types/board";
+import { type BoardState, type Issue, KanbanStatus } from "@/types/kanban";
 
 /** Colours for the dummy issues below; real tags carry their own from the server. */
 const SEED_TAG_COLORS: Record<string, string> = {

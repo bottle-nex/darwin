@@ -1,24 +1,25 @@
 import type { Editor, Range } from "@tiptap/core";
 import type { IconType } from "react-icons";
-import { LuCalendarClock } from "react-icons/lu";
-import type { TimestampMode } from "./timestamp";
 import {
+    LuCalendarClock,
+    LuCode,
+    LuHeading,
     LuHeading1,
     LuHeading2,
     LuHeading3,
+    LuImage,
+    LuLink,
     LuList,
+    LuListCollapse,
     LuListOrdered,
     LuListTodo,
-    LuImage,
-    LuCode,
-    LuQuote,
-    LuMinus,
-    LuListCollapse,
-    LuHeading,
     LuListTree,
+    LuMinus,
+    LuQuote,
     LuTable,
-    LuLink,
 } from "react-icons/lu";
+
+import type { TimestampMode } from "./timestamp";
 
 export interface SlashCommandItem {
     title: string;

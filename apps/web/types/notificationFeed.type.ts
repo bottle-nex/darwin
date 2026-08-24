@@ -1,5 +1,5 @@
-import type { Notification, NotificationFeedPage } from "@trymatcha/types";
 import type { InfiniteData } from "@tanstack/react-query";
+import type { Notification, NotificationFeedPage } from "@trymatcha/types";
 
 export type NotificationFeedData = InfiniteData<NotificationFeedPage, string | null>;
 

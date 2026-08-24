@@ -1,6 +1,8 @@
+import { type Notification, NotificationType } from "@trymatcha/types";
 import { describe, expect, test } from "bun:test";
-import { NotificationType, type Notification } from "@trymatcha/types";
+
 import { PlaygroundTab } from "@/components/playground/playgroundTabs";
+
 import { should_float_notification } from "./floatSuppression";
 
 function notification(type: NotificationType, projectId: string | null): Notification {

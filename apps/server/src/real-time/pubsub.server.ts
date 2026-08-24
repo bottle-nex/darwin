@@ -1,4 +1,5 @@
 import { Redis } from "ioredis";
+
 import { ENV } from "../configs/env";
 
 export type ChannelScope = "project" | "user";

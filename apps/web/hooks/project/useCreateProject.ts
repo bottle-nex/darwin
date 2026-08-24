@@ -1,10 +1,11 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+
+import type { IconPick } from "@/components/ui/IconPicker";
+import { DASHBOARD_QUERY_KEY } from "@/hooks/dashboard/useGetDashboard";
+import { ORGANIZATIONS_QUERY_KEY } from "@/hooks/playground/useFetchOrganizations";
 import { apiClient } from "@/lib/axios";
 import { CREATE_PROJECT } from "@/routes/api_routes";
-import { ORGANIZATIONS_QUERY_KEY } from "@/hooks/playground/useFetchOrganizations";
-import { DASHBOARD_QUERY_KEY } from "@/hooks/dashboard/useGetDashboard";
 import type { ApiResponse } from "@/types/api";
-import type { IconPick } from "@/components/ui/IconPicker";
 
 export interface CreateProjectInput {
     org_id: string;

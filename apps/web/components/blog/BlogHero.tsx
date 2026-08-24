@@ -1,7 +1,9 @@
 import { ChangelogBackdrop } from "@trymatcha/editorial";
+
 import { cn } from "@/lib/utils";
-import { landingContainer } from "../landing/LandingSection";
+
 import BlurFade from "../landing/BlurFade";
+import { landingContainer } from "../landing/LandingSection";
 import BlogTabs, { type BlogTab } from "./BlogTabs";
 
 export default function BlogHero({ active }: { active: BlogTab }) {

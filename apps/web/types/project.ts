@@ -1,4 +1,10 @@
-import { BackgroundLightingColor, ProjectRole, TeamRole } from "@trymatcha/types";
+import type {
+    BackgroundLightingColor,
+    DefaultHomeView,
+    ProjectRole,
+    TeamRole,
+} from "@trymatcha/types";
+
 import type { IconPick } from "@/components/ui/IconPicker";
 
 export type PlanStatus = "Pending" | "Generating" | "Ready" | "Failed";
@@ -18,6 +24,7 @@ export interface Project {
 export interface UserConfig {
     backgroundLightingEnabled: boolean;
     backgroundLightingColor: BackgroundLightingColor;
+    defaultHomeView: DefaultHomeView;
 }
 
 export interface DashboardData {

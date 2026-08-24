@@ -1,6 +1,7 @@
-import type { Sandbox } from "e2b";
-import chalk from "chalk";
 import type Logger from "@trymatcha/logger";
+import chalk from "chalk";
+import type { Sandbox } from "e2b";
+
 import SandboxStream, { truncate } from "./service.sandbox_stream";
 
 const REPO_DIR = "/home/user/repo";

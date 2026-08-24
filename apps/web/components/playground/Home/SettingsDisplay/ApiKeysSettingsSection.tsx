@@ -1,15 +1,17 @@
 "use client";
 import { useState } from "react";
+import { MdContentCopy, MdKey } from "react-icons/md";
 import { toast } from "sonner";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
-import { CLAUDE_MCP_URL, CLAUDE_MCP_CONNECTOR_URL } from "@/routes/api_routes";
 import { useApiKeys } from "@/hooks/apiKeys/useApiKeys";
 import { useCreateApiKey } from "@/hooks/apiKeys/useCreateApiKey";
 import { useRevokeApiKey } from "@/hooks/apiKeys/useRevokeApiKey";
+import { cn } from "@/lib/utils";
+import { CLAUDE_MCP_CONNECTOR_URL,CLAUDE_MCP_URL } from "@/routes/api_routes";
 import type { CreatedApiKey } from "@/types/apiKey.type";
-import { MdContentCopy, MdKey } from "react-icons/md";
+
 import SettingsUtilityCard from "./SettingsUtilityCard";
 
 function formatDate(value: string | null) {

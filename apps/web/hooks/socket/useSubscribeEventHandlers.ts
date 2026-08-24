@@ -1,11 +1,13 @@
 "use client";
-import { useEffect, useRef } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { OutboundSocketMessageType } from "@trymatcha/types";
-import { SocketHandlers } from "@/lib/socket.handlers";
-import { useWebSocket } from "./useWebSocket";
-import type { MessageHandler } from "@/socket/socket.client";
+import { useEffect, useRef } from "react";
+
 import { reconcileBoardProject } from "@/hooks/issues/boardCache";
+import { SocketHandlers } from "@/lib/socket.handlers";
+import type { MessageHandler } from "@/socket/socket.client";
+
+import { useWebSocket } from "./useWebSocket";
 
 export function useSubscribeEventHandlers(project_id: string | undefined) {
     const { is_connected, subscribe, unsubscribe } = useWebSocket(project_id);

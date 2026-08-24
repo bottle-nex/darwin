@@ -1,7 +1,8 @@
-import { Request, Response } from "express";
 import { Action, Permissions } from "@trymatcha/access-control";
 import { MAX_GLOBAL_SEARCH_QUERY_LENGTH, MIN_GLOBAL_SEARCH_QUERY_LENGTH } from "@trymatcha/types";
+import type { Request, Response } from "express";
 import z from "zod";
+
 import Access from "../../access-control/access";
 import GlobalSearchService from "../../services/service.global-search";
 import ResponseWriter from "../../services/service.response";

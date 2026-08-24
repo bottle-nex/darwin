@@ -1,21 +1,22 @@
 "use client";
 
-import { useState } from "react";
 import type { Editor } from "@tiptap/react";
 import { AxiosError } from "axios";
-import { toast } from "@/lib/toast";
+import { useState } from "react";
 import { MdCheck, MdChevronLeft, MdDescription } from "react-icons/md";
+
+import IssueDescriptionEditor from "@/components/playground/Issue/editor/IssueDescriptionEditor";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import IconPicker, { type IconPick, IconPickGlyph } from "@/components/ui/IconPicker";
+import ConfirmDialog from "@/components/utility/ConfirmDialog";
+import { useEscapeExit } from "@/hooks/shortcuts/useEscapeExit";
 import { useCreateTemplate } from "@/hooks/templates/useCreateTemplate";
 import { useUpdateTemplate } from "@/hooks/templates/useUpdateTemplate";
 import { promptsFromBraces } from "@/lib/templates/promptHtml";
-import IssueDescriptionEditor from "@/components/playground/Issue/editor/IssueDescriptionEditor";
+import { toast } from "@/lib/toast";
+import { cn } from "@/lib/utils";
 import type { ApiResponse } from "@/types/api";
 import type { IssueTemplate } from "@/types/issueTemplate";
-import IconPicker, { IconPickGlyph, type IconPick } from "@/components/ui/IconPicker";
-import ConfirmDialog from "@/components/utility/ConfirmDialog";
-import { useEscapeExit } from "@/hooks/shortcuts/useEscapeExit";
 
 const GHOST = "w-full bg-transparent outline-none placeholder:text-white/25";
 

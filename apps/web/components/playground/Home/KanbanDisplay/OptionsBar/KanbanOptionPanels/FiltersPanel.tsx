@@ -1,5 +1,6 @@
 "use client";
 import { LuListFilter, LuTrash2 } from "react-icons/lu";
+
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -9,16 +10,17 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { TooltipComponent } from "@/components/ui/tooltip-component";
-import { cn } from "@/lib/utils";
 import { activeFacetKeys, hasActiveFilters } from "@/lib/kanban/boardFilter";
+import { cn } from "@/lib/utils";
 import { useKanbanFilterStore } from "@/store/kanban/useKanbanFilterStore";
-import { DATE_FACET_KEYS, LIST_FACET_KEYS, type FacetKey } from "@/types/boardFilter";
-import OptionButton from "./OptionButton";
+import { DATE_FACET_KEYS, type FacetKey, LIST_FACET_KEYS } from "@/types/boardFilter";
+
 import EagerSubmenu from "./EagerSubmenu";
-import { FACET_MENU_CONTENT, FACET_META, facetValues } from "./filterFacets";
-import { FilterFacetItems } from "./FilterFacetMenu";
 import { FilterDateItems } from "./FilterDateMenu";
+import { FilterFacetItems } from "./FilterFacetMenu";
+import { FACET_MENU_CONTENT, FACET_META, facetValues } from "./filterFacets";
 import { FilterQueryItems } from "./FilterQueryMenu";
+import OptionButton from "./OptionButton";
 
 export const FILTERS_PANEL_WIDTH = "w-52";
 

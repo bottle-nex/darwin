@@ -1,5 +1,6 @@
-import { prisma, NotificationType } from "@trymatcha/database";
-import { to_plain_text, type LabelledReference, type NotificationJobData } from "@trymatcha/types";
+import { NotificationType, prisma } from "@trymatcha/database";
+import { type LabelledReference, type NotificationJobData, to_plain_text } from "@trymatcha/types";
+
 import { MESSAGE_REFERENCE_INCLUDE } from "../../services/service.message-references";
 import NotificationCreateService from "../service.notification-create";
 

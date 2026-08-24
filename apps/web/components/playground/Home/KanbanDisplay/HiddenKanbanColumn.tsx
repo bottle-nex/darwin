@@ -1,9 +1,11 @@
 "use client";
-import { useState } from "react";
 import { motion, type Variants } from "motion/react";
+import { useState } from "react";
 import { MdArrowRight } from "react-icons/md";
+
 import { cn } from "@/lib/utils";
 import type { KanbanColumnDef } from "@/types/kanban";
+
 import LLMIssueStatusTicker from "./LLMIssueStatusTicker";
 
 const HEIGHT_SPRING = { type: "spring", stiffness: 800, damping: 48, mass: 0.6 } as const;

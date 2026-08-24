@@ -1,22 +1,25 @@
-import { CommandResult, Sandbox, SnapshotInfo } from "e2b";
+import { randomUUID } from "node:crypto";
+
+import { prisma, WorkerStatus } from "@trymatcha/database";
+import Logger, { format_duration } from "@trymatcha/logger";
+import type { CommandResult, SnapshotInfo } from "e2b";
+import { Sandbox } from "e2b";
+
 import { ENV } from "../conf/config.env";
+import ClaudeRun from "./service.claude_run";
 import GithubService, { type PullRequestSummary } from "./service.github";
-import SecretService from "./service.secret";
-import PlanService from "./services.plan";
 import GraphService, {
     GRAPHIFY_INTEGRATION,
     GRAPHIFY_OUT,
     GRAPHIFY_SETTINGS,
 } from "./service.graph";
-import ClaudeRun from "./service.claude_run";
-import SandboxStream, { redact } from "./service.sandbox_stream";
-import { sign_worker_jwt } from "./service.jwt";
 import IssueSolver, { type ClaimedIssue } from "./service.issue_solver";
+import { sign_worker_jwt } from "./service.jwt";
 import OutcomeReporter from "./service.outcome_queue";
-import Logger, { format_duration } from "@trymatcha/logger";
-import { prisma, WorkerStatus } from "@trymatcha/database";
 import RunReporter from "./service.run_report";
-import { randomUUID } from "node:crypto";
+import SandboxStream, { redact } from "./service.sandbox_stream";
+import SecretService from "./service.secret";
+import PlanService from "./services.plan";
 
 const REPO_DIR = "/home/user/repo";
 const SAFE_BRANCH = /^[A-Za-z0-9._/-]+$/;

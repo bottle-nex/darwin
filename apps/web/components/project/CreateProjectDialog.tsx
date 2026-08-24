@@ -1,20 +1,21 @@
 "use client";
-import { useState } from "react";
 import { useParams } from "next/navigation";
 import { signOut } from "next-auth/react";
+import { useState } from "react";
 import { MdOutlineKeyboardArrowRight } from "react-icons/md";
 import { PiSmileyFill } from "react-icons/pi";
+
+import PlaygroundAvatar from "@/components/playground/Core/components/PlaygroundAvatar";
+import CreateProjectDialogDetailsStep from "@/components/project/CreateProjectDialogDetailsStep";
+import ProjectEnvStep, { type EnvRow } from "@/components/project/ProjectEnvStep";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import IconPicker, { IconPickGlyph, type IconPick } from "@/components/ui/IconPicker";
-import PlaygroundAvatar from "@/components/playground/Core/components/PlaygroundAvatar";
+import IconPicker, { type IconPick, IconPickGlyph } from "@/components/ui/IconPicker";
+import { useGetDashboard } from "@/hooks/dashboard/useGetDashboard";
+import { useFetchOrganizations } from "@/hooks/playground/useFetchOrganizations";
+import { useSetProjectSecrets } from "@/hooks/project/useSetProjectSecrets";
 import { cn } from "@/lib/utils";
 import { useNewProjectStore } from "@/store/project/useNewProjectStore";
-import { useFetchOrganizations } from "@/hooks/playground/useFetchOrganizations";
-import { useGetDashboard } from "@/hooks/dashboard/useGetDashboard";
-import { useSetProjectSecrets } from "@/hooks/project/useSetProjectSecrets";
-import ProjectEnvStep, { type EnvRow } from "@/components/project/ProjectEnvStep";
-import CreateProjectDialogDetailsStep from "@/components/project/CreateProjectDialogDetailsStep";
 
 export const FIELD =
     "mt-1.5 border-white/10 bg-white/5 text-neutral-200 placeholder:text-neutral-500 focus-visible:border-matcha focus-visible:ring-matcha/30";

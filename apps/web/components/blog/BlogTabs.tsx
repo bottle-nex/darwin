@@ -1,4 +1,5 @@
 import Link from "next/link";
+
 import { cn } from "@/lib/utils";
 
 export const BLOG_TABS = ["all", "changelog", "blogs"] as const;

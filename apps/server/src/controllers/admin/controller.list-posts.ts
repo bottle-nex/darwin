@@ -1,5 +1,6 @@
-import type { Request, Response } from "express";
 import { prisma } from "@trymatcha/database";
+import type { Request, Response } from "express";
+
 import ResponseWriter from "../../services/service.response";
 import { post_kind_schema } from "./post.schema";
 

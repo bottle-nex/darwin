@@ -1,5 +1,5 @@
-import { cn } from "@/lib/utils";
 import { GanttTimeline } from "@/lib/gantt/GanttTimeline";
+import { cn } from "@/lib/utils";
 
 /**
  * The top time axis. Ticks every 5 minutes (matching the 5-minute grid blocks),

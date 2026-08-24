@@ -1,11 +1,13 @@
 "use client";
 
 import { useInView, useReducedMotion } from "motion/react";
-import { useRef, type CSSProperties } from "react";
+import { type CSSProperties, useRef } from "react";
 import { BsArrowDownShort } from "react-icons/bs";
 import { FaDiscord, FaGithub, FaXTwitter } from "react-icons/fa6";
+
 import { MatchaLogo } from "@/components/logo/MatchaLogo";
 import { cn } from "@/lib/utils";
+
 import { landingContainer } from "./LandingSection";
 
 const LIGHT_DELAY_MS = 200;

@@ -1,7 +1,8 @@
 "use client";
 
 import { motion, useReducedMotion } from "motion/react";
-import { draw, fade, POP_ORIGIN, pop } from "./diagramMotion";
+
+import { draw, fade, pop, POP_ORIGIN } from "./diagramMotion";
 import LandingSection from "./LandingSection";
 import SectionHeader from "./SectionHeader";
 

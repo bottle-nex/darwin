@@ -1,11 +1,11 @@
 import { displayNameOf, toneFor } from "@/components/playground/Core/components/PlaygroundAvatar";
-import type { BoardAssignee, BoardIssue, BoardResponse, ServerIssueStatus } from "@/types/board";
 import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
+import type { BoardAssignee, BoardIssue, BoardResponse, ServerIssueStatus } from "@/types/board";
 import {
-    KanbanStatus,
     type Assignee,
     type BoardState,
     type Issue,
+    KanbanStatus,
     type Priority,
 } from "@/types/kanban";
 

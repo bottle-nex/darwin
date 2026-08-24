@@ -1,9 +1,10 @@
+import { useQuery } from "@tanstack/react-query";
+
 import { apiClient } from "@/lib/axios";
 import { LIST_INVITES_URL } from "@/routes/api_routes";
 import { useUserSessionStore } from "@/store/user/useUserSessionStore";
-import { ApiResponse } from "@/types/api";
-import { InvitePreview } from "@/types/types.invitation";
-import { useQuery } from "@tanstack/react-query";
+import type { ApiResponse } from "@/types/api";
+import type { InvitePreview } from "@/types/types.invitation";
 
 export default function useFetchInvites() {
     const session_token = useUserSessionStore((s) => s.session?.user?.token);

@@ -1,4 +1,5 @@
 import { create } from "zustand";
+
 import { buildMockIssues } from "@/data/dummy-gantt-issues";
 import { GanttTimeline } from "@/lib/gantt/GanttTimeline";
 import type { GanttIssue } from "@/types/gantt";

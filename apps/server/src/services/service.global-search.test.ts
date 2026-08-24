@@ -1,4 +1,5 @@
 import { describe, expect, test } from "bun:test";
+
 import GlobalSearchController from "../controllers/search/controller.global_search";
 import { escape_like } from "./service.board-issues";
 import {

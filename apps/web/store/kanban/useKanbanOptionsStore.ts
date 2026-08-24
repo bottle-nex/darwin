@@ -1,4 +1,5 @@
 import { create } from "zustand";
+
 import type { BoardView, KanbanStatus, KanbanView } from "@/types/kanban";
 
 /**

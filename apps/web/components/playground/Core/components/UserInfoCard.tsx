@@ -1,14 +1,15 @@
 "use client";
 
 import { HiOutlineRectangleGroup } from "react-icons/hi2";
-import { cn } from "@/lib/utils";
-import { useActiveProject } from "@/hooks/useActiveProject";
-import { useProjectMembers } from "@/hooks/project/useProjectMembers";
-import { useProjectPresence } from "@/hooks/project/useProjectPresence";
+
 import PlaygroundAvatar, {
     displayNameOf,
     toneFor,
 } from "@/components/playground/Core/components/PlaygroundAvatar";
+import { useProjectMembers } from "@/hooks/project/useProjectMembers";
+import { useProjectPresence } from "@/hooks/project/useProjectPresence";
+import { useActiveProject } from "@/hooks/useActiveProject";
+import { cn } from "@/lib/utils";
 
 type UserInfoCardProps = {
     userId: string;

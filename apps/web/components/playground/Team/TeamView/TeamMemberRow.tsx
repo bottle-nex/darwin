@@ -1,22 +1,24 @@
 "use client";
-import { formatDate } from "@/lib/format";
-import type { PendingInviteDetail, TeamMemberDetail } from "@/types/team";
-import { INVITATION_STATUS } from "@/types/types.invitation";
+import { MdJoinLeft, MdPersonRemove } from "react-icons/md";
+import { PiDotsThreeOutlineVerticalLight } from "react-icons/pi";
+
 import PlaygroundAvatar, {
     initialOf,
     toneFor,
 } from "@/components/playground/Core/components/PlaygroundAvatar";
 import { Button } from "@/components/ui/button";
-import ProjectRoleTicker from "./ProjectRoleTicker";
-import useRevokeInvite from "@/hooks/invitations/useRevokeInvite";
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MdJoinLeft, MdPersonRemove } from "react-icons/md";
-import { PiDotsThreeOutlineVerticalLight } from "react-icons/pi";
+import useRevokeInvite from "@/hooks/invitations/useRevokeInvite";
+import { formatDate } from "@/lib/format";
+import type { PendingInviteDetail, TeamMemberDetail } from "@/types/team";
+import { INVITATION_STATUS } from "@/types/types.invitation";
+
+import ProjectRoleTicker from "./ProjectRoleTicker";
 
 type MemberDetailProps = { teamId: string } & (
     | {

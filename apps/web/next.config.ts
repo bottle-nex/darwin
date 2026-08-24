@@ -1,5 +1,5 @@
-import type { NextConfig } from "next";
 import fs from "fs";
+import type { NextConfig } from "next";
 import path from "path";
 
 const rootEnv = path.resolve(__dirname, "../../.env");

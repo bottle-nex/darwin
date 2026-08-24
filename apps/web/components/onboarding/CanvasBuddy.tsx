@@ -1,5 +1,6 @@
-import { cn } from "@/lib/utils";
 import "./CanvasBuddy.css";
+
+import { cn } from "@/lib/utils";
 
 const BODY = "var(--color-primary)";
 const EYE = "#262626";

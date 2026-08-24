@@ -1,10 +1,12 @@
 "use client";
 
 import { motion } from "motion/react";
+
 import { Button } from "@/components/ui/button";
+
+import { MatchaLogo } from "../logo/MatchaLogo";
 import { screenVariants, stepItemVariants } from "./choreography";
 import type { TourDraft } from "./steps";
-import { MatchaLogo } from "../logo/MatchaLogo";
 
 export default function DoneScreen({
     draft,

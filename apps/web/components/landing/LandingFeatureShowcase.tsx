@@ -1,8 +1,10 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
 import { useInView } from "motion/react";
+import { useEffect, useRef, useState } from "react";
 import { BsChevronRight } from "react-icons/bs";
+
 import { cn } from "@/lib/utils";
+
 import Reveal from "../utility/Reveal";
 import LandingSection from "./LandingSection";
 import SectionHeader from "./SectionHeader";

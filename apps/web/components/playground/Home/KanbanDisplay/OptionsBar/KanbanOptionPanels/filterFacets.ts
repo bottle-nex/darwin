@@ -4,16 +4,17 @@ import type { IconType } from "react-icons";
 import { HiCalendar } from "react-icons/hi2";
 import { LuTag, LuUser, LuUsers } from "react-icons/lu";
 import { MdSearch } from "react-icons/md";
-import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
+
 import { DATE_ICON_COLOR, PRIORITY_OPTIONS } from "@/components/playground/Issue/issueHelpers";
-import { useActiveProject } from "@/hooks/useActiveProject";
 import { useProjectMembers } from "@/hooks/project/useProjectMembers";
 import { useListTags } from "@/hooks/tags/useListTags";
+import { useActiveProject } from "@/hooks/useActiveProject";
+import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
 import {
-    UNASSIGNED,
     type BoardFilters,
     type FacetKey,
     type ListFacetKey,
+    UNASSIGNED,
 } from "@/types/boardFilter";
 
 export const FACET_MENU_CONTENT = "flex max-h-76 w-56 flex-col overflow-hidden p-0";
@@ -53,6 +54,7 @@ export type FacetOption = {
     icon?: IconType;
     iconClassName?: string;
     dotColor?: string;
+    avatarSrc?: string | null;
 };
 
 const SEARCHABLE_FACETS: ListFacetKey[] = ["assigneeIds", "creatorIds", "tagIds"];
@@ -74,6 +76,7 @@ export function useFacetOptions(key: ListFacetKey): FacetOption[] {
         const people = (members ?? []).map((member) => ({
             value: member.id,
             label: member.name ?? member.email,
+            avatarSrc: member.image,
         }));
 
         switch (key) {

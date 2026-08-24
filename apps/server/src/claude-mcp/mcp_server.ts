@@ -1,11 +1,12 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { z } from "zod";
 import { Action, Permissions } from "@trymatcha/access-control";
-import type { AuthUser } from "../types/express";
+import { z } from "zod";
+
 import Access from "../access-control/access";
 import IssueService from "../services/service.issue";
-import { resolve_project } from "./lib/resolve_project";
+import type { AuthUser } from "../types/express";
 import { resolve_assignee } from "./lib/resolve_assignee";
+import { resolve_project } from "./lib/resolve_project";
 
 function text(message: string) {
     return { content: [{ type: "text" as const, text: message }] };

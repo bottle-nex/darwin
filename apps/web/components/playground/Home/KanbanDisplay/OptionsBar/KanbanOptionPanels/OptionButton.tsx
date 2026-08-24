@@ -1,7 +1,8 @@
 "use client";
-import { Button } from "@/components/ui/button";
 import { forwardRef } from "react";
 import type { IconType } from "react-icons";
+
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 type OptionButtonProps = {

@@ -1,9 +1,10 @@
-import { Request, Response } from "express";
-import { z } from "zod";
-import { createHash } from "crypto";
 import { InvitationStatus, OrgRole, prisma, TeamRole } from "@trymatcha/database";
-import ResponseWriter from "../../services/service.response";
+import { createHash } from "crypto";
+import type { Request, Response } from "express";
+import { z } from "zod";
+
 import { server_services } from "../..";
+import ResponseWriter from "../../services/service.response";
 
 const body_schema = z.object({
     token: z.string().min(1),

@@ -1,22 +1,24 @@
 "use client";
 import { useState } from "react";
-import type { BoardColumn, BoardIssue } from "@/types/board";
+
 import { PLAYGROUND_PANE_SHELL } from "@/components/playground/Core/components/paneBar";
+import PaneColumns from "@/components/playground/Core/components/PaneColumns";
+import PlaygroundBreadcrumb from "@/components/playground/Core/components/PlaygroundBreadcrumb";
+import { PANE_TOP_BAR_HEIGHT } from "@/components/playground/Core/components/PlaygroundPaneFrame";
 import {
     PaneActionsSlot,
     PaneLeadSlot,
 } from "@/components/playground/Core/components/PlaygroundPaneSlots";
-import PlaygroundBreadcrumb from "@/components/playground/Core/components/PlaygroundBreadcrumb";
-import { PANE_TOP_BAR_HEIGHT } from "@/components/playground/Core/components/PlaygroundPaneFrame";
-import PaneColumns from "@/components/playground/Core/components/PaneColumns";
 import IssueDropdown from "@/components/playground/Home/KanbanDisplay/IssueDropdown";
 import ConfirmDialog from "@/components/utility/ConfirmDialog";
 import { useEscapeExit } from "@/hooks/shortcuts/useEscapeExit";
+import { usePaneRouteStore } from "@/store/playground/usePaneRouteStore";
+import type { BoardColumn, BoardIssue } from "@/types/board";
+
 import IssueDetailBody from "./IssueDetailBody";
+import { isEditable, targetForIssue } from "./issueHelpers";
 import IssueProperties from "./IssueProperties";
 import IssueSubmitAction from "./IssueSubmitAction";
-import { isEditable, targetForIssue } from "./issueHelpers";
-import { usePaneRouteStore } from "@/store/playground/usePaneRouteStore";
 import { useIssueForm } from "./useIssueForm";
 
 export default function IssueDisplayPane({

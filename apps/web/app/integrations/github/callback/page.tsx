@@ -1,9 +1,10 @@
 "use client";
 
-import { Suspense, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { FaCircleCheck, FaCircleXmark } from "react-icons/fa6";
 import { RiLoader4Line } from "react-icons/ri";
+
 import { Button } from "@/components/ui/button";
 import { useCompleteGithubConnect } from "@/hooks/github/useCompleteGithubConnect";
 import { GITHUB_LINK_RETURN_KEY, useCompleteGithubLink } from "@/hooks/github/useGithubLink";

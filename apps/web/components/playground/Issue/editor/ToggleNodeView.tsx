@@ -1,8 +1,9 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { NodeViewContent, NodeViewWrapper, type ReactNodeViewProps } from "@tiptap/react";
 import { FaCaretDown, FaCaretRight } from "react-icons/fa";
+
+import { Button } from "@/components/ui/button";
 
 export default function ToggleNodeView({ node, updateAttributes, editor }: ReactNodeViewProps) {
     const open = node.attrs.open as boolean;

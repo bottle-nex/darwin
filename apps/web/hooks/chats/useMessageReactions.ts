@@ -1,17 +1,19 @@
-import { useSyncExternalStore } from "react";
 import type { QueryClient } from "@tanstack/react-query";
 import {
-    InboundSocketMessageType,
-    type Chat,
-    type ProjectChat,
-    type TeamChat,
     apply_reaction_deltas,
     apply_reaction_updates,
+    type Chat,
     get_reaction_selection,
+    InboundSocketMessageType,
+    type ProjectChat,
     type ReactionDelta,
     type ReactionSummary,
+    type TeamChat,
 } from "@trymatcha/types";
+import { useSyncExternalStore } from "react";
+
 import { send_socket_message } from "@/hooks/socket/useWebSocket";
+
 import { updateChatReactions } from "./chatCache";
 
 type ReactionEvent = {

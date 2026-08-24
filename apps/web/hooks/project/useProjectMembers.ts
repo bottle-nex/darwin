@@ -1,8 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
-import { apiClient } from "@/lib/axios";
-import type { ApiResponse } from "@/types/api";
 import type { ProjectRole } from "@trymatcha/types";
+
+import { apiClient } from "@/lib/axios";
 import { LIST_PROJECT_MEMBERS_URL } from "@/routes/api_routes";
+import type { ApiResponse } from "@/types/api";
 
 export interface ProjectMember {
     id: string;

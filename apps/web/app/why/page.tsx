@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+
 import { LandingNavbar } from "@/components/new/LandingNavbar";
 import WhyHero from "@/components/why/WhyHero";
 import WhyMatcha from "@/components/why/WhyMatcha";

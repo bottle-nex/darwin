@@ -1,6 +1,7 @@
 import { Router } from "express";
-import { require_auth } from "../../middlewares/middleware.auth";
+
 import ChatGetController from "../../controllers/chat/controller.get_chats";
+import { require_auth } from "../../middlewares/middleware.auth";
 
 // Chat writes go over the WebSocket (CHAT_CREATE in real-time/chat.handler.ts);
 // HTTP only serves the history read.

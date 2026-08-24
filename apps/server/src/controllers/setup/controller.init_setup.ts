@@ -1,7 +1,8 @@
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
 import z from "zod";
-import ResponseWriter from "../../services/service.response";
+
 import Access from "../../access-control/access";
+import ResponseWriter from "../../services/service.response";
 
 export default class SetupInitController {
     static body_schema = z.object({

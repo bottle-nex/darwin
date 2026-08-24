@@ -1,8 +1,9 @@
-import { Sandbox } from "e2b";
 import { PlanStatus, prisma } from "@trymatcha/database";
+import Logger, { format_duration } from "@trymatcha/logger";
+import { Sandbox } from "e2b";
+
 import { ENV } from "../conf/config.env";
 import ClaudeRun from "./service.claude_run";
-import Logger, { format_duration } from "@trymatcha/logger";
 
 const log = Logger.scope("plan");
 

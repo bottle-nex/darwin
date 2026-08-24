@@ -1,5 +1,7 @@
 import { MdBlock } from "react-icons/md";
+
 import type { Issue } from "@/types/kanban";
+
 import BaseCard from "./BaseCard";
 
 /** Cancelled: a human pulled the issue before the agent finished it. */

@@ -1,11 +1,13 @@
 "use client";
 import { GoGitPullRequest } from "react-icons/go";
-import type { BoardIssue } from "@/types/board";
+
 import { reviewSlugFor } from "@/components/playground/Review/reviewSlug";
 import { usePaneRouteStore } from "@/store/playground/usePaneRouteStore";
+import type { BoardIssue } from "@/types/board";
+
 import { CapsuleTrigger } from "./Capsule";
-import PropertyGroup from "./PropertyGroup";
 import { STACKED_CAPSULE } from "./issueHelpers";
+import PropertyGroup from "./PropertyGroup";
 
 export default function IssueAttachments({ issue }: { issue: BoardIssue }) {
     const openReview = usePaneRouteStore((s) => s.openReview);

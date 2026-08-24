@@ -1,6 +1,6 @@
 "use client";
-import { useEffect } from "react";
 import type { Editor } from "@tiptap/react";
+import { useEffect } from "react";
 
 function isInsideEditor(editor: Editor | null | undefined, node: Element | null): boolean {
     if (!editor || editor.isDestroyed || !node) return false;

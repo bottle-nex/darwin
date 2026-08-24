@@ -1,15 +1,16 @@
 "use client";
 
-import Image from "next/image";
-import { useState } from "react";
-import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import axios from "axios";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
+import { useState } from "react";
+
 import AppLogo from "@/components/app/Applogo";
-import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { Button } from "@/components/ui/button";
-import { REQUEST_OTP_URL } from "@/routes/api_routes";
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { cn } from "@/lib/utils";
+import { REQUEST_OTP_URL } from "@/routes/api_routes";
 
 type Step = "options" | "email" | "otp";
 type OauthProvider = (typeof oauth_options)[number]["type"];

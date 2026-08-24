@@ -1,11 +1,12 @@
-import { Request, Response } from "express";
-import z from "zod";
-import ResponseWriter from "../../services/service.response";
-import Access from "../../access-control/access";
 import { Action, Permissions } from "@trymatcha/access-control";
+import type { Request, Response } from "express";
+import z from "zod";
+
+import Access from "../../access-control/access";
 import ChatHistoryService, {
     InvalidChatHistoryCursorError,
 } from "../../services/service.chat-history";
+import ResponseWriter from "../../services/service.response";
 
 export default class ProjectChatGetController {
     static params_schema = z.object({

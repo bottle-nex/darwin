@@ -1,11 +1,12 @@
 "use client";
-import { HiOutlineTag } from "react-icons/hi2";
 import { HiMenuAlt2 } from "react-icons/hi";
+import { HiOutlineTag } from "react-icons/hi2";
 import { PiColumnsLight } from "react-icons/pi";
+
+import { PlaygroundTab } from "../playgroundTabs";
+import { type SidebarSectionProps } from "./shared";
 import Row from "./SidebarRow";
 import Section from "./SidebarSection";
-import { type SidebarSectionProps } from "./shared";
-import { PlaygroundTab } from "../playgroundTabs";
 
 // The ways you look at the project's work — the board itself and its lenses.
 const BOARD_ROWS: { id: string; label: string; icon: React.ComponentType }[] = [

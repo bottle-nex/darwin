@@ -1,14 +1,14 @@
 "use client";
 import { closestCorners, DndContext } from "@dnd-kit/core";
+
+import { BoardDataLoader, BoardFeedProvider } from "@/hooks/issues/useBoard";
 import { useKanbanPane } from "@/hooks/kanban/useKanbanPane";
 import { useActiveProject } from "@/hooks/useActiveProject";
-import { BoardDataLoader, BoardFeedProvider } from "@/hooks/issues/useBoard";
-import KanbanOptionsBar from "./OptionsBar/KanbanOptionsBar";
+
+import AddCustomColumnDialog from "./customkanban/AddCustomColumnDialog";
 import KanbanContent from "./KanbanContent";
 import KanbanDragOverlay from "./KanbanDragOverlay";
-import IssueFlightTrigger from "./flight/IssueFlightTrigger";
-import IssueFlightOverlay from "./flight/IssueFlightOverlay";
-import AddCustomColumnDialog from "./customkanban/AddCustomColumnDialog";
+import KanbanOptionsBar from "./OptionsBar/KanbanOptionsBar";
 
 export default function KanbanDisplay() {
     const projectId = useActiveProject()?.id;
@@ -38,8 +38,6 @@ function KanbanDisplayContent({ projectId }: { projectId: string | undefined }) 
                 <KanbanContent />
                 <KanbanDragOverlay />
             </DndContext>
-            <IssueFlightTrigger />
-            <IssueFlightOverlay />
             <AddCustomColumnDialog />
         </div>
     );

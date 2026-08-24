@@ -1,7 +1,9 @@
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+
 import { apiClient } from "@/lib/axios";
 import { ACCEPT_INVITE_URL } from "@/routes/api_routes";
-import { ApiResponse } from "@/types/api";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { ApiResponse } from "@/types/api";
+
 import { ORGANIZATIONS_QUERY_KEY } from "../playground/useFetchOrganizations";
 
 interface AcceptResult {

@@ -1,8 +1,10 @@
 "use client";
 
 import { motion } from "motion/react";
-import { cn } from "@/lib/utils";
+
 import { sourceSerif4 } from "@/lib/fonts";
+import { cn } from "@/lib/utils";
+
 import HeroPanel from "./HeroPanel";
 
 const HEADLINE: { text: string; emphasis?: boolean; delay: number; breakAfter?: boolean }[] = [

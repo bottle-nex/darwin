@@ -3,7 +3,7 @@
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import IconPicker, { IconPickGlyph, type IconPick } from "@/components/ui/IconPicker";
+import IconPicker, { type IconPick, IconPickGlyph } from "@/components/ui/IconPicker";
 
 export default function EmojisPage() {
     const [open, setOpen] = useState(false);

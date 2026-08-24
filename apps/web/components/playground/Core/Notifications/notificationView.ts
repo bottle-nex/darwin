@@ -1,4 +1,5 @@
-import { formatDistanceToNowStrict, isToday, isYesterday, format } from "date-fns";
+import { type Notification, NotificationType } from "@trymatcha/types";
+import { format, formatDistanceToNowStrict, isToday, isYesterday } from "date-fns";
 import type { IconType } from "react-icons";
 import {
     HiOutlineArrowPath,
@@ -18,7 +19,6 @@ import {
     HiOutlineUserMinus,
     HiOutlineUserPlus,
 } from "react-icons/hi2";
-import { NotificationType, type Notification } from "@trymatcha/types";
 
 export type NotificationView = {
     actorId: string;

@@ -1,17 +1,18 @@
 "use client";
 import { useState } from "react";
 import { MdOutlineKeyboardArrowRight } from "react-icons/md";
-import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { Textarea } from "@/components/ui/textarea";
-import { DIALOG_TITLE_FIELD, GHOST_FIELD } from "@/components/ui/fieldStyles";
+
 import PlaygroundAvatar, {
     toneFor,
 } from "@/components/playground/Core/components/PlaygroundAvatar";
-import { cn } from "@/lib/utils";
-import { useActiveProject } from "@/hooks/useActiveProject";
-import { useAddCustomColumnStore } from "@/store/kanban/useAddCustomColumnStore";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { DIALOG_TITLE_FIELD, GHOST_FIELD } from "@/components/ui/fieldStyles";
+import { Textarea } from "@/components/ui/textarea";
 import { useCustomColumnActions } from "@/hooks/kanban/useCustomColumnActions";
+import { useActiveProject } from "@/hooks/useActiveProject";
+import { cn } from "@/lib/utils";
+import { useAddCustomColumnStore } from "@/store/kanban/useAddCustomColumnStore";
 
 export default function AddCustomColumnDialog() {
     const { open, setOpen } = useAddCustomColumnStore();

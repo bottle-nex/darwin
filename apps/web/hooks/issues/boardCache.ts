@@ -1,8 +1,8 @@
 import type { InfiniteData, QueryClient, QueryKey } from "@tanstack/react-query";
-import { IssueStatus, type CursorPage, type Issue } from "@trymatcha/types";
-import { removeInfinitePageItem, updateInfinitePageItem } from "@/lib/pagination/infinitePages";
+import { type CursorPage, type Issue, IssueStatus } from "@trymatcha/types";
+
 import { hasActiveFilters, issueMatchesFilters } from "@/lib/kanban/boardFilter";
-import type { BoardFilters, DateRangeFilter } from "@/types/boardFilter";
+import { removeInfinitePageItem, updateInfinitePageItem } from "@/lib/pagination/infinitePages";
 import type {
     BoardIssue,
     BoardLane,
@@ -10,6 +10,7 @@ import type {
     BoardMetadata,
     BoardSearchKey,
 } from "@/types/board";
+import type { BoardFilters, DateRangeFilter } from "@/types/boardFilter";
 
 export const BOARD_QUERY_KEY = ["board"] as const;
 export const BOARD_COLUMNS_QUERY_KEY = [...BOARD_QUERY_KEY, "columns"] as const;

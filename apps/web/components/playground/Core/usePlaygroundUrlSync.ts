@@ -1,9 +1,14 @@
 "use client";
-import { useEffect, useRef } from "react";
 import { useParams } from "next/navigation";
-import type { ProjectTeam } from "@/types/project";
+import { useEffect, useRef } from "react";
+
+import {
+    isPlaygroundTab,
+    PLAYGROUND_DEFAULT_TAB,
+    type PlaygroundTab,
+} from "@/components/playground/playgroundTabs";
 import { TEAM_DETAIL_TAB, usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
-import { isPlaygroundTab, PLAYGROUND_DEFAULT_TAB } from "@/components/playground/playgroundTabs";
+import type { ProjectTeam } from "@/types/project";
 
 /**
  * Keeps the playground's navigation state and the browser URL in sync, so a
@@ -17,9 +22,18 @@ import { isPlaygroundTab, PLAYGROUND_DEFAULT_TAB } from "@/components/playground
  * params before the first write so the writes can't clobber the values we still
  * need to hydrate from.
  *
+ * When no `?tab=` is present, the user's "default home view" preference is
+ * applied once it loads — but only once, so it can never fight a later manual
+ * tab switch or a background refetch of that preference.
+ *
  * @param teams Teams of the active project (used to resolve `team` → object).
+ * @param defaultHomeView The user's default-home-view preference, translated
+ *   to a `PlaygroundTab`. `undefined` while it's still loading.
  */
-export function usePlaygroundUrlSync(teams: ProjectTeam[] | undefined) {
+export function usePlaygroundUrlSync(
+    teams: ProjectTeam[] | undefined,
+    defaultHomeView?: PlaygroundTab,
+) {
     const { projectSlug } = useParams<{ projectSlug?: string }>();
 
     const tab = usePlaygroundNavStore((s) => s.tab);
@@ -33,6 +47,7 @@ export function usePlaygroundUrlSync(teams: ProjectTeam[] | undefined) {
     });
     const hydratedRef = useRef(false);
     const teamHydratedRef = useRef(false);
+    const preferenceAppliedRef = useRef(false);
 
     // Hydrate the active tab from the URL once on mount.
     useEffect(() => {
@@ -46,6 +61,19 @@ export function usePlaygroundUrlSync(teams: ProjectTeam[] | undefined) {
         if (tabParam) setTab(isPlaygroundTab(tabParam) ? tabParam : PLAYGROUND_DEFAULT_TAB);
         hydratedRef.current = true;
     }, [setTab]);
+
+    // Once, if no ?tab= was present, apply the user's default-home-view
+    // preference as soon as it loads. Never fires again after that.
+    useEffect(() => {
+        if (preferenceAppliedRef.current || !hydratedRef.current) return;
+        if (initialRef.current.tab) {
+            preferenceAppliedRef.current = true;
+            return;
+        }
+        if (defaultHomeView === undefined) return;
+        setTab(defaultHomeView);
+        preferenceAppliedRef.current = true;
+    }, [defaultHomeView, setTab]);
 
     // Resolve the team-detail target from its slug once the teams have loaded.
     // Runs after the hydrate effect, so `initialRef` is already populated.

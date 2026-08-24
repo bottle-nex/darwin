@@ -1,9 +1,10 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+
+import { patchBoardIssueCaches } from "@/hooks/issues/boardCache";
+import type { UpdateIssueInput } from "@/hooks/issues/useUpdateIssue";
 import { apiClient } from "@/lib/axios";
 import { BULK_UPDATE_ISSUES_URL } from "@/routes/api_routes";
-import { patchBoardIssueCaches } from "@/hooks/issues/boardCache";
 import type { ApiResponse } from "@/types/api";
-import type { UpdateIssueInput } from "@/hooks/issues/useUpdateIssue";
 import type { BoardIssue, BoardLane } from "@/types/board";
 
 export interface BulkUpdateIssuesInput extends Omit<

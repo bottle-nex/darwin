@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect } from "react";
-import {
-    useIssueSelectionStore,
-    type IssueSelectionScope,
-} from "@/store/issues/useIssueSelectionStore";
+
 import { isTyping } from "@/hooks/shortcuts/usePlaygroundShortcuts";
+import {
+    type IssueSelectionScope,
+    useIssueSelectionStore,
+} from "@/store/issues/useIssueSelectionStore";
 
 function hoveredIssue(): { id: string; scope: IssueSelectionScope } | null {
     const hovered = document.querySelectorAll<HTMLElement>("[data-issue-id]:hover");

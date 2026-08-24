@@ -1,10 +1,12 @@
-import { useUserSessionStore } from "@/store/user/useUserSessionStore";
 import { useQuery } from "@tanstack/react-query";
-import { PROJECT_QUERY_KEY } from "./useGetProject";
+
 import { apiClient } from "@/lib/axios";
 import { GET_PROJECT_CONFIG_URL } from "@/routes/api_routes";
+import { useUserSessionStore } from "@/store/user/useUserSessionStore";
 import type { ApiResponse } from "@/types/api";
 import type { ProjectConfig } from "@/types/project";
+
+import { PROJECT_QUERY_KEY } from "./useGetProject";
 
 /**
  * Fetch a project's config. A project with no config row yet resolves to the

@@ -1,7 +1,8 @@
+import chalk from "chalk";
 import { Resend } from "resend";
+
 import { ENV } from "../configs/env";
 import EmailTemplate from "../templates/templates";
-import chalk from "chalk";
 
 let _resend: Resend | null = null;
 

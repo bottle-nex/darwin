@@ -1,6 +1,7 @@
 import { Action } from "@trymatcha/access-control";
 import { ReviewState } from "@trymatcha/types";
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
+
 import GithubPullsService from "../../services/service.github_pulls";
 import GithubUserService from "../../services/service.github_user";
 import ResponseWriter from "../../services/service.response";

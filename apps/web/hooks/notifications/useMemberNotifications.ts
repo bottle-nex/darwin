@@ -1,12 +1,14 @@
 "use client";
-import { useMemo } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import type { Notification, NotificationFeedPage } from "@trymatcha/types";
+import { useMemo } from "react";
+
 import { apiClient } from "@/lib/axios";
 import { flattenInfinitePages } from "@/lib/pagination/infinitePages";
 import { MEMBER_NOTIFICATIONS_URL } from "@/routes/api_routes";
 import { useUserSessionStore } from "@/store/user/useUserSessionStore";
 import type { ApiResponse } from "@/types/api";
+
 import { MEMBER_NOTIFICATIONS_QUERY_KEY } from "./notificationCache";
 
 export const NOTIFICATION_PAGE_LIMIT = 30;

@@ -1,11 +1,13 @@
 import Image from "next/image";
 import Link from "next/link";
 import { FaLinkedinIn, FaXTwitter } from "react-icons/fa6";
-import { cn } from "@/lib/utils";
-import { azeretMono } from "@/lib/fonts";
-import Eyebrow from "./Eyebrow";
+
 import Reveal from "@/components/utility/Reveal";
+import { azeretMono } from "@/lib/fonts";
+import { cn } from "@/lib/utils";
+
 import { founders } from "./data";
+import Eyebrow from "./Eyebrow";
 
 export default function FoundersSection() {
     return (

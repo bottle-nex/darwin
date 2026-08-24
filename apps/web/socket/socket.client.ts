@@ -1,9 +1,9 @@
-import {
+import type {
     InboundSocketMessage,
     OutboundSocketMessage,
     OutboundSocketMessageType,
-    is_intentional_closure,
 } from "@trymatcha/types";
+import { is_intentional_closure } from "@trymatcha/types";
 
 export type MessageHandler = (payload: OutboundSocketMessage) => void;
 

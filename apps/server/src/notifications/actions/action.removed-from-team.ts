@@ -1,5 +1,6 @@
-import { prisma, NotificationType } from "@trymatcha/database";
+import { NotificationType, prisma } from "@trymatcha/database";
 import type { NotificationJobData } from "@trymatcha/types";
+
 import { sendRemovedFromScopeEmail } from "../../services/service.email";
 import NotificationCreateService from "../service.notification-create";
 

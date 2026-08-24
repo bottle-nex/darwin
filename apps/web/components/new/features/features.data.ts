@@ -1,8 +1,9 @@
 import type { Feature } from "@/types/feature.type";
-import ContextAwareMedia from "./media/ContextAwareMedia";
-import RealActionMedia from "./media/RealActionMedia";
+
 import ConnectsEverythingMedia from "./media/ConnectsEverythingMedia";
+import ContextAwareMedia from "./media/ContextAwareMedia";
 import ImprovesOverTimeMedia from "./media/ImprovesOverTimeMedia";
+import RealActionMedia from "./media/RealActionMedia";
 
 export const FEATURES: Feature[] = [
     {

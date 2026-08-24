@@ -1,8 +1,8 @@
 "use client";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { useEffect, useRef } from "react";
-import { MdClose, MdSearch } from "react-icons/md";
+import { MdSearch } from "react-icons/md";
+
+import { Input } from "@/components/ui/input";
 
 type PlaygroundSearchInputProps = {
     value: string;
@@ -39,17 +39,8 @@ export default function PlaygroundSearchInput({
                 onChange={(e) => onChange(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder={placeholder}
-                className="h-7 w-full rounded-md pr-9 pl-8 text-[12px] text-neutral-100 placeholder:text-neutral-500 focus:border-white/25 focus:outline-none shadow-none"
+                className="h-7 w-full rounded-md bg-transparent pr-3 pl-8 text-[12px] text-neutral-100 placeholder:text-neutral-500 hover:bg-transparent focus:border-white/25 focus:outline-none shadow-none"
             />
-            <Button
-                variant="unstyled"
-                type="button"
-                onClick={onClose}
-                aria-label="Close search"
-                className="absolute right-2 flex size-3.5 cursor-pointer items-center justify-center rounded-full bg-white/10 text-neutral-400 transition-colors hover:bg-white/20 hover:text-neutral-100"
-            >
-                <MdClose className="size-2.25" aria-hidden />
-            </Button>
         </div>
     );
 }

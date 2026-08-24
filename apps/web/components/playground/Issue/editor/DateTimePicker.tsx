@@ -1,9 +1,11 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { LuChevronDown, LuChevronUp } from "react-icons/lu";
-import { cn } from "@/lib/utils";
+
+import { Button } from "@/components/ui/button";
 import { MENU_SURFACE } from "@/components/ui/menuSurface";
+import { cn } from "@/lib/utils";
+
 import type { TimestampMode } from "./timestamp";
 
 export const DATE_TIME_SEGMENTS = ["day", "month", "year", "hour", "minute", "mode"] as const;

@@ -1,15 +1,16 @@
+import { CardCover, ContentCard, Prose } from "@trymatcha/editorial";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { MdArrowBack } from "react-icons/md";
-import { CardCover, ContentCard, Prose } from "@trymatcha/editorial";
-import { LandingNavbar } from "@/components/new/LandingNavbar";
-import LandingFooter from "@/components/landing/LandingFooter";
-import { landingContainer } from "@/components/landing/LandingSection";
+
 import EntryByline from "@/components/blog/EntryByline";
 import EntryCta from "@/components/blog/EntryCta";
-import { cn } from "@/lib/utils";
+import LandingFooter from "@/components/landing/LandingFooter";
+import { landingContainer } from "@/components/landing/LandingSection";
+import { LandingNavbar } from "@/components/new/LandingNavbar";
 import { getEntry, getPosts, getReleases } from "@/lib/content";
+import { cn } from "@/lib/utils";
 
 type EntryPageProps = { params: Promise<{ slug: string }> };
 

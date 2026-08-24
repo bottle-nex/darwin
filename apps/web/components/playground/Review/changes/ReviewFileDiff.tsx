@@ -1,24 +1,26 @@
 "use client";
+import type { ReviewFile } from "@trymatcha/types";
 import { useMemo, useState } from "react";
 import {
     computeNewLineNumber,
     computeOldLineNumber,
     Decoration,
     Diff,
-    getCollapsedLinesCountBetween,
-    Hunk,
-    parseDiff,
     expandFromRawCode,
-    tokenize,
+    getCollapsedLinesCountBetween,
     type GutterOptions,
+    Hunk,
     type HunkData,
+    parseDiff,
+    tokenize,
 } from "react-diff-view";
 import { GoFileCode } from "react-icons/go";
 import { LuChevronsUpDown, LuExternalLink } from "react-icons/lu";
-import type { ReviewFile } from "@trymatcha/types";
-import { cn } from "@/lib/utils";
+
 import { Button } from "@/components/ui/button";
 import { useReviewFileSource } from "@/hooks/review/useReviewFileSource";
+import { cn } from "@/lib/utils";
+
 import { languageFor, refractor } from "./diffLanguage";
 import { splitPath } from "./ReviewFileRow";
 

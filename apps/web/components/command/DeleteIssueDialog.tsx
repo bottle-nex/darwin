@@ -1,12 +1,12 @@
 "use client";
-import { toast } from "@/lib/toast";
 import ConfirmDialog from "@/components/utility/ConfirmDialog";
-import { useActiveProject } from "@/hooks/useActiveProject";
-import { useIssues } from "@/hooks/issues/useIssue";
 import { useBulkDeleteIssues } from "@/hooks/issues/useBulkDeleteIssues";
+import { useIssues } from "@/hooks/issues/useIssue";
+import { useActiveProject } from "@/hooks/useActiveProject";
+import { toast } from "@/lib/toast";
 import { useDeleteIssueStore } from "@/store/issues/useDeleteIssueStore";
-import { usePaneRouteStore } from "@/store/playground/usePaneRouteStore";
 import { useIssueSelectionStore } from "@/store/issues/useIssueSelectionStore";
+import { usePaneRouteStore } from "@/store/playground/usePaneRouteStore";
 
 export default function DeleteIssueDialog() {
     const { issueIds, close } = useDeleteIssueStore();

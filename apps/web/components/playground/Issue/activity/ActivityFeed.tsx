@@ -1,36 +1,38 @@
 "use client";
+import { defaultRangeExtractor, type Range, useVirtualizer } from "@tanstack/react-virtual";
+import { type Chat, to_plain_text } from "@trymatcha/types";
 import {
+    type FocusEvent,
     useCallback,
     useEffect,
     useLayoutEffect,
     useMemo,
     useRef,
     useState,
-    type FocusEvent,
 } from "react";
-import { defaultRangeExtractor, useVirtualizer, type Range } from "@tanstack/react-virtual";
-import { to_plain_text, type Chat } from "@trymatcha/types";
-import { useActivity } from "@/hooks/activity/useActivity";
+
+import LogoLoader from "@/components/app/LogoLoader";
+import ChatComposer from "@/components/playground/Home/chat/ChatComposer";
+import { Button } from "@/components/ui/button";
+import ConfirmDialog from "@/components/utility/ConfirmDialog";
 import {
     ACTIVITY_AUTO_FILL_PAGE_CAP,
     ACTIVITY_VIRTUAL_OVERSCAN,
     flattenActivityPages,
 } from "@/hooks/activity/activityCache";
+import { useActivity } from "@/hooks/activity/useActivity";
 import { useIssueComments } from "@/hooks/chats/useIssueComments";
-import LogoLoader from "@/components/app/LogoLoader";
-import ConfirmDialog from "@/components/utility/ConfirmDialog";
-import ChatComposer from "@/components/playground/Home/chat/ChatComposer";
-import { Button } from "@/components/ui/button";
-import ActivityRow from "./ActivityRow";
-import CommentCard from "./CommentCard";
+
 import {
+    type ActivityFeedEntry,
     buildActivityFeedEntries,
     coordinateTimelineCoverage,
     preserveTimelineAnchor,
     selectLimitingTimelineStream,
-    type ActivityFeedEntry,
     type TimelineStream,
 } from "./activityFeedEntries";
+import ActivityRow from "./ActivityRow";
+import CommentCard from "./CommentCard";
 
 const EXCERPT_LIMIT = 120;
 

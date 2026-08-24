@@ -1,16 +1,17 @@
-import { Worker, type Job } from "bullmq";
 import { prisma } from "@trymatcha/database";
-import queue_config from "../conf/config.queue";
-import { ENV } from "../conf/config.env";
-import E2B from "./services.e2b";
 import Logger from "@trymatcha/logger";
 import {
-    QueueName,
     type DispatchJobData,
     type OnboardJobData,
     type ProductDiffJobData,
+    QueueName,
 } from "@trymatcha/types";
+import { type Job, Worker } from "bullmq";
+
+import { ENV } from "../conf/config.env";
+import queue_config from "../conf/config.queue";
 import ProductDiffRunner from "./service.product_diff";
+import E2B from "./services.e2b";
 
 const log = Logger.scope("queue");
 const PRODUCT_DIFF_LOCK_MS = 60_000;

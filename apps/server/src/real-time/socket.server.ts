@@ -1,20 +1,21 @@
-import { WebSocketServer, WebSocket, type RawData } from "ws";
-import { IncomingMessage, Server } from "http";
-import SubscriberSystem from "./subscriber.system";
-import { verifySessionJwt } from "../services/service.jwt";
+import { Action, Permissions } from "@trymatcha/access-control";
 import {
     AppSocketCloseCode,
+    type InboundSocketMessage,
     InboundSocketMessageType,
     StandardSocketCloseCode,
-    type InboundSocketMessage,
 } from "@trymatcha/types";
-import { Action, Permissions } from "@trymatcha/access-control";
+import type { IncomingMessage, Server } from "http";
+import { type RawData, WebSocket, WebSocketServer } from "ws";
+
 import Access from "../access-control/access";
+import { verifySessionJwt } from "../services/service.jwt";
+import PresenceService from "../services/service.presence";
 import type { AuthUser } from "../types/express.d";
 import ChatSocketHandler from "./chat.handler";
 import ProjectChatSocketHandler from "./project-chat.handler";
+import SubscriberSystem from "./subscriber.system";
 import TeamChatSocketHandler from "./team-chat.handler";
-import PresenceService from "../services/service.presence";
 
 const PRESENCE_HEARTBEAT_MS = 30_000;
 

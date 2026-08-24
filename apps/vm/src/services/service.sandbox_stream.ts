@@ -1,5 +1,5 @@
-import chalk from "chalk";
 import type Logger from "@trymatcha/logger";
+import chalk from "chalk";
 
 const MAX_LINE = 160;
 const CREDENTIAL_IN_URL = /\/\/[^/\s:@]+:[^/\s@]+@/g;

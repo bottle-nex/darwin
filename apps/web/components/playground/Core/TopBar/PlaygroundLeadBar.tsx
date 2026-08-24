@@ -1,6 +1,6 @@
 "use client";
-import PlaygroundProjectSwitcher from "./PlaygroundProjectSwitcher";
 import OfflineTicker from "./OfflineTicker";
+import PlaygroundProjectSwitcher from "./PlaygroundProjectSwitcher";
 
 export default function PlaygroundLeadBar() {
     return (

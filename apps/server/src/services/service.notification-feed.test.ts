@@ -1,10 +1,11 @@
-import { describe, expect, test } from "bun:test";
 import {
     MEMBER_NOTIFICATION_TYPES,
+    notification_scope,
     NotificationType,
     PROJECT_NOTIFICATION_TYPES,
-    notification_scope,
 } from "@trymatcha/types";
+import { describe, expect, test } from "bun:test";
+
 import NotificationFeedService, {
     InvalidNotificationCursorError,
     type NotificationFeedScope,

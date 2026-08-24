@@ -1,6 +1,8 @@
 import type { ReactNode } from "react";
+
 import { cn } from "@/lib/utils";
 import type { Issue } from "@/types/kanban";
+
 import { CARD_SHELL } from "../cardStyles";
 import IssueCardFace, { issueIdentifier } from "./IssueCardFace";
 

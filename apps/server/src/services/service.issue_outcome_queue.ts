@@ -1,5 +1,6 @@
-import { Worker, type Job } from "bullmq";
-import { QueueName, type IssueOutcomeJobData } from "@trymatcha/types";
+import { type IssueOutcomeJobData, QueueName } from "@trymatcha/types";
+import { type Job, Worker } from "bullmq";
+
 import queue_config from "../configs/config.queue";
 import IssueOutcomeService, { IssueOutcomeConflict } from "./service.issue_outcome";
 

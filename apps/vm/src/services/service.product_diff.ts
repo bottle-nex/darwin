@@ -1,7 +1,9 @@
-import { Prisma, prisma } from "@trymatcha/database";
+import type { Prisma } from "@trymatcha/database";
+import { prisma } from "@trymatcha/database";
 import Logger from "@trymatcha/logger";
 import type { ProductDiffViewport } from "@trymatcha/types";
 import { CommandExitError, Sandbox } from "e2b";
+
 import { ENV } from "../conf/config.env";
 import ClaudeRun from "./service.claude_run";
 import GithubService from "./service.github";
@@ -118,7 +120,9 @@ Step 3 - write matcha_preview/manifest.json
   id must match ^[a-z0-9][a-z0-9-]{0,48}$ and equal the target file's name.
   sourcePath is relative to ${input.nextAppDir}.
   At most 4 targets and at most 4 states each.
-  Put anything a reviewer should distrust into warnings.
+  label is at most 80 characters, for both a target and a state.
+  Put anything a reviewer should distrust into warnings, as short one-line notes.
+  At most 20 warnings, each at most 300 characters. Split a long note into several short ones.
 
 Step 4 - finish the harness.
   The Product Diff pipeline validates every target in a real browser after you exit. Do not run

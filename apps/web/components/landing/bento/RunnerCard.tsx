@@ -1,8 +1,10 @@
 "use client";
 
-import Image from "next/image";
 import { motion, useReducedMotion } from "motion/react";
+import Image from "next/image";
+
 import { MatchaLogo } from "@/components/logo/MatchaLogo";
+
 import BentoCard from "./BentoCard";
 
 /** The dock plane: centered, tilted back, and turned so it runs down-right like a ramp. */

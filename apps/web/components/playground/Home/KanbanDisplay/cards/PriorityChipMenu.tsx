@@ -1,10 +1,12 @@
 "use client";
 import type { ReactNode } from "react";
-import PriorityCapsule from "@/components/playground/Issue/PriorityCapsule";
+
 import { PRIORITY_OPTIONS } from "@/components/playground/Issue/issueHelpers";
-import { PRIORITY_TO_NUMBER } from "../customkanban/data";
+import PriorityCapsule from "@/components/playground/Issue/PriorityCapsule";
 import { useIssueActions } from "@/hooks/issues/useIssueActions";
 import type { BoardIssue } from "@/types/board";
+
+import { PRIORITY_TO_NUMBER } from "../customkanban/data";
 
 export default function PriorityChipMenu({
     issueId,

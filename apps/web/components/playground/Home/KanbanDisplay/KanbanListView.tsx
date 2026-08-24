@@ -1,20 +1,22 @@
 "use client";
 import { useMemo, useState } from "react";
 import { LuColumns3 } from "react-icons/lu";
-import { IssueSelectionOrderProvider } from "@/hooks/issues/useIssueSelection";
-import { useCreateIssueStore, type IssueTarget } from "@/store/issues/useCreateIssueStore";
-import { useActiveProject } from "@/hooks/useActiveProject";
+
 import { useBoardFeed } from "@/hooks/issues/useBoard";
 import { useBoardColumns } from "@/hooks/issues/useBoardColumns";
+import { IssueSelectionOrderProvider } from "@/hooks/issues/useIssueSelection";
 import { useFilteredCustomColumns } from "@/hooks/kanban/useFilteredCustomColumns";
+import { useActiveProject } from "@/hooks/useActiveProject";
 import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
-import { KanbanStatus, type BoardState, type Issue } from "@/types/kanban";
+import { type IssueTarget, useCreateIssueStore } from "@/store/issues/useCreateIssueStore";
 import type { BoardLaneSelector } from "@/types/board";
+import { type BoardState, type Issue, KanbanStatus } from "@/types/kanban";
+
 import BoardLanePagination from "./BoardLanePagination";
 import IssueListGroupHeader from "./IssueListGroupHeader";
 import IssueListRow from "./IssueListRow";
-import { VirtualizedRows } from "./VirtualizedRows";
 import { flattenGroupedIssueRows } from "./virtualizedIssueRows";
+import { VirtualizedRows } from "./VirtualizedRows";
 
 type KanbanListViewProps = {
     board?: BoardState;

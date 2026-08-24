@@ -1,7 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
+
 import { apiClient } from "@/lib/axios";
-import type { ApiResponse } from "@/types/api";
 import { LIST_PROJECT_SECRETS_URL } from "@/routes/api_routes";
+import type { ApiResponse } from "@/types/api";
 
 export interface ProjectSecretKey {
     key: string;

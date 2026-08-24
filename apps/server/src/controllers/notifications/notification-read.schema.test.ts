@@ -1,4 +1,5 @@
 import { describe, expect, test } from "bun:test";
+
 import { notification_read_body_schema } from "./notification-read.schema";
 
 const accepts = (body: unknown) => notification_read_body_schema.safeParse(body).success;

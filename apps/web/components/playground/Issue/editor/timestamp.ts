@@ -1,7 +1,9 @@
 import { mergeAttributes, Node } from "@tiptap/core";
 import { ReactNodeViewRenderer } from "@tiptap/react";
-import TimestampNodeView from "./TimestampNodeView";
+
 import { formatDate } from "@/lib/format";
+
+import TimestampNodeView from "./TimestampNodeView";
 
 export type TimestampMode = "date" | "time" | "datetime";
 

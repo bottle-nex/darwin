@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useAnimationControls } from "motion/react";
+import { useEffect, useRef, useState } from "react";
+
 import { cn } from "@/lib/utils";
 
 const WARNING_LIFETIME_MS = 2200;

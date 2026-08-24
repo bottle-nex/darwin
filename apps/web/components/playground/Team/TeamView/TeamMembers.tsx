@@ -1,8 +1,9 @@
 "use client";
-import { useGetTeamMembers } from "@/hooks/team/useGetTeamMembers";
 import LogoLoader from "@/components/app/LogoLoader";
+import { useGetTeamMembers } from "@/hooks/team/useGetTeamMembers";
+import type { TeamMembersData } from "@/types/team";
+
 import PlaygroundTeamMemberRow from "./TeamMemberRow";
-import { TeamMembersData } from "@/types/team";
 
 export default function PlaygroundTeamMembers({ teamId }: { teamId: string }) {
     const { data, isLoading, isError } = useGetTeamMembers(teamId);

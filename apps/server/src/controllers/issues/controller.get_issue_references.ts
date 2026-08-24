@@ -1,10 +1,11 @@
-import { Request, Response } from "express";
+import { Action, Permissions } from "@trymatcha/access-control";
 import { prisma } from "@trymatcha/database";
 import { to_plain_text } from "@trymatcha/types";
-import ResponseWriter from "../../services/service.response";
+import type { Request, Response } from "express";
+
 import Access from "../../access-control/access";
-import { Action, Permissions } from "@trymatcha/access-control";
 import { MESSAGE_REFERENCE_INCLUDE } from "../../services/service.message-references";
+import ResponseWriter from "../../services/service.response";
 
 const SENDER_SELECT = { select: { id: true, name: true, email: true, image: true } } as const;
 

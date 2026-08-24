@@ -1,7 +1,8 @@
-import { Request, Response } from "express";
-import ResponseWriter from "../../services/service.response";
-import Access from "../../access-control/access";
 import { Action, Permissions } from "@trymatcha/access-control";
+import type { Request, Response } from "express";
+
+import Access from "../../access-control/access";
+import ResponseWriter from "../../services/service.response";
 import SecretService from "../../services/service.secret";
 
 export default async function delete_secret_controller(req: Request, res: Response) {

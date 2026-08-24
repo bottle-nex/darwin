@@ -1,5 +1,6 @@
 import { revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
+
 import { CONTENT_TAG } from "@/lib/content";
 
 export async function POST(request: Request) {

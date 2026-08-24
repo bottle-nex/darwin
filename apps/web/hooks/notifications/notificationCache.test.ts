@@ -1,11 +1,13 @@
-import { describe, expect, test } from "bun:test";
 import { QueryClient } from "@tanstack/react-query";
-import { NotificationType, type Notification } from "@trymatcha/types";
+import { type Notification, NotificationType } from "@trymatcha/types";
+import { describe, expect, test } from "bun:test";
+
 import type { NotificationFeedData } from "@/types/notificationFeed.type";
+
 import {
-    MEMBER_NOTIFICATIONS_QUERY_KEY,
     apply_read_to_pages,
     inboxNotificationsKey,
+    MEMBER_NOTIFICATIONS_QUERY_KEY,
     notification_feed_key,
     prepend_notification,
     read_target_for,

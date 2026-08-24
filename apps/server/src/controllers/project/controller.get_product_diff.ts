@@ -1,8 +1,9 @@
 import { Action, Permissions } from "@trymatcha/access-control";
 import { prisma } from "@trymatcha/database";
 import { is_product_diff_manifest_v2, type ProductDiffManifest } from "@trymatcha/types";
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
 import z from "zod";
+
 import Access from "../../access-control/access";
 import GithubPullsService from "../../services/service.github_pulls";
 import ProductDiffService from "../../services/service.product_diff";

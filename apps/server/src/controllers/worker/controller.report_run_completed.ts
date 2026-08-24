@@ -1,12 +1,13 @@
-import { Request, Response } from "express";
-import z from "zod";
 import { ActivityType, ActorType, AgentSessionStatus, prisma } from "@trymatcha/database";
-import ResponseWriter from "../../services/service.response";
+import type { Request, Response } from "express";
+import z from "zod";
+
 import ActivityService from "../../services/service.activity";
 import AgentSessionService, {
     run_cost_schema,
     run_stats_schema,
 } from "../../services/service.agent-session";
+import ResponseWriter from "../../services/service.response";
 
 const body_schema = z.object({
     run_id: z.string().min(1),

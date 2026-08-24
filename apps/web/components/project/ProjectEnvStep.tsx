@@ -1,11 +1,12 @@
 "use client";
-import { useRef, type Dispatch, type SetStateAction } from "react";
-import { FaPlus, FaXmark, FaFileArrowUp, FaEye, FaEyeSlash } from "react-icons/fa6";
+import { type Dispatch, type SetStateAction, useRef } from "react";
+import { FaEye, FaEyeSlash, FaFileArrowUp, FaPlus, FaXmark } from "react-icons/fa6";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { cn } from "@/lib/utils";
 import parse_env from "@/lib/env_parser";
+import { cn } from "@/lib/utils";
 
 export type EnvRow = { key: string; value: string };
 

@@ -1,17 +1,18 @@
 "use client";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { isAxiosError } from "axios";
-import { toast } from "@/lib/toast";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { cn } from "@/lib/utils";
-import { slugify } from "@/lib/format";
 import { useCreateOrganization } from "@/hooks/playground/useCreateOrganization";
 import { ORGANIZATIONS_QUERY_KEY } from "@/hooks/playground/useFetchOrganizations";
+import { slugify } from "@/lib/format";
+import { toast } from "@/lib/toast";
+import { cn } from "@/lib/utils";
 import { useNewProjectStore } from "@/store/project/useNewProjectStore";
 import type { Organization } from "@/types/organization";
 

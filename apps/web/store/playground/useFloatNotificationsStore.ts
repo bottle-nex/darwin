@@ -1,5 +1,5 @@
+import { type Notification, notification_scope, type NotificationScope } from "@trymatcha/types";
 import { create } from "zustand";
-import { notification_scope, type Notification, type NotificationScope } from "@trymatcha/types";
 
 const MAX_FLOATS = 3;
 

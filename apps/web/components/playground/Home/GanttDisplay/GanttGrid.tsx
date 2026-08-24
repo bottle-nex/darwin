@@ -1,5 +1,5 @@
-import { cn } from "@/lib/utils";
 import { GanttTimeline } from "@/lib/gantt/GanttTimeline";
+import { cn } from "@/lib/utils";
 
 /**
  * Full-height vertical gridlines behind the lanes: a stronger line every hour and

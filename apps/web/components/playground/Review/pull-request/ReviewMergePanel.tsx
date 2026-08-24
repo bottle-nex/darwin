@@ -1,22 +1,23 @@
 "use client";
-import { useState } from "react";
+import { Action, Permissions } from "@trymatcha/access-control";
+import { type ReviewHeader, ReviewState } from "@trymatcha/types";
 import axios from "axios";
+import { useState } from "react";
+import type { IconType } from "react-icons";
+import { AiFillMerge } from "react-icons/ai";
 import { FaGithub } from "react-icons/fa6";
 import { GoGitPullRequestClosed } from "react-icons/go";
 import { HiExclamationTriangle, HiInformationCircle, HiXCircle } from "react-icons/hi2";
-import { AiFillMerge } from "react-icons/ai";
-import type { IconType } from "react-icons";
-import { Action, Permissions } from "@trymatcha/access-control";
-import { ReviewState, type ReviewHeader } from "@trymatcha/types";
-import { cn } from "@/lib/utils";
+import { IoMdCheckmark } from "react-icons/io";
+
 import { Button } from "@/components/ui/button";
 import ConfirmDialog from "@/components/utility/ConfirmDialog";
 import { useGithubLink, useStartGithubLink } from "@/hooks/github/useGithubLink";
 import { useGetProject } from "@/hooks/project/useGetProject";
-import { GITHUB_NOT_LINKED } from "@/hooks/review/usePostReviewComment";
 import { useCloseReview } from "@/hooks/review/useCloseReview";
 import { useMergeReview } from "@/hooks/review/useMergeReview";
-import { IoMdCheckmark } from "react-icons/io";
+import { GITHUB_NOT_LINKED } from "@/hooks/review/usePostReviewComment";
+import { cn } from "@/lib/utils";
 
 type MergeTone = "clean" | "dirty" | "attention" | "checking";
 type ConfirmingAction = "merge" | "close" | null;

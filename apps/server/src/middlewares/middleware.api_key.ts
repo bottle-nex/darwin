@@ -1,5 +1,6 @@
-import type { Request, Response, NextFunction } from "express";
 import { prisma } from "@trymatcha/database";
+import type { NextFunction, Request, Response } from "express";
+
 import ApiKeyService from "../services/service.api_key";
 import ResponseWriter from "../services/service.response";
 

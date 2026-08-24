@@ -1,20 +1,22 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, MotionConfig } from "motion/react";
+import { useEffect, useRef, useState } from "react";
+
 import AppLogo from "@/components/app/Applogo";
-import { ADVANCE_TOTAL_MS, BACK_TOTAL_MS, type SpeedTarget } from "./choreography";
+
 import type { BuddyPose } from "./CanvasBuddy";
-import { EMPTY_DRAFT, TOUR_STEPS, type TourDraft } from "./steps";
+import { ADVANCE_TOTAL_MS, BACK_TOTAL_MS, type SpeedTarget } from "./choreography";
 import DoneScreen from "./DoneScreen";
 import IntroScreen from "./IntroScreen";
 import ProgressTrack from "./ProgressTrack";
 import StepFrame from "./StepFrame";
-import TourScene from "./TourScene";
+import { EMPTY_DRAFT, TOUR_STEPS, type TourDraft } from "./steps";
 import StepAgentsMd from "./steps/StepAgentsMd";
 import StepBasics from "./steps/StepBasics";
 import StepGithub from "./steps/StepGithub";
 import StepTeam from "./steps/StepTeam";
+import TourScene from "./TourScene";
 
 type StepIndex = 1 | 2 | 3 | 4;
 type Scene = "intro" | StepIndex | "done";

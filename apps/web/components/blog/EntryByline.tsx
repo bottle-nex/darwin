@@ -1,4 +1,4 @@
-import { StatusTag, type ContentEntry } from "@trymatcha/editorial";
+import { type ContentEntry, StatusTag } from "@trymatcha/editorial";
 import { formatDate } from "@trymatcha/editorial";
 
 function Dot() {

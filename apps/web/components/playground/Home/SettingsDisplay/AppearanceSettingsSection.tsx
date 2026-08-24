@@ -1,17 +1,32 @@
 "use client";
-import { BackgroundLightingColor } from "@trymatcha/types";
+import type { BackgroundLightingColor } from "@trymatcha/types";
+import { useParams } from "next/navigation";
 import { Slider } from "radix-ui";
-import { cn } from "@/lib/utils";
+
+import {
+    DEFAULT_HOME_VIEW_OPTIONS,
+    defaultHomeViewToTab,
+    type PlaygroundTab,
+    tabToDefaultHomeView,
+} from "@/components/playground/playgroundTabs";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { useGetDashboard } from "@/hooks/dashboard/useGetDashboard";
 import { useUpdateUserConfig } from "@/hooks/user/useUpdateUserConfig";
-import { useBackgroundLightingStore } from "@/store/playground/useBackgroundLightingStore";
 import {
     BACKGROUND_LIGHTING_COLORS,
     BACKGROUND_LIGHTING_PRESETS,
     DEFAULT_USER_CONFIG,
 } from "@/lib/backgroundLighting";
-import { useParams } from "next/navigation";
+import { cn } from "@/lib/utils";
+import { useBackgroundLightingStore } from "@/store/playground/useBackgroundLightingStore";
+
 import SettingsUtilityCard from "./SettingsUtilityCard";
 
 function ColorSwatch({
@@ -77,6 +92,33 @@ export default function AppearanceSettingsSection() {
 
     return (
         <div className="flex flex-col gap-4">
+            <SettingsUtilityCard
+                title="Default home view"
+                description="The view a project opens on when you don't link to a specific tab."
+            >
+                <div className="flex items-center justify-between gap-4">
+                    <span className="text-[13px] text-neutral-300">Opens on</span>
+                    <Select
+                        value={defaultHomeViewToTab(config.defaultHomeView)}
+                        onValueChange={(tab) => {
+                            const view = tabToDefaultHomeView(tab as PlaygroundTab);
+                            if (view) updateConfig.mutate({ defaultHomeView: view });
+                        }}
+                    >
+                        <SelectTrigger size="sm">
+                            <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {DEFAULT_HOME_VIEW_OPTIONS.map((option) => (
+                                <SelectItem key={option.tab} value={option.tab}>
+                                    {option.label}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
+            </SettingsUtilityCard>
+
             <SettingsUtilityCard
                 title="Background lighting"
                 description="An ambient glow behind the workspace. These settings follow your account, not this project."

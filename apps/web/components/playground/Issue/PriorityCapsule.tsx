@@ -1,7 +1,7 @@
 "use client";
-import { useState, type ReactNode } from "react";
+import { type ReactNode, useState } from "react";
 import { MdCheck } from "react-icons/md";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+
 import {
     Command,
     CommandEmpty,
@@ -9,8 +9,10 @@ import {
     CommandItem,
     CommandList,
 } from "@/components/ui/command";
-import type { Priority } from "@/types/kanban";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
+import type { Priority } from "@/types/kanban";
+
 import { CapsuleTrigger } from "./Capsule";
 import { PRIORITY_OPTIONS } from "./issueHelpers";
 

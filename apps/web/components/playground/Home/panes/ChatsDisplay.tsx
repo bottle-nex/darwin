@@ -1,21 +1,22 @@
 "use client";
-import { useEffect, useMemo } from "react";
 import {
-    ProjectRole,
-    TeamRole,
     type ProjectChat,
+    ProjectRole,
     type TeamChat,
+    TeamRole,
     type ThreadMessage,
 } from "@trymatcha/types";
-import { PaneLeadSlot } from "@/components/playground/Core/components/PlaygroundPaneSlots";
+import { useEffect, useMemo } from "react";
+
 import PlaygroundBreadcrumb from "@/components/playground/Core/components/PlaygroundBreadcrumb";
-import ProjectChatThread from "@/components/playground/Home/chat/ProjectChatThread";
+import { PaneLeadSlot } from "@/components/playground/Core/components/PlaygroundPaneSlots";
 import ChatConversationSidebar from "@/components/playground/Home/chat/ChatConversationSidebar";
-import { useActiveProject } from "@/hooks/useActiveProject";
+import ProjectChatThread from "@/components/playground/Home/chat/ProjectChatThread";
 import { useProjectChatThread } from "@/hooks/chats/useProjectChatThread";
 import { useTeamChatThread } from "@/hooks/chats/useTeamChatThread";
 import { useGetProject } from "@/hooks/project/useGetProject";
 import { useGetTeamMembers } from "@/hooks/team/useGetTeamMembers";
+import { useActiveProject } from "@/hooks/useActiveProject";
 import SessionServices from "@/lib/session";
 import { useChatThreadStore } from "@/store/playground/useChatThreadStore";
 

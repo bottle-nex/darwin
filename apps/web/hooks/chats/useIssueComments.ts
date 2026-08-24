@@ -1,26 +1,28 @@
 "use client";
-import { useMemo } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import {
-    InboundSocketMessageType,
-    ProjectRole,
     type Chat,
+    InboundSocketMessageType,
     type LabelledReference,
+    ProjectRole,
 } from "@trymatcha/types";
-import { toast } from "@/lib/toast";
-import SessionServices from "@/lib/session";
-import { useActiveProject } from "@/hooks/useActiveProject";
+import { useMemo } from "react";
+
 import { useProjectMembers } from "@/hooks/project/useProjectMembers";
 import { send_socket_message } from "@/hooks/socket/useWebSocket";
-import { toggle_chat_reaction } from "./useMessageReactions";
+import { useActiveProject } from "@/hooks/useActiveProject";
+import SessionServices from "@/lib/session";
+import { toast } from "@/lib/toast";
+
+import { flattenChatPages } from "./chatCache";
 import {
     add_chat,
     build_optimistic_chat,
     mark_chat_deleted,
-    useChats,
     OPTIMISTIC_ID_PREFIX,
+    useChats,
 } from "./useChats";
-import { flattenChatPages } from "./chatCache";
+import { toggle_chat_reaction } from "./useMessageReactions";
 
 export function useIssueComments(issueId: string | undefined) {
     const queryClient = useQueryClient();

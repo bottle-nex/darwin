@@ -1,6 +1,7 @@
-import { prisma } from "@trymatcha/database";
-import { OrgRole, ProjectRole, TeamRole } from "@trymatcha/types";
 import { Permissions } from "@trymatcha/access-control";
+import { prisma } from "@trymatcha/database";
+import type { OrgRole, TeamRole } from "@trymatcha/types";
+import { ProjectRole } from "@trymatcha/types";
 
 const PROJECT_ROLE_RANK: Record<ProjectRole, number> = {
     [ProjectRole.Admin]: 4,

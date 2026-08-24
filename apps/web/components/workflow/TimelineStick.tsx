@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { motion, useMotionValue, useSpring } from "framer-motion";
+import { useEffect, useState } from "react";
 
 const TICK_WIDTH = 8;
 const SPRING = { stiffness: 120, damping: 25, restDelta: 0.0001 } as const;

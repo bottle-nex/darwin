@@ -1,19 +1,21 @@
 "use client";
 
-import { useMemo } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { flattenInfinitePages } from "@/lib/pagination/infinitePages";
+import { useMemo } from "react";
+
 import { apiClient } from "@/lib/axios";
-import { myIssuesKey, normalizeBoardFilters } from "./boardCache";
+import { flattenInfinitePages } from "@/lib/pagination/infinitePages";
 import { MY_ISSUES_URL } from "@/routes/api_routes";
-import type { ApiResponse } from "@/types/api";
-import type { BoardFilters } from "@/types/boardFilter";
-import type { BoardIssue, BoardIssuePage } from "@/types/board";
 import type {
     MyIssuesGroup,
     MyIssuesOrder,
     MyIssuesView,
 } from "@/store/issues/useMyIssuesOptionsStore";
+import type { ApiResponse } from "@/types/api";
+import type { BoardIssue, BoardIssuePage } from "@/types/board";
+import type { BoardFilters } from "@/types/boardFilter";
+
+import { myIssuesKey, normalizeBoardFilters } from "./boardCache";
 
 const PAGE_LIMIT = 50;
 

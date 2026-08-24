@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+
 import IntegrationsHero from "@/components/integrations/IntegrationsHero";
 import { LandingNavbar } from "@/components/new/LandingNavbar";
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { motion, useReducedMotion } from "motion/react";
+
 import { drop } from "../diagramMotion";
 import BentoCard from "./BentoCard";
 

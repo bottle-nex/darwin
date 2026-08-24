@@ -1,8 +1,8 @@
 "use client";
 import { useMemo, useState } from "react";
-import { FaGithub, FaSpinner, FaCodeBranch } from "react-icons/fa6";
-import { Input } from "@/components/ui/input";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { FaCodeBranch, FaGithub, FaSpinner } from "react-icons/fa6";
+
+import { CapsuleTrigger } from "@/components/playground/Issue/Capsule";
 import {
     Command,
     CommandEmpty,
@@ -10,11 +10,13 @@ import {
     CommandItem,
     CommandList,
 } from "@/components/ui/command";
-import { CapsuleTrigger } from "@/components/playground/Issue/Capsule";
-import { useGithubRepos } from "@/hooks/github/useGithubRepos";
-import { useGithubBranches } from "@/hooks/github/useGithubBranches";
+import { Input } from "@/components/ui/input";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useConnectGithub } from "@/hooks/github/useConnectGithub";
+import { useGithubBranches } from "@/hooks/github/useGithubBranches";
+import { useGithubRepos } from "@/hooks/github/useGithubRepos";
 import type { GithubRepo, Organization } from "@/types/organization";
+
 import { FIELD } from "./CreateProjectDialog";
 import CreateProjectDialogRepoRow from "./CreateProjectDialogRepoRow";
 

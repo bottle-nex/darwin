@@ -1,6 +1,7 @@
-import { describe, expect, test } from "bun:test";
 import type { InfiniteData } from "@tanstack/react-query";
 import type { CursorPage } from "@trymatcha/types";
+import { describe, expect, test } from "bun:test";
+
 import {
     flattenInfinitePages,
     removeInfinitePageItem,

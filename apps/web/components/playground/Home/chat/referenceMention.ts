@@ -1,17 +1,19 @@
+import type { QueryClient } from "@tanstack/react-query";
 import Mention, { type MentionNodeAttrs } from "@tiptap/extension-mention";
 import { PluginKey } from "@tiptap/pm/state";
 import { ReactNodeViewRenderer, ReactRenderer } from "@tiptap/react";
 import type { SuggestionOptions } from "@tiptap/suggestion";
-import type { QueryClient } from "@tanstack/react-query";
 import { parse_reference_token, reference_key } from "@trymatcha/types";
+
 import { displayNameOf } from "@/components/playground/Core/components/PlaygroundAvatar";
-import { search_issues, search_members, type IssueSuggestion } from "@/lib/referenceSearch";
 import type { ProjectMember } from "@/hooks/project/useProjectMembers";
+import { type IssueSuggestion, search_issues, search_members } from "@/lib/referenceSearch";
+
 import ReferenceChip from "./ReferenceChip";
-import { ISSUE_TRIGGER, MEMBER_TRIGGER, kindFor } from "./referenceTriggers";
 import ReferenceSuggestionList, {
     type ReferenceSuggestionListHandle,
 } from "./ReferenceSuggestionList";
+import { ISSUE_TRIGGER, kindFor, MEMBER_TRIGGER } from "./referenceTriggers";
 
 export type ReferenceSuggestion =
     | { kind: "member"; id: string; label: string; member: ProjectMember }

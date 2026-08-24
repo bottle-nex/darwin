@@ -1,14 +1,22 @@
 "use client";
-import { useMemo } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import {
     InboundSocketMessageType,
     type LabelledReference,
     type ProjectChat,
 } from "@trymatcha/types";
-import { toast } from "@/lib/toast";
-import SessionServices from "@/lib/session";
+import { useMemo } from "react";
+
 import { send_socket_message } from "@/hooks/socket/useWebSocket";
+import SessionServices from "@/lib/session";
+import { toast } from "@/lib/toast";
+
+import { flattenChatPages } from "./chatCache";
+import {
+    CHAT_CONVERSATION_PREVIEWS_QUERY_KEY,
+    mark_project_conversation_preview_deleted,
+    update_project_conversation_preview,
+} from "./useChatConversationPreviews";
 import { OPTIMISTIC_ID_PREFIX } from "./useChats";
 import { toggle_project_chat_reaction } from "./useMessageReactions";
 import {
@@ -17,12 +25,6 @@ import {
     mark_project_chat_deleted,
     useProjectChat,
 } from "./useProjectChat";
-import {
-    CHAT_CONVERSATION_PREVIEWS_QUERY_KEY,
-    mark_project_conversation_preview_deleted,
-    update_project_conversation_preview,
-} from "./useChatConversationPreviews";
-import { flattenChatPages } from "./chatCache";
 
 export function useProjectChatThread(projectId: string | undefined) {
     const queryClient = useQueryClient();

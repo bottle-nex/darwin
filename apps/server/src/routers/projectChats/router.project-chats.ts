@@ -1,8 +1,9 @@
 import { Router } from "express";
-import { require_auth } from "../../middlewares/middleware.auth";
+
+import ConversationPreviewsGetController from "../../controllers/projectChat/controller.get_conversation_previews";
 import ProjectChatGetController from "../../controllers/projectChat/controller.get_project_chats";
 import TeamChatGetController from "../../controllers/projectChat/controller.get_team_chats";
-import ConversationPreviewsGetController from "../../controllers/projectChat/controller.get_conversation_previews";
+import { require_auth } from "../../middlewares/middleware.auth";
 
 const project_chats_router: Router = Router();
 

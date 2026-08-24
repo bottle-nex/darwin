@@ -1,5 +1,6 @@
-import type { CommandStartOpts, Sandbox } from "e2b";
 import type Logger from "@trymatcha/logger";
+import type { CommandStartOpts, Sandbox } from "e2b";
+
 import SandboxStream from "./service.sandbox_stream";
 
 const REPO_DIR = "/home/user/repo";

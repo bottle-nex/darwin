@@ -1,5 +1,6 @@
+import { type Notification, NotificationType } from "@trymatcha/types";
 import { describe, expect, test } from "bun:test";
-import { NotificationType, type Notification } from "@trymatcha/types";
+
 import {
     filter_notifications,
     flattenNotificationDayRows,

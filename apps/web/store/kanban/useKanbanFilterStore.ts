@@ -1,8 +1,9 @@
 import { create } from "zustand";
+
 import { emptyFacetValue } from "@/lib/kanban/boardFilter";
 import {
-    EMPTY_FILTERS,
     type BoardFilters,
+    EMPTY_FILTERS,
     type FacetKey,
     type ListFacetKey,
 } from "@/types/boardFilter";

@@ -1,24 +1,25 @@
 import { Router } from "express";
-import { require_auth } from "../../middlewares/middleware.auth";
-import IssueCreateController from "../../controllers/issues/controller.create_issues";
-import IssueGetController from "../../controllers/issues/controller.get_issues";
-import IssueUpdateController from "../../controllers/issues/controller.update_issue";
-import IssueDeleteController from "../../controllers/issues/controller.delete_issue";
-import ColumnCreateController from "../../controllers/issues/controller.create_column";
-import ColumnUpdateController from "../../controllers/issues/controller.update_column";
-import ColumnDeleteController from "../../controllers/issues/controller.delete_column";
-import ColumnReorderController from "../../controllers/issues/controller.reorder_columns";
+
 import IssueAssignController from "../../controllers/issues/controller.assign_issue";
-import IssueUnassignController from "../../controllers/issues/controller.unassign_issue";
-import IssueSearchController from "../../controllers/issues/controller.search_issues";
-import IssueReferencesGetController from "../../controllers/issues/controller.get_issue_references";
-import IssueActivityListController from "../../controllers/issues/controller.list_activity";
-import IssueBulkUpdateController from "../../controllers/issues/controller.bulk_update_issues";
 import IssueBulkDeleteController from "../../controllers/issues/controller.bulk_delete_issues";
+import IssueBulkUpdateController from "../../controllers/issues/controller.bulk_update_issues";
+import ColumnCreateController from "../../controllers/issues/controller.create_column";
+import IssueCreateController from "../../controllers/issues/controller.create_issues";
+import ColumnDeleteController from "../../controllers/issues/controller.delete_column";
+import IssueDeleteController from "../../controllers/issues/controller.delete_issue";
 import BoardColumnsGetController from "../../controllers/issues/controller.get_board_columns";
 import IssueGetByIdController from "../../controllers/issues/controller.get_issue";
+import IssueReferencesGetController from "../../controllers/issues/controller.get_issue_references";
+import IssueGetController from "../../controllers/issues/controller.get_issues";
+import IssueActivityListController from "../../controllers/issues/controller.list_activity";
 import MyIssuesListController from "../../controllers/issues/controller.list_my_issues";
+import ColumnReorderController from "../../controllers/issues/controller.reorder_columns";
 import BoardIssuesSearchController from "../../controllers/issues/controller.search_board_issues";
+import IssueSearchController from "../../controllers/issues/controller.search_issues";
+import IssueUnassignController from "../../controllers/issues/controller.unassign_issue";
+import ColumnUpdateController from "../../controllers/issues/controller.update_column";
+import IssueUpdateController from "../../controllers/issues/controller.update_issue";
+import { require_auth } from "../../middlewares/middleware.auth";
 
 const issues_router: Router = Router();
 

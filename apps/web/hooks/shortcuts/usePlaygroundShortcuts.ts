@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { HiMenuAlt2, HiOutlineAnnotation } from "react-icons/hi";
 import {
     HiOutlineBell,
     HiOutlineBriefcase,
@@ -10,30 +11,30 @@ import {
     HiOutlineTag,
     HiOutlineUserGroup,
 } from "react-icons/hi2";
-import { HiMenuAlt2, HiOutlineAnnotation } from "react-icons/hi";
 import { LuCalendar, LuColumns3, LuCopy, LuTag, LuTrash2, LuUsers } from "react-icons/lu";
 import { PiColumnsLight } from "react-icons/pi";
-import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
-import { PRIORITY_OPTIONS } from "@/components/playground/Issue/issueHelpers";
 import { TbLayoutSidebarFilled } from "react-icons/tb";
-import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
-import { useShortcutSheetStore } from "@/store/playground/useShortcutSheetStore";
+
+import { PRIORITY_OPTIONS } from "@/components/playground/Issue/issueHelpers";
 import { PlaygroundTab } from "@/components/playground/playgroundTabs";
-import { useSidebarWidthStore } from "@/store/playground/useSidebarWidthStore";
-import { useNotificationsPanelStore } from "@/store/playground/useNotificationsPanelStore";
-import { useCreateIssueStore } from "@/store/issues/useCreateIssueStore";
-import { useNewProjectStore } from "@/store/project/useNewProjectStore";
-import { useNewTeamStore } from "@/store/team/useNewTeamStore";
-import { useCommandMenuStore } from "@/store/command/useCommandMenuStore";
-import { useDeleteIssueStore } from "@/store/issues/useDeleteIssueStore";
-import { useIssueSelectionStore } from "@/store/issues/useIssueSelectionStore";
+import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
 import { useCommandActionStore } from "@/store/command/useCommandActionStore";
 import { commandContext } from "@/store/command/useCommandContextStore";
+import { useCommandMenuStore } from "@/store/command/useCommandMenuStore";
+import { useCreateIssueStore } from "@/store/issues/useCreateIssueStore";
+import { useDeleteIssueStore } from "@/store/issues/useDeleteIssueStore";
+import { useIssueSelectionStore } from "@/store/issues/useIssueSelectionStore";
+import { useNotificationsPanelStore } from "@/store/playground/useNotificationsPanelStore";
+import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
+import { useShortcutSheetStore } from "@/store/playground/useShortcutSheetStore";
+import { useSidebarWidthStore } from "@/store/playground/useSidebarWidthStore";
+import { useNewProjectStore } from "@/store/project/useNewProjectStore";
+import { useNewTeamStore } from "@/store/team/useNewTeamStore";
 import {
-    CommandKind,
     type CommandAction,
     type CommandContext,
     type CommandEntry,
+    CommandKind,
     type CommandPage,
 } from "@/types/command.type";
 

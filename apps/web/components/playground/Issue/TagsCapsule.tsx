@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { MdAdd, MdCheck, MdLabel } from "react-icons/md";
 import { RiLoader4Line } from "react-icons/ri";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+
+import TagDisplay from "@/components/playground/Home/TagsDisplay/TagDisplay";
 import {
     Command,
     CommandEmpty,
@@ -12,10 +13,11 @@ import {
     CommandItem,
     CommandList,
 } from "@/components/ui/command";
-import { useListTags } from "@/hooks/tags/useListTags";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useCreateTag } from "@/hooks/tags/useCreateTag";
+import { useListTags } from "@/hooks/tags/useListTags";
 import { TAG_COLORS } from "@/types/tags";
-import TagDisplay from "@/components/playground/Home/TagsDisplay/TagDisplay";
+
 import { CapsuleTrigger } from "./Capsule";
 
 interface TagsCapsuleProps {

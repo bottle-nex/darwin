@@ -1,5 +1,6 @@
-import { Sandbox } from "e2b";
 import Logger from "@trymatcha/logger";
+import { Sandbox } from "e2b";
+
 import { ENV } from "../conf/config.env";
 
 const log = Logger.scope("template");

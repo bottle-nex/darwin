@@ -1,4 +1,4 @@
-import { BackgroundLightingColor } from "@trymatcha/types";
+import { BackgroundLightingColor, DefaultHomeView } from "@trymatcha/types";
 
 export const BACKGROUND_LIGHTING_PRESETS: Record<
     BackgroundLightingColor,
@@ -19,6 +19,7 @@ export const BACKGROUND_LIGHTING_COLORS = Object.keys(
 export const DEFAULT_USER_CONFIG = {
     backgroundLightingEnabled: true,
     backgroundLightingColor: BackgroundLightingColor.Violet,
+    defaultHomeView: DefaultHomeView.Kanban,
 };
 
 export const GLOW_STORAGE_KEY = "playground-background-glow";

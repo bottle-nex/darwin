@@ -1,5 +1,4 @@
 "use client";
-import { Button } from "@/components/ui/button";
 import {
     LuColumns3,
     LuEye,
@@ -8,6 +7,13 @@ import {
     LuShare2,
     LuSlidersHorizontal,
 } from "react-icons/lu";
+
+import PlaygroundBreadcrumb from "@/components/playground/Core/components/PlaygroundBreadcrumb";
+import {
+    PaneActionsSlot,
+    PaneLeadSlot,
+} from "@/components/playground/Core/components/PlaygroundPaneSlots";
+import { Button } from "@/components/ui/button";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -15,21 +21,17 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useFilteredCustomColumns } from "@/hooks/kanban/useFilteredCustomColumns";
 import { activeFacetKeys } from "@/lib/kanban/boardFilter";
 import { useKanbanFilterStore } from "@/store/kanban/useKanbanFilterStore";
 import { useKanbanOptionsStore } from "@/store/kanban/useKanbanOptionsStore";
-import { useFilteredCustomColumns } from "@/hooks/kanban/useFilteredCustomColumns";
-import { FocusPanelItems, FOCUS_PANEL_WIDTH } from "./KanbanOptionPanels/FocusPanel";
-import { FiltersPanelItems, FILTERS_PANEL_WIDTH } from "./KanbanOptionPanels/FiltersPanel";
-import { BoardViewPanelItems, BOARD_VIEW_PANEL_WIDTH } from "./KanbanOptionPanels/BoardViewPanel";
-import FilterChipsBar from "./KanbanOptionPanels/FilterChipsBar";
-import {
-    PaneActionsSlot,
-    PaneLeadSlot,
-} from "@/components/playground/Core/components/PlaygroundPaneSlots";
-import PlaygroundBreadcrumb from "@/components/playground/Core/components/PlaygroundBreadcrumb";
+
 import AddTaskButton from "./KanbanOptionPanels/AddTaskButton";
+import { BOARD_VIEW_PANEL_WIDTH,BoardViewPanelItems } from "./KanbanOptionPanels/BoardViewPanel";
 import EagerSubmenu from "./KanbanOptionPanels/EagerSubmenu";
+import FilterChipsBar from "./KanbanOptionPanels/FilterChipsBar";
+import { FILTERS_PANEL_WIDTH,FiltersPanelItems } from "./KanbanOptionPanels/FiltersPanel";
+import { FOCUS_PANEL_WIDTH,FocusPanelItems } from "./KanbanOptionPanels/FocusPanel";
 
 /**
  * Every toolbar option collapsed behind one "Options" menu. The panels that have

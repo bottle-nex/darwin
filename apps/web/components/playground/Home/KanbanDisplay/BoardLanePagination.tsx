@@ -1,28 +1,16 @@
 "use client";
 import { useEffect, useRef } from "react";
-import { Button } from "@/components/ui/button";
-import { useActiveProject } from "@/hooks/useActiveProject";
-import { useBoardLaneModel } from "@/hooks/issues/useBoard";
-import { useKanbanBoardStore } from "@/store/kanban/useKanbanBoardStore";
-import { useCustomKanbanStore } from "@/store/kanban/useCustomKanbanStore";
-import type { BoardLaneSelector } from "@/types/board";
 
-export type BoardLaneModel = ReturnType<typeof useBoardLaneModel>;
+import { Button } from "@/components/ui/button";
+import { useBoardLaneModel } from "@/hooks/issues/useBoard";
+import { useActiveProject } from "@/hooks/useActiveProject";
+import { useCustomKanbanStore } from "@/store/kanban/useCustomKanbanStore";
+import { useKanbanBoardStore } from "@/store/kanban/useKanbanBoardStore";
+import type { BoardLaneSelector } from "@/types/board";
 
 export default function BoardLanePagination({ selector }: { selector: BoardLaneSelector }) {
     const projectId = useActiveProject()?.id;
     const lane = useBoardLaneModel(projectId, selector);
-
-    return <BoardLanePaginationView lane={lane} autoLoadWhenVisible />;
-}
-
-export function BoardLanePaginationView({
-    lane,
-    autoLoadWhenVisible = false,
-}: {
-    lane: BoardLaneModel;
-    autoLoadWhenVisible?: boolean;
-}) {
     const paginationTargetRef = useRef<HTMLDivElement | null>(null);
     const boardDragActive = useKanbanBoardStore((state) => state.overlayActive);
     const customDragActive = useCustomKanbanStore((state) => state.overlayActive);
@@ -38,20 +26,11 @@ export function BoardLanePaginationView({
         ? lane.fallbackError
         : lane.laneError || lane.basePageError;
     const fetchNextPage = fallbackPagination ? lane.fetchNextFallbackPage : lane.fetchNextBasePage;
-    const hasRetry = lane.fallbackError || lane.laneError || lane.basePageError;
+    const retryPage = fallbackPagination ? lane.retryFallback : lane.retryBasePage;
 
     useEffect(() => {
         const target = paginationTargetRef.current;
-        if (
-            !target ||
-            !autoLoadWhenVisible ||
-            !hasNextPage ||
-            fetchingNextPage ||
-            pageError ||
-            dragActive
-        ) {
-            return;
-        }
+        if (!target || !hasNextPage || fetchingNextPage || pageError || dragActive) return;
         const root = target.closest<HTMLElement>("[data-lenis-prevent]");
         if (!root) return;
         const observer = new IntersectionObserver(
@@ -62,41 +41,27 @@ export function BoardLanePaginationView({
         );
         observer.observe(target);
         return () => observer.disconnect();
-    }, [autoLoadWhenVisible, dragActive, fetchNextPage, fetchingNextPage, hasNextPage, pageError]);
+    }, [dragActive, fetchNextPage, fetchingNextPage, hasNextPage, pageError]);
 
     return (
         <div
             ref={paginationTargetRef}
             className={
-                hasRetry
+                pageError
                     ? "flex shrink-0 justify-end px-1 pt-2"
                     : "h-px w-full shrink-0 overflow-hidden"
             }
         >
-            {hasRetry ? (
-                <div className="flex items-center gap-1">
-                    {lane.fallbackError && (
-                        <Button
-                            size="xs"
-                            variant="tertiary"
-                            disabled={dragActive}
-                            onClick={() => lane.retryFallback()}
-                        >
-                            Retry search
-                        </Button>
-                    )}
-                    {(lane.laneError || lane.basePageError) && (
-                        <Button
-                            size="xs"
-                            variant="tertiary"
-                            disabled={dragActive}
-                            onClick={() => lane.retryBasePage()}
-                        >
-                            Retry lane
-                        </Button>
-                    )}
-                </div>
-            ) : null}
+            {pageError && (
+                <Button
+                    size="xs"
+                    variant="tertiary"
+                    disabled={dragActive}
+                    onClick={() => retryPage()}
+                >
+                    {fallbackPagination ? "Retry search" : "Retry lane"}
+                </Button>
+            )}
         </div>
     );
 }

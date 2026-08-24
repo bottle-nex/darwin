@@ -1,9 +1,9 @@
 "use client";
 
-import { useLayoutEffect } from "react";
 import { useParams } from "next/navigation";
+import { useLayoutEffect } from "react";
+
 import { useGetDashboard } from "@/hooks/dashboard/useGetDashboard";
-import { useBackgroundLightingStore } from "@/store/playground/useBackgroundLightingStore";
 import {
     applyGlowVars,
     BACKGROUND_LIGHTING_PRESETS,
@@ -13,6 +13,7 @@ import {
     GLOW_X_VAR,
     GLOW_Y_VAR,
 } from "@/lib/backgroundLighting";
+import { useBackgroundLightingStore } from "@/store/playground/useBackgroundLightingStore";
 
 export default function BackgroundLighting() {
     const { orgSlug } = useParams<{ orgSlug: string }>();

@@ -1,14 +1,16 @@
-import { useInfiniteQuery, type QueryClient } from "@tanstack/react-query";
+import { type QueryClient, useInfiniteQuery } from "@tanstack/react-query";
+import type { AgentSession, IssueActivity } from "@trymatcha/types";
+
 import { apiClient } from "@/lib/axios";
 import { ISSUE_ACTIVITY_URL } from "@/routes/api_routes";
 import type { ApiResponse } from "@/types/api";
-import type { AgentSession, IssueActivity } from "@trymatcha/types";
+
 import {
+    type ActivityInfiniteData,
+    type ActivityPage,
     activityPageParams,
     appendActivitiesToNewestPage,
     updateAgentSessionInPages,
-    type ActivityInfiniteData,
-    type ActivityPage,
 } from "./activityCache";
 
 export const ACTIVITY_QUERY_KEY = ["activity"] as const;

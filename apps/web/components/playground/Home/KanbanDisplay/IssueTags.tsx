@@ -1,5 +1,5 @@
-import { cn } from "@/lib/utils";
 import TagDisplay from "@/components/playground/Home/TagsDisplay/TagDisplay";
+import { cn } from "@/lib/utils";
 import type { BoardTag } from "@/types/board";
 
 type IssueTagsProps = {

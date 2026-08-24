@@ -6,6 +6,15 @@ const PREVIEW_DIR = "/home/user/preview";
 const COMMAND_TIMEOUT_MS = 15 * 60_000;
 const RUNTIME_PROTOCOL_VERSION = 3;
 const SAFE_ID = /^[a-z0-9][a-z0-9-]{0,48}$/;
+const MAX_WARNINGS = 20;
+const MAX_WARNING_LENGTH = 400;
+
+const advisoryWarningsSchema = z
+    .array(z.string())
+    .catch([])
+    .transform((values) =>
+        values.slice(0, MAX_WARNINGS).map((value) => value.slice(0, MAX_WARNING_LENGTH)),
+    );
 
 const packageManagerSchema = z.enum(["bun", "pnpm", "yarn", "npm"]);
 export type PackageManager = z.infer<typeof packageManagerSchema>;
@@ -66,7 +75,7 @@ const harnessManifestSchema = z.object({
         )
         .min(1)
         .max(6),
-    warnings: z.array(z.string().max(400)).max(20),
+    warnings: advisoryWarningsSchema,
 });
 export type HarnessManifest = z.infer<typeof harnessManifestSchema>;
 

@@ -1,4 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
+
 import { apiClient } from "@/lib/axios";
 import { LAST_VISITED_URL } from "@/routes/api_routes";
 import type { LastVisited } from "@/types/user";

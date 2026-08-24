@@ -1,14 +1,16 @@
 "use client";
 import { ActorType, type IssueActivity } from "@trymatcha/types";
-import { cn } from "@/lib/utils";
-import { formatRelativeTime } from "@/lib/format";
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
+
+import HeroBuddy from "@/components/landing/v2/HeroBuddy";
 import PlaygroundAvatar, {
     toneFor,
 } from "@/components/playground/Core/components/PlaygroundAvatar";
-import HeroBuddy from "@/components/landing/v2/HeroBuddy";
-import InfoTooltip from "@/components/ui/InfoTooltip";
 import UserInfoCard from "@/components/playground/Core/components/UserInfoCard";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
+import InfoTooltip from "@/components/ui/InfoTooltip";
+import { formatRelativeTime } from "@/lib/format";
+import { cn } from "@/lib/utils";
+
 import { activity_entry } from "./activity.registry";
 
 export type ActivityActorView = {

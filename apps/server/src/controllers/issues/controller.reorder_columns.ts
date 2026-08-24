@@ -1,9 +1,10 @@
-import { Request, Response } from "express";
-import z from "zod";
-import { prisma } from "@trymatcha/database";
 import { Action, Permissions } from "@trymatcha/access-control";
-import ResponseWriter from "../../services/service.response";
+import { prisma } from "@trymatcha/database";
+import type { Request, Response } from "express";
+import z from "zod";
+
 import Access from "../../access-control/access";
+import ResponseWriter from "../../services/service.response";
 
 /**
  * Persists one user's personal display order for a project's custom columns.

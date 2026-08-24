@@ -1,5 +1,6 @@
-import { useQuery, type QueryClient } from "@tanstack/react-query";
+import { type QueryClient, useQuery } from "@tanstack/react-query";
 import type { ChatConversationPreviews, ProjectChat, TeamChat } from "@trymatcha/types";
+
 import { apiClient } from "@/lib/axios";
 import { CHAT_CONVERSATION_PREVIEWS_URL } from "@/routes/api_routes";
 import type { ApiResponse } from "@/types/api";

@@ -1,10 +1,13 @@
 "use client";
 
 import { useCallback, useEffect, useLayoutEffect, useRef } from "react";
+
 import { shouldPrefetchNextIssuePage, stickyHeaderPushOffset } from "./virtualizedIssueRows";
 import type { AutoFillOptions, PrependAnchorCapture } from "./virtualizedRows.type";
 
 const AUTO_FILL_PAGE_CAP = 3;
+
+const FAILED_PAGE_COOLDOWN_MS = 3000;
 
 export function useStickyHeaderPush(
     element: HTMLDivElement | null,
@@ -63,6 +66,7 @@ export function useAutomaticPageLoading(
 ) {
     const automaticPages = useRef(0);
     const fetchInFlight = useRef(false);
+    const lastAttemptAt = useRef(0);
 
     useEffect(() => {
         automaticPages.current = 0;
@@ -73,18 +77,22 @@ export function useAutomaticPageLoading(
             !options ||
             !options.hasNextPage ||
             options.fetchingNextPage ||
-            options.pageError ||
             options.paused ||
             fetchInFlight.current
         ) {
-            return;
+            return false;
         }
+        if (options.pageError && Date.now() - lastAttemptAt.current < FAILED_PAGE_COOLDOWN_MS) {
+            return false;
+        }
+        lastAttemptAt.current = Date.now();
         fetchInFlight.current = true;
         const clearPrependAnchor = options.preservePrepend ? capturePrependAnchor() : undefined;
         void Promise.resolve(options.onLoadMore()).finally(() => {
             fetchInFlight.current = false;
             clearPrependAnchor?.();
         });
+        return true;
     }, [capturePrependAnchor, options]);
 
     useEffect(() => {
@@ -93,7 +101,6 @@ export function useAutomaticPageLoading(
             !options ||
             !options.hasNextPage ||
             options.fetchingNextPage ||
-            options.pageError ||
             options.paused ||
             automaticPages.current >= AUTO_FILL_PAGE_CAP
         ) {
@@ -102,8 +109,7 @@ export function useAutomaticPageLoading(
 
         const frame = requestAnimationFrame(() => {
             if (contentSize > element.clientHeight + 1) return;
-            automaticPages.current += 1;
-            loadMore();
+            if (loadMore()) automaticPages.current += 1;
         });
         return () => cancelAnimationFrame(frame);
     }, [contentSize, element, loadMore, options, rowCount]);

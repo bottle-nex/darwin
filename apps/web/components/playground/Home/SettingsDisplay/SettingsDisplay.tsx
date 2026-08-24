@@ -1,14 +1,16 @@
 "use client";
 import { useParams } from "next/navigation";
 import { MdLock } from "react-icons/md";
-import { useGetDashboard } from "@/hooks/dashboard/useGetDashboard";
-import { useGetProject } from "@/hooks/project/useGetProject";
+
 import NoResource from "@/components/utility/NoResource";
 import ProjectsGlyph from "@/components/utility/ProjectsGlyph";
-import ProjectSettingsGeneralSection from "./ProjectSettingsGeneralSection";
+import { useGetDashboard } from "@/hooks/dashboard/useGetDashboard";
+import { useGetProject } from "@/hooks/project/useGetProject";
+
 import ProjectSettingsEnvSection from "./ProjectSettingsEnvSection";
-import IssueTemplatesDisplay from "./templates/IssueTemplatesDisplay";
+import ProjectSettingsGeneralSection from "./ProjectSettingsGeneralSection";
 import SettingsPaneShell from "./SettingsPaneShell";
+import IssueTemplatesDisplay from "./templates/IssueTemplatesDisplay";
 
 export type ProjectSettingsSection = "project" | "env" | "templates";
 

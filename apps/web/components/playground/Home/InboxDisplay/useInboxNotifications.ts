@@ -1,7 +1,8 @@
 "use client";
 import { useEffect, useMemo } from "react";
-import { useActiveProject } from "@/hooks/useActiveProject";
+
 import { useInboxFeed } from "@/hooks/notifications/useInboxFeed";
+import { useActiveProject } from "@/hooks/useActiveProject";
 import { useInboxStore } from "@/store/playground/useInboxStore";
 
 export function useInboxNotifications() {

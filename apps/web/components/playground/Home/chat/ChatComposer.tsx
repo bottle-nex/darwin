@@ -1,19 +1,21 @@
 "use client";
 
-import { forwardRef, useEffect, useId, useImperativeHandle, useMemo, useRef } from "react";
-import { Extension, type Editor } from "@tiptap/core";
+import { useQueryClient } from "@tanstack/react-query";
+import { type Editor, Extension } from "@tiptap/core";
+import Placeholder from "@tiptap/extension-placeholder";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import Placeholder from "@tiptap/extension-placeholder";
-import { useQueryClient } from "@tanstack/react-query";
 import type { LabelledReference } from "@trymatcha/types";
+import { forwardRef, useEffect, useId, useImperativeHandle, useMemo, useRef } from "react";
 import { HiOutlineFaceSmile } from "react-icons/hi2";
-import { cn } from "@/lib/utils";
+import { RiTelegram2Line } from "react-icons/ri";
+
 import { Button } from "@/components/ui/button";
 import EmojiPicker from "@/components/ui/EmojiPicker";
 import IconWrapper from "@/components/ui/IconWrapper";
+import { cn } from "@/lib/utils";
+
 import { createReferenceMention, ISSUE_TRIGGER, SUGGESTION_KEYS } from "./referenceMention";
-import { RiTelegram2Line } from "react-icons/ri";
 
 const MESSAGE_CHAR_LIMIT = 5000;
 

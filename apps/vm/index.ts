@@ -1,5 +1,6 @@
-import { ENV } from "./src/conf/config.env";
 import Logger from "@trymatcha/logger";
+
+import { ENV } from "./src/conf/config.env";
 import { InitServices } from "./src/services/service.init";
 
 export const vm_services = new InitServices();

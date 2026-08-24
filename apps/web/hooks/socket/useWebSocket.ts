@@ -1,14 +1,14 @@
 "use client";
+import type { InboundSocketMessage, OutboundSocketMessageType } from "@trymatcha/types";
 import { useEffect, useRef, useState } from "react";
-import WebSocketClient from "@/socket/socket.client";
-import {
-    get_socket_client,
-    get_active_socket_client,
-    close_socket_client,
-} from "@/socket/singleton.socket";
-import { type MessageHandler } from "@/socket/socket.client";
-import { type InboundSocketMessage, OutboundSocketMessageType } from "@trymatcha/types";
+
 import SessionServices from "@/lib/session";
+import {
+    close_socket_client,
+    get_active_socket_client,
+    get_socket_client,
+} from "@/socket/singleton.socket";
+import { type default as WebSocketClient, type MessageHandler } from "@/socket/socket.client";
 
 /**
  * Send through the active project connection. Returns false when no connection

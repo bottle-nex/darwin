@@ -1,9 +1,11 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+
 import { apiClient } from "@/lib/axios";
 import { UPDATE_PROJECT_CONFIG_URL } from "@/routes/api_routes";
-import { PROJECT_QUERY_KEY } from "./useGetProject";
 import type { ApiResponse } from "@/types/api";
 import type { KanbanOptionView, ProjectConfig } from "@/types/project";
+
+import { PROJECT_QUERY_KEY } from "./useGetProject";
 
 interface UpdateProjectConfigInput {
     projectId: string;

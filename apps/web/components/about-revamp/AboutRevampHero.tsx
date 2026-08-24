@@ -1,11 +1,13 @@
 "use client";
 import Link from "next/link";
 import { FaXTwitter } from "react-icons/fa6";
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { azeretMono } from "@/lib/fonts";
-import Reveal from "@/components/utility/Reveal";
+
 import HeroBuddy from "@/components/landing/v2/HeroBuddy";
+import { Button } from "@/components/ui/button";
+import Reveal from "@/components/utility/Reveal";
+import { azeretMono } from "@/lib/fonts";
+import { cn } from "@/lib/utils";
+
 import GridBackdrop from "./GridBackdrop";
 
 export default function AboutRevampHero() {

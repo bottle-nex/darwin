@@ -1,8 +1,10 @@
 "use client";
 import { TbLayoutSidebarFilled } from "react-icons/tb";
+
 import { Button } from "@/components/ui/button";
 import { TooltipComponent } from "@/components/ui/tooltip-component";
 import { useSidebarWidthStore } from "@/store/playground/useSidebarWidthStore";
+
 import PlaygroundLeadBar from "./PlaygroundLeadBar";
 
 export default function PlaygroundCollapsedLead() {

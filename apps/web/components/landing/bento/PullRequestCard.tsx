@@ -1,7 +1,8 @@
 "use client";
 
 import { motion, useReducedMotion } from "motion/react";
-import { drop, fade, POP_ORIGIN, pop } from "../diagramMotion";
+
+import { drop, fade, pop, POP_ORIGIN } from "../diagramMotion";
 import BentoCard from "./BentoCard";
 
 /** Standard 30° isometric projection: +u runs down-right, +v runs down-left. */

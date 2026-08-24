@@ -1,6 +1,7 @@
 "use client";
 
 import { motion, useReducedMotion } from "motion/react";
+
 import { cn } from "@/lib/utils";
 
 export const EASE_OUT = [0.22, 1, 0.36, 1] as const;

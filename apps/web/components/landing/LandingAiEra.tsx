@@ -1,7 +1,9 @@
 import Link from "next/link";
+
 import { cn } from "@/lib/utils";
-import { landingContainer } from "./LandingSection";
+
 import AsciiFanCanvas from "./AsciiFanCanvas";
+import { landingContainer } from "./LandingSection";
 
 const bracket = "pointer-events-none absolute size-6 border-neutral-600";
 

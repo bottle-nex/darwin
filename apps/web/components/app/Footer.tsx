@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { FiArrowUpRight } from "react-icons/fi";
+
 import { cn } from "@/lib/utils";
+
 import AppLogo from "./Applogo";
 
 const FOOTER_LINKS: Record<string, { label: string; href: string }[]> = {

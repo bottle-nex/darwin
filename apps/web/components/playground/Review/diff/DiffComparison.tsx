@@ -1,9 +1,10 @@
 "use client";
 import type { ProductDiffShot, ProductReviewShot } from "@trymatcha/types";
-import { BLURRED_BG_ONE } from "@/components/playground/Home/KanbanDisplay/cardStyles";
+
 import { MICRO_LABEL } from "@/components/playground/Core/components/paneBar";
-import { useUserConfig } from "@/hooks/user/useUserConfig";
+import { BLURRED_BG_ONE } from "@/components/playground/Home/KanbanDisplay/cardStyles";
 import TapToOpenImage from "@/components/utility/TapToOpenImage";
+import { useUserConfig } from "@/hooks/user/useUserConfig";
 import { cn } from "@/lib/utils";
 
 export default function DiffComparison({

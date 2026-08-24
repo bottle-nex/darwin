@@ -1,4 +1,5 @@
 import type { ContentSummary } from "@trymatcha/editorial";
+
 import EntryGrid from "./EntryGrid";
 
 export default function ChangelogEntries({ entries }: { entries: ContentSummary[] }) {

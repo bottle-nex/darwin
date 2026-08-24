@@ -1,12 +1,13 @@
 "use client";
 import { MdCheck } from "react-icons/md";
-import { cn } from "@/lib/utils";
-import { CommandEmpty, CommandGroup, CommandItem, CommandList } from "@/components/ui/command";
-import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
-import { PRIORITY_OPTIONS } from "@/components/playground/Issue/issueHelpers";
+
 import { PRIORITY_TO_NUMBER } from "@/components/playground/Home/KanbanDisplay/customkanban/data";
-import { COPY_FIELDS, DATE_PRESETS, type IssueActions } from "@/hooks/issues/useIssueActions";
+import { PRIORITY_OPTIONS } from "@/components/playground/Issue/issueHelpers";
 import MemberAvatar from "@/components/playground/Issue/MemberAvatar";
+import { CommandEmpty, CommandGroup, CommandItem, CommandList } from "@/components/ui/command";
+import { COPY_FIELDS, DATE_PRESETS, type IssueActions } from "@/hooks/issues/useIssueActions";
+import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
+import { cn } from "@/lib/utils";
 import type { CommandPage } from "@/types/command.type";
 
 const LIST = "no-scrollbar max-h-[min(60vh,26rem)] p-2";

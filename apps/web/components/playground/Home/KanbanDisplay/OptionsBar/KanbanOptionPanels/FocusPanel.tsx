@@ -1,6 +1,7 @@
 "use client";
-import { MdAutoAwesome, MdCheck, MdViewKanban, MdWindow } from "react-icons/md";
 import { LuColumns3 } from "react-icons/lu";
+import { MdAutoAwesome, MdCheck, MdViewKanban, MdWindow } from "react-icons/md";
+
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -8,12 +9,13 @@ import {
     DropdownMenuLabel,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { cn } from "@/lib/utils";
-import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
-import type { FocusValue } from "@/store/kanban/useKanbanOptionsStore";
-import OptionButton from "./OptionButton";
-import EagerSubmenu from "./EagerSubmenu";
 import { TooltipComponent } from "@/components/ui/tooltip-component";
+import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
+import { cn } from "@/lib/utils";
+import type { FocusValue } from "@/store/kanban/useKanbanOptionsStore";
+
+import EagerSubmenu from "./EagerSubmenu";
+import OptionButton from "./OptionButton";
 
 type FocusPanelProps = {
     value: FocusValue;

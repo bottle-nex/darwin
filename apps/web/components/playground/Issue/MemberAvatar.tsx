@@ -1,6 +1,6 @@
 "use client";
-import { cn } from "@/lib/utils";
 import type { ProjectMember } from "@/hooks/project/useProjectMembers";
+import { cn } from "@/lib/utils";
 
 const MEMBER_TONES = [
     "bg-indigo-500/30 text-indigo-100",

@@ -1,18 +1,20 @@
 "use client";
-import { useState } from "react";
 import { isAxiosError } from "axios";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import type { IconPick } from "@/components/ui/IconPicker";
-import { DIALOG_TITLE_FIELD, GHOST_FIELD } from "@/components/ui/fieldStyles";
+import { useState } from "react";
+
 import { CapsuleTrigger } from "@/components/playground/Issue/Capsule";
 import IssueDescriptionEditor from "@/components/playground/Issue/editor/IssueDescriptionEditor";
-import { cn } from "@/lib/utils";
-import { slugify } from "@/lib/format";
+import { Button } from "@/components/ui/button";
+import { DIALOG_TITLE_FIELD, GHOST_FIELD } from "@/components/ui/fieldStyles";
+import type { IconPick } from "@/components/ui/IconPicker";
+import { Input } from "@/components/ui/input";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Textarea } from "@/components/ui/textarea";
 import { useCreateProject } from "@/hooks/project/useCreateProject";
+import { slugify } from "@/lib/format";
+import { cn } from "@/lib/utils";
 import type { GithubRepo, Organization } from "@/types/organization";
+
 import { FIELD } from "./CreateProjectDialog";
 import CreateProjectDialogRepository from "./CreateProjectDialogRepository";
 

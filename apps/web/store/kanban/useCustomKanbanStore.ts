@@ -1,7 +1,8 @@
-import { create } from "zustand";
 import { arrayMove } from "@dnd-kit/sortable";
-import type { CustomCard, CustomColumn } from "@/types/kanban-custom";
+import { create } from "zustand";
+
 import type { Issue } from "@/types/kanban";
+import type { CustomCard, CustomColumn } from "@/types/kanban-custom";
 
 /** The active drag — a custom card being moved, an LLM issue dragged in, or a column being reordered. */
 export type ActiveItem =

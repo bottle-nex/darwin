@@ -1,14 +1,15 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
-import { useState } from "react";
 import { signOut } from "next-auth/react";
-import { Button } from "@/components/ui/button";
+import { useState } from "react";
+
 import LogoLoader from "@/components/app/LogoLoader";
-import { useUserSessionStore } from "@/store/user/useUserSessionStore";
-import useInvitationPreview from "@/hooks/invitations/useInvitationPreview";
+import { Button } from "@/components/ui/button";
 import useAcceptInvite from "@/hooks/invitations/useAcceptInvite";
+import useInvitationPreview from "@/hooks/invitations/useInvitationPreview";
 import useRejectInvite from "@/hooks/invitations/useRejectInvite";
+import { useUserSessionStore } from "@/store/user/useUserSessionStore";
 import { INVITATION_STATUS } from "@/types/types.invitation";
 
 const ACCENT = "var(--color-matcha)";

@@ -1,4 +1,5 @@
-import { ProjectRole } from "@trymatcha/types";
+import type { ProjectRole } from "@trymatcha/types";
+
 import { cn } from "@/lib/utils";
 
 const SIZES = {

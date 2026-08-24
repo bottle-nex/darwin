@@ -2,17 +2,19 @@
 
 import { useState } from "react";
 import { MdAdd, MdDelete, MdDescription, MdEdit, MdStar, MdStarOutline } from "react-icons/md";
-import { IconPickGlyph } from "@/components/ui/IconPicker";
-import { toast } from "@/lib/toast";
+
 import { Button } from "@/components/ui/button";
-import ConfirmDialog from "@/components/utility/ConfirmDialog";
+import { IconPickGlyph } from "@/components/ui/IconPicker";
 import { TooltipComponent } from "@/components/ui/tooltip-component";
+import ConfirmDialog from "@/components/utility/ConfirmDialog";
+import { useDeleteTemplate } from "@/hooks/templates/useDeleteTemplate";
 import { useListTemplates } from "@/hooks/templates/useListTemplates";
 import { useUpdateTemplate } from "@/hooks/templates/useUpdateTemplate";
-import { useDeleteTemplate } from "@/hooks/templates/useDeleteTemplate";
+import { toast } from "@/lib/toast";
 import type { IssueTemplate } from "@/types/issueTemplate";
-import CreateTemplateDisplay from "./CreateTemplateDisplay";
+
 import SettingsUtilityCard from "../SettingsUtilityCard";
+import CreateTemplateDisplay from "./CreateTemplateDisplay";
 
 type View = { kind: "list" } | { kind: "edit"; template?: IssueTemplate };
 

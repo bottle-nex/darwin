@@ -1,9 +1,10 @@
-import { Request, Response } from "express";
-import z from "zod";
-import ResponseWriter from "../../services/service.response";
-import { prisma } from "@trymatcha/database";
-import Access from "../../access-control/access";
 import { Action, Permissions } from "@trymatcha/access-control";
+import { prisma } from "@trymatcha/database";
+import type { Request, Response } from "express";
+import z from "zod";
+
+import Access from "../../access-control/access";
+import ResponseWriter from "../../services/service.response";
 import SecretService from "../../services/service.secret";
 
 const body_schema = z.object({

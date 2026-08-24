@@ -1,5 +1,6 @@
-import Image from "next/image";
 import type { ReviewActor } from "@trymatcha/types";
+import Image from "next/image";
+
 import { cn } from "@/lib/utils";
 
 const INTRINSIC_SIZE = 48;

@@ -1,23 +1,24 @@
 "use client";
+import { type Chat, type LabelledReference, to_plain_text } from "@trymatcha/types";
 import { useRef } from "react";
-import { MdContentCopy } from "react-icons/md";
+import { BsReply } from "react-icons/bs";
 import { HiOutlineTrash } from "react-icons/hi";
 import { HiOutlineFaceSmile } from "react-icons/hi2";
-import { BsReply } from "react-icons/bs";
-import { to_plain_text, type Chat, type LabelledReference } from "@trymatcha/types";
-import { formatRelativeTime } from "@/lib/format";
-import EmojiPicker from "@/components/ui/EmojiPicker";
+import { MdContentCopy } from "react-icons/md";
+
 import PlaygroundAvatar, {
     toneFor,
 } from "@/components/playground/Core/components/PlaygroundAvatar";
-import MessageBody from "@/components/playground/Home/chat/MessageBody";
-import MessageReactions from "@/components/playground/Home/chat/MessageReactions";
-import { ActionButton } from "@/components/playground/Home/chat/MessageActions";
 import ChatComposer, {
     type ChatComposerHandle,
 } from "@/components/playground/Home/chat/ChatComposer";
+import { ActionButton } from "@/components/playground/Home/chat/MessageActions";
+import MessageBody from "@/components/playground/Home/chat/MessageBody";
+import MessageReactions from "@/components/playground/Home/chat/MessageReactions";
+import EmojiPicker from "@/components/ui/EmojiPicker";
 import { OPTIMISTIC_ID_PREFIX } from "@/hooks/chats/useChats";
 import { useReactionPending } from "@/hooks/chats/useMessageReactions";
+import { formatRelativeTime } from "@/lib/format";
 
 export type CommentThread = { root: Chat; replies: Chat[] };
 

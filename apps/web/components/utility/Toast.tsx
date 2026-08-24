@@ -1,6 +1,6 @@
 "use client";
-import { useCallback, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { IconType } from "react-icons";
 import {
     HiBell,
@@ -10,6 +10,7 @@ import {
     HiXCircle,
     HiXMark,
 } from "react-icons/hi2";
+
 import { cn } from "@/lib/utils";
 import { useToastStore } from "@/store/toast/useToastStore";
 import type { ToastItem, ToastPosition, ToastStatus } from "@/types/toast.type";

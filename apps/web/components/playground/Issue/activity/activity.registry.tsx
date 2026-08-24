@@ -1,6 +1,15 @@
 "use client";
+import {
+    type ActivityLocationRef,
+    type ActivityPayload,
+    type ActivityPayloadMap,
+    ActivityType,
+} from "@trymatcha/types";
 import type { ReactNode } from "react";
 import type { IconType } from "react-icons";
+import { GoGitMerge, GoGitPullRequestClosed } from "react-icons/go";
+import { HiCalendar } from "react-icons/hi2";
+import { IoPencilSharp } from "react-icons/io5";
 import {
     LuActivity,
     LuAlignLeft,
@@ -13,21 +22,14 @@ import {
     LuUserMinus,
     LuUserPlus,
 } from "react-icons/lu";
-import { GoGitMerge, GoGitPullRequestClosed } from "react-icons/go";
-import { RiSignalCellular2Fill } from "react-icons/ri";
-import { IoPencilSharp } from "react-icons/io5";
-import { HiCalendar } from "react-icons/hi2";
 import { MdOutlineSupportAgent } from "react-icons/md";
-import {
-    ActivityType,
-    type ActivityLocationRef,
-    type ActivityPayload,
-    type ActivityPayloadMap,
-} from "@trymatcha/types";
+import { RiSignalCellular2Fill } from "react-icons/ri";
+
+import TagDisplay from "@/components/playground/Home/TagsDisplay/TagDisplay";
 import { formatDate } from "@/lib/format";
 import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
+
 import { DATE_ICON_COLOR, PRIORITY_OPTIONS } from "../issueHelpers";
-import TagDisplay from "@/components/playground/Home/TagsDisplay/TagDisplay";
 import TextDiff from "./TextDiff";
 
 /** Every other status already reads as a word. */

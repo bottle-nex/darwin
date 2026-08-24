@@ -1,22 +1,24 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
-import Link from "next/link";
-import { cn } from "@/lib/utils";
-import AppLogo from "@/components/app/Applogo";
-import { useUserSessionStore } from "@/store/user/useUserSessionStore";
-import { useRouter } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
+import { MdChevronRight } from "react-icons/md";
 import { PiCaretDownBold } from "react-icons/pi";
+
+import AppLogo from "@/components/app/Applogo";
 import {
+    type AnimatedIcon,
     BriefcaseIcon,
     ChecklistIcon,
     NoteIcon,
     PeopleIcon,
-    type AnimatedIcon,
 } from "@/components/icons/AnimatedIcons";
-import { Button } from "../ui/button";
-import { MdChevronRight } from "react-icons/md";
+import { cn } from "@/lib/utils";
+import { useUserSessionStore } from "@/store/user/useUserSessionStore";
+
 import { landingContainer } from "../landing/LandingSection";
+import { Button } from "../ui/button";
 
 const MotionLink = motion.create(Link);
 

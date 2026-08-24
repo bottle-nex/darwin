@@ -1,9 +1,10 @@
-import { describe, expect, spyOn, test } from "bun:test";
-import { QueryClient, type InfiniteData } from "@tanstack/react-query";
+import { type InfiniteData, QueryClient } from "@tanstack/react-query";
 import type { CursorPage, ReactionSummary } from "@trymatcha/types";
+import { describe, expect, spyOn, test } from "bun:test";
+
 import {
-    appendChatToNewestPage,
     addOptimisticChat,
+    appendChatToNewestPage,
     applyChatReaction,
     chatQueryKey,
     deleteChatFromCache,

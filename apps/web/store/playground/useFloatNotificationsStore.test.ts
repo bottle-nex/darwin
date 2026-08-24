@@ -1,5 +1,6 @@
+import { type Notification, NotificationScope, NotificationType } from "@trymatcha/types";
 import { beforeEach, describe, expect, test } from "bun:test";
-import { NotificationScope, NotificationType, type Notification } from "@trymatcha/types";
+
 import { useFloatNotificationsStore } from "./useFloatNotificationsStore";
 
 function notification(id: string, type: NotificationType, projectId: string | null): Notification {

@@ -1,8 +1,10 @@
 import { MdAccessTimeFilled, MdChat, MdPause } from "react-icons/md";
-import { cn } from "@/lib/utils";
+
 import { GanttTimeline } from "@/lib/gantt/GanttTimeline";
+import { cn } from "@/lib/utils";
 import type { GanttIssue } from "@/types/gantt";
-import { BLURRED_BG_ONE } from "../KanbanDisplay/cardStyles";
+
+import { BLURRED_BG_TWO } from "../KanbanDisplay/cardStyles";
 
 export default function GanttIssueCard({ issue, now }: { issue: GanttIssue; now: number }) {
     const { left, width } = GanttTimeline.barGeometry(issue, now);
@@ -32,7 +34,7 @@ export default function GanttIssueCard({ issue, now }: { issue: GanttIssue; now:
                 className={cn(
                     "absolute inset-y-2 z-1 overflow-hidden rounded-md border border-zinc-800/80",
                     isQueued && "border-dashed",
-                    BLURRED_BG_ONE(true),
+                    BLURRED_BG_TWO(true),
                 )}
                 style={{
                     left,

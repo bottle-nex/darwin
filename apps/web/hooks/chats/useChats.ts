@@ -1,16 +1,18 @@
-import { useInfiniteQuery, type QueryClient } from "@tanstack/react-query";
+import { type QueryClient, useInfiniteQuery } from "@tanstack/react-query";
+import type { Chat, CursorPage, LabelledReference } from "@trymatcha/types";
+
 import { apiClient } from "@/lib/axios";
 import { CHAT_URL } from "@/routes/api_routes";
 import type { ApiResponse } from "@/types/api";
-import type { Chat, CursorPage, LabelledReference } from "@trymatcha/types";
+
 import {
-    CHAT_PAGE_LIMIT,
-    OPTIMISTIC_ID_PREFIX,
     addOptimisticChat,
+    CHAT_PAGE_LIMIT,
+    type ChatCacheItem,
     chatQueryKey,
     deleteChatFromCache,
+    OPTIMISTIC_ID_PREFIX,
     receiveChat,
-    type ChatCacheItem,
 } from "./chatCache";
 
 export const CHATS_QUERY_KEY = ["chats"] as const;

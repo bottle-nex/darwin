@@ -1,15 +1,16 @@
-import type { IconType } from "react-icons";
-import { LuEllipsis } from "react-icons/lu";
-import { BsExclamationSquareFill } from "react-icons/bs";
 import { IssueStatus } from "@trymatcha/types";
-import type { BoardColumn, BoardIssue } from "@/types/board";
-import type { IssueTarget } from "@/store/issues/useCreateIssueStore";
-import type { Priority } from "@/types/kanban";
+import type { IconType } from "react-icons";
+import { BsExclamationSquareFill } from "react-icons/bs";
+import { LuEllipsis } from "react-icons/lu";
+
 import {
     HighPriorityIcon,
-    MediumPriorityIcon,
     LowPriorityIcon,
+    MediumPriorityIcon,
 } from "@/components/icons/PriorityIcons";
+import type { IssueTarget } from "@/store/issues/useCreateIssueStore";
+import type { BoardColumn, BoardIssue } from "@/types/board";
+import type { Priority } from "@/types/kanban";
 
 export const DATE_ICON_COLOR = {
     start: "text-yellow-400",

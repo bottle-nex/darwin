@@ -1,6 +1,7 @@
 import { prisma } from "@trymatcha/database";
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
 import { z } from "zod";
+
 import GithubUserService from "../../services/service.github_user";
 import ResponseWriter from "../../services/service.response";
 

@@ -1,5 +1,7 @@
 "use client";
+import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useRef } from "react";
+import { LuArrowUpDown, LuSearch } from "react-icons/lu";
 import {
     MdAccessTimeFilled,
     MdAdd,
@@ -10,22 +12,21 @@ import {
     MdSearch,
     MdSortByAlpha,
 } from "react-icons/md";
-import { LuArrowUpDown, LuSearch } from "react-icons/lu";
-import { AnimatePresence, motion } from "motion/react";
+
+import PlaygroundBreadcrumb from "@/components/playground/Core/components/PlaygroundBreadcrumb";
+import {
+    PaneActionsSlot,
+    PaneLeadSlot,
+} from "@/components/playground/Core/components/PlaygroundPaneSlots";
+import OptionButton from "@/components/playground/Home/KanbanDisplay/OptionsBar/KanbanOptionPanels/OptionButton";
+import { Button } from "@/components/ui/button";
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
-import OptionButton from "@/components/playground/Home/KanbanDisplay/OptionsBar/KanbanOptionPanels/OptionButton";
-import {
-    PaneActionsSlot,
-    PaneLeadSlot,
-} from "@/components/playground/Core/components/PlaygroundPaneSlots";
-import PlaygroundBreadcrumb from "@/components/playground/Core/components/PlaygroundBreadcrumb";
-import { useTagsOptionsStore, type TagSort } from "@/store/tags/useTagsOptionsStore";
+import { type TagSort, useTagsOptionsStore } from "@/store/tags/useTagsOptionsStore";
 
 const SORTS: { id: TagSort; label: string; icon: typeof MdSortByAlpha }[] = [
     { id: "name", label: "Name (A–Z)", icon: MdSortByAlpha },

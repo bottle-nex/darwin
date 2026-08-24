@@ -1,17 +1,18 @@
 "use client";
-import { HiOutlineAnnotation } from "react-icons/hi";
 import type {
     GlobalSearchMessageHit,
     GlobalSearchMessageThread,
     GlobalSearchResult,
 } from "@trymatcha/types";
-import { cn } from "@/lib/utils";
+import { HiOutlineAnnotation } from "react-icons/hi";
+
+import { PlaygroundTab } from "@/components/playground/playgroundTabs";
 import { CommandGroup, CommandItem } from "@/components/ui/command";
 import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
+import { cn } from "@/lib/utils";
+import { useChatThreadStore } from "@/store/playground/useChatThreadStore";
 import { usePaneRouteStore } from "@/store/playground/usePaneRouteStore";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
-import { useChatThreadStore } from "@/store/playground/useChatThreadStore";
-import { PlaygroundTab } from "@/components/playground/playgroundTabs";
 
 const ITEM_CLASS = "items-start gap-2 p-2.5 text-[13.5px]";
 

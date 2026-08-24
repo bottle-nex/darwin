@@ -1,19 +1,21 @@
 "use client";
 
 import {
+    type MutableRefObject,
+    type ReactNode,
     useCallback,
     useEffect,
     useMemo,
     useState,
-    type MutableRefObject,
-    type ReactNode,
 } from "react";
+
 import { cn } from "@/lib/utils";
+
 import { chunkIssueRows, loadedIssueSelectionIds } from "./virtualizedIssueRows";
-import { VirtualizedRows, useVirtualizedPrependAnchor } from "./VirtualizedRows";
+import { useVirtualizedPrependAnchor, VirtualizedRows } from "./VirtualizedRows";
 import type { AutoFillOptions, PrependAnchorCapture, VirtualStatus } from "./virtualizedRows.type";
 
-export { VirtualizedRows, useVirtualizedPrependAnchor };
+export { useVirtualizedPrependAnchor, VirtualizedRows };
 
 type VirtualizedIssueCardsProps<T extends { id: string }> = {
     items: T[];

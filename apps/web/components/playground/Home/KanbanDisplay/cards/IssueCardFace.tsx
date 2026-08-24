@@ -1,16 +1,18 @@
 "use client";
 import type { ReactNode } from "react";
-import { LuCircleDashed } from "react-icons/lu";
 import { HiCalendar } from "react-icons/hi2";
-import { cn } from "@/lib/utils";
+import { LuCircleDashed } from "react-icons/lu";
+
 import PlaygroundAvatar from "@/components/playground/Core/components/PlaygroundAvatar";
-import type { Assignee, Priority } from "@/types/kanban";
-import type { BoardIssue, BoardTag } from "@/types/board";
-import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
 import { DATE_ICON_COLOR, PRIORITY_OPTIONS } from "@/components/playground/Issue/issueHelpers";
-import PriorityChipMenu from "./PriorityChipMenu";
-import IssueTags from "../IssueTags";
 import IconWrapper from "@/components/ui/IconWrapper";
+import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
+import { cn } from "@/lib/utils";
+import type { BoardIssue, BoardTag } from "@/types/board";
+import type { Assignee, Priority } from "@/types/kanban";
+
+import IssueTags from "../IssueTags";
+import PriorityChipMenu from "./PriorityChipMenu";
 
 const MAX_AVATARS = 3;
 
@@ -121,7 +123,7 @@ export default function IssueCardFace({
                     className={cn("mt-px size-4 shrink-0", column?.titleBox ?? "text-neutral-500")}
                     aria-label={column?.title ?? "No status"}
                 />
-                <p className="line-clamp-2 text-[13px] leading-snug font-medium text-neutral-50">
+                <p className="line-clamp-2 text-[14px] leading-snug font-medium text-neutral-50">
                     {title}
                 </p>
             </div>

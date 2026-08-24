@@ -1,5 +1,6 @@
+import type { Session } from "next-auth";
+
 import { useUserSessionStore } from "@/store/user/useUserSessionStore";
-import { Session } from "next-auth";
 
 export default class SessionServices {
     static get_session(): Session | null {

@@ -1,6 +1,6 @@
+import chalk from "chalk";
 import dotenv from "dotenv";
 import { z } from "zod";
-import chalk from "chalk";
 
 dotenv.config({ path: new URL("../../../../.env", import.meta.url).pathname });
 

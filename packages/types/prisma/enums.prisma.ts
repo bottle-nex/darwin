@@ -198,3 +198,13 @@ export const BackgroundLightingColor = {
 } as const;
 export type BackgroundLightingColor =
     (typeof BackgroundLightingColor)[keyof typeof BackgroundLightingColor];
+
+export const DefaultHomeView = {
+    Inbox: "Inbox",
+    Chats: "Chats",
+    Kanban: "Kanban",
+    Gantt: "Gantt",
+    Tags: "Tags",
+    AssignedToMe: "AssignedToMe",
+} as const;
+export type DefaultHomeView = (typeof DefaultHomeView)[keyof typeof DefaultHomeView];

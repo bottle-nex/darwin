@@ -1,8 +1,9 @@
-import { Request, Response } from "express";
-import z from "zod";
 import { prisma } from "@trymatcha/database";
-import ResponseWriter from "../../services/service.response";
+import type { Request, Response } from "express";
+import z from "zod";
+
 import ApiKeyService from "../../services/service.api_key";
+import ResponseWriter from "../../services/service.response";
 
 export default class ApiKeyCreateController {
     static body_schema = z.object({

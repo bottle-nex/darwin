@@ -1,11 +1,12 @@
 "use client";
 
 import { useMemo } from "react";
-import { useActiveProject } from "@/hooks/useActiveProject";
+
 import { useBoardFeed } from "@/hooks/issues/useBoard";
+import { useActiveProject } from "@/hooks/useActiveProject";
 import { KanbanMappers } from "@/lib/kanban/KanbanMappers";
-import type { BoardState } from "@/types/kanban";
 import { useKanbanBoardStore } from "@/store/kanban/useKanbanBoardStore";
+import type { BoardState } from "@/types/kanban";
 
 export function useFilteredKanbanBoard(): BoardState {
     const project = useActiveProject();

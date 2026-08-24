@@ -1,11 +1,13 @@
 import { describe, expect, test } from "bun:test";
+
+import type { BoardIssue } from "@/types/board";
+import { type BoardFilters, EMPTY_FILTERS } from "@/types/boardFilter";
+
 import {
     normalizeBoardFilters,
     resolveBoardFilterFallback,
     serializeBoardFilters,
 } from "./boardCache";
-import { EMPTY_FILTERS, type BoardFilters } from "@/types/boardFilter";
-import type { BoardIssue } from "@/types/board";
 
 const issue = (id: string, title: string): BoardIssue => ({
     id,

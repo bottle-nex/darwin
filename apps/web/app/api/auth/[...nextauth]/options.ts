@@ -1,9 +1,10 @@
-import { Account, AuthOptions, ISODateString } from "next-auth";
-import GoogleProvider from "next-auth/providers/google";
-import GitHubProvider from "next-auth/providers/github";
-import CredentialsProvider from "next-auth/providers/credentials";
-import { JWT } from "next-auth/jwt";
 import axios from "axios";
+import type { Account, AuthOptions, ISODateString } from "next-auth";
+import type { JWT } from "next-auth/jwt";
+import CredentialsProvider from "next-auth/providers/credentials";
+import GitHubProvider from "next-auth/providers/github";
+import GoogleProvider from "next-auth/providers/google";
+
 import { SIGNIN_URL, VERIFY_OTP_URL } from "@/routes/api_routes";
 
 export interface UserType {

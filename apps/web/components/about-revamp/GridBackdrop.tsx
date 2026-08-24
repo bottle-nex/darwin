@@ -1,5 +1,5 @@
-import GridCell from "./GridCell";
 import { gridConfig, specialCells } from "./data";
+import GridCell from "./GridCell";
 
 const { columns: COLUMNS, rows: ROWS } = gridConfig;
 

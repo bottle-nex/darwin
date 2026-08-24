@@ -1,8 +1,9 @@
 "use client";
 import type { BoardState, KanbanView } from "@/types/kanban";
+
+import CustomKanbanBoard from "./customkanban/CustomKanbanBoard";
 import KanbanBoardView from "./KanbanBoardView";
 import KanbanListView from "./KanbanListView";
-import CustomKanbanBoard from "./customkanban/CustomKanbanBoard";
 
 type KanbanBothBoardsProps = {
     board: BoardState;

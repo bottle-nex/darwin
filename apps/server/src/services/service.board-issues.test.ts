@@ -1,12 +1,12 @@
-import { describe, expect, test } from "bun:test";
 import { IssueStatus } from "@trymatcha/database";
+import { describe, expect, test } from "bun:test";
+
 import {
     board_filters_schema,
     board_lane_query_schema,
     my_issues_query_schema,
 } from "../controllers/issues/board-query.schema";
-import BoardIssueService from "./service.board-issues";
-import { aggregate_custom_column_counts } from "./service.board-issues";
+import BoardIssueService, { aggregate_custom_column_counts } from "./service.board-issues";
 
 const base_issue = {
     id: "issue-1",

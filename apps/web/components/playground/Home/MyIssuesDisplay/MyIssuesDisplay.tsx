@@ -1,12 +1,13 @@
 "use client";
 
-import { useActiveProject } from "@/hooks/useActiveProject";
 import { useMyIssues } from "@/hooks/issues/useMyIssues";
 import { useKanbanFilterUrlSync } from "@/hooks/kanban/useKanbanFilterUrlSync";
+import { useActiveProject } from "@/hooks/useActiveProject";
 import { hasActiveFilters } from "@/lib/kanban/boardFilter";
-import { useKanbanFilterStore } from "@/store/kanban/useKanbanFilterStore";
 import { useMyIssuesOptionsStore } from "@/store/issues/useMyIssuesOptionsStore";
+import { useKanbanFilterStore } from "@/store/kanban/useKanbanFilterStore";
 import { useUserSessionStore } from "@/store/user/useUserSessionStore";
+
 import MyIssuesList from "./MyIssuesList";
 import MyIssuesOptionsBar from "./MyIssuesOptionsBar";
 import MyIssuesViewBar from "./MyIssuesViewBar";

@@ -1,7 +1,8 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+
+import { removeBoardIssueCaches } from "@/hooks/issues/boardCache";
 import { apiClient } from "@/lib/axios";
 import { ISSUE_URL } from "@/routes/api_routes";
-import { removeBoardIssueCaches } from "@/hooks/issues/boardCache";
 import type { ApiResponse } from "@/types/api";
 
 export interface DeleteIssueInput {

@@ -1,13 +1,15 @@
 "use client";
 
 import { forwardRef, useImperativeHandle, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+
 import PlaygroundAvatar, {
     displayNameOf,
     toneFor,
 } from "@/components/playground/Core/components/PlaygroundAvatar";
+import { Button } from "@/components/ui/button";
 import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
+import { cn } from "@/lib/utils";
+
 import type { ReferenceSuggestion } from "./referenceMention";
 
 function keyOf(item: ReferenceSuggestion): string {

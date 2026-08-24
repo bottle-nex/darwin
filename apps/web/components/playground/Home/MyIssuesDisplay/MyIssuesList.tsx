@@ -1,14 +1,15 @@
 "use client";
 
-import { useMemo, useState, type ReactNode } from "react";
+import { type ReactNode, useMemo, useState } from "react";
 import { HiOutlineClipboardDocumentList } from "react-icons/hi2";
-import { Button } from "@/components/ui/button";
+
 import LogoLoader from "@/components/app/LogoLoader";
 import PaneEmptyState from "@/components/playground/Core/components/PaneEmptyState";
 import IssueListGroupHeader from "@/components/playground/Home/KanbanDisplay/IssueListGroupHeader";
 import IssueListRow from "@/components/playground/Home/KanbanDisplay/IssueListRow";
-import { VirtualizedRows } from "@/components/playground/Home/KanbanDisplay/VirtualizedRows";
 import { flattenGroupedIssueRows } from "@/components/playground/Home/KanbanDisplay/virtualizedIssueRows";
+import { VirtualizedRows } from "@/components/playground/Home/KanbanDisplay/VirtualizedRows";
+import { Button } from "@/components/ui/button";
 import { IssueSelectionOrderProvider } from "@/hooks/issues/useIssueSelection";
 import { KanbanMappers } from "@/lib/kanban/KanbanMappers";
 import type {
@@ -17,6 +18,7 @@ import type {
     MyIssuesView,
 } from "@/store/issues/useMyIssuesOptionsStore";
 import type { BoardIssue } from "@/types/board";
+
 import { groupIssues } from "./myIssues";
 
 type MyIssuesListProps = {
@@ -106,30 +108,6 @@ export default function MyIssuesList({
                 findIssueRow={(issueId) => issueRows.get(issueId) ?? -1}
                 stickyRowIndexes={stickyGroupRows}
                 emptyState={emptyState}
-                footer={
-                    issues.length > 0 ? (
-                        <div className="flex justify-center py-3">
-                            {pageError ? (
-                                <Button variant="tertiary" size="sm" onClick={onRetry}>
-                                    Retry loading more
-                                </Button>
-                            ) : hasNextPage ? (
-                                <Button
-                                    variant="tertiary"
-                                    size="sm"
-                                    disabled={fetchingNextPage}
-                                    onClick={onLoadMore}
-                                >
-                                    {fetchingNextPage ? "Loading…" : "Load more issues"}
-                                </Button>
-                            ) : (
-                                <span className="text-[11px] text-neutral-600">
-                                    All loaded issues are shown
-                                </span>
-                            )}
-                        </div>
-                    ) : undefined
-                }
                 status={{
                     label: loading
                         ? "Loading your issues"

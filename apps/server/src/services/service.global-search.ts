@@ -1,18 +1,19 @@
-import { prisma, Prisma } from "@trymatcha/database";
+import { Prisma, prisma } from "@trymatcha/database";
 import {
     filter_reference_tokens,
-    to_plain_text,
     GLOBAL_SEARCH_GROUP_CAP,
-    MIN_GLOBAL_SEARCH_QUERY_LENGTH,
     type GlobalSearchIssueHit,
     type GlobalSearchMessageHit,
     type GlobalSearchMessageThread,
     type GlobalSearchResult,
     type LabelledReference,
+    MIN_GLOBAL_SEARCH_QUERY_LENGTH,
+    to_plain_text,
 } from "@trymatcha/types";
+
 import { escape_like } from "./service.board-issues";
-import PostContentService from "./service.post-content";
 import { MESSAGE_REFERENCE_INCLUDE } from "./service.message-references";
+import PostContentService from "./service.post-content";
 
 const CANDIDATE_LIMIT = GLOBAL_SEARCH_GROUP_CAP * 3;
 const LABEL_MATCH_LIMIT = 50;

@@ -1,7 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
+
 import { apiClient } from "@/lib/axios";
-import type { ApiResponse } from "@/types/api";
 import { PROJECT_PRESENCE_URL } from "@/routes/api_routes";
+import type { ApiResponse } from "@/types/api";
 
 const PRESENCE_REFETCH_MS = 30_000;
 

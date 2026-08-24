@@ -1,4 +1,5 @@
-import { NotificationScope, notification_scope, type Notification } from "@trymatcha/types";
+import { type Notification, notification_scope, NotificationScope } from "@trymatcha/types";
+
 import { PlaygroundTab } from "@/components/playground/playgroundTabs";
 
 export function should_float_notification(

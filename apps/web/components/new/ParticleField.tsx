@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useRef } from "react";
 import { useReducedMotion } from "motion/react";
+import { useEffect, useRef } from "react";
+
 import { cn } from "@/lib/utils";
 
 const PARTICLE_DENSITY = 0.5;

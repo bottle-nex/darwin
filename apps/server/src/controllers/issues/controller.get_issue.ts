@@ -1,7 +1,8 @@
-import { Request, Response } from "express";
 import { Action, Permissions } from "@trymatcha/access-control";
 import { prisma } from "@trymatcha/database";
+import type { Request, Response } from "express";
 import z from "zod";
+
 import Access from "../../access-control/access";
 import { BOARD_ISSUE_SELECT } from "../../services/service.board-issues";
 import ResponseWriter from "../../services/service.response";

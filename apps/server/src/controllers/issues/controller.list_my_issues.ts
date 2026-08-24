@@ -1,6 +1,7 @@
-import { Request, Response } from "express";
 import { Action, Permissions } from "@trymatcha/access-control";
+import type { Request, Response } from "express";
 import z from "zod";
+
 import Access from "../../access-control/access";
 import BoardIssueService, { InvalidBoardCursorError } from "../../services/service.board-issues";
 import ResponseWriter from "../../services/service.response";

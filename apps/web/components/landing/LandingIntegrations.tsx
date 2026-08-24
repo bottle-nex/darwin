@@ -3,8 +3,10 @@ import { motion, useReducedMotion } from "motion/react";
 import type { ComponentType, CSSProperties } from "react";
 import { RiGithubFill, RiSlackFill } from "react-icons/ri";
 import { SiJira, SiLinear, SiNotion } from "react-icons/si";
+
 import { MatchaLogo } from "@/components/logo/MatchaLogo";
 import { cn } from "@/lib/utils";
+
 import { landingContainer } from "./LandingSection";
 import SectionHeader from "./SectionHeader";
 

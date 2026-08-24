@@ -1,9 +1,11 @@
 "use client";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+
 import { cn } from "@/lib/utils";
-import CustomKanbanCard from "./CustomKanbanCard";
 import type { CustomCard } from "@/types/kanban-custom";
+
+import CustomKanbanCard from "./CustomKanbanCard";
 
 type SortableCustomCardProps = {
     card: CustomCard;

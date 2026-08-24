@@ -1,5 +1,6 @@
-import Redis from "ioredis";
 import chalk from "chalk";
+import Redis from "ioredis";
+
 import { ENV } from "../configs/env";
 
 /**

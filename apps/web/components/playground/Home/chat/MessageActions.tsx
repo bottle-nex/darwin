@@ -1,14 +1,15 @@
 "use client";
 
+import { type ThreadMessage, to_plain_text } from "@trymatcha/types";
 import type { ComponentProps } from "react";
-import { MdContentCopy } from "react-icons/md";
 import { BsReply } from "react-icons/bs";
+import { HiOutlineTrash } from "react-icons/hi";
 import { HiOutlineFaceSmile } from "react-icons/hi2";
-import { to_plain_text, type ThreadMessage } from "@trymatcha/types";
+import { MdContentCopy } from "react-icons/md";
+
 import { Button } from "@/components/ui/button";
 import EmojiPicker from "@/components/ui/EmojiPicker";
 import { cn } from "@/lib/utils";
-import { HiOutlineTrash } from "react-icons/hi";
 
 type AnyChat = ThreadMessage;
 

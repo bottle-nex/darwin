@@ -1,7 +1,10 @@
 "use client";
-import { useMemo, useState, type ReactNode } from "react";
-import { FiRefreshCw } from "react-icons/fi";
 import { is_screenshot_product_review_manifest } from "@trymatcha/types";
+import { type ReactNode, useMemo, useState } from "react";
+import { FiRefreshCw } from "react-icons/fi";
+
+import LogoLoader from "@/components/app/LogoLoader";
+import { PaneActionsSlot } from "@/components/playground/Core/components/PlaygroundPaneSlots";
 import { Button } from "@/components/ui/button";
 import {
     Select,
@@ -10,12 +13,11 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import LogoLoader from "@/components/app/LogoLoader";
-import { PaneActionsSlot } from "@/components/playground/Core/components/PlaygroundPaneSlots";
-import { useActiveProject } from "@/hooks/useActiveProject";
 import { useProductDiff } from "@/hooks/project/useProductDiff";
 import { useProductDiffArtifacts } from "@/hooks/project/useProductDiffArtifacts";
 import { useRegenerateProductDiff } from "@/hooks/project/useRegenerateProductDiff";
+import { useActiveProject } from "@/hooks/useActiveProject";
+
 import DiffComparison from "./DiffComparison";
 
 const OUTCOME_SUFFIX: Record<string, string> = {

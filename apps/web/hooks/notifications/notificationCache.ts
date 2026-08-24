@@ -1,10 +1,11 @@
 import type { QueryClient } from "@tanstack/react-query";
 import {
-    NotificationScope,
-    notification_scope,
     type Notification,
+    notification_scope,
     type NotificationFeedPage,
+    NotificationScope,
 } from "@trymatcha/types";
+
 import type { NotificationFeedData, NotificationReadTarget } from "@/types/notificationFeed.type";
 
 export const NOTIFICATIONS_QUERY_KEY = ["notifications"] as const;

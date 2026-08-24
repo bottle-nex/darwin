@@ -1,32 +1,39 @@
 "use client";
 
 import {
-    Fragment,
-    createContext,
-    createElement,
-    useContext,
-    useEffect,
-    useMemo,
-    type ReactNode,
-} from "react";
-import {
+    type InfiniteData,
+    type QueryClient,
     useInfiniteQuery,
     useQueries,
     useQuery,
     useQueryClient,
-    type InfiniteData,
-    type QueryClient,
 } from "@tanstack/react-query";
 import type { CursorPage, Issue } from "@trymatcha/types";
+import {
+    createContext,
+    createElement,
+    Fragment,
+    type ReactNode,
+    useContext,
+    useEffect,
+    useMemo,
+} from "react";
+
 import { apiClient } from "@/lib/axios";
 import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
+import { BOARD_SEARCH_URL, BOARD_URL } from "@/routes/api_routes";
+import { useKanbanFilterStore } from "@/store/kanban/useKanbanFilterStore";
+import type { ApiResponse } from "@/types/api";
+import type { BoardIssue, BoardIssuePage, BoardLaneSelector } from "@/types/board";
+import type { BoardFilters } from "@/types/boardFilter";
+
 import {
     BOARD_QUERY_KEY,
     boardIssueBelongsToLane,
     boardIssueMatchesFilters,
-    boardLanePageLimit,
     boardLaneForIssue,
     boardLaneKey,
+    boardLanePageLimit,
     boardOverlayKey,
     boardSearchKey,
     flattenBoardLanePages,
@@ -37,11 +44,6 @@ import {
     resolveBoardFilterFallback,
 } from "./boardCache";
 import { useBoardColumns } from "./useBoardColumns";
-import { BOARD_SEARCH_URL, BOARD_URL } from "@/routes/api_routes";
-import { useKanbanFilterStore } from "@/store/kanban/useKanbanFilterStore";
-import type { ApiResponse } from "@/types/api";
-import type { BoardFilters } from "@/types/boardFilter";
-import type { BoardIssue, BoardIssuePage, BoardLaneSelector } from "@/types/board";
 
 export { BOARD_QUERY_KEY };
 
@@ -63,21 +65,26 @@ function laneParams(selector: BoardLaneSelector, cursor: string | null) {
           };
 }
 
+async function fetchBoardLanePage(
+    projectId: string,
+    selector: BoardLaneSelector,
+    cursor: string | null,
+    signal?: AbortSignal,
+) {
+    const response = await apiClient.get<ApiResponse<BoardIssuePage>>(BOARD_URL(projectId), {
+        params: laneParams(selector, cursor),
+        signal,
+    });
+    return response.data.data;
+}
+
 export function useBoardLane(projectId: string | undefined, selector: BoardLaneSelector) {
     return useInfiniteQuery({
         queryKey: boardLaneKey(projectId ?? "", selector),
         enabled: Boolean(projectId),
         initialPageParam: null as string | null,
-        queryFn: async ({ pageParam, signal }) => {
-            const response = await apiClient.get<ApiResponse<BoardIssuePage>>(
-                BOARD_URL(projectId!),
-                {
-                    params: laneParams(selector, pageParam),
-                    signal,
-                },
-            );
-            return response.data.data;
-        },
+        queryFn: ({ pageParam, signal }) =>
+            fetchBoardLanePage(projectId!, selector, pageParam, signal),
         getNextPageParam: (page) => page.nextCursor ?? undefined,
     });
 }
@@ -95,16 +102,20 @@ function useLoadedBoardRows(projectId: string | undefined) {
         ],
         [metadata?.columns],
     );
+    const queryClient = useQueryClient();
     const queries = useQueries({
         queries: selectors.map((selector) => ({
             queryKey: boardLaneKey(projectId ?? "", selector),
             enabled: false,
+            queryFn: (): Promise<unknown> => fetchBoardLanePage(projectId ?? "", selector, null),
         })),
     });
+    const overlayKey = boardOverlayKey(projectId ?? "");
     const overlayQuery = useQuery({
-        queryKey: boardOverlayKey(projectId ?? ""),
+        queryKey: overlayKey,
         enabled: false,
         initialData: [] as BoardIssue[],
+        queryFn: () => queryClient.getQueryData<BoardIssue[]>(overlayKey) ?? [],
     });
     const overlays = useMemo(() => overlayQuery.data ?? [], [overlayQuery.data]);
     const rows = useMemo(

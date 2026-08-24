@@ -1,9 +1,10 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { useState } from "react";
 import { NodeViewWrapper, type ReactNodeViewProps } from "@tiptap/react";
+import { useState } from "react";
 import { MdClose, MdZoomOutMap } from "react-icons/md";
+
+import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 

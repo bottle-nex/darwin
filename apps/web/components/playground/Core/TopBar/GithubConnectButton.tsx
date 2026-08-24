@@ -1,11 +1,12 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import { FaGithub, FaCheck } from "react-icons/fa6";
-import { useFetchOrganizations } from "@/hooks/playground/useFetchOrganizations";
+import { FaCheck, FaGithub } from "react-icons/fa6";
+
+import { Button } from "@/components/ui/button";
 import { useConnectGithub } from "@/hooks/github/useConnectGithub";
 import { useDisconnectGithub } from "@/hooks/github/useDisconnectGithub";
-import { Button } from "@/components/ui/button";
+import { useFetchOrganizations } from "@/hooks/playground/useFetchOrganizations";
 
 /**
  * Top-bar affordance for connecting the active org to GitHub. Only shown to

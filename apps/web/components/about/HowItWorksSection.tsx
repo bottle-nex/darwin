@@ -1,11 +1,13 @@
 "use client";
-import { useRef } from "react";
 import { motion, useScroll } from "motion/react";
-import { cn } from "@/lib/utils";
-import { azeretMono } from "@/lib/fonts";
-import Eyebrow from "./Eyebrow";
+import { useRef } from "react";
+
 import Reveal from "@/components/utility/Reveal";
+import { azeretMono } from "@/lib/fonts";
+import { cn } from "@/lib/utils";
+
 import { steps } from "./data";
+import Eyebrow from "./Eyebrow";
 
 export default function HowItWorksSection() {
     const railRef = useRef<HTMLDivElement>(null);

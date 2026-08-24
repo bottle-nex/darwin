@@ -1,15 +1,17 @@
 "use client";
 import { AnimatePresence, motion } from "motion/react";
-import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
+
 import { PANE_TOP_BAR_HEIGHT } from "@/components/playground/Core/components/PlaygroundPaneFrame";
 import PlaygroundLeadBar from "@/components/playground/Core/TopBar/PlaygroundLeadBar";
 import PlaygroundUserMenu from "@/components/playground/Core/TopBar/PlaygroundUserMenu";
+import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
+
 import { isSettingsTab } from "../playgroundTabs";
 import BoardSection from "./BoardSection";
 import ForYouSection from "./ForYouSection";
-import TeamsSection from "./TeamsSection";
 import SettingsPanel from "./SettingsPanel";
 import SidebarActions from "./SidebarActions";
+import TeamsSection from "./TeamsSection";
 
 export default function SidebarContent() {
     const selectedRowId = usePlaygroundNavStore((s) => s.tab);

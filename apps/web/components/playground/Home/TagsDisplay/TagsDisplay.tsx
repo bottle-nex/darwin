@@ -1,24 +1,26 @@
 "use client";
+import { useParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { MdLabel } from "react-icons/md";
-import { useParams } from "next/navigation";
-import { formatDate } from "@/lib/format";
-import { useGetDashboard } from "@/hooks/dashboard/useGetDashboard";
-import { useListTags } from "@/hooks/tags/useListTags";
+
 import LogoLoader from "@/components/app/LogoLoader";
 import PaneEmptyState from "@/components/playground/Core/components/PaneEmptyState";
-import SelectableRow from "@/components/playground/Core/components/SelectableRow";
-import NoResource from "@/components/utility/NoResource";
-import ProjectsGlyph from "@/components/utility/ProjectsGlyph";
-import type { Tag } from "@/types/tags";
-import { useTagsOptionsStore } from "@/store/tags/useTagsOptionsStore";
-import { useDeleteTagStore } from "@/store/tags/useDeleteTagStore";
 import PlaygroundAvatar, {
     initialOf,
     toneFor,
 } from "@/components/playground/Core/components/PlaygroundAvatar";
-import TagDisplay from "./TagDisplay";
+import SelectableRow from "@/components/playground/Core/components/SelectableRow";
+import NoResource from "@/components/utility/NoResource";
+import ProjectsGlyph from "@/components/utility/ProjectsGlyph";
+import { useGetDashboard } from "@/hooks/dashboard/useGetDashboard";
+import { useListTags } from "@/hooks/tags/useListTags";
+import { formatDate } from "@/lib/format";
+import { useDeleteTagStore } from "@/store/tags/useDeleteTagStore";
+import { useTagsOptionsStore } from "@/store/tags/useTagsOptionsStore";
+import type { Tag } from "@/types/tags";
+
 import CreateTagDialog from "./CreateTagDialog";
+import TagDisplay from "./TagDisplay";
 import TagsOptionsBar from "./TagsOptionsBar";
 
 export default function TagsDisplay() {

@@ -1,8 +1,9 @@
 "use client";
 import Image from "next/image";
 import { useState } from "react";
+
+import { type IconPick, IconPickGlyph } from "@/components/ui/IconPicker";
 import { cn } from "@/lib/utils";
-import { IconPickGlyph, type IconPick } from "@/components/ui/IconPicker";
 
 const AVATAR_TONE = {
     indigo: {

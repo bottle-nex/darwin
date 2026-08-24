@@ -1,6 +1,7 @@
 "use client";
 
-import { motion, useTransform, type MotionValue } from "motion/react";
+import { motion, type MotionValue, useTransform } from "motion/react";
+
 import { SaguaroSilhouette } from "./PixelSprites";
 
 const TILE_WIDTH = 1440;

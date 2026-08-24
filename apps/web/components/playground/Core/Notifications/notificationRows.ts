@@ -1,6 +1,8 @@
-import { format } from "date-fns";
 import type { Notification } from "@trymatcha/types";
+import { format } from "date-fns";
+
 import type { NotificationFeedRow } from "@/types/notificationFeed.type";
+
 import { day_label, notification_view } from "./notificationView";
 
 export function matches_query(notification: Notification, query: string): boolean {

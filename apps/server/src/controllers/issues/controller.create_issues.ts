@@ -1,11 +1,12 @@
-import { Request, Response } from "express";
-import z from "zod";
-import ResponseWriter from "../../services/service.response";
-import DescriptionReferenceService from "../../services/service.description-references";
-import Access from "../../access-control/access";
 import { Action, Permissions } from "@trymatcha/access-control";
 import { prisma } from "@trymatcha/database";
+import type { Request, Response } from "express";
+import z from "zod";
+
+import Access from "../../access-control/access";
+import DescriptionReferenceService from "../../services/service.description-references";
 import IssueService from "../../services/service.issue";
+import ResponseWriter from "../../services/service.response";
 
 export default class IssueCreateController {
     static body_schema = z

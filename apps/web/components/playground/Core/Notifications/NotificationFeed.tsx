@@ -1,6 +1,8 @@
 "use client";
 import type { Notification } from "@trymatcha/types";
+
 import { VirtualizedRows } from "@/components/playground/Home/KanbanDisplay/VirtualizedRows";
+
 import NotificationDayHeader from "./NotificationDayHeader";
 import NotificationFeedEmpty from "./NotificationFeedEmpty";
 import NotificationFeedFooter from "./NotificationFeedFooter";

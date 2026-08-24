@@ -16,6 +16,7 @@ import {
     LuSquareKanban,
     LuSquareTerminal,
 } from "react-icons/lu";
+
 import HeroBuddy from "@/components/landing/v2/HeroBuddy";
 import { MatchaLogo } from "@/components/logo/MatchaLogo";
 import { cn } from "@/lib/utils";

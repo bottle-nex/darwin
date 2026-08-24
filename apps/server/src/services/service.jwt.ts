@@ -1,6 +1,7 @@
 import jwt, { type SignOptions } from "jsonwebtoken";
+
 import { ENV } from "../configs/env";
-import { AuthUser } from "../types/express";
+import type { AuthUser } from "../types/express";
 
 /**
  * Sign a session JWT for an authenticated user.

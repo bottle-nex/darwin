@@ -1,22 +1,23 @@
 "use client";
-import { useState } from "react";
 import { isAxiosError } from "axios";
+import { useState } from "react";
 import { MdOutlineKeyboardArrowRight } from "react-icons/md";
-import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { DIALOG_TITLE_FIELD, GHOST_FIELD } from "@/components/ui/fieldStyles";
-import { CapsuleTrigger } from "@/components/playground/Issue/Capsule";
+
 import PlaygroundAvatar, {
     toneFor,
 } from "@/components/playground/Core/components/PlaygroundAvatar";
-import { cn } from "@/lib/utils";
-import { slugify } from "@/lib/format";
-import { useActiveProject } from "@/hooks/useActiveProject";
-import { useNewTeamStore } from "@/store/team/useNewTeamStore";
+import { CapsuleTrigger } from "@/components/playground/Issue/Capsule";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { DIALOG_TITLE_FIELD, GHOST_FIELD } from "@/components/ui/fieldStyles";
+import { Input } from "@/components/ui/input";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Textarea } from "@/components/ui/textarea";
 import { useCreateTeam } from "@/hooks/team/useCreateTeam";
+import { useActiveProject } from "@/hooks/useActiveProject";
+import { slugify } from "@/lib/format";
+import { cn } from "@/lib/utils";
+import { useNewTeamStore } from "@/store/team/useNewTeamStore";
 
 const DESCRIPTION_LIMIT = 150;
 

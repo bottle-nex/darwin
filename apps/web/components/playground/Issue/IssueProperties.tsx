@@ -1,6 +1,7 @@
 "use client";
-import type { BoardIssue } from "@/types/board";
 import LLMIssueStatusTicker from "@/components/playground/Home/KanbanDisplay/LLMIssueStatusTicker";
+import type { BoardIssue } from "@/types/board";
+
 import IssueAttachments from "./IssueAttachments";
 import IssueFields from "./IssueFields";
 import PropertyGroup from "./PropertyGroup";

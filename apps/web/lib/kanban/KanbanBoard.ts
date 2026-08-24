@@ -1,18 +1,19 @@
 import {
     LuCircle,
+    LuCircleCheck,
     LuCircleDashed,
     LuCircleDotDashed,
-    LuCircleCheck,
     LuCirclePause,
-    LuCircleX,
     LuCircleSlash,
+    LuCircleX,
 } from "react-icons/lu";
 import { RiProgress4Line } from "react-icons/ri";
+
 import {
-    KanbanStatus,
     type BoardState,
     type Issue,
     type KanbanColumnDef,
+    KanbanStatus,
     type Priority,
 } from "@/types/kanban";
 

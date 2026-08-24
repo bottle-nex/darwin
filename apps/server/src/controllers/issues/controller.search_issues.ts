@@ -1,8 +1,10 @@
-import { Request, Response } from "express";
-import { prisma, Prisma } from "@trymatcha/database";
-import ResponseWriter from "../../services/service.response";
-import Access from "../../access-control/access";
 import { Action, Permissions } from "@trymatcha/access-control";
+import type { Prisma } from "@trymatcha/database";
+import { prisma } from "@trymatcha/database";
+import type { Request, Response } from "express";
+
+import Access from "../../access-control/access";
+import ResponseWriter from "../../services/service.response";
 
 export default class IssueSearchController {
     static async process(req: Request, res: Response) {

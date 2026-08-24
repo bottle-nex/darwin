@@ -1,7 +1,9 @@
 "use client";
 
 import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
-import { createHalftone, HalftoneInstance, HalftoneOptions } from "./hero-engine";
+
+import type { HalftoneInstance, HalftoneOptions } from "./hero-engine";
+import { createHalftone } from "./hero-engine";
 
 export type HalftoneProps = HalftoneOptions & {
     className?: string;

@@ -2,6 +2,7 @@
 
 import type { ComponentPropsWithoutRef } from "react";
 import { MdCheck } from "react-icons/md";
+
 import { cn } from "@/lib/utils";
 
 type SelectableRowProps = Omit<ComponentPropsWithoutRef<"div">, "onClick" | "onClickCapture"> & {

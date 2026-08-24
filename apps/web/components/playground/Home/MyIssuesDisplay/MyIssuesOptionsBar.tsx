@@ -1,7 +1,7 @@
 "use client";
 
-import { PaneLeadSlot } from "@/components/playground/Core/components/PlaygroundPaneSlots";
 import PlaygroundBreadcrumb from "@/components/playground/Core/components/PlaygroundBreadcrumb";
+import { PaneLeadSlot } from "@/components/playground/Core/components/PlaygroundPaneSlots";
 import FilterChipsBar from "@/components/playground/Home/KanbanDisplay/OptionsBar/KanbanOptionPanels/FilterChipsBar";
 import FiltersPanel from "@/components/playground/Home/KanbanDisplay/OptionsBar/KanbanOptionPanels/FiltersPanel";
 
