@@ -16,6 +16,7 @@ import PreviewRunner, {
 import PreviewServer, { type PreviewServerHandle } from "./service.preview_server";
 import PreviewWorkspace from "./service.preview_workspace";
 import ProductDiffArtifacts from "./service.product_diff_artifacts";
+import { sanitize_preview_diagnostic_message } from "./product_diff/service.preview_diagnostic_sanitizer";
 import { redact } from "./service.sandbox_stream";
 
 const SANDBOX_TIMEOUT_MS = 55 * 60_000;
@@ -73,7 +74,7 @@ export function preview_check_error(
     return new Error(`${revision} preview validation failed: ${target} ${problem}${detail}`);
 }
 
-function preview_diagnostic(
+export function preview_unavailable_diagnostic(
     stage: string,
     message: string,
     applicationPath: string | null,
@@ -84,7 +85,7 @@ function preview_diagnostic(
             ? "PREVIEW_BROWSER_VALIDATION_FAILED"
             : "PREVIEW_SERVER_UNAVAILABLE",
         stage: browserValidation ? "browser-validation" : "startup",
-        message,
+        message: sanitize_preview_diagnostic_message(message),
         adapter: "next",
         applicationPath,
         workspaceKind: null,
@@ -501,7 +502,7 @@ export default class ProductDiffRunner {
                 const message = `Product Diff could not start this project — ${reason}`;
                 await this.settle(productDiffId, "PreviewUnavailable", {
                     error: message,
-                    diagnostics: preview_diagnostic(
+                    diagnostics: preview_unavailable_diagnostic(
                         "start head dev server",
                         message,
                         previewApplicationPath,
@@ -702,12 +703,14 @@ export default class ProductDiffRunner {
                 }
             }
             const failure = describe_product_diff_failure(stage, error);
-            const message = redact(
-                redactedDiagnostics
-                    ? `${failure} | dev server: ${diagnostic_summary(redactedDiagnostics)}`
-                    : failure,
-                [githubToken, ENV.SERVER_CLAUDE_CODE_OAUTH_TOKEN],
-            ).slice(0, 500);
+            const message = sanitize_preview_diagnostic_message(
+                redact(
+                    redactedDiagnostics
+                        ? `${failure} | dev server: ${diagnostic_summary(redactedDiagnostics)}`
+                        : failure,
+                    [githubToken, ENV.SERVER_CLAUDE_CODE_OAUTH_TOKEN],
+                ),
+            );
             log.error("generation failed", new Error(message));
             const status = product_diff_failure_status(stage);
             await this.settle(
@@ -716,7 +719,7 @@ export default class ProductDiffRunner {
                 status === "PreviewUnavailable"
                     ? {
                           error: message,
-                          diagnostics: preview_diagnostic(
+                          diagnostics: preview_unavailable_diagnostic(
                               stage,
                               message,
                               previewApplicationPath,
