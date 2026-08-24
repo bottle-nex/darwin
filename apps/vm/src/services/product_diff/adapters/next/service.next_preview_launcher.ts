@@ -55,11 +55,22 @@ function append_network_arguments(
     command: string,
     workspaceKind: NextWorkspaceKind,
     port: number,
+    directNext = false,
 ): string {
     if (workspaceKind === "Nx") {
         return `${command} -- --host=127.0.0.1 --port=${port}`;
     }
+    if (directNext) return `${command} --hostname 127.0.0.1 --port ${port}`;
     return `${command} -- --hostname 127.0.0.1 --port ${port}`;
+}
+
+function direct_next_command(command: string): string | null {
+    if (!/(?: run)? dev$/.test(command)) return null;
+    const prefix = command.replace(/(?: run)? dev$/, "");
+    if (!/^(bun --cwd .+|pnpm --dir .+|yarn --cwd .+|npm --prefix .+|bun run --filter \S+|pnpm --filter \S+|yarn workspace \S+|npm run --workspace \S+)$/.test(prefix)) return null;
+    if (prefix.startsWith("bun --cwd")) return `${prefix} x --no-install next dev`;
+    if (prefix.startsWith("bun run")) return `${prefix.replace("bun run", "bun x --no-install")} next dev`;
+    return `${prefix} exec next dev`;
 }
 
 function standalone_command(packageManager: PackageManager, applicationPath: string): string {
@@ -181,8 +192,14 @@ export default class NextPreviewLauncher {
         const command = input.launchCommand
             ? this.validate_override(input.launchCommand)
             : known_command(input);
+        const directNext = !input.launchCommand && input.workspaceKind !== "Nx" ? direct_next_command(command) : null;
         return {
-            command: append_network_arguments(command, input.workspaceKind, input.port),
+            command: append_network_arguments(
+                directNext ?? command,
+                input.workspaceKind,
+                input.port,
+                Boolean(directNext),
+            ),
             workingDirectory: input.workspaceRoot ?? ".",
             port: input.port,
             healthPath,
@@ -210,9 +227,15 @@ export default class NextPreviewLauncher {
 
         const launchCommand = this.validate_override(input.workspacePlan.launchCommand);
         const command = workspaceKind === "Nx" ? nx_serve_command(launchCommand) : launchCommand;
+        const directNext = workspaceKind !== "Nx" ? direct_next_command(command) : null;
 
         return {
-            command: append_network_arguments(command, workspaceKind, input.port),
+            command: append_network_arguments(
+                directNext ?? command,
+                workspaceKind,
+                input.port,
+                Boolean(directNext),
+            ),
             workingDirectory: input.workspaceRoot,
             port: input.port,
             healthPath: input.workspacePlan.healthPath,

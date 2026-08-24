@@ -2,7 +2,7 @@ import { expect, test } from "bun:test";
 
 import NextPreviewLauncher from "./service.next_preview_launcher";
 
-test("uses the selected package script through pnpm filtering", () => {
+test("runs Next directly instead of forwarding a second separator into a package script", () => {
     const plan = NextPreviewLauncher.create({
         workspaceKind: "Turborepo",
         packageManager: "pnpm",
@@ -12,7 +12,7 @@ test("uses the selected package script through pnpm filtering", () => {
     });
 
     expect(plan.command).toBe(
-        "pnpm --filter @acme/marketing run dev -- --hostname 127.0.0.1 --port 41337",
+        "pnpm --filter @acme/marketing exec next dev --hostname 127.0.0.1 --port 41337",
     );
 });
 
@@ -39,7 +39,7 @@ test("quotes a standalone application path before supplying it to npm", () => {
     });
 
     expect(plan.command).toBe(
-        "npm --prefix 'apps/marketing site' run dev -- --hostname 127.0.0.1 --port 41337",
+        "npm --prefix 'apps/marketing site' exec next dev --hostname 127.0.0.1 --port 41337",
     );
 });
 
@@ -52,7 +52,7 @@ test("escapes an apostrophe in a standalone application path", () => {
     });
 
     expect(plan.command).toBe(
-        "pnpm --dir 'apps/marketing'\"'\"'s site' run dev -- --hostname 127.0.0.1 --port 41337",
+        "pnpm --dir 'apps/marketing'\"'\"'s site' exec next dev --hostname 127.0.0.1 --port 41337",
     );
 });
 
@@ -80,6 +80,33 @@ test("keeps the resolver's Bun Nx serve command on the local target", () => {
 
     expect(plan.command).toBe(
         "bun x --no-install nx run @acme/marketing:serve -- --host=127.0.0.1 --port=41337",
+    );
+});
+
+test("converts a resolved pnpm workspace dev script into direct Next startup", () => {
+    const plan = NextPreviewLauncher.from_workspace_plan({
+        workspaceRoot: "/home/user/workspace/head",
+        workspacePlan: {
+            repositoryRoot: ".",
+            applicationPath: "apps/web",
+            workspaceKind: "Turborepo",
+            installDirectory: ".",
+            launchCommand: "pnpm --filter web run dev",
+            healthPath: "/",
+            router: "AppRouter",
+            framework: "NextAppRouter",
+            dependency: {
+                packageManager: "pnpm",
+                lockfileRelPath: "pnpm-lock.yaml",
+                lockfileSha256: "lock-hash",
+                workspaceDirs: ["."],
+            },
+        },
+        port: 41337,
+    });
+
+    expect(plan.command).toBe(
+        "pnpm --filter web exec next dev --hostname 127.0.0.1 --port 41337",
     );
 });
 
