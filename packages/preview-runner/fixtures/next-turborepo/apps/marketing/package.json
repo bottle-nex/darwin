@@ -1,0 +1,13 @@
+{
+    "name": "@matcha-fixture/marketing",
+    "private": true,
+    "scripts": {
+        "dev": "next dev"
+    },
+    "dependencies": {
+        "@matcha-fixture/ui": "workspace:*",
+        "next": "15.0.0",
+        "react": "19.0.0",
+        "react-dom": "19.0.0"
+    }
+}

@@ -1,0 +1,7 @@
+{
+    "name": "@matcha-fixture/next-nx",
+    "private": true,
+    "scripts": {
+        "dev": "nx run @matcha-fixture/store:serve"
+    }
+}
