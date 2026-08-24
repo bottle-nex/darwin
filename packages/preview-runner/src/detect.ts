@@ -3,7 +3,6 @@ import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { join, relative, sep } from "node:path";
 import type { DetectInput, DetectOutput, Framework, PackageManager } from "./contract";
 
-const MAX_SCAN_DEPTH = 4;
 const SKIP_DIRS = new Set([
     "node_modules",
     ".git",
@@ -66,11 +65,10 @@ function is_directory(path: string): boolean {
 function find_package_dirs(root: string): string[] {
     const found: string[] = [];
 
-    const walk = (absolute: string, depth: number) => {
+    const walk = (absolute: string) => {
         if (existsSync(join(absolute, "package.json"))) {
             found.push(relative(root, absolute) || ".");
         }
-        if (depth >= MAX_SCAN_DEPTH) return;
 
         let entries: string[];
         try {
@@ -81,11 +79,11 @@ function find_package_dirs(root: string): string[] {
         for (const entry of entries) {
             if (entry.startsWith(".") || SKIP_DIRS.has(entry)) continue;
             const child = join(absolute, entry);
-            if (is_directory(child)) walk(child, depth + 1);
+            if (is_directory(child)) walk(child);
         }
     };
 
-    walk(root, 0);
+    walk(root);
     return found;
 }
 

@@ -14,6 +14,34 @@ export const advisoryWarningsSchema = z
 export const packageManagerSchema = z.enum(["bun", "pnpm", "yarn", "npm"]);
 export type PackageManager = z.infer<typeof packageManagerSchema>;
 
+export const nextWorkspaceKindSchema = z.enum(["Standalone", "Turborepo", "Nx"]);
+export type NextWorkspaceKind = z.infer<typeof nextWorkspaceKindSchema>;
+
+export const nextApplicationRouterSchema = z.enum(["AppRouter", "PagesRouter"]);
+export type NextApplicationRouter = z.infer<typeof nextApplicationRouterSchema>;
+
+export const nextApplicationCandidateSchema = z.object({
+    applicationPath: z.string().min(1),
+    packageName: z.string().min(1).nullable(),
+    router: nextApplicationRouterSchema,
+    hasPagesDirectory: z.boolean(),
+});
+export type NextApplicationCandidate = z.infer<typeof nextApplicationCandidateSchema>;
+
+export const nextWorkspaceInspectionInputSchema = z.object({
+    workspaceRoot: z.string().min(1),
+    changedPaths: z.array(z.string()).default([]),
+});
+export type NextWorkspaceInspectionInput = z.infer<typeof nextWorkspaceInspectionInputSchema>;
+
+export const nextWorkspaceInspectionSchema = z.object({
+    workspaceKind: nextWorkspaceKindSchema,
+    packageManager: packageManagerSchema.nullable(),
+    applications: z.array(nextApplicationCandidateSchema),
+    changedApplicationPaths: z.array(z.string().min(1)),
+});
+export type NextWorkspaceInspection = z.infer<typeof nextWorkspaceInspectionSchema>;
+
 export const frameworkSchema = z.enum(["NextAppRouter", "NextPagesRouter"]);
 export type Framework = z.infer<typeof frameworkSchema>;
 

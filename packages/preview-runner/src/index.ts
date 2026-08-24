@@ -7,6 +7,7 @@ import {
     captureInputSchema,
     checkInputSchema,
     detectInputSchema,
+    nextWorkspaceInspectionInputSchema,
     pairInputSchema,
     scaffoldInputSchema,
     type DoctorOutput,
@@ -14,9 +15,19 @@ import {
 import { detect } from "./detect";
 import { scaffold } from "./scaffold";
 import { pair } from "./pair";
+import { inspect_next_workspace } from "./adapters/next/workspace";
 
-const RUNTIME_PROTOCOL_VERSION = 3;
-const COMMANDS = ["detect", "scaffold", "check", "capture", "pair", "doctor", "version"] as const;
+const RUNTIME_PROTOCOL_VERSION = 4;
+const COMMANDS = [
+    "detect",
+    "inspect-next-workspace",
+    "scaffold",
+    "check",
+    "capture",
+    "pair",
+    "doctor",
+    "version",
+] as const;
 type Command = (typeof COMMANDS)[number];
 
 function flag(argv: string[], name: string): string | null {
@@ -68,6 +79,8 @@ async function run(command: Command, input: unknown): Promise<unknown> {
     switch (command) {
         case "detect":
             return detect(detectInputSchema.parse(input));
+        case "inspect-next-workspace":
+            return inspect_next_workspace(nextWorkspaceInspectionInputSchema.parse(input));
         case "scaffold":
             return scaffold(scaffoldInputSchema.parse(input));
         case "check":

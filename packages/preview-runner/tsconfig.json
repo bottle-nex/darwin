@@ -4,7 +4,7 @@
     "exclude": ["node_modules", "dist"],
     "compilerOptions": {
         "target": "ESNext",
-        "types": ["node"],
+        "types": ["node", "bun"],
         "strictNullChecks": true
     }
 }

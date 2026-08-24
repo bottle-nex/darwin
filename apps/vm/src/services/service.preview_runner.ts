@@ -19,6 +19,25 @@ const advisoryWarningsSchema = z
 const packageManagerSchema = z.enum(["bun", "pnpm", "yarn", "npm"]);
 export type PackageManager = z.infer<typeof packageManagerSchema>;
 
+const nextWorkspaceKindSchema = z.enum(["Standalone", "Turborepo", "Nx"]);
+export type NextWorkspaceKind = z.infer<typeof nextWorkspaceKindSchema>;
+
+const nextApplicationCandidateSchema = z.object({
+    applicationPath: z.string().min(1),
+    packageName: z.string().min(1).nullable(),
+    router: z.enum(["AppRouter", "PagesRouter"]),
+    hasPagesDirectory: z.boolean(),
+});
+export type NextApplicationCandidate = z.infer<typeof nextApplicationCandidateSchema>;
+
+const nextWorkspaceInspectionSchema = z.object({
+    workspaceKind: nextWorkspaceKindSchema,
+    packageManager: packageManagerSchema.nullable(),
+    applications: z.array(nextApplicationCandidateSchema),
+    changedApplicationPaths: z.array(z.string().min(1)),
+});
+export type NextWorkspaceInspection = z.infer<typeof nextWorkspaceInspectionSchema>;
+
 const frameworkSchema = z.enum(["NextAppRouter", "NextPagesRouter"]);
 export type PreviewFramework = z.infer<typeof frameworkSchema>;
 
@@ -204,6 +223,19 @@ export default class PreviewRunner {
         changedPaths: string[],
     ): Promise<PreviewDetect> {
         return this.invoke(sandbox, "detect", { workspaceRoot, changedPaths }, detectSchema);
+    }
+
+    static async inspect_next_workspace(
+        sandbox: Sandbox,
+        workspaceRoot: string,
+        changedPaths: string[],
+    ): Promise<NextWorkspaceInspection> {
+        return this.invoke(
+            sandbox,
+            "inspect-next-workspace",
+            { workspaceRoot, changedPaths },
+            nextWorkspaceInspectionSchema,
+        );
     }
 
     /**
