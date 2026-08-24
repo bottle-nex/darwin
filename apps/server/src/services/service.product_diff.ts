@@ -1,6 +1,6 @@
 import { extname } from "node:path";
 
-import { prisma } from "@trymatcha/database";
+import { Prisma, prisma } from "@trymatcha/database";
 import type { ProductDiffStatus, ProductDiffSummary } from "@trymatcha/types";
 
 import GithubPullsService from "./service.github_pulls";
@@ -114,7 +114,7 @@ export default class ProductDiffService {
         if (retry_failed && this.retryable_product_diff_status(productDiff.status)) {
             const reset = await prisma.productDiff.updateMany({
                 where: { id: productDiff.id, status: { in: ["Failed", "PreviewUnavailable"] } },
-                data: { status: "Pending", error: null },
+                data: { status: "Pending", error: null, diagnostics: Prisma.DbNull },
             });
             if (reset.count === 0) return null;
             productDiff = { id: productDiff.id, status: "Pending" };
