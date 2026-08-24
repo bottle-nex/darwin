@@ -184,5 +184,12 @@ export function resolve_next_workspace(
         launchCommand: configuration?.launchCommand ?? launch_command(inspection, application),
         healthPath: configuration?.healthPath ?? "/",
         router: application.router,
+        framework: application.router === "AppRouter" ? "NextAppRouter" : "NextPagesRouter",
+        dependency: {
+            packageManager: inspection.packageManager,
+            lockfileRelPath: "",
+            lockfileSha256: "",
+            workspaceDirs: [],
+        },
     };
 }

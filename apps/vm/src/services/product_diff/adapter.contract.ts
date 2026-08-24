@@ -21,6 +21,13 @@ export interface ProductDiffWorkspacePlan {
     launchCommand: string;
     healthPath: string;
     router: string;
+    framework: string;
+    dependency: {
+        packageManager: "bun" | "pnpm" | "yarn" | "npm";
+        lockfileRelPath: string;
+        lockfileSha256: string;
+        workspaceDirs: string[];
+    };
 }
 
 export interface ProductDiffWorkspaceResolutionInput extends ProductDiffAdapterDetectionInput {
@@ -56,6 +63,7 @@ export interface ProductDiffRunningPreview {
     id: string;
     revision: ProductDiffRevision;
     url: string;
+    surfacePath: string;
 }
 
 export interface ProductDiffVerifyRevisionInput {

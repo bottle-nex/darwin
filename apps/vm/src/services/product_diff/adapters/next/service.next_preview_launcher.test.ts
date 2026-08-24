@@ -67,6 +67,13 @@ test("converts the resolver's Bun Nx dev command to the local serve target", () 
             launchCommand: "bun nx run @acme/marketing:dev",
             healthPath: "/",
             router: "AppRouter",
+            framework: "NextAppRouter",
+            dependency: {
+                packageManager: "bun",
+                lockfileRelPath: "bun.lock",
+                lockfileSha256: "lock-hash",
+                workspaceDirs: ["."],
+            },
         },
         port: 41337,
     });

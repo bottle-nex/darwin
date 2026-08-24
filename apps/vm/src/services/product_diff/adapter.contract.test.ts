@@ -1,8 +1,6 @@
 import { expect, test } from "bun:test";
 
-import type {
-    ProductDiffAdapter,
-} from "./adapter.contract";
+import type { ProductDiffAdapter } from "./adapter.contract";
 import ProductDiffAdapterRegistry from "./adapter.registry";
 
 function adapter(id: string, supported: boolean): ProductDiffAdapter {
@@ -22,6 +20,7 @@ function adapter(id: string, supported: boolean): ProductDiffAdapter {
             id: `${id}-${revision}`,
             revision,
             url: "http://127.0.0.1:3000",
+            surfacePath: "/preview-run-a",
         }),
         verify_revision: async ({ preview }) => ({
             revision: preview.revision,

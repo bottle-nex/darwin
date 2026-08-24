@@ -6,6 +6,7 @@ import { promisify } from "node:util";
 
 import type Logger from "@trymatcha/logger";
 import type {
+    ProductDiffDiagnostic,
     ProductDiffFramework,
     ProductDiffManifestV3,
     ProductDiffShotOutcome,
@@ -147,6 +148,13 @@ export default class ProductDiffArtifacts {
         framework: ProductDiffFramework;
         viewports: ProductDiffViewport[];
         warnings: string[];
+        adapter: {
+            id: string;
+            applicationPath: string;
+            workspaceKind: string;
+            router: string;
+        };
+        diagnostics: ProductDiffDiagnostic[];
     }): ProductDiffManifestV3 {
         const targets: ProductReviewTarget[] = input.harness.targets.map((target) => {
             const shots: ProductReviewShot[] = input.pair.shots
@@ -175,7 +183,16 @@ export default class ProductDiffArtifacts {
             framework: input.framework,
             viewports: input.viewports,
             targets,
-            warnings: [...input.harness.warnings, ...input.pair.warnings, ...input.warnings],
+            warnings: [
+                ...input.harness.warnings,
+                ...input.pair.warnings,
+                ...input.warnings,
+                `adapter=${input.adapter.id}; applicationPath=${input.adapter.applicationPath}; workspaceKind=${input.adapter.workspaceKind}; router=${input.adapter.router}`,
+                ...input.diagnostics.map(
+                    (diagnostic) =>
+                        `diagnostic=${diagnostic.code}; stage=${diagnostic.stage}; message=${diagnostic.message}`,
+                ),
+            ],
         };
     }
 }

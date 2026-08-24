@@ -102,11 +102,14 @@ export default class QueueService {
                 where: { id: job.data.productDiffId },
                 select: { status: true, error: true },
             });
-            if (productDiff?.status === "Failed") {
+            if (productDiff?.status !== "Ready") {
                 log.error(
-                    "product diff job recorded failure",
-                    new Error(productDiff.error ?? "Product Diff failed"),
-                    { productDiff: job.data.productDiffId },
+                    "product diff job settled without a ready artifact",
+                    new Error(productDiff?.error ?? "Product Diff did not produce an artifact"),
+                    {
+                        productDiff: job.data.productDiffId,
+                        status: productDiff?.status ?? "Missing",
+                    },
                 );
                 return;
             }

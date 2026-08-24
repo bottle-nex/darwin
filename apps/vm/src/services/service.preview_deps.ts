@@ -6,7 +6,7 @@ import { Sandbox } from "e2b";
 
 import { ENV } from "../conf/config.env";
 import type { ProductDiffWorkspacePlan } from "./product_diff/adapter.contract";
-import type { PackageManager, PreviewDetect } from "./service.preview_runner";
+import type { PackageManager } from "./service.preview_runner";
 
 const DEPS_CACHE_DIR = "/home/user/.matcha/deps-cache";
 const INSTALL_TIMEOUT_MS = 12 * 60_000;
@@ -19,11 +19,6 @@ const INSTALL_COMMANDS: Record<PackageManager, string[]> = {
     yarn: ["yarn install --immutable", "yarn install --frozen-lockfile"],
     npm: ["npm ci --no-audit --no-fund", "npm install --no-audit --no-fund"],
 };
-
-function lockfile_dir(worktree: string, lockfileRelPath: string): string {
-    const segments = lockfileRelPath.split("/").slice(0, -1);
-    return segments.length ? `${worktree}/${segments.join("/")}` : worktree;
-}
 
 function install_directory(worktree: string, directory: string): string {
     const normalized = directory.replaceAll("\\", "/").replace(/^\.\//, "");
@@ -78,42 +73,21 @@ export default class PreviewDeps {
         sandbox: Sandbox,
         worktree: string,
         workspacePlan: ProductDiffWorkspacePlan,
-        detect: PreviewDetect,
         log: Logger,
-    ): Promise<void>;
-    static async install(
-        sandbox: Sandbox,
-        worktree: string,
-        detect: PreviewDetect,
-        log: Logger,
-    ): Promise<void>;
-    static async install(
-        sandbox: Sandbox,
-        worktree: string,
-        workspacePlanOrDetect: ProductDiffWorkspacePlan | PreviewDetect,
-        detectOrLog: PreviewDetect | Logger,
-        optionalLog?: Logger,
     ): Promise<void> {
-        const usesWorkspacePlan = "installDirectory" in workspacePlanOrDetect;
-        const workspacePlan = usesWorkspacePlan ? workspacePlanOrDetect : null;
-        const detect = usesWorkspacePlan
-            ? (detectOrLog as PreviewDetect)
-            : (workspacePlanOrDetect as PreviewDetect);
-        const log = usesWorkspacePlan ? optionalLog! : (detectOrLog as Logger);
-        if (!detect.packageManager || !detect.lockfileRelPath) {
+        const dependency = workspacePlan.dependency;
+        if (!dependency.packageManager || !dependency.lockfileRelPath) {
             throw new Error("cannot install without a detected package manager");
         }
 
-        const cwd = workspacePlan
-            ? install_directory(worktree, workspacePlan.installDirectory)
-            : lockfile_dir(worktree, detect.lockfileRelPath);
-        const [primary, fallback] = INSTALL_COMMANDS[detect.packageManager];
+        const cwd = install_directory(worktree, workspacePlan.installDirectory);
+        const [primary, fallback] = INSTALL_COMMANDS[dependency.packageManager as PackageManager];
 
         try {
             await sandbox.commands.run(primary!, { cwd, timeoutMs: INSTALL_TIMEOUT_MS });
         } catch {
             log.warn("frozen install failed, retrying without the lockfile constraint", {
-                package_manager: detect.packageManager,
+                package_manager: dependency.packageManager,
             });
             await sandbox.commands.run(fallback!, { cwd, timeoutMs: INSTALL_TIMEOUT_MS });
         }

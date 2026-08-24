@@ -1,21 +1,26 @@
-import type { Prisma } from "@trymatcha/database";
-import { prisma } from "@trymatcha/database";
+import { Prisma, prisma } from "@trymatcha/database";
 import Logger from "@trymatcha/logger";
-import type { ProductDiffDiagnostic, ProductDiffViewport } from "@trymatcha/types";
-import { CommandExitError, Sandbox } from "e2b";
+import type {
+    ProductDiffDiagnostic,
+    ProductDiffPreviewConfiguration,
+    ProductDiffViewport,
+} from "@trymatcha/types";
+import { Sandbox } from "e2b";
 
 import { ENV } from "../conf/config.env";
 import ClaudeRun from "./service.claude_run";
 import GithubService from "./service.github";
 import PreviewDeps from "./service.preview_deps";
-import PreviewRunner, {
-    type NextApplicationRouter,
-    type PreviewDetect,
-    type PreviewSurface,
-} from "./service.preview_runner";
-import PreviewServer, { type PreviewServerHandle } from "./service.preview_server";
+import PreviewRunner, { type PreviewCapture } from "./service.preview_runner";
 import PreviewWorkspace from "./service.preview_workspace";
 import ProductDiffArtifacts from "./service.product_diff_artifacts";
+import ProductDiffAdapterRegistry from "./product_diff/adapter.registry";
+import type {
+    ProductDiffAdapter,
+    ProductDiffPreparedRevision,
+    ProductDiffRunningPreview,
+    ProductDiffWorkspacePlan,
+} from "./product_diff/adapter.contract";
 import {
     preview_check_summary,
     type PreviewCheckFailure,
@@ -28,13 +33,11 @@ const AGENT_TIMEOUT_MS = 15 * 60_000;
 const SNAPSHOT_DEADLINE_MS = 30 * 60_000;
 const REPO_DIR = "/home/user/repo";
 const WORKSPACE_DIR = "/home/user/workspace";
-const PREVIEW_DIR = "/home/user/preview";
 const SHOTS_DIR = "/home/user/output/shots";
 const PROMPT_PATH = "/home/user/product_diff_prompt.txt";
 const HEAD_PORT = 41337;
 const BASE_PORT = 41338;
 const MAX_SHOTS = 48;
-const MAX_ERROR_OUTPUT = 400;
 const FROZEN_NOW_MS = 1_750_000_000_000;
 const SAFE_REPOSITORY = /^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/;
 const SAFE_SHA = /^[0-9a-f]{40,64}$/;
@@ -48,6 +51,18 @@ const SERVER_ENV = {
     CI: "1",
     TZ: "UTC",
 };
+
+type ProductDiffTerminalStatus =
+    "Ready" | "Stale" | "Failed" | "Unsupported" | "ConfigurationRequired" | "PreviewUnavailable";
+
+class ProductDiffPreviewUnavailableError extends Error {
+    constructor(readonly diagnostic: ProductDiffDiagnostic) {
+        super(diagnostic.message);
+    }
+}
+
+class PreviewCheckError extends Error {}
+
 const PREVIEW_UNAVAILABLE_STAGES = new Set([
     "start head dev server",
     "verify the head preview surface",
@@ -56,8 +71,6 @@ const PREVIEW_UNAVAILABLE_STAGES = new Set([
     "verify the base preview surface",
     "photograph the base revision",
 ]);
-
-class PreviewCheckError extends Error {}
 
 export function product_diff_failure_status(stage: string): "PreviewUnavailable" | "Failed" {
     return PREVIEW_UNAVAILABLE_STAGES.has(stage) ? "PreviewUnavailable" : "Failed";
@@ -103,25 +116,32 @@ function is_current_product_diff(
     return pull.state === "open" && pull.baseSha === baseSha && pull.headSha === headSha;
 }
 
-function describe_product_diff_failure(stage: string, error: unknown): string {
-    const fallback = error instanceof Error ? error.message : String(error);
-    if (!(error instanceof CommandExitError)) return `${stage} failed: ${fallback}`;
-
-    const output = error.stderr.trim() || error.stdout.trim() || error.error?.trim() || fallback;
-    return `${stage} failed (exit ${error.exitCode}): ${output.slice(-MAX_ERROR_OUTPUT)}`;
+function static_diagnostic(
+    code: string,
+    stage: string,
+    message: string,
+    adapter: string | null = null,
+    applicationPath: string | null = null,
+    workspaceKind: string | null = null,
+): ProductDiffDiagnostic {
+    return { code, stage, message, adapter, applicationPath, workspaceKind };
 }
 
-function diagnostic_summary(output: string): string {
-    return output.replace(/\s+/g, " ").trim().slice(-MAX_ERROR_OUTPUT);
+function framework_from_plan(plan: ProductDiffWorkspacePlan): "NextAppRouter" | "NextPagesRouter" {
+    return plan.framework === "NextPagesRouter" ? "NextPagesRouter" : "NextAppRouter";
+}
+
+function failure_message(stage: string): string {
+    return `Product Diff failed during ${stage}.`;
 }
 
 function prompt(input: {
     baseSha: string;
     headSha: string;
-    nextAppDir: string;
+    applicationPath: string;
     framework: string;
 }): string {
-    const appDir = `${WORKSPACE_DIR}/head/${input.nextAppDir}`;
+    const applicationRoot = `${WORKSPACE_DIR}/head/${input.applicationPath}`;
 
     return `You are preparing a visual preview for a pull request. You will NOT draw anything.
 You write React that mounts the project's REAL components with fixed data.
@@ -131,9 +151,9 @@ Revisions
   head commit:   ${input.headSha}
   base worktree: ${WORKSPACE_DIR}/base
   head worktree: ${WORKSPACE_DIR}/head
-  Next.js app:   ${appDir}   (${input.framework})
+  application:   ${applicationRoot}   (${input.framework})
 
-Work only inside ${appDir}/matcha_preview/. You write exactly two kinds of file there:
+Work only inside ${applicationRoot}/matcha_preview/. You write exactly two kinds of file there:
   targets/<targetId>.tsx   one per target
   manifest.json            the index of targets
 
@@ -173,7 +193,7 @@ Step 3 - write matcha_preview/manifest.json
     "warnings": []
   }
   id must match ^[a-z0-9][a-z0-9-]{0,48}$ and equal the target file's name.
-  sourcePath is relative to ${input.nextAppDir}.
+  sourcePath is relative to ${input.applicationPath}.
   At most 4 targets and at most 4 states each.
   label is at most 80 characters, for both a target and a state.
   Put anything a reviewer should distrust into warnings, as short one-line notes.
@@ -197,31 +217,13 @@ Hard rules
 export default class ProductDiffRunner {
     private static async settle(
         productDiffId: string,
-        status: "Ready" | "Stale" | "Failed" | "Unsupported" | "PreviewUnavailable",
+        status: ProductDiffTerminalStatus,
         data: Prisma.ProductDiffUpdateManyMutationInput = {},
     ): Promise<void> {
         await prisma.productDiff.updateMany({
             where: { id: productDiffId, status: "Generating" },
             data: { status, ...data },
         });
-    }
-
-    private static async prepare_revisions(
-        sandbox: Sandbox,
-        detect: PreviewDetect,
-        projectId: string,
-    ): Promise<void> {
-        for (const revision of ["head", "base"] as const) {
-            const worktree = `${WORKSPACE_DIR}/${revision}`;
-            await PreviewWorkspace.write_placeholder_env(
-                sandbox,
-                worktree,
-                detect.nextAppDir!,
-                detect,
-                projectId,
-            );
-            await PreviewWorkspace.disable_middleware(sandbox, worktree, detect.middlewarePaths);
-        }
     }
 
     private static async start_sandbox(
@@ -235,16 +237,8 @@ export default class ProductDiffRunner {
                     apiKey: ENV.SERVER_E2B_API_KEY,
                     timeoutMs: SANDBOX_TIMEOUT_MS,
                 });
-                if (await PreviewRunner.supports_current_protocol(warm)) {
-                    log.info("booted from the project's dependency snapshot", {
-                        snapshot: snapshotId,
-                    });
-                    return warm;
-                }
+                if (await PreviewRunner.supports_current_protocol(warm)) return warm;
 
-                log.warn("dependency snapshot has an outdated preview runner; starting cold", {
-                    snapshot: snapshotId,
-                });
                 await warm.kill();
                 await PreviewDeps.forget_snapshot(projectId);
             } catch (error) {
@@ -261,71 +255,35 @@ export default class ProductDiffRunner {
         });
     }
 
-    private static async bring_up_head(
-        sandbox: Sandbox,
-        detect: PreviewDetect,
-        runId: string,
-        log: Logger,
-    ): Promise<{
-        server: PreviewServerHandle;
-        surface: PreviewSurface;
-        routeFiles: string[];
-    } | null> {
-        const worktree = `${WORKSPACE_DIR}/head`;
-        const scaffold = await PreviewRunner.scaffold(sandbox, worktree, detect);
-        const router: NextApplicationRouter =
-            detect.framework === "NextAppRouter" ? "AppRouter" : "PagesRouter";
-        const surface = await PreviewRunner.create_next_preview_surface(sandbox, {
-            workspaceRoot: worktree,
-            applicationPath: detect.nextAppDir!,
-            routeSegment: `preview-${runId}`,
-            router,
-        });
-        const server = await PreviewServer.start(
-            sandbox,
-            { worktree, nextAppDir: detect.nextAppDir!, port: HEAD_PORT, label: "head" },
-            SERVER_ENV,
-        );
-
-        if (await PreviewServer.wait_until_ready(sandbox, server, log)) {
-            return {
-                server,
-                surface,
-                routeFiles: [...scaffold.routeFiles, ...surface.generatedFiles],
-            };
-        }
-
-        const tail = await PreviewServer.log_tail(sandbox, server);
-        log.warn("head revision did not render", { router });
-        if (tail) log.block("head dev server output", tail);
-        await PreviewServer.stop(server);
-        await PreviewRunner.remove_next_preview_surface(sandbox, surface);
-        return null;
-    }
-
-    private static async preview_diagnostics(
-        sandbox: Sandbox,
-        server: PreviewServerHandle | null,
-    ): Promise<string> {
-        if (!server) return "";
-        const output = await PreviewServer.log_tail(sandbox, server);
-        return output ? `dev server\n${output}` : "";
+    private static async cleanup_revision(
+        adapter: ProductDiffAdapter,
+        revision: "head" | "base",
+        workspaceRoot: string,
+        preparedRevision: ProductDiffPreparedRevision | null,
+        preview: ProductDiffRunningPreview | null,
+    ): Promise<void> {
+        await adapter.cleanup_revision({ revision, workspaceRoot, preparedRevision, preview });
     }
 
     static async run(productDiffId: string): Promise<void> {
         const claim = await prisma.productDiff.updateMany({
             where: { id: productDiffId, status: "Pending" },
-            data: { status: "Generating", error: null },
+            data: { status: "Generating", error: null, diagnostics: Prisma.JsonNull },
         });
         if (claim.count === 0) return;
 
         const log = Logger.scope(`product-diff:${productDiffId.slice(-8)}`);
         const startedAt = Date.now();
         let sandbox: Sandbox | null = null;
-        let activeServer: PreviewServerHandle | null = null;
+        let adapter: ProductDiffAdapter | null = null;
+        let headPrepared: ProductDiffPreparedRevision | null = null;
+        let basePrepared: ProductDiffPreparedRevision | null = null;
+        let headPreview: ProductDiffRunningPreview | null = null;
+        let basePreview: ProductDiffRunningPreview | null = null;
+        let headWorkspaceRoot = "";
+        let baseWorkspaceRoot = "";
         let githubToken = "";
         let stage = "load Product Diff";
-        let previewApplicationPath: string | null = null;
         const step = (name: string) => {
             stage = name;
             log.step(name);
@@ -335,10 +293,16 @@ export default class ProductDiffRunner {
             const productDiff = await prisma.productDiff.findUniqueOrThrow({
                 where: { id: productDiffId },
                 include: {
-                    issue: { include: { project: { include: { githubInstallation: true } } } },
+                    issue: {
+                        include: {
+                            project: { include: { githubInstallation: true, projectConfig: true } },
+                        },
+                    },
                 },
             });
             const project = productDiff.issue.project;
+            const configuration = project.projectConfig?.productDiffPreviewConfig as
+                ProductDiffPreviewConfiguration | null | undefined;
 
             step("validate Product Diff metadata");
             if (
@@ -349,7 +313,7 @@ export default class ProductDiffRunner {
                 !SAFE_SHA.test(productDiff.baseSha) ||
                 !SAFE_SHA.test(productDiff.headSha)
             ) {
-                throw new Error("Product Diff repository metadata is invalid");
+                throw new Error("invalid Product Diff repository metadata");
             }
 
             step("create GitHub installation token");
@@ -360,7 +324,7 @@ export default class ProductDiffRunner {
 
             step("start preview sandbox");
             sandbox = await this.start_sandbox(project.previewSnapshotId, project.id, log);
-            await sandbox.commands.run(`mkdir -p ${PREVIEW_DIR} ${SHOTS_DIR}`);
+            await sandbox.commands.run(`mkdir -p ${SHOTS_DIR}`);
 
             step("fetch both revisions");
             const remote = `https://x-access-token:${githubToken}@github.com/${project.githubRepoFullName}.git`;
@@ -373,52 +337,87 @@ export default class ProductDiffRunner {
                 pullNumber: productDiff.pullNumber,
             });
 
-            step("inspect the project");
+            step("select Product Diff adapter");
             const changedPaths = await PreviewWorkspace.changed_paths(
                 sandbox,
                 REPO_DIR,
                 productDiff.baseSha,
                 productDiff.headSha,
             );
-            const detect = await PreviewRunner.detect(
+            headWorkspaceRoot = `${WORKSPACE_DIR}/head`;
+            baseWorkspaceRoot = `${WORKSPACE_DIR}/base`;
+            const registry = ProductDiffAdapterRegistry.registered({
                 sandbox,
-                `${WORKSPACE_DIR}/head`,
+                projectId: project.id,
+                log,
+                environment: SERVER_ENV,
+            });
+            adapter = await registry.resolve({
+                workspaceRoot: headWorkspaceRoot,
                 changedPaths,
-            );
-
-            if (!detect.supported || !detect.nextAppDir || !detect.framework) {
-                log.info("project cannot be previewed", { reason: detect.reason });
-                await sandbox.kill();
-                sandbox = null;
+                configuration,
+            });
+            if (!adapter) {
                 await this.settle(productDiffId, "Unsupported", {
-                    error: `Product Diff currently supports Next.js projects only — ${detect.reason ?? "no supported app found"}`,
+                    error: "No installed Product Diff adapter supports this project.",
+                    diagnostics: static_diagnostic(
+                        "PRODUCT_DIFF_ADAPTER_UNSUPPORTED",
+                        "adapter-selection",
+                        "No installed Product Diff adapter supports this project.",
+                    ) as unknown as Prisma.InputJsonValue,
                 });
                 return;
             }
-            previewApplicationPath = detect.nextAppDir;
+
+            const detection = await adapter.detect({
+                workspaceRoot: headWorkspaceRoot,
+                changedPaths,
+                configuration,
+            });
+            const resolution = await adapter.resolve_workspace({
+                workspaceRoot: headWorkspaceRoot,
+                changedPaths,
+                configuration,
+                detection,
+            });
+            if (!resolution.plan) {
+                await this.settle(productDiffId, "ConfigurationRequired", {
+                    error: "Product Diff needs preview configuration for this project.",
+                    diagnostics: (resolution.diagnostics[0] ??
+                        static_diagnostic(
+                            "PRODUCT_DIFF_CONFIGURATION_REQUIRED",
+                            "workspace-resolution",
+                            "Product Diff needs preview configuration for this project.",
+                            adapter.id,
+                        )) as unknown as Prisma.InputJsonValue,
+                });
+                return;
+            }
+            const workspacePlan = resolution.plan;
 
             step("prepare both revisions");
-            await this.prepare_revisions(sandbox, detect, project.id);
+            headPrepared = await adapter.prepare_revision({
+                revision: "head",
+                workspaceRoot: headWorkspaceRoot,
+                plan: workspacePlan,
+            });
+            basePrepared = await adapter.prepare_revision({
+                revision: "base",
+                workspaceRoot: baseWorkspaceRoot,
+                plan: workspacePlan,
+            });
 
             step("install dependencies");
-            const cacheKey = PreviewDeps.cache_key({
-                packageManager: detect.packageManager!,
-                lockfileRelPath: detect.lockfileRelPath!,
-                lockfileSha256: detect.lockfileSha256!,
-            });
+            const cacheKey = PreviewDeps.cache_key(workspacePlan.dependency);
             const warmCache =
                 project.previewDepsHash === cacheKey && (await PreviewDeps.cache_present(sandbox));
-
-            if (warmCache) {
-                log.info("reusing the project's cached dependencies");
-            } else {
-                await PreviewDeps.install(sandbox, `${WORKSPACE_DIR}/head`, detect, log);
+            if (!warmCache) {
+                await PreviewDeps.install(sandbox, headWorkspaceRoot, workspacePlan, log);
                 await PreviewDeps.move_to_cache(
                     sandbox,
-                    `${WORKSPACE_DIR}/head`,
-                    detect.workspaceDirs,
+                    headWorkspaceRoot,
+                    workspacePlan.dependency.workspaceDirs,
                 );
-
                 if (Date.now() - startedAt < SNAPSHOT_DEADLINE_MS) {
                     step("save the dependency snapshot");
                     await sandbox.commands.run(`rm -rf ${REPO_DIR} ${WORKSPACE_DIR}`);
@@ -428,7 +427,6 @@ export default class ProductDiffRunner {
                         cacheKey,
                         log,
                     );
-
                     step("restore both revisions after snapshotting");
                     await PreviewWorkspace.checkout(sandbox, {
                         repoDir: REPO_DIR,
@@ -438,20 +436,25 @@ export default class ProductDiffRunner {
                         headSha: productDiff.headSha,
                         pullNumber: productDiff.pullNumber,
                     });
-                    await this.prepare_revisions(sandbox, detect, project.id);
-                } else {
-                    log.warn(
-                        "skipping the dependency snapshot to stay within the sandbox lifetime",
-                    );
+                    headPrepared = await adapter.prepare_revision({
+                        revision: "head",
+                        workspaceRoot: headWorkspaceRoot,
+                        plan: workspacePlan,
+                    });
+                    basePrepared = await adapter.prepare_revision({
+                        revision: "base",
+                        workspaceRoot: baseWorkspaceRoot,
+                        plan: workspacePlan,
+                    });
                 }
             }
 
             step("populate both revisions with dependencies");
-            for (const revision of ["head", "base"] as const) {
+            for (const worktree of [headWorkspaceRoot, baseWorkspaceRoot]) {
                 await PreviewDeps.restore_into(
                     sandbox,
-                    `${WORKSPACE_DIR}/${revision}`,
-                    detect.workspaceDirs,
+                    worktree,
+                    workspacePlan.dependency.workspaceDirs,
                 );
             }
 
@@ -461,8 +464,8 @@ export default class ProductDiffRunner {
                 prompt({
                     baseSha: productDiff.baseSha,
                     headSha: productDiff.headSha,
-                    nextAppDir: detect.nextAppDir,
-                    framework: detect.framework,
+                    applicationPath: workspacePlan.applicationPath,
+                    framework: workspacePlan.framework,
                 }),
             );
             await ClaudeRun.execute(sandbox, log, {
@@ -475,156 +478,107 @@ export default class ProductDiffRunner {
             });
 
             step("read the harness the agent wrote");
-            const harness = await PreviewRunner.read_manifest(
-                sandbox,
-                `${WORKSPACE_DIR}/head/${detect.nextAppDir}`,
-            );
+            const applicationRoot = `${headWorkspaceRoot}/${workspacePlan.applicationPath}`;
+            const harness = await PreviewRunner.read_manifest(sandbox, applicationRoot);
             const restored = await PreviewWorkspace.restore_unexpected_edits(
                 sandbox,
-                `${WORKSPACE_DIR}/head`,
+                headWorkspaceRoot,
                 [],
                 log,
             );
-
-            step("apply the harness to the base revision");
             await PreviewWorkspace.copy_harness(
                 sandbox,
-                `${WORKSPACE_DIR}/head`,
-                `${WORKSPACE_DIR}/base`,
-                detect.nextAppDir,
+                headWorkspaceRoot,
+                baseWorkspaceRoot,
+                workspacePlan.applicationPath,
             );
 
-            step("start head dev server");
-            const head = await this.bring_up_head(sandbox, detect, productDiffId, log);
-            if (!head) {
-                const reason = detect.hasExistingPagesDir
-                    ? "the app's root layout could not render and the project already uses a pages directory"
-                    : "the app could not render with placeholder configuration";
-                await sandbox.kill();
-                sandbox = null;
-                const message = `Product Diff could not start this project — ${reason}`;
-                await this.settle(productDiffId, "PreviewUnavailable", {
-                    error: message,
-                    diagnostics: preview_unavailable_diagnostic(
-                        "start head dev server",
-                        message,
-                        previewApplicationPath,
-                    ) as unknown as Prisma.InputJsonValue,
+            const capture_revision = async (
+                revision: "head" | "base",
+                port: number,
+                preparedRevision: ProductDiffPreparedRevision,
+            ): Promise<PreviewCapture> => {
+                const workspaceRoot = revision === "head" ? headWorkspaceRoot : baseWorkspaceRoot;
+                step(`start ${revision} preview`);
+                const preview = await adapter!.start_revision({
+                    revision,
+                    workspaceRoot,
+                    plan: workspacePlan,
+                    preparedRevision,
+                    port,
                 });
-                return;
-            }
-            activeServer = head.server;
+                if (revision === "head") headPreview = preview;
+                else basePreview = preview;
 
-            step("verify the head preview surface");
-            const headCheck = await PreviewRunner.check(sandbox, {
-                baseUrl: head.server.url,
-                routePath: head.surface.routePath,
-                workspaceRoot: `${WORKSPACE_DIR}/head`,
-                nextAppDir: detect.nextAppDir,
-            });
-            if (!headCheck.ok) {
-                const failed = headCheck.results.find((result) => !result.ok);
-                throw preview_check_error("head", failed, head.surface.routePath);
-            }
+                step(`verify ${revision} preview`);
+                const health = await adapter!.verify_revision({ preview, plan: workspacePlan });
+                if (!health.ready) {
+                    throw new ProductDiffPreviewUnavailableError(
+                        health.diagnostics[0] ??
+                            static_diagnostic(
+                                "PREVIEW_UNAVAILABLE",
+                                "preview-verification",
+                                "The preview could not be verified.",
+                                adapter!.id,
+                                workspacePlan.applicationPath,
+                                workspacePlan.workspaceKind,
+                            ),
+                    );
+                }
 
-            step("photograph the head revision");
-            const headShots = await PreviewRunner.capture(sandbox, {
-                url: head.server.url,
-                routePath: head.surface.routePath,
-                side: "head",
-                workspaceRoot: `${WORKSPACE_DIR}/head`,
-                nextAppDir: detect.nextAppDir,
-                outputDir: SHOTS_DIR,
-                viewports: VIEWPORTS,
-                frozenNowMs: FROZEN_NOW_MS,
-                maxShots: MAX_SHOTS,
-            });
-            const failedHeadShot = headShots.captures.find(
-                (capture) => capture.status === "failed",
-            );
-            if (!headShots.ok || failedHeadShot) {
-                throw new Error(
-                    `head screenshot validation failed${failedHeadShot ? `: ${failedHeadShot.targetId}/${failedHeadShot.stateId} ${failedHeadShot.error ?? "capture failed"}` : ""}`,
+                step(`capture ${revision} preview`);
+                const capture = await PreviewRunner.capture(sandbox!, {
+                    url: preview.url,
+                    routePath: preview.surfacePath,
+                    side: revision,
+                    workspaceRoot,
+                    nextAppDir: workspacePlan.applicationPath,
+                    outputDir: SHOTS_DIR,
+                    viewports: VIEWPORTS,
+                    frozenNowMs: FROZEN_NOW_MS,
+                    maxShots: MAX_SHOTS,
+                });
+                const failed = capture.captures.find((shot) => shot.status === "failed");
+                if (!capture.ok || failed) {
+                    throw new ProductDiffPreviewUnavailableError(
+                        static_diagnostic(
+                            "PREVIEW_CAPTURE_UNAVAILABLE",
+                            "capture",
+                            "The verified preview could not be captured.",
+                            adapter!.id,
+                            workspacePlan.applicationPath,
+                            workspacePlan.workspaceKind,
+                        ),
+                    );
+                }
+                await this.cleanup_revision(
+                    adapter!,
+                    revision,
+                    workspaceRoot,
+                    preparedRevision,
+                    preview,
                 );
-            }
+                if (revision === "head") headPreview = null;
+                else basePreview = null;
+                return capture;
+            };
 
-            step("stop the head dev server");
-            await PreviewServer.stop(head.server);
-            await PreviewRunner.remove_next_preview_surface(sandbox, head.surface);
-            activeServer = null;
-
-            step("start base dev server");
-            await PreviewRunner.scaffold(sandbox, `${WORKSPACE_DIR}/base`, detect);
-            const baseSurface = await PreviewRunner.create_next_preview_surface(sandbox, {
-                workspaceRoot: `${WORKSPACE_DIR}/base`,
-                applicationPath: detect.nextAppDir,
-                routeSegment: head.surface.routePath.slice(1),
-                router: head.surface.router,
-            });
-            const baseServer = await PreviewServer.start(
-                sandbox,
-                {
-                    worktree: `${WORKSPACE_DIR}/base`,
-                    nextAppDir: detect.nextAppDir,
-                    port: BASE_PORT,
-                    label: "base",
-                },
-                SERVER_ENV,
-            );
-            activeServer = baseServer;
-            const baseUsable = await PreviewServer.wait_until_ready(sandbox, baseServer, log);
-            if (!baseUsable) {
-                const tail = await PreviewServer.log_tail(sandbox, baseServer);
-                log.warn("base revision never became ready");
-                if (tail) log.block("base dev server output", tail);
-                throw new Error(
-                    `base revision never became ready${tail ? `: ${diagnostic_summary(tail)}` : ""}`,
-                );
-            }
-
-            step("verify the base preview surface");
-            const baseCheck = await PreviewRunner.check(sandbox, {
-                baseUrl: baseServer.url,
-                routePath: baseSurface.routePath,
-                workspaceRoot: `${WORKSPACE_DIR}/base`,
-                nextAppDir: detect.nextAppDir,
-            });
-            if (!baseCheck.ok) {
-                const failed = baseCheck.results.find((result) => !result.ok);
-                throw preview_check_error("base", failed, baseSurface.routePath);
-            }
-
-            step("photograph the base revision");
-            const baseShots = await PreviewRunner.capture(sandbox, {
-                url: baseServer.url,
-                routePath: baseSurface.routePath,
-                side: "base",
-                workspaceRoot: `${WORKSPACE_DIR}/base`,
-                nextAppDir: detect.nextAppDir,
-                outputDir: SHOTS_DIR,
-                viewports: VIEWPORTS,
-                frozenNowMs: FROZEN_NOW_MS,
-                maxShots: MAX_SHOTS,
-            });
-            const failedBaseShot = baseShots.captures.find(
-                (capture) => capture.status === "failed",
-            );
-            if (!baseShots.ok || failedBaseShot) {
-                throw new Error(
-                    `base screenshot validation failed${failedBaseShot ? `: ${failedBaseShot.targetId}/${failedBaseShot.stateId} ${failedBaseShot.error ?? "capture failed"}` : ""}`,
-                );
-            }
-
-            step("stop the base dev server");
-            await PreviewServer.stop(baseServer);
-            await PreviewRunner.remove_next_preview_surface(sandbox, baseSurface);
-            activeServer = null;
+            const headShots = await capture_revision("head", HEAD_PORT, headPrepared);
+            const baseShots = await capture_revision("base", BASE_PORT, basePrepared);
 
             step("pair the screenshots");
             const pair = await PreviewRunner.pair(sandbox, headShots.captures, baseShots.captures);
             if (!pair.ok) {
-                const first = pair.shots.find((shot) => shot.error)?.error;
-                throw new Error(`no target could be rendered${first ? `: ${first}` : ""}`);
+                throw new ProductDiffPreviewUnavailableError(
+                    static_diagnostic(
+                        "PREVIEW_PAIRING_UNAVAILABLE",
+                        "pairing",
+                        "The preview screenshots could not be paired.",
+                        adapter.id,
+                        workspacePlan.applicationPath,
+                        workspacePlan.workspaceKind,
+                    ),
+                );
             }
 
             step("recheck the pull request before upload");
@@ -634,8 +588,6 @@ export default class ProductDiffRunner {
                 productDiff.pullNumber,
             );
             if (!is_current_product_diff(beforeUpload, productDiff.baseSha, productDiff.headSha)) {
-                await sandbox.kill();
-                sandbox = null;
                 await this.settle(productDiffId, "Stale");
                 return;
             }
@@ -650,88 +602,73 @@ export default class ProductDiffRunner {
                 project.githubRepoFullName,
                 productDiff.pullNumber,
             );
+            const manifest = ProductDiffArtifacts.build_manifest({
+                harness,
+                pair,
+                framework: framework_from_plan(workspacePlan),
+                viewports: VIEWPORTS,
+                warnings: restored.length
+                    ? [`the agent edited ${restored.length} file(s) outside its harness folder`]
+                    : [],
+                adapter: {
+                    id: adapter.id,
+                    applicationPath: workspacePlan.applicationPath,
+                    workspaceKind: workspacePlan.workspaceKind,
+                    router: workspacePlan.router,
+                },
+                diagnostics: resolution.diagnostics,
+            });
             const current = is_current_product_diff(
                 afterUpload,
                 productDiff.baseSha,
                 productDiff.headSha,
             );
-
-            const warnings = [...detect.warnings];
-            if (detect.middlewarePaths.length) {
-                warnings.push("the project's middleware was disabled so targets could render");
-            }
-            if (restored.length) {
-                warnings.push(
-                    `the agent edited ${restored.length} file(s) outside its harness folder; they were restored`,
-                );
-            }
-            const manifest = ProductDiffArtifacts.build_manifest({
-                harness,
-                pair,
-                framework: detect.framework,
-                viewports: VIEWPORTS,
-                warnings,
-            });
-
-            step("destroy preview sandbox");
-            await sandbox.kill();
-            sandbox = null;
-
-            step("publish Product Diff");
             await this.settle(productDiffId, current ? "Ready" : "Stale", {
                 manifest: manifest as unknown as Prisma.InputJsonValue,
                 artifactPrefix: prefix,
             });
-            log.success("Product Diff ready", {
-                targets: manifest.targets.length,
-                shots: pair.shots.length,
-            });
         } catch (error) {
-            const diagnostics =
-                sandbox && activeServer
-                    ? await this.preview_diagnostics(sandbox, activeServer)
-                    : "";
-            const redactedDiagnostics = redact(diagnostics, [
-                githubToken,
-                ENV.SERVER_CLAUDE_CODE_OAUTH_TOKEN,
-            ]);
-            if (redactedDiagnostics) {
-                log.block("preview diagnostics", redactedDiagnostics);
-            }
-            if (sandbox) {
-                try {
-                    await sandbox.kill();
-                } catch {
-                    // E2B timeout remains final cleanup.
-                }
-            }
-            const status = product_diff_failure_status(stage);
-            const message =
-                status === "PreviewUnavailable"
-                    ? preview_unavailable_error_message(stage, error)
-                    : sanitize_preview_diagnostic_message(
-                          redact(
-                              redactedDiagnostics
-                                  ? `${describe_product_diff_failure(stage, error)} | dev server: ${diagnostic_summary(redactedDiagnostics)}`
-                                  : describe_product_diff_failure(stage, error),
-                              [githubToken, ENV.SERVER_CLAUDE_CODE_OAUTH_TOKEN],
-                          ),
-                      );
-            log.error("generation failed", new Error(message));
-            await this.settle(
-                productDiffId,
-                status,
-                status === "PreviewUnavailable"
-                    ? {
-                          error: message,
-                          diagnostics: preview_unavailable_diagnostic(
-                              stage,
-                              message,
-                              previewApplicationPath,
-                          ) as unknown as Prisma.InputJsonValue,
-                      }
-                    : { error: message },
+            const previewError = error instanceof ProductDiffPreviewUnavailableError ? error : null;
+            const status: ProductDiffTerminalStatus = previewError
+                ? "PreviewUnavailable"
+                : "Failed";
+            const diagnostic =
+                previewError?.diagnostic ??
+                static_diagnostic(
+                    "PRODUCT_DIFF_RUN_FAILED",
+                    "orchestration",
+                    failure_message(stage),
+                    adapter?.id ?? null,
+                );
+            const safeRuntimeMessage = error instanceof Error ? error.message : String(error);
+            log.error(
+                "generation failed",
+                new Error(
+                    redact(safeRuntimeMessage, [githubToken, ENV.SERVER_CLAUDE_CODE_OAUTH_TOKEN]),
+                ),
             );
+            await this.settle(productDiffId, status, {
+                error: previewError?.diagnostic.message ?? failure_message(stage),
+                diagnostics: diagnostic as unknown as Prisma.InputJsonValue,
+            });
+        } finally {
+            if (adapter) {
+                await this.cleanup_revision(
+                    adapter,
+                    "head",
+                    headWorkspaceRoot,
+                    headPrepared,
+                    headPreview,
+                ).catch(() => undefined);
+                await this.cleanup_revision(
+                    adapter,
+                    "base",
+                    baseWorkspaceRoot,
+                    basePrepared,
+                    basePreview,
+                ).catch(() => undefined);
+            }
+            await sandbox?.kill().catch(() => undefined);
         }
     }
 }

@@ -13,6 +13,13 @@ const workspacePlan: ProductDiffWorkspacePlan = {
     launchCommand: "bun run dev",
     healthPath: "/",
     router: "AppRouter",
+    framework: "NextAppRouter",
+    dependency: {
+        packageManager: "bun",
+        lockfileRelPath: "bun.lock",
+        lockfileSha256: "lock-hash",
+        workspaceDirs: ["."],
+    },
 };
 const originalCreateNextPreviewSurface = PreviewRunner.create_next_preview_surface;
 
