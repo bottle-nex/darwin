@@ -1,5 +1,5 @@
 import { join } from "node:path";
-import type { Browser, Locator } from "playwright";
+import type { Browser, Locator, Request } from "playwright";
 import { open_browser, open_deterministic_context, settle_page } from "./browser";
 import {
     HARNESS_ROOT_ATTRIBUTE,
@@ -46,6 +46,21 @@ export async function next_error_overlay_detail(
         .catch(() => "");
 }
 
+function request_redirected(request: Request): boolean {
+    return request.redirectedFrom() !== null;
+}
+
+function expected_navigation(url: string, finalUrl: string): boolean {
+    const expected = new URL(url);
+    const received = new URL(finalUrl);
+    return (
+        expected.origin === received.origin &&
+        expected.pathname === received.pathname &&
+        expected.search === received.search &&
+        expected.hash === received.hash
+    );
+}
+
 async function check_one(
     browser: Browser,
     baseUrl: string,
@@ -72,6 +87,16 @@ async function check_one(
         });
         const httpStatus = response?.status() ?? null;
 
+        if (response && request_redirected(response.request())) {
+            return fail(
+                targetId,
+                stateId,
+                url,
+                "Redirected",
+                `navigation followed an HTTP redirect before ending at ${page.url()}`,
+                httpStatus,
+            );
+        }
         if (httpStatus === null || httpStatus >= 400) {
             const body = await page.content().catch(() => "");
             return fail(
@@ -83,7 +108,7 @@ async function check_one(
                 httpStatus,
             );
         }
-        if (!page.url().includes(`${routePath}/`)) {
+        if (!expected_navigation(url, page.url())) {
             return fail(
                 targetId,
                 stateId,

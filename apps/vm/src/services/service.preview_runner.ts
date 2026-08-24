@@ -8,13 +8,20 @@ const RUNTIME_PROTOCOL_VERSION = 5;
 const SAFE_ID = /^[a-z0-9][a-z0-9-]{0,48}$/;
 const MAX_WARNINGS = 20;
 const MAX_WARNING_LENGTH = 400;
+const ADVISORY_WARNINGS_TRUNCATED = "advisory warnings were truncated to fit preview limits";
 
 const advisoryWarningsSchema = z
     .array(z.string())
     .catch([])
-    .transform((values) =>
-        values.slice(0, MAX_WARNINGS).map((value) => value.slice(0, MAX_WARNING_LENGTH)),
-    );
+    .transform((values) => {
+        const truncated =
+            values.length > MAX_WARNINGS ||
+            values.some((value) => value.length > MAX_WARNING_LENGTH);
+        const normalized = values
+            .slice(0, truncated ? MAX_WARNINGS - 1 : MAX_WARNINGS)
+            .map((value) => value.slice(0, MAX_WARNING_LENGTH));
+        return truncated ? [...normalized, ADVISORY_WARNINGS_TRUNCATED] : normalized;
+    });
 
 const packageManagerSchema = z.enum(["bun", "pnpm", "yarn", "npm"]);
 export type PackageManager = z.infer<typeof packageManagerSchema>;

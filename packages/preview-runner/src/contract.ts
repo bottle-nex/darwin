@@ -13,7 +13,7 @@ export const advisoryWarningsSchema = z
             values.length > MAX_WARNINGS ||
             values.some((value) => value.length > MAX_WARNING_LENGTH);
         const normalized = values
-            .slice(0, MAX_WARNINGS)
+            .slice(0, truncated ? MAX_WARNINGS - 1 : MAX_WARNINGS)
             .map((value) => value.slice(0, MAX_WARNING_LENGTH));
         return truncated ? [...normalized, ADVISORY_WARNINGS_TRUNCATED] : normalized;
     });

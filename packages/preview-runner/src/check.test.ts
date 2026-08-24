@@ -27,12 +27,26 @@ function fixture_root(): string {
     return root;
 }
 
+let consoleError = true;
+let redirected = false;
+let currentUrl = "";
+
 const page = {
     on(event: string, listener: (value: { type: () => string; text: () => string }) => void) {
-        if (event === "console") listener({ type: () => "error", text: () => "target failure" });
+        if (event === "console" && consoleError) {
+            listener({ type: () => "error", text: () => "target failure" });
+        }
     },
-    goto: async () => ({ status: () => 200 }),
-    url: () => "http://127.0.0.1:41337/preview-run-a/failing-target",
+    goto: async (url: string) => {
+        currentUrl = url;
+        return {
+            status: () => 200,
+            request: () => ({
+                redirectedFrom: () => (redirected ? {} : null),
+            }),
+        };
+    },
+    url: () => currentUrl,
     content: async () => "",
     locator: () => ({
         count: async () => 1,
@@ -70,6 +84,26 @@ test("rejects a target that logs a console error before capture", async () => {
     expect(result.results[1]).toMatchObject({ problem: "ConsoleError" });
 });
 
+test("rejects a redirect even when it returns to the expected preview route", async () => {
+    consoleError = false;
+    redirected = true;
+    const root = fixture_root();
+
+    const result = await check({
+        baseUrl: "http://127.0.0.1:41337",
+        routePath: "/preview-run-a",
+        workspaceRoot: root,
+        nextAppDir: "apps/web",
+        navigationTimeoutMs: 10_000,
+    });
+
+    expect(result.ok).toBe(false);
+    expect(result.results[1]).toMatchObject({ problem: "Redirected" });
+});
+
 afterEach(() => {
+    consoleError = true;
+    redirected = false;
+    currentUrl = "";
     while (fixtureRoots.length) rmSync(fixtureRoots.pop()!, { recursive: true, force: true });
 });

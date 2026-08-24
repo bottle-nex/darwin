@@ -1,7 +1,7 @@
 import type { Prisma } from "@trymatcha/database";
 import { prisma } from "@trymatcha/database";
 import Logger from "@trymatcha/logger";
-import type { ProductDiffViewport } from "@trymatcha/types";
+import type { ProductDiffDiagnostic, ProductDiffViewport } from "@trymatcha/types";
 import { CommandExitError, Sandbox } from "e2b";
 
 import { ENV } from "../conf/config.env";
@@ -43,6 +43,36 @@ const SERVER_ENV = {
     CI: "1",
     TZ: "UTC",
 };
+const PREVIEW_UNAVAILABLE_STAGES = new Set([
+    "start head dev server",
+    "verify the head preview surface",
+    "photograph the head revision",
+    "start base dev server",
+    "verify the base preview surface",
+    "photograph the base revision",
+]);
+
+export function product_diff_failure_status(stage: string): "PreviewUnavailable" | "Failed" {
+    return PREVIEW_UNAVAILABLE_STAGES.has(stage) ? "PreviewUnavailable" : "Failed";
+}
+
+function preview_diagnostic(
+    stage: string,
+    message: string,
+    applicationPath: string | null,
+): ProductDiffDiagnostic {
+    const browserValidation = stage.includes("verify") || stage.includes("photograph");
+    return {
+        code: browserValidation
+            ? "PREVIEW_BROWSER_VALIDATION_FAILED"
+            : "PREVIEW_SERVER_UNAVAILABLE",
+        stage: browserValidation ? "browser-validation" : "startup",
+        message,
+        adapter: "next",
+        applicationPath,
+        workspaceKind: null,
+    };
+}
 
 function is_current_product_diff(
     pull: { state: string; baseSha: string; headSha: string },
@@ -146,7 +176,7 @@ Hard rules
 export default class ProductDiffRunner {
     private static async settle(
         productDiffId: string,
-        status: "Ready" | "Stale" | "Failed" | "Unsupported",
+        status: "Ready" | "Stale" | "Failed" | "Unsupported" | "PreviewUnavailable",
         data: Prisma.ProductDiffUpdateManyMutationInput = {},
     ): Promise<void> {
         await prisma.productDiff.updateMany({
@@ -274,6 +304,7 @@ export default class ProductDiffRunner {
         let activeServer: PreviewServerHandle | null = null;
         let githubToken = "";
         let stage = "load Product Diff";
+        let previewApplicationPath: string | null = null;
         const step = (name: string) => {
             stage = name;
             log.step(name);
@@ -343,6 +374,7 @@ export default class ProductDiffRunner {
                 });
                 return;
             }
+            previewApplicationPath = detect.nextAppDir;
 
             step("prepare both revisions");
             await this.prepare_revisions(sandbox, detect, project.id);
@@ -449,8 +481,14 @@ export default class ProductDiffRunner {
                     : "the app could not render with placeholder configuration";
                 await sandbox.kill();
                 sandbox = null;
-                await this.settle(productDiffId, "Unsupported", {
-                    error: `Product Diff could not start this project — ${reason}`,
+                const message = `Product Diff could not start this project — ${reason}`;
+                await this.settle(productDiffId, "PreviewUnavailable", {
+                    error: message,
+                    diagnostics: preview_diagnostic(
+                        "start head dev server",
+                        message,
+                        previewApplicationPath,
+                    ) as unknown as Prisma.InputJsonValue,
                 });
                 return;
             }
@@ -658,7 +696,21 @@ export default class ProductDiffRunner {
                 [githubToken, ENV.SERVER_CLAUDE_CODE_OAUTH_TOKEN],
             ).slice(0, 500);
             log.error("generation failed", new Error(message));
-            await this.settle(productDiffId, "Failed", { error: message });
+            const status = product_diff_failure_status(stage);
+            await this.settle(
+                productDiffId,
+                status,
+                status === "PreviewUnavailable"
+                    ? {
+                          error: message,
+                          diagnostics: preview_diagnostic(
+                              stage,
+                              message,
+                              previewApplicationPath,
+                          ) as unknown as Prisma.InputJsonValue,
+                      }
+                    : { error: message },
+            );
         }
     }
 }

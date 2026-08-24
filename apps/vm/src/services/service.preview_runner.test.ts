@@ -62,3 +62,29 @@ test("sends a VM-provided job-scoped surface request to the sandbox runner", asy
     });
     expect(surface.routePath).toBe("/preview-run-a");
 });
+
+test("preserves the truncation sentinel when normalizing harness warnings", async () => {
+    const sandbox = {
+        files: {
+            read: async () =>
+                JSON.stringify({
+                    targets: [
+                        {
+                            id: "header-nav",
+                            label: "Header navigation",
+                            sourcePath: "components/HeaderNav.tsx",
+                            states: [{ id: "default", label: "Default" }],
+                        },
+                    ],
+                    warnings: Array.from({ length: 21 }, (_, index) => `warning-${index}`),
+                }),
+        },
+    } as unknown as Sandbox;
+
+    const manifest = await PreviewRunner.read_manifest(sandbox, "/workspace/apps/web");
+
+    expect(manifest.warnings).toHaveLength(20);
+    expect(manifest.warnings.at(-1)).toBe("advisory warnings were truncated to fit preview limits");
+    expect(manifest.warnings).toContain("warning-18");
+    expect(manifest.warnings).not.toContain("warning-19");
+});
