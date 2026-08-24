@@ -21,10 +21,7 @@ import ProductDiffPreviewLifecycle, {
 } from "../../service.preview_lifecycle";
 import { resolve_next_workspace } from "./service.next_workspace_resolver";
 import NextPreviewLauncher from "./service.next_preview_launcher";
-import PreviewRunner, {
-    type NextWorkspaceInspection,
-    type PreviewDetect,
-} from "../../../service.preview_runner";
+import PreviewRunner, { type NextWorkspaceInspection } from "../../../service.preview_runner";
 import PreviewWorkspace from "../../../service.preview_workspace";
 
 function detection_diagnostic(inspection: NextWorkspaceInspection): ProductDiffDiagnostic {
@@ -38,10 +35,30 @@ function detection_diagnostic(inspection: NextWorkspaceInspection): ProductDiffD
     };
 }
 
+function normalized_application_path(applicationPath: string | null): string | null {
+    if (!applicationPath) return null;
+    const normalized = applicationPath.replaceAll("\\", "/").replace(/^\.\//, "");
+    return normalized === "" ? "." : normalized;
+}
+
+function selected_detection_paths(applicationPath: string): string[] {
+    return [applicationPath === "." ? "package.json" : `${applicationPath}/package.json`];
+}
+
+function selection_mismatch_diagnostic(plan: ProductDiffWorkspacePlan): ProductDiffDiagnostic {
+    return {
+        code: "NEXT_APPLICATION_SELECTION_MISMATCH",
+        stage: "workspace-resolution",
+        message: "The selected Next.js application could not be prepared consistently.",
+        adapter: "next",
+        applicationPath: plan.applicationPath,
+        workspaceKind: plan.workspaceKind,
+    };
+}
+
 export default class NextProductDiffAdapter implements ProductDiffAdapter {
     readonly id = "next";
     private readonly inspections = new Map<string, NextWorkspaceInspection>();
-    private readonly detects = new Map<string, PreviewDetect>();
     private readonly previews = new Map<string, ProductDiffPreviewLifecycleRevision>();
 
     constructor(private readonly runtime: ProductDiffAdapterRuntime) {}
@@ -80,7 +97,7 @@ export default class NextProductDiffAdapter implements ProductDiffAdapter {
         const detect = await PreviewRunner.detect(
             this.runtime.sandbox,
             input.workspaceRoot,
-            input.changedPaths,
+            selected_detection_paths(resolved.applicationPath),
         );
         if (
             !detect.supported ||
@@ -102,8 +119,10 @@ export default class NextProductDiffAdapter implements ProductDiffAdapter {
                 ],
             };
         }
+        if (normalized_application_path(detect.nextAppDir) !== resolved.applicationPath) {
+            return { plan: null, diagnostics: [selection_mismatch_diagnostic(resolved)] };
+        }
 
-        this.detects.set(input.workspaceRoot, detect);
         return {
             plan: {
                 ...resolved,
@@ -122,10 +141,15 @@ export default class NextProductDiffAdapter implements ProductDiffAdapter {
     async prepare_revision(
         input: ProductDiffPrepareRevisionInput,
     ): Promise<ProductDiffPreparedRevision> {
-        const detect =
-            this.detects.get(input.workspaceRoot) ??
-            (await PreviewRunner.detect(this.runtime.sandbox, input.workspaceRoot, []));
-        if (!detect.supported) {
+        const detect = await PreviewRunner.detect(
+            this.runtime.sandbox,
+            input.workspaceRoot,
+            selected_detection_paths(input.plan.applicationPath),
+        );
+        if (
+            !detect.supported ||
+            normalized_application_path(detect.nextAppDir) !== input.plan.applicationPath
+        ) {
             throw new Error("Next preview preparation requires a supported application");
         }
 
@@ -185,7 +209,7 @@ export default class NextProductDiffAdapter implements ProductDiffAdapter {
         if (!input.preview) return;
         const preview = this.previews.get(input.preview.id);
         if (!preview) return;
-        this.previews.delete(input.preview.id);
         await ProductDiffPreviewLifecycle.cleanup_revision(this.runtime.sandbox, preview);
+        this.previews.delete(input.preview.id);
     }
 }

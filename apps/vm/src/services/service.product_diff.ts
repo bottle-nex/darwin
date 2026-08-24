@@ -61,6 +61,12 @@ class ProductDiffPreviewUnavailableError extends Error {
     }
 }
 
+class ProductDiffInternalError extends Error {
+    constructor(readonly diagnostic: ProductDiffDiagnostic) {
+        super(diagnostic.message);
+    }
+}
+
 class PreviewCheckError extends Error {}
 
 const PREVIEW_UNAVAILABLE_STAGES = new Set([
@@ -527,17 +533,31 @@ export default class ProductDiffRunner {
                 }
 
                 step(`capture ${revision} preview`);
-                const capture = await PreviewRunner.capture(sandbox!, {
-                    url: preview.url,
-                    routePath: preview.surfacePath,
-                    side: revision,
-                    workspaceRoot,
-                    nextAppDir: workspacePlan.applicationPath,
-                    outputDir: SHOTS_DIR,
-                    viewports: VIEWPORTS,
-                    frozenNowMs: FROZEN_NOW_MS,
-                    maxShots: MAX_SHOTS,
-                });
+                let capture: PreviewCapture;
+                try {
+                    capture = await PreviewRunner.capture(sandbox!, {
+                        url: preview.url,
+                        routePath: preview.surfacePath,
+                        side: revision,
+                        workspaceRoot,
+                        nextAppDir: workspacePlan.applicationPath,
+                        outputDir: SHOTS_DIR,
+                        viewports: VIEWPORTS,
+                        frozenNowMs: FROZEN_NOW_MS,
+                        maxShots: MAX_SHOTS,
+                    });
+                } catch {
+                    throw new ProductDiffPreviewUnavailableError(
+                        static_diagnostic(
+                            "PREVIEW_CAPTURE_UNAVAILABLE",
+                            "capture",
+                            "The verified preview could not be captured.",
+                            adapter!.id,
+                            workspacePlan.applicationPath,
+                            workspacePlan.workspaceKind,
+                        ),
+                    );
+                }
                 const failed = capture.captures.find((shot) => shot.status === "failed");
                 if (!capture.ok || failed) {
                     throw new ProductDiffPreviewUnavailableError(
@@ -569,11 +589,11 @@ export default class ProductDiffRunner {
             step("pair the screenshots");
             const pair = await PreviewRunner.pair(sandbox, headShots.captures, baseShots.captures);
             if (!pair.ok) {
-                throw new ProductDiffPreviewUnavailableError(
+                throw new ProductDiffInternalError(
                     static_diagnostic(
-                        "PREVIEW_PAIRING_UNAVAILABLE",
+                        "PRODUCT_DIFF_PAIRING_FAILED",
                         "pairing",
-                        "The preview screenshots could not be paired.",
+                        "The screenshot pairing service failed.",
                         adapter.id,
                         workspacePlan.applicationPath,
                         workspacePlan.workspaceKind,
@@ -602,6 +622,15 @@ export default class ProductDiffRunner {
                 project.githubRepoFullName,
                 productDiff.pullNumber,
             );
+            const current = is_current_product_diff(
+                afterUpload,
+                productDiff.baseSha,
+                productDiff.headSha,
+            );
+            if (!current) {
+                await this.settle(productDiffId, "Stale");
+                return;
+            }
             const manifest = ProductDiffArtifacts.build_manifest({
                 harness,
                 pair,
@@ -618,22 +647,19 @@ export default class ProductDiffRunner {
                 },
                 diagnostics: resolution.diagnostics,
             });
-            const current = is_current_product_diff(
-                afterUpload,
-                productDiff.baseSha,
-                productDiff.headSha,
-            );
-            await this.settle(productDiffId, current ? "Ready" : "Stale", {
+            await this.settle(productDiffId, "Ready", {
                 manifest: manifest as unknown as Prisma.InputJsonValue,
                 artifactPrefix: prefix,
             });
         } catch (error) {
             const previewError = error instanceof ProductDiffPreviewUnavailableError ? error : null;
+            const internalError = error instanceof ProductDiffInternalError ? error : null;
             const status: ProductDiffTerminalStatus = previewError
                 ? "PreviewUnavailable"
                 : "Failed";
             const diagnostic =
                 previewError?.diagnostic ??
+                internalError?.diagnostic ??
                 static_diagnostic(
                     "PRODUCT_DIFF_RUN_FAILED",
                     "orchestration",
@@ -648,7 +674,10 @@ export default class ProductDiffRunner {
                 ),
             );
             await this.settle(productDiffId, status, {
-                error: previewError?.diagnostic.message ?? failure_message(stage),
+                error:
+                    previewError?.diagnostic.message ??
+                    internalError?.diagnostic.message ??
+                    failure_message(stage),
                 diagnostics: diagnostic as unknown as Prisma.InputJsonValue,
             });
         } finally {

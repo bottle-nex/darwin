@@ -6,7 +6,7 @@ import type { ProductDiffWorkspacePlan } from "./adapter.contract";
 import NextPreviewLauncher from "./adapters/next/service.next_preview_launcher";
 import NextPreviewSurface from "./adapters/next/service.next_preview_surface";
 import PreviewRunner from "../service.preview_runner";
-import PreviewServer from "../service.preview_server";
+import PreviewServer, { type PreviewServerHandle } from "../service.preview_server";
 import ProductDiffPreviewLifecycle from "./service.preview_lifecycle";
 
 const workspacePlan: ProductDiffWorkspacePlan = {
@@ -31,6 +31,8 @@ const originalLogTail = PreviewServer.log_tail;
 const originalCreateSurface = NextPreviewSurface.create;
 const originalCheck = PreviewRunner.check;
 const originalCapture = PreviewRunner.capture;
+const originalStop = PreviewServer.stop;
+const originalRemoveSurface = NextPreviewSurface.remove;
 
 test("refuses capture after browser validation fails", async () => {
     const sandbox = {} as Sandbox;
@@ -46,7 +48,7 @@ test("refuses capture after browser validation fails", async () => {
         healthPath: "/",
         logPath: "/preview/server.log",
         port: 41337,
-        process: {},
+        process: {} as PreviewServerHandle["process"],
     });
     PreviewServer.wait_until_ready = mock().mockResolvedValue(true);
     NextPreviewSurface.create = mock().mockResolvedValue({
@@ -206,6 +208,34 @@ test("does not persist preview surface errors", async () => {
     expect(JSON.stringify(preview.health)).not.toContain("lifecycle-surface-secret");
 });
 
+test("removes the preview surface when stopping the server fails", async () => {
+    const server = {
+        url: "http://127.0.0.1:41337",
+        healthPath: "/",
+        logPath: "/preview/server.log",
+        port: 41337,
+        process: {} as PreviewServerHandle["process"],
+    };
+    const surface = {
+        routePath: "/preview-run-a",
+        generatedFiles: ["/workspace/apps/web/app/preview-run-a/[targetId]/page.tsx"],
+        router: "AppRouter" as const,
+    };
+    PreviewServer.stop = mock().mockRejectedValue(new Error("stop failed"));
+    NextPreviewSurface.remove = mock().mockResolvedValue(undefined);
+
+    await expect(
+        ProductDiffPreviewLifecycle.cleanup_revision({} as Sandbox, {
+            revision: "head",
+            server,
+            surface,
+            health: { ok: false, diagnostic: null },
+        }),
+    ).rejects.toThrow("stop failed");
+
+    expect(NextPreviewSurface.remove).toHaveBeenCalledWith({}, surface);
+});
+
 afterEach(() => {
     PreviewServer.start = originalStart;
     PreviewServer.wait_until_ready = originalWaitUntilReady;
@@ -213,4 +243,6 @@ afterEach(() => {
     NextPreviewSurface.create = originalCreateSurface;
     PreviewRunner.check = originalCheck;
     PreviewRunner.capture = originalCapture;
+    PreviewServer.stop = originalStop;
+    NextPreviewSurface.remove = originalRemoveSurface;
 });

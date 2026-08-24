@@ -157,7 +157,10 @@ export default class ProductDiffPreviewLifecycle {
         sandbox: Sandbox,
         preview: ProductDiffPreviewLifecycleRevision,
     ): Promise<void> {
-        if (preview.server) await PreviewServer.stop(preview.server);
-        await NextPreviewSurface.remove(sandbox, preview.surface);
+        try {
+            if (preview.server) await PreviewServer.stop(preview.server);
+        } finally {
+            await NextPreviewSurface.remove(sandbox, preview.surface);
+        }
     }
 }

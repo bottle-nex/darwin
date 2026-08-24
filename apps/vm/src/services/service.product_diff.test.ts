@@ -15,6 +15,8 @@ import PreviewRunner from "./service.preview_runner";
 import PreviewServer from "./service.preview_server";
 import PreviewWorkspace from "./service.preview_workspace";
 import ClaudeRun from "./service.claude_run";
+import ProductDiffArtifacts from "./service.product_diff_artifacts";
+import NextPreviewSurface from "./product_diff/adapters/next/service.next_preview_surface";
 
 const originalProductDiffUpdate = prisma.productDiff.updateMany;
 const originalProductDiffFind = prisma.productDiff.findUniqueOrThrow;
@@ -36,6 +38,14 @@ const originalReadManifest = PreviewRunner.read_manifest;
 const originalPreviewStart = PreviewServer.start;
 const originalWaitUntilReady = PreviewServer.wait_until_ready;
 const originalLogTail = PreviewServer.log_tail;
+const originalCapture = PreviewRunner.capture;
+const originalPair = PreviewRunner.pair;
+const originalCheck = PreviewRunner.check;
+const originalCreateSurface = NextPreviewSurface.create;
+const originalRemoveSurface = NextPreviewSurface.remove;
+const originalStop = PreviewServer.stop;
+const originalGetPullRequest = GithubService.getPullRequest;
+const originalUpload = ProductDiffArtifacts.upload;
 
 function product_diff_record() {
     return {
@@ -54,6 +64,110 @@ function product_diff_record() {
                 projectConfig: { productDiffPreviewConfig: null },
             },
         },
+    };
+}
+
+function mock_ready_preview_pipeline() {
+    const update = mock().mockResolvedValue({ count: 1 });
+    const productDiff = product_diff_record();
+    productDiff.issue.project.previewDepsHash = "cache-key";
+    prisma.productDiff.updateMany = update;
+    prisma.productDiff.findUniqueOrThrow = mock().mockResolvedValue(productDiff);
+    GithubService.getInstallationToken = mock().mockResolvedValue("github-token");
+    Sandbox.create = mock().mockResolvedValue({
+        sandboxId: "sandbox-id",
+        commands: { run: mock().mockResolvedValue({}) },
+        files: { write: mock().mockResolvedValue(undefined) },
+        kill: mock().mockResolvedValue(undefined),
+    });
+    PreviewWorkspace.checkout = mock().mockResolvedValue(undefined);
+    PreviewWorkspace.changed_paths = mock().mockResolvedValue(["apps/web/app/page.tsx"]);
+    PreviewRunner.inspect_next_workspace = mock().mockResolvedValue({
+        workspaceKind: "Standalone",
+        packageManager: "bun",
+        applications: [
+            {
+                applicationPath: "apps/web",
+                packageName: null,
+                router: "AppRouter",
+                hasPagesDirectory: false,
+            },
+        ],
+        changedApplicationPaths: ["apps/web"],
+    });
+    PreviewRunner.detect = mock().mockResolvedValue({
+        supported: true,
+        reason: null,
+        framework: "NextAppRouter",
+        nextAppDir: "apps/web",
+        routeDir: "apps/web/app",
+        pagesDir: null,
+        hasExistingPagesDir: false,
+        packageManager: "bun",
+        lockfileRelPath: "bun.lock",
+        lockfileSha256: "lock-hash",
+        nextMajor: 16,
+        globalStylesheet: null,
+        middlewarePaths: [],
+        envExampleKeys: [],
+        workspaceDirs: ["."],
+        warnings: [],
+    });
+    PreviewWorkspace.write_placeholder_env = mock().mockResolvedValue(undefined);
+    PreviewWorkspace.disable_middleware = mock().mockResolvedValue(undefined);
+    PreviewWorkspace.restore_unexpected_edits = mock().mockResolvedValue([]);
+    PreviewWorkspace.copy_harness = mock().mockResolvedValue(undefined);
+    PreviewDeps.cache_key = mock().mockReturnValue("cache-key");
+    PreviewDeps.cache_present = mock().mockResolvedValue(true);
+    PreviewDeps.restore_into = mock().mockResolvedValue(undefined);
+    ClaudeRun.execute = mock().mockResolvedValue(undefined);
+    PreviewRunner.read_manifest = mock().mockResolvedValue({
+        targets: [
+            {
+                id: "header",
+                label: "Header",
+                sourcePath: "components/Header.tsx",
+                states: [{ id: "default", label: "Default" }],
+            },
+        ],
+        warnings: [],
+    });
+    PreviewServer.start = mock().mockResolvedValue({
+        url: "http://127.0.0.1:41337",
+        healthPath: "/",
+        logPath: "/home/user/preview/server.log",
+        port: 41337,
+        process: { kill: mock().mockResolvedValue(undefined) },
+    });
+    PreviewServer.wait_until_ready = mock().mockResolvedValue(true);
+    PreviewServer.stop = mock().mockResolvedValue(undefined);
+    NextPreviewSurface.create = mock().mockResolvedValue({
+        routePath: "/preview-run-a",
+        generatedFiles: ["/workspace/apps/web/app/preview-run-a/[targetId]/page.tsx"],
+        router: "AppRouter",
+    });
+    NextPreviewSurface.remove = mock().mockResolvedValue(undefined);
+    PreviewRunner.check = mock().mockResolvedValue({ ok: true, results: [], warnings: [] });
+    return update;
+}
+
+function successful_capture(
+    side: "head" | "base",
+): Awaited<ReturnType<typeof PreviewRunner.capture>> {
+    return {
+        ok: true,
+        side,
+        captures: [
+            {
+                targetId: "header",
+                stateId: "default",
+                viewportId: "desktop",
+                status: "ok" as const,
+                file: `header/default/desktop/${side}.png`,
+                error: null,
+            },
+        ],
+        warnings: [],
     };
 }
 
@@ -214,6 +328,72 @@ test("settles secret-bearing lifecycle startup input with only the safe diagnost
     expect(PreviewServer.log_tail).not.toHaveBeenCalled();
 });
 
+test("settles a thrown capture command as PreviewUnavailable", async () => {
+    const update = mock_ready_preview_pipeline();
+    PreviewRunner.capture = mock().mockRejectedValue(
+        new Error("PREVIEW_TOKEN=capture-command-secret"),
+    );
+
+    await ProductDiffRunner.run("product-diff-id");
+
+    expect(update).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+            data: {
+                status: "PreviewUnavailable",
+                error: "The verified preview could not be captured.",
+                diagnostics: expect.objectContaining({ code: "PREVIEW_CAPTURE_UNAVAILABLE" }),
+            },
+        }),
+    );
+});
+
+test("settles screenshot pairing failures as Matcha failures", async () => {
+    const update = mock_ready_preview_pipeline();
+    PreviewRunner.capture = mock((_, input: { side: "head" | "base" }) =>
+        Promise.resolve(successful_capture(input.side)),
+    );
+    PreviewRunner.pair = mock().mockResolvedValue({ ok: false, shots: [], warnings: [] });
+
+    await ProductDiffRunner.run("product-diff-id");
+
+    expect(update).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+            data: {
+                status: "Failed",
+                error: "The screenshot pairing service failed.",
+                diagnostics: expect.objectContaining({ code: "PRODUCT_DIFF_PAIRING_FAILED" }),
+            },
+        }),
+    );
+});
+
+test("does not persist manifest metadata for stale Product Diffs", async () => {
+    const update = mock_ready_preview_pipeline();
+    PreviewRunner.capture = mock((_, input: { side: "head" | "base" }) =>
+        Promise.resolve(successful_capture(input.side)),
+    );
+    PreviewRunner.pair = mock().mockResolvedValue({ ok: true, shots: [], warnings: [] });
+    GithubService.getPullRequest = mock()
+        .mockResolvedValueOnce({
+            state: "open",
+            baseSha: "a".repeat(40),
+            headSha: "b".repeat(40),
+        })
+        .mockResolvedValueOnce({
+            state: "closed",
+            baseSha: "a".repeat(40),
+            headSha: "b".repeat(40),
+        });
+    ProductDiffArtifacts.upload = mock().mockResolvedValue(1);
+
+    await ProductDiffRunner.run("product-diff-id");
+
+    expect(update).toHaveBeenLastCalledWith(expect.objectContaining({ data: { status: "Stale" } }));
+    const settlement = update.mock.calls.at(-1)?.[0] as { data: Record<string, unknown> };
+    expect(settlement.data).not.toHaveProperty("manifest");
+    expect(settlement.data).not.toHaveProperty("artifactPrefix");
+});
+
 test("maps preview startup and browser-validation failures to PreviewUnavailable", () => {
     expect(product_diff_failure_status("start head dev server")).toBe("PreviewUnavailable");
     expect(product_diff_failure_status("verify the base preview surface")).toBe(
@@ -334,4 +514,12 @@ afterEach(() => {
     PreviewServer.start = originalPreviewStart;
     PreviewServer.wait_until_ready = originalWaitUntilReady;
     PreviewServer.log_tail = originalLogTail;
+    PreviewRunner.capture = originalCapture;
+    PreviewRunner.pair = originalPair;
+    PreviewRunner.check = originalCheck;
+    NextPreviewSurface.create = originalCreateSurface;
+    NextPreviewSurface.remove = originalRemoveSurface;
+    PreviewServer.stop = originalStop;
+    GithubService.getPullRequest = originalGetPullRequest;
+    ProductDiffArtifacts.upload = originalUpload;
 });
