@@ -21,7 +21,6 @@ import { useKanbanOptionsStore } from "@/store/kanban/useKanbanOptionsStore";
 import { useFilteredCustomColumns } from "@/hooks/kanban/useFilteredCustomColumns";
 import { FocusPanelItems, FOCUS_PANEL_WIDTH } from "./KanbanOptionPanels/FocusPanel";
 import { FiltersPanelItems, FILTERS_PANEL_WIDTH } from "./KanbanOptionPanels/FiltersPanel";
-import { ViewsPanelItems, VIEWS_PANEL_WIDTH } from "./KanbanOptionPanels/ViewsPanel";
 import { BoardViewPanelItems, BOARD_VIEW_PANEL_WIDTH } from "./KanbanOptionPanels/BoardViewPanel";
 import FilterChipsBar from "./KanbanOptionPanels/FilterChipsBar";
 import {
@@ -131,22 +130,9 @@ export default function KanbanOptionsBarGroupedKeys() {
                                     <BoardViewPanelItems
                                         value={boardView}
                                         onChange={setBoardView}
+                                        kanbanView={kanbanView}
+                                        onKanbanViewChange={setKanbanView}
                                     />
-                                </EagerSubmenu>
-
-                                <EagerSubmenu
-                                    className={`${VIEWS_PANEL_WIDTH} [direction:ltr]`}
-                                    trigger={
-                                        <>
-                                            <LuSlidersHorizontal
-                                                className="size-3.5 text-neutral-400"
-                                                aria-hidden
-                                            />
-                                            <span className="flex-1">Views</span>
-                                        </>
-                                    }
-                                >
-                                    <ViewsPanelItems value={kanbanView} onChange={setKanbanView} />
                                 </EagerSubmenu>
                             </>
 

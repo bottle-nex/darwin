@@ -12,7 +12,7 @@ import {
     DEFAULT_USER_CONFIG,
 } from "@/lib/backgroundLighting";
 import { useParams } from "next/navigation";
-import SettingsSectionHeader from "./SettingsSectionHeader";
+import SettingsUtilityCard from "./SettingsUtilityCard";
 
 function ColorSwatch({
     color,
@@ -77,47 +77,45 @@ export default function AppearanceSettingsSection() {
 
     return (
         <div className="flex flex-col gap-4">
-            <SettingsSectionHeader
-                title="Appearance"
-                description="Tune how the workspace looks for you. These settings follow your account, not this project."
-            />
-
-            <div className="flex items-center justify-between gap-4 rounded-lg border border-white/8 p-3">
-                <div>
-                    <p className="text-[12px] font-medium text-neutral-200">Background lighting</p>
-                    <p className="mt-1 text-[11px] text-neutral-500">
-                        An ambient glow behind the workspace.
-                    </p>
-                </div>
-                <Switch
-                    checked={enabled}
-                    onCheckedChange={(backgroundLightingEnabled) =>
-                        updateConfig.mutate({ backgroundLightingEnabled })
-                    }
-                    aria-label="Enable background lighting"
-                />
-            </div>
-
-            <div
-                className={cn(
-                    "rounded-lg border border-white/8 p-3",
-                    !enabled && "pointer-events-none opacity-50",
-                )}
+            <SettingsUtilityCard
+                title="Background lighting"
+                description="An ambient glow behind the workspace. These settings follow your account, not this project."
             >
-                <span className="text-[12px] text-neutral-300">Color</span>
-                <div className="mt-3 flex flex-wrap items-start gap-x-6 gap-y-4">
-                    {BACKGROUND_LIGHTING_COLORS.map((color) => (
-                        <ColorSwatch
-                            key={color}
-                            color={color}
-                            checked={config.backgroundLightingColor === color}
-                            disabled={!enabled}
-                            onSelect={() => updateConfig.mutate({ backgroundLightingColor: color })}
-                        />
-                    ))}
+                <div className="flex items-center justify-between gap-4">
+                    <span className="text-[13px] text-neutral-300">Enable</span>
+                    <Switch
+                        checked={enabled}
+                        onCheckedChange={(backgroundLightingEnabled) =>
+                            updateConfig.mutate({ backgroundLightingEnabled })
+                        }
+                        aria-label="Enable background lighting"
+                    />
+                </div>
+            </SettingsUtilityCard>
+
+            <SettingsUtilityCard
+                title="Color & direction"
+                description="Choose a hue and sweep angle for the glow."
+                className={cn(!enabled && "pointer-events-none opacity-50")}
+            >
+                <div>
+                    <span className="text-[12px] text-neutral-300">Color</span>
+                    <div className="mt-3 flex flex-wrap items-start gap-x-6 gap-y-4">
+                        {BACKGROUND_LIGHTING_COLORS.map((color) => (
+                            <ColorSwatch
+                                key={color}
+                                color={color}
+                                checked={config.backgroundLightingColor === color}
+                                disabled={!enabled}
+                                onSelect={() =>
+                                    updateConfig.mutate({ backgroundLightingColor: color })
+                                }
+                            />
+                        ))}
+                    </div>
                 </div>
 
-                <div className="mt-5 border-t border-white/5 pt-4">
+                <div className="border-t border-white/5 pt-4">
                     <div className="flex items-center justify-between gap-3">
                         <span className="text-[12px] text-neutral-300">Direction</span>
                         <span className="text-[11px] text-neutral-500 tabular-nums">{angle}°</span>
@@ -141,7 +139,7 @@ export default function AppearanceSettingsSection() {
                         />
                     </Slider.Root>
                 </div>
-            </div>
+            </SettingsUtilityCard>
         </div>
     );
 }

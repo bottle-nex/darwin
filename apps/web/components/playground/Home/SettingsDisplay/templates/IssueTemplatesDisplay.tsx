@@ -12,7 +12,7 @@ import { useUpdateTemplate } from "@/hooks/templates/useUpdateTemplate";
 import { useDeleteTemplate } from "@/hooks/templates/useDeleteTemplate";
 import type { IssueTemplate } from "@/types/issueTemplate";
 import CreateTemplateDisplay from "./CreateTemplateDisplay";
-import SettingsSectionHeader from "../SettingsSectionHeader";
+import SettingsUtilityCard from "../SettingsUtilityCard";
 
 type View = { kind: "list" } | { kind: "edit"; template?: IssueTemplate };
 
@@ -63,12 +63,10 @@ export default function IssueTemplatesDisplay({ projectId }: { projectId: string
     const list = templates.data ?? [];
 
     return (
-        <section className="flex flex-col gap-4">
-            <header className="flex items-start justify-between gap-3">
-                <SettingsSectionHeader
-                    title="Issue templates"
-                    description="A pre-written issue body. Write it the way you'd want issues filed, mark one as the default, and everyone starts from it. Every project also has built-in starters, which show up in the picker on their own."
-                />
+        <SettingsUtilityCard
+            title="Issue templates"
+            description="A pre-written issue body. Write it the way you'd want issues filed, mark one as the default, and everyone starts from it. Every project also has built-in starters, which show up in the picker on their own."
+            headerAction={
                 <Button
                     type="button"
                     size="sm"
@@ -79,8 +77,8 @@ export default function IssueTemplatesDisplay({ projectId }: { projectId: string
                     <MdAdd className="size-3" aria-hidden />
                     New template
                 </Button>
-            </header>
-
+            }
+        >
             <section>
                 <h3 className="mb-2 text-[11px] font-medium tracking-wide text-neutral-500 uppercase">
                     {list.length} template{list.length === 1 ? "" : "s"}
@@ -103,7 +101,7 @@ export default function IssueTemplatesDisplay({ projectId }: { projectId: string
                             return (
                                 <li
                                     key={template.id}
-                                    className="group flex flex-col gap-1 rounded-lg bg-cement px-3 py-2.5 shadow-[inset_0_1px_0_0_var(--color-edge)]"
+                                    className="group flex flex-col gap-1 rounded-lg bg-white/5 px-3 py-2.5 shadow-[inset_0_1px_0_0_var(--color-edge)]"
                                 >
                                     <article className="flex items-center justify-between gap-3">
                                         <hgroup className="flex min-w-0 items-center gap-2">
@@ -193,6 +191,6 @@ export default function IssueTemplatesDisplay({ projectId }: { projectId: string
                 }}
                 pending={deleteTemplate.isPending}
             />
-        </section>
+        </SettingsUtilityCard>
     );
 }

@@ -10,7 +10,7 @@ import { useCreateApiKey } from "@/hooks/apiKeys/useCreateApiKey";
 import { useRevokeApiKey } from "@/hooks/apiKeys/useRevokeApiKey";
 import type { CreatedApiKey } from "@/types/apiKey.type";
 import { MdContentCopy, MdKey } from "react-icons/md";
-import SettingsSectionHeader from "./SettingsSectionHeader";
+import SettingsUtilityCard from "./SettingsUtilityCard";
 
 function formatDate(value: string | null) {
     if (!value) return "Never";
@@ -112,12 +112,10 @@ export default function ApiKeysSettingsSection() {
     const activeKeys = (apiKeys ?? []).filter((key) => !key.revokedAt);
 
     return (
-        <div className="flex flex-col gap-y-4">
-            <SettingsSectionHeader
-                title="API keys"
-                description="Create an api key to let Claude create issues on your projects via MCP."
-            />
-
+        <SettingsUtilityCard
+            title="API keys"
+            description="Create an api key to let Claude create issues on your projects via MCP."
+        >
             <div className="flex items-center gap-x-2">
                 <code className="min-w-0 flex-1 truncate rounded-md bg-charcoal px-2.5 py-1.5 text-[12px] text-neutral-400">
                     {CLAUDE_MCP_URL}
@@ -199,6 +197,6 @@ export default function ApiKeysSettingsSection() {
                     </div>
                 ))}
             </div>
-        </div>
+        </SettingsUtilityCard>
     );
 }

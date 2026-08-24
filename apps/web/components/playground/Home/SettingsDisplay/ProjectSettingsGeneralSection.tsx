@@ -23,7 +23,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import IconPicker, { IconPickGlyph, type IconPick } from "@/components/ui/IconPicker";
 import ProjectSettingsBoardSection from "./ProjectSettingsBoardSection";
-import SettingsSectionHeader from "./SettingsSectionHeader";
+import SettingsUtilityCard from "./SettingsUtilityCard";
 
 const FIELD =
     "border-white/10 bg-white/5 text-neutral-200 placeholder:text-neutral-500 focus-visible:border-matcha focus-visible:ring-matcha/30";
@@ -91,117 +91,131 @@ export default function ProjectSettingsGeneralSection({
 
     return (
         <div className="flex flex-col gap-4">
-            <SettingsSectionHeader
+            <SettingsUtilityCard
                 title="Project"
                 description="Change the name, slug, or description."
-            />
-
-            <div className="flex gap-3">
-                <div>
-                    <label className="text-[12px] text-neutral-300">Icon</label>
-                    <IconPicker open={iconOpen} onOpenChange={setIconOpen} onSelect={setIcon}>
+                footer={
+                    <>
+                        {update.isSuccess && !dirty && (
+                            <span className="mr-auto text-[11px] text-matcha">Saved</span>
+                        )}
                         <Button
-                            variant="unstyled"
                             type="button"
-                            aria-label="Pick project icon"
-                            style={
-                                icon?.kind === "icon"
-                                    ? { backgroundColor: `${icon.color}33` }
-                                    : undefined
-                            }
-                            className={cn(
-                                "mt-1.5 flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-lg transition-colors",
-                                icon?.kind === "icon"
-                                    ? "hover:brightness-125"
-                                    : "bg-white/5 hover:bg-white/10",
-                            )}
+                            size="sm"
+                            loading={update.isPending}
+                            disabled={!canSave}
+                            onClick={save}
                         >
-                            {icon ? (
-                                <IconPickGlyph pick={icon} className="size-4 text-base" />
-                            ) : (
-                                <PiSmileyFill className="size-4 text-white/60" aria-hidden />
-                            )}
+                            Save changes
                         </Button>
-                    </IconPicker>
+                    </>
+                }
+            >
+                <div className="flex gap-3">
+                    <div>
+                        <label className="text-[12px] text-neutral-300">Icon</label>
+                        <IconPicker open={iconOpen} onOpenChange={setIconOpen} onSelect={setIcon}>
+                            <Button
+                                variant="unstyled"
+                                type="button"
+                                aria-label="Pick project icon"
+                                style={
+                                    icon?.kind === "icon"
+                                        ? { backgroundColor: `${icon.color}33` }
+                                        : undefined
+                                }
+                                className={cn(
+                                    "mt-1.5 flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-lg transition-colors",
+                                    icon?.kind === "icon"
+                                        ? "hover:brightness-125"
+                                        : "bg-white/5 hover:bg-white/10",
+                                )}
+                            >
+                                {icon ? (
+                                    <IconPickGlyph pick={icon} className="size-4 text-base" />
+                                ) : (
+                                    <PiSmileyFill className="size-4 text-white/60" aria-hidden />
+                                )}
+                            </Button>
+                        </IconPicker>
+                    </div>
+                    <div className="flex-1">
+                        <label className="text-[12px] text-neutral-300">Name</label>
+                        <Input
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            className={cn(FIELD, "mt-1.5 h-9 text-[13px]")}
+                        />
+                    </div>
                 </div>
-                <div className="flex-1">
-                    <label className="text-[12px] text-neutral-300">Name</label>
+
+                <div>
+                    <label className="text-[12px] text-neutral-300">Slug</label>
                     <Input
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        className={cn(FIELD, "mt-1.5 h-9 text-[13px]")}
+                        variant={"ghost"}
+                        value={slug}
+                        onChange={(e) =>
+                            setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""))
+                        }
+                        className={cn(FIELD, "mt-1.5 h-9 font-mono text-[13px]")}
+                    />
+                    {slugTaken && (
+                        <p className="mt-1.5 text-[11px] text-red-400">
+                            That slug is already taken.
+                        </p>
+                    )}
+                </div>
+
+                <div>
+                    <label className="text-[12px] text-neutral-300">Description</label>
+                    <Textarea
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                        maxLength={150}
+                        rows={10}
+                        className="max-h-64 resize-none overflow-y-auto"
                     />
                 </div>
-            </div>
 
-            <div>
-                <label className="text-[12px] text-neutral-300">Slug</label>
-                <Input
-                    value={slug}
-                    onChange={(e) =>
-                        setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""))
-                    }
-                    className={cn(FIELD, "mt-1.5 h-9 font-mono text-[13px]")}
-                />
-                {slugTaken && (
-                    <p className="mt-1.5 text-[11px] text-red-400">That slug is already taken.</p>
-                )}
-            </div>
+                <ProjectSettingsBoardSection value={optionsBarView} onChange={setOptionsBarDraft} />
 
-            <div>
-                <label className="text-[12px] text-neutral-300">Description</label>
-                <Textarea
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    maxLength={150}
-                    rows={8}
-                />
-            </div>
-
-            <ProjectSettingsBoardSection value={optionsBarView} onChange={setOptionsBarDraft} />
-
-            <div className="flex items-center justify-between gap-4 rounded-lg border border-white/8 p-3">
-                <div>
-                    <p className="text-[12px] font-medium text-neutral-200">Product Diff</p>
-                    <p className="mt-1 text-[11px] text-neutral-500">
-                        Generate visual base and head previews for frontend pull requests.
-                    </p>
+                <div className="flex items-center justify-between gap-4 rounded-lg border border-white/8 p-3">
+                    <div>
+                        <p className="text-[12px] font-medium text-neutral-200">Product Diff</p>
+                        <p className="mt-1 text-[11px] text-neutral-500">
+                            Generate visual base and head previews for frontend pull requests.
+                        </p>
+                    </div>
+                    <Switch
+                        checked={productDiffEnabled}
+                        onCheckedChange={setProductDiffDraft}
+                        aria-label="Enable Product Diff"
+                    />
                 </div>
-                <Switch
-                    checked={productDiffEnabled}
-                    onCheckedChange={setProductDiffDraft}
-                    aria-label="Enable Product Diff"
-                />
-            </div>
+            </SettingsUtilityCard>
 
-            <div className="h-px bg-white/5" />
-
-            <div className="flex items-center gap-3">
-                <Button
-                    type="button"
-                    size="sm"
-                    loading={update.isPending}
-                    disabled={!canSave}
-                    onClick={save}
+            {isAdmin && (
+                <SettingsUtilityCard
+                    title="Danger zone"
+                    description="Irreversible actions — proceed with caution."
+                    footer={
+                        <Button
+                            type="button"
+                            size="sm"
+                            variant="destructive"
+                            onClick={() => setConfirmOpen(true)}
+                        >
+                            <MdDelete className="size-3" aria-hidden />
+                            Delete project
+                        </Button>
+                    }
                 >
-                    Save changes
-                </Button>
-                {update.isSuccess && !dirty && (
-                    <span className="text-[11px] text-matcha">Saved</span>
-                )}
-                {isAdmin && (
-                    <Button
-                        type="button"
-                        size="sm"
-                        variant="destructive"
-                        className="ml-auto"
-                        onClick={() => setConfirmOpen(true)}
-                    >
-                        <MdDelete className="size-3" aria-hidden />
-                        Delete project
-                    </Button>
-                )}
-            </div>
+                    <p className="text-[12px] text-neutral-500">
+                        Deleting <span className="text-neutral-300">{project.name}</span> removes it
+                        and everything in it, teams, issues, and secrets, for good.
+                    </p>
+                </SettingsUtilityCard>
+            )}
 
             <Dialog open={confirmOpen} onOpenChange={(o) => !del.isPending && setConfirmOpen(o)}>
                 <DialogContent className="border-white/10 sm:max-w-md">
