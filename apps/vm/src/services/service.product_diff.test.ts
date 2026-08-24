@@ -35,6 +35,7 @@ const originalCachePresent = PreviewDeps.cache_present;
 const originalRestoreInto = PreviewDeps.restore_into;
 const originalClaudeExecute = ClaudeRun.execute;
 const originalReadManifest = PreviewRunner.read_manifest;
+const originalScaffold = PreviewRunner.scaffold;
 const originalPreviewStart = PreviewServer.start;
 const originalWaitUntilReady = PreviewServer.wait_until_ready;
 const originalLogTail = PreviewServer.log_tail;
@@ -131,6 +132,16 @@ function mock_ready_preview_pipeline() {
             },
         ],
         warnings: [],
+    });
+    PreviewRunner.scaffold = mock().mockResolvedValue({
+        ok: true,
+        routeFiles: ["apps/web/matcha_preview/registry.ts"],
+        warnings: [],
+    });
+    NextPreviewSurface.create = mock().mockResolvedValue({
+        routePath: "/preview-run-head",
+        generatedFiles: ["/workspace/apps/web/app/preview-run-head/[targetId]/page.tsx"],
+        router: "AppRouter",
     });
     PreviewServer.start = mock().mockResolvedValue({
         url: "http://127.0.0.1:41337",
@@ -294,6 +305,11 @@ test("settles secret-bearing lifecycle startup input with only the safe diagnost
         ],
         warnings: [],
     });
+    PreviewRunner.scaffold = mock().mockResolvedValue({
+        ok: true,
+        routeFiles: ["apps/web/matcha_preview/registry.ts"],
+        warnings: [],
+    });
     PreviewServer.start = mock().mockResolvedValue({
         url: "http://127.0.0.1:41337",
         healthPath: "/",
@@ -302,6 +318,11 @@ test("settles secret-bearing lifecycle startup input with only the safe diagnost
         process: { kill: mock().mockResolvedValue(undefined) },
     });
     PreviewServer.wait_until_ready = mock().mockResolvedValue(false);
+    NextPreviewSurface.create = mock().mockResolvedValue({
+        routePath: "/preview-run-head",
+        generatedFiles: ["/workspace/apps/web/app/preview-run-head/[targetId]/page.tsx"],
+        router: "AppRouter",
+    });
     PreviewServer.log_tail = mock().mockResolvedValue(
         "DATABASE_URL=postgres://startup-log-secret PREVIEW_TOKEN=startup-token-secret",
     );
@@ -511,6 +532,7 @@ afterEach(() => {
     PreviewDeps.restore_into = originalRestoreInto;
     ClaudeRun.execute = originalClaudeExecute;
     PreviewRunner.read_manifest = originalReadManifest;
+    PreviewRunner.scaffold = originalScaffold;
     PreviewServer.start = originalPreviewStart;
     PreviewServer.wait_until_ready = originalWaitUntilReady;
     PreviewServer.log_tail = originalLogTail;

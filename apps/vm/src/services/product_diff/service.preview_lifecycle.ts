@@ -76,6 +76,10 @@ function startup_failure_summary(logTail: string): string {
 function redact_startup_log(value: string): string {
     return value
         .replace(
+            /"(authorization|cookie|password|token|secret|api[_-]?key)"\s*:\s*"[^"]*"/gi,
+            '"$1":"[redacted]"',
+        )
+        .replace(
             /(authorization|cookie|password|token|secret|api[_-]?key)\s*[:=]\s*(?:bearer\s+)?[^\s,;]+/gi,
             "$1=[redacted]",
         )
@@ -148,6 +152,18 @@ export default class ProductDiffPreviewLifecycle {
                 nextAppDir: input.workspacePlan.applicationPath,
             });
             if (!check.ok) {
+                const failed = check.results.find((result) => !result.ok);
+                input.log.warn("preview browser validation failed", {
+                    revision: input.revision,
+                    applicationPath: input.workspacePlan.applicationPath,
+                    workspaceKind: input.workspacePlan.workspaceKind,
+                    routePath: surface.routePath,
+                    targetId: failed?.targetId ?? "unknown",
+                    stateId: failed?.stateId ?? "unknown",
+                    problem: failed?.problem ?? "Unknown",
+                    httpStatus: failed?.httpStatus ?? null,
+                    detail: redact_startup_log(failed?.detail ?? ""),
+                });
                 return {
                     revision: input.revision,
                     server,

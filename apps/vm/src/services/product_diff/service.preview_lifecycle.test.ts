@@ -79,10 +79,11 @@ test("refuses capture after browser validation fails", async () => {
         warnings: [],
     });
     PreviewRunner.capture = capture;
+    const log = { warn: mock() } as unknown as Logger;
 
     const preview = await ProductDiffPreviewLifecycle.start_and_verify({
         sandbox,
-        log: {} as Logger,
+        log,
         revision: "head",
         workspaceRoot: "/workspace",
         workspacePlan,
@@ -102,6 +103,13 @@ test("refuses capture after browser validation fails", async () => {
     expect(preview.health.diagnostic?.message).not.toContain("lifecycle-secret");
     expect(preview.health.diagnostic?.message).not.toContain("lifecycle-cookie");
     expect(preview.health.diagnostic?.message).not.toContain("lifecycle-control-secret");
+    expect(log.warn).toHaveBeenCalledWith(
+        "preview browser validation failed",
+        expect.objectContaining({
+            problem: "ConsoleError",
+            detail: expect.not.stringContaining("lifecycle-secret"),
+        }),
+    );
     await expect(
         ProductDiffPreviewLifecycle.capture_verified(sandbox, preview, {
             url: "http://127.0.0.1:41337",
@@ -141,7 +149,8 @@ test("logs a redacted startup summary without persisting server output", async (
         router: "AppRouter",
     });
     PreviewServer.startup_diagnostics = mock().mockResolvedValue({
-        logTail: "Module not found: Can't resolve 'pino-pretty' Authorization=Bearer lifecycle-log-secret",
+        logTail:
+            "Module not found: Can't resolve 'pino-pretty' Authorization=Bearer lifecycle-log-secret",
         listenerSnapshot: "",
         processSnapshot: "123 S 241 next dev",
     });
@@ -181,7 +190,8 @@ test("logs a redacted startup summary without persisting server output", async (
         expect.objectContaining({
             revision: "head",
             applicationPath: "apps/web",
-            startupSummary: "Module not found: Can't resolve 'pino-pretty' Authorization=[redacted]",
+            startupSummary:
+                "Module not found: Can't resolve 'pino-pretty' Authorization=[redacted]",
             processSnapshot: "123 S 241 next dev",
         }),
     );

@@ -39,10 +39,32 @@ export async function next_error_overlay_detail(
     portal: Pick<Locator, "evaluate">,
 ): Promise<string> {
     return portal
-        .evaluate(
-            (element) =>
-                element.shadowRoot?.textContent?.trim() || element.textContent?.trim() || "",
-        )
+        .evaluate((element) => {
+            const text: string[] = [];
+            const collect = (root: Node) => {
+                const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+                let node = walker.nextNode();
+                while (node) {
+                    const parent = node.parentElement;
+                    const value = node.textContent?.trim();
+                    if (
+                        value &&
+                        !parent?.closest("style, script") &&
+                        !parent?.closest("nextjs-dev-tools-button")
+                    ) {
+                        text.push(value);
+                    }
+                    node = walker.nextNode();
+                }
+                if (root instanceof Element || root instanceof ShadowRoot) {
+                    root.querySelectorAll("*").forEach((child) => {
+                        if (child.shadowRoot) collect(child.shadowRoot);
+                    });
+                }
+            };
+            collect(element.shadowRoot ?? element);
+            return [...new Set(text)].join("\n");
+        })
         .catch(() => "");
 }
 

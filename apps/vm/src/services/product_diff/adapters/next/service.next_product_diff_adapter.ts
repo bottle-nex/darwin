@@ -165,6 +165,21 @@ export default class NextProductDiffAdapter implements ProductDiffAdapter {
             input.workspaceRoot,
             detect.middlewarePaths,
         );
+        if (input.rebuildHarnessRegistry) {
+            const scaffold = await PreviewRunner.scaffold(
+                this.runtime.sandbox,
+                input.workspaceRoot,
+                detect,
+            );
+            if (!scaffold.ok) {
+                throw new Error("Next preview scaffold could not be prepared");
+            }
+            return {
+                revision: input.revision,
+                workspaceRoot: input.workspaceRoot,
+                generatedPaths: scaffold.routeFiles,
+            };
+        }
         return { revision: input.revision, workspaceRoot: input.workspaceRoot, generatedPaths: [] };
     }
 

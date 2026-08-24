@@ -498,6 +498,18 @@ export default class ProductDiffRunner {
                 baseWorkspaceRoot,
                 workspacePlan.applicationPath,
             );
+            headPrepared = await adapter.prepare_revision({
+                revision: "head",
+                workspaceRoot: headWorkspaceRoot,
+                plan: workspacePlan,
+                rebuildHarnessRegistry: true,
+            });
+            basePrepared = await adapter.prepare_revision({
+                revision: "base",
+                workspaceRoot: baseWorkspaceRoot,
+                plan: workspacePlan,
+                rebuildHarnessRegistry: true,
+            });
 
             const capture_revision = async (
                 revision: "head" | "base",

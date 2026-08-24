@@ -43,6 +43,7 @@ export interface ProductDiffPrepareRevisionInput {
     revision: ProductDiffRevision;
     workspaceRoot: string;
     plan: ProductDiffWorkspacePlan;
+    rebuildHarnessRegistry?: boolean;
 }
 
 export interface ProductDiffPreparedRevision {
