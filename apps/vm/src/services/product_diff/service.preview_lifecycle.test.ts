@@ -20,6 +20,7 @@ const workspacePlan: ProductDiffWorkspacePlan = {
 };
 const originalStart = PreviewServer.start;
 const originalWaitUntilReady = PreviewServer.wait_until_ready;
+const originalLogTail = PreviewServer.log_tail;
 const originalCreateSurface = NextPreviewSurface.create;
 const originalCheck = PreviewRunner.check;
 const originalCapture = PreviewRunner.capture;
@@ -107,9 +108,101 @@ test("refuses capture after browser validation fails", async () => {
     expect(capture).not.toHaveBeenCalled();
 });
 
+test("does not persist preview server output when startup fails", async () => {
+    const sandbox = {} as Sandbox;
+    const launchPlan = NextPreviewLauncher.create({
+        workspaceKind: "Standalone",
+        packageManager: "bun",
+        applicationPath: "apps/web",
+        port: 41337,
+        workspaceRoot: "/workspace",
+    });
+    PreviewServer.start = mock().mockResolvedValue({
+        url: "http://127.0.0.1:41337",
+        healthPath: "/",
+        logPath: "/preview/server.log",
+        port: 41337,
+        process: {},
+    });
+    PreviewServer.wait_until_ready = mock().mockResolvedValue(false);
+    PreviewServer.log_tail = mock().mockResolvedValue(
+        "DATABASE_URL=postgres://lifecycle-log-secret",
+    );
+
+    const preview = await ProductDiffPreviewLifecycle.start_and_verify({
+        sandbox,
+        log: {} as Logger,
+        revision: "head",
+        workspaceRoot: "/workspace",
+        workspacePlan,
+        launchPlan,
+        runId: "run-a",
+    });
+
+    expect(preview.health).toEqual({
+        ok: false,
+        diagnostic: {
+            code: "PREVIEW_SERVER_UNAVAILABLE",
+            stage: "startup",
+            message: "The preview server did not become ready.",
+            adapter: "next",
+            applicationPath: "apps/web",
+            workspaceKind: "Standalone",
+        },
+    });
+    expect(JSON.stringify(preview.health)).not.toContain("lifecycle-log-secret");
+    expect(PreviewServer.log_tail).not.toHaveBeenCalled();
+});
+
+test("does not persist preview surface errors", async () => {
+    const sandbox = {} as Sandbox;
+    const launchPlan = NextPreviewLauncher.create({
+        workspaceKind: "Standalone",
+        packageManager: "bun",
+        applicationPath: "apps/web",
+        port: 41337,
+        workspaceRoot: "/workspace",
+    });
+    PreviewServer.start = mock().mockResolvedValue({
+        url: "http://127.0.0.1:41337",
+        healthPath: "/",
+        logPath: "/preview/server.log",
+        port: 41337,
+        process: {},
+    });
+    PreviewServer.wait_until_ready = mock().mockResolvedValue(true);
+    NextPreviewSurface.create = mock().mockRejectedValue(
+        new Error("PREVIEW_TOKEN=lifecycle-surface-secret"),
+    );
+
+    const preview = await ProductDiffPreviewLifecycle.start_and_verify({
+        sandbox,
+        log: {} as Logger,
+        revision: "base",
+        workspaceRoot: "/workspace",
+        workspacePlan,
+        launchPlan,
+        runId: "run-a",
+    });
+
+    expect(preview.health).toEqual({
+        ok: false,
+        diagnostic: {
+            code: "PREVIEW_SURFACE_UNAVAILABLE",
+            stage: "preview-surface",
+            message: "The preview surface could not be prepared.",
+            adapter: "next",
+            applicationPath: "apps/web",
+            workspaceKind: "Standalone",
+        },
+    });
+    expect(JSON.stringify(preview.health)).not.toContain("lifecycle-surface-secret");
+});
+
 afterEach(() => {
     PreviewServer.start = originalStart;
     PreviewServer.wait_until_ready = originalWaitUntilReady;
+    PreviewServer.log_tail = originalLogTail;
     NextPreviewSurface.create = originalCreateSurface;
     PreviewRunner.check = originalCheck;
     PreviewRunner.capture = originalCapture;

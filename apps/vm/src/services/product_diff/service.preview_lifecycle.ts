@@ -13,6 +13,9 @@ import PreviewRunner, {
 } from "../service.preview_runner";
 import PreviewServer, { type PreviewServerHandle } from "../service.preview_server";
 
+const PREVIEW_SERVER_UNAVAILABLE_MESSAGE = "The preview server did not become ready.";
+const PREVIEW_SURFACE_UNAVAILABLE_MESSAGE = "The preview surface could not be prepared.";
+
 export interface PreviewHealth {
     ok: boolean;
     diagnostic: ProductDiffDiagnostic | null;
@@ -66,7 +69,6 @@ export default class ProductDiffPreviewLifecycle {
         try {
             server = await PreviewServer.start(input.sandbox, input.launchPlan);
             if (!(await PreviewServer.wait_until_ready(input.sandbox, server, input.log))) {
-                const logTail = await PreviewServer.log_tail(input.sandbox, server);
                 return {
                     revision: input.revision,
                     server,
@@ -77,7 +79,7 @@ export default class ProductDiffPreviewLifecycle {
                             input.workspacePlan,
                             "PREVIEW_SERVER_UNAVAILABLE",
                             "startup",
-                            logTail || "The preview server did not become ready.",
+                            PREVIEW_SERVER_UNAVAILABLE_MESSAGE,
                         ),
                     },
                 };
@@ -122,7 +124,7 @@ export default class ProductDiffPreviewLifecycle {
                 surface,
                 health: { ok: true, diagnostic: null },
             };
-        } catch (error) {
+        } catch {
             return {
                 revision: input.revision,
                 server,
@@ -133,7 +135,7 @@ export default class ProductDiffPreviewLifecycle {
                         input.workspacePlan,
                         "PREVIEW_SURFACE_UNAVAILABLE",
                         "preview-surface",
-                        error instanceof Error ? error.message : String(error),
+                        PREVIEW_SURFACE_UNAVAILABLE_MESSAGE,
                     ),
                 },
             };
