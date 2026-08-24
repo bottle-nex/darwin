@@ -193,10 +193,6 @@ export default class PreviewWorkspace {
      * would no longer show the pull request — they would show the agent's edit. Offending files are
      * restored rather than failing the run, since one stray edit should not cost the whole preview.
      *
-     * Git reports an untracked directory as a single entry rather than listing what is inside it,
-     * so a generated route folder arrives as `apps/web/app/matcha-preview/` and never matches an
-     * exact filename. Comparing prefixes in both directions is what keeps this from crying wolf on
-     * every run — and a check that always warns is worse than no check, because people stop reading it.
      *
      * @example
      * await PreviewWorkspace.restore_unexpected_edits(sandbox, worktree, routeFiles, log);

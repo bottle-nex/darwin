@@ -8,7 +8,11 @@ import { ENV } from "../conf/config.env";
 import ClaudeRun from "./service.claude_run";
 import GithubService from "./service.github";
 import PreviewDeps from "./service.preview_deps";
-import PreviewRunner, { type PreviewDetect, type ScaffoldMode } from "./service.preview_runner";
+import PreviewRunner, {
+    type NextApplicationRouter,
+    type PreviewDetect,
+    type PreviewSurface,
+} from "./service.preview_runner";
 import PreviewServer, { type PreviewServerHandle } from "./service.preview_server";
 import PreviewWorkspace from "./service.preview_workspace";
 import ProductDiffArtifacts from "./service.product_diff_artifacts";
@@ -209,30 +213,42 @@ export default class ProductDiffRunner {
     private static async bring_up_head(
         sandbox: Sandbox,
         detect: PreviewDetect,
+        runId: string,
         log: Logger,
-    ): Promise<{ server: PreviewServerHandle; mode: ScaffoldMode; routeFiles: string[] } | null> {
+    ): Promise<{
+        server: PreviewServerHandle;
+        surface: PreviewSurface;
+        routeFiles: string[];
+    } | null> {
         const worktree = `${WORKSPACE_DIR}/head`;
-        const modes: ScaffoldMode[] = detect.hasExistingPagesDir
-            ? ["AppRoute"]
-            : ["AppRoute", "PagesEscape"];
+        const scaffold = await PreviewRunner.scaffold(sandbox, worktree, detect);
+        const router: NextApplicationRouter =
+            detect.framework === "NextAppRouter" ? "AppRouter" : "PagesRouter";
+        const surface = await PreviewRunner.create_next_preview_surface(sandbox, {
+            workspaceRoot: worktree,
+            applicationPath: detect.nextAppDir!,
+            routeSegment: `preview-${runId}`,
+            router,
+        });
+        const server = await PreviewServer.start(
+            sandbox,
+            { worktree, nextAppDir: detect.nextAppDir!, port: HEAD_PORT, label: "head" },
+            SERVER_ENV,
+        );
 
-        for (const mode of modes) {
-            const scaffold = await PreviewRunner.scaffold(sandbox, worktree, detect, mode);
-            const server = await PreviewServer.start(
-                sandbox,
-                { worktree, nextAppDir: detect.nextAppDir!, port: HEAD_PORT, label: "head" },
-                SERVER_ENV,
-            );
-
-            if (await PreviewServer.wait_until_ready(sandbox, server, log)) {
-                return { server, mode, routeFiles: scaffold.routeFiles };
-            }
-
-            const tail = await PreviewServer.log_tail(sandbox, server);
-            log.warn("head revision did not render with this mounting mode", { mode });
-            if (tail) log.block(`${mode} dev server output`, tail);
-            await PreviewServer.stop(server);
+        if (await PreviewServer.wait_until_ready(sandbox, server, log)) {
+            return {
+                server,
+                surface,
+                routeFiles: [...scaffold.routeFiles, ...surface.generatedFiles],
+            };
         }
+
+        const tail = await PreviewServer.log_tail(sandbox, server);
+        log.warn("head revision did not render", { router });
+        if (tail) log.block("head dev server output", tail);
+        await PreviewServer.stop(server);
+        await PreviewRunner.remove_next_preview_surface(sandbox, surface);
         return null;
     }
 
@@ -426,7 +442,7 @@ export default class ProductDiffRunner {
             );
 
             step("start head dev server");
-            const head = await this.bring_up_head(sandbox, detect, log);
+            const head = await this.bring_up_head(sandbox, detect, productDiffId, log);
             if (!head) {
                 const reason = detect.hasExistingPagesDir
                     ? "the app's root layout could not render and the project already uses a pages directory"
@@ -440,9 +456,24 @@ export default class ProductDiffRunner {
             }
             activeServer = head.server;
 
+            step("verify the head preview surface");
+            const headCheck = await PreviewRunner.check(sandbox, {
+                baseUrl: head.server.url,
+                routePath: head.surface.routePath,
+                workspaceRoot: `${WORKSPACE_DIR}/head`,
+                nextAppDir: detect.nextAppDir,
+            });
+            if (!headCheck.ok) {
+                const failed = headCheck.results.find((result) => !result.ok);
+                throw new Error(
+                    `head preview validation failed${failed ? `: ${failed.targetId}/${failed.stateId} ${failed.problem ?? "render failed"}` : ""}`,
+                );
+            }
+
             step("photograph the head revision");
             const headShots = await PreviewRunner.capture(sandbox, {
                 url: head.server.url,
+                routePath: head.surface.routePath,
                 side: "head",
                 workspaceRoot: `${WORKSPACE_DIR}/head`,
                 nextAppDir: detect.nextAppDir,
@@ -462,10 +493,17 @@ export default class ProductDiffRunner {
 
             step("stop the head dev server");
             await PreviewServer.stop(head.server);
+            await PreviewRunner.remove_next_preview_surface(sandbox, head.surface);
             activeServer = null;
 
             step("start base dev server");
-            await PreviewRunner.scaffold(sandbox, `${WORKSPACE_DIR}/base`, detect, head.mode);
+            await PreviewRunner.scaffold(sandbox, `${WORKSPACE_DIR}/base`, detect);
+            const baseSurface = await PreviewRunner.create_next_preview_surface(sandbox, {
+                workspaceRoot: `${WORKSPACE_DIR}/base`,
+                applicationPath: detect.nextAppDir,
+                routeSegment: head.surface.routePath.slice(1),
+                router: head.surface.router,
+            });
             const baseServer = await PreviewServer.start(
                 sandbox,
                 {
@@ -487,9 +525,24 @@ export default class ProductDiffRunner {
                 );
             }
 
+            step("verify the base preview surface");
+            const baseCheck = await PreviewRunner.check(sandbox, {
+                baseUrl: baseServer.url,
+                routePath: baseSurface.routePath,
+                workspaceRoot: `${WORKSPACE_DIR}/base`,
+                nextAppDir: detect.nextAppDir,
+            });
+            if (!baseCheck.ok) {
+                const failed = baseCheck.results.find((result) => !result.ok);
+                throw new Error(
+                    `base preview validation failed${failed ? `: ${failed.targetId}/${failed.stateId} ${failed.problem ?? "render failed"}` : ""}`,
+                );
+            }
+
             step("photograph the base revision");
             const baseShots = await PreviewRunner.capture(sandbox, {
                 url: baseServer.url,
+                routePath: baseSurface.routePath,
                 side: "base",
                 workspaceRoot: `${WORKSPACE_DIR}/base`,
                 nextAppDir: detect.nextAppDir,
@@ -509,6 +562,7 @@ export default class ProductDiffRunner {
 
             step("stop the base dev server");
             await PreviewServer.stop(baseServer);
+            await PreviewRunner.remove_next_preview_surface(sandbox, baseSurface);
             activeServer = null;
 
             step("pair the screenshots");

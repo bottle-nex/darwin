@@ -6,9 +6,11 @@ import { check } from "./check";
 import {
     captureInputSchema,
     checkInputSchema,
+    createNextPreviewSurfaceInputSchema,
     detectInputSchema,
     nextWorkspaceInspectionInputSchema,
     pairInputSchema,
+    removeNextPreviewSurfaceInputSchema,
     scaffoldInputSchema,
     type DoctorOutput,
 } from "./contract";
@@ -16,12 +18,18 @@ import { detect } from "./detect";
 import { scaffold } from "./scaffold";
 import { pair } from "./pair";
 import { inspect_next_workspace } from "./adapters/next/workspace";
+import {
+    create_next_preview_surface,
+    remove_next_preview_surface,
+} from "./adapters/next/preview_surface";
 
-const RUNTIME_PROTOCOL_VERSION = 4;
+const RUNTIME_PROTOCOL_VERSION = 5;
 const COMMANDS = [
     "detect",
     "inspect-next-workspace",
     "scaffold",
+    "create-next-preview-surface",
+    "remove-next-preview-surface",
     "check",
     "capture",
     "pair",
@@ -83,6 +91,15 @@ async function run(command: Command, input: unknown): Promise<unknown> {
             return inspect_next_workspace(nextWorkspaceInspectionInputSchema.parse(input));
         case "scaffold":
             return scaffold(scaffoldInputSchema.parse(input));
+        case "create-next-preview-surface": {
+            const surfaceInput = createNextPreviewSurfaceInputSchema.parse(input);
+            return create_next_preview_surface(surfaceInput.workspaceRoot, surfaceInput);
+        }
+        case "remove-next-preview-surface": {
+            const { surface } = removeNextPreviewSurfaceInputSchema.parse(input);
+            remove_next_preview_surface(surface);
+            return { ok: true };
+        }
         case "check":
             return check(checkInputSchema.parse(input));
         case "capture":

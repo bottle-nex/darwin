@@ -35,6 +35,7 @@ export async function capture_problem(
 async function warm_up(
     context: BrowserContext,
     baseUrl: string,
+    routePath: string,
     slots: Slot[],
     timeoutMs: number,
 ): Promise<void> {
@@ -42,7 +43,7 @@ async function warm_up(
     try {
         for (const slot of slots) {
             await page
-                .goto(preview_url(baseUrl, slot.targetId, slot.stateId), {
+                .goto(preview_url(baseUrl, routePath, slot.targetId, slot.stateId), {
                     waitUntil: "domcontentloaded",
                     timeout: timeoutMs,
                 })
@@ -74,10 +75,13 @@ async function capture_one(
     };
 
     try {
-        const response = await page.goto(preview_url(input.url, slot.targetId, slot.stateId), {
-            waitUntil: "domcontentloaded",
-            timeout: input.navigationTimeoutMs,
-        });
+        const response = await page.goto(
+            preview_url(input.url, input.routePath, slot.targetId, slot.stateId),
+            {
+                waitUntil: "domcontentloaded",
+                timeout: input.navigationTimeoutMs,
+            },
+        );
         const status = response?.status() ?? 0;
         if (!response || status >= 400) {
             return { ...base, status: "failed", file: null, error: `HTTP ${status}` };
@@ -155,7 +159,7 @@ export async function capture(input: CaptureInput): Promise<CaptureOutput> {
                 { frozenNowMs: input.frozenNowMs, randomSeed: input.randomSeed },
             );
             try {
-                await warm_up(context, input.url, slots, input.warmupTimeoutMs);
+                await warm_up(context, input.url, input.routePath, slots, input.warmupTimeoutMs);
                 for (const slot of slots) {
                     captures.push(await capture_one(context, input, slot, viewport));
                 }

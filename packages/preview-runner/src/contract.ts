@@ -3,13 +3,20 @@ import { z } from "zod";
 export const SAFE_ID = /^[a-z0-9][a-z0-9-]{0,48}$/;
 export const MAX_WARNINGS = 20;
 export const MAX_WARNING_LENGTH = 400;
+export const ADVISORY_WARNINGS_TRUNCATED = "advisory warnings were truncated to fit preview limits";
 
 export const advisoryWarningsSchema = z
     .array(z.string())
     .catch([])
-    .transform((values) =>
-        values.slice(0, MAX_WARNINGS).map((value) => value.slice(0, MAX_WARNING_LENGTH)),
-    );
+    .transform((values) => {
+        const truncated =
+            values.length > MAX_WARNINGS ||
+            values.some((value) => value.length > MAX_WARNING_LENGTH);
+        const normalized = values
+            .slice(0, MAX_WARNINGS)
+            .map((value) => value.slice(0, MAX_WARNING_LENGTH));
+        return truncated ? [...normalized, ADVISORY_WARNINGS_TRUNCATED] : normalized;
+    });
 
 export const packageManagerSchema = z.enum(["bun", "pnpm", "yarn", "npm"]);
 export type PackageManager = z.infer<typeof packageManagerSchema>;
@@ -19,6 +26,26 @@ export type NextWorkspaceKind = z.infer<typeof nextWorkspaceKindSchema>;
 
 export const nextApplicationRouterSchema = z.enum(["AppRouter", "PagesRouter"]);
 export type NextApplicationRouter = z.infer<typeof nextApplicationRouterSchema>;
+
+export const previewSurfaceSchema = z.object({
+    routePath: z.string().regex(/^\/[a-z0-9][a-z0-9-]{0,48}$/),
+    generatedFiles: z.array(z.string().min(1)).min(1),
+    router: nextApplicationRouterSchema,
+});
+export type PreviewSurface = z.infer<typeof previewSurfaceSchema>;
+
+export const createNextPreviewSurfaceInputSchema = z.object({
+    workspaceRoot: z.string().min(1),
+    applicationPath: z.string().min(1),
+    routeSegment: z.string().regex(SAFE_ID),
+    router: nextApplicationRouterSchema,
+});
+export type CreateNextPreviewSurfaceInput = z.infer<typeof createNextPreviewSurfaceInputSchema>;
+
+export const removeNextPreviewSurfaceInputSchema = z.object({
+    surface: previewSurfaceSchema,
+});
+export type RemoveNextPreviewSurfaceInput = z.infer<typeof removeNextPreviewSurfaceInputSchema>;
 
 export const nextApplicationCandidateSchema = z.object({
     applicationPath: z.string().min(1),
@@ -44,9 +71,6 @@ export type NextWorkspaceInspection = z.infer<typeof nextWorkspaceInspectionSche
 
 export const frameworkSchema = z.enum(["NextAppRouter", "NextPagesRouter"]);
 export type Framework = z.infer<typeof frameworkSchema>;
-
-export const scaffoldModeSchema = z.enum(["AppRoute", "PagesEscape"]);
-export type ScaffoldMode = z.infer<typeof scaffoldModeSchema>;
 
 export const shotOutcomeSchema = z.enum(["Rendered", "Added", "Removed", "Unavailable"]);
 export type ShotOutcome = z.infer<typeof shotOutcomeSchema>;
@@ -116,7 +140,6 @@ export type DetectOutput = z.infer<typeof detectOutputSchema>;
 export const scaffoldInputSchema = z.object({
     workspaceRoot: z.string().min(1),
     detect: detectOutputSchema,
-    mode: scaffoldModeSchema,
 });
 export type ScaffoldInput = z.infer<typeof scaffoldInputSchema>;
 
@@ -141,6 +164,7 @@ export type CheckProblem = z.infer<typeof checkProblemSchema>;
 
 export const checkInputSchema = z.object({
     baseUrl: z.string().min(1),
+    routePath: previewSurfaceSchema.shape.routePath,
     workspaceRoot: z.string().min(1),
     nextAppDir: z.string().min(1),
     targetIds: z.array(z.string()).optional(),
@@ -171,6 +195,7 @@ export type RevisionSide = z.infer<typeof revisionSideSchema>;
 
 export const captureInputSchema = z.object({
     url: z.string().min(1),
+    routePath: previewSurfaceSchema.shape.routePath,
     side: revisionSideSchema,
     workspaceRoot: z.string().min(1),
     nextAppDir: z.string().min(1),
@@ -244,19 +269,13 @@ export type DoctorOutput = z.infer<typeof doctorOutputSchema>;
 
 export const HARNESS_DIR = "matcha_preview";
 export const HARNESS_ROOT_ATTRIBUTE = "data-matcha-harness-root";
-export const PREVIEW_ROUTE_SEGMENT = "matcha-preview";
 export const PROBE_TARGET_ID = "matcha-probe";
 
-/**
- * Builds the URL that shows one target in one state on a running dev server.
- *
- * Both the App Router and the Pages Router harnesses answer on the same path shape, so every
- * other part of the runner can share one code path.
- *
- * @example
- * preview_url("http://127.0.0.1:41337", "header-nav", "signed-out");
- * // "http://127.0.0.1:41337/matcha-preview/header-nav?state=signed-out"
- */
-export function preview_url(baseUrl: string, targetId: string, stateId: string): string {
-    return `${baseUrl.replace(/\/+$/, "")}/${PREVIEW_ROUTE_SEGMENT}/${targetId}?state=${encodeURIComponent(stateId)}`;
+export function preview_url(
+    baseUrl: string,
+    routePath: string,
+    targetId: string,
+    stateId: string,
+): string {
+    return `${baseUrl.replace(/\/+$/, "")}${routePath}/${targetId}?state=${encodeURIComponent(stateId)}`;
 }

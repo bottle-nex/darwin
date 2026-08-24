@@ -3,7 +3,6 @@ import type { Browser, Locator } from "playwright";
 import { open_browser, open_deterministic_context, settle_page } from "./browser";
 import {
     HARNESS_ROOT_ATTRIBUTE,
-    PREVIEW_ROUTE_SEGMENT,
     PROBE_TARGET_ID,
     preview_url,
     type CheckInput,
@@ -50,16 +49,16 @@ export async function next_error_overlay_detail(
 async function check_one(
     browser: Browser,
     baseUrl: string,
+    routePath: string,
     targetId: string,
     stateId: string,
     navigationTimeoutMs: number,
 ): Promise<CheckResult> {
-    const url = preview_url(baseUrl, targetId, stateId);
+    const url = preview_url(baseUrl, routePath, targetId, stateId);
     const context = await open_deterministic_context(browser, CHECK_VIEWPORT, DETERMINISM);
     const page = await context.newPage();
     const pageErrors: string[] = [];
     const consoleErrors: string[] = [];
-    const warnings: string[] = [];
 
     page.on("pageerror", (error) => pageErrors.push(error.stack ?? error.message));
     page.on("console", (message) => {
@@ -84,7 +83,7 @@ async function check_one(
                 httpStatus,
             );
         }
-        if (!page.url().includes(`/${PREVIEW_ROUTE_SEGMENT}/`)) {
+        if (!page.url().includes(`${routePath}/`)) {
             return fail(
                 targetId,
                 stateId,
@@ -97,14 +96,28 @@ async function check_one(
 
         await settle_page(page, 150);
 
+        if (pageErrors.length > 0) {
+            return fail(targetId, stateId, url, "PageError", pageErrors.join("\n\n"), httpStatus);
+        }
+
         const portal = page.locator("nextjs-portal");
         const overlay = (await portal.count()) > 0 ? await next_error_overlay_detail(portal) : "";
+        if (overlay) {
+            return fail(targetId, stateId, url, "NextErrorOverlay", overlay, httpStatus);
+        }
+        if (consoleErrors.length > 0) {
+            return fail(
+                targetId,
+                stateId,
+                url,
+                "ConsoleError",
+                consoleErrors.join("\n\n"),
+                httpStatus,
+            );
+        }
 
         const root = page.locator(`[${HARNESS_ROOT_ATTRIBUTE}]`).first();
         if ((await root.count()) === 0) {
-            if (overlay) {
-                return fail(targetId, stateId, url, "NextErrorOverlay", overlay, httpStatus);
-            }
             return fail(
                 targetId,
                 stateId,
@@ -117,9 +130,6 @@ async function check_one(
 
         const box = await root.boundingBox();
         if (!box || box.width <= 0 || box.height <= 0) {
-            if (overlay) {
-                return fail(targetId, stateId, url, "NextErrorOverlay", overlay, httpStatus);
-            }
             return fail(
                 targetId,
                 stateId,
@@ -129,15 +139,6 @@ async function check_one(
                 httpStatus,
             );
         }
-        if (pageErrors.length > 0) {
-            return fail(targetId, stateId, url, "PageError", pageErrors.join("\n\n"), httpStatus);
-        }
-        if (overlay) {
-            warnings.push(overlay);
-        }
-        if (consoleErrors.length > 0) {
-            warnings.push(...consoleErrors);
-        }
 
         return {
             targetId,
@@ -146,7 +147,7 @@ async function check_one(
             ok: true,
             httpStatus,
             problem: null,
-            detail: [...new Set(warnings)].join("\n\n") || null,
+            detail: null,
         };
     } catch (error) {
         const message = error instanceof Error ? error.message : String(error);
@@ -184,6 +185,7 @@ export async function check(input: CheckInput): Promise<CheckOutput> {
             await check_one(
                 browser,
                 input.baseUrl,
+                input.routePath,
                 PROBE_TARGET_ID,
                 "default",
                 input.navigationTimeoutMs,
@@ -195,6 +197,7 @@ export async function check(input: CheckInput): Promise<CheckOutput> {
                     await check_one(
                         browser,
                         input.baseUrl,
+                        input.routePath,
                         target.id,
                         state.id,
                         input.navigationTimeoutMs,

@@ -4,7 +4,7 @@ import { z } from "zod";
 const RUNNER_ENTRY = "/opt/matcha/preview-runner/index.js";
 const PREVIEW_DIR = "/home/user/preview";
 const COMMAND_TIMEOUT_MS = 15 * 60_000;
-const RUNTIME_PROTOCOL_VERSION = 4;
+const RUNTIME_PROTOCOL_VERSION = 5;
 const SAFE_ID = /^[a-z0-9][a-z0-9-]{0,48}$/;
 const MAX_WARNINGS = 20;
 const MAX_WARNING_LENGTH = 400;
@@ -41,7 +41,15 @@ export type NextWorkspaceInspection = z.infer<typeof nextWorkspaceInspectionSche
 const frameworkSchema = z.enum(["NextAppRouter", "NextPagesRouter"]);
 export type PreviewFramework = z.infer<typeof frameworkSchema>;
 
-export type ScaffoldMode = "AppRoute" | "PagesEscape";
+const nextApplicationRouterSchema = z.enum(["AppRouter", "PagesRouter"]);
+export type NextApplicationRouter = z.infer<typeof nextApplicationRouterSchema>;
+
+const previewSurfaceSchema = z.object({
+    routePath: z.string().regex(/^\/[a-z0-9][a-z0-9-]{0,48}$/),
+    generatedFiles: z.array(z.string().min(1)).min(1),
+    router: nextApplicationRouterSchema,
+});
+export type PreviewSurface = z.infer<typeof previewSurfaceSchema>;
 
 const detectSchema = z.object({
     supported: z.boolean(),
@@ -167,6 +175,7 @@ export interface PreviewViewport {
 
 export interface CaptureRequest {
     url: string;
+    routePath: string;
     side: "head" | "base";
     workspaceRoot: string;
     nextAppDir: string;
@@ -238,23 +247,36 @@ export default class PreviewRunner {
         );
     }
 
-    /**
-     * Generates the preview route files for one revision.
-     *
-     * Always run by the pipeline, never by the agent — which is what makes it safe to run the very
-     * same generation on the base revision, where the agent never went.
-     *
-     * @example
-     * await PreviewRunner.scaffold(sandbox, "/home/user/workspace/base", detect, "AppRoute");
-     * // { ok: true, routeFiles: ["apps/web/app/matcha-preview/[targetId]/page.tsx", ...] }
-     */
+    static async create_next_preview_surface(
+        sandbox: Sandbox,
+        input: {
+            workspaceRoot: string;
+            applicationPath: string;
+            routeSegment: string;
+            router: NextApplicationRouter;
+        },
+    ): Promise<PreviewSurface> {
+        return this.invoke(sandbox, "create-next-preview-surface", input, previewSurfaceSchema);
+    }
+
+    static async remove_next_preview_surface(
+        sandbox: Sandbox,
+        surface: PreviewSurface,
+    ): Promise<void> {
+        await this.invoke(
+            sandbox,
+            "remove-next-preview-surface",
+            { surface },
+            z.object({ ok: z.literal(true) }),
+        );
+    }
+
     static async scaffold(
         sandbox: Sandbox,
         workspaceRoot: string,
         detect: PreviewDetect,
-        mode: ScaffoldMode,
     ): Promise<PreviewScaffold> {
-        return this.invoke(sandbox, "scaffold", { workspaceRoot, detect, mode }, scaffoldSchema);
+        return this.invoke(sandbox, "scaffold", { workspaceRoot, detect }, scaffoldSchema);
     }
 
     /**
@@ -274,6 +296,7 @@ export default class PreviewRunner {
             "capture",
             {
                 url: request.url,
+                routePath: request.routePath,
                 side: request.side,
                 workspaceRoot: request.workspaceRoot,
                 nextAppDir: request.nextAppDir,
@@ -289,7 +312,7 @@ export default class PreviewRunner {
 
     static async check(
         sandbox: Sandbox,
-        settings: { baseUrl: string; workspaceRoot: string; nextAppDir: string },
+        settings: { baseUrl: string; routePath: string; workspaceRoot: string; nextAppDir: string },
     ): Promise<PreviewCheck> {
         return this.invoke(sandbox, "check", settings, checkSchema);
     }
@@ -333,7 +356,6 @@ export default class PreviewRunner {
             workspaceRoot: string;
             nextAppDir: string;
             baseUrl: string;
-            mode: ScaffoldMode;
             detect: PreviewDetect;
         },
     ): Promise<void> {

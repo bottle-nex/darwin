@@ -20,7 +20,7 @@ const TEMPLATE_NAME = "node-py-claude-template";
 const TEMPLATE_TAG = "stable";
 const SANDBOX_MCP_ENTRY = "/opt/matcha/sandbox-mcp/index.js";
 const PREVIEW_RUNNER_ENTRY = "/opt/matcha/preview-runner/index.js";
-const PREVIEW_RUNNER_PROTOCOL_VERSION = 3;
+const PREVIEW_RUNNER_PROTOCOL_VERSION = 5;
 
 interface Requirement {
     name: string;

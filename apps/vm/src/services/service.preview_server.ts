@@ -6,7 +6,7 @@ import type { NextPreviewLaunchPlan } from "./product_diff/adapters/next/service
 const READY_TIMEOUT_MS = 4 * 60_000;
 const READY_GRACE_MS = 30_000;
 const LOG_TAIL_LINES = 20;
-const PROBE_PATH = "/matcha-preview/matcha-probe";
+const PROBE_PATH = "/";
 
 export interface PreviewServerOptions {
     worktree: string;
