@@ -36,3 +36,33 @@ test("redacts authorization values after non-bearer schemes", () => {
     expect(message).toContain("Authorization: [redacted]");
     expect(message).not.toContain("basic-secret");
 });
+
+test("redacts compound credential labels in query strings and labelled output", () => {
+    const message = sanitize_preview_diagnostic_message(
+        "ConsoleError: https://preview.example/?client_secret=client-secret&refresh_token=refresh-secret&cookies=query-cookie client_secret: labelled-client refresh_token=labelled-refresh Cookie: session=labelled-cookie data-secret: compound-secret",
+    );
+
+    expect(message).toContain("client_secret=[redacted]");
+    expect(message).toContain("refresh_token=[redacted]");
+    expect(message).toContain("cookies=[redacted]");
+    expect(message).toContain("Cookie: [redacted]");
+    expect(message).toContain("data-secret: [redacted]");
+    expect(message).not.toContain("client-secret");
+    expect(message).not.toContain("refresh-secret");
+    expect(message).not.toContain("query-cookie");
+    expect(message).not.toContain("labelled-client");
+    expect(message).not.toContain("labelled-refresh");
+    expect(message).not.toContain("labelled-cookie");
+    expect(message).not.toContain("compound-secret");
+});
+
+test("omits arbitrary markup fragments from diagnostics", () => {
+    const message = sanitize_preview_diagnostic_message(
+        'HTTP 403 <div data-token="markup-secret">Preview denied</div>',
+    );
+
+    expect(message).toContain("HTTP 403");
+    expect(message).toContain("[HTML response omitted]");
+    expect(message).not.toContain("markup-secret");
+    expect(message).not.toContain("<div");
+});

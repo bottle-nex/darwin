@@ -37,3 +37,26 @@ test("does not persist browser-check credentials in PreviewUnavailable diagnosti
     expect(diagnostic.message).not.toContain("browser-secret");
     expect(diagnostic.message).not.toContain("query-secret");
 });
+
+test("does not persist sensitive browser-check detail in PreviewUnavailable diagnostics", () => {
+    const checkError = preview_check_error("head", {
+        targetId: "header-nav",
+        stateId: "signed-out",
+        problem: "ConsoleError",
+        detail: 'https://preview.example/?client_secret=client-secret&refresh_token=refresh-secret Cookie: session=browser-cookie <div data-token="markup-secret">Preview denied</div>',
+    });
+    const diagnostic = preview_unavailable_diagnostic(
+        "verify the head preview surface",
+        checkError.message,
+        "apps/web",
+    );
+
+    expect(diagnostic.message).toContain("client_secret=[redacted]");
+    expect(diagnostic.message).toContain("refresh_token=[redacted]");
+    expect(diagnostic.message).toContain("Cookie: [redacted]");
+    expect(diagnostic.message).toContain("[HTML response omitted]");
+    expect(diagnostic.message).not.toContain("client-secret");
+    expect(diagnostic.message).not.toContain("refresh-secret");
+    expect(diagnostic.message).not.toContain("browser-cookie");
+    expect(diagnostic.message).not.toContain("markup-secret");
+});
