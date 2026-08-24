@@ -110,3 +110,11 @@ test("rejects an override that sets its own network binding", () => {
         }),
     ).toThrow();
 });
+
+test("rejects an override with an attached short host argument", () => {
+    expect(() => NextPreviewLauncher.validate_override("pnpm run dev -- -H0.0.0.0")).toThrow();
+});
+
+test("rejects an override with a short host argument", () => {
+    expect(() => NextPreviewLauncher.validate_override("pnpm run dev -- -H 0.0.0.0")).toThrow();
+});

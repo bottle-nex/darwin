@@ -22,7 +22,6 @@ export interface ProductDiffPreviewConfiguration {
     applicationPath?: string;
     launchCommand?: string;
     healthPath?: string;
-    visualRoutes?: string[];
 }
 
 export const ProductDiffFramework = {

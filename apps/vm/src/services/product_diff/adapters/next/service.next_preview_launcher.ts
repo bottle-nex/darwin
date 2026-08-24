@@ -5,6 +5,8 @@ const SAFE_SHELL_ARGUMENT = /^[A-Za-z0-9_@%+=:,./-]+$/;
 const SAFE_OVERRIDE = /^[A-Za-z0-9_@%+=:,./ -]+$/;
 const SAFE_HEALTH_PATH = /^\/[A-Za-z0-9._~/-]*$/;
 const PACKAGE_MANAGERS = new Set<PackageManager>(["bun", "pnpm", "yarn", "npm"]);
+const NETWORK_BINDING_ARGUMENT =
+    /(?:^|\s)(?:--(?:hostname|host|port)(?:=|\s|$)|-(?:H|p)(?:=|\s|[^\s]+|$))/;
 const WORKSPACE_KINDS = new Set<NextWorkspaceKind>([
     "Standalone",
     "PnpmWorkspace",
@@ -46,7 +48,7 @@ function valid_health_path(healthPath: string): boolean {
 }
 
 function has_network_binding_argument(command: string): boolean {
-    return /(?:^|\s)(?:--(?:hostname|host|port)(?:=|\s|$)|-p(?:\d+)?(?:\s|$))/.test(command);
+    return NETWORK_BINDING_ARGUMENT.test(command);
 }
 
 function append_network_arguments(
