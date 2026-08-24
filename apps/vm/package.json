@@ -10,6 +10,7 @@
         "solve": "bun run src/scripts/script.solve_hardcoded_issue.ts",
         "template": "bun run src/scripts/script.build_sandbox_template.ts",
         "template:verify": "bun run src/scripts/script.verify_sandbox_template.ts",
+        "test": "bun test src",
         "lint": "eslint . --max-warnings 0",
         "typecheck": "tsc --noEmit"
     },
