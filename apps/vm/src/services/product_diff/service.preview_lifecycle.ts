@@ -73,6 +73,15 @@ function startup_failure_summary(logTail: string): string {
         .slice(0, STARTUP_SUMMARY_MAX_LENGTH);
 }
 
+function redact_startup_log(value: string): string {
+    return value
+        .replace(
+            /(authorization|cookie|password|token|secret|api[_-]?key)\s*[:=]\s*(?:bearer\s+)?[^\s,;]+/gi,
+            "$1=[redacted]",
+        )
+        .slice(-2_000);
+}
+
 export default class ProductDiffPreviewLifecycle {
     static async start_and_verify(input: {
         sandbox: Sandbox;
@@ -89,14 +98,19 @@ export default class ProductDiffPreviewLifecycle {
         try {
             server = await PreviewServer.start(input.sandbox, input.launchPlan);
             if (!(await PreviewServer.wait_until_ready(input.sandbox, server, input.log))) {
-                const logTail = await PreviewServer.log_tail(input.sandbox, server);
+                const startup = await PreviewServer.startup_diagnostics(input.sandbox, server);
                 input.log.warn("preview startup failed", {
                     revision: input.revision,
                     applicationPath: input.workspacePlan.applicationPath,
                     workspaceKind: input.workspacePlan.workspaceKind,
                     port: server.port,
                     healthPath: server.healthPath,
-                    startupSummary: startup_failure_summary(logTail),
+                    launchCommand: input.launchPlan.command,
+                    workingDirectory: input.launchPlan.workingDirectory,
+                    startupSummary: startup_failure_summary(startup.logTail),
+                    startupLogTail: redact_startup_log(startup.logTail),
+                    listenerSnapshot: startup.listenerSnapshot,
+                    processSnapshot: startup.processSnapshot,
                 });
                 return {
                     revision: input.revision,

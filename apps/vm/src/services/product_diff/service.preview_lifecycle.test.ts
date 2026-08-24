@@ -28,6 +28,7 @@ const workspacePlan: ProductDiffWorkspacePlan = {
 const originalStart = PreviewServer.start;
 const originalWaitUntilReady = PreviewServer.wait_until_ready;
 const originalLogTail = PreviewServer.log_tail;
+const originalStartupDiagnostics = PreviewServer.startup_diagnostics;
 const originalCreateSurface = NextPreviewSurface.create;
 const originalCheck = PreviewRunner.check;
 const originalCapture = PreviewRunner.capture;
@@ -134,9 +135,11 @@ test("logs a redacted startup summary without persisting server output", async (
         process: {},
     });
     PreviewServer.wait_until_ready = mock().mockResolvedValue(false);
-    PreviewServer.log_tail = mock().mockResolvedValue(
-        "Module not found: Can't resolve 'pino-pretty' Authorization=Bearer lifecycle-log-secret",
-    );
+    PreviewServer.startup_diagnostics = mock().mockResolvedValue({
+        logTail: "Module not found: Can't resolve 'pino-pretty' Authorization=Bearer lifecycle-log-secret",
+        listenerSnapshot: "",
+        processSnapshot: "123 S 241 next dev",
+    });
     const log = { warn: mock() } as unknown as Logger;
 
     const preview = await ProductDiffPreviewLifecycle.start_and_verify({
@@ -161,13 +164,14 @@ test("logs a redacted startup summary without persisting server output", async (
         },
     });
     expect(JSON.stringify(preview.health)).not.toContain("lifecycle-log-secret");
-    expect(PreviewServer.log_tail).toHaveBeenCalled();
+    expect(PreviewServer.startup_diagnostics).toHaveBeenCalled();
     expect(log.warn).toHaveBeenCalledWith(
         "preview startup failed",
         expect.objectContaining({
             revision: "head",
             applicationPath: "apps/web",
             startupSummary: "Module not found: Can't resolve 'pino-pretty' Authorization=[redacted]",
+            processSnapshot: "123 S 241 next dev",
         }),
     );
 });
@@ -249,6 +253,7 @@ afterEach(() => {
     PreviewServer.start = originalStart;
     PreviewServer.wait_until_ready = originalWaitUntilReady;
     PreviewServer.log_tail = originalLogTail;
+    PreviewServer.startup_diagnostics = originalStartupDiagnostics;
     NextPreviewSurface.create = originalCreateSurface;
     PreviewRunner.check = originalCheck;
     PreviewRunner.capture = originalCapture;

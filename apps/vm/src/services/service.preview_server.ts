@@ -6,6 +6,7 @@ import type { NextPreviewLaunchPlan } from "./product_diff/adapters/next/service
 const READY_TIMEOUT_MS = 4 * 60_000;
 const READY_GRACE_MS = 30_000;
 const LOG_TAIL_LINES = 20;
+const DIAGNOSTIC_LOG_TAIL_LINES = 60;
 const PROBE_PATH = "/";
 
 export interface PreviewServerOptions {
@@ -21,6 +22,12 @@ export interface PreviewServerHandle {
     logPath: string;
     port: number;
     process: CommandHandle;
+}
+
+export interface PreviewServerStartupDiagnostics {
+    logTail: string;
+    listenerSnapshot: string;
+    processSnapshot: string;
 }
 
 function app_directory(options: PreviewServerOptions): string {
@@ -149,6 +156,27 @@ export default class PreviewServer {
             .run(`tail -n ${LOG_TAIL_LINES} ${server.logPath} 2>/dev/null || true`)
             .catch(() => null);
         return result?.stdout.trim() ?? "";
+    }
+
+    static async startup_diagnostics(
+        sandbox: Sandbox,
+        server: PreviewServerHandle,
+    ): Promise<PreviewServerStartupDiagnostics> {
+        const [logTail, listenerSnapshot, processSnapshot] = await Promise.all([
+            sandbox.commands
+                .run(`tail -n ${DIAGNOSTIC_LOG_TAIL_LINES} ${shell_argument(server.logPath)} 2>/dev/null || true`)
+                .then((result) => result.stdout.trim())
+                .catch(() => ""),
+            sandbox.commands
+                .run(`(ss -ltn 2>/dev/null || netstat -ltn 2>/dev/null || true) | grep ':${server.port} ' || true`)
+                .then((result) => result.stdout.trim())
+                .catch(() => ""),
+            sandbox.commands
+                .run("ps -eo pid=,stat=,etimes=,command= | grep -E '[n]ext|[t]urbo|[n]x' || true")
+                .then((result) => result.stdout.trim())
+                .catch(() => ""),
+        ]);
+        return { logTail, listenerSnapshot, processSnapshot };
     }
 
     /**
