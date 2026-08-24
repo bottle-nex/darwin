@@ -5,6 +5,7 @@ import type Logger from "@trymatcha/logger";
 import { Sandbox } from "e2b";
 
 import { ENV } from "../conf/config.env";
+import type { ProductDiffWorkspacePlan } from "./product_diff/adapter.contract";
 import type { PackageManager, PreviewDetect } from "./service.preview_runner";
 
 const DEPS_CACHE_DIR = "/home/user/.matcha/deps-cache";
@@ -22,6 +23,15 @@ const INSTALL_COMMANDS: Record<PackageManager, string[]> = {
 function lockfile_dir(worktree: string, lockfileRelPath: string): string {
     const segments = lockfileRelPath.split("/").slice(0, -1);
     return segments.length ? `${worktree}/${segments.join("/")}` : worktree;
+}
+
+function install_directory(worktree: string, directory: string): string {
+    const normalized = directory.replaceAll("\\", "/").replace(/^\.\//, "");
+    if (!normalized || normalized === ".") return worktree;
+    if (normalized.startsWith("/") || normalized.split("/").includes("..")) {
+        throw new Error("workspace installation directory must remain inside the worktree");
+    }
+    return `${worktree}/${normalized}`;
 }
 
 export default class PreviewDeps {
@@ -67,14 +77,36 @@ export default class PreviewDeps {
     static async install(
         sandbox: Sandbox,
         worktree: string,
+        workspacePlan: ProductDiffWorkspacePlan,
         detect: PreviewDetect,
         log: Logger,
+    ): Promise<void>;
+    static async install(
+        sandbox: Sandbox,
+        worktree: string,
+        detect: PreviewDetect,
+        log: Logger,
+    ): Promise<void>;
+    static async install(
+        sandbox: Sandbox,
+        worktree: string,
+        workspacePlanOrDetect: ProductDiffWorkspacePlan | PreviewDetect,
+        detectOrLog: PreviewDetect | Logger,
+        optionalLog?: Logger,
     ): Promise<void> {
+        const usesWorkspacePlan = "installDirectory" in workspacePlanOrDetect;
+        const workspacePlan = usesWorkspacePlan ? workspacePlanOrDetect : null;
+        const detect = usesWorkspacePlan
+            ? (detectOrLog as PreviewDetect)
+            : (workspacePlanOrDetect as PreviewDetect);
+        const log = usesWorkspacePlan ? optionalLog! : (detectOrLog as Logger);
         if (!detect.packageManager || !detect.lockfileRelPath) {
             throw new Error("cannot install without a detected package manager");
         }
 
-        const cwd = lockfile_dir(worktree, detect.lockfileRelPath);
+        const cwd = workspacePlan
+            ? install_directory(worktree, workspacePlan.installDirectory)
+            : lockfile_dir(worktree, detect.lockfileRelPath);
         const [primary, fallback] = INSTALL_COMMANDS[detect.packageManager];
 
         try {

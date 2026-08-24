@@ -1,6 +1,8 @@
 import type Logger from "@trymatcha/logger";
 import type { CommandHandle, Sandbox } from "e2b";
 
+import type { NextPreviewLaunchPlan } from "./product_diff/adapters/next/service.next_preview_launcher";
+
 const READY_TIMEOUT_MS = 4 * 60_000;
 const READY_GRACE_MS = 30_000;
 const LOG_TAIL_LINES = 20;
@@ -15,6 +17,7 @@ export interface PreviewServerOptions {
 
 export interface PreviewServerHandle {
     url: string;
+    healthPath: string;
     logPath: string;
     port: number;
     process: CommandHandle;
@@ -24,6 +27,17 @@ function app_directory(options: PreviewServerOptions): string {
     return options.nextAppDir === "."
         ? options.worktree
         : `${options.worktree}/${options.nextAppDir}`;
+}
+
+function shell_argument(value: string): string {
+    if (/^[A-Za-z0-9_@%+=:,./-]+$/.test(value)) return value;
+    return `'${value.replaceAll("'", "'\\\"'\\\"'")}'`;
+}
+
+function is_launch_plan(
+    options: PreviewServerOptions | NextPreviewLaunchPlan,
+): options is NextPreviewLaunchPlan {
+    return "workingDirectory" in options;
 }
 
 export default class PreviewServer {
@@ -39,11 +53,34 @@ export default class PreviewServer {
      * const server = await PreviewServer.start(sandbox, { worktree, nextAppDir: "apps/web", port: 41337, label: "head" });
      * // { url: "http://127.0.0.1:41337", logPath: "/home/user/preview/head.log", port: 41337 }
      */
+    static async start(sandbox: Sandbox, plan: NextPreviewLaunchPlan): Promise<PreviewServerHandle>;
     static async start(
         sandbox: Sandbox,
         options: PreviewServerOptions,
         envs: Record<string, string>,
+    ): Promise<PreviewServerHandle>;
+    static async start(
+        sandbox: Sandbox,
+        planOrOptions: NextPreviewLaunchPlan | PreviewServerOptions,
+        legacyEnvs: Record<string, string> = {},
     ): Promise<PreviewServerHandle> {
+        if (is_launch_plan(planOrOptions)) {
+            const logPath = `/home/user/preview/${planOrOptions.port}-server.log`;
+            const process = await sandbox.commands.run(
+                `mkdir -p /home/user/preview && cd ${shell_argument(planOrOptions.workingDirectory)} && ${planOrOptions.command} > ${shell_argument(logPath)} 2>&1`,
+                { background: true, envs: planOrOptions.environment },
+            );
+
+            return {
+                url: `http://127.0.0.1:${planOrOptions.port}`,
+                healthPath: planOrOptions.healthPath,
+                logPath,
+                port: planOrOptions.port,
+                process,
+            };
+        }
+
+        const options = planOrOptions;
         const appDir = app_directory(options);
         const logPath = `/home/user/preview/${options.label}-server.log`;
 
@@ -57,10 +94,16 @@ export default class PreviewServer {
 
         const process = await sandbox.commands.run(
             `cd ${appDir} && ${nextBinary} dev --hostname 127.0.0.1 --port ${options.port} > ${logPath} 2>&1`,
-            { background: true, envs },
+            { background: true, envs: legacyEnvs },
         );
 
-        return { url: `http://127.0.0.1:${options.port}`, logPath, port: options.port, process };
+        return {
+            url: `http://127.0.0.1:${options.port}`,
+            healthPath: PROBE_PATH,
+            logPath,
+            port: options.port,
+            process,
+        };
     }
 
     /**
@@ -80,7 +123,7 @@ export default class PreviewServer {
         log: Logger,
     ): Promise<boolean> {
         const seconds = Math.floor(READY_TIMEOUT_MS / 1000);
-        const probe = `curl -sf -o /dev/null --max-time 10 ${server.url}${PROBE_PATH}`;
+        const probe = `curl -sf -o /dev/null --max-time 10 ${server.url}${server.healthPath}`;
         const waited = await sandbox.commands
             .run(`timeout ${seconds} bash -c 'until ${probe}; do sleep 1; done'`, {
                 timeoutMs: READY_TIMEOUT_MS + READY_GRACE_MS,

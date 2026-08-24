@@ -6,7 +6,7 @@ import type { PreviewDetect } from "./service.preview_runner";
 
 const HARNESS_DIR = "matcha_preview";
 const DISABLED_SUFFIX = ".matcha-disabled";
-const OUR_OWN_FILES = [".env", ".env.local"];
+const OUR_OWN_FILES = [".env"];
 const GIT_TIMEOUT_MS = 5 * 60_000;
 const PLACEHOLDER = "matcha-preview-placeholder";
 const UNREACHABLE_URL = "http://127.0.0.1:9";
@@ -116,7 +116,7 @@ export default class PreviewWorkspace {
     static async write_placeholder_env(
         sandbox: Sandbox,
         worktree: string,
-        nextAppDir: string,
+        applicationPath: string,
         detect: PreviewDetect,
         projectId: string,
     ): Promise<void> {
@@ -132,11 +132,12 @@ export default class PreviewWorkspace {
         for (const [key, value] of Object.entries(FIXED_ENV)) lines.push(`${key}=${value}`);
 
         const contents = `${lines.join("\n")}\n`;
-        await sandbox.files.write(`${worktree}/.env`, contents);
-        if (nextAppDir !== ".") {
-            await sandbox.files.write(`${worktree}/${nextAppDir}/.env.local`, contents);
-        } else {
-            await sandbox.files.write(`${worktree}/.env.local`, contents);
+        const paths = new Set([`${worktree}/.env`]);
+        if (applicationPath !== ".") {
+            paths.add(`${worktree}/${applicationPath}/.env`);
+        }
+        for (const path of paths) {
+            await sandbox.files.write(path, contents);
         }
     }
 
@@ -219,6 +220,7 @@ export default class PreviewWorkspace {
             const path = line.slice(3).trim().replace(/^"|"$/g, "");
             if (!path) continue;
             if (path.includes(HARNESS_DIR)) continue;
+            if (path === ".env" || path.endsWith("/.env")) continue;
             if (path.endsWith(DISABLED_SUFFIX) || path.includes("middleware")) continue;
 
             const ours = generated.some(
