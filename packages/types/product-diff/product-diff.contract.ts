@@ -120,6 +120,7 @@ export interface ProductDiffDetail extends ProductDiffSummary {
     manifest: ProductDiffManifest | null;
     baseUrl: string | null;
     headUrl: string | null;
+    diagnostics: ProductDiffDiagnostic | null;
 }
 
 /**

@@ -124,6 +124,32 @@ export default function DiffReviewDisplay({
                     body={detail.error ?? "Diffs currently cover Next.js projects only."}
                 />
             )}
+            {detail && detail.status === "ConfigurationRequired" && (
+                <DiffStatus
+                    title="Needs preview setup"
+                    body={
+                        detail.diagnostics?.message ??
+                        detail.error ??
+                        "This project needs preview configuration before a visual diff can be captured."
+                    }
+                />
+            )}
+            {detail && detail.status === "PreviewUnavailable" && (
+                <DiffStatus
+                    title="Preview could not start"
+                    body={
+                        detail.diagnostics?.message ??
+                        detail.error ??
+                        "The preview could not start in its sandbox. Try again after checking the project setup."
+                    }
+                    action={
+                        <Button size="sm" loading={regenerate.isPending} onClick={handleRegenerate}>
+                            <FiRefreshCw />
+                            Retry
+                        </Button>
+                    }
+                />
+            )}
             {detail && (detail.status === "Failed" || detail.status === "Stale") && (
                 <DiffStatus
                     title={detail.status === "Stale" ? "Out of date" : "Capture failed"}
