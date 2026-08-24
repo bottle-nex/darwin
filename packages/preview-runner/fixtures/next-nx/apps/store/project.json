@@ -1,0 +1,14 @@
+{
+    "name": "@matcha-fixture/store",
+    "projectType": "application",
+    "sourceRoot": "apps/store",
+    "targets": {
+        "serve": {
+            "executor": "@nx/next:server",
+            "options": {
+                "buildTarget": "@matcha-fixture/store:build",
+                "dev": true
+            }
+        }
+    }
+}

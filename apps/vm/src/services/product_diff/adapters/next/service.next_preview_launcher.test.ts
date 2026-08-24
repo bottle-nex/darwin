@@ -56,7 +56,7 @@ test("escapes an apostrophe in a standalone application path", () => {
     );
 });
 
-test("converts the resolver's Bun Nx dev command to the local serve target", () => {
+test("keeps the resolver's Bun Nx serve command on the local target", () => {
     const plan = NextPreviewLauncher.from_workspace_plan({
         workspaceRoot: "/home/user/workspace/head",
         workspacePlan: {
@@ -64,7 +64,7 @@ test("converts the resolver's Bun Nx dev command to the local serve target", () 
             applicationPath: "apps/marketing",
             workspaceKind: "Nx",
             installDirectory: ".",
-            launchCommand: "bun nx run @acme/marketing:dev",
+            launchCommand: "bun nx run @acme/marketing:serve",
             healthPath: "/",
             router: "AppRouter",
             framework: "NextAppRouter",

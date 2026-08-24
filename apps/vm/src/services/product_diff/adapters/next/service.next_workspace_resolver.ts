@@ -1,10 +1,10 @@
 import type { ProductDiffDiagnostic, ProductDiffPreviewConfiguration } from "@trymatcha/types";
 
-import type { ProductDiffWorkspacePlan } from "../../adapter.contract";
 import type {
     NextApplicationCandidate,
     NextWorkspaceInspection,
 } from "../../../service.preview_runner";
+import type { ProductDiffWorkspacePlan } from "../../adapter.contract";
 
 function normalized_path(path: string): string {
     return path.replaceAll("\\", "/").replace(/^\.\//, "").replace(/^\/+/, "");
@@ -97,13 +97,13 @@ function nx_launch_command(
     const project = application.packageName ?? application.applicationPath;
     switch (packageManager) {
         case "bun":
-            return `bun nx run ${project}:dev`;
+            return `bun nx run ${project}:serve`;
         case "pnpm":
-            return `pnpm nx run ${project}:dev`;
+            return `pnpm nx run ${project}:serve`;
         case "yarn":
-            return `yarn nx run ${project}:dev`;
+            return `yarn nx run ${project}:serve`;
         case "npm":
-            return `npm exec nx run ${project}:dev`;
+            return `npm exec nx run ${project}:serve`;
     }
 }
 

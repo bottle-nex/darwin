@@ -41,7 +41,7 @@ test("uses an explicit application path before changed paths", () => {
     });
 });
 
-test("builds an Nx workspace-root launch plan for an application change", () => {
+test("builds an Nx workspace-root serve plan for an application change", () => {
     const result = resolve_next_workspace(
         {
             ...twoAppInspection,
@@ -56,7 +56,7 @@ test("builds an Nx workspace-root launch plan for an application change", () => 
     expect(result).toMatchObject({
         applicationPath: "apps/marketing",
         installDirectory: ".",
-        launchCommand: "bun nx run @acme/marketing:dev",
+        launchCommand: "bun nx run @acme/marketing:serve",
     });
 });
 
