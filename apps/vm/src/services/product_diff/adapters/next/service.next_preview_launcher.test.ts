@@ -25,7 +25,9 @@ test("uses an Nx serve target with controlled host and port arguments", () => {
         port: 41337,
     });
 
-    expect(plan.command).toBe("bun nx run marketing:serve -- --host=127.0.0.1 --port=41337");
+    expect(plan.command).toBe(
+        "bun x --no-install nx run marketing:serve -- --host=127.0.0.1 --port=41337",
+    );
 });
 
 test("quotes a standalone application path before supplying it to npm", () => {
@@ -39,6 +41,51 @@ test("quotes a standalone application path before supplying it to npm", () => {
     expect(plan.command).toBe(
         "npm --prefix 'apps/marketing site' run dev -- --hostname 127.0.0.1 --port 41337",
     );
+});
+
+test("escapes an apostrophe in a standalone application path", () => {
+    const plan = NextPreviewLauncher.create({
+        workspaceKind: "Standalone",
+        packageManager: "pnpm",
+        applicationPath: "apps/marketing's site",
+        port: 41337,
+    });
+
+    expect(plan.command).toBe(
+        "pnpm --dir 'apps/marketing'\"'\"'s site' run dev -- --hostname 127.0.0.1 --port 41337",
+    );
+});
+
+test("converts the resolver's Bun Nx dev command to the local serve target", () => {
+    const plan = NextPreviewLauncher.from_workspace_plan({
+        workspaceRoot: "/home/user/workspace/head",
+        workspacePlan: {
+            repositoryRoot: ".",
+            applicationPath: "apps/marketing",
+            workspaceKind: "Nx",
+            installDirectory: ".",
+            launchCommand: "bun nx run @acme/marketing:dev",
+            healthPath: "/",
+            router: "AppRouter",
+        },
+        port: 41337,
+    });
+
+    expect(plan.command).toBe(
+        "bun x --no-install nx run @acme/marketing:serve -- --host=127.0.0.1 --port=41337",
+    );
+});
+
+test("rejects a health path that can alter the probe shell command", () => {
+    expect(() =>
+        NextPreviewLauncher.create({
+            workspaceKind: "Standalone",
+            packageManager: "pnpm",
+            applicationPath: ".",
+            healthPath: "/ready; touch /tmp/pwned",
+            port: 41337,
+        }),
+    ).toThrow();
 });
 
 test("rejects an override containing shell control operators", () => {

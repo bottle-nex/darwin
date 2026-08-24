@@ -31,7 +31,7 @@ function app_directory(options: PreviewServerOptions): string {
 
 function shell_argument(value: string): string {
     if (/^[A-Za-z0-9_@%+=:,./-]+$/.test(value)) return value;
-    return `'${value.replaceAll("'", "'\\\"'\\\"'")}'`;
+    return `'${value.replaceAll("'", "'\"'\"'")}'`;
 }
 
 function is_launch_plan(
@@ -123,9 +123,10 @@ export default class PreviewServer {
         log: Logger,
     ): Promise<boolean> {
         const seconds = Math.floor(READY_TIMEOUT_MS / 1000);
-        const probe = `curl -sf -o /dev/null --max-time 10 ${server.url}${server.healthPath}`;
+        const probe = `curl -sf -o /dev/null --max-time 10 ${shell_argument(`${server.url}${server.healthPath}`)}`;
+        const retry = `until ${probe}; do sleep 1; done`;
         const waited = await sandbox.commands
-            .run(`timeout ${seconds} bash -c 'until ${probe}; do sleep 1; done'`, {
+            .run(`timeout ${seconds} bash -c ${shell_argument(retry)}`, {
                 timeoutMs: READY_TIMEOUT_MS + READY_GRACE_MS,
             })
             .catch(() => null);

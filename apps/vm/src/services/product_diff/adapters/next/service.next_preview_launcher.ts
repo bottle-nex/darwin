@@ -3,6 +3,7 @@ import type { NextWorkspaceKind, PackageManager } from "../../../service.preview
 
 const SAFE_SHELL_ARGUMENT = /^[A-Za-z0-9_@%+=:,./-]+$/;
 const SAFE_OVERRIDE = /^[A-Za-z0-9_@%+=:,./ -]+$/;
+const SAFE_HEALTH_PATH = /^\/[A-Za-z0-9._~/-]*$/;
 const PACKAGE_MANAGERS = new Set<PackageManager>(["bun", "pnpm", "yarn", "npm"]);
 const WORKSPACE_KINDS = new Set<NextWorkspaceKind>([
     "Standalone",
@@ -33,7 +34,7 @@ export interface NextPreviewLaunchInput {
 
 function shell_argument(value: string): string {
     if (SAFE_SHELL_ARGUMENT.test(value)) return value;
-    return `'${value.replaceAll("'", "'\\\"'\\\"'")}'`;
+    return `'${value.replaceAll("'", "'\"'\"'")}'`;
 }
 
 function valid_port(port: number): boolean {
@@ -41,7 +42,7 @@ function valid_port(port: number): boolean {
 }
 
 function valid_health_path(healthPath: string): boolean {
-    return healthPath.startsWith("/") && !healthPath.includes("\n") && !healthPath.includes("\r");
+    return SAFE_HEALTH_PATH.test(healthPath);
 }
 
 function has_network_binding_argument(command: string): boolean {
@@ -101,7 +102,7 @@ function nx_command(
     const target = shell_argument(`${packageName ?? applicationPath}:serve`);
     switch (packageManager) {
         case "bun":
-            return `bun nx run ${target}`;
+            return `bun x --no-install nx run ${target}`;
         case "pnpm":
             return `pnpm nx run ${target}`;
         case "yarn":
@@ -109,6 +110,18 @@ function nx_command(
         case "npm":
             return `npm exec nx run ${target}`;
     }
+}
+
+function nx_serve_command(command: string): string {
+    const match = command.match(
+        /^(bun(?: x --no-install)?|pnpm|yarn|npm exec) nx run ([^\s]+):(dev|serve)$/,
+    );
+    if (!match) {
+        throw new Error("preview launch plan must use a supported Nx serve command");
+    }
+
+    const runner = match[1]!.startsWith("bun") ? "bun x --no-install" : match[1]!;
+    return `${runner} nx run ${match[2]}:serve`;
 }
 
 function known_command(input: NextPreviewLaunchInput): string {
@@ -193,12 +206,11 @@ export default class NextPreviewLauncher {
             throw new Error("preview launch plan has an invalid health path");
         }
 
+        const launchCommand = this.validate_override(input.workspacePlan.launchCommand);
+        const command = workspaceKind === "Nx" ? nx_serve_command(launchCommand) : launchCommand;
+
         return {
-            command: append_network_arguments(
-                this.validate_override(input.workspacePlan.launchCommand),
-                workspaceKind,
-                input.port,
-            ),
+            command: append_network_arguments(command, workspaceKind, input.port),
             workingDirectory: input.workspaceRoot,
             port: input.port,
             healthPath: input.workspacePlan.healthPath,
