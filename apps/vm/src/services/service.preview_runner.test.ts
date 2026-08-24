@@ -15,10 +15,10 @@ function sandbox_with_runtime_version(version: number): Sandbox {
 }
 
 test("accepts the current preview-runner protocol and rejects an older snapshot", async () => {
-    expect(await PreviewRunner.supports_current_protocol(sandbox_with_runtime_version(5))).toBe(
+    expect(await PreviewRunner.supports_current_protocol(sandbox_with_runtime_version(6))).toBe(
         true,
     );
-    expect(await PreviewRunner.supports_current_protocol(sandbox_with_runtime_version(4))).toBe(
+    expect(await PreviewRunner.supports_current_protocol(sandbox_with_runtime_version(5))).toBe(
         false,
     );
 });

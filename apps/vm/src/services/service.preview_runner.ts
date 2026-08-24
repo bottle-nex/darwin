@@ -4,7 +4,7 @@ import { z } from "zod";
 const RUNNER_ENTRY = "/opt/matcha/preview-runner/index.js";
 const PREVIEW_DIR = "/home/user/preview";
 const COMMAND_TIMEOUT_MS = 15 * 60_000;
-const RUNTIME_PROTOCOL_VERSION = 5;
+const RUNTIME_PROTOCOL_VERSION = 6;
 const SAFE_ID = /^[a-z0-9][a-z0-9-]{0,48}$/;
 const MAX_WARNINGS = 20;
 const MAX_WARNING_LENGTH = 400;
