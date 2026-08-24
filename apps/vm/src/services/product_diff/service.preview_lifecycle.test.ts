@@ -135,6 +135,11 @@ test("logs a redacted startup summary without persisting server output", async (
         process: {},
     });
     PreviewServer.wait_until_ready = mock().mockResolvedValue(false);
+    NextPreviewSurface.create = mock().mockResolvedValue({
+        routePath: "/preview-run-a",
+        generatedFiles: ["/workspace/apps/web/app/preview-run-a/[targetId]/page.tsx"],
+        router: "AppRouter",
+    });
     PreviewServer.startup_diagnostics = mock().mockResolvedValue({
         logTail: "Module not found: Can't resolve 'pino-pretty' Authorization=Bearer lifecycle-log-secret",
         listenerSnapshot: "",
@@ -165,6 +170,12 @@ test("logs a redacted startup summary without persisting server output", async (
     });
     expect(JSON.stringify(preview.health)).not.toContain("lifecycle-log-secret");
     expect(PreviewServer.startup_diagnostics).toHaveBeenCalled();
+    expect(PreviewServer.wait_until_ready).toHaveBeenCalledWith(
+        sandbox,
+        expect.anything(),
+        log,
+        "/preview-run-a/__ready__",
+    );
     expect(log.warn).toHaveBeenCalledWith(
         "preview startup failed",
         expect.objectContaining({

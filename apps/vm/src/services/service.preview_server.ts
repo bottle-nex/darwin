@@ -128,9 +128,10 @@ export default class PreviewServer {
         sandbox: Sandbox,
         server: PreviewServerHandle,
         log: Logger,
+        probePath: string = server.healthPath,
     ): Promise<boolean> {
         const seconds = Math.floor(READY_TIMEOUT_MS / 1000);
-        const probe = `curl -sf -o /dev/null --max-time 10 ${shell_argument(`${server.url}${server.healthPath}`)}`;
+        const probe = `curl -sf -o /dev/null --max-time 10 ${shell_argument(`${server.url}${probePath}`)}`;
         const retry = `until ${probe}; do sleep 1; done`;
         const waited = await sandbox.commands
             .run(`timeout ${seconds} bash -c ${shell_argument(retry)}`, {

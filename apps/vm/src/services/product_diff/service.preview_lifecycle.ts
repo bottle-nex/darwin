@@ -96,8 +96,21 @@ export default class ProductDiffPreviewLifecycle {
         let surface: PreviewSurface | null = null;
 
         try {
+            surface = await NextPreviewSurface.create(
+                input.sandbox,
+                input.workspaceRoot,
+                input.workspacePlan,
+                input.runId,
+            );
             server = await PreviewServer.start(input.sandbox, input.launchPlan);
-            if (!(await PreviewServer.wait_until_ready(input.sandbox, server, input.log))) {
+            if (
+                !(await PreviewServer.wait_until_ready(
+                    input.sandbox,
+                    server,
+                    input.log,
+                    `${surface.routePath}/__ready__`,
+                ))
+            ) {
                 const startup = await PreviewServer.startup_diagnostics(input.sandbox, server);
                 input.log.warn("preview startup failed", {
                     revision: input.revision,
@@ -128,12 +141,6 @@ export default class ProductDiffPreviewLifecycle {
                 };
             }
 
-            surface = await NextPreviewSurface.create(
-                input.sandbox,
-                input.workspaceRoot,
-                input.workspacePlan,
-                input.runId,
-            );
             const check = await PreviewRunner.check(input.sandbox, {
                 baseUrl: server.url,
                 routePath: surface.routePath,
