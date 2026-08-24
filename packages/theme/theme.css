@@ -99,11 +99,6 @@
     --color-ring: #a3a3a3;
 }
 
-/*
- * Codex-inspired dark surfaces for the playground, a shade darker than the
- * reference screenshot. Colorful tokens (primary/matcha/brick/destructive)
- * are intentionally untouched — only neutrals/surfaces/text change here.
- */
 .theme-playground {
     --color-ink: #0c0c0c;
     --color-charcoal: #141414;
