@@ -11,7 +11,7 @@ test("verifies generated launch plans and categorizes the real missing provider 
             applicationPath: ".",
             installDirectory: ".",
             healthPath: "/",
-            command: "npm run dev -- --hostname 127.0.0.1 --port 41337",
+            command: "bun run dev -- --hostname 127.0.0.1 --port 41337",
         }),
         expect.objectContaining({
             name: "next-turborepo",
@@ -19,7 +19,7 @@ test("verifies generated launch plans and categorizes the real missing provider 
             installDirectory: ".",
             healthPath: "/",
             command:
-                "pnpm --filter @matcha-fixture/marketing run dev -- --hostname 127.0.0.1 --port 41337",
+                "bun run --filter @matcha-fixture/marketing dev -- --hostname 127.0.0.1 --port 41337",
         }),
         expect.objectContaining({
             name: "next-nx",
@@ -32,6 +32,18 @@ test("verifies generated launch plans and categorizes the real missing provider 
     ]);
     expect(verified.providerFailure).toMatchObject({
         status: "PreviewUnavailable",
+        hermetic: true,
         diagnostic: { code: "PREVIEW_SERVER_UNAVAILABLE", stage: "startup" },
     });
-});
+    expect(verified.installability).toEqual([
+        expect.objectContaining({ name: "next-standalone", frozen: true }),
+        expect.objectContaining({ name: "next-turborepo", frozen: true }),
+        expect.objectContaining({ name: "next-nx", frozen: true }),
+        expect.objectContaining({ name: "next-ambiguous-workspace", frozen: true }),
+        expect.objectContaining({ name: "next-provider-failure", frozen: true }),
+    ]);
+    expect(verified.ready[2]).toMatchObject({
+        name: "next-nx",
+        buildTarget: "@matcha-fixture/store:build",
+    });
+}, 30_000);

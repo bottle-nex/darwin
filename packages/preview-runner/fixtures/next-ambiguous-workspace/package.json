@@ -1,5 +1,8 @@
 {
     "name": "@matcha-fixture/next-ambiguous-workspace",
     "private": true,
-    "packageManager": "pnpm@10.0.0"
+    "packageManager": "bun@1.3.2",
+    "devDependencies": {
+        "turbo": "2.10.4"
+    }
 }

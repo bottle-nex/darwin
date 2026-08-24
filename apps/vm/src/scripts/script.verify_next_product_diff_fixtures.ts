@@ -1,5 +1,7 @@
 import { spawnSync } from "node:child_process";
-import { existsSync, readFileSync } from "node:fs";
+import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import type { ProductDiffDiagnostic } from "@trymatcha/types";
@@ -22,24 +24,25 @@ const expected = {
 } as const;
 
 const fixtureRoot = new URL("../../../../packages/preview-runner/fixtures/", import.meta.url);
+const FIXTURE_NEXT_VERSION = "15.5.9";
 
 const fixtureConfiguration = {
     "next-standalone": {
         changedPaths: [],
         applicationPath: ".",
-        lockfile: "package-lock.json",
+        lockfile: "bun.lock",
         visualRoute: "app/page.tsx",
         packageManifest: "package.json",
-        command: "npm run dev -- --hostname 127.0.0.1 --port 41337",
+        command: "bun run dev -- --hostname 127.0.0.1 --port 41337",
     },
     "next-turborepo": {
         changedPaths: ["apps/marketing/app/page.tsx"],
         applicationPath: "apps/marketing",
-        lockfile: "pnpm-lock.yaml",
+        lockfile: "bun.lock",
         visualRoute: "apps/marketing/app/page.tsx",
         packageManifest: "apps/marketing/package.json",
         command:
-            "pnpm --filter @matcha-fixture/marketing run dev -- --hostname 127.0.0.1 --port 41337",
+            "bun run --filter @matcha-fixture/marketing dev -- --hostname 127.0.0.1 --port 41337",
     },
     "next-nx": {
         changedPaths: ["apps/store/app/page.tsx"],
@@ -52,13 +55,13 @@ const fixtureConfiguration = {
     },
     "next-ambiguous-workspace": {
         changedPaths: ["packages/ui/Button.tsx"],
-        lockfile: "pnpm-lock.yaml",
+        lockfile: "bun.lock",
         visualRoute: "apps/marketing/app/page.tsx",
     },
     "next-provider-failure": {
         changedPaths: ["app/layout.tsx"],
         applicationPath: ".",
-        lockfile: "package-lock.json",
+        lockfile: "bun.lock",
         visualRoute: "app/page.tsx",
     },
 } as const;
@@ -69,12 +72,19 @@ interface ReadyFixtureVerification {
     installDirectory: string;
     healthPath: string;
     command: string;
+    buildTarget: string | null;
 }
 
 interface ProviderFailureVerification {
     status: "PreviewUnavailable" | "Failed";
+    hermetic: boolean;
     diagnostic: ProductDiffDiagnostic;
     command: string[];
+}
+
+interface FixtureInstallability {
+    name: keyof typeof expected;
+    frozen: boolean;
 }
 
 function assert(condition: unknown, message: string): asserts condition {
@@ -96,17 +106,20 @@ function has_exact_dependency(manifest: Record<string, unknown>, dependency: str
     return (
         dependencies !== null &&
         typeof dependencies === "object" &&
-        (dependencies as Record<string, unknown>)[dependency] === "15.0.0"
+        (dependencies as Record<string, unknown>)[dependency] === FIXTURE_NEXT_VERSION
     );
 }
 
 function verify_fixture_metadata(
     name: "next-standalone" | "next-turborepo" | "next-nx",
     root: string,
-): void {
+): string | null {
     const configuration = fixtureConfiguration[name];
     const manifest = read_json(`${root}/${configuration.packageManifest}`);
-    assert(has_exact_dependency(manifest, "next"), `${name} does not pin Next 15.0.0`);
+    assert(
+        has_exact_dependency(manifest, "next"),
+        `${name} does not pin Next ${FIXTURE_NEXT_VERSION}`,
+    );
 
     if (name === "next-nx") {
         const workspaceManifest = read_json(`${root}/package.json`);
@@ -121,16 +134,32 @@ function verify_fixture_metadata(
         );
         const project = read_json(`${root}/apps/store/project.json`);
         const targets = project.targets;
+        const targetGraph = targets as Record<string, unknown>;
         assert(
             targets !== null &&
                 typeof targets === "object" &&
-                (targets as Record<string, unknown>).serve !== null &&
-                typeof (targets as Record<string, unknown>).serve === "object" &&
-                ((targets as Record<string, unknown>).serve as Record<string, unknown>).executor ===
-                    "@nx/next:server",
+                targetGraph.serve !== null &&
+                typeof targetGraph.serve === "object" &&
+                (targetGraph.serve as Record<string, unknown>).executor === "@nx/next:server",
             "next-nx does not declare the serve target its launch plan invokes",
         );
+        assert(
+            targetGraph.build !== null &&
+                typeof targetGraph.build === "object" &&
+                (targetGraph.build as Record<string, unknown>).executor === "@nx/next:build",
+            "next-nx does not declare the build target consumed by serve",
+        );
+        const serveOptions = (targetGraph.serve as Record<string, unknown>).options;
+        assert(
+            serveOptions !== null &&
+                typeof serveOptions === "object" &&
+                (serveOptions as Record<string, unknown>).buildTarget ===
+                    "@matcha-fixture/store:build",
+            "next-nx serve does not consume its declared build target",
+        );
+        return "@matcha-fixture/store:build";
     }
+    return null;
 }
 
 function resolve_fixture_plan(
@@ -160,7 +189,7 @@ function verify_ready_fixture(
 ): ReadyFixtureVerification {
     const root = fixturePath(name);
     const configuration = fixtureConfiguration[name];
-    verify_fixture_metadata(name, root);
+    const buildTarget = verify_fixture_metadata(name, root);
     const plan = resolve_fixture_plan(name);
     const launch = NextPreviewLauncher.from_workspace_plan({
         workspaceRoot: root,
@@ -191,11 +220,17 @@ function verify_ready_fixture(
         installDirectory: plan.installDirectory,
         healthPath: plan.healthPath,
         command: launch.command,
+        buildTarget,
     };
 }
 
 function verify_provider_failure(plan: ProductDiffWorkspacePlan): ProviderFailureVerification {
-    const root = fixturePath("next-provider-failure");
+    const source = fixturePath("next-provider-failure");
+    const temporaryRoot = mkdtempSync(join(tmpdir(), "matcha-next-provider-"));
+    const fixture = join(temporaryRoot, "next-provider-failure");
+    const temporaryDirectory = join(temporaryRoot, "tmp");
+    mkdirSync(temporaryDirectory);
+    cpSync(source, fixture, { recursive: true });
     const command = [
         "build",
         "app/layout.tsx",
@@ -204,31 +239,101 @@ function verify_provider_failure(plan: ProductDiffWorkspacePlan): ProviderFailur
         "--external",
         "react/jsx-dev-runtime",
     ];
-    const compilation = spawnSync("bun", command, { cwd: root, encoding: "utf8" });
-    const output = `${compilation.stdout}\n${compilation.stderr}`;
-    assert(compilation.status !== 0, "next-provider-failure compiled successfully");
-    assert(
-        output.includes("unavailable-preview-provider"),
-        "next-provider-failure did not compile its unavailable provider import",
-    );
 
-    const stage = "start head dev server";
-    const diagnostic = preview_unavailable_diagnostic(stage, output, plan.applicationPath);
-    const status = product_diff_failure_status(stage);
-    assert(
-        status === expected["next-provider-failure"].status,
-        `next-provider-failure settled as ${status}`,
-    );
-    assert(
-        diagnostic.code === "PREVIEW_SERVER_UNAVAILABLE",
-        "next-provider-failure did not retain its startup diagnostic category",
-    );
-    return { status, diagnostic, command };
+    try {
+        const compilation = spawnSync("bun", command, {
+            cwd: fixture,
+            encoding: "utf8",
+            env: {
+                ...process.env,
+                TMPDIR: temporaryDirectory,
+                TEMP: temporaryDirectory,
+                TMP: temporaryDirectory,
+            },
+        });
+        const output = `${compilation.stdout}\n${compilation.stderr}`;
+        assert(compilation.status !== 0, "next-provider-failure compiled successfully");
+        assert(
+            output.includes("unavailable-preview-provider"),
+            "next-provider-failure did not compile its unavailable provider import",
+        );
+
+        const stage = "start head dev server";
+        const diagnostic = preview_unavailable_diagnostic(stage, output, plan.applicationPath);
+        const status = product_diff_failure_status(stage);
+        assert(
+            status === expected["next-provider-failure"].status,
+            `next-provider-failure settled as ${status}`,
+        );
+        assert(
+            diagnostic.code === "PREVIEW_SERVER_UNAVAILABLE",
+            "next-provider-failure did not retain its startup diagnostic category",
+        );
+        return { status, hermetic: true, diagnostic, command };
+    } finally {
+        rmSync(temporaryRoot, { recursive: true, force: true });
+    }
+}
+
+function verify_fixture_installability(name: keyof typeof expected): FixtureInstallability {
+    const source = fixturePath(name);
+    const temporaryRoot = mkdtempSync(join(tmpdir(), "matcha-next-fixture-"));
+    const fixture = join(temporaryRoot, name);
+    const temporaryDirectory = join(temporaryRoot, "tmp");
+    mkdirSync(temporaryDirectory);
+    cpSync(source, fixture, { recursive: true });
+
+    try {
+        const lockfile = readFileSync(join(fixture, "bun.lock"), "utf8");
+        const install = spawnSync(
+            "bun",
+            [
+                "install",
+                "--frozen-lockfile",
+                "--ignore-scripts",
+                "--backend=copy",
+                "--registry",
+                "http://127.0.0.1:9",
+            ],
+            {
+                cwd: fixture,
+                encoding: "utf8",
+                env: {
+                    ...process.env,
+                    TMPDIR: temporaryDirectory,
+                    TEMP: temporaryDirectory,
+                    TMP: temporaryDirectory,
+                },
+            },
+        );
+        assert(
+            install.status === 0,
+            `${name} did not complete a frozen offline install: ${install.stderr || install.stdout}`,
+        );
+        assert(
+            readFileSync(join(fixture, "bun.lock"), "utf8") === lockfile,
+            `${name} changed its frozen lockfile`,
+        );
+        if (name === "next-nx") {
+            const nx = spawnSync("bun", ["x", "--no-install", "nx", "--version"], {
+                cwd: fixture,
+                encoding: "utf8",
+            });
+            assert(
+                nx.status === 0,
+                "next-nx does not install the Nx binary used by its serve plan",
+            );
+        }
+        return { name, frozen: true };
+    } finally {
+        rmSync(temporaryRoot, { recursive: true, force: true });
+    }
 }
 
 export function verify_next_product_diff_fixtures(): {
     ready: ReadyFixtureVerification[];
     providerFailure: ProviderFailureVerification;
+    installability: FixtureInstallability[];
 } {
     for (const fixtureName of Object.keys(expected)) {
         const path = fixturePath(fixtureName as keyof typeof expected);
@@ -268,6 +373,9 @@ export function verify_next_product_diff_fixtures(): {
             verify_ready_fixture("next-nx"),
         ],
         providerFailure: verify_provider_failure(resolve_fixture_plan("next-provider-failure")),
+        installability: (Object.keys(expected) as (keyof typeof expected)[]).map(
+            verify_fixture_installability,
+        ),
     };
 }
 

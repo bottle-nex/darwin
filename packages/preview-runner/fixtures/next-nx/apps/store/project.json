@@ -3,6 +3,12 @@
     "projectType": "application",
     "sourceRoot": "apps/store",
     "targets": {
+        "build": {
+            "executor": "@nx/next:build",
+            "options": {
+                "outputPath": "dist/apps/store"
+            }
+        },
         "serve": {
             "executor": "@nx/next:server",
             "options": {
