@@ -2,8 +2,8 @@ import { expect, test } from "bun:test";
 
 import { verify_next_product_diff_fixtures } from "./script.verify_next_product_diff_fixtures";
 
-test("verifies generated launch plans and categorizes the real missing provider import", () => {
-    const verified = verify_next_product_diff_fixtures();
+test("verifies generated launch plans and categorizes the real missing provider import", async () => {
+    const verified = await verify_next_product_diff_fixtures();
 
     expect(verified.ready).toEqual([
         expect.objectContaining({
@@ -33,6 +33,7 @@ test("verifies generated launch plans and categorizes the real missing provider 
     expect(verified.providerFailure).toMatchObject({
         status: "PreviewUnavailable",
         hermetic: true,
+        ancestorPoisoned: true,
         diagnostic: { code: "PREVIEW_SERVER_UNAVAILABLE", stage: "startup" },
     });
     expect(verified.installability).toEqual([
@@ -46,4 +47,9 @@ test("verifies generated launch plans and categorizes the real missing provider 
         name: "next-nx",
         buildTarget: "@matcha-fixture/store:build",
     });
-}, 30_000);
+    expect(verified.readyLaunch).toEqual([
+        expect.objectContaining({ name: "next-standalone", ready: true }),
+        expect.objectContaining({ name: "next-turborepo", ready: true }),
+        expect.objectContaining({ name: "next-nx", ready: true }),
+    ]);
+}, 120_000);

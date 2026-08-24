@@ -1,5 +1,13 @@
-import { spawnSync } from "node:child_process";
-import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { spawn, spawnSync } from "node:child_process";
+import {
+    cpSync,
+    existsSync,
+    mkdirSync,
+    mkdtempSync,
+    readFileSync,
+    rmSync,
+    writeFileSync,
+} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -25,6 +33,7 @@ const expected = {
 
 const fixtureRoot = new URL("../../../../packages/preview-runner/fixtures/", import.meta.url);
 const FIXTURE_NEXT_VERSION = "15.5.9";
+const READY_TIMEOUT_MS = 30_000;
 
 const fixtureConfiguration = {
     "next-standalone": {
@@ -78,6 +87,7 @@ interface ReadyFixtureVerification {
 interface ProviderFailureVerification {
     status: "PreviewUnavailable" | "Failed";
     hermetic: boolean;
+    ancestorPoisoned: boolean;
     diagnostic: ProductDiffDiagnostic;
     command: string[];
 }
@@ -85,6 +95,11 @@ interface ProviderFailureVerification {
 interface FixtureInstallability {
     name: keyof typeof expected;
     frozen: boolean;
+}
+
+interface ReadyLaunchVerification {
+    name: ReadyFixtureVerification["name"];
+    ready: boolean;
 }
 
 function assert(condition: unknown, message: string): asserts condition {
@@ -227,13 +242,34 @@ function verify_ready_fixture(
 function verify_provider_failure(plan: ProductDiffWorkspacePlan): ProviderFailureVerification {
     const source = fixturePath("next-provider-failure");
     const temporaryRoot = mkdtempSync(join(tmpdir(), "matcha-next-provider-"));
-    const fixture = join(temporaryRoot, "next-provider-failure");
+    const executionRoot = join(temporaryRoot, "execution");
+    const fixture = join(executionRoot, "next-provider-failure");
     const temporaryDirectory = join(temporaryRoot, "tmp");
     mkdirSync(temporaryDirectory);
+    mkdirSync(join(temporaryRoot, "node_modules", "unavailable-preview-provider"), {
+        recursive: true,
+    });
+    writeFileSync(
+        join(temporaryRoot, "node_modules", "unavailable-preview-provider", "package.json"),
+        JSON.stringify({ name: "unavailable-preview-provider", main: "./index.js" }),
+    );
+    writeFileSync(
+        join(temporaryRoot, "node_modules", "unavailable-preview-provider", "index.js"),
+        'throw new Error("ancestor-poison-resolved");',
+    );
+    mkdirSync(join(executionRoot, "node_modules", "unavailable-preview-provider"), {
+        recursive: true,
+    });
+    writeFileSync(
+        join(executionRoot, "node_modules", "unavailable-preview-provider", "package.json"),
+        JSON.stringify({ name: "unavailable-preview-provider", exports: {} }),
+    );
     cpSync(source, fixture, { recursive: true });
     const command = [
         "build",
         "app/layout.tsx",
+        "--root",
+        executionRoot,
         "--external",
         "react",
         "--external",
@@ -257,6 +293,10 @@ function verify_provider_failure(plan: ProductDiffWorkspacePlan): ProviderFailur
             output.includes("unavailable-preview-provider"),
             "next-provider-failure did not compile its unavailable provider import",
         );
+        assert(
+            !output.includes("ancestor-poison-resolved"),
+            "next-provider-failure resolved the poisoned ancestor provider",
+        );
 
         const stage = "start head dev server";
         const diagnostic = preview_unavailable_diagnostic(stage, output, plan.applicationPath);
@@ -269,7 +309,7 @@ function verify_provider_failure(plan: ProductDiffWorkspacePlan): ProviderFailur
             diagnostic.code === "PREVIEW_SERVER_UNAVAILABLE",
             "next-provider-failure did not retain its startup diagnostic category",
         );
-        return { status, hermetic: true, diagnostic, command };
+        return { status, hermetic: true, ancestorPoisoned: true, diagnostic, command };
     } finally {
         rmSync(temporaryRoot, { recursive: true, force: true });
     }
@@ -330,11 +370,127 @@ function verify_fixture_installability(name: keyof typeof expected): FixtureInst
     }
 }
 
-export function verify_next_product_diff_fixtures(): {
+function fixture_environment(
+    temporaryDirectory: string,
+    nxSocketDirectory?: string,
+): Record<string, string | undefined> {
+    return {
+        ...process.env,
+        TMPDIR: temporaryDirectory,
+        TEMP: temporaryDirectory,
+        TMP: temporaryDirectory,
+        NPM_CONFIG_REGISTRY: "http://127.0.0.1:9",
+        npm_config_registry: "http://127.0.0.1:9",
+        NX_DAEMON: "false",
+        NX_SOCKET_DIR: nxSocketDirectory,
+    };
+}
+
+function wait(milliseconds: number): Promise<void> {
+    return new Promise((resolve) => setTimeout(resolve, milliseconds));
+}
+
+function signal_preview(preview: ReturnType<typeof spawn>, signal: "SIGTERM" | "SIGKILL"): void {
+    try {
+        if (preview.pid !== undefined) {
+            process.kill(-preview.pid, signal);
+        } else {
+            preview.kill(signal);
+        }
+    } catch {
+        return;
+    }
+}
+
+async function stop_preview(preview: ReturnType<typeof spawn>): Promise<void> {
+    if (preview.exitCode !== null) return;
+    signal_preview(preview, "SIGTERM");
+    const stopped = await Promise.race([
+        new Promise<boolean>((resolve) => preview.once("exit", () => resolve(true))),
+        wait(5_000).then(() => false),
+    ]);
+    if (!stopped && preview.exitCode === null) signal_preview(preview, "SIGKILL");
+}
+
+async function wait_for_preview(
+    url: string,
+    preview: ReturnType<typeof spawn>,
+    output: () => string,
+): Promise<void> {
+    const deadline = Date.now() + READY_TIMEOUT_MS;
+    while (Date.now() < deadline) {
+        if (preview.exitCode !== null) {
+            throw new Error(`preview process exited before becoming ready: ${output()}`);
+        }
+        try {
+            const response = await fetch(url);
+            if (response.ok) return;
+        } catch {
+            await wait(250);
+            continue;
+        }
+        await wait(250);
+    }
+    throw new Error(`preview process did not become ready before the timeout: ${output()}`);
+}
+
+async function verify_ready_launch(
+    ready: ReadyFixtureVerification,
+): Promise<ReadyLaunchVerification> {
+    const source = fixturePath(ready.name);
+    const temporaryRoot = mkdtempSync(join(tmpdir(), "matcha-next-ready-"));
+    const fixture = join(temporaryRoot, ready.name);
+    const temporaryDirectory = join(temporaryRoot, "tmp");
+    const nxSocketDirectory = mkdtempSync("/tmp/matcha-nx-");
+    mkdirSync(temporaryDirectory);
+    cpSync(source, fixture, { recursive: true });
+    let preview: ReturnType<typeof spawn> | null = null;
+    let output = "";
+
+    try {
+        const install = spawnSync(
+            "bun",
+            [
+                "install",
+                "--frozen-lockfile",
+                "--ignore-scripts",
+                "--backend=copy",
+                "--registry",
+                "http://127.0.0.1:9",
+            ],
+            { cwd: fixture, encoding: "utf8", env: fixture_environment(temporaryDirectory) },
+        );
+        assert(
+            install.status === 0,
+            `${ready.name} could not prepare an isolated frozen install: ${install.stderr || install.stdout}`,
+        );
+        preview = spawn("bash", ["-lc", `exec ${ready.command}`], {
+            cwd: fixture,
+            detached: true,
+            env: fixture_environment(temporaryDirectory, nxSocketDirectory),
+            stdio: ["ignore", "pipe", "pipe"],
+        });
+        preview.stdout?.on("data", (chunk: Buffer) => {
+            output = `${output}${chunk}`.slice(-4_000);
+        });
+        preview.stderr?.on("data", (chunk: Buffer) => {
+            output = `${output}${chunk}`.slice(-4_000);
+        });
+        await wait_for_preview(`http://127.0.0.1:41337${ready.healthPath}`, preview, () => output);
+        return { name: ready.name, ready: true };
+    } finally {
+        if (preview) await stop_preview(preview);
+        rmSync(temporaryRoot, { recursive: true, force: true });
+        rmSync(nxSocketDirectory, { recursive: true, force: true });
+    }
+}
+
+export async function verify_next_product_diff_fixtures(): Promise<{
     ready: ReadyFixtureVerification[];
+    readyLaunch: ReadyLaunchVerification[];
     providerFailure: ProviderFailureVerification;
     installability: FixtureInstallability[];
-} {
+}> {
     for (const fixtureName of Object.keys(expected)) {
         const path = fixturePath(fixtureName as keyof typeof expected);
         if (!existsSync(path)) {
@@ -366,12 +522,20 @@ export function verify_next_product_diff_fixtures(): {
         "next-ambiguous-workspace did not report APPLICATION_SELECTION_AMBIGUOUS",
     );
 
+    const ready = [
+        verify_ready_fixture("next-standalone"),
+        verify_ready_fixture("next-turborepo"),
+        verify_ready_fixture("next-nx"),
+    ];
+
+    const readyLaunch: ReadyLaunchVerification[] = [];
+    for (const fixture of ready) {
+        readyLaunch.push(await verify_ready_launch(fixture));
+    }
+
     return {
-        ready: [
-            verify_ready_fixture("next-standalone"),
-            verify_ready_fixture("next-turborepo"),
-            verify_ready_fixture("next-nx"),
-        ],
+        ready,
+        readyLaunch,
         providerFailure: verify_provider_failure(resolve_fixture_plan("next-provider-failure")),
         installability: (Object.keys(expected) as (keyof typeof expected)[]).map(
             verify_fixture_installability,
@@ -379,4 +543,4 @@ export function verify_next_product_diff_fixtures(): {
     };
 }
 
-if (import.meta.main) verify_next_product_diff_fixtures();
+if (import.meta.main) await verify_next_product_diff_fixtures();
