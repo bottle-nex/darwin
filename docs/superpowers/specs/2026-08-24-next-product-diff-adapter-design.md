@@ -8,7 +8,7 @@ Make Product Diff reliable for Next.js applications in standalone repositories, 
 
 This design supports Next.js App Router and Pages Router applications. It covers standalone repositories, npm, pnpm, Yarn, and Bun workspaces, Turborepo, and Nx.
 
-Vite, static HTML, Astro, Remix, and other frameworks are intentionally outside this implementation. The adapter contract must let them be added later without changing the Product Diff core.
+Vite + React is the committed next adapter after this Next.js delivery. Static HTML, Astro, Remix, and other frameworks are intentionally outside this implementation. The adapter contract must let Vite + React be added without changing the Product Diff core.
 
 ## Product Contract
 
@@ -149,7 +149,7 @@ Each fixture asserts both success behavior and the exact outcome code and diagno
 2. Compare startup success, time to first preview, capture success, and failure classifications on internal and opted-in projects.
 3. Enable the adapter per project after fixture and shadow-mode acceptance criteria are met.
 4. Make it the default for Next.js projects.
-5. Start a Vite/React adapter only after the Next adapter is reliable across standalone, Turborepo, and Nx projects.
+5. Begin the Vite + React adapter immediately after the Next adapter meets its standalone, Turborepo, and Nx reliability criteria. The Vite adapter reuses the same workspace resolver, lifecycle, browser validation, diagnostics, artifact, and rollout contracts.
 
 Rollback disables the adapter flag and preserves artifacts and diagnostics already collected. No adapter change may alter existing published Product Diff artifacts.
 
