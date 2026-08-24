@@ -117,7 +117,7 @@ test("refuses capture after browser validation fails", async () => {
     expect(capture).not.toHaveBeenCalled();
 });
 
-test("does not persist preview server output when startup fails", async () => {
+test("logs a redacted startup summary without persisting server output", async () => {
     const sandbox = {} as Sandbox;
     const launchPlan = NextPreviewLauncher.create({
         workspaceKind: "Standalone",
@@ -135,12 +135,13 @@ test("does not persist preview server output when startup fails", async () => {
     });
     PreviewServer.wait_until_ready = mock().mockResolvedValue(false);
     PreviewServer.log_tail = mock().mockResolvedValue(
-        "DATABASE_URL=postgres://lifecycle-log-secret",
+        "Module not found: Can't resolve 'pino-pretty' Authorization=Bearer lifecycle-log-secret",
     );
+    const log = { warn: mock() } as unknown as Logger;
 
     const preview = await ProductDiffPreviewLifecycle.start_and_verify({
         sandbox,
-        log: {} as Logger,
+        log,
         revision: "head",
         workspaceRoot: "/workspace",
         workspacePlan,
@@ -160,7 +161,15 @@ test("does not persist preview server output when startup fails", async () => {
         },
     });
     expect(JSON.stringify(preview.health)).not.toContain("lifecycle-log-secret");
-    expect(PreviewServer.log_tail).not.toHaveBeenCalled();
+    expect(PreviewServer.log_tail).toHaveBeenCalled();
+    expect(log.warn).toHaveBeenCalledWith(
+        "preview startup failed",
+        expect.objectContaining({
+            revision: "head",
+            applicationPath: "apps/web",
+            startupSummary: "Module not found: Can't resolve 'pino-pretty' Authorization=[redacted]",
+        }),
+    );
 });
 
 test("does not persist preview surface errors", async () => {

@@ -15,6 +15,7 @@ import PreviewServer, { type PreviewServerHandle } from "../service.preview_serv
 
 const PREVIEW_SERVER_UNAVAILABLE_MESSAGE = "The preview server did not become ready.";
 const PREVIEW_SURFACE_UNAVAILABLE_MESSAGE = "The preview surface could not be prepared.";
+const STARTUP_SUMMARY_MAX_LENGTH = 500;
 
 export interface PreviewHealth {
     ok: boolean;
@@ -53,6 +54,25 @@ function browser_failure_message(
     return preview_check_summary(revision, failed, routePath);
 }
 
+function startup_failure_summary(logTail: string): string {
+    const candidate = logTail
+        .split("\n")
+        .map((line) => line.trim())
+        .filter(Boolean)
+        .find((line) =>
+            /(cannot find module|can't resolve|module not found|failed to compile|syntaxerror|typeerror|referenceerror|eaddrinuse|error:)/i.test(
+                line,
+            ),
+        );
+    if (!candidate) return "No recognized startup error was emitted before the readiness timeout.";
+    return candidate
+        .replace(
+            /(authorization|cookie|password|token|secret|api[_-]?key)\s*[:=]\s*(?:bearer\s+)?[^\s,;]+/gi,
+            "$1=[redacted]",
+        )
+        .slice(0, STARTUP_SUMMARY_MAX_LENGTH);
+}
+
 export default class ProductDiffPreviewLifecycle {
     static async start_and_verify(input: {
         sandbox: Sandbox;
@@ -69,6 +89,15 @@ export default class ProductDiffPreviewLifecycle {
         try {
             server = await PreviewServer.start(input.sandbox, input.launchPlan);
             if (!(await PreviewServer.wait_until_ready(input.sandbox, server, input.log))) {
+                const logTail = await PreviewServer.log_tail(input.sandbox, server);
+                input.log.warn("preview startup failed", {
+                    revision: input.revision,
+                    applicationPath: input.workspacePlan.applicationPath,
+                    workspaceKind: input.workspacePlan.workspaceKind,
+                    port: server.port,
+                    healthPath: server.healthPath,
+                    startupSummary: startup_failure_summary(logTail),
+                });
                 return {
                     revision: input.revision,
                     server,
