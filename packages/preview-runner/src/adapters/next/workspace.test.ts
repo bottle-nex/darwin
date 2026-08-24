@@ -1,5 +1,5 @@
 import { afterAll, expect, test } from "bun:test";
-import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
+import { mkdtempSync, mkdirSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 
@@ -8,7 +8,9 @@ import { inspect_next_workspace } from "./workspace";
 
 const fixtureRoots: string[] = [];
 
-function fixtureRoot(name: "turbo-next" | "nested-next" | "nx-next" | "standalone-next"): string {
+function fixtureRoot(
+    name: "turbo-next" | "nested-next" | "nx-next" | "standalone-next" | "pnpm-workspace-next",
+): string {
     const root = mkdtempSync(join(tmpdir(), `matcha-${name}-`));
     fixtureRoots.push(root);
 
@@ -33,6 +35,12 @@ function fixtureRoot(name: "turbo-next" | "nested-next" | "nx-next" | "standalon
             "apps/store/pages/index.tsx",
         ],
         "standalone-next": ["package-lock.json", "package.json", "src/app/layout.tsx"],
+        "pnpm-workspace-next": [
+            "pnpm-lock.yaml",
+            "pnpm-workspace.yaml",
+            "apps/store/package.json",
+            "apps/store/app/layout.tsx",
+        ],
     }[name].reduce<Record<string, string>>((result, path) => {
         if (path.endsWith("package.json")) {
             const packageName =
@@ -42,7 +50,9 @@ function fixtureRoot(name: "turbo-next" | "nested-next" | "nx-next" | "standalon
                       ? "@acme/store"
                       : name === "standalone-next"
                         ? "website"
-                        : "@acme/site";
+                        : name === "pnpm-workspace-next"
+                          ? "@acme/store"
+                          : "@acme/site";
             result[path] = JSON.stringify({
                 name: packageName,
                 dependencies: path.includes("packages/ui") ? {} : { next: "15.0.0" },
@@ -110,6 +120,29 @@ test("classifies Nx and standalone Next workspaces from root metadata", () => {
     expect(inspect_next_workspace(fixtureRoot("standalone-next"), []).workspaceKind).toBe(
         "Standalone",
     );
+});
+
+test("classifies a plain pnpm workspace without Turborepo metadata", () => {
+    const inspection = inspect_next_workspace(fixtureRoot("pnpm-workspace-next"), []);
+
+    expect(inspection).toMatchObject({
+        workspaceKind: "PnpmWorkspace",
+        packageManager: "pnpm",
+        applications: [expect.objectContaining({ applicationPath: "apps/store" })],
+    });
+});
+
+test("skips cyclic directory symlinks while inspecting Next workspaces", () => {
+    const root = fixtureRoot("standalone-next");
+    symlinkSync(root, join(root, "cycle"), "dir");
+
+    expect(inspect_next_workspace(root, [])).toMatchObject({
+        applications: [expect.objectContaining({ applicationPath: "." })],
+    });
+    expect(detect({ workspaceRoot: root, changedPaths: [] })).toMatchObject({
+        supported: true,
+        nextAppDir: ".",
+    });
 });
 
 afterAll(() => {

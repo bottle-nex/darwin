@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
+import { existsSync, lstatSync, readdirSync, readFileSync } from "node:fs";
 import { join, relative, sep } from "node:path";
 import type { DetectInput, DetectOutput, Framework, PackageManager } from "./contract";
 
@@ -56,7 +56,7 @@ function read_json(path: string): Record<string, unknown> | null {
 
 function is_directory(path: string): boolean {
     try {
-        return statSync(path).isDirectory();
+        return lstatSync(path).isDirectory();
     } catch {
         return false;
     }

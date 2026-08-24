@@ -59,3 +59,21 @@ test("builds an Nx workspace-root launch plan for an application change", () => 
         launchCommand: "bun nx run @acme/marketing:dev",
     });
 });
+
+test("builds a pnpm workspace launch plan without Turborepo metadata", () => {
+    const result = resolve_next_workspace(
+        {
+            ...twoAppInspection,
+            workspaceKind: "PnpmWorkspace",
+            applications: [twoAppInspection.applications[0]],
+        },
+        ["apps/marketing/app/page.tsx"],
+        null,
+    );
+
+    expect(result).toMatchObject({
+        applicationPath: "apps/marketing",
+        installDirectory: ".",
+        launchCommand: "pnpm --filter @acme/marketing run dev",
+    });
+});

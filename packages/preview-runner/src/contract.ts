@@ -14,7 +14,7 @@ export const advisoryWarningsSchema = z
 export const packageManagerSchema = z.enum(["bun", "pnpm", "yarn", "npm"]);
 export type PackageManager = z.infer<typeof packageManagerSchema>;
 
-export const nextWorkspaceKindSchema = z.enum(["Standalone", "Turborepo", "Nx"]);
+export const nextWorkspaceKindSchema = z.enum(["Standalone", "PnpmWorkspace", "Turborepo", "Nx"]);
 export type NextWorkspaceKind = z.infer<typeof nextWorkspaceKindSchema>;
 
 export const nextApplicationRouterSchema = z.enum(["AppRouter", "PagesRouter"]);

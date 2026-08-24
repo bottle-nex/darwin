@@ -117,6 +117,8 @@ function launch_command(
             return directory_launch_command(packageManager, application.applicationPath);
         case "Turborepo":
             return turbo_launch_command(packageManager, application);
+        case "PnpmWorkspace":
+            return turbo_launch_command(packageManager, application);
         case "Nx":
             return nx_launch_command(packageManager, application);
     }

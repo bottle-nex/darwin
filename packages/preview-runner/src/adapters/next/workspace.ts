@@ -1,4 +1,4 @@
-import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
+import { existsSync, lstatSync, readdirSync, readFileSync } from "node:fs";
 import { join, relative, sep } from "node:path";
 
 import type {
@@ -31,7 +31,7 @@ const ROOT_LOCKFILES: readonly { file: string; packageManager: PackageManager }[
 
 function is_directory(path: string): boolean {
     try {
-        return statSync(path).isDirectory();
+        return lstatSync(path).isDirectory();
     } catch {
         return false;
     }
@@ -117,6 +117,7 @@ function workspace_kind(root: string): NextWorkspaceKind {
         return "Nx";
     }
     if (existsSync(join(root, "turbo.json"))) return "Turborepo";
+    if (existsSync(join(root, "pnpm-workspace.yaml"))) return "PnpmWorkspace";
     return "Standalone";
 }
 
