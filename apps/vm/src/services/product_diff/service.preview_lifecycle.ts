@@ -5,6 +5,7 @@ import type { Sandbox } from "e2b";
 import type { ProductDiffRevision, ProductDiffWorkspacePlan } from "./adapter.contract";
 import type { NextPreviewLaunchPlan } from "./adapters/next/service.next_preview_launcher";
 import NextPreviewSurface from "./adapters/next/service.next_preview_surface";
+import { preview_check_summary } from "./service.preview_check_summary";
 import PreviewRunner, {
     type CaptureRequest,
     type PreviewCapture,
@@ -41,11 +42,12 @@ function diagnostic(
 }
 
 function browser_failure_message(
+    revision: ProductDiffRevision,
     results: Awaited<ReturnType<typeof PreviewRunner.check>>["results"],
+    routePath: string,
 ): string {
     const failed = results.find((result) => !result.ok);
-    if (!failed) return "Preview browser validation did not complete.";
-    return `${failed.problem ?? "Browser validation failed"}: ${failed.detail ?? `${failed.targetId}/${failed.stateId}`}`;
+    return preview_check_summary(revision, failed, routePath);
 }
 
 export default class ProductDiffPreviewLifecycle {
@@ -104,7 +106,11 @@ export default class ProductDiffPreviewLifecycle {
                             input.workspacePlan,
                             "PREVIEW_BROWSER_VALIDATION_FAILED",
                             "browser-validation",
-                            browser_failure_message(check.results),
+                            browser_failure_message(
+                                input.revision,
+                                check.results,
+                                surface.routePath,
+                            ),
                         ),
                     },
                 };

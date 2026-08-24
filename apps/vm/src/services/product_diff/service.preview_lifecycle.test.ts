@@ -56,7 +56,7 @@ test("refuses capture after browser validation fails", async () => {
                 ok: false,
                 httpStatus: 200,
                 problem: "ConsoleError",
-                detail: "target failure",
+                detail: '{"Authorization":"Bearer lifecycle-secret","Cookie":"session=lifecycle-cookie"}\u001eaccess_token=lifecycle-control-secret',
             },
         ],
         warnings: [],
@@ -81,8 +81,16 @@ test("refuses capture after browser validation fails", async () => {
 
     expect(preview.health).toMatchObject({
         ok: false,
-        diagnostic: { code: "PREVIEW_BROWSER_VALIDATION_FAILED", stage: "browser-validation" },
+        diagnostic: {
+            code: "PREVIEW_BROWSER_VALIDATION_FAILED",
+            stage: "browser-validation",
+            message:
+                "preview browser validation failed; revision=head; target=failing-target; state=default; problem=ConsoleError; httpStatus=200; route=/preview-run-a",
+        },
     });
+    expect(preview.health.diagnostic?.message).not.toContain("lifecycle-secret");
+    expect(preview.health.diagnostic?.message).not.toContain("lifecycle-cookie");
+    expect(preview.health.diagnostic?.message).not.toContain("lifecycle-control-secret");
     await expect(
         ProductDiffPreviewLifecycle.capture_verified(sandbox, preview, {
             url: "http://127.0.0.1:41337",

@@ -16,6 +16,10 @@ import PreviewRunner, {
 import PreviewServer, { type PreviewServerHandle } from "./service.preview_server";
 import PreviewWorkspace from "./service.preview_workspace";
 import ProductDiffArtifacts from "./service.product_diff_artifacts";
+import {
+    preview_check_summary,
+    type PreviewCheckFailure,
+} from "./product_diff/service.preview_check_summary";
 import { sanitize_preview_diagnostic_message } from "./product_diff/service.preview_diagnostic_sanitizer";
 import { redact } from "./service.sandbox_stream";
 
@@ -53,25 +57,24 @@ const PREVIEW_UNAVAILABLE_STAGES = new Set([
     "photograph the base revision",
 ]);
 
+class PreviewCheckError extends Error {}
+
 export function product_diff_failure_status(stage: string): "PreviewUnavailable" | "Failed" {
     return PREVIEW_UNAVAILABLE_STAGES.has(stage) ? "PreviewUnavailable" : "Failed";
 }
 
 export function preview_check_error(
     revision: "head" | "base",
-    failed:
-        | {
-              targetId: string;
-              stateId: string;
-              problem: string | null;
-              detail: string | null;
-          }
-        | undefined,
+    failed: (PreviewCheckFailure & { detail: string | null }) | undefined,
+    routePath: string,
 ): Error {
-    const target = failed ? `${failed.targetId}/${failed.stateId}` : "unknown target";
-    const problem = failed?.problem ?? "render failed";
-    const detail = failed?.detail ? `: ${failed.detail.slice(0, MAX_ERROR_OUTPUT)}` : "";
-    return new Error(`${revision} preview validation failed: ${target} ${problem}${detail}`);
+    return new PreviewCheckError(preview_check_summary(revision, failed, routePath));
+}
+
+export function preview_unavailable_error_message(stage: string, error: unknown): string {
+    if (error instanceof PreviewCheckError) return error.message;
+    const safeStage = PREVIEW_UNAVAILABLE_STAGES.has(stage) ? stage : "preview";
+    return `Preview unavailable during ${safeStage}.`;
 }
 
 export function preview_unavailable_diagnostic(
@@ -521,7 +524,7 @@ export default class ProductDiffRunner {
             });
             if (!headCheck.ok) {
                 const failed = headCheck.results.find((result) => !result.ok);
-                throw preview_check_error("head", failed);
+                throw preview_check_error("head", failed, head.surface.routePath);
             }
 
             step("photograph the head revision");
@@ -588,7 +591,7 @@ export default class ProductDiffRunner {
             });
             if (!baseCheck.ok) {
                 const failed = baseCheck.results.find((result) => !result.ok);
-                throw preview_check_error("base", failed);
+                throw preview_check_error("base", failed, baseSurface.routePath);
             }
 
             step("photograph the base revision");
@@ -702,17 +705,19 @@ export default class ProductDiffRunner {
                     // E2B timeout remains final cleanup.
                 }
             }
-            const failure = describe_product_diff_failure(stage, error);
-            const message = sanitize_preview_diagnostic_message(
-                redact(
-                    redactedDiagnostics
-                        ? `${failure} | dev server: ${diagnostic_summary(redactedDiagnostics)}`
-                        : failure,
-                    [githubToken, ENV.SERVER_CLAUDE_CODE_OAUTH_TOKEN],
-                ),
-            );
-            log.error("generation failed", new Error(message));
             const status = product_diff_failure_status(stage);
+            const message =
+                status === "PreviewUnavailable"
+                    ? preview_unavailable_error_message(stage, error)
+                    : sanitize_preview_diagnostic_message(
+                          redact(
+                              redactedDiagnostics
+                                  ? `${describe_product_diff_failure(stage, error)} | dev server: ${diagnostic_summary(redactedDiagnostics)}`
+                                  : describe_product_diff_failure(stage, error),
+                              [githubToken, ENV.SERVER_CLAUDE_CODE_OAUTH_TOKEN],
+                          ),
+                      );
+            log.error("generation failed", new Error(message));
             await this.settle(
                 productDiffId,
                 status,
