@@ -63,6 +63,42 @@ test("sends a VM-provided job-scoped surface request to the sandbox runner", asy
     expect(surface.routePath).toBe("/preview-run-a");
 });
 
+test("passes the requested settle time to the sandbox capture command", async () => {
+    let request: unknown = null;
+    const sandbox = {
+        files: {
+            write: async (_path: string, contents: string) => {
+                request = JSON.parse(contents);
+            },
+            read: async () =>
+                JSON.stringify({
+                    ok: true,
+                    side: "head",
+                    captures: [],
+                    warnings: [],
+                }),
+        },
+        commands: {
+            run: async () => ({ exitCode: 0, stdout: "" }),
+        },
+    } as unknown as Sandbox;
+
+    await PreviewRunner.capture(sandbox, {
+        url: "http://127.0.0.1:41337",
+        routePath: "/preview-run-head",
+        side: "head",
+        workspaceRoot: "/workspace",
+        nextAppDir: "apps/web",
+        outputDir: "/output",
+        viewports: [{ id: "desktop", label: "Desktop", width: 1280, height: 800 }],
+        frozenNowMs: 1,
+        settleMs: 1_000,
+        maxShots: 1,
+    });
+
+    expect(request).toMatchObject({ settleMs: 1_000 });
+});
+
 test("preserves the truncation sentinel when normalizing harness warnings", async () => {
     const sandbox = {
         files: {

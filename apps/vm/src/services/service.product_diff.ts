@@ -39,6 +39,7 @@ const HEAD_PORT = 41337;
 const BASE_PORT = 41338;
 const MAX_SHOTS = 48;
 const FROZEN_NOW_MS = 1_750_000_000_000;
+const CAPTURE_SETTLE_MS = 1_000;
 const SAFE_REPOSITORY = /^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/;
 const SAFE_SHA = /^[0-9a-f]{40,64}$/;
 const VIEWPORTS: ProductDiffViewport[] = [
@@ -556,6 +557,7 @@ export default class ProductDiffRunner {
                         outputDir: SHOTS_DIR,
                         viewports: VIEWPORTS,
                         frozenNowMs: FROZEN_NOW_MS,
+                        settleMs: CAPTURE_SETTLE_MS,
                         maxShots: MAX_SHOTS,
                     });
                 } catch {

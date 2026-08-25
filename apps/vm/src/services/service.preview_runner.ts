@@ -8,6 +8,7 @@ const RUNTIME_PROTOCOL_VERSION = 6;
 const SAFE_ID = /^[a-z0-9][a-z0-9-]{0,48}$/;
 const MAX_WARNINGS = 20;
 const MAX_WARNING_LENGTH = 400;
+const DEFAULT_CAPTURE_SETTLE_MS = 250;
 const ADVISORY_WARNINGS_TRUNCATED = "advisory warnings were truncated to fit preview limits";
 
 const advisoryWarningsSchema = z
@@ -189,6 +190,7 @@ export interface CaptureRequest {
     outputDir: string;
     viewports: PreviewViewport[];
     frozenNowMs: number;
+    settleMs?: number;
     maxShots: number;
 }
 
@@ -311,6 +313,7 @@ export default class PreviewRunner {
                 viewports: request.viewports,
                 frozenNowMs: request.frozenNowMs,
                 randomSeed: 1,
+                settleMs: request.settleMs ?? DEFAULT_CAPTURE_SETTLE_MS,
                 maxShots: request.maxShots,
             },
             captureSchema,
