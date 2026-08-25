@@ -153,6 +153,7 @@ export default class ProductDiffPreviewLifecycle {
             });
             if (!check.ok) {
                 const failed = check.results.find((result) => !result.ok);
+                const startup = await PreviewServer.startup_diagnostics(input.sandbox, server);
                 input.log.warn("preview browser validation failed", {
                     revision: input.revision,
                     applicationPath: input.workspacePlan.applicationPath,
@@ -163,6 +164,10 @@ export default class ProductDiffPreviewLifecycle {
                     problem: failed?.problem ?? "Unknown",
                     httpStatus: failed?.httpStatus ?? null,
                     detail: redact_startup_log(failed?.detail ?? ""),
+                    startupLogTail: redact_startup_log(startup.logTail),
+                    listenerSnapshot: redact_startup_log(startup.listenerSnapshot),
+                    processSnapshot: redact_startup_log(startup.processSnapshot),
+                    memorySnapshot: redact_startup_log(startup.memorySnapshot),
                 });
                 return {
                     revision: input.revision,

@@ -29,6 +29,7 @@ export interface PreviewServerStartupDiagnostics {
     logTail: string;
     listenerSnapshot: string;
     processSnapshot: string;
+    memorySnapshot: string;
 }
 
 function app_directory(options: PreviewServerOptions): string {
@@ -164,7 +165,7 @@ export default class PreviewServer {
         sandbox: Sandbox,
         server: PreviewServerHandle,
     ): Promise<PreviewServerStartupDiagnostics> {
-        const [logTail, listenerSnapshot, processSnapshot] = await Promise.all([
+        const [logTail, listenerSnapshot, processSnapshot, memorySnapshot] = await Promise.all([
             sandbox.commands
                 .run(
                     `tail -n ${DIAGNOSTIC_LOG_TAIL_LINES} ${shell_argument(server.logPath)} 2>/dev/null || true`,
@@ -181,8 +182,14 @@ export default class PreviewServer {
                 .run("ps -eo pid=,stat=,etimes=,command= | grep -E '[n]ext|[t]urbo|[n]x' || true")
                 .then((result) => result.stdout.trim())
                 .catch(() => ""),
+            sandbox.commands
+                .run(
+                    "(cat /sys/fs/cgroup/memory.events 2>/dev/null || true; free -m 2>/dev/null || true)",
+                )
+                .then((result) => result.stdout.trim())
+                .catch(() => ""),
         ]);
-        return { logTail, listenerSnapshot, processSnapshot };
+        return { logTail, listenerSnapshot, processSnapshot, memorySnapshot };
     }
 
     /**

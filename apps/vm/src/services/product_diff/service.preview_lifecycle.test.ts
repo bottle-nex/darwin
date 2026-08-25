@@ -52,6 +52,12 @@ test("refuses capture after browser validation fails", async () => {
         process: {} as PreviewServerHandle["process"],
     });
     PreviewServer.wait_until_ready = mock().mockResolvedValue(true);
+    PreviewServer.startup_diagnostics = mock().mockResolvedValue({
+        logTail: "server diagnostic tail",
+        listenerSnapshot: "LISTEN 127.0.0.1:41337",
+        processSnapshot: "1257 Sl next dev",
+        memorySnapshot: "oom_kill 1",
+    });
     NextPreviewSurface.create = mock().mockResolvedValue({
         routePath: "/preview-run-a",
         generatedFiles: ["/workspace/apps/web/app/preview-run-a/[targetId]/page.tsx"],
@@ -108,8 +114,13 @@ test("refuses capture after browser validation fails", async () => {
         expect.objectContaining({
             problem: "ConsoleError",
             detail: expect.not.stringContaining("lifecycle-secret"),
+            startupLogTail: "server diagnostic tail",
+            listenerSnapshot: "LISTEN 127.0.0.1:41337",
+            processSnapshot: "1257 Sl next dev",
+            memorySnapshot: "oom_kill 1",
         }),
     );
+    expect(PreviewServer.startup_diagnostics).toHaveBeenCalled();
     await expect(
         ProductDiffPreviewLifecycle.capture_verified(sandbox, preview, {
             url: "http://127.0.0.1:41337",
@@ -153,6 +164,7 @@ test("logs a redacted startup summary without persisting server output", async (
             "Module not found: Can't resolve 'pino-pretty' Authorization=Bearer lifecycle-log-secret",
         listenerSnapshot: "",
         processSnapshot: "123 S 241 next dev",
+        memorySnapshot: "",
     });
     const log = { warn: mock() } as unknown as Logger;
 
