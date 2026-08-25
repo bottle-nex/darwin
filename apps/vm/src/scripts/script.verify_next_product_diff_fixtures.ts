@@ -50,8 +50,7 @@ const fixtureConfiguration = {
         lockfile: "bun.lock",
         visualRoute: "apps/marketing/app/page.tsx",
         packageManifest: "apps/marketing/package.json",
-        command:
-            "bun run --filter @matcha-fixture/marketing dev -- --hostname 127.0.0.1 --port 41337",
+        command: "bun run --cwd apps/marketing dev -- --hostname 127.0.0.1 --port 41337",
     },
     "next-nx": {
         changedPaths: ["apps/store/app/page.tsx"],

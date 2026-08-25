@@ -1,5 +1,5 @@
-import type { ProductDiffWorkspacePlan } from "../../adapter.contract";
 import type { NextWorkspaceKind, PackageManager } from "../../../service.preview_runner";
+import type { ProductDiffWorkspacePlan } from "../../adapter.contract";
 
 const SAFE_SHELL_ARGUMENT = /^[A-Za-z0-9_@%+=:,./-]+$/;
 const SAFE_OVERRIDE = /^[A-Za-z0-9_@%+=:,./ -]+$/;
@@ -67,9 +67,12 @@ function append_network_arguments(
 function direct_next_command(command: string): string | null {
     if (!/(?: run)? dev$/.test(command)) return null;
     const prefix = command.replace(/(?: run)? dev$/, "");
-    if (!/^(bun --cwd .+|pnpm --dir .+|yarn --cwd .+|npm --prefix .+|bun run --filter \S+|pnpm --filter \S+|yarn workspace \S+|npm run --workspace \S+)$/.test(prefix)) return null;
-    if (prefix.startsWith("bun --cwd")) return `${prefix} x --no-install next dev`;
-    if (prefix.startsWith("bun run")) return `${prefix.replace("bun run", "bun x --no-install")} next dev`;
+    if (
+        !/^(pnpm --dir .+|yarn --cwd .+|npm --prefix .+|pnpm --filter \S+|yarn workspace \S+|npm run --workspace \S+)$/.test(
+            prefix,
+        )
+    )
+        return null;
     return `${prefix} exec next dev`;
 }
 
@@ -77,7 +80,7 @@ function standalone_command(packageManager: PackageManager, applicationPath: str
     const path = shell_argument(applicationPath);
     switch (packageManager) {
         case "bun":
-            return `bun --cwd ${path} run dev`;
+            return `bun run --cwd ${path} dev`;
         case "pnpm":
             return `pnpm --dir ${path} run dev`;
         case "yarn":
@@ -97,7 +100,7 @@ function workspace_command(
     const packageArgument = shell_argument(packageName);
     switch (packageManager) {
         case "bun":
-            return `bun run --filter ${packageArgument} dev`;
+            return `bun run --cwd ${shell_argument(applicationPath)} dev`;
         case "pnpm":
             return `pnpm --filter ${packageArgument} run dev`;
         case "yarn":
@@ -192,7 +195,10 @@ export default class NextPreviewLauncher {
         const command = input.launchCommand
             ? this.validate_override(input.launchCommand)
             : known_command(input);
-        const directNext = !input.launchCommand && input.workspaceKind !== "Nx" ? direct_next_command(command) : null;
+        const directNext =
+            !input.launchCommand && input.workspaceKind !== "Nx"
+                ? direct_next_command(command)
+                : null;
         return {
             command: append_network_arguments(
                 directNext ?? command,
@@ -226,7 +232,12 @@ export default class NextPreviewLauncher {
         }
 
         const launchCommand = this.validate_override(input.workspacePlan.launchCommand);
-        const command = workspaceKind === "Nx" ? nx_serve_command(launchCommand) : launchCommand;
+        const command =
+            workspaceKind === "Nx"
+                ? nx_serve_command(launchCommand)
+                : launchCommand.startsWith("bun run --filter ")
+                  ? `bun run --cwd ${shell_argument(input.workspacePlan.applicationPath)} dev`
+                  : launchCommand;
         const directNext = workspaceKind !== "Nx" ? direct_next_command(command) : null;
 
         return {

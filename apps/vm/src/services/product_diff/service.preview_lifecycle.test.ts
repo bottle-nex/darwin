@@ -1,12 +1,12 @@
-import { afterEach, expect, mock, test } from "bun:test";
 import type Logger from "@trymatcha/logger";
+import { afterEach, expect, mock, test } from "bun:test";
 import type { Sandbox } from "e2b";
 
+import PreviewRunner from "../service.preview_runner";
+import PreviewServer, { type PreviewServerHandle } from "../service.preview_server";
 import type { ProductDiffWorkspacePlan } from "./adapter.contract";
 import NextPreviewLauncher from "./adapters/next/service.next_preview_launcher";
 import NextPreviewSurface from "./adapters/next/service.next_preview_surface";
-import PreviewRunner from "../service.preview_runner";
-import PreviewServer, { type PreviewServerHandle } from "../service.preview_server";
 import ProductDiffPreviewLifecycle from "./service.preview_lifecycle";
 
 const workspacePlan: ProductDiffWorkspacePlan = {
@@ -18,6 +18,7 @@ const workspacePlan: ProductDiffWorkspacePlan = {
     healthPath: "/",
     router: "AppRouter",
     framework: "NextAppRouter",
+    rootLayoutMode: null,
     dependency: {
         packageManager: "bun",
         lockfileRelPath: "bun.lock",
@@ -65,6 +66,8 @@ test("refuses capture after browser validation fails", async () => {
         routePath: "/preview-run-a",
         generatedFiles: ["/workspace/apps/web/app/preview-run-a/[targetId]/page.tsx"],
         router: "AppRouter",
+        rootLayoutMode: "inherit",
+        rootLayoutRestore: null,
     });
     PreviewRunner.check = mock().mockResolvedValue({
         ok: false,
@@ -98,6 +101,7 @@ test("refuses capture after browser validation fails", async () => {
         workspacePlan,
         launchPlan,
         runId: "run-a",
+        rootLayoutMode: "inherit",
     });
 
     expect(preview.health).toMatchObject({
@@ -116,6 +120,7 @@ test("refuses capture after browser validation fails", async () => {
         "preview browser validation failed",
         expect.objectContaining({
             problem: "ConsoleError",
+            rootLayoutMode: "inherit",
             detail: expect.not.stringContaining("lifecycle-secret"),
             startupLogTail: "server diagnostic tail",
             listenerSnapshot: "LISTEN 127.0.0.1:41337",
@@ -164,6 +169,8 @@ test("logs a redacted startup summary without persisting server output", async (
         routePath: "/preview-run-a",
         generatedFiles: ["/workspace/apps/web/app/preview-run-a/[targetId]/page.tsx"],
         router: "AppRouter",
+        rootLayoutMode: "inherit",
+        rootLayoutRestore: null,
     });
     PreviewServer.runtime_diagnostics = mock().mockResolvedValue({
         logTail:
@@ -185,6 +192,7 @@ test("logs a redacted startup summary without persisting server output", async (
         workspacePlan,
         launchPlan,
         runId: "run-a",
+        rootLayoutMode: "inherit",
     });
 
     expect(preview.health).toEqual({
@@ -241,15 +249,17 @@ test("does not persist preview surface errors", async () => {
     NextPreviewSurface.create = mock().mockRejectedValue(
         new Error("PREVIEW_TOKEN=lifecycle-surface-secret"),
     );
+    const log = { warn: mock() } as unknown as Logger;
 
     const preview = await ProductDiffPreviewLifecycle.start_and_verify({
         sandbox,
-        log: {} as Logger,
+        log,
         revision: "base",
         workspaceRoot: "/workspace",
         workspacePlan,
         launchPlan,
         runId: "run-a",
+        rootLayoutMode: "inherit",
     });
 
     expect(preview.health).toEqual({
@@ -264,6 +274,13 @@ test("does not persist preview surface errors", async () => {
         },
     });
     expect(JSON.stringify(preview.health)).not.toContain("lifecycle-surface-secret");
+    expect(log.warn).toHaveBeenCalledWith(
+        "preview surface preparation failed",
+        expect.objectContaining({
+            rootLayoutMode: "inherit",
+            detail: expect.not.stringContaining("lifecycle-surface-secret"),
+        }),
+    );
 });
 
 test("removes the preview surface when stopping the server fails", async () => {
@@ -278,6 +295,8 @@ test("removes the preview surface when stopping the server fails", async () => {
         routePath: "/preview-run-a",
         generatedFiles: ["/workspace/apps/web/app/preview-run-a/[targetId]/page.tsx"],
         router: "AppRouter" as const,
+        rootLayoutMode: "inherit" as const,
+        rootLayoutRestore: null,
     };
     PreviewServer.stop = mock().mockRejectedValue(new Error("stop failed"));
     NextPreviewSurface.remove = mock().mockResolvedValue(undefined);

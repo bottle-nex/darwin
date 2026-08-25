@@ -1,10 +1,11 @@
+import type { ProductDiffRootLayoutMode } from "@trymatcha/types";
 import type { Sandbox } from "e2b";
 
-import type { ProductDiffWorkspacePlan } from "../../adapter.contract";
 import PreviewRunner, {
     type NextApplicationRouter,
     type PreviewSurface,
 } from "../../../service.preview_runner";
+import type { ProductDiffWorkspacePlan } from "../../adapter.contract";
 
 const SAFE_ROUTE_SEGMENT = /^[a-z0-9][a-z0-9-]{0,48}$/;
 
@@ -29,12 +30,16 @@ export default class NextPreviewSurface {
         workspaceRoot: string,
         workspacePlan: ProductDiffWorkspacePlan,
         runId: string,
+        harnessRootLayoutMode: ProductDiffRootLayoutMode,
     ): Promise<PreviewSurface> {
+        const router = selected_router(workspacePlan);
+        const rootLayoutMode = workspacePlan.rootLayoutMode ?? harnessRootLayoutMode;
         return PreviewRunner.create_next_preview_surface(sandbox, {
             workspaceRoot,
             applicationPath: workspacePlan.applicationPath,
             routeSegment: this.route_segment(runId),
-            router: selected_router(workspacePlan),
+            router,
+            rootLayoutMode,
         });
     }
 

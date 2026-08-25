@@ -68,6 +68,7 @@ test("keeps the resolver's Bun Nx serve command on the local target", () => {
             healthPath: "/",
             router: "AppRouter",
             framework: "NextAppRouter",
+            rootLayoutMode: null,
             dependency: {
                 packageManager: "bun",
                 lockfileRelPath: "bun.lock",
@@ -95,6 +96,7 @@ test("converts a resolved pnpm workspace dev script into direct Next startup", (
             healthPath: "/",
             router: "AppRouter",
             framework: "NextAppRouter",
+            rootLayoutMode: null,
             dependency: {
                 packageManager: "pnpm",
                 lockfileRelPath: "pnpm-lock.yaml",
@@ -105,8 +107,34 @@ test("converts a resolved pnpm workspace dev script into direct Next startup", (
         port: 41337,
     });
 
+    expect(plan.command).toBe("pnpm --filter web exec next dev --hostname 127.0.0.1 --port 41337");
+});
+
+test("runs Bun workspace Next from the selected application directory", () => {
+    const plan = NextPreviewLauncher.from_workspace_plan({
+        workspaceRoot: "/home/user/workspace/head",
+        workspacePlan: {
+            repositoryRoot: ".",
+            applicationPath: "apps/marketing",
+            workspaceKind: "Turborepo",
+            installDirectory: ".",
+            launchCommand: "bun run --filter @acme/marketing dev",
+            healthPath: "/",
+            router: "AppRouter",
+            framework: "NextAppRouter",
+            rootLayoutMode: null,
+            dependency: {
+                packageManager: "bun",
+                lockfileRelPath: "bun.lock",
+                lockfileSha256: "lock-hash",
+                workspaceDirs: ["."],
+            },
+        },
+        port: 41337,
+    });
+
     expect(plan.command).toBe(
-        "pnpm --filter web exec next dev --hostname 127.0.0.1 --port 41337",
+        "bun run --cwd apps/marketing dev -- --hostname 127.0.0.1 --port 41337",
     );
 });
 

@@ -1,22 +1,22 @@
-import { afterEach, expect, mock, test } from "bun:test";
 import { prisma } from "@trymatcha/database";
+import { afterEach, expect, mock, test } from "bun:test";
 import { Sandbox } from "e2b";
 
-import {
-    default as ProductDiffRunner,
-    product_diff_failure_status,
-    preview_check_error,
-    preview_unavailable_error_message,
-    preview_unavailable_diagnostic,
-} from "./service.product_diff";
+import NextPreviewSurface from "./product_diff/adapters/next/service.next_preview_surface";
+import ClaudeRun from "./service.claude_run";
 import GithubService from "./service.github";
 import PreviewDeps from "./service.preview_deps";
 import PreviewRunner from "./service.preview_runner";
 import PreviewServer from "./service.preview_server";
 import PreviewWorkspace from "./service.preview_workspace";
-import ClaudeRun from "./service.claude_run";
+import {
+    default as ProductDiffRunner,
+    preview_check_error,
+    preview_unavailable_diagnostic,
+    preview_unavailable_error_message,
+    product_diff_failure_status,
+} from "./service.product_diff";
 import ProductDiffArtifacts from "./service.product_diff_artifacts";
-import NextPreviewSurface from "./product_diff/adapters/next/service.next_preview_surface";
 
 const originalProductDiffUpdate = prisma.productDiff.updateMany;
 const originalProductDiffFind = prisma.productDiff.findUniqueOrThrow;
@@ -132,6 +132,7 @@ function mock_ready_preview_pipeline() {
             },
         ],
         warnings: [],
+        rootLayoutMode: "inherit",
     });
     PreviewRunner.scaffold = mock().mockResolvedValue({
         ok: true,
@@ -142,6 +143,8 @@ function mock_ready_preview_pipeline() {
         routePath: "/preview-run-head",
         generatedFiles: ["/workspace/apps/web/app/preview-run-head/[targetId]/page.tsx"],
         router: "AppRouter",
+        rootLayoutMode: "inherit",
+        rootLayoutRestore: null,
     });
     PreviewServer.start = mock().mockResolvedValue({
         url: "http://127.0.0.1:41337",
@@ -156,6 +159,8 @@ function mock_ready_preview_pipeline() {
         routePath: "/preview-run-a",
         generatedFiles: ["/workspace/apps/web/app/preview-run-a/[targetId]/page.tsx"],
         router: "AppRouter",
+        rootLayoutMode: "inherit",
+        rootLayoutRestore: null,
     });
     NextPreviewSurface.remove = mock().mockResolvedValue(undefined);
     PreviewRunner.check = mock().mockResolvedValue({ ok: true, results: [], warnings: [] });
@@ -304,6 +309,7 @@ test("settles secret-bearing lifecycle startup input with only the safe diagnost
             },
         ],
         warnings: [],
+        rootLayoutMode: "inherit",
     });
     PreviewRunner.scaffold = mock().mockResolvedValue({
         ok: true,
@@ -322,6 +328,8 @@ test("settles secret-bearing lifecycle startup input with only the safe diagnost
         routePath: "/preview-run-head",
         generatedFiles: ["/workspace/apps/web/app/preview-run-head/[targetId]/page.tsx"],
         router: "AppRouter",
+        rootLayoutMode: "inherit",
+        rootLayoutRestore: null,
     });
     PreviewServer.log_tail = mock().mockResolvedValue(
         "DATABASE_URL=postgres://startup-log-secret PREVIEW_TOKEN=startup-token-secret",

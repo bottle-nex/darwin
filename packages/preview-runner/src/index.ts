@@ -23,7 +23,7 @@ import {
     remove_next_preview_surface,
 } from "./adapters/next/preview_surface";
 
-const RUNTIME_PROTOCOL_VERSION = 6;
+const RUNTIME_PROTOCOL_VERSION = 7;
 const COMMANDS = [
     "detect",
     "inspect-next-workspace",

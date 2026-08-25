@@ -29,12 +29,14 @@ function valid_launch_command(command: string): boolean {
 const application_path_schema = z.string().min(1).max(240).refine(valid_application_path);
 const launch_command_schema = z.string().trim().min(1).max(500).refine(valid_launch_command);
 const health_path_schema = z.string().max(240).regex(SAFE_HEALTH_PATH);
+const root_layout_mode_schema = z.enum(["inherit", "isolate"]);
 
 export const product_diff_preview_config_schema = z
     .object({
         applicationPath: application_path_schema.optional(),
         launchCommand: launch_command_schema.optional(),
         healthPath: health_path_schema.optional(),
+        rootLayoutMode: root_layout_mode_schema.optional(),
     })
     .strict()
     .refine((configuration) => Object.keys(configuration).length > 0);
@@ -47,10 +49,12 @@ export function read_product_diff_preview_config(
     const application_path = application_path_schema.safeParse(source.applicationPath);
     const launch_command = launch_command_schema.safeParse(source.launchCommand);
     const health_path = health_path_schema.safeParse(source.healthPath);
+    const root_layout_mode = root_layout_mode_schema.safeParse(source.rootLayoutMode);
     const configuration = {
         ...(application_path.success && { applicationPath: application_path.data }),
         ...(launch_command.success && { launchCommand: launch_command.data }),
         ...(health_path.success && { healthPath: health_path.data }),
+        ...(root_layout_mode.success && { rootLayoutMode: root_layout_mode.data }),
     };
     return Object.keys(configuration).length > 0 ? configuration : null;
 }

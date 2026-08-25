@@ -27,10 +27,22 @@ export type NextWorkspaceKind = z.infer<typeof nextWorkspaceKindSchema>;
 export const nextApplicationRouterSchema = z.enum(["AppRouter", "PagesRouter"]);
 export type NextApplicationRouter = z.infer<typeof nextApplicationRouterSchema>;
 
+export const rootLayoutModeSchema = z.enum(["inherit", "isolate"]);
+export type RootLayoutMode = z.infer<typeof rootLayoutModeSchema>;
+
+export const rootLayoutRestoreSchema = z.object({
+    layoutPath: z.string().min(1),
+    backupPath: z.string().min(1),
+    generatedShellPath: z.string().min(1),
+});
+export type RootLayoutRestore = z.infer<typeof rootLayoutRestoreSchema>;
+
 export const previewSurfaceSchema = z.object({
     routePath: z.string().regex(/^\/[a-z0-9][a-z0-9-]{0,48}$/),
     generatedFiles: z.array(z.string().min(1)).min(1),
     router: nextApplicationRouterSchema,
+    rootLayoutMode: rootLayoutModeSchema,
+    rootLayoutRestore: rootLayoutRestoreSchema.nullable(),
 });
 export type PreviewSurface = z.infer<typeof previewSurfaceSchema>;
 
@@ -39,6 +51,7 @@ export const createNextPreviewSurfaceInputSchema = z.object({
     applicationPath: z.string().min(1),
     routeSegment: z.string().regex(SAFE_ID),
     router: nextApplicationRouterSchema,
+    rootLayoutMode: rootLayoutModeSchema.default("inherit"),
 });
 export type CreateNextPreviewSurfaceInput = z.infer<typeof createNextPreviewSurfaceInputSchema>;
 
@@ -108,6 +121,7 @@ export const harnessManifestSchema = z.object({
         .min(1)
         .max(6),
     warnings: advisoryWarningsSchema,
+    rootLayoutMode: rootLayoutModeSchema.default("inherit"),
 });
 export type HarnessManifest = z.infer<typeof harnessManifestSchema>;
 

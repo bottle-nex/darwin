@@ -18,10 +18,18 @@ export interface ProductDiffDiagnostic {
     workspaceKind: string | null;
 }
 
+export const ProductDiffRootLayoutMode = {
+    Inherit: "inherit",
+    Isolate: "isolate",
+} as const;
+export type ProductDiffRootLayoutMode =
+    (typeof ProductDiffRootLayoutMode)[keyof typeof ProductDiffRootLayoutMode];
+
 export interface ProductDiffPreviewConfiguration {
     applicationPath?: string;
     launchCommand?: string;
     healthPath?: string;
+    rootLayoutMode?: ProductDiffRootLayoutMode;
 }
 
 export const ProductDiffFramework = {

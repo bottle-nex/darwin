@@ -1,5 +1,5 @@
 import { afterAll, expect, test } from "bun:test";
-import { existsSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 
@@ -42,6 +42,50 @@ test("creates only the selected App Router surface at its job-scoped route", () 
         generatedFiles: [join(root, "apps/web/app/preview-run-a/[targetId]/page.tsx")],
     });
     expect(existsSync(join(root, "apps/web/pages/preview-run-a/[targetId].tsx"))).toBe(false);
+});
+
+test("isolates an App Router root layout and restores it byte-for-byte", () => {
+    const root = fixture_root("AppRouter");
+    const layoutFile = join(root, "apps/web/app/layout.tsx");
+    const originalLayout = `import "./globals.css";
+import MissingProvider from "./MissingProvider";
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+    return <MissingProvider>{children}</MissingProvider>;
+}
+`;
+    writeFileSync(layoutFile, originalLayout);
+
+    const surface = create_next_preview_surface(root, {
+        applicationPath: "apps/web",
+        routeSegment: "preview-run-a",
+        router: "AppRouter",
+        rootLayoutMode: "isolate",
+    });
+
+    const isolatedLayout = readFileSync(layoutFile, "utf8");
+    expect(surface).toMatchObject({ rootLayoutMode: "isolate" });
+    expect(isolatedLayout).toContain('import "./globals.css";');
+    expect(isolatedLayout).not.toContain("MissingProvider");
+
+    remove_next_preview_surface(surface);
+
+    expect(readFileSync(layoutFile, "utf8")).toBe(originalLayout);
+});
+
+test("rejects Pages Router isolation before creating a preview route", () => {
+    const root = fixture_root("PagesRouter");
+    const routePath = join(root, "apps/web/pages/preview-run-a");
+
+    expect(() =>
+        create_next_preview_surface(root, {
+            applicationPath: "apps/web",
+            routeSegment: "preview-run-a",
+            router: "PagesRouter",
+            rootLayoutMode: "isolate",
+        }),
+    ).toThrow("Pages Router does not support root layout isolation");
+    expect(existsSync(routePath)).toBe(false);
 });
 
 test("removes an App Router surface before creating a Pages Router surface", () => {
@@ -109,6 +153,8 @@ test("removes exactly tracked generated files deepest path first", () => {
             routePath: "/preview-run-a",
             router: "AppRouter",
             generatedFiles: [shallow, deep],
+            rootLayoutMode: "inherit",
+            rootLayoutRestore: null,
         },
         (file) => {
             removed.push(file);
@@ -132,6 +178,8 @@ test("does not remove a tracked path more than once", () => {
             routePath: "/preview-run-a",
             router: "AppRouter",
             generatedFiles: [generated, generated],
+            rootLayoutMode: "inherit",
+            rootLayoutRestore: null,
         },
         (file) => removed.push(file),
     );

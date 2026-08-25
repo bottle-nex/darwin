@@ -4,7 +4,7 @@ import { z } from "zod";
 const RUNNER_ENTRY = "/opt/matcha/preview-runner/index.js";
 const PREVIEW_DIR = "/home/user/preview";
 const COMMAND_TIMEOUT_MS = 15 * 60_000;
-const RUNTIME_PROTOCOL_VERSION = 6;
+const RUNTIME_PROTOCOL_VERSION = 7;
 const SAFE_ID = /^[a-z0-9][a-z0-9-]{0,48}$/;
 const MAX_WARNINGS = 20;
 const MAX_WARNING_LENGTH = 400;
@@ -52,10 +52,21 @@ export type PreviewFramework = z.infer<typeof frameworkSchema>;
 const nextApplicationRouterSchema = z.enum(["AppRouter", "PagesRouter"]);
 export type NextApplicationRouter = z.infer<typeof nextApplicationRouterSchema>;
 
+const rootLayoutModeSchema = z.enum(["inherit", "isolate"]);
+export type RootLayoutMode = z.infer<typeof rootLayoutModeSchema>;
+
+const rootLayoutRestoreSchema = z.object({
+    layoutPath: z.string().min(1),
+    backupPath: z.string().min(1),
+    generatedShellPath: z.string().min(1),
+});
+
 const previewSurfaceSchema = z.object({
     routePath: z.string().regex(/^\/[a-z0-9][a-z0-9-]{0,48}$/),
     generatedFiles: z.array(z.string().min(1)).min(1),
     router: nextApplicationRouterSchema,
+    rootLayoutMode: rootLayoutModeSchema,
+    rootLayoutRestore: rootLayoutRestoreSchema.nullable(),
 });
 export type PreviewSurface = z.infer<typeof previewSurfaceSchema>;
 
@@ -111,6 +122,7 @@ const harnessManifestSchema = z.object({
         .min(1)
         .max(6),
     warnings: advisoryWarningsSchema,
+    rootLayoutMode: rootLayoutModeSchema.default("inherit"),
 });
 export type HarnessManifest = z.infer<typeof harnessManifestSchema>;
 
@@ -263,6 +275,7 @@ export default class PreviewRunner {
             applicationPath: string;
             routeSegment: string;
             router: NextApplicationRouter;
+            rootLayoutMode: RootLayoutMode;
         },
     ): Promise<PreviewSurface> {
         return this.invoke(sandbox, "create-next-preview-surface", input, previewSurfaceSchema);

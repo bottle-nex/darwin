@@ -1,18 +1,26 @@
-import { existsSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
-import { join, relative, resolve } from "node:path";
+import { existsSync, mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
+import { dirname, extname, join, relative, resolve } from "node:path";
 
-import { SAFE_ID, type NextApplicationRouter } from "../../contract";
+import {
+    SAFE_ID,
+    type NextApplicationRouter,
+    type RootLayoutMode,
+    type RootLayoutRestore,
+} from "../../contract";
 
 export interface PreviewSurface {
     routePath: string;
     generatedFiles: string[];
     router: NextApplicationRouter;
+    rootLayoutMode: RootLayoutMode;
+    rootLayoutRestore: RootLayoutRestore | null;
 }
 
 export interface CreateNextPreviewSurfaceInput {
     applicationPath: string;
     routeSegment: string;
     router: NextApplicationRouter;
+    rootLayoutMode?: RootLayoutMode;
 }
 
 function to_posix(path: string): string {
@@ -52,6 +60,66 @@ function route_directory(applicationDirectory: string, router: NextApplicationRo
         throw new Error(`selected ${router} directory was not found`);
     }
     return routeDirectory;
+}
+
+function root_layout_path(routeDirectory: string): string {
+    const layoutPath = ["layout.tsx", "layout.jsx", "layout.ts", "layout.js"]
+        .map((file) => join(routeDirectory, file))
+        .find((file) => existsSync(file));
+    if (!layoutPath) throw new Error("App Router root layout was not found for isolation");
+    return layoutPath;
+}
+
+function stylesheet_imports(layoutSource: string): string[] {
+    return Array.from(
+        layoutSource.matchAll(
+            /^\s*import\s+(?:(?:type\s+)?[^"']+\s+from\s+)?["'](?:\.{1,2}\/)[^"']+\.css["'];?\s*$/gm,
+        ),
+        (match) => match[0]!.trim(),
+    );
+}
+
+function isolated_root_layout_source(imports: string[]): string {
+    const stylesheetImports = imports.join("\n");
+    return `import type { ReactNode } from "react";
+${stylesheetImports ? `${stylesheetImports}\n` : ""}
+export default function MatchaPreviewRootLayout({ children }: { children: ReactNode }) {
+    return <html lang="en" data-matcha-preview-root-layout="true"><body>{children}</body></html>;
+}
+`;
+}
+
+function create_root_layout_isolation(
+    applicationDirectory: string,
+    routeDirectory: string,
+    routeSegment: string,
+): RootLayoutRestore {
+    const layoutPath = root_layout_path(routeDirectory);
+    const runtimeDirectory = join(applicationDirectory, ".matcha_preview_runtime", routeSegment);
+    if (existsSync(runtimeDirectory)) {
+        throw new Error(`preview layout runtime ${routeSegment} already exists`);
+    }
+
+    const backupPath = join(runtimeDirectory, `layout${extname(layoutPath)}`);
+    const source = readFileSync(layoutPath, "utf8");
+    mkdirSync(runtimeDirectory, { recursive: true });
+    renameSync(layoutPath, backupPath);
+    try {
+        writeFileSync(layoutPath, isolated_root_layout_source(stylesheet_imports(source)), "utf8");
+    } catch (error) {
+        renameSync(backupPath, layoutPath);
+        rmSync(runtimeDirectory, { recursive: true, force: true });
+        throw error;
+    }
+
+    return { layoutPath, backupPath, generatedShellPath: layoutPath };
+}
+
+function restore_root_layout_isolation(restore: RootLayoutRestore): void {
+    if (!existsSync(restore.backupPath)) return;
+    rmSync(restore.generatedShellPath, { force: true });
+    renameSync(restore.backupPath, restore.layoutPath);
+    rmSync(dirname(restore.backupPath), { recursive: true, force: true });
 }
 
 function app_route_source(routeDirectory: string, registryFile: string): string {
@@ -130,6 +198,7 @@ export function create_next_preview_surface(
         throw new Error("preview route segment is invalid");
     }
 
+    const rootLayoutMode = input.rootLayoutMode ?? "inherit";
     const applicationDirectory = application_directory(workspaceRoot, input.applicationPath);
     const routeRoot = route_directory(applicationDirectory, input.router);
     const surfaceRoot = join(routeRoot, input.routeSegment);
@@ -141,6 +210,9 @@ export function create_next_preview_surface(
     if (!existsSync(registryFile)) {
         throw new Error("preview harness registry was not found");
     }
+    if (rootLayoutMode === "isolate" && input.router !== "AppRouter") {
+        throw new Error("Pages Router does not support root layout isolation");
+    }
 
     const routeDirectory =
         input.router === "AppRouter" ? join(surfaceRoot, "[targetId]") : surfaceRoot;
@@ -148,19 +220,35 @@ export function create_next_preview_surface(
         input.router === "AppRouter"
             ? join(routeDirectory, "page.tsx")
             : join(routeDirectory, "[targetId].tsx");
-    mkdirSync(routeDirectory, { recursive: true });
-    writeFileSync(
-        pageFile,
-        input.router === "AppRouter"
-            ? app_route_source(routeDirectory, registryFile)
-            : pages_route_source(routeDirectory, registryFile),
-        "utf8",
-    );
+    let rootLayoutRestore: RootLayoutRestore | null = null;
+    try {
+        if (rootLayoutMode === "isolate") {
+            rootLayoutRestore = create_root_layout_isolation(
+                applicationDirectory,
+                routeRoot,
+                input.routeSegment,
+            );
+        }
+        mkdirSync(routeDirectory, { recursive: true });
+        writeFileSync(
+            pageFile,
+            input.router === "AppRouter"
+                ? app_route_source(routeDirectory, registryFile)
+                : pages_route_source(routeDirectory, registryFile),
+            "utf8",
+        );
+    } catch (error) {
+        rmSync(surfaceRoot, { recursive: true, force: true });
+        if (rootLayoutRestore) restore_root_layout_isolation(rootLayoutRestore);
+        throw error;
+    }
 
     return {
         routePath: `/${input.routeSegment}`,
         generatedFiles: [pageFile],
         router: input.router,
+        rootLayoutMode,
+        rootLayoutRestore,
     };
 }
 
@@ -173,4 +261,5 @@ export function remove_next_preview_surface(
     )) {
         removeFile(file);
     }
+    if (surface.rootLayoutRestore) restore_root_layout_isolation(surface.rootLayoutRestore);
 }

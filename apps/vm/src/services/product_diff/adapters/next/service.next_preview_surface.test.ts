@@ -1,8 +1,8 @@
 import { afterEach, expect, mock, test } from "bun:test";
 import type { Sandbox } from "e2b";
 
-import type { ProductDiffWorkspacePlan } from "../../adapter.contract";
 import PreviewRunner from "../../../service.preview_runner";
+import type { ProductDiffWorkspacePlan } from "../../adapter.contract";
 import NextPreviewSurface from "./service.next_preview_surface";
 
 const workspacePlan: ProductDiffWorkspacePlan = {
@@ -14,6 +14,7 @@ const workspacePlan: ProductDiffWorkspacePlan = {
     healthPath: "/",
     router: "AppRouter",
     framework: "NextAppRouter",
+    rootLayoutMode: "inherit",
     dependency: {
         packageManager: "bun",
         lockfileRelPath: "bun.lock",
@@ -29,16 +30,25 @@ test("creates a validated job-scoped route for the selected workspace router", a
         routePath: "/preview-run-a",
         generatedFiles: ["/workspace/apps/web/app/preview-run-a/[targetId]/page.tsx"],
         router: "AppRouter",
+        rootLayoutMode: "inherit",
+        rootLayoutRestore: null,
     });
     PreviewRunner.create_next_preview_surface = create;
 
-    const surface = await NextPreviewSurface.create(sandbox, "/workspace", workspacePlan, "run-a");
+    const surface = await NextPreviewSurface.create(
+        sandbox,
+        "/workspace",
+        workspacePlan,
+        "run-a",
+        "isolate",
+    );
 
     expect(create).toHaveBeenCalledWith(sandbox, {
         workspaceRoot: "/workspace",
         applicationPath: "apps/web",
         routeSegment: "preview-run-a",
         router: "AppRouter",
+        rootLayoutMode: "inherit",
     });
     expect(surface.generatedFiles).toHaveLength(1);
 });

@@ -61,7 +61,7 @@ function directory_launch_command(
     if (applicationPath === ".") return `${package_command(packageManager)} run dev`;
     switch (packageManager) {
         case "bun":
-            return `bun --cwd ${applicationPath} run dev`;
+            return `bun run --cwd ${applicationPath} dev`;
         case "pnpm":
             return `pnpm --dir ${applicationPath} run dev`;
         case "yarn":
@@ -185,6 +185,7 @@ export function resolve_next_workspace(
         healthPath: configuration?.healthPath ?? "/",
         router: application.router,
         framework: application.router === "AppRouter" ? "NextAppRouter" : "NextPagesRouter",
+        rootLayoutMode: configuration?.rootLayoutMode ?? null,
         dependency: {
             packageManager: inspection.packageManager,
             lockfileRelPath: "",

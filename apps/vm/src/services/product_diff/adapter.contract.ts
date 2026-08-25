@@ -1,4 +1,8 @@
-import type { ProductDiffDiagnostic, ProductDiffPreviewConfiguration } from "@trymatcha/types";
+import type {
+    ProductDiffDiagnostic,
+    ProductDiffPreviewConfiguration,
+    ProductDiffRootLayoutMode,
+} from "@trymatcha/types";
 
 export type ProductDiffRevision = "base" | "head";
 
@@ -22,6 +26,7 @@ export interface ProductDiffWorkspacePlan {
     healthPath: string;
     router: string;
     framework: string;
+    rootLayoutMode: ProductDiffRootLayoutMode | null;
     dependency: {
         packageManager: "bun" | "pnpm" | "yarn" | "npm";
         lockfileRelPath: string;
@@ -58,6 +63,7 @@ export interface ProductDiffStartRevisionInput {
     plan: ProductDiffWorkspacePlan;
     preparedRevision: ProductDiffPreparedRevision;
     port: number;
+    rootLayoutMode: ProductDiffRootLayoutMode;
 }
 
 export interface ProductDiffRunningPreview {

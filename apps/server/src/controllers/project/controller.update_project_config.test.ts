@@ -66,6 +66,37 @@ test("accepts a product diff application override without a Kanban change", asyn
     });
 });
 
+test("accepts an explicit Product Diff root layout mode", async () => {
+    const configuration = { rootLayoutMode: "isolate" };
+    project_config.upsert.mockResolvedValue({
+        kanbanOptionView: "FLAT",
+        productDiffEnabled: false,
+        productDiffPreviewConfig: configuration,
+    });
+    const result = response();
+
+    await update_project_config_controller(
+        {
+            params: { project_id: "project-1" },
+            body: { product_diff_preview_config: configuration },
+            user: { id: "user-1" },
+        } as never,
+        result.res as never,
+    );
+
+    expect(result.result().status_code).toBe(200);
+    expect(project_config.upsert).toHaveBeenLastCalledWith({
+        where: { projectId: "project-1" },
+        create: { projectId: "project-1", productDiffPreviewConfig: configuration },
+        update: { productDiffPreviewConfig: configuration },
+        select: {
+            kanbanOptionView: true,
+            productDiffEnabled: true,
+            productDiffPreviewConfig: true,
+        },
+    });
+});
+
 test("preserves an existing preview configuration when updating its launch command", async () => {
     project_config.findUnique.mockResolvedValue({
         productDiffPreviewConfig: {

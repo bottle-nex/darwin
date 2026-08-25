@@ -18,8 +18,7 @@ test("verifies generated launch plans and categorizes the real missing provider 
             applicationPath: "apps/marketing",
             installDirectory: ".",
             healthPath: "/",
-            command:
-                "bun run --filter @matcha-fixture/marketing dev -- --hostname 127.0.0.1 --port 41337",
+            command: "bun run --cwd apps/marketing dev -- --hostname 127.0.0.1 --port 41337",
         }),
         expect.objectContaining({
             name: "next-nx",

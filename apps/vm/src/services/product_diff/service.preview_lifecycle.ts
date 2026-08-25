@@ -1,17 +1,17 @@
-import type { ProductDiffDiagnostic } from "@trymatcha/types";
 import type Logger from "@trymatcha/logger";
+import type { ProductDiffDiagnostic, ProductDiffRootLayoutMode } from "@trymatcha/types";
 import type { Sandbox } from "e2b";
 
-import type { ProductDiffRevision, ProductDiffWorkspacePlan } from "./adapter.contract";
-import type { NextPreviewLaunchPlan } from "./adapters/next/service.next_preview_launcher";
-import NextPreviewSurface from "./adapters/next/service.next_preview_surface";
-import { preview_check_summary } from "./service.preview_check_summary";
 import PreviewRunner, {
     type CaptureRequest,
     type PreviewCapture,
     type PreviewSurface,
 } from "../service.preview_runner";
 import PreviewServer, { type PreviewServerHandle } from "../service.preview_server";
+import type { ProductDiffRevision, ProductDiffWorkspacePlan } from "./adapter.contract";
+import type { NextPreviewLaunchPlan } from "./adapters/next/service.next_preview_launcher";
+import NextPreviewSurface from "./adapters/next/service.next_preview_surface";
+import { preview_check_summary } from "./service.preview_check_summary";
 
 const PREVIEW_SERVER_UNAVAILABLE_MESSAGE = "The preview server did not become ready.";
 const PREVIEW_SURFACE_UNAVAILABLE_MESSAGE = "The preview surface could not be prepared.";
@@ -96,6 +96,7 @@ export default class ProductDiffPreviewLifecycle {
         workspacePlan: ProductDiffWorkspacePlan;
         launchPlan: NextPreviewLaunchPlan;
         runId: string;
+        rootLayoutMode: ProductDiffRootLayoutMode;
     }): Promise<ProductDiffPreviewLifecycleRevision> {
         let server: PreviewServerHandle | null = null;
         let surface: PreviewSurface | null = null;
@@ -106,6 +107,7 @@ export default class ProductDiffPreviewLifecycle {
                 input.workspaceRoot,
                 input.workspacePlan,
                 input.runId,
+                input.rootLayoutMode,
             );
             server = await PreviewServer.start(input.sandbox, input.launchPlan);
             if (
@@ -127,6 +129,7 @@ export default class ProductDiffPreviewLifecycle {
                     workspaceKind: input.workspacePlan.workspaceKind,
                     port: server.port,
                     healthPath: server.healthPath,
+                    rootLayoutMode: input.rootLayoutMode,
                     launchCommand: input.launchPlan.command,
                     workingDirectory: input.launchPlan.workingDirectory,
                     serverProcessId: server.process.pid,
@@ -174,6 +177,7 @@ export default class ProductDiffPreviewLifecycle {
                     workspaceKind: input.workspacePlan.workspaceKind,
                     port: server.port,
                     serverProcessId: server.process.pid,
+                    rootLayoutMode: input.rootLayoutMode,
                     launchCommand: input.launchPlan.command,
                     workingDirectory: input.launchPlan.workingDirectory,
                     routePath: surface.routePath,
@@ -216,7 +220,14 @@ export default class ProductDiffPreviewLifecycle {
                 surface,
                 health: { ok: true, diagnostic: null },
             };
-        } catch {
+        } catch (error) {
+            input.log.warn("preview surface preparation failed", {
+                revision: input.revision,
+                applicationPath: input.workspacePlan.applicationPath,
+                workspaceKind: input.workspacePlan.workspaceKind,
+                rootLayoutMode: input.rootLayoutMode,
+                detail: redact_startup_log(error instanceof Error ? error.message : String(error)),
+            });
             return {
                 revision: input.revision,
                 server,

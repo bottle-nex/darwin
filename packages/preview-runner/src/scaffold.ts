@@ -44,7 +44,7 @@ function write_file(absolute: string, contents: string): void {
  */
 export function read_harness_manifest(appAbsoluteDir: string): HarnessManifest {
     const path = join(appAbsoluteDir, HARNESS_DIR, "manifest.json");
-    if (!existsSync(path)) return { targets: [], warnings: [] };
+    if (!existsSync(path)) return { targets: [], warnings: [], rootLayoutMode: "inherit" };
 
     return harnessManifestSchema.parse(JSON.parse(readFileSync(path, "utf8")));
 }

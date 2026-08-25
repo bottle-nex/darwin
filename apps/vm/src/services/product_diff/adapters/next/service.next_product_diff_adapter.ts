@@ -1,13 +1,15 @@
 import type { ProductDiffDiagnostic } from "@trymatcha/types";
 
+import PreviewRunner, { type NextWorkspaceInspection } from "../../../service.preview_runner";
+import PreviewWorkspace from "../../../service.preview_workspace";
 import type {
     ProductDiffAdapter,
     ProductDiffAdapterDetection,
     ProductDiffAdapterDetectionInput,
     ProductDiffCleanupRevisionInput,
     ProductDiffHealthCheck,
-    ProductDiffPrepareRevisionInput,
     ProductDiffPreparedRevision,
+    ProductDiffPrepareRevisionInput,
     ProductDiffRunningPreview,
     ProductDiffStartRevisionInput,
     ProductDiffVerifyRevisionInput,
@@ -19,10 +21,8 @@ import type { ProductDiffAdapterRuntime } from "../../adapter.registry";
 import ProductDiffPreviewLifecycle, {
     type ProductDiffPreviewLifecycleRevision,
 } from "../../service.preview_lifecycle";
-import { resolve_next_workspace } from "./service.next_workspace_resolver";
 import NextPreviewLauncher from "./service.next_preview_launcher";
-import PreviewRunner, { type NextWorkspaceInspection } from "../../../service.preview_runner";
-import PreviewWorkspace from "../../../service.preview_workspace";
+import { resolve_next_workspace } from "./service.next_workspace_resolver";
 
 function detection_diagnostic(inspection: NextWorkspaceInspection): ProductDiffDiagnostic {
     return {
@@ -198,6 +198,7 @@ export default class NextProductDiffAdapter implements ProductDiffAdapter {
             workspacePlan: input.plan,
             launchPlan,
             runId: `run-${input.revision}`,
+            rootLayoutMode: input.rootLayoutMode,
         });
         const id = `${input.revision}-${input.port}`;
         this.previews.set(id, preview);

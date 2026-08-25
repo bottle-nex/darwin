@@ -41,6 +41,17 @@ test("uses an explicit application path before changed paths", () => {
     });
 });
 
+test("retains an owner-selected root layout mode in the workspace plan", () => {
+    const result = resolve_next_workspace(twoAppInspection, ["apps/marketing/app/page.tsx"], {
+        rootLayoutMode: "isolate",
+    });
+
+    expect(result).toMatchObject({
+        applicationPath: "apps/marketing",
+        rootLayoutMode: "isolate",
+    });
+});
+
 test("builds an Nx workspace-root serve plan for an application change", () => {
     const result = resolve_next_workspace(
         {

@@ -8,24 +8,24 @@ import type {
 import { Sandbox } from "e2b";
 
 import { ENV } from "../conf/config.env";
-import ClaudeRun from "./service.claude_run";
-import GithubService from "./service.github";
-import PreviewDeps from "./service.preview_deps";
-import PreviewRunner, { type PreviewCapture } from "./service.preview_runner";
-import PreviewWorkspace from "./service.preview_workspace";
-import ProductDiffArtifacts from "./service.product_diff_artifacts";
-import ProductDiffAdapterRegistry from "./product_diff/adapter.registry";
 import type {
     ProductDiffAdapter,
     ProductDiffPreparedRevision,
     ProductDiffRunningPreview,
     ProductDiffWorkspacePlan,
 } from "./product_diff/adapter.contract";
+import ProductDiffAdapterRegistry from "./product_diff/adapter.registry";
 import {
     preview_check_summary,
     type PreviewCheckFailure,
 } from "./product_diff/service.preview_check_summary";
 import { sanitize_preview_diagnostic_message } from "./product_diff/service.preview_diagnostic_sanitizer";
+import ClaudeRun from "./service.claude_run";
+import GithubService from "./service.github";
+import PreviewDeps from "./service.preview_deps";
+import PreviewRunner, { type PreviewCapture } from "./service.preview_runner";
+import PreviewWorkspace from "./service.preview_workspace";
+import ProductDiffArtifacts from "./service.product_diff_artifacts";
 import { redact } from "./service.sandbox_stream";
 
 const SANDBOX_TIMEOUT_MS = 55 * 60_000;
@@ -190,6 +190,7 @@ Step 2 - write one target file per target.
 
 Step 3 - write matcha_preview/manifest.json
   {
+    "rootLayoutMode": "inherit",
     "targets": [
       { "id": "header-nav",
         "label": "Header navigation",
@@ -203,6 +204,10 @@ Step 3 - write matcha_preview/manifest.json
   sourcePath is relative to ${input.applicationPath}.
   At most 4 targets and at most 4 states each.
   label is at most 80 characters, for both a target and a state.
+  rootLayoutMode applies to every target in this Product Diff. Use "inherit" if any target needs
+  the application's root layout, fonts, provider, theme, i18n, auth, or data context. Use
+  "isolate" only when every target renders from deterministic local fixtures without root-layout
+  context. When uncertain, use "inherit".
   Put anything a reviewer should distrust into warnings, as short one-line notes.
   At most 20 warnings, each at most 300 characters. Split a long note into several short ones.
 
@@ -525,6 +530,7 @@ export default class ProductDiffRunner {
                     plan: workspacePlan,
                     preparedRevision,
                     port,
+                    rootLayoutMode: harness.rootLayoutMode,
                 });
                 if (revision === "head") headPreview = preview;
                 else basePreview = preview;

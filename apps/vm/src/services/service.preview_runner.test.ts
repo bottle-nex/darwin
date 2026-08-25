@@ -15,10 +15,10 @@ function sandbox_with_runtime_version(version: number): Sandbox {
 }
 
 test("accepts the current preview-runner protocol and rejects an older snapshot", async () => {
-    expect(await PreviewRunner.supports_current_protocol(sandbox_with_runtime_version(6))).toBe(
+    expect(await PreviewRunner.supports_current_protocol(sandbox_with_runtime_version(7))).toBe(
         true,
     );
-    expect(await PreviewRunner.supports_current_protocol(sandbox_with_runtime_version(5))).toBe(
+    expect(await PreviewRunner.supports_current_protocol(sandbox_with_runtime_version(6))).toBe(
         false,
     );
 });
@@ -36,6 +36,13 @@ test("sends a VM-provided job-scoped surface request to the sandbox runner", asy
                     routePath: "/preview-run-a",
                     generatedFiles: ["/workspace/apps/web/app/preview-run-a/[targetId]/page.tsx"],
                     router: "AppRouter",
+                    rootLayoutMode: "isolate",
+                    rootLayoutRestore: {
+                        layoutPath: "/workspace/apps/web/app/layout.tsx",
+                        backupPath:
+                            "/workspace/apps/web/.matcha_preview_runtime/preview-run-a/layout.tsx",
+                        generatedShellPath: "/workspace/apps/web/app/layout.tsx",
+                    },
                 }),
         },
         commands: {
@@ -51,6 +58,7 @@ test("sends a VM-provided job-scoped surface request to the sandbox runner", asy
         applicationPath: "apps/web",
         routeSegment: "preview-run-a",
         router: "AppRouter",
+        rootLayoutMode: "isolate",
     });
 
     expect(command).toContain("create-next-preview-surface");
@@ -59,6 +67,7 @@ test("sends a VM-provided job-scoped surface request to the sandbox runner", asy
         applicationPath: "apps/web",
         routeSegment: "preview-run-a",
         router: "AppRouter",
+        rootLayoutMode: "isolate",
     });
     expect(surface.routePath).toBe("/preview-run-a");
 });
@@ -119,6 +128,7 @@ test("preserves the truncation sentinel when normalizing harness warnings", asyn
 
     const manifest = await PreviewRunner.read_manifest(sandbox, "/workspace/apps/web");
 
+    expect(manifest.rootLayoutMode).toBe("inherit");
     expect(manifest.warnings).toHaveLength(20);
     expect(manifest.warnings.at(-1)).toBe("advisory warnings were truncated to fit preview limits");
     expect(manifest.warnings).toContain("warning-18");

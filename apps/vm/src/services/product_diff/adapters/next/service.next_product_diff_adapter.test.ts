@@ -1,11 +1,11 @@
-import { afterEach, expect, mock, test } from "bun:test";
 import type Logger from "@trymatcha/logger";
+import { afterEach, expect, mock, test } from "bun:test";
 import type { Sandbox } from "e2b";
 
-import type { ProductDiffWorkspacePlan } from "../../adapter.contract";
-import type { ProductDiffAdapterRuntime } from "../../adapter.registry";
 import PreviewRunner from "../../../service.preview_runner";
 import PreviewWorkspace from "../../../service.preview_workspace";
+import type { ProductDiffWorkspacePlan } from "../../adapter.contract";
+import type { ProductDiffAdapterRuntime } from "../../adapter.registry";
 import NextProductDiffAdapter from "./service.next_product_diff_adapter";
 
 const originalInspect = PreviewRunner.inspect_next_workspace;
@@ -29,6 +29,7 @@ const workspacePlan: ProductDiffWorkspacePlan = {
     healthPath: "/",
     router: "AppRouter",
     framework: "NextAppRouter",
+    rootLayoutMode: null,
     dependency: {
         packageManager: "pnpm",
         lockfileRelPath: "pnpm-lock.yaml",
