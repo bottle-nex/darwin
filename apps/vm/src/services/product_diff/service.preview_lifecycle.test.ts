@@ -28,7 +28,7 @@ const workspacePlan: ProductDiffWorkspacePlan = {
 const originalStart = PreviewServer.start;
 const originalWaitUntilReady = PreviewServer.wait_until_ready;
 const originalLogTail = PreviewServer.log_tail;
-const originalStartupDiagnostics = PreviewServer.startup_diagnostics;
+const originalRuntimeDiagnostics = PreviewServer.runtime_diagnostics;
 const originalCreateSurface = NextPreviewSurface.create;
 const originalCheck = PreviewRunner.check;
 const originalCapture = PreviewRunner.capture;
@@ -52,11 +52,14 @@ test("refuses capture after browser validation fails", async () => {
         process: {} as PreviewServerHandle["process"],
     });
     PreviewServer.wait_until_ready = mock().mockResolvedValue(true);
-    PreviewServer.startup_diagnostics = mock().mockResolvedValue({
+    PreviewServer.runtime_diagnostics = mock().mockResolvedValue({
         logTail: "server diagnostic tail",
         listenerSnapshot: "LISTEN 127.0.0.1:41337",
         processSnapshot: "1257 Sl next dev",
         memorySnapshot: "oom_kill 1",
+        processGroupSnapshot: "1257 377 1257 1257 Sl next dev",
+        httpProbeSnapshot: "curl: (7) Failed to connect",
+        diskSnapshot: "/dev/vda 80% /home/user",
     });
     NextPreviewSurface.create = mock().mockResolvedValue({
         routePath: "/preview-run-a",
@@ -118,9 +121,12 @@ test("refuses capture after browser validation fails", async () => {
             listenerSnapshot: "LISTEN 127.0.0.1:41337",
             processSnapshot: "1257 Sl next dev",
             memorySnapshot: "oom_kill 1",
+            processGroupSnapshot: "1257 377 1257 1257 Sl next dev",
+            httpProbeSnapshot: "curl: (7) Failed to connect",
+            diskSnapshot: "/dev/vda 80% /home/user",
         }),
     );
-    expect(PreviewServer.startup_diagnostics).toHaveBeenCalled();
+    expect(PreviewServer.runtime_diagnostics).toHaveBeenCalled();
     await expect(
         ProductDiffPreviewLifecycle.capture_verified(sandbox, preview, {
             url: "http://127.0.0.1:41337",
@@ -159,12 +165,15 @@ test("logs a redacted startup summary without persisting server output", async (
         generatedFiles: ["/workspace/apps/web/app/preview-run-a/[targetId]/page.tsx"],
         router: "AppRouter",
     });
-    PreviewServer.startup_diagnostics = mock().mockResolvedValue({
+    PreviewServer.runtime_diagnostics = mock().mockResolvedValue({
         logTail:
             "Module not found: Can't resolve 'pino-pretty' Authorization=Bearer lifecycle-log-secret",
         listenerSnapshot: "",
         processSnapshot: "123 S 241 next dev",
         memorySnapshot: "",
+        processGroupSnapshot: "123 1 123 123 S next dev",
+        httpProbeSnapshot: "curl_exit=7",
+        diskSnapshot: "/dev/vda 80% /home/user",
     });
     const log = { warn: mock() } as unknown as Logger;
 
@@ -190,7 +199,7 @@ test("logs a redacted startup summary without persisting server output", async (
         },
     });
     expect(JSON.stringify(preview.health)).not.toContain("lifecycle-log-secret");
-    expect(PreviewServer.startup_diagnostics).toHaveBeenCalled();
+    expect(PreviewServer.runtime_diagnostics).toHaveBeenCalled();
     expect(PreviewServer.wait_until_ready).toHaveBeenCalledWith(
         sandbox,
         expect.anything(),
@@ -205,6 +214,9 @@ test("logs a redacted startup summary without persisting server output", async (
             startupSummary:
                 "Module not found: Can't resolve 'pino-pretty' Authorization=[redacted]",
             processSnapshot: "123 S 241 next dev",
+            processGroupSnapshot: "123 1 123 123 S next dev",
+            httpProbeSnapshot: "curl_exit=7",
+            diskSnapshot: "/dev/vda 80% /home/user",
         }),
     );
 });
@@ -286,7 +298,7 @@ afterEach(() => {
     PreviewServer.start = originalStart;
     PreviewServer.wait_until_ready = originalWaitUntilReady;
     PreviewServer.log_tail = originalLogTail;
-    PreviewServer.startup_diagnostics = originalStartupDiagnostics;
+    PreviewServer.runtime_diagnostics = originalRuntimeDiagnostics;
     NextPreviewSurface.create = originalCreateSurface;
     PreviewRunner.check = originalCheck;
     PreviewRunner.capture = originalCapture;

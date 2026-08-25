@@ -25,11 +25,14 @@ export interface PreviewServerHandle {
     process: CommandHandle;
 }
 
-export interface PreviewServerStartupDiagnostics {
+export interface PreviewServerRuntimeDiagnostics {
     logTail: string;
     listenerSnapshot: string;
     processSnapshot: string;
     memorySnapshot: string;
+    processGroupSnapshot: string;
+    httpProbeSnapshot: string;
+    diskSnapshot: string;
 }
 
 function app_directory(options: PreviewServerOptions): string {
@@ -161,11 +164,20 @@ export default class PreviewServer {
         return result?.stdout.trim() ?? "";
     }
 
-    static async startup_diagnostics(
+    static async runtime_diagnostics(
         sandbox: Sandbox,
         server: PreviewServerHandle,
-    ): Promise<PreviewServerStartupDiagnostics> {
-        const [logTail, listenerSnapshot, processSnapshot, memorySnapshot] = await Promise.all([
+        probePath: string = server.healthPath,
+    ): Promise<PreviewServerRuntimeDiagnostics> {
+        const [
+            logTail,
+            listenerSnapshot,
+            processSnapshot,
+            memorySnapshot,
+            processGroupSnapshot,
+            httpProbeSnapshot,
+            diskSnapshot,
+        ] = await Promise.all([
             sandbox.commands
                 .run(
                     `tail -n ${DIAGNOSTIC_LOG_TAIL_LINES} ${shell_argument(server.logPath)} 2>/dev/null || true`,
@@ -174,22 +186,49 @@ export default class PreviewServer {
                 .catch(() => ""),
             sandbox.commands
                 .run(
-                    `(ss -ltn 2>/dev/null || netstat -ltn 2>/dev/null || true) | grep ':${server.port} ' || true`,
+                    `(ss -ltnp 2>/dev/null || netstat -ltnp 2>/dev/null || true) | grep ':${server.port} ' || true`,
                 )
-                .then((result) => result.stdout.trim())
-                .catch(() => ""),
-            sandbox.commands
-                .run("ps -eo pid=,stat=,etimes=,command= | grep -E '[n]ext|[t]urbo|[n]x' || true")
                 .then((result) => result.stdout.trim())
                 .catch(() => ""),
             sandbox.commands
                 .run(
-                    "(cat /sys/fs/cgroup/memory.events 2>/dev/null || true; free -m 2>/dev/null || true)",
+                    "ps -eo pid=,ppid=,pgid=,sid=,stat=,etimes=,rss=,vsz=,command= | grep -E '[n]ext|[t]urbo|[n]x|[p]npm|[n]ode|[b]un' || true",
                 )
                 .then((result) => result.stdout.trim())
                 .catch(() => ""),
+            sandbox.commands
+                .run(
+                    "(cat /sys/fs/cgroup/memory.events 2>/dev/null || true; cat /sys/fs/cgroup/memory.current 2>/dev/null || true; cat /sys/fs/cgroup/memory.max 2>/dev/null || true; cat /sys/fs/cgroup/memory.peak 2>/dev/null || true; free -m 2>/dev/null || true)",
+                )
+                .then((result) => result.stdout.trim())
+                .catch(() => ""),
+            sandbox.commands
+                .run(
+                    `ps -eo pid=,ppid=,pgid=,sid=,stat=,etimes=,rss=,vsz=,command= | awk '$1 == ${server.process.pid} || $3 == ${server.process.pid} { print }' || true`,
+                )
+                .then((result) => result.stdout.trim())
+                .catch(() => ""),
+            sandbox.commands
+                .run(
+                    `(curl -sS -D - -o /dev/null --max-time 10 ${shell_argument(`${server.url}${probePath}`)}; printf 'curl_exit=%s\\n' \"$?\") 2>&1`,
+                    { timeoutMs: 15_000 },
+                )
+                .then((result) => result.stdout.trim())
+                .catch(() => ""),
+            sandbox.commands
+                .run("df -h /home/user /tmp 2>/dev/null || true")
+                .then((result) => result.stdout.trim())
+                .catch(() => ""),
         ]);
-        return { logTail, listenerSnapshot, processSnapshot, memorySnapshot };
+        return {
+            logTail,
+            listenerSnapshot,
+            processSnapshot,
+            memorySnapshot,
+            processGroupSnapshot,
+            httpProbeSnapshot,
+            diskSnapshot,
+        };
     }
 
     /**

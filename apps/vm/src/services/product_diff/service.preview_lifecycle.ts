@@ -75,12 +75,13 @@ function startup_failure_summary(logTail: string): string {
 
 function redact_startup_log(value: string): string {
     return value
+        .replace(/([a-z][a-z0-9+.-]*:\/\/)[^/\s@]+@/gi, "$1[redacted]@")
         .replace(
-            /"(authorization|cookie|password|token|secret|api[_-]?key)"\s*:\s*"[^"]*"/gi,
+            /"(authorization|cookie|password|token|secret|api[_-]?key|database[_-]?url|redis[_-]?url|connection[_-]?string)"\s*:\s*"[^"]*"/gi,
             '"$1":"[redacted]"',
         )
         .replace(
-            /(authorization|cookie|password|token|secret|api[_-]?key)\s*[:=]\s*(?:bearer\s+)?[^\s,;]+/gi,
+            /(authorization|cookie|password|token|secret|api[_-]?key|database[_-]?url|redis[_-]?url|connection[_-]?string)\s*[:=]\s*(?:bearer\s+)?[^\s,;]+/gi,
             "$1=[redacted]",
         )
         .slice(-2_000);
@@ -115,7 +116,11 @@ export default class ProductDiffPreviewLifecycle {
                     `${surface.routePath}/__ready__`,
                 ))
             ) {
-                const startup = await PreviewServer.startup_diagnostics(input.sandbox, server);
+                const startup = await PreviewServer.runtime_diagnostics(
+                    input.sandbox,
+                    server,
+                    `${surface.routePath}/__ready__`,
+                );
                 input.log.warn("preview startup failed", {
                     revision: input.revision,
                     applicationPath: input.workspacePlan.applicationPath,
@@ -124,10 +129,15 @@ export default class ProductDiffPreviewLifecycle {
                     healthPath: server.healthPath,
                     launchCommand: input.launchPlan.command,
                     workingDirectory: input.launchPlan.workingDirectory,
+                    serverProcessId: server.process.pid,
                     startupSummary: startup_failure_summary(startup.logTail),
                     startupLogTail: redact_startup_log(startup.logTail),
-                    listenerSnapshot: startup.listenerSnapshot,
-                    processSnapshot: startup.processSnapshot,
+                    listenerSnapshot: redact_startup_log(startup.listenerSnapshot),
+                    processSnapshot: redact_startup_log(startup.processSnapshot),
+                    memorySnapshot: redact_startup_log(startup.memorySnapshot),
+                    processGroupSnapshot: redact_startup_log(startup.processGroupSnapshot),
+                    httpProbeSnapshot: redact_startup_log(startup.httpProbeSnapshot),
+                    diskSnapshot: redact_startup_log(startup.diskSnapshot),
                 });
                 return {
                     revision: input.revision,
@@ -153,11 +163,19 @@ export default class ProductDiffPreviewLifecycle {
             });
             if (!check.ok) {
                 const failed = check.results.find((result) => !result.ok);
-                const startup = await PreviewServer.startup_diagnostics(input.sandbox, server);
+                const startup = await PreviewServer.runtime_diagnostics(
+                    input.sandbox,
+                    server,
+                    `${surface.routePath}/__ready__`,
+                );
                 input.log.warn("preview browser validation failed", {
                     revision: input.revision,
                     applicationPath: input.workspacePlan.applicationPath,
                     workspaceKind: input.workspacePlan.workspaceKind,
+                    port: server.port,
+                    serverProcessId: server.process.pid,
+                    launchCommand: input.launchPlan.command,
+                    workingDirectory: input.launchPlan.workingDirectory,
                     routePath: surface.routePath,
                     targetId: failed?.targetId ?? "unknown",
                     stateId: failed?.stateId ?? "unknown",
@@ -168,6 +186,9 @@ export default class ProductDiffPreviewLifecycle {
                     listenerSnapshot: redact_startup_log(startup.listenerSnapshot),
                     processSnapshot: redact_startup_log(startup.processSnapshot),
                     memorySnapshot: redact_startup_log(startup.memorySnapshot),
+                    processGroupSnapshot: redact_startup_log(startup.processGroupSnapshot),
+                    httpProbeSnapshot: redact_startup_log(startup.httpProbeSnapshot),
+                    diskSnapshot: redact_startup_log(startup.diskSnapshot),
                 });
                 return {
                     revision: input.revision,
