@@ -7,6 +7,7 @@ const READY_TIMEOUT_MS = 4 * 60_000;
 const READY_GRACE_MS = 30_000;
 const LOG_TAIL_LINES = 20;
 const DIAGNOSTIC_LOG_TAIL_LINES = 60;
+const STOP_TIMEOUT_MS = 10_000;
 const PROBE_PATH = "/";
 
 export interface PreviewServerOptions {
@@ -74,7 +75,7 @@ export default class PreviewServer {
         if (is_launch_plan(planOrOptions)) {
             const logPath = `/home/user/preview/${planOrOptions.port}-server.log`;
             const process = await sandbox.commands.run(
-                `mkdir -p /home/user/preview && cd ${shell_argument(planOrOptions.workingDirectory)} && ${planOrOptions.command} > ${shell_argument(logPath)} 2>&1`,
+                `mkdir -p /home/user/preview && cd ${shell_argument(planOrOptions.workingDirectory)} && exec setsid ${planOrOptions.command} > ${shell_argument(logPath)} 2>&1`,
                 { background: true, envs: planOrOptions.environment },
             );
 
@@ -100,7 +101,7 @@ export default class PreviewServer {
         }
 
         const process = await sandbox.commands.run(
-            `cd ${appDir} && ${nextBinary} dev --hostname 127.0.0.1 --port ${options.port} > ${logPath} 2>&1`,
+            `cd ${appDir} && exec setsid ${nextBinary} dev --hostname 127.0.0.1 --port ${options.port} > ${logPath} 2>&1`,
             { background: true, envs: legacyEnvs },
         );
 
@@ -165,11 +166,15 @@ export default class PreviewServer {
     ): Promise<PreviewServerStartupDiagnostics> {
         const [logTail, listenerSnapshot, processSnapshot] = await Promise.all([
             sandbox.commands
-                .run(`tail -n ${DIAGNOSTIC_LOG_TAIL_LINES} ${shell_argument(server.logPath)} 2>/dev/null || true`)
+                .run(
+                    `tail -n ${DIAGNOSTIC_LOG_TAIL_LINES} ${shell_argument(server.logPath)} 2>/dev/null || true`,
+                )
                 .then((result) => result.stdout.trim())
                 .catch(() => ""),
             sandbox.commands
-                .run(`(ss -ltn 2>/dev/null || netstat -ltn 2>/dev/null || true) | grep ':${server.port} ' || true`)
+                .run(
+                    `(ss -ltn 2>/dev/null || netstat -ltn 2>/dev/null || true) | grep ':${server.port} ' || true`,
+                )
                 .then((result) => result.stdout.trim())
                 .catch(() => ""),
             sandbox.commands
@@ -188,9 +193,13 @@ export default class PreviewServer {
      * and taking down the shell it is running in.
      *
      * @example
-     * await PreviewServer.stop(server);
+     * await PreviewServer.stop(sandbox, server);
      */
-    static async stop(server: PreviewServerHandle): Promise<void> {
-        await server.process.kill().catch(() => undefined);
+    static async stop(sandbox: Sandbox, server: PreviewServerHandle): Promise<void> {
+        const stopped = await sandbox.commands
+            .run(`kill -- -${server.process.pid}`, { timeoutMs: STOP_TIMEOUT_MS })
+            .then((result) => result.exitCode === 0)
+            .catch(() => false);
+        if (!stopped) await server.process.kill().catch(() => undefined);
     }
 }

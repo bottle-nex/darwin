@@ -224,7 +224,7 @@ export default class ProductDiffPreviewLifecycle {
         preview: ProductDiffPreviewLifecycleRevision,
     ): Promise<void> {
         try {
-            if (preview.server) await PreviewServer.stop(preview.server);
+            if (preview.server) await PreviewServer.stop(sandbox, preview.server);
         } finally {
             await NextPreviewSurface.remove(sandbox, preview.surface);
         }
