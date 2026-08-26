@@ -22,7 +22,7 @@ type ProductDiffSummaryRow = {
 
 export default class ProductDiffService {
     static retryable_product_diff_status(status: ProductDiffStatus): boolean {
-        return status === "Failed" || status === "PreviewUnavailable";
+        return status === "Failed" || status === "Stale";
     }
 
     static has_frontend_candidate(files: string[]): boolean {
@@ -113,8 +113,8 @@ export default class ProductDiffService {
 
         if (retry_failed && this.retryable_product_diff_status(productDiff.status)) {
             const reset = await prisma.productDiff.updateMany({
-                where: { id: productDiff.id, status: { in: ["Failed", "PreviewUnavailable"] } },
-                data: { status: "Pending", error: null, diagnostics: Prisma.DbNull },
+                where: { id: productDiff.id, status: { in: ["Failed", "Stale"] } },
+                data: { status: "Pending", error: null },
             });
             if (reset.count === 0) return null;
             productDiff = { id: productDiff.id, status: "Pending" };

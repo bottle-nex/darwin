@@ -17,12 +17,14 @@ afterEach(() => {
     mock.restore();
 });
 
-test("retryable_product_diff_status excludes configuration-required runs", () => {
-    expect(ProductDiffService.retryable_product_diff_status("PreviewUnavailable")).toBe(true);
-    expect(ProductDiffService.retryable_product_diff_status("ConfigurationRequired")).toBe(false);
+test("a finished run is only retried when it failed or fell behind the branch", () => {
+    expect(ProductDiffService.retryable_product_diff_status("Failed")).toBe(true);
+    expect(ProductDiffService.retryable_product_diff_status("Stale")).toBe(true);
+    expect(ProductDiffService.retryable_product_diff_status("Ready")).toBe(false);
+    expect(ProductDiffService.retryable_product_diff_status("Generating")).toBe(false);
 });
 
-test("retrying a preview-unavailable Product Diff clears terminal diagnostics", async () => {
+test("retrying a stale Product Diff puts it back in the queue", async () => {
     spyOn(StorageService, "is_product_diff_configured").mockReturnValue(true);
     productDiffPrisma.issue.findUnique.mockResolvedValue({
         prUrl: "https://github.com/acme/storefront/pull/42",
@@ -51,7 +53,7 @@ test("retrying a preview-unavailable Product Diff clears terminal diagnostics", 
     ]);
     productDiffPrisma.productDiff.upsert.mockResolvedValue({
         id: "product-diff-1",
-        status: "PreviewUnavailable",
+        status: "Stale",
     } as never);
     productDiffPrisma.productDiff.updateMany.mockResolvedValue({
         count: 1,
@@ -61,8 +63,8 @@ test("retrying a preview-unavailable Product Diff clears terminal diagnostics", 
     expect(productDiffPrisma.productDiff.updateMany).toHaveBeenCalledWith({
         where: {
             id: "product-diff-1",
-            status: { in: ["Failed", "PreviewUnavailable"] },
+            status: { in: ["Failed", "Stale"] },
         },
-        data: { status: "Pending", error: null, diagnostics: Prisma.DbNull },
+        data: { status: "Pending", error: null },
     });
 });
