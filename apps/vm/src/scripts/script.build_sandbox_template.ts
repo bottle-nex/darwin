@@ -1,4 +1,3 @@
-import { spawnSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 
 import Logger from "@trymatcha/logger";
@@ -18,18 +17,16 @@ const log = Logger.scope("template");
  *
  * Run with: bun run template
  *
- * Prerequisite: `packages/sandbox-mcp/dist/index.js` and `packages/preview-runner/dist/index.js`
+ * Prerequisite: `packages/sandbox-mcp/dist/index.js` and `packages/capsule-check/dist/index.js`
  * must be current, since the Dockerfile copies them in — build them first with
- * `bun run build --filter=@trymatcha/sandbox-mcp --filter=@trymatcha/preview-runner`.
+ * `bun run build --filter=@trymatcha/sandbox-mcp --filter=@trymatcha/capsule-check`.
  */
 
 const TEMPLATE_NAME = "node-py-claude-template";
 const TEMPLATE_TAG = "stable";
-const PREVIEW_RUNNER_PROTOCOL_VERSION = 11;
-// E2B's default is 976 MB, of which roughly 700 MB is free once the box has booted. Webpack
-// compiling a real Next.js app's root layout wants more than that, so Next's own memory watchdog
-// restarts the dev server in a loop and no route ever finishes compiling. Raising this is what
-// makes Product Diff able to run a customer's app at all.
+// E2B's default is 976 MB, of which roughly 700 MB is free once the box has booted. Installing a
+// real project's dependencies and then bundling six components with vite wants more than that.
+// Raising this is what makes Product Diff able to build a customer's app at all.
 const SANDBOX_MEMORY_MB = 4096;
 const SANDBOX_CPU_COUNT = 4;
 const REPO_ROOT = new URL("../../../../", import.meta.url).pathname;
@@ -41,32 +38,11 @@ const BUNDLES: { name: string; path: string; filter: string }[] = [
         filter: "@trymatcha/sandbox-mcp",
     },
     {
-        name: "preview-runner",
-        path: `${REPO_ROOT}packages/preview-runner/dist/index.js`,
-        filter: "@trymatcha/preview-runner",
+        name: "capsule-check",
+        path: `${REPO_ROOT}packages/capsule-check/dist/index.js`,
+        filter: "@trymatcha/capsule-check",
     },
 ];
-
-function verify_preview_runner_bundle(path: string): void {
-    const version = spawnSync("node", [path, "version"], { encoding: "utf8" });
-    if (version.status !== 0) {
-        log.error("preview-runner bundle cannot report its protocol version", undefined, {
-            expected: PREVIEW_RUNNER_PROTOCOL_VERSION,
-            stderr: version.stderr.trim() || null,
-        });
-        process.exit(1);
-    }
-
-    try {
-        const output = JSON.parse(version.stdout) as { version?: unknown };
-        if (output.version !== PREVIEW_RUNNER_PROTOCOL_VERSION) throw new Error("version mismatch");
-    } catch {
-        log.error("preview-runner bundle has an incompatible protocol version", undefined, {
-            expected: PREVIEW_RUNNER_PROTOCOL_VERSION,
-        });
-        process.exit(1);
-    }
-}
 
 async function main() {
     for (const bundle of BUNDLES) {
@@ -81,7 +57,6 @@ async function main() {
             process.exit(1);
         }
     }
-    verify_preview_runner_bundle(BUNDLES[1]!.path);
 
     const dockerfile = readFileSync(DOCKERFILE, "utf8");
     log.step("building sandbox template", { name: TEMPLATE_NAME, dockerfile: DOCKERFILE });

@@ -19,8 +19,7 @@ const log = Logger.scope("template");
 const TEMPLATE_NAME = "node-py-claude-template";
 const TEMPLATE_TAG = "stable";
 const SANDBOX_MCP_ENTRY = "/opt/matcha/sandbox-mcp/index.js";
-const PREVIEW_RUNNER_ENTRY = "/opt/matcha/preview-runner/index.js";
-const PREVIEW_RUNNER_PROTOCOL_VERSION = 11;
+const CAPSULE_CHECK_ENTRY = "/opt/matcha/capsule-check/index.js";
 
 interface Requirement {
     name: string;
@@ -45,19 +44,19 @@ const REQUIREMENTS: Requirement[] = [
         needed_for: "building and querying the code graph",
     },
     {
-        name: "preview-runner",
-        command: `node ${PREVIEW_RUNNER_ENTRY} doctor | jq -e '.ok and .chromiumVersion and .replayCommandAvailable' > /dev/null`,
-        needed_for: "launching Chromium and replaying Product Diff targets",
+        name: "capsule-check",
+        command: `test -f ${CAPSULE_CHECK_ENTRY} && echo present`,
+        needed_for: "grading whether a built capsule actually renders",
     },
     {
-        name: "preview-runner protocol",
-        command: `node ${PREVIEW_RUNNER_ENTRY} version | jq -e '.version == ${PREVIEW_RUNNER_PROTOCOL_VERSION}' > /dev/null`,
-        needed_for: "matching the VM's Product Diff output contract",
+        name: "chromium",
+        command: `cd /opt/matcha/capsule-check && node -e "import('playwright').then(async (p) => { const b = await p.chromium.launch(); console.log(b.version()); await b.close(); })"`,
+        needed_for: "opening capsule pages to check them",
     },
     {
-        name: "preview-check",
-        command: "preview-check --help",
-        needed_for: "the harness agent's render oracle",
+        name: "npx",
+        command: "npx --version",
+        needed_for: "installing and running the capsule build harness",
     },
     { name: "pnpm", command: "pnpm --version", needed_for: "installing pnpm-lock.yaml projects" },
     { name: "yarn", command: "yarn --version", needed_for: "installing yarn.lock projects" },
