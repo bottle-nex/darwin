@@ -46,7 +46,6 @@ export function capsule_alias(capsule_id: string): string {
 
 export function resolve_aliases(
     profile: AppProfile,
-    options: HarnessOptions = DEFAULT_OPTIONS,
     capsules: { ids: string[]; revision: CapsuleRevision } = { ids: [], revision: "head" },
 ): Record<string, string> {
     const aliases: Record<string, string> = {};
@@ -79,7 +78,7 @@ export function render_vite_config(
     options: HarnessOptions = DEFAULT_OPTIONS,
     revision: CapsuleRevision = "head",
 ): string {
-    const aliases = resolve_aliases(profile, options, { ids: [capsule_id], revision });
+    const aliases = resolve_aliases(profile, { ids: [capsule_id], revision });
     const harness = harness_dir(profile);
     const input = `${harness}/pages/${capsule_id}/index.html`;
 
@@ -446,7 +445,6 @@ export default class CapsuleHarness {
         revision: CapsuleRevision,
     ): Promise<string[]> {
         const buildable = specs.filter((spec) => spec.entries[revision]);
-        const options = await this.detect(sandbox, profile);
 
         const harness = harness_dir(profile);
         await sandbox.commands.run(`rm -rf ${harness}/pages && mkdir -p ${harness}/shims`);

@@ -1,10 +1,5 @@
 "use client";
-import {
-    type Capsule,
-    type CapsuleFidelity,
-    type CapsuleRevision,
-    meaningful_diagnostics,
-} from "@trymatcha/types";
+import type { Capsule, CapsuleFidelity, CapsuleRevision } from "@trymatcha/types";
 import { useEffect, useRef, useState } from "react";
 
 import { MICRO_LABEL } from "@/components/playground/Core/components/paneBar";
@@ -134,8 +129,6 @@ export default function CapsuleComparison({
                     />
                 </div>
             </div>
-
-            {/*<Diagnostics capsule={capsule} scale={scale} />*/}
         </div>
     );
 }
@@ -241,39 +234,6 @@ function Frame({
                 }}
                 className="border-0"
             />
-        </div>
-    );
-}
-
-function Diagnostics({ capsule, scale }: { capsule: Capsule; scale: number }) {
-    const notes = [
-        ...meaningful_diagnostics(capsule.base?.diagnostics ?? []).map((text) => ({
-            side: "Before",
-            text,
-        })),
-        ...meaningful_diagnostics(capsule.head?.diagnostics ?? []).map((text) => ({
-            side: "After",
-            text,
-        })),
-    ];
-
-    return (
-        <div className="flex flex-col gap-1">
-            {scale < 1 && (
-                <p className="text-[11px] text-neutral-500">
-                    Scaled to {Math.round(scale * 100)}% to fit. The page itself is rendered at full
-                    width, so its layout is the real one.
-                </p>
-            )}
-            {notes.map((note) => (
-                <p
-                    key={`${note.side}-${note.text}`}
-                    className="text-[11px] leading-relaxed text-amber-300/80"
-                >
-                    <span className="text-neutral-500">{note.side} · </span>
-                    {note.text}
-                </p>
-            ))}
         </div>
     );
 }

@@ -1,4 +1,5 @@
-import { Prisma, prisma } from "@trymatcha/database";
+import type { Prisma } from "@trymatcha/database";
+import { prisma } from "@trymatcha/database";
 import Logger from "@trymatcha/logger";
 import type { CapsuleManifest, ProductDiffStatus } from "@trymatcha/types";
 import { Sandbox } from "e2b";
@@ -15,8 +16,8 @@ import CapsuleWorkspace, {
     NoFrontendAppError,
 } from "./service.capsule_workspace";
 import GithubService from "./service.github";
-import E2B from "./services.e2b";
 import { command_error_text, describe_failure, failure_sentence } from "./service.sandbox_stream";
+import E2B from "./services.e2b";
 
 const log = Logger.scope("product-diff");
 

@@ -4,8 +4,8 @@ import { extname, join, posix, relative, sep } from "node:path";
 
 import type Logger from "@trymatcha/logger";
 import {
-    CAPSULE_MANIFEST_VERSION,
     type Capsule,
+    CAPSULE_MANIFEST_VERSION,
     type CapsuleFidelity,
     type CapsuleManifest,
     type CapsuleRevision as ManifestRevision,

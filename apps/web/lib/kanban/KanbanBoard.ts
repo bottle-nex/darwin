@@ -3,7 +3,6 @@ import { LuCircle, LuCircleDashed, LuCircleDotDashed, LuCirclePause } from "reac
 import { RiProgress4Line } from "react-icons/ri";
 
 import { DoneStatusIcon, FailedStatusIcon } from "@/components/icons/StatusIcons";
-
 import {
     type BoardState,
     type Issue,

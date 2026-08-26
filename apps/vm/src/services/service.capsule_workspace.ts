@@ -83,10 +83,6 @@ function is_inside(dir: string, file: string): boolean {
     return dir === "." || file.startsWith(`${dir}/`);
 }
 
-function join(dir: string, name: string): string {
-    return dir === "." ? name : `${dir}/${name}`;
-}
-
 export default class CapsuleWorkspace {
     public static async prepare(
         sandbox: Sandbox,

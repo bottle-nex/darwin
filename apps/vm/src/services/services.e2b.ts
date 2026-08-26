@@ -17,12 +17,7 @@ import IssueSolver, { type ClaimedIssue } from "./service.issue_solver";
 import { sign_worker_jwt } from "./service.jwt";
 import OutcomeReporter from "./service.outcome_queue";
 import RunReporter from "./service.run_report";
-import SandboxStream, {
-    describe_failure,
-    type FailureReport,
-    failure_sentence,
-    redact,
-} from "./service.sandbox_stream";
+import SandboxStream, { describe_failure, failure_sentence } from "./service.sandbox_stream";
 import SecretService from "./service.secret";
 import PlanService from "./services.plan";
 

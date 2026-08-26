@@ -4,10 +4,10 @@ import type { Sandbox } from "e2b";
 import { z } from "zod";
 
 import { ENV } from "../conf/config.env";
-import ClaudeRun from "./service.claude_run";
 import { capsules_dir, harness_dir, OVERRIDES_FILE } from "./service.capsule_harness";
 import type { CapsuleTarget } from "./service.capsule_targets";
 import type { AppProfile } from "./service.capsule_workspace";
+import ClaudeRun from "./service.claude_run";
 
 const AUTHOR_PROMPT_PATH = "/home/user/capsule_author_prompt.txt";
 const REPAIR_PROMPT_PATH = "/home/user/capsule_repair_prompt.txt";

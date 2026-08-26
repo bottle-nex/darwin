@@ -12,8 +12,8 @@ import { useActiveProject } from "@/hooks/useActiveProject";
 import type { CapsuleCompareMode, CapsuleViewport } from "@/types/capsule.type";
 
 import CapsuleComparison from "./CapsuleComparison";
-import CapsuleHeader from "./CapsuleHeader";
 import CapsuleControls from "./CapsuleControls";
+import CapsuleHeader from "./CapsuleHeader";
 import CapsuleList from "./CapsuleList";
 
 export default function DiffReviewDisplay({
