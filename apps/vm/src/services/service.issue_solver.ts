@@ -7,6 +7,7 @@ export interface ClaimedIssue {
     title: string;
     description: string;
     prBranch: string;
+    agentDoneAt: Date | null;
 }
 
 export default class IssueSolver {
@@ -27,6 +28,7 @@ export default class IssueSolver {
                 title: true,
                 description: true,
                 prBranch: true,
+                agentDoneAt: true,
             },
         });
 
@@ -47,7 +49,7 @@ export default class IssueSolver {
         const issue = await prisma.issue.findFirst({
             where: { assignerWorkerId: worker_id, status: IssueStatus.Queued },
             orderBy: { queuePosition: "asc" },
-            select: { id: true, number: true, title: true, description: true },
+            select: { id: true, number: true, title: true, description: true, agentDoneAt: true },
         });
 
         if (!issue) {

@@ -16,7 +16,7 @@ import CapsuleWorkspace, {
 } from "./service.capsule_workspace";
 import GithubService from "./service.github";
 import E2B from "./services.e2b";
-import { command_error_text, redact } from "./service.sandbox_stream";
+import { command_error_text, describe_failure, failure_sentence } from "./service.sandbox_stream";
 
 const log = Logger.scope("product-diff");
 
@@ -88,8 +88,17 @@ export default class ProductDiffRunner {
         });
 
         const project = row?.issue.project;
-        if (!row || !project?.githubRepoUrl || !project.githubDefaultBranch || !project.githubInstallation) {
-            return this.settle(product_diff_id, "Failed", "This project is not connected to GitHub");
+        if (
+            !row ||
+            !project?.githubRepoUrl ||
+            !project.githubDefaultBranch ||
+            !project.githubInstallation
+        ) {
+            return this.settle(
+                product_diff_id,
+                "Failed",
+                "This project is not connected to GitHub",
+            );
         }
         if (!SAFE_SHA.test(row.baseSha) || !SAFE_SHA.test(row.headSha)) {
             return this.settle(product_diff_id, "Failed", "This pull request has unusable commits");
@@ -122,14 +131,21 @@ export default class ProductDiffRunner {
             const status = await this.generate(sandbox, product_diff_id, row.baseSha, row.headSha);
             return status;
         } catch (error) {
-            const message = redact(error instanceof Error ? error.message : String(error), [
+            const failure = describe_failure("generate capsule diff", error, [
                 token,
                 ENV.SERVER_CLAUDE_CODE_OAUTH_TOKEN,
             ]);
-            log.error("capsule diff run failed", new Error(message), {
+            log.error("capsule diff run failed", new Error(failure.message), {
                 productDiff: product_diff_id,
+                base: row.baseSha.slice(0, 8),
+                head: row.headSha.slice(0, 8),
+                stage: failure.stage,
             });
-            return this.settle(product_diff_id, "Failed", this.reason(error, message));
+            return this.settle(
+                product_diff_id,
+                "Failed",
+                this.reason(error, failure_sentence(failure)),
+            );
         } finally {
             if (sandbox_id) {
                 await E2B.destroy(sandbox_id).catch((error) => {

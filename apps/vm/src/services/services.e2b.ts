@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 
-import { prisma, WorkerStatus } from "@trymatcha/database";
+import { Prisma, prisma, WorkerStatus } from "@trymatcha/database";
 import Logger, { format_duration } from "@trymatcha/logger";
 import type { CommandResult, SnapshotInfo } from "e2b";
 import { Sandbox } from "e2b";
@@ -17,7 +17,12 @@ import IssueSolver, { type ClaimedIssue } from "./service.issue_solver";
 import { sign_worker_jwt } from "./service.jwt";
 import OutcomeReporter from "./service.outcome_queue";
 import RunReporter from "./service.run_report";
-import SandboxStream, { redact } from "./service.sandbox_stream";
+import SandboxStream, {
+    describe_failure,
+    type FailureReport,
+    failure_sentence,
+    redact,
+} from "./service.sandbox_stream";
 import SecretService from "./service.secret";
 import PlanService from "./services.plan";
 
@@ -38,6 +43,7 @@ const MCP_CONFIG_PATH = "/home/user/matcha_mcp_config.json";
 const SANDBOX_MCP_ENTRY = "/opt/matcha/sandbox-mcp/index.js";
 const ISSUE_SOLVE_TIMEOUT_MS = 30 * 60_000;
 const ISSUE_PUSH_TIMEOUT_MS = 10 * 60_000;
+const MAX_PUSH_ATTEMPTS = 3;
 
 export function requires_agent_run(
     existing_pull: boolean,
@@ -48,6 +54,12 @@ export function requires_agent_run(
 }
 
 class IssueBranchPushError extends Error {}
+
+function previous_push_attempts(worker: { contextSummary: unknown }): number {
+    const summary = worker.contextSummary as { pushAttempts?: unknown } | null;
+    const attempts = Number(summary?.pushAttempts);
+    return Number.isInteger(attempts) && attempts > 0 ? attempts : 0;
+}
 
 export default class E2B {
     public static async run_onboarding_job(
@@ -119,14 +131,20 @@ export default class E2B {
             });
             log.success("onboarding ready", { session: session_id });
         } catch (error) {
-            log.error("onboarding failed", error, { session: session_id });
+            const failure = describe_failure("onboard project", error, []);
+            log.error("onboarding failed", error, {
+                session: session_id,
+                project: project_id,
+                sandbox: sandbox_id,
+                stage: failure.stage,
+            });
             try {
                 await Promise.all([
                     prisma.setupSession.update({
                         where: { id: session_id },
                         data: {
                             status: "Failed",
-                            error: error instanceof Error ? error.message : String(error),
+                            error: failure_sentence(failure),
                             finishedAt: new Date(),
                         },
                     }),
@@ -187,6 +205,18 @@ export default class E2B {
         let teardown_succeeded = false;
         let retain_sandbox = false;
         let gh_token = "";
+        let current_issue: ClaimedIssue | null = null;
+
+        const secrets = () => [gh_token, ENV.SERVER_CLAUDE_CODE_OAUTH_TOKEN];
+        const failure_fields = () => ({
+            worker: worker_id,
+            project: project.id,
+            sandbox: sandbox_id ?? "none",
+            issue: current_issue?.id ?? "none",
+            number: current_issue ? `#${current_issue.number}` : "none",
+            branch: current_issue?.prBranch ?? "none",
+        });
+
         log.step("worker loop starting", { worker: worker_id, project: project.id, branch });
 
         try {
@@ -223,6 +253,8 @@ export default class E2B {
             gh_token = installation_token;
             log.info("minted github + worker tokens for the sandbox");
 
+            await E2B.refresh_origin(sandbox, repo_url, gh_token);
+
             await sandbox.files.write(
                 MCP_CONFIG_PATH,
                 JSON.stringify(
@@ -258,6 +290,7 @@ export default class E2B {
 
             for (;;) {
                 const issue = await IssueSolver.claim_next_issue(worker_id, log);
+                current_issue = issue;
                 if (!issue) {
                     log.success("queue empty — stopping loop", { solved: solved_count });
                     break;
@@ -347,7 +380,7 @@ export default class E2B {
                             worker_token,
                             run_id,
                             issue.id,
-                            error instanceof Error ? error.message : String(error),
+                            failure_sentence(describe_failure("solve issue", error, secrets())),
                             log,
                         );
                         throw error;
@@ -370,7 +403,7 @@ export default class E2B {
                 }
 
                 if (!existing_pull && !already_pushed) {
-                    await E2B.push_issue_branch(sandbox, issue.prBranch);
+                    await E2B.push_issue_branch(sandbox, issue.prBranch, secrets());
                 }
 
                 if (!agent_done) {
@@ -400,7 +433,9 @@ export default class E2B {
                         kind: "failed",
                         issueId: issue.id,
                         workerId: worker_id,
-                        reason: error instanceof Error ? error.message : String(error),
+                        reason: failure_sentence(
+                            describe_failure("open pull request", error, secrets()),
+                        ),
                         runId: run_id,
                     });
                     throw error;
@@ -433,23 +468,38 @@ export default class E2B {
             log.info("worker marked Idle");
             await prisma.worker.update({
                 where: { id: worker_id },
-                data: { status: WorkerStatus.Idle },
+                data: { status: WorkerStatus.Idle, contextSummary: Prisma.DbNull },
             });
         } catch (error) {
-            const error_message = redact(error instanceof Error ? error.message : String(error), [
-                gh_token,
-                ENV.SERVER_CLAUDE_CODE_OAUTH_TOKEN,
-            ]);
-            log.error("worker loop failed", new Error(error_message), { worker: worker_id });
-            retain_sandbox = error instanceof IssueBranchPushError;
+            const failure = describe_failure(
+                current_issue ? "run issue" : "start worker loop",
+                error,
+                secrets(),
+            );
+            const push_attempts =
+                error instanceof IssueBranchPushError ? previous_push_attempts(worker) + 1 : 0;
+            retain_sandbox =
+                error instanceof IssueBranchPushError && push_attempts < MAX_PUSH_ATTEMPTS;
+
+            log.error("worker loop failed", new Error(failure.message), {
+                ...failure_fields(),
+                stage: failure.stage,
+                ...(push_attempts > 0 && { attempt: `${push_attempts}/${MAX_PUSH_ATTEMPTS}` }),
+            });
+
             try {
                 await prisma.worker.update({
                     where: { id: worker_id },
                     data: {
                         status: retain_sandbox ? WorkerStatus.Idle : WorkerStatus.Dead,
                         contextSummary: {
-                            error: error_message,
+                            stage: failure.stage,
+                            error: failure.message,
+                            issueId: current_issue?.id ?? null,
+                            issueNumber: current_issue?.number ?? null,
+                            branch: current_issue?.prBranch ?? null,
                             failedAt: new Date().toISOString(),
+                            pushAttempts: push_attempts,
                             retryable: retain_sandbox,
                         },
                     },
@@ -458,9 +508,23 @@ export default class E2B {
                     retain_sandbox
                         ? "worker retained for branch push retry"
                         : "worker marked Dead after failure",
+                    failure_fields(),
                 );
             } catch (e) {
-                log.error("could not mark worker Dead", e, { worker: worker_id });
+                log.error("could not mark worker Dead", e, failure_fields());
+            }
+            if (!retain_sandbox && current_issue && error instanceof IssueBranchPushError) {
+                log.error(
+                    `giving up on issue #${current_issue.number} after ${push_attempts} push attempts`,
+                    new Error(failure.message),
+                    failure_fields(),
+                );
+                await OutcomeReporter.publish({
+                    kind: "failed",
+                    issueId: current_issue.id,
+                    workerId: worker_id,
+                    reason: failure_sentence(failure),
+                }).catch((e) => log.error("could not report the failed issue", e, failure_fields()));
             }
         } finally {
             if (sandbox_id && !retain_sandbox) {
@@ -580,21 +644,21 @@ Never start a long-running command in the background and end your turn waiting o
         return pulls[0] ?? null;
     }
 
-    public static async push_issue_branch(sandbox: Sandbox, issue_branch: string): Promise<void> {
+    public static async push_issue_branch(
+        sandbox: Sandbox,
+        issue_branch: string,
+        secrets: string[],
+    ): Promise<void> {
         this.validate_branch(issue_branch);
         try {
-            const result = await sandbox.commands.run(`git push origin ${issue_branch}`, {
+            await sandbox.commands.run(`git push origin ${issue_branch}`, {
                 cwd: REPO_DIR,
                 timeoutMs: ISSUE_PUSH_TIMEOUT_MS,
             });
-            if (result.exitCode !== 0) {
-                throw new Error(result.stderr.trim() || `git push exited with ${result.exitCode}`);
-            }
         } catch (error) {
+            const failure = describe_failure("push issue branch", error, secrets);
             throw new IssueBranchPushError(
-                `could not push branch ${issue_branch}: ${
-                    error instanceof Error ? error.message : String(error)
-                }`,
+                `could not push branch ${issue_branch} — ${failure.message}`,
             );
         }
     }
@@ -671,6 +735,28 @@ Never start a long-running command in the background and end your turn waiting o
         await sandbox.kill();
     }
 
+    /**
+     * Re-point origin at a freshly minted installation token.
+     *
+     * clone_repo bakes a token into the remote, and those expire after an hour. A sandbox kept
+     * across dispatches therefore pushes with the credential it was cloned with, which is fine for
+     * minutes and useless by the afternoon.
+     */
+    public static async refresh_origin(
+        sandbox: Sandbox,
+        repo_url: string,
+        token: string,
+    ): Promise<void> {
+        const authenticated = repo_url.replace("https://", `https://x-access-token:${token}@`);
+        try {
+            await sandbox.commands.run(`git remote set-url origin ${authenticated}`, {
+                cwd: REPO_DIR,
+            });
+        } catch (error) {
+            throw new Error(failure_sentence(describe_failure("refresh origin", error, [token])));
+        }
+    }
+
     public static async clone_repo(
         sandbox_id: string,
         repo_url: string,
@@ -707,9 +793,7 @@ Never start a long-running command in the background and end your turn waiting o
                 },
             );
         } catch (error) {
-            throw new Error(
-                redact(error instanceof Error ? error.message : String(error), [token]),
-            );
+            throw new Error(failure_sentence(describe_failure("clone repo", error, [token])));
         } finally {
             stream.flush();
         }

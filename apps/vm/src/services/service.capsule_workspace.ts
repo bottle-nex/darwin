@@ -1,6 +1,8 @@
 import type Logger from "@trymatcha/logger";
 import type { Sandbox } from "e2b";
 
+import { describe_failure } from "./service.sandbox_stream";
+
 const REPO_DIR = "/home/user/repo";
 const INSTALL_TIMEOUT_MS = 12 * 60_000;
 const MAX_INSTALL_ERROR_CHARS = 2000;
@@ -61,7 +63,10 @@ export function read_tailwind_major(
     return major === 3 || major === 4 ? major : null;
 }
 
-export function pick_app_dir(candidates: PackageCandidate[], changed_files: string[]): string | null {
+export function pick_app_dir(
+    candidates: PackageCandidate[],
+    changed_files: string[],
+): string | null {
     const react_packages = candidates.filter((candidate) => "react" in candidate.dependencies);
     if (react_packages.length === 0) return null;
 
@@ -137,11 +142,13 @@ export default class CapsuleWorkspace {
         base_sha: string,
         head_sha: string,
     ): Promise<string[]> {
-        const result = await sandbox.commands.run(
-            `git diff --name-only ${base_sha} ${head_sha}`,
-            { cwd: REPO_DIR },
-        );
-        return result.stdout.split("\n").map((line) => line.trim()).filter(Boolean);
+        const result = await sandbox.commands.run(`git diff --name-only ${base_sha} ${head_sha}`, {
+            cwd: REPO_DIR,
+        });
+        return result.stdout
+            .split("\n")
+            .map((line) => line.trim())
+            .filter(Boolean);
     }
 
     private static async package_candidates(sandbox: Sandbox): Promise<PackageCandidate[]> {
@@ -170,7 +177,10 @@ export default class CapsuleWorkspace {
         return candidates;
     }
 
-    private static async find_global_css(sandbox: Sandbox, app_dir: string): Promise<string | null> {
+    private static async find_global_css(
+        sandbox: Sandbox,
+        app_dir: string,
+    ): Promise<string | null> {
         const result = await sandbox.commands
             .run(`grep -rlE ${JSON.stringify(GLOBAL_CSS_PATTERN)} --include=*.css ${app_dir}`, {
                 cwd: REPO_DIR,
@@ -195,8 +205,7 @@ export default class CapsuleWorkspace {
                 `${REPO_DIR}/${join(dir, "tsconfig.json")}`,
             );
             const options = manifest?.compilerOptions as
-                | { paths?: Record<string, string[]> }
-                | undefined;
+                { paths?: Record<string, string[]> } | undefined;
             if (options?.paths) return options.paths;
         }
         return {};
@@ -216,9 +225,9 @@ export default class CapsuleWorkspace {
                 timeoutMs: INSTALL_TIMEOUT_MS,
             });
         } catch (error) {
-            const message = error instanceof Error ? error.message : String(error);
+            const failure = describe_failure("install dependencies", error, []);
             throw new InstallFailedError(
-                `${command} failed: ${message.slice(-MAX_INSTALL_ERROR_CHARS)}`,
+                `${command} failed: ${failure.message.slice(-MAX_INSTALL_ERROR_CHARS)}`,
             );
         }
     }
