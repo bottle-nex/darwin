@@ -1,4 +1,3 @@
-import { IoIosCheckmarkCircle } from "react-icons/io";
 import {
     LuCircle,
     LuCircleDashed,
@@ -8,6 +7,8 @@ import {
     LuCircleX,
 } from "react-icons/lu";
 import { RiProgress4Line } from "react-icons/ri";
+
+import { DoneStatusIcon } from "@/components/icons/StatusIcons";
 
 import {
     type BoardState,
@@ -61,8 +62,8 @@ export class KanbanBoard {
         {
             status: KanbanStatus.Done,
             title: "Done",
-            icon: IoIosCheckmarkCircle,
-            titleBox: "text-blue-600",
+            icon: DoneStatusIcon,
+            titleBox: "text-green-500",
         },
         {
             status: KanbanStatus.Failed,
