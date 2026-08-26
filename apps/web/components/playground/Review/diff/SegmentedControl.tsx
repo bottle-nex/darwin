@@ -6,6 +6,10 @@ import { Button } from "@/components/ui/button";
 import { TooltipComponent } from "@/components/ui/tooltip-component";
 import { cn } from "@/lib/utils";
 
+// Matches the icon buttons in the kanban options bar, where a tooltip that only names the icon
+// waits rather than following the pointer around.
+const LABEL_TOOLTIP_DELAY_MS = 1000;
+
 export interface SegmentedOption<T extends string> {
     value: T;
     label: string;
@@ -94,7 +98,11 @@ function Segment<T extends string>({
     if (!hint) return segment;
 
     return (
-        <TooltipComponent content={hint} side="top">
+        <TooltipComponent
+            content={hint}
+            side="top"
+            delayDuration={option.disabledReason ? undefined : LABEL_TOOLTIP_DELAY_MS}
+        >
             <span className="inline-flex">{segment}</span>
         </TooltipComponent>
     );
