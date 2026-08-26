@@ -1,9 +1,9 @@
+import { AiFillStop } from "react-icons/ai";
 import {
     LuCircle,
     LuCircleDashed,
     LuCircleDotDashed,
     LuCirclePause,
-    LuCircleSlash,
 } from "react-icons/lu";
 import { RiProgress4Line } from "react-icons/ri";
 
@@ -73,8 +73,8 @@ export class KanbanBoard {
         {
             status: KanbanStatus.Cancelled,
             title: "Cancelled",
-            icon: LuCircleSlash,
-            titleBox: "text-neutral-300",
+            icon: AiFillStop,
+            titleBox: "text-snow/60",
         },
     ];
 
