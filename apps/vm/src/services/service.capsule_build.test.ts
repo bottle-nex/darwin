@@ -8,7 +8,6 @@ const profile: AppProfile = {
     packageManager: "bun",
     tailwindMajor: 4,
     globalCssPath: "apps/web/app/globals.css",
-    tsconfigPaths: { "@/*": ["./*"] },
 };
 
 test("each revision builds into its own output directory", () => {

@@ -1,7 +1,12 @@
 import { expect, test } from "bun:test";
 
 import type { CapsuleSpec } from "./service.capsule_author";
-import { collect_failures, MAX_REPAIR_ROUNDS, terminal_status } from "./service.product_diff";
+import {
+    collect_failures,
+    first_build_error,
+    MAX_REPAIR_ROUNDS,
+    terminal_status,
+} from "./service.product_diff";
 import type { GateResults } from "./service.capsule_upload";
 
 function spec(overrides: Partial<CapsuleSpec> = {}): CapsuleSpec {
@@ -88,8 +93,24 @@ test("the repair loop is bounded, so a stubborn capsule cannot run forever", () 
     expect(MAX_REPAIR_ROUNDS).toBe(2);
 });
 
-test("a run with no capsules at all is unsupported, not failed", () => {
-    expect(terminal_status({ version: 5, capsules: [], warnings: [] })).toBe("Unsupported");
+test("a pull request with nothing previewable is unsupported", () => {
+    expect(terminal_status({ version: 5, capsules: [], warnings: [] }, 0)).toBe("Unsupported");
+});
+
+test("a run that tried components and built none is failed, not unsupported", () => {
+    expect(terminal_status({ version: 5, capsules: [], warnings: [] }, 2)).toBe("Failed");
+});
+
+test("the compiler error is what a failed run reports", () => {
+    const error = first_build_error({
+        base: { hero: `Rollup failed to resolve import "routes/api_routes"` },
+        head: { hero: `Rollup failed to resolve import "routes/api_routes"` },
+    });
+    expect(error).toContain("routes/api_routes");
+});
+
+test("a run with nothing to report has no build error", () => {
+    expect(first_build_error({ base: {}, head: {} })).toBe(null);
 });
 
 test("a run that published at least one capsule is ready", () => {
@@ -104,12 +125,16 @@ test("a run that published at least one capsule is ready", () => {
                 viewport: { width: 720, height: 240 },
                 controls: [],
                 base: null,
-                head: { path: "head/faq-item/index.html", fidelity: "Failed" as const, diagnostics: ["boom"] },
+                head: {
+                    path: "head/faq-item/index.html",
+                    fidelity: "Failed" as const,
+                    diagnostics: ["boom"],
+                },
             },
         ],
         warnings: [],
     };
-    expect(terminal_status(manifest)).toBe("Ready");
+    expect(terminal_status(manifest, 1)).toBe("Ready");
 });
 
 test("one capsule failing to compile does not take the others down with it", () => {

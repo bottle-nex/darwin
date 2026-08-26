@@ -15,27 +15,12 @@ function profile(overrides: Partial<AppProfile> = {}): AppProfile {
         packageManager: "bun",
         tailwindMajor: 4,
         globalCssPath: "apps/web/app/globals.css",
-        tsconfigPaths: { "@/*": ["./*"] },
         ...overrides,
     };
 }
 
-test("a tsconfig path becomes a vite alias rooted at the app", () => {
-    const aliases = resolve_aliases(profile());
-    expect(aliases["@"]).toBe("/home/user/repo/apps/web");
-});
 
-test("a path mapping without a wildcard still resolves", () => {
-    const aliases = resolve_aliases(
-        profile({ tsconfigPaths: { "~config": ["./config/index.ts"] } }),
-    );
-    expect(aliases["~config"]).toBe("/home/user/repo/apps/web/config/index.ts");
-});
 
-test("aliases are rooted at the repo when the app is the repo", () => {
-    const aliases = resolve_aliases(profile({ appDir: ".", tsconfigPaths: { "@/*": ["./src/*"] } }));
-    expect(aliases["@"]).toBe("/home/user/repo/src");
-});
 
 test("every framework only module is shimmed, since plain vite cannot resolve them", () => {
     const aliases = resolve_aliases(profile());
@@ -56,9 +41,7 @@ test("tailwind v3 builds through postcss instead", () => {
     const config = render_vite_config(profile({ tailwindMajor: 3 }), "faq-item");
     expect(config).not.toContain("@tailwindcss/vite");
     expect(config).toContain("postcss");
-    expect(harness_dependencies(profile({ tailwindMajor: 3 })).join(" ")).toContain(
-        "tailwindcss@",
-    );
+    expect(harness_dependencies(profile({ tailwindMajor: 3 })).join(" ")).toContain("tailwindcss@");
 });
 
 test("a project without tailwind pulls in no tailwind packages", () => {
@@ -99,10 +82,6 @@ test("react is never aliased, because a string alias breaks react/jsx-runtime", 
     expect(render_vite_config(profile(), "faq-item")).toContain('dedupe: ["react", "react-dom"]');
 });
 
-
-
-
-
 test("the modules a real next app reaches for are all shimmed", () => {
     const aliases = resolve_aliases(profile());
     for (const specifier of [
@@ -136,6 +115,33 @@ test("next/font is rewritten in place, so any font name in any project works", (
     const config = render_vite_config(profile(), "faq-item");
 
     expect(config).toContain("matcha:next-font");
-    expect(config).toContain("plugins: [nextFontShim,");
+    expect(config).toContain("plugins: [\n        nextFontShim,");
     expect(config).not.toContain("shims/next-font");
+});
+
+test("tsconfig resolution is delegated, so paths, baseUrl and extends all work", () => {
+    const config = render_vite_config(profile(), "faq-item");
+
+    expect(config).toContain("vite-tsconfig-paths");
+    expect(config).toContain('tsconfigPaths({ root: "/home/user/repo/apps/web" })');
+    expect(harness_dependencies(profile()).join(" ")).toContain("vite-tsconfig-paths@");
+});
+
+test("we still alias only what a tsconfig cannot know about", () => {
+    const aliases = resolve_aliases(profile(), undefined, { ids: ["faq-item"], revision: "head" });
+
+    expect(Object.keys(aliases).sort()).toEqual([
+        "@capsule/faq-item",
+        "@matcha/global.css",
+        "client-only",
+        "next/cache",
+        "next/dynamic",
+        "next/head",
+        "next/image",
+        "next/link",
+        "next/navigation",
+        "next/router",
+        "next/script",
+        "server-only",
+    ]);
 });

@@ -15,7 +15,6 @@ export interface AppProfile {
     packageManager: PackageManager;
     tailwindMajor: 3 | 4 | null;
     globalCssPath: string | null;
-    tsconfigPaths: Record<string, string[]>;
 }
 
 export interface PreparedWorkspace {
@@ -113,7 +112,6 @@ export default class CapsuleWorkspace {
             packageManager: package_manager,
             tailwindMajor: read_tailwind_major(app_dependencies),
             globalCssPath: await this.find_global_css(sandbox, app_dir),
-            tsconfigPaths: await this.read_tsconfig_paths(sandbox, app_dir),
         };
 
         log.step("frontend application detected", {
@@ -193,22 +191,6 @@ export default class CapsuleWorkspace {
             .filter(Boolean);
 
         return matches.sort((left, right) => left.length - right.length)[0] ?? null;
-    }
-
-    private static async read_tsconfig_paths(
-        sandbox: Sandbox,
-        app_dir: string,
-    ): Promise<Record<string, string[]>> {
-        for (const dir of app_dir === "." ? ["."] : [app_dir, "."]) {
-            const manifest = await this.read_json(
-                sandbox,
-                `${REPO_DIR}/${join(dir, "tsconfig.json")}`,
-            );
-            const options = manifest?.compilerOptions as
-                { paths?: Record<string, string[]> } | undefined;
-            if (options?.paths) return options.paths;
-        }
-        return {};
     }
 
     private static async install(

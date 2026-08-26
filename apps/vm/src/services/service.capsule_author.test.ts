@@ -15,7 +15,6 @@ const profile: AppProfile = {
     packageManager: "bun",
     tailwindMajor: 4,
     globalCssPath: "apps/web/app/globals.css",
-    tsconfigPaths: { "@/*": ["./*"] },
 };
 
 const targets: CapsuleTarget[] = [
@@ -67,6 +66,7 @@ test("a repair prompt names only the capsules that failed, with their errors", (
             },
         ],
         "/home/user/repo/apps/web/.matcha/capsules",
+        "/home/user/repo/apps/web/.matcha/harness/matcha.overrides.ts",
     );
     expect(prompt).toContain("apps-web-components-faq-item");
     expect(prompt).toContain("head");
@@ -129,7 +129,9 @@ test("entries importing different fixtures are rejected, because a split lie inv
 });
 
 test("a head-only capsule cannot split its fixture", () => {
-    expect(reject_split_fixture({ base: null, head: 'import f from "./fixture.json";' })).toBe(null);
+    expect(reject_split_fixture({ base: null, head: 'import f from "./fixture.json";' })).toBe(
+        null,
+    );
 });
 
 test("a component that hardcodes its own content needs no fixture", () => {
@@ -147,4 +149,16 @@ test("a fixture read by only one side is rejected, since the sides would then di
 
 test("a capsule with no entry at all is still rejected", () => {
     expect(reject_split_fixture({ base: null, head: null })).toContain("no capsule entry");
+});
+
+test("a repair agent is told where a resolution fix can survive", () => {
+    const prompt = build_repair_prompt(
+        [{ capsuleId: "hero", revision: "base", diagnostics: ["Rollup failed to resolve import"] }],
+        "/home/user/repo/apps/web/.matcha/capsules",
+        "/home/user/repo/apps/web/.matcha/harness/matcha.overrides.ts",
+    );
+
+    expect(prompt).toContain("matcha.overrides.ts");
+    expect(prompt).toContain("never regenerated");
+    expect(prompt).toContain("aliases");
 });

@@ -5,7 +5,7 @@ import { z } from "zod";
 
 import { ENV } from "../conf/config.env";
 import ClaudeRun from "./service.claude_run";
-import { capsules_dir } from "./service.capsule_harness";
+import { capsules_dir, harness_dir, OVERRIDES_FILE } from "./service.capsule_harness";
 import type { CapsuleTarget } from "./service.capsule_targets";
 import type { AppProfile } from "./service.capsule_workspace";
 
@@ -66,9 +66,7 @@ export function reject_split_fixture(entries: {
     base: string | null;
     head: string | null;
 }): string | null {
-    const present = [entries.base, entries.head].filter(
-        (entry): entry is string => entry !== null,
-    );
+    const present = [entries.base, entries.head].filter((entry): entry is string => entry !== null);
     if (present.length === 0) return "no capsule entry was written";
 
     for (const entry of present) {
@@ -158,7 +156,11 @@ ${list}
 Work until every listed capsule has its files. Then stop.`;
 }
 
-export function build_repair_prompt(failures: CapsuleFailure[], capsules_root: string): string {
+export function build_repair_prompt(
+    failures: CapsuleFailure[],
+    capsules_root: string,
+    overrides_path: string,
+): string {
     const list = failures
         .map((failure) =>
             [
@@ -179,9 +181,18 @@ For each one, read the entry file and the component it imports, then fix the ent
 
 Common causes: a missing provider, a prop shape that does not match the component's type, data missing from fixture.json, or a hook that needs a value the fixture does not supply.
 
+If the build cannot resolve an import, that is a project-wide problem and no edit to a capsule entry will fix it. Answer it in ${overrides_path}, which is the one harness file that is never regenerated:
+
+    export default {
+        aliases: { "some/specifier": "/absolute/path/to/the/file.ts" },
+        external: [],
+    };
+
+Its aliases are merged into the build's own, and external leaves an import unbundled. Prefer an alias pointing at the real file; reach for external only when the import genuinely has no source in this repository.
+
 Rules that still hold:
 - fixture.json is shared by both revisions. If you change it, both sides change together. Never write a second fixture file.
-- Never edit the component itself or any file outside the capsule directory.
+- Never edit the component itself, and never edit any harness file other than the overrides above.
 - Do not stub fetch, XMLHttpRequest or WebSocket. The harness already did.
 
 Fix the listed capsules, then stop.`;
@@ -222,7 +233,11 @@ export default class CapsuleAuthor {
     ): Promise<void> {
         await sandbox.files.write(
             REPAIR_PROMPT_PATH,
-            build_repair_prompt(failures, capsules_dir(profile)),
+            build_repair_prompt(
+                failures,
+                capsules_dir(profile),
+                `${harness_dir(profile)}/${OVERRIDES_FILE}`,
+            ),
         );
 
         log.step("repairing capsules", { count: failures.length });

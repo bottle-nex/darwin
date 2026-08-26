@@ -28,9 +28,15 @@ export interface HarnessOptions {
 const DEFAULT_OPTIONS: HarnessOptions = { tailwindConfigPath: null };
 
 export function harness_dependencies(profile: AppProfile): string[] {
-    const packages = ["vite@^7", "@vitejs/plugin-react@^5", "vite-plugin-singlefile@^2"];
+    const packages = [
+        "vite@^7",
+        "@vitejs/plugin-react@^5",
+        "vite-plugin-singlefile@^2",
+        "vite-tsconfig-paths@^5",
+    ];
     if (profile.tailwindMajor === 4) packages.push("@tailwindcss/vite@^4");
-    if (profile.tailwindMajor === 3) packages.push("tailwindcss@^3", "postcss@^8", "autoprefixer@^10");
+    if (profile.tailwindMajor === 3)
+        packages.push("tailwindcss@^3", "postcss@^8", "autoprefixer@^10");
     return packages;
 }
 
@@ -44,15 +50,6 @@ export function resolve_aliases(
     capsules: { ids: string[]; revision: CapsuleRevision } = { ids: [], revision: "head" },
 ): Record<string, string> {
     const aliases: Record<string, string> = {};
-
-    for (const [pattern, targets] of Object.entries(profile.tsconfigPaths)) {
-        const target = targets[0];
-        if (!target) continue;
-        const key = pattern.replace(/\/\*$/, "");
-        const value = target.replace(/\/\*$/, "").replace(/^\.\/?/, "");
-        aliases[key] = value ? `${app_root(profile)}/${value}` : app_root(profile);
-    }
-
     const harness = harness_dir(profile);
     aliases["next/image"] = `${harness}/shims/next-image.tsx`;
     aliases["next/link"] = `${harness}/shims/next-link.tsx`;
@@ -109,15 +106,23 @@ export function render_vite_config(
     return `import react from "@vitejs/plugin-react";
 ${tailwind_import}import { defineConfig } from "vite";
 import { viteSingleFile } from "vite-plugin-singlefile";
+import tsconfigPaths from "vite-tsconfig-paths";
+
+import overrides from "./matcha.overrides";
 
 ${FONT_TRANSFORM_PLUGIN}
 
 export default defineConfig({
     root: ${JSON.stringify(`${harness}/pages`)},
     base: "./",
-    plugins: [nextFontShim, react()${tailwind_plugin}, viteSingleFile()],
+    plugins: [
+        nextFontShim,
+        tsconfigPaths({ root: ${JSON.stringify(app_root(profile))} }),
+        react()${tailwind_plugin},
+        viteSingleFile(),
+    ],
     resolve: {
-        alias: ${JSON.stringify(aliases, null, 8).replace(/\n}/, "\n    }")},
+        alias: { ...${JSON.stringify(aliases, null, 8).replace(/\n}/, "\n        }")}, ...overrides.aliases },
         dedupe: ["react", "react-dom"],
     },
 ${postcss}    server: {
@@ -129,11 +134,27 @@ ${postcss}    server: {
         cssCodeSplit: false,
         rollupOptions: {
             input: ${JSON.stringify(input)},
+            external: overrides.external,
         },
     },
 });
 `;
 }
+
+export const OVERRIDES_FILE = "matcha.overrides.ts";
+
+/**
+ * The one file in the harness the repair agent owns.
+ *
+ * Everything else here is regenerated before every build, so a fix written into the generated
+ * config is deleted seconds after it works. Resolution problems belong to the project rather than
+ * to a capsule entry, and this is where they can be answered and survive.
+ */
+export const OVERRIDES_TEMPLATE = `export default {
+    aliases: {} as Record<string, string>,
+    external: [] as string[],
+};
+`;
 
 export function render_global_css(profile: AppProfile): string {
     const stylesheet = `${REPO_DIR}/${profile.globalCssPath}`;
@@ -433,6 +454,10 @@ export default class CapsuleHarness {
         for (const [name, contents] of Object.entries(harness_files())) {
             await sandbox.files.write(`${harness}/${name}`, contents);
         }
+
+        const overrides = `${harness}/${OVERRIDES_FILE}`;
+        const kept = await sandbox.files.read(overrides).catch(() => null);
+        if (kept === null) await sandbox.files.write(overrides, OVERRIDES_TEMPLATE);
         if (profile.globalCssPath) {
             await sandbox.files.write(`${harness}/global.css`, render_global_css(profile));
         }

@@ -61,8 +61,27 @@ export function collect_failures(
     return failures;
 }
 
-export function terminal_status(manifest: CapsuleManifest): ProductDiffStatus {
-    return manifest.capsules.length > 0 ? "Ready" : "Unsupported";
+/**
+ * A run that built nothing is a failure, not an absence.
+ *
+ * Reporting it as Unsupported tells the reviewer this pull request changes nothing worth looking
+ * at, which is the most misleading thing it could say when every component failed to compile.
+ */
+export function terminal_status(
+    manifest: CapsuleManifest,
+    attempted: number,
+): ProductDiffStatus {
+    if (manifest.capsules.length > 0) return "Ready";
+    return attempted > 0 ? "Failed" : "Unsupported";
+}
+
+export function first_build_error(build_errors: BuildErrors): string | null {
+    for (const revision of REVISIONS) {
+        for (const message of Object.values(build_errors[revision])) {
+            if (message) return message;
+        }
+    }
+    return null;
 }
 
 export default class ProductDiffRunner {
@@ -213,17 +232,22 @@ export default class ProductDiffRunner {
             log,
         );
 
+        const status = terminal_status(manifest, specs.length);
         await prisma.productDiff.update({
             where: { id: product_diff_id },
             data: {
-                status: terminal_status(manifest),
+                status,
                 manifest: manifest as unknown as Prisma.InputJsonValue,
                 artifactPrefix: prefix,
-                error: null,
+                error:
+                    status === "Failed"
+                        ? (first_build_error(attempt.buildErrors) ??
+                          "No component could be built for preview")
+                        : null,
             },
         });
 
-        return terminal_status(manifest);
+        return status;
     }
 
     private static async build_and_check(
