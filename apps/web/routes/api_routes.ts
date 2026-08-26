@@ -100,6 +100,7 @@ export const BULK_UPDATE_ISSUES_URL = ISSUES_URL + "/bulk";
 export const BULK_DELETE_ISSUES_URL = ISSUES_URL + "/bulk/delete";
 export const SEARCH_ISSUES_URL = (project_id: string, query: string) =>
     `${ISSUES_URL}/search/${project_id}?q=${encodeURIComponent(query)}`;
+export const ISSUE_CONFIG_URL = (id: string) => `${ISSUES_URL}/${id}/config`;
 export const ISSUE_REFERENCES_URL = (id: string) => `${ISSUES_URL}/${id}/references`;
 export const ISSUE_ACTIVITY_URL = (id: string) => `${ISSUES_URL}/${id}/activity`;
 export const COLUMN_URL = (id: string) => `${ISSUES_URL}/columns/${id}`;

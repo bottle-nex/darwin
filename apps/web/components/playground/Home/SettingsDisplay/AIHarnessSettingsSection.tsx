@@ -21,7 +21,6 @@ import {
     type Harness,
 } from "@/types/harness.type";
 import SettingsPaneShell from "./SettingsPaneShell";
-// import SettingsSectionHeader from "./SettingsSectionHeader";
 import SectionHeader from "@/components/landing/SectionHeader";
 
 interface AIHarnessSettingsSectionProps {

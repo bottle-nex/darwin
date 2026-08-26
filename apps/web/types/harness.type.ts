@@ -36,3 +36,14 @@ export const HARNESS_SUPPORTS_EFFORT: Record<Harness, boolean> = {
     Codex: true,
     OpenCode: false,
 };
+
+export interface IssueHarnessConfig {
+    harness: Harness;
+    model: string | null;
+    effort: Effort | null;
+}
+
+export interface IssueConfigResponse {
+    config: IssueHarnessConfig;
+    is_override: boolean;
+}

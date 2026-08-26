@@ -4,6 +4,7 @@ import type { BoardIssue } from "@/types/board";
 
 import IssueAttachments from "./IssueAttachments";
 import IssueFields from "./IssueFields";
+import HarnessCapsules from "./HarnessCapsule";
 import PropertyGroup from "./PropertyGroup";
 import type { IssueFormState } from "./useIssueForm";
 
@@ -28,6 +29,9 @@ export default function IssueProperties({
             </PropertyGroup>
             <PropertyGroup title="Tags">
                 <IssueFields form={form} layout="tags" />
+            </PropertyGroup>
+            <PropertyGroup title="Agent">
+                <HarnessCapsules issueId={issue.id} status={issue.status} />
             </PropertyGroup>
             <IssueAttachments issue={issue} />
         </aside>
