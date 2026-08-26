@@ -21,7 +21,8 @@ import {
     type Harness,
 } from "@/types/harness.type";
 import SettingsPaneShell from "./SettingsPaneShell";
-import SettingsSectionHeader from "./SettingsSectionHeader";
+// import SettingsSectionHeader from "./SettingsSectionHeader";
+import SectionHeader from "@/components/landing/SectionHeader";
 
 interface AIHarnessSettingsSectionProps {
     projectId: string;
@@ -88,7 +89,7 @@ export default function AIHarnessSettingsSection({
     return (
         <SettingsPaneShell sectionKey="harness">
             <div className="flex flex-col gap-4">
-                <SettingsSectionHeader
+                <SectionHeader
                     title="AI Harness"
                     description="Choose the default agent harness, model, and effort new issues in this project run with."
                 />
