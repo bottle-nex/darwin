@@ -20,7 +20,10 @@ test("the build runs vite from the harness into that revision's directory", () =
     const command = build_command("head");
     expect(command).toContain("vite build");
     expect(command).toContain("/home/user/dist/head");
-    expect(command).toContain("--emptyOutDir");
+});
+
+test("the output directory is never emptied per capsule, or each build would erase the last", () => {
+    expect(build_command("head")).not.toContain("--emptyOutDir");
 });
 
 test("the capsules are stashed before checkout and restored after", () => {

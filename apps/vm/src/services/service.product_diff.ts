@@ -28,7 +28,13 @@ const SAFE_SHA = /^[0-9a-f]{7,64}$/;
 
 export const MAX_REPAIR_ROUNDS = 2;
 
-export function collect_failures(specs: CapsuleSpec[], gates: GateResults): CapsuleFailure[] {
+export type BuildErrors = Record<CapsuleRevision, Record<string, string>>;
+
+export function collect_failures(
+    specs: CapsuleSpec[],
+    gates: GateResults,
+    build_errors: BuildErrors = { base: {}, head: {} },
+): CapsuleFailure[] {
     const failures: CapsuleFailure[] = [];
 
     for (const spec of specs) {
@@ -37,10 +43,13 @@ export function collect_failures(specs: CapsuleSpec[], gates: GateResults): Caps
 
             const gate = gates[revision][spec.id];
             if (!gate) {
+                const build_error = build_errors[revision][spec.id];
                 failures.push({
                     capsuleId: spec.id,
                     revision,
-                    diagnostics: [`the ${revision} revision did not build`],
+                    diagnostics: build_error
+                        ? [`the ${revision} revision did not compile:`, build_error]
+                        : [`the ${revision} revision did not build`],
                 });
                 continue;
             }
@@ -164,10 +173,10 @@ export default class ProductDiffRunner {
 
         await CapsuleHarness.install(sandbox, profile);
 
-        let gates = await this.build_and_check(sandbox, profile, specs, base_sha, head_sha);
+        let attempt = await this.build_and_check(sandbox, profile, specs, base_sha, head_sha);
 
         for (let round = 0; round < MAX_REPAIR_ROUNDS; round += 1) {
-            const failures = collect_failures(specs, gates);
+            const failures = collect_failures(specs, attempt.gates, attempt.buildErrors);
             if (failures.length === 0) break;
 
             log.info("retrying capsules that did not render", {
@@ -175,8 +184,9 @@ export default class ProductDiffRunner {
                 failing: failures.length,
             });
             await CapsuleAuthor.repair(sandbox, log, profile, failures);
-            gates = await this.build_and_check(sandbox, profile, specs, base_sha, head_sha);
+            attempt = await this.build_and_check(sandbox, profile, specs, base_sha, head_sha);
         }
+        const gates = attempt.gates;
 
         const { manifest, prefix } = await CapsuleUpload.publish(
             sandbox,
@@ -206,29 +216,50 @@ export default class ProductDiffRunner {
         specs: CapsuleSpec[],
         base_sha: string,
         head_sha: string,
-    ): Promise<GateResults> {
+    ): Promise<{ gates: GateResults; buildErrors: BuildErrors }> {
         const gates: GateResults = { base: {}, head: {} };
+        const buildErrors: BuildErrors = { base: {}, head: {} };
 
         for (const revision of REVISIONS) {
             const capsule_ids = await CapsuleHarness.write(sandbox, profile, specs, revision);
             if (capsule_ids.length === 0) continue;
 
-            const built = await CapsuleBuild.build_revision(
+            await CapsuleBuild.checkout_revision(
                 sandbox,
                 profile,
                 revision,
                 revision === "base" ? base_sha : head_sha,
                 log,
             );
-            if (!built.ok) {
-                log.warn(`the ${revision} revision failed to compile`);
-                continue;
+
+            const built: string[] = [];
+            for (const capsule_id of capsule_ids) {
+                const outcome = await CapsuleBuild.build_capsule(
+                    sandbox,
+                    profile,
+                    revision,
+                    capsule_id,
+                );
+                if (outcome.ok) {
+                    built.push(capsule_id);
+                    continue;
+                }
+                buildErrors[revision][capsule_id] =
+                    outcome.error ?? "the build produced no error text";
+                log.block(
+                    `${revision} build failure — ${capsule_id}`,
+                    buildErrors[revision][capsule_id]!,
+                );
             }
 
-            gates[revision] = await this.check(sandbox, revision, capsule_ids);
+            log.info(`${revision} revision built`, {
+                built: built.length,
+                failed: capsule_ids.length - built.length,
+            });
+            if (built.length > 0) gates[revision] = await this.check(sandbox, revision, built);
         }
 
-        return gates;
+        return { gates, buildErrors };
     }
 
     private static async check(

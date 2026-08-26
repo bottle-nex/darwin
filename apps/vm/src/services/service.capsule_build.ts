@@ -1,13 +1,17 @@
 import type Logger from "@trymatcha/logger";
 import type { Sandbox } from "e2b";
 
-import { app_root, type CapsuleRevision, harness_dir } from "./service.capsule_harness";
+import CapsuleHarness, {
+    app_root,
+    type CapsuleRevision,
+    harness_dir,
+} from "./service.capsule_harness";
 import type { AppProfile } from "./service.capsule_workspace";
 
 const REPO_DIR = "/home/user/repo";
 const DIST_ROOT = "/home/user/dist";
 const CARRY_DIR = "/home/user/matcha-carry";
-const BUILD_TIMEOUT_MS = 8 * 60_000;
+const BUILD_TIMEOUT_MS = 6 * 60_000;
 const MAX_BUILD_ERROR_CHARS = 2000;
 
 export interface BuildOutcome {
@@ -20,7 +24,7 @@ export function dist_dir(revision: CapsuleRevision): string {
 }
 
 export function build_command(revision: CapsuleRevision): string {
-    return `npx vite build --outDir ${dist_dir(revision)} --emptyOutDir`;
+    return `npx vite build --outDir ${dist_dir(revision)}`;
 }
 
 export function checkout_steps(profile: AppProfile, sha: string): string[] {
@@ -41,18 +45,28 @@ export function trim_build_error(message: string): string {
 }
 
 export default class CapsuleBuild {
-    public static async build_revision(
+    public static async checkout_revision(
         sandbox: Sandbox,
         profile: AppProfile,
         revision: CapsuleRevision,
         sha: string,
         log: Logger,
-    ): Promise<BuildOutcome> {
-        log.step(`building the ${revision} revision`, { sha: sha.slice(0, 8) });
+    ): Promise<void> {
+        log.step(`checking out the ${revision} revision`, { sha: sha.slice(0, 8) });
 
         for (const step of checkout_steps(profile, sha)) {
             await sandbox.commands.run(step, { cwd: REPO_DIR });
         }
+        await sandbox.commands.run(`rm -rf ${dist_dir(revision)} && mkdir -p ${dist_dir(revision)}`);
+    }
+
+    public static async build_capsule(
+        sandbox: Sandbox,
+        profile: AppProfile,
+        revision: CapsuleRevision,
+        capsule_id: string,
+    ): Promise<BuildOutcome> {
+        await CapsuleHarness.write_config(sandbox, profile, capsule_id, revision);
 
         try {
             await sandbox.commands.run(build_command(revision), {
@@ -62,7 +76,6 @@ export default class CapsuleBuild {
             return { ok: true, error: null };
         } catch (error) {
             const message = error instanceof Error ? error.message : String(error);
-            log.warn(`the ${revision} revision did not build`);
             return { ok: false, error: trim_build_error(message) };
         }
     }

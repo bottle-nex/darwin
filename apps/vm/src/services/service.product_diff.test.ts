@@ -60,6 +60,16 @@ test("a revision the checker never reached counts as a failure", () => {
     expect(failures[0]!.diagnostics.join(" ")).toContain("did not build");
 });
 
+test("a compile failure hands the agent the compiler error, not just the fact of it", () => {
+    const gates: GateResults = { base: {}, head: { "faq-item": gate("Verified") } };
+    const failures = collect_failures([spec()], gates, {
+        base: { "faq-item": `Rollup failed to resolve import "next/font/google"` },
+        head: {},
+    });
+
+    expect(failures[0]!.diagnostics.join(" ")).toContain("Rollup failed to resolve");
+});
+
 test("a revision the capsule never had is not a failure", () => {
     const added = spec({ change: "Added", entries: { base: false, head: true } });
     const gates: GateResults = { base: {}, head: { "faq-item": gate("Verified") } };
@@ -100,4 +110,18 @@ test("a run that published at least one capsule is ready", () => {
         warnings: [],
     };
     expect(terminal_status(manifest)).toBe("Ready");
+});
+
+test("one capsule failing to compile does not take the others down with it", () => {
+    const other = spec({ id: "badge", title: "Badge" });
+    const gates: GateResults = {
+        base: { badge: { capsuleId: "badge", fidelity: "Verified", diagnostics: [] } },
+        head: { badge: { capsuleId: "badge", fidelity: "Verified", diagnostics: [] } },
+    };
+    const failures = collect_failures([spec(), other], gates, {
+        base: { "faq-item": "boom" },
+        head: { "faq-item": "boom" },
+    });
+
+    expect(failures.map((failure) => failure.capsuleId)).toEqual(["faq-item", "faq-item"]);
 });

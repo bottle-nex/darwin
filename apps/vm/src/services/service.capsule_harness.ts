@@ -68,7 +68,7 @@ export function resolve_aliases(
     aliases["client-only"] = `${harness}/shims/passthrough.ts`;
 
     if (profile.globalCssPath) {
-        aliases[GLOBAL_CSS_ALIAS] = `${REPO_DIR}/${profile.globalCssPath}`;
+        aliases[GLOBAL_CSS_ALIAS] = `${harness}/global.css`;
     }
 
     for (const id of capsules.ids) {
@@ -80,15 +80,13 @@ export function resolve_aliases(
 
 export function render_vite_config(
     profile: AppProfile,
-    capsule_ids: string[],
+    capsule_id: string,
     options: HarnessOptions = DEFAULT_OPTIONS,
     revision: CapsuleRevision = "head",
 ): string {
-    const aliases = resolve_aliases(profile, options, { ids: capsule_ids, revision });
+    const aliases = resolve_aliases(profile, options, { ids: [capsule_id], revision });
     const harness = harness_dir(profile);
-    const inputs = Object.fromEntries(
-        capsule_ids.map((id) => [id, `${harness}/pages/${id}/index.html`]),
-    );
+    const input = `${harness}/pages/${capsule_id}/index.html`;
 
     const tailwind_import =
         profile.tailwindMajor === 4 ? 'import tailwindcss from "@tailwindcss/vite";\n' : "";
@@ -126,14 +124,21 @@ ${postcss}    server: {
         fs: { allow: [${JSON.stringify(REPO_DIR)}] },
     },
     build: {
-        emptyOutDir: true,
+        emptyOutDir: false,
         assetsInlineLimit: Number.MAX_SAFE_INTEGER,
         cssCodeSplit: false,
         rollupOptions: {
-            input: ${JSON.stringify(inputs, null, 12).replace(/\n}/, "\n        }")},
+            input: ${JSON.stringify(input)},
         },
     },
 });
+`;
+}
+
+export function render_global_css(profile: AppProfile): string {
+    const stylesheet = `${REPO_DIR}/${profile.globalCssPath}`;
+    return `@import ${JSON.stringify(stylesheet)};
+@source "../../";
 `;
 }
 
@@ -429,6 +434,9 @@ export default class CapsuleHarness {
         for (const [name, contents] of Object.entries(harness_files(fonts))) {
             await sandbox.files.write(`${harness}/${name}`, contents);
         }
+        if (profile.globalCssPath) {
+            await sandbox.files.write(`${harness}/global.css`, render_global_css(profile));
+        }
 
         for (const spec of buildable) {
             const page = `${harness}/pages/${spec.id}`;
@@ -436,13 +444,20 @@ export default class CapsuleHarness {
             await sandbox.files.write(`${page}/main.tsx`, render_page_entry(spec, profile));
         }
 
-        const capsule_ids = buildable.map((spec) => spec.id);
-        await sandbox.files.write(
-            `${harness}/vite.config.ts`,
-            render_vite_config(profile, capsule_ids, options, revision),
-        );
+        return buildable.map((spec) => spec.id);
+    }
 
-        return capsule_ids;
+    public static async write_config(
+        sandbox: Sandbox,
+        profile: AppProfile,
+        capsule_id: string,
+        revision: CapsuleRevision,
+    ): Promise<void> {
+        const options = await this.detect(sandbox, profile);
+        await sandbox.files.write(
+            `${harness_dir(profile)}/vite.config.ts`,
+            render_vite_config(profile, capsule_id, options, revision),
+        );
     }
 
     public static async install(sandbox: Sandbox, profile: AppProfile): Promise<void> {
@@ -463,7 +478,7 @@ export default class CapsuleHarness {
     ): Promise<string[]> {
         const found = await sandbox.commands
             .run(
-                `grep -rhoE "import[^;]*from ['\"]next/font/(google|local)['\"]" ${app_root(profile)} --include=*.tsx --include=*.ts --exclude-dir=node_modules`,
+                `grep -rhoE "import[^;]*from ['\"]next/font/(google|local)['\"]" ${app_root(profile)} --include='*.tsx' --include='*.ts' --exclude-dir=node_modules`,
             )
             .catch(() => null);
 
