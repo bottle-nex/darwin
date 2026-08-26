@@ -18,6 +18,7 @@
         "@octokit/rest": "^22.0.1",
         "@trymatcha/access-control": "*",
         "@trymatcha/database": "*",
+        "@trymatcha/harness": "*",
         "@trymatcha/types": "*",
         "@types/cors": "^2.8.19",
         "@types/dotenv": "^8.2.3",

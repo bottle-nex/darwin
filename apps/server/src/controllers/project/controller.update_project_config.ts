@@ -1,5 +1,6 @@
 import { Action, Permissions } from "@trymatcha/access-control";
-import { Prisma, prisma } from "@trymatcha/database";
+import { Effort, Harness, Prisma, prisma } from "@trymatcha/database";
+import { is_effort_supported, is_model_supported } from "@trymatcha/harness";
 import type { Request, Response } from "express";
 import z from "zod";
 
@@ -13,6 +14,9 @@ const params_schema = z.object({
 const body_schema = z
     .object({
         kanban_option_view: z.enum(["FLAT", "GROUPED"]).optional(),
+        harness: z.enum(Harness).optional(),
+        default_model: z.string().min(1).optional(),
+        default_effort: z.enum(Effort).optional(),
     })
     .strict();
 
@@ -31,7 +35,7 @@ export default async function update_project_config_controller(req: Request, res
         }
 
         const { project_id } = parsed_params.data;
-        const { kanban_option_view } = parsed_body.data;
+        const { kanban_option_view, harness, default_model, default_effort } = parsed_body.data;
         const user_id = req.user.id;
 
         const project_role = await Access.project(user_id, project_id);
@@ -40,14 +44,47 @@ export default async function update_project_config_controller(req: Request, res
             return;
         }
 
+        if (default_model || default_effort) {
+            const existing = await prisma.projectConfig.findUnique({
+                where: { projectId: project_id },
+                select: { harness: true },
+            });
+            const effective_harness = harness ?? existing?.harness ?? Harness.Claude;
+
+            if (default_model && !is_model_supported(effective_harness, default_model)) {
+                ResponseWriter.invalid_data(
+                    res,
+                    `"${default_model}" is not supported by the ${effective_harness} harness`,
+                );
+                return;
+            }
+
+            if (default_effort && !is_effort_supported(effective_harness)) {
+                ResponseWriter.invalid_data(
+                    res,
+                    `The ${effective_harness} harness does not support an effort level`,
+                );
+                return;
+            }
+        }
+
         const config_data = {
             ...(kanban_option_view !== undefined && { kanbanOptionView: kanban_option_view }),
+            ...(harness !== undefined && { harness }),
+            ...(default_model !== undefined && { defaultModel: default_model }),
+            ...(default_effort !== undefined && { defaultEffort: default_effort }),
         };
         const config = await prisma.projectConfig.upsert({
             where: { projectId: project_id },
             create: { projectId: project_id, ...config_data },
             update: config_data,
-            select: { kanbanOptionView: true, productDiffEnabled: true },
+            select: {
+                kanbanOptionView: true,
+                productDiffEnabled: true,
+                harness: true,
+                defaultModel: true,
+                defaultEffort: true,
+            },
         });
 
         ResponseWriter.success(res, config, "Project config updated successfully");

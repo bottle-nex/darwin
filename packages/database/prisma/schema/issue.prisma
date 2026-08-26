@@ -38,6 +38,7 @@ model Issue {
 
   activities    IssueActivity[]
   agentSessions AgentSession[]
+  issueConfig   IssueConfig?
 
   descriptionReferences    DescriptionReference[] @relation(name: "DescriptionReferenceSource")
   referencedInDescriptions DescriptionReference[] @relation(name: "DescriptionReferenceTarget")
@@ -51,6 +52,18 @@ model Issue {
   @@index([assignerWorkerId, status, queuePosition])
   @@index([title(ops: raw("gin_trgm_ops"))], map: "Issue_title_trgm_idx", type: Gin)
   @@index([description(ops: raw("gin_trgm_ops"))], map: "Issue_description_trgm_idx", type: Gin)
+}
+
+/// Snapshotted at creation from ProjectConfig's defaults, then frozen — a project's harness
+/// switching later must never retarget an issue that's already Queued or running, since an
+/// in-flight sandbox can't hot-swap its CLI, credentials, or flag syntax mid-run.
+model IssueConfig {
+  id      String  @id @default(cuid())
+  issueId String  @unique
+  issue   Issue   @relation(fields: [issueId], references: [id], onDelete: Cascade)
+  harness Harness
+  model   String
+  effort  Effort?
 }
 
 model Tag {

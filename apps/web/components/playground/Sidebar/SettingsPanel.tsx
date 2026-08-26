@@ -15,6 +15,7 @@ import { PlaygroundTab } from "../playgroundTabs";
 import type { SidebarSectionProps } from "./shared";
 import Row from "./SidebarRow";
 import Section from "./SidebarSection";
+import { GoHubot } from "react-icons/go";
 
 type SettingsItem = { tab: PlaygroundTab; label: string; icon: IconType };
 
@@ -27,6 +28,7 @@ const PROJECT_SETTINGS: SettingsItem[] = [
     { tab: PlaygroundTab.SettingsProject, label: "General", icon: SettingsGeneralIcon },
     { tab: PlaygroundTab.SettingsTemplates, label: "Issue templates", icon: SettingsTemplatesIcon },
     { tab: PlaygroundTab.SettingsEnv, label: "Environment variables", icon: EnvSecretIcon },
+    { tab: PlaygroundTab.SettingsHarness, label: "AI Harness", icon: GoHubot },
 ];
 
 export default function PlaygroundSidebarSettingsPanel({

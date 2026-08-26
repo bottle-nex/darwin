@@ -23,6 +23,8 @@ import ChapterUpdateController from "../../controllers/issues/controller.update_
 import ColumnUpdateController from "../../controllers/issues/controller.update_column";
 import IssueUpdateController from "../../controllers/issues/controller.update_issue";
 import { require_auth } from "../../middlewares/middleware.auth";
+import IssueGetConfigController from "../../controllers/issues/controller.get_issue_config";
+import IssueSetConfigController from "../../controllers/issues/controller.set_issue_config";
 
 const issues_router: Router = Router();
 
@@ -49,6 +51,9 @@ issues_router.get("/:id", require_auth, IssueGetByIdController.process);
 
 issues_router.patch("/:id", require_auth, IssueUpdateController.process);
 issues_router.delete("/:id", require_auth, IssueDeleteController.process);
+
+issues_router.get("/:id/config", require_auth, IssueGetConfigController.process);
+issues_router.put("/:id/config", require_auth, IssueSetConfigController.process);
 
 issues_router.get("/:id/references", require_auth, IssueReferencesGetController.process);
 issues_router.get("/:id/activity", require_auth, IssueActivityListController.process);
