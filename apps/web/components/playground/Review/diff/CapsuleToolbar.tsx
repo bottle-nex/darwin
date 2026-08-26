@@ -1,5 +1,6 @@
 "use client";
-import { MdCompare, MdDesktopWindows, MdSmartphone, MdVerticalSplit } from "react-icons/md";
+import { IoDesktopOutline } from "react-icons/io5";
+import { MdCompare, MdOutlinePhoneIphone, MdVerticalSplit } from "react-icons/md";
 
 import { BLURRED_BG_TWO } from "@/components/playground/Home/KanbanDisplay/cardStyles";
 import { useUserConfig } from "@/hooks/user/useUserConfig";
@@ -9,8 +10,8 @@ import type { CapsuleCompareMode, CapsuleViewport } from "@/types/capsule.type";
 import SegmentedControl, { type SegmentedOption } from "./SegmentedControl";
 
 const VIEWPORTS: SegmentedOption<CapsuleViewport>[] = [
-    { value: "desktop", label: "Desktop", icon: MdDesktopWindows },
-    { value: "mobile", label: "Mobile", icon: MdSmartphone },
+    { value: "desktop", label: "Desktop", icon: IoDesktopOutline },
+    { value: "mobile", label: "Mobile", icon: MdOutlinePhoneIphone },
 ];
 
 export default function CapsuleToolbar({
@@ -46,6 +47,7 @@ export default function CapsuleToolbar({
                 value={viewport}
                 options={VIEWPORTS}
                 onChange={onViewportChange}
+                showLabels={false}
             />
             <span className="h-5 w-px bg-white/5" aria-hidden />
             <SegmentedControl

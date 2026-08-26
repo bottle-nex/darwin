@@ -213,6 +213,9 @@ function Frame({
     scale: number;
     painted: { width: number; height: number };
 }) {
+    // The key deliberately leaves the frame size out. Changing an iframe's width resizes the
+    // document inside it, which is the re-layout we want; keying on the size would remount it and
+    // fetch the page again, which reads as a flash every time the device is switched.
     if (!revision || !url) {
         return (
             <p
@@ -230,7 +233,7 @@ function Frame({
             style={{ width: painted.width, height: painted.height }}
         >
             <iframe
-                key={`${revision.path}-${intrinsic.width}`}
+                key={revision.path}
                 title={`${capsule.title} ${label}`}
                 src={`${url}#${controlHash}`}
                 sandbox={IFRAME_SANDBOX}
