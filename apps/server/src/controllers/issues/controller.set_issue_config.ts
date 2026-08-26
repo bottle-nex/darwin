@@ -1,10 +1,11 @@
 import { Request, Response } from "express";
 import z from "zod";
-import { Effort, Harness, IssueStatus, prisma } from "@trymatcha/database";
+import { ActivityType, ActorType, Effort, Harness, IssueStatus, prisma } from "@trymatcha/database";
 import { Action, Permissions } from "@trymatcha/access-control";
 import { is_effort_supported, is_model_supported } from "@trymatcha/harness";
 import ResponseWriter from "../../services/service.response";
 import Access from "../../access-control/access";
+import ActivityService from "../../services/service.activity";
 
 // An issue whose sandbox already started can't have its harness swapped under it —
 // a running solve can't hot-swap its CLI, credentials, or flag syntax mid-run.
@@ -88,12 +89,61 @@ export default class IssueSetConfigController {
                 return;
             }
 
-            const config = await prisma.issueConfig.upsert({
-                where: { issueId: params_data.id },
-                create: { issueId: params_data.id, harness, model, effort },
-                update: { harness, model, effort },
-                select: { harness: true, model: true, effort: true },
+            const { config, activities } = await prisma.$transaction(async (tx) => {
+                const override = await tx.issueConfig.findUnique({
+                    where: { issueId: params_data.id },
+                    select: { harness: true, model: true, effort: true },
+                });
+
+                // No explicit override yet doesn't mean nothing was showing — the issue was
+                // inheriting the project's default, and that's what the user actually saw
+                // before making this change. Mirrors the fallback in get_issue_config.
+                const project_default = override
+                    ? null
+                    : await tx.projectConfig.findUnique({
+                          where: { projectId: issue.projectId },
+                          select: { harness: true, defaultModel: true, defaultEffort: true },
+                      });
+
+                const before =
+                    override ??
+                    (project_default
+                        ? {
+                              harness: project_default.harness,
+                              model: project_default.defaultModel,
+                              effort: project_default.defaultEffort,
+                          }
+                        : { harness: Harness.Claude, model: null, effort: null });
+
+                const config = await tx.issueConfig.upsert({
+                    where: { issueId: params_data.id },
+                    create: { issueId: params_data.id, harness, model, effort },
+                    update: { harness, model, effort },
+                    select: { harness: true, model: true, effort: true },
+                });
+
+                const changed =
+                    before.harness !== config.harness ||
+                    before.model !== config.model ||
+                    before.effort !== config.effort;
+
+                const activities = changed
+                    ? await ActivityService.emit(tx, {
+                          issueId: params_data.id,
+                          actor: { type: ActorType.User, userId: user.id, name: user.name },
+                          events: [
+                              {
+                                  type: ActivityType.HarnessConfigChanged,
+                                  payload: { from: before, to: config },
+                              },
+                          ],
+                      })
+                    : [];
+
+                return { config, activities };
             });
+
+            await ActivityService.publish(issue.projectId, params_data.id, activities);
 
             ResponseWriter.success(res, { config }, "Issue config updated");
         } catch (error) {

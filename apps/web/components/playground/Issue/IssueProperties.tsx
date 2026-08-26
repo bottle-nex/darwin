@@ -31,7 +31,7 @@ export default function IssueProperties({
                 <IssueFields form={form} layout="tags" />
             </PropertyGroup>
             <PropertyGroup title="Agent">
-                <HarnessCapsules issueId={issue.id} status={issue.status} />
+                <HarnessCapsules harnessConfig={form.harnessConfig} />
             </PropertyGroup>
             <IssueAttachments issue={issue} />
         </aside>

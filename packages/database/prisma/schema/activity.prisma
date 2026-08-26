@@ -112,6 +112,7 @@ enum ActivityType {
   DatesChanged
   ColumnChanged
   SpecializationChanged
+  HarnessConfigChanged
 
   // relationships
   RelationAdded

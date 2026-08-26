@@ -1,16 +1,9 @@
 "use client";
-import { useGetIssueConfig, useSetIssueConfig } from "@/hooks/issues/useIssueConfig";
-import {
-    EFFORT_OPTIONS,
-    HARNESS_MODELS,
-    HARNESS_OPTIONS,
-    HARNESS_SUPPORTS_EFFORT,
-} from "@/types/harness.type";
+import { EFFORT_OPTIONS, HARNESS_OPTIONS } from "@/types/harness.type";
 import type { Effort, Harness } from "@/types/harness.type";
 import Capsule, { type CapsuleOption } from "./Capsule";
 import { STACKED_CAPSULE } from "./issueHelpers";
-
-const FROZEN_STATUSES = ["InProgress", "InReview", "Done", "Failed", "Cancelled"];
+import type { HarnessConfigState } from "./useIssueForm";
 
 const HARNESS_CAPSULE_OPTIONS: CapsuleOption[] = HARNESS_OPTIONS.map((option) => ({
     value: option.id,
@@ -22,48 +15,20 @@ const EFFORT_CAPSULE_OPTIONS: CapsuleOption[] = EFFORT_OPTIONS.map((option) => (
     label: option.label,
 }));
 
-export default function HarnessCapsules({ issueId, status }: { issueId: string; status: string }) {
-    const { data } = useGetIssueConfig(issueId);
-    const setConfig = useSetIssueConfig();
+export default function HarnessCapsules({ harnessConfig }: { harnessConfig: HarnessConfigState }) {
+    const {
+        harness,
+        model,
+        effort,
+        modelOptions,
+        supportsEffort,
+        frozen,
+        setHarness,
+        setModel,
+        setEffort,
+    } = harnessConfig;
 
-    const frozen = FROZEN_STATUSES.includes(status);
-    const current = data?.config;
-    const harness = current?.harness ?? "Claude";
-    const model = current?.model ?? undefined;
-    const effort = current?.effort ?? undefined;
-    const supportsEffort = HARNESS_SUPPORTS_EFFORT[harness];
-    const modelOptions: CapsuleOption[] = HARNESS_MODELS[harness].map((m) => ({
-        value: m,
-        label: m,
-    }));
-
-    function changeHarness(next: string) {
-        const nextHarness = next as Harness;
-        const nextModel = HARNESS_MODELS[nextHarness].includes(model ?? "")
-            ? (model as string)
-            : HARNESS_MODELS[nextHarness][0];
-        if (!nextModel) return;
-        setConfig.mutate({
-            issueId,
-            harness: nextHarness,
-            model: nextModel,
-            ...(HARNESS_SUPPORTS_EFFORT[nextHarness] && effort ? { effort } : {}),
-        });
-    }
-
-    function changeModel(next: string) {
-        setConfig.mutate({
-            issueId,
-            harness,
-            model: next,
-            ...(supportsEffort && effort ? { effort } : {}),
-        });
-    }
-
-    function changeEffort(next: string) {
-        if (!model) return;
-        setConfig.mutate({ issueId, harness, model, effort: next as Effort });
-    }
+    const modelCapsuleOptions: CapsuleOption[] = modelOptions.map((m) => ({ value: m, label: m }));
 
     return (
         <>
@@ -71,15 +36,15 @@ export default function HarnessCapsules({ issueId, status }: { issueId: string; 
                 type="dropdown"
                 options={HARNESS_CAPSULE_OPTIONS}
                 value={harness}
-                onChange={changeHarness}
+                onChange={(next) => setHarness(next as Harness)}
                 disabled={frozen}
                 className={STACKED_CAPSULE}
             />
             <Capsule
                 type="dropdown"
-                options={modelOptions}
-                value={model}
-                onChange={changeModel}
+                options={modelCapsuleOptions}
+                value={model ?? undefined}
+                onChange={setModel}
                 disabled={frozen}
                 className={STACKED_CAPSULE}
                 placeholder="No model selected"
@@ -88,8 +53,8 @@ export default function HarnessCapsules({ issueId, status }: { issueId: string; 
                 <Capsule
                     type="dropdown"
                     options={EFFORT_CAPSULE_OPTIONS}
-                    value={effort}
-                    onChange={changeEffort}
+                    value={effort ?? undefined}
+                    onChange={(next) => setEffort(next as Effort)}
                     disabled={frozen || !model}
                     className={STACKED_CAPSULE}
                     placeholder="No effort selected"

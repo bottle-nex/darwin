@@ -1,4 +1,6 @@
 "use client";
+import { forwardRef, type ComponentProps, type ReactNode } from "react";
+import { GoHubot } from "react-icons/go";
 import {
     type ActivityLocationRef,
     type ActivityPayload,
@@ -24,12 +26,12 @@ import {
     TagIcon,
     UntrackedActivityIcon,
 } from "@trymatcha/ui/icons";
-import type { ReactNode } from "react";
 
 import TagDisplay from "@/components/playground/Home/TagsDisplay/TagDisplay";
 import { formatDate } from "@/lib/format";
 import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
-
+import { cn } from "@/lib/utils";
+import InfoTooltip from "@/components/ui/InfoTooltip";
 import { DATE_ICON_COLOR, PRIORITY_OPTIONS } from "../issueHelpers";
 import TextDiff from "./TextDiff";
 
@@ -77,18 +79,36 @@ function dates_glyph(from: DateRange | undefined, to: DateRange | undefined): Gl
     };
 }
 
+function harness_config_label(
+    ref: { harness: string; model: string | null; effort: string | null } | null,
+) {
+    if (!ref) return "nothing";
+    const parts = [ref.harness, ref.model].filter(Boolean);
+    return ref.effort ? `${parts.join(" · ")} (${ref.effort})` : parts.join(" · ");
+}
+
 /** "PrChecksFailed" -> "pr checks failed", for types that have no template yet. */
 function humanize(type: ActivityType): string {
     return type.replace(/([a-z0-9])([A-Z])/g, "$1 $2").toLowerCase();
 }
 
-function Pill({ children }: { children: ReactNode }) {
+const Pill = forwardRef<HTMLSpanElement, ComponentProps<"span">>(function Pill(
+    { children, className, ...props },
+    ref,
+) {
     return (
-        <span className="rounded-[4px] bg-graphite px-1.5 py-0.5 text-[12px] font-medium text-neutral-300">
+        <span
+            ref={ref}
+            className={cn(
+                "rounded-[4px] bg-graphite px-1.5 py-0.5 text-[12px] font-medium text-neutral-300",
+                className,
+            )}
+            {...props}
+        >
             {children}
         </span>
     );
-}
+});
 
 function Strong({ children }: { children: ReactNode }) {
     return <span className="font-medium text-neutral-300">{children}</span>;
@@ -257,6 +277,35 @@ const REGISTRY: { [K in ActivityType]?: ActivityEntry<K> } = {
             </>
         ),
         summary: "failed an attempt",
+    },
+    [ActivityType.HarnessConfigChanged]: {
+        icon: GoHubot,
+        iconClassName: "text-neutral-500 ",
+        render: (payload) => (
+            <>
+                set the agent to{" "}
+                <InfoTooltip
+                    content={
+                        payload.from ? (
+                            <span className="text-[12px] text-neutral-400">
+                                was {harness_config_label(payload.from)}
+                            </span>
+                        ) : null
+                    }
+                >
+                    <Pill
+                        className={
+                            payload.from
+                                ? "cursor-default underline decoration-edge decoration-dotted underline-offset-4 hover:decoration-neutral-500"
+                                : undefined
+                        }
+                    >
+                        {harness_config_label(payload.to)}
+                    </Pill>
+                </InfoTooltip>
+            </>
+        ),
+        summary: "changed the agent config",
     },
     [ActivityType.PrOpened]: {
         icon: PullRequestOpenIcon,

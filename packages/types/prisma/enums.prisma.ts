@@ -76,6 +76,7 @@ export const ActivityType = {
     DatesChanged: "DatesChanged",
     ColumnChanged: "ColumnChanged",
     SpecializationChanged: "SpecializationChanged",
+    HarnessConfigChanged: "HarnessConfigChanged",
 
     RelationAdded: "RelationAdded",
     RelationRemoved: "RelationRemoved",
