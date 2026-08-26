@@ -1,6 +1,6 @@
+import { IoIosCheckmarkCircle } from "react-icons/io";
 import {
     LuCircle,
-    LuCircleCheck,
     LuCircleDashed,
     LuCircleDotDashed,
     LuCirclePause,
@@ -61,8 +61,8 @@ export class KanbanBoard {
         {
             status: KanbanStatus.Done,
             title: "Done",
-            icon: LuCircleCheck,
-            titleBox: "text-emerald-300",
+            icon: IoIosCheckmarkCircle,
+            titleBox: "text-blue-600",
         },
         {
             status: KanbanStatus.Failed,
