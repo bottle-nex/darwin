@@ -5,11 +5,10 @@ import { z } from "zod";
 
 import { ENV } from "../conf/config.env";
 import ClaudeRun from "./service.claude_run";
+import { capsules_dir } from "./service.capsule_harness";
 import type { CapsuleTarget } from "./service.capsule_targets";
 import type { AppProfile } from "./service.capsule_workspace";
 
-const REPO_DIR = "/home/user/repo";
-const CAPSULES_DIR = `${REPO_DIR}/.matcha/capsules`;
 const AUTHOR_PROMPT_PATH = "/home/user/capsule_author_prompt.txt";
 const REPAIR_PROMPT_PATH = "/home/user/capsule_repair_prompt.txt";
 const AUTHOR_TIMEOUT_MS = 20 * 60_000;
@@ -59,8 +58,8 @@ export interface CapsuleFailure {
     diagnostics: string[];
 }
 
-export function capsule_dir(capsule_id: string): string {
-    return `${CAPSULES_DIR}/${capsule_id}`;
+export function capsule_dir(profile: AppProfile, capsule_id: string): string {
+    return `${capsules_dir(profile)}/${capsule_id}`;
 }
 
 export function reject_split_fixture(entries: {
@@ -83,10 +82,8 @@ export function reject_split_fixture(entries: {
     return null;
 }
 
-export function build_author_prompt(
-    targets: CapsuleTarget[],
-    profile: Pick<AppProfile, "tailwindMajor">,
-): string {
+export function build_author_prompt(targets: CapsuleTarget[], profile: AppProfile): string {
+    const root = capsules_dir(profile);
     const styling =
         profile.tailwindMajor === null
             ? "This project does not use Tailwind. Do not add Tailwind classes that do not already exist."
@@ -115,7 +112,7 @@ Each component is rendered on its own blank page so a reviewer can compare it be
 
 ${styling}
 
-Write these files for each capsule below, under /home/user/repo/.matcha/capsules/<id>/
+Write these files for each capsule below, under ${root}/<id>/
 
 1. fixture.json
    The synthetic data the component needs. One file per capsule.
@@ -149,7 +146,7 @@ Write these files for each capsule below, under /home/user/repo/.matcha/capsules
    - Pass no-op functions for callback props.
    - controls values arrive as strings. Convert them: controls.open === "true" for a boolean.
    - Do NOT stub fetch, XMLHttpRequest or WebSocket. The harness already replaced all three before your code runs.
-   - Do NOT edit any file outside .matcha/. The repository must stay exactly as it is.
+   - Do NOT edit any file outside ${root}/. The repository must stay exactly as it is.
 
 Capsules to write:
 ${list}
@@ -157,13 +154,13 @@ ${list}
 Work until every listed capsule has its files. Then stop.`;
 }
 
-export function build_repair_prompt(failures: CapsuleFailure[]): string {
+export function build_repair_prompt(failures: CapsuleFailure[], capsules_root: string): string {
     const list = failures
         .map((failure) =>
             [
                 `- capsule: ${failure.capsuleId}`,
                 `  revision: ${failure.revision}`,
-                `  file: .matcha/capsules/${failure.capsuleId}/${failure.revision}.tsx`,
+                `  file: ${capsules_root}/${failure.capsuleId}/${failure.revision}.tsx`,
                 `  what went wrong:`,
                 ...failure.diagnostics.map((line) => `    ${line}`),
             ].join("\n"),
@@ -180,7 +177,7 @@ Common causes: a missing provider, a prop shape that does not match the componen
 
 Rules that still hold:
 - fixture.json is shared by both revisions. If you change it, both sides change together. Never write a second fixture file.
-- Never edit the component itself or any file outside .matcha/.
+- Never edit the component itself or any file outside the capsule directory.
 - Do not stub fetch, XMLHttpRequest or WebSocket. The harness already did.
 
 Fix the listed capsules, then stop.`;
@@ -197,7 +194,7 @@ export default class CapsuleAuthor {
         targets: CapsuleTarget[],
         profile: AppProfile,
     ): Promise<{ specs: CapsuleSpec[]; warnings: string[] }> {
-        await sandbox.commands.run(`mkdir -p ${CAPSULES_DIR}`);
+        await sandbox.commands.run(`mkdir -p ${capsules_dir(profile)}`);
         await sandbox.files.write(AUTHOR_PROMPT_PATH, build_author_prompt(targets, profile));
 
         log.step("authoring capsules", { count: targets.length });
@@ -210,15 +207,19 @@ export default class CapsuleAuthor {
             label: "capsule authoring agent",
         });
 
-        return this.collect(sandbox, targets, log);
+        return this.collect(sandbox, profile, targets, log);
     }
 
     public static async repair(
         sandbox: Sandbox,
         log: Logger,
+        profile: AppProfile,
         failures: CapsuleFailure[],
     ): Promise<void> {
-        await sandbox.files.write(REPAIR_PROMPT_PATH, build_repair_prompt(failures));
+        await sandbox.files.write(
+            REPAIR_PROMPT_PATH,
+            build_repair_prompt(failures, capsules_dir(profile)),
+        );
 
         log.step("repairing capsules", { count: failures.length });
         await ClaudeRun.execute(sandbox, log, {
@@ -233,6 +234,7 @@ export default class CapsuleAuthor {
 
     public static async collect(
         sandbox: Sandbox,
+        profile: AppProfile,
         targets: CapsuleTarget[],
         log: Logger,
     ): Promise<{ specs: CapsuleSpec[]; warnings: string[] }> {
@@ -240,7 +242,7 @@ export default class CapsuleAuthor {
         const warnings: string[] = [];
 
         for (const target of targets) {
-            const dir = capsule_dir(target.id);
+            const dir = capsule_dir(profile, target.id);
             const parsed = capsule_spec_schema.safeParse(
                 await this.read_json(sandbox, `${dir}/capsule.json`),
             );

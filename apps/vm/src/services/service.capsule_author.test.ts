@@ -8,6 +8,15 @@ import {
     reject_split_fixture,
 } from "./service.capsule_author";
 import type { CapsuleTarget } from "./service.capsule_targets";
+import type { AppProfile } from "./service.capsule_workspace";
+
+const profile: AppProfile = {
+    appDir: "apps/web",
+    packageManager: "bun",
+    tailwindMajor: 4,
+    globalCssPath: "apps/web/app/globals.css",
+    tsconfigPaths: { "@/*": ["./*"] },
+};
 
 const targets: CapsuleTarget[] = [
     {
@@ -25,37 +34,40 @@ const targets: CapsuleTarget[] = [
 ];
 
 test("every capsule lives under its own id", () => {
-    expect(capsule_dir("apps-web-components-faq-item")).toBe(
-        "/home/user/repo/.matcha/capsules/apps-web-components-faq-item",
+    expect(capsule_dir(profile, "apps-web-components-faq-item")).toBe(
+        "/home/user/repo/apps/web/.matcha/capsules/apps-web-components-faq-item",
     );
 });
 
 test("one prompt carries every target, so six components cost one run", () => {
-    const prompt = build_author_prompt(targets, { tailwindMajor: 4 });
+    const prompt = build_author_prompt(targets, profile);
     expect(prompt).toContain("apps/web/components/marketing/FaqItem.tsx");
     expect(prompt).toContain("apps/web/components/ui/Badge.tsx");
     expect(prompt).toContain("apps-web-components-faq-item");
 });
 
 test("the prompt states the shared fixture rule, which the whole design rests on", () => {
-    const prompt = build_author_prompt(targets, { tailwindMajor: 4 });
+    const prompt = build_author_prompt(targets, profile);
     expect(prompt).toContain("fixture.json");
     expect(prompt.toLowerCase()).toContain("identical");
 });
 
 test("a capsule added in this pull request is not asked for a base entry", () => {
-    const prompt = build_author_prompt(targets, { tailwindMajor: 4 });
+    const prompt = build_author_prompt(targets, profile);
     expect(prompt).toContain("Badge.tsx does not exist at the base revision");
 });
 
 test("a repair prompt names only the capsules that failed, with their errors", () => {
-    const prompt = build_repair_prompt([
-        {
-            capsuleId: "apps-web-components-faq-item",
-            revision: "head",
-            diagnostics: ["TypeError: issues.map is not a function"],
-        },
-    ]);
+    const prompt = build_repair_prompt(
+        [
+            {
+                capsuleId: "apps-web-components-faq-item",
+                revision: "head",
+                diagnostics: ["TypeError: issues.map is not a function"],
+            },
+        ],
+        "/home/user/repo/apps/web/.matcha/capsules",
+    );
     expect(prompt).toContain("apps-web-components-faq-item");
     expect(prompt).toContain("head");
     expect(prompt).toContain("issues.map is not a function");
