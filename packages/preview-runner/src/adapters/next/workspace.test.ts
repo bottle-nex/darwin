@@ -9,7 +9,13 @@ import { inspect_next_workspace } from "./workspace";
 const fixtureRoots: string[] = [];
 
 function fixtureRoot(
-    name: "turbo-next" | "nested-next" | "nx-next" | "standalone-next" | "pnpm-workspace-next",
+    name:
+        | "turbo-next"
+        | "nested-next"
+        | "nx-next"
+        | "nx-project-next"
+        | "standalone-next"
+        | "pnpm-workspace-next",
 ): string {
     const root = mkdtempSync(join(tmpdir(), `matcha-${name}-`));
     fixtureRoots.push(root);
@@ -32,7 +38,15 @@ function fixtureRoot(
             "yarn.lock",
             "nx.json",
             "apps/store/package.json",
+            "apps/store/project.json",
             "apps/store/pages/index.tsx",
+        ],
+        "nx-project-next": [
+            "bun.lock",
+            "nx.json",
+            "package.json",
+            "apps/admin/project.json",
+            "apps/admin/app/layout.tsx",
         ],
         "standalone-next": ["package-lock.json", "package.json", "src/app/layout.tsx"],
         "pnpm-workspace-next": [
@@ -42,20 +56,56 @@ function fixtureRoot(
             "apps/store/app/layout.tsx",
         ],
     }[name].reduce<Record<string, string>>((result, path) => {
-        if (path.endsWith("package.json")) {
+        if (path === "apps/store/project.json") {
+            result[path] = JSON.stringify({
+                name: "store",
+                targets: {
+                    build: { executor: "@nx/next:build" },
+                    serve: {
+                        executor: "@nx/next:server",
+                        configurations: { production: { dev: false } },
+                    },
+                },
+            });
+        } else if (path === "apps/admin/project.json") {
+            result[path] = JSON.stringify({
+                name: "admin",
+                sourceRoot: "apps/admin",
+                projectType: "application",
+                targets: {
+                    compile: { executor: "@nx/next:build" },
+                    preview: {
+                        executor: "@nx/next:server",
+                        options: { buildTarget: "admin:compile" },
+                        configurations: {
+                            production: { buildTarget: "admin:compile:production", dev: false },
+                        },
+                    },
+                },
+            });
+        } else if (path.endsWith("package.json")) {
             const packageName =
                 name === "turbo-next" && path === "apps/marketing/package.json"
                     ? "@acme/marketing"
                     : name === "nx-next"
                       ? "@acme/store"
-                      : name === "standalone-next"
-                        ? "website"
-                        : name === "pnpm-workspace-next"
-                          ? "@acme/store"
-                          : "@acme/site";
+                      : name === "nx-project-next"
+                        ? "nx-project-workspace"
+                        : name === "standalone-next"
+                          ? "website"
+                          : name === "pnpm-workspace-next"
+                            ? "@acme/store"
+                            : "@acme/site";
             result[path] = JSON.stringify({
                 name: packageName,
-                dependencies: path.includes("packages/ui") ? {} : { next: "15.0.0" },
+                dependencies:
+                    path.includes("packages/ui") || name === "nx-project-next"
+                        ? {}
+                        : { next: "15.0.0" },
+                devDependencies:
+                    name === "nx-project-next"
+                        ? { next: "15.0.0", nx: "20.0.0", "@nx/next": "20.0.0" }
+                        : undefined,
             });
         } else {
             result[path] = path.endsWith(".tsx")
@@ -116,10 +166,51 @@ test("detects a deeply nested Next application without a scan-depth cutoff", () 
 });
 
 test("classifies Nx and standalone Next workspaces from root metadata", () => {
-    expect(inspect_next_workspace(fixtureRoot("nx-next"), []).workspaceKind).toBe("Nx");
+    expect(inspect_next_workspace(fixtureRoot("nx-next"), [])).toMatchObject({
+        workspaceKind: "Nx",
+        applications: [
+            {
+                applicationPath: "apps/store",
+                packageName: "store",
+                nxTargets: {
+                    build: "store:build:production",
+                    serve: "store:serve:production",
+                },
+            },
+        ],
+    });
     expect(inspect_next_workspace(fixtureRoot("standalone-next"), []).workspaceKind).toBe(
         "Standalone",
     );
+});
+
+test("discovers an Nx Next project from project.json without an app package manifest", () => {
+    const root = fixtureRoot("nx-project-next");
+    const inspection = inspect_next_workspace(root, ["apps/admin/app/page.tsx"]);
+
+    expect(inspection).toMatchObject({
+        workspaceKind: "Nx",
+        packageManager: "bun",
+        applications: [
+            {
+                applicationPath: "apps/admin",
+                packageName: "admin",
+                router: "AppRouter",
+                nxTargets: {
+                    build: "admin:compile:production",
+                    serve: "admin:preview:production",
+                },
+            },
+        ],
+        changedApplicationPaths: ["apps/admin"],
+    });
+    expect(
+        detect({ workspaceRoot: root, changedPaths: ["apps/admin/project.json"] }),
+    ).toMatchObject({
+        supported: true,
+        nextAppDir: "apps/admin",
+        framework: "NextAppRouter",
+    });
 });
 
 test("classifies a plain pnpm workspace without Turborepo metadata", () => {

@@ -16,6 +16,11 @@ const envSchema = z.object({
     SERVER_SOLVE_EFFORT: z.enum(["low", "medium", "high", "xhigh", "max"]).default("high"),
     SERVER_VM_DISPATCH_CONCURRENCY: z.coerce.number().int().min(1).default(10),
     SERVER_PRODUCT_DIFF_CONCURRENCY: z.coerce.number().int().min(1).default(2),
+    SERVER_PRODUCT_DIFF_REPLAY_ENABLED: z
+        .enum(["true", "false"])
+        .default("false")
+        .transform((value) => value === "true"),
+    SERVER_PRODUCT_DIFF_REPLAY_ORIGIN: z.string().max(2048).optional(),
     SERVER_PREVIEW_MODEL: z.string().default("claude-sonnet-5"),
     SERVER_PREVIEW_EFFORT: z.enum(["low", "medium", "high", "xhigh", "max"]).default("high"),
     SERVER_SECRET_ENCRYPTION_KEY: z

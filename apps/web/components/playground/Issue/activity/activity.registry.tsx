@@ -7,8 +7,10 @@ import {
 } from "@trymatcha/types";
 import type { ReactNode } from "react";
 import type { IconType } from "react-icons";
+import { FaRunning } from "react-icons/fa";
 import { GoGitMerge, GoGitPullRequestClosed } from "react-icons/go";
 import { HiCalendar } from "react-icons/hi2";
+import { IoMdPricetags } from "react-icons/io";
 import { IoPencilSharp } from "react-icons/io5";
 import {
     LuActivity,
@@ -17,13 +19,10 @@ import {
     LuCircleX,
     LuGitPullRequest,
     LuPencil,
-    LuPlay,
-    LuTag,
-    LuUserMinus,
-    LuUserPlus,
 } from "react-icons/lu";
-import { MdOutlineSupportAgent } from "react-icons/md";
+import { MdPersonAddAlt1, MdPersonRemove } from "react-icons/md";
 import { RiSignalCellular2Fill } from "react-icons/ri";
+import { TbSoupFilled } from "react-icons/tb";
 
 import TagDisplay from "@/components/playground/Home/TagsDisplay/TagDisplay";
 import { formatDate } from "@/lib/format";
@@ -138,6 +137,8 @@ type ActivityEntry<K extends ActivityType> = {
     summary?: string;
 };
 
+const MUTED_ICON_COLOR = "text-snow/70";
+
 const REGISTRY: { [K in ActivityType]?: ActivityEntry<K> } = {
     [ActivityType.IssueCreated]: {
         icon: IoPencilSharp,
@@ -187,8 +188,8 @@ const REGISTRY: { [K in ActivityType]?: ActivityEntry<K> } = {
         summary: "updated the description",
     },
     [ActivityType.AssigneeAdded]: {
-        icon: LuUserPlus,
-        iconClassName: "text-emerald-300",
+        icon: MdPersonAddAlt1,
+        iconClassName: MUTED_ICON_COLOR,
         render: (payload) => (
             <>
                 assigned <Strong>{payload.user?.name ?? "someone"}</Strong>
@@ -197,8 +198,8 @@ const REGISTRY: { [K in ActivityType]?: ActivityEntry<K> } = {
         summary: "changed assignees",
     },
     [ActivityType.AssigneeRemoved]: {
-        icon: LuUserMinus,
-        iconClassName: "text-green-500",
+        icon: MdPersonRemove,
+        iconClassName: MUTED_ICON_COLOR,
         render: (payload) => (
             <>
                 unassigned <Strong>{payload.user?.name ?? "someone"}</Strong>
@@ -207,8 +208,8 @@ const REGISTRY: { [K in ActivityType]?: ActivityEntry<K> } = {
         summary: "changed assignees",
     },
     [ActivityType.LabelAdded]: {
-        icon: LuTag,
-        iconClassName: "text-violet-400",
+        icon: IoMdPricetags,
+        iconClassName: MUTED_ICON_COLOR,
         render: (payload) => (
             <>
                 added <LabelChip label={payload.label} />
@@ -217,8 +218,8 @@ const REGISTRY: { [K in ActivityType]?: ActivityEntry<K> } = {
         summary: "changed labels",
     },
     [ActivityType.LabelRemoved]: {
-        icon: LuTag,
-        iconClassName: "text-violet-400",
+        icon: IoMdPricetags,
+        iconClassName: MUTED_ICON_COLOR,
         render: (payload) => (
             <>
                 removed <LabelChip label={payload.label} />
@@ -234,14 +235,14 @@ const REGISTRY: { [K in ActivityType]?: ActivityEntry<K> } = {
         summary: "changed dates",
     },
     [ActivityType.RunStarted]: {
-        icon: LuPlay,
-        iconClassName: "text-amber-300",
+        icon: FaRunning,
+        iconClassName: "text-snow/60",
         render: (payload) => `started attempt ${payload.attemptNumber}`,
         summary: "started an attempt",
     },
     [ActivityType.RunCompleted]: {
-        icon: MdOutlineSupportAgent,
-        iconClassName: "text-neutral-400",
+        icon: TbSoupFilled,
+        iconClassName: "text-snow/60",
         render: (payload) => `finished attempt ${payload.attemptNumber}`,
         summary: "finished an attempt",
     },
@@ -257,7 +258,7 @@ const REGISTRY: { [K in ActivityType]?: ActivityEntry<K> } = {
     },
     [ActivityType.PrOpened]: {
         icon: LuGitPullRequest,
-        iconClassName: "text-violet-400",
+        iconClassName: "text-green-500/90",
         render: (payload) => (
             <>
                 opened{" "}

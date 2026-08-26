@@ -3,6 +3,7 @@ import express from "express";
 import http from "http";
 
 import { ENV } from "./configs/env";
+import { replay_host_boundary } from "./middlewares/middleware.replay_host";
 import SocketServer from "./real-time/socket.server";
 import v1_router from "./routers/v1/router.v1";
 import InitService from "./services/service.init";
@@ -14,6 +15,7 @@ await RedisService.connect();
 const app = express();
 const server = http.createServer(app);
 
+app.use(replay_host_boundary);
 app.use(
     cors({
         origin: [ENV.SERVER_WEB_URL, ENV.SERVER_ADMIN_URL],

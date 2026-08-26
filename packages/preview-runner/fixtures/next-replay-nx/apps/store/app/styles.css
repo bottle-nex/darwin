@@ -1,0 +1,15 @@
+body {
+    margin: 0;
+    font-family: sans-serif;
+}
+
+.nx-card {
+    animation: nx-card 1.25s linear infinite alternate;
+    margin: 4rem;
+}
+
+@keyframes nx-card {
+    to {
+        opacity: 0.65;
+    }
+}

@@ -1,0 +1,57 @@
+{
+    "applications": [
+        {
+            "id": "standalone",
+            "applicationPath": ".",
+            "adapterId": "next"
+        }
+    ],
+    "surfaces": [
+        {
+            "id": "standalone-route",
+            "applicationId": "standalone",
+            "label": "Standalone route",
+            "sourcePaths": ["app/replay/page.tsx"],
+            "entry": {
+                "kind": "route",
+                "path": "/replay"
+            },
+            "rootLayoutMode": "inherit",
+            "states": [
+                {
+                    "id": "default",
+                    "label": "Default",
+                    "scenarios": [
+                        {
+                            "id": "activate",
+                            "label": "Activate standalone",
+                            "actions": [
+                                {
+                                    "kind": "click",
+                                    "selector": {
+                                        "role": "button",
+                                        "name": "Activate standalone"
+                                    }
+                                },
+                                {
+                                    "kind": "waitFor",
+                                    "selector": {
+                                        "testId": "standalone-changed"
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ],
+            "viewports": [
+                {
+                    "id": "desktop",
+                    "label": "Desktop",
+                    "width": 1280,
+                    "height": 800
+                }
+            ]
+        }
+    ]
+}

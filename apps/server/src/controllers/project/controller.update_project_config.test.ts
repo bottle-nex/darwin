@@ -97,6 +97,53 @@ test("accepts an explicit Product Diff root layout mode", async () => {
     });
 });
 
+test("accepts a bounded project-controlled replay data policy", async () => {
+    const configuration = {
+        replayDataPolicy: { sameOriginJsonPaths: ["/api/catalog", "/api/products/*"] },
+    };
+    project_config.upsert.mockResolvedValue({
+        kanbanOptionView: "FLAT",
+        productDiffEnabled: false,
+        productDiffPreviewConfig: configuration,
+    });
+    const result = response();
+
+    await update_project_config_controller(
+        {
+            params: { project_id: "project-1" },
+            body: { product_diff_preview_config: configuration },
+            user: { id: "user-1" },
+        } as never,
+        result.res as never,
+    );
+
+    expect(result.result().status_code).toBe(200);
+    expect(project_config.upsert).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+            update: { productDiffPreviewConfig: configuration },
+        }),
+    );
+});
+
+test("rejects unbounded replay data paths", async () => {
+    const result = response();
+
+    await update_project_config_controller(
+        {
+            params: { project_id: "project-1" },
+            body: {
+                product_diff_preview_config: {
+                    replayDataPolicy: { sameOriginJsonPaths: ["/*"] },
+                },
+            },
+            user: { id: "user-1" },
+        } as never,
+        result.res as never,
+    );
+
+    expect(result.result().status_code).toBe(400);
+});
+
 test("preserves an existing preview configuration when updating its launch command", async () => {
     project_config.findUnique.mockResolvedValue({
         productDiffPreviewConfig: {

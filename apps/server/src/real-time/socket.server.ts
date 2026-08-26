@@ -9,6 +9,7 @@ import type { IncomingMessage, Server } from "http";
 import { type RawData, WebSocket, WebSocketServer } from "ws";
 
 import Access from "../access-control/access";
+import { ordinary_socket_host_allowed } from "../middlewares/middleware.replay_host";
 import { verifySessionJwt } from "../services/service.jwt";
 import PresenceService from "../services/service.presence";
 import type { AuthUser } from "../types/express.d";
@@ -27,7 +28,11 @@ export default class SocketServer {
     private subscriber_system: SubscriberSystem;
 
     constructor(server: Server) {
-        this.wss = new WebSocketServer({ server });
+        this.wss = new WebSocketServer({
+            server,
+            verifyClient: ({ req }: { req: IncomingMessage }) =>
+                ordinary_socket_host_allowed(req.headers.host),
+        });
         this.subscriber_system = new SubscriberSystem();
         this.init_connection();
         this.start_listening();

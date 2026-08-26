@@ -12,6 +12,8 @@ import { useGithubLink, useStartGithubLink } from "@/hooks/github/useGithubLink"
 import { useGetProject } from "@/hooks/project/useGetProject";
 import { GITHUB_NOT_LINKED, usePostReviewComment } from "@/hooks/review/usePostReviewComment";
 import { htmlToMarkdown } from "@/lib/markdown";
+import { IoSendSharp } from "react-icons/io5";
+import { RiSendPlane2Fill } from "react-icons/ri";
 
 export default function ReviewComposer({
     projectId,
@@ -122,8 +124,14 @@ export default function ReviewComposer({
                         That comment didn&apos;t post. Try again.
                     </p>
                 )}
-                <Button size="xs" disabled={isEmpty} loading={post.isPending} onClick={submit}>
-                    Comment
+                <Button
+                    size="icon-xs"
+                    className="bg-snow rounded-full"
+                    disabled={isEmpty}
+                    loading={post.isPending}
+                    onClick={submit}
+                >
+                    <RiSendPlane2Fill />
                 </Button>
             </div>
         </div>

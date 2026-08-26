@@ -22,6 +22,22 @@ function adapter(id: string, supported: boolean): ProductDiffAdapter {
             url: "http://127.0.0.1:3000",
             surfacePath: "/preview-run-a",
         }),
+        prepare_replay_revision: async ({ revision }) => ({
+            revision,
+            workspaceRoot: "/repo",
+            generatedPaths: ["/repo/app/preview-run-a/page.tsx"],
+            applicationPath: "/repo",
+            surfacePath: "/preview-run-a",
+        }),
+        start_replay_revision: async ({ revision }) => ({
+            id: `${id}-${revision}-replay`,
+            revision,
+            url: "http://127.0.0.1:3000",
+            surfacePath: "/preview-run-a",
+            applicationPath: "/repo",
+            browserAssets: [],
+        }),
+        collect_replay_browser_assets: async () => [],
         verify_revision: async ({ preview }) => ({
             revision: preview.revision,
             ready: true,
@@ -29,6 +45,7 @@ function adapter(id: string, supported: boolean): ProductDiffAdapter {
             diagnostics: [],
         }),
         cleanup_revision: async () => undefined,
+        cleanup_replay_revision: async () => undefined,
     };
 }
 

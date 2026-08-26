@@ -7,6 +7,8 @@ import { ENV } from "../configs/env";
 
 const SIGNED_URL_TTL_MS = 5 * 60 * 1000;
 const ARTIFACT_URL_TTL_MS = 15 * 60 * 1000;
+const SAFE_PRODUCT_DIFF_CONTENT_TYPE =
+    /^(application\/(javascript|json|manifest\+json|octet-stream|wasm)|font\/(otf|ttf|woff|woff2)|image\/(avif|gif|jpeg|png|svg\+xml|webp|x-icon)|text\/(css|html|plain))$/;
 
 const EXTENSIONS: Record<string, string> = {
     "image/png": "png",
@@ -136,5 +138,52 @@ export default class StorageService {
             ]),
         );
         return Object.fromEntries(signed);
+    }
+
+    static async read_product_diff_object(key: string, maximum_bytes: number): Promise<Buffer> {
+        const object = await this.stream_product_diff_object(key);
+        if (object.size > maximum_bytes) {
+            object.body.destroy();
+            throw new Error("Product Diff object exceeds the read limit");
+        }
+
+        const chunks: Buffer[] = [];
+        let bytes = 0;
+        for await (const chunk of object.body) {
+            const body = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
+            bytes += body.length;
+            if (bytes > maximum_bytes) {
+                object.body.destroy();
+                throw new Error("Product Diff object exceeds the read limit");
+            }
+            chunks.push(body);
+        }
+        if (bytes !== object.size) {
+            throw new Error("Product Diff object size changed during read");
+        }
+        return Buffer.concat(chunks, bytes);
+    }
+
+    static async stream_product_diff_object(key: string) {
+        const client = this.minio();
+        const bucket = ENV.SERVER_PRODUCT_DIFF_BUCKET!;
+        const stat = await client.statObject(bucket, key);
+        const metadata = Object.fromEntries(
+            Object.entries(stat.metaData).map(([name, value]) => [
+                name.toLowerCase(),
+                typeof value === "string" ? value : "",
+            ]),
+        );
+        const stored_content_type = metadata["content-type"]?.toLowerCase().split(";", 1)[0];
+        const contentType =
+            stored_content_type && SAFE_PRODUCT_DIFF_CONTENT_TYPE.test(stored_content_type)
+                ? stored_content_type
+                : "application/octet-stream";
+
+        return {
+            body: await client.getObject(bucket, key),
+            size: stat.size,
+            contentType,
+        };
     }
 }

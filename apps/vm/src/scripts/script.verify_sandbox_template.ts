@@ -20,7 +20,7 @@ const TEMPLATE_NAME = "node-py-claude-template";
 const TEMPLATE_TAG = "stable";
 const SANDBOX_MCP_ENTRY = "/opt/matcha/sandbox-mcp/index.js";
 const PREVIEW_RUNNER_ENTRY = "/opt/matcha/preview-runner/index.js";
-const PREVIEW_RUNNER_PROTOCOL_VERSION = 7;
+const PREVIEW_RUNNER_PROTOCOL_VERSION = 11;
 
 interface Requirement {
     name: string;
@@ -46,8 +46,8 @@ const REQUIREMENTS: Requirement[] = [
     },
     {
         name: "preview-runner",
-        command: `node ${PREVIEW_RUNNER_ENTRY} doctor | jq -e '.ok' > /dev/null && node ${PREVIEW_RUNNER_ENTRY} doctor | jq -r '.chromiumVersion'`,
-        needed_for: "launching Chromium to screenshot Product Diff targets",
+        command: `node ${PREVIEW_RUNNER_ENTRY} doctor | jq -e '.ok and .chromiumVersion and .replayCommandAvailable' > /dev/null`,
+        needed_for: "launching Chromium and replaying Product Diff targets",
     },
     {
         name: "preview-runner protocol",

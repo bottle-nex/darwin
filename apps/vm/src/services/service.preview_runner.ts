@@ -1,10 +1,11 @@
+import type { ProductDiffReplayDataPolicy, ReplayRevisionEvidence } from "@trymatcha/types";
 import type { Sandbox } from "e2b";
 import { z } from "zod";
 
 const RUNNER_ENTRY = "/opt/matcha/preview-runner/index.js";
 const PREVIEW_DIR = "/home/user/preview";
 const COMMAND_TIMEOUT_MS = 15 * 60_000;
-const RUNTIME_PROTOCOL_VERSION = 7;
+const RUNTIME_PROTOCOL_VERSION = 11;
 const SAFE_ID = /^[a-z0-9][a-z0-9-]{0,48}$/;
 const MAX_WARNINGS = 20;
 const MAX_WARNING_LENGTH = 400;
@@ -35,6 +36,13 @@ const nextApplicationCandidateSchema = z.object({
     packageName: z.string().min(1).nullable(),
     router: z.enum(["AppRouter", "PagesRouter"]),
     hasPagesDirectory: z.boolean(),
+    nxTargets: z
+        .object({
+            build: z.string().min(1),
+            serve: z.string().min(1),
+        })
+        .strict()
+        .optional(),
 });
 export type NextApplicationCandidate = z.infer<typeof nextApplicationCandidateSchema>;
 
@@ -122,7 +130,7 @@ const harnessManifestSchema = z.object({
         .min(1)
         .max(6),
     warnings: advisoryWarningsSchema,
-    rootLayoutMode: rootLayoutModeSchema.default("inherit"),
+    rootLayoutMode: rootLayoutModeSchema.nullable().optional().default(null),
 });
 export type HarnessManifest = z.infer<typeof harnessManifestSchema>;
 
@@ -186,6 +194,259 @@ const pairSchema = z.object({
 });
 export type PreviewPair = z.infer<typeof pairSchema>;
 
+const boundedReplayStringSchema = z.string().min(1).max(300);
+const replaySelectorSchema = z
+    .object({
+        testId: boundedReplayStringSchema.optional(),
+        role: boundedReplayStringSchema.optional(),
+        name: boundedReplayStringSchema.optional(),
+        label: boundedReplayStringSchema.optional(),
+    })
+    .strict()
+    .refine((selector) => Object.values(selector).some((value) => value !== undefined));
+const replayActionBaseSchema = z.object({ selector: replaySelectorSchema }).strict();
+const replayActionSchema = z.discriminatedUnion("kind", [
+    replayActionBaseSchema.extend({ kind: z.literal("click") }),
+    replayActionBaseSchema.extend({ kind: z.literal("fill"), value: boundedReplayStringSchema }),
+    replayActionBaseSchema.extend({ kind: z.literal("select"), value: boundedReplayStringSchema }),
+    replayActionBaseSchema.extend({ kind: z.literal("check"), checked: z.boolean().optional() }),
+    replayActionBaseSchema.extend({ kind: z.literal("waitFor") }),
+]);
+const replayScenarioSchema = z
+    .object({
+        id: z.string().regex(SAFE_ID),
+        label: boundedReplayStringSchema,
+        actions: z.array(replayActionSchema).max(12),
+    })
+    .strict();
+const replayApplicationSchema = z
+    .object({
+        id: z.string().regex(SAFE_ID),
+        applicationPath: boundedReplayStringSchema.refine(
+            (value) => !value.includes("..") && !value.startsWith("/"),
+        ),
+        adapterId: boundedReplayStringSchema.optional(),
+    })
+    .strict();
+const replayViewportSchema = z
+    .object({
+        id: z.string().regex(SAFE_ID),
+        label: z.string().min(1).max(40),
+        width: z.number().int().min(240).max(3840),
+        height: z.number().int().min(240).max(3840),
+    })
+    .strict();
+const replaySurfaceSchema = z
+    .object({
+        id: z.string().regex(SAFE_ID),
+        applicationId: z.string().regex(SAFE_ID),
+        label: boundedReplayStringSchema,
+        sourcePaths: z
+            .array(
+                boundedReplayStringSchema.refine(
+                    (value) => !value.includes("..") && !value.startsWith("/"),
+                ),
+            )
+            .min(1)
+            .max(12),
+        entry: z.discriminatedUnion("kind", [
+            z
+                .object({
+                    kind: z.literal("route"),
+                    path: boundedReplayStringSchema.refine(
+                        (value) => value.startsWith("/") && !value.includes(".."),
+                    ),
+                })
+                .strict(),
+            z
+                .object({ kind: z.literal("component"), targetId: z.string().regex(SAFE_ID) })
+                .strict(),
+        ]),
+        rootLayoutMode: rootLayoutModeSchema,
+        states: z
+            .array(
+                z
+                    .object({
+                        id: z.string().regex(SAFE_ID),
+                        label: boundedReplayStringSchema,
+                        scenarios: z.array(replayScenarioSchema).max(12),
+                    })
+                    .strict(),
+            )
+            .min(1)
+            .max(6),
+        viewports: z.array(replayViewportSchema).min(1).max(4),
+    })
+    .strict();
+const replayReviewPlanSchema = z
+    .object({
+        applications: z.array(replayApplicationSchema).min(1).max(12),
+        surfaces: z.array(replaySurfaceSchema).min(1).max(12),
+    })
+    .strict()
+    .superRefine((plan, context) => {
+        const addDuplicateIssues = (
+            ids: string[],
+            issuePaths: Array<Array<string | number>>,
+            message: string,
+        ) => {
+            const seen = new Set<string>();
+            for (const [index, id] of ids.entries()) {
+                if (seen.has(id)) {
+                    context.addIssue({ code: "custom", path: issuePaths[index], message });
+                }
+                seen.add(id);
+            }
+        };
+        addDuplicateIssues(
+            plan.applications.map((application) => application.id),
+            plan.applications.map((_, index) => ["applications", index, "id"]),
+            "must be unique within the review plan",
+        );
+        const applicationIds = new Set(plan.applications.map((application) => application.id));
+        const surfaceIdsByApplication = new Map<string, Set<string>>();
+        for (const [index, surface] of plan.surfaces.entries()) {
+            if (!applicationIds.has(surface.applicationId)) {
+                context.addIssue({
+                    code: "custom",
+                    path: ["surfaces", index, "applicationId"],
+                    message: "must reference a declared application",
+                });
+            }
+            const surfaceIds = surfaceIdsByApplication.get(surface.applicationId) ?? new Set();
+            if (surfaceIds.has(surface.id)) {
+                context.addIssue({
+                    code: "custom",
+                    path: ["surfaces", index, "id"],
+                    message: "must be unique within the application",
+                });
+            }
+            surfaceIds.add(surface.id);
+            surfaceIdsByApplication.set(surface.applicationId, surfaceIds);
+            addDuplicateIssues(
+                surface.states.map((state) => state.id),
+                surface.states.map((_, stateIndex) => [
+                    "surfaces",
+                    index,
+                    "states",
+                    stateIndex,
+                    "id",
+                ]),
+                "must be unique within the surface",
+            );
+            addDuplicateIssues(
+                surface.viewports.map((viewport) => viewport.id),
+                surface.viewports.map((_, viewportIndex) => [
+                    "surfaces",
+                    index,
+                    "viewports",
+                    viewportIndex,
+                    "id",
+                ]),
+                "must be unique within the surface",
+            );
+            for (const [stateIndex, state] of surface.states.entries()) {
+                addDuplicateIssues(
+                    state.scenarios.map((scenario) => scenario.id),
+                    state.scenarios.map((_, scenarioIndex) => [
+                        "surfaces",
+                        index,
+                        "states",
+                        stateIndex,
+                        "scenarios",
+                        scenarioIndex,
+                        "id",
+                    ]),
+                    "must be unique within the state",
+                );
+            }
+        }
+    });
+export type ReplayReviewPlan = z.infer<typeof replayReviewPlanSchema>;
+export type ReplaySurface = z.infer<typeof replaySurfaceSchema>;
+export type ReplayScenario = z.infer<typeof replayScenarioSchema>;
+
+const replayBrowserAssetSchema = z
+    .object({
+        requestPath: z.string().min(1).max(500).startsWith("/"),
+        sourcePath: z.string().min(1).max(500).startsWith("/"),
+        contentType: z.string().min(1).max(200),
+    })
+    .strict();
+const replayActionEvidenceSchema = z
+    .object({
+        index: z.number().int().min(0).max(11),
+        kind: z.enum(["click", "fill", "select", "check", "waitFor"]),
+        outcome: z.enum(["Succeeded", "Failed"]),
+        diagnostic: z.string().max(300).optional(),
+    })
+    .strict();
+const emptyReplayEvidence: ReplayRevisionEvidence = {
+    scenarios: [],
+    dom: null,
+    accessibility: null,
+    consoleDiagnostics: [],
+    failedRequestDiagnostics: [],
+};
+export const replayEvidenceSchema: z.ZodType<ReplayRevisionEvidence> = z
+    .object({
+        scenarios: z
+            .array(
+                z
+                    .object({
+                        id: z.string().regex(SAFE_ID),
+                        label: z.string().min(1).max(300),
+                        outcome: z.enum(["Succeeded", "Failed"]),
+                        actions: z.array(replayActionEvidenceSchema).max(12),
+                    })
+                    .strict(),
+            )
+            .max(12),
+        dom: z
+            .object({
+                elementCount: z.number().int().min(0).max(1_000_000),
+                interactiveElementCount: z.number().int().min(0).max(1_000_000),
+                visibleTextLength: z.number().int().min(0).max(10_000_000),
+            })
+            .strict()
+            .nullable(),
+        accessibility: z
+            .object({
+                landmarkCount: z.number().int().min(0).max(1_000_000),
+                headingCount: z.number().int().min(0).max(1_000_000),
+                labeledControlCount: z.number().int().min(0).max(1_000_000),
+                unlabeledControlCount: z.number().int().min(0).max(1_000_000),
+            })
+            .strict()
+            .nullable(),
+        consoleDiagnostics: z.array(z.string().max(300)).max(20),
+        failedRequestDiagnostics: z.array(z.string().max(300)).max(20),
+    })
+    .strict();
+const replayCaptureOutputSchema = z
+    .object({
+        artifactKey: z.literal("artifact.json"),
+        fidelity: z.enum(["Verified", "Partial", "Unavailable"]),
+        diagnostics: z.array(z.string().max(300)).max(20),
+        resourceCount: z.number().int().min(0).max(10_000),
+        packageBytes: z.number().int().min(0).max(500_000_000),
+        captureDurationMs: z.number().int().min(0).max(3_600_000),
+        validationOutcome: z.enum(["Verified", "Partial", "Unavailable"]),
+        evidence: replayEvidenceSchema.default(emptyReplayEvidence),
+    })
+    .strict();
+export type ReplayCaptureOutput = z.infer<typeof replayCaptureOutputSchema>;
+
+export interface ReplayCaptureRequest {
+    url: string;
+    artifactRoot: string;
+    scenario: ReplayScenario;
+    scenarios?: ReplayScenario[];
+    viewport: { width: number; height: number };
+    browserAssets: z.infer<typeof replayBrowserAssetSchema>[];
+    dataPolicy?: ProductDiffReplayDataPolicy;
+}
+
 export interface PreviewViewport {
     id: string;
     label: string;
@@ -204,6 +465,35 @@ export interface CaptureRequest {
     frozenNowMs: number;
     settleMs?: number;
     maxShots: number;
+}
+
+class PreviewRunnerCommandError extends Error {
+    readonly code = "PREVIEW_RUNNER_COMMAND_FAILED";
+    readonly command: string;
+    readonly exitCode: number | null;
+
+    constructor(command: string, exitCode: number | null) {
+        super("Preview runner command failed");
+        this.name = "PreviewRunnerCommandError";
+        this.command = command;
+        this.exitCode = exitCode;
+    }
+}
+
+function command_exit_code(error: unknown): number | null {
+    if (!error || typeof error !== "object" || !("exitCode" in error)) return null;
+    const exitCode = error.exitCode;
+    return typeof exitCode === "number" && Number.isSafeInteger(exitCode) ? exitCode : null;
+}
+
+function replay_policy(url: string, dataPolicy?: ProductDiffReplayDataPolicy) {
+    const state = new URL(url).searchParams.get("state");
+    const allowedQueryParameters = state ? { state: [state] } : undefined;
+    if (!dataPolicy && !allowedQueryParameters) return undefined;
+    return {
+        ...(allowedQueryParameters && { allowedQueryParameters }),
+        ...(dataPolicy && { sameOriginJsonPaths: dataPolicy.sameOriginJsonPaths }),
+    };
 }
 
 export default class PreviewRunner {
@@ -230,10 +520,18 @@ export default class PreviewRunner {
         const outputPath = `${PREVIEW_DIR}/${command}-out.json`;
 
         await sandbox.files.write(inputPath, JSON.stringify(input));
-        await sandbox.commands.run(
-            `node ${RUNNER_ENTRY} ${command} --input ${inputPath} --output ${outputPath}`,
-            { timeoutMs: COMMAND_TIMEOUT_MS },
-        );
+        let result;
+        try {
+            result = await sandbox.commands.run(
+                `node ${RUNNER_ENTRY} ${command} --input ${inputPath} --output ${outputPath}`,
+                { timeoutMs: COMMAND_TIMEOUT_MS },
+            );
+        } catch (error) {
+            throw new PreviewRunnerCommandError(command, command_exit_code(error));
+        }
+        if (result.exitCode !== 0) {
+            throw new PreviewRunnerCommandError(command, result.exitCode);
+        }
         return schema.parse(JSON.parse(await sandbox.files.read(outputPath)));
     }
 
@@ -348,6 +646,39 @@ export default class PreviewRunner {
         return this.invoke(sandbox, "pair", { head, base }, pairSchema);
     }
 
+    static async replay_capture(
+        sandbox: Sandbox,
+        request: ReplayCaptureRequest,
+    ): Promise<ReplayCaptureOutput> {
+        return this.invoke(
+            sandbox,
+            "replay-capture",
+            {
+                url: request.url,
+                artifactRoot: request.artifactRoot,
+                scenario: replayScenarioSchema.parse(request.scenario),
+                ...(request.scenarios
+                    ? {
+                          scenarios: z
+                              .array(replayScenarioSchema)
+                              .min(1)
+                              .max(12)
+                              .parse(request.scenarios),
+                      }
+                    : {}),
+                policy: replay_policy(request.url, request.dataPolicy),
+                viewport: replayViewportSchema
+                    .pick({ width: true, height: true })
+                    .parse(request.viewport),
+                browserAssets: z
+                    .array(replayBrowserAssetSchema)
+                    .max(10_000)
+                    .parse(request.browserAssets),
+            },
+            replayCaptureOutputSchema,
+        );
+    }
+
     /**
      * Reads and validates the target list the harness agent wrote.
      *
@@ -362,6 +693,11 @@ export default class PreviewRunner {
     static async read_manifest(sandbox: Sandbox, appDir: string): Promise<HarnessManifest> {
         const raw = await sandbox.files.read(`${appDir}/matcha_preview/manifest.json`);
         return harnessManifestSchema.parse(JSON.parse(raw));
+    }
+
+    static async read_replay_plan(sandbox: Sandbox, appDir: string): Promise<ReplayReviewPlan> {
+        const raw = await sandbox.files.read(`${appDir}/matcha_preview/review-plan.json`);
+        return replayReviewPlanSchema.parse(JSON.parse(raw));
     }
 
     /**

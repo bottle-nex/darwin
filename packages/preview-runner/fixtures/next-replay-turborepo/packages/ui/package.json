@@ -1,0 +1,11 @@
+{
+    "name": "@matcha-fixture/replay-ui",
+    "private": true,
+    "exports": "./SharedBanner.tsx",
+    "peerDependencies": {
+        "react": "19.2.0"
+    },
+    "devDependencies": {
+        "@types/react": "19.2.17"
+    }
+}

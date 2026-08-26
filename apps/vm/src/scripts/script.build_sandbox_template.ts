@@ -25,7 +25,7 @@ const log = Logger.scope("template");
 
 const TEMPLATE_NAME = "node-py-claude-template";
 const TEMPLATE_TAG = "stable";
-const PREVIEW_RUNNER_PROTOCOL_VERSION = 7;
+const PREVIEW_RUNNER_PROTOCOL_VERSION = 11;
 // E2B's default is 976 MB, of which roughly 700 MB is free once the box has booted. Webpack
 // compiling a real Next.js app's root layout wants more than that, so Next's own memory watchdog
 // restarts the dev server in a loop and no route ever finishes compiling. Raising this is what

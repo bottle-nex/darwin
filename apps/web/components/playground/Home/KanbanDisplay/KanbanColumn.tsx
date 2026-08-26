@@ -57,7 +57,7 @@ export default function KanbanColumn({
         <div
             data-column-status={column.status}
             className={cn(
-                "group flex max-h-full min-h-0 flex-col rounded-lg bg-ink/20 ring-1 ring-snow/3 p-2 transition-colors",
+                "group flex max-h-full min-h-0 flex-col rounded-lg bg-ink/20 ring-[0.5px] ring-snow/3 p-2 transition-colors",
                 fullWidth ? "min-w-0 flex-1" : "w-84 shrink-0",
             )}
         >

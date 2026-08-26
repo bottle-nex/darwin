@@ -1,0 +1,16 @@
+{
+    "targets": [
+        {
+            "id": "rive-card",
+            "label": "Rive card",
+            "sourcePath": "matcha_preview/targets/rive-card.tsx",
+            "states": [
+                {
+                    "id": "default",
+                    "label": "Default"
+                }
+            ]
+        }
+    ],
+    "warnings": []
+}

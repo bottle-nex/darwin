@@ -1,5 +1,8 @@
 "use client";
-import { is_screenshot_product_review_manifest } from "@trymatcha/types";
+import {
+    is_replay_product_diff_manifest,
+    is_screenshot_product_review_manifest,
+} from "@trymatcha/types";
 import { type ReactNode, useMemo, useState } from "react";
 import { FiRefreshCw } from "react-icons/fi";
 
@@ -13,12 +16,22 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { useProductDiff } from "@/hooks/project/useProductDiff";
+import { useProductDiff, useProductDiffReplayLaunch } from "@/hooks/project/useProductDiff";
 import { useProductDiffArtifacts } from "@/hooks/project/useProductDiffArtifacts";
 import { useRegenerateProductDiff } from "@/hooks/project/useRegenerateProductDiff";
 import { useActiveProject } from "@/hooks/useActiveProject";
+import {
+    default_replay_selection,
+    has_launchable_replay_surface,
+    select_replay_artifacts,
+    select_replay_state,
+    select_replay_surface,
+    select_replay_viewport,
+} from "@/lib/product-diff-replay";
 
 import DiffComparison from "./DiffComparison";
+import ReplayComparison from "./ReplayComparison";
+import ReplaySurfaceCatalog from "./ReplaySurfaceCatalog";
 
 const OUTCOME_SUFFIX: Record<string, string> = {
     Added: " · added",
@@ -39,9 +52,14 @@ export default function DiffReviewDisplay({
 
     const [targetId, setTargetId] = useState("");
     const [stateId, setStateId] = useState("");
+    const [replayApplicationId, setReplayApplicationId] = useState("");
+    const [replaySurfaceId, setReplaySurfaceId] = useState("");
+    const [replayStateId, setReplayStateId] = useState("");
+    const [replayViewportId, setReplayViewportId] = useState("");
 
     const stored = detail?.manifest ?? null;
     const manifest = is_screenshot_product_review_manifest(stored) ? stored : null;
+    const replayManifest = is_replay_product_diff_manifest(stored) ? stored : null;
     const target = manifest?.targets.find((item) => item.id === targetId) ?? manifest?.targets[0];
     const state = target?.states.find((item) => item.id === stateId) ?? target?.states[0];
     const viewport = manifest?.viewports[0];
@@ -61,6 +79,35 @@ export default function DiffReviewDisplay({
         artifactKeys,
     );
 
+    const defaultReplaySelection = useMemo(
+        () => (replayManifest ? default_replay_selection(replayManifest) : undefined),
+        [replayManifest],
+    );
+    const activeReplaySelection = {
+        applicationId: replayApplicationId || defaultReplaySelection?.applicationId || "",
+        surfaceId: replaySurfaceId || defaultReplaySelection?.surfaceId || "",
+        stateId: replayStateId || defaultReplaySelection?.stateId || "",
+        viewportId: replayViewportId || defaultReplaySelection?.viewportId || "",
+    };
+    const replaySurface = replayManifest
+        ? select_replay_surface(replayManifest, activeReplaySelection)
+        : undefined;
+    const replayState = select_replay_state(replaySurface, activeReplaySelection.stateId);
+    const replayViewport = select_replay_viewport(replayState, activeReplaySelection.viewportId);
+    const replayArtifacts = replayManifest
+        ? select_replay_artifacts(replayManifest, activeReplaySelection)
+        : undefined;
+    const baseReplay = useProductDiffReplayLaunch(
+        projectId,
+        productDiffId,
+        replayArtifacts?.base.artifactKey ?? null,
+    );
+    const headReplay = useProductDiffReplayLaunch(
+        projectId,
+        productDiffId,
+        replayArtifacts?.head.artifactKey ?? null,
+    );
+
     function handleTargetChange(nextId: string) {
         const next = manifest?.targets.find((item) => item.id === nextId);
         setTargetId(nextId);
@@ -70,6 +117,36 @@ export default function DiffReviewDisplay({
     function handleRegenerate() {
         if (!projectId) return;
         regenerate.mutate({ projectId, issueId });
+    }
+
+    function handleReplayApplicationChange(applicationId: string) {
+        const surface = replayManifest?.surfaces.find(
+            (item) => item.applicationId === applicationId,
+        );
+        const state = surface?.states[0];
+        const viewport = state?.viewports[0];
+        setReplayApplicationId(applicationId);
+        setReplaySurfaceId(surface?.id ?? "");
+        setReplayStateId(state?.id ?? "");
+        setReplayViewportId(viewport?.id ?? "");
+    }
+
+    function handleReplaySurfaceChange(surfaceId: string) {
+        const surface = replayManifest?.surfaces.find(
+            (item) =>
+                item.applicationId === activeReplaySelection.applicationId && item.id === surfaceId,
+        );
+        const state = surface?.states[0];
+        const viewport = state?.viewports[0];
+        setReplaySurfaceId(surfaceId);
+        setReplayStateId(state?.id ?? "");
+        setReplayViewportId(viewport?.id ?? "");
+    }
+
+    function handleReplayStateChange(nextStateId: string) {
+        const state = replaySurface?.states.find((item) => item.id === nextStateId);
+        setReplayStateId(nextStateId);
+        setReplayViewportId(state?.viewports[0]?.id ?? "");
     }
 
     return (
@@ -109,12 +186,12 @@ export default function DiffReviewDisplay({
             {detail && detail.status === "Pending" && (
                 <DiffStatus
                     title="Queued"
-                    body="A sandbox is about to build both revisions and photograph them."
+                    body="A sandbox is about to build both revisions and prepare their review artifacts."
                 />
             )}
             {detail && detail.status === "Generating" && (
                 <DiffStatus
-                    title="Capturing screenshots"
+                    title="Preparing review"
                     body="Both revisions are building in a clean sandbox. This updates on its own."
                 />
             )}
@@ -162,7 +239,7 @@ export default function DiffReviewDisplay({
                     }
                 />
             )}
-            {detail && detail.status === "Ready" && !manifest && (
+            {detail && detail.status === "Ready" && !manifest && !replayManifest && (
                 <DiffStatus
                     title="Captured in an older format"
                     body="This diff predates screenshot capture. Regenerate it to see the real components."
@@ -173,6 +250,51 @@ export default function DiffReviewDisplay({
                         </Button>
                     }
                 />
+            )}
+            {detail && detail.status === "Ready" && replayManifest && (
+                <div className="flex min-h-0 flex-1 flex-col">
+                    <ReplaySurfaceCatalog
+                        manifest={replayManifest}
+                        selection={activeReplaySelection}
+                        onApplicationChange={handleReplayApplicationChange}
+                        onSurfaceChange={handleReplaySurfaceChange}
+                        onStateChange={handleReplayStateChange}
+                        onViewportChange={setReplayViewportId}
+                    />
+                    {!has_launchable_replay_surface(replayManifest) && (
+                        <DiffStatus
+                            title="Interactive replay is unavailable"
+                            body="No launchable Base or Head replay was captured. Regenerate the diff after checking the preview setup."
+                            action={
+                                <Button
+                                    size="sm"
+                                    loading={regenerate.isPending}
+                                    onClick={handleRegenerate}
+                                >
+                                    <FiRefreshCw />
+                                    Regenerate
+                                </Button>
+                            }
+                        />
+                    )}
+                    {has_launchable_replay_surface(replayManifest) &&
+                        replayViewport &&
+                        replayArtifacts && (
+                            <ReplayComparison
+                                base={replayArtifacts.base}
+                                head={replayArtifacts.head}
+                                baseLaunchUrl={baseReplay.data?.url}
+                                headLaunchUrl={headReplay.data?.url}
+                                isLoading={baseReplay.isPending || headReplay.isPending}
+                            />
+                        )}
+                    {has_launchable_replay_surface(replayManifest) && !replayViewport && (
+                        <DiffStatus
+                            title="No replay surface selected"
+                            body="Choose a surface, state, and viewport with a captured replay."
+                        />
+                    )}
+                </div>
             )}
             {detail && detail.status === "Ready" && manifest && shot && (
                 <DiffComparison shot={shot} urls={artifactUrls} />

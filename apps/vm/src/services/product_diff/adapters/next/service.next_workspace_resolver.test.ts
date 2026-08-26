@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
 
 import type { NextWorkspaceInspection } from "../../../service.preview_runner";
-import { resolve_next_workspace } from "./service.next_workspace_resolver";
+import { resolve_next_workspace, resolve_next_workspaces } from "./service.next_workspace_resolver";
 
 const twoAppInspection: NextWorkspaceInspection = {
     workspaceKind: "Turborepo",
@@ -71,6 +71,38 @@ test("builds an Nx workspace-root serve plan for an application change", () => {
     });
 });
 
+test("retains declared Nx production targets in the resolved workspace plan", () => {
+    const result = resolve_next_workspace(
+        {
+            workspaceKind: "Nx",
+            packageManager: "bun",
+            applications: [
+                {
+                    applicationPath: "apps/admin",
+                    packageName: "admin",
+                    router: "AppRouter",
+                    hasPagesDirectory: false,
+                    nxTargets: {
+                        build: "admin:compile:production",
+                        serve: "admin:preview:production",
+                    },
+                },
+            ],
+            changedApplicationPaths: ["apps/admin"],
+        },
+        ["apps/admin/app/page.tsx"],
+        null,
+    );
+
+    expect(result).toMatchObject({
+        applicationPath: "apps/admin",
+        nxTargets: {
+            build: "admin:compile:production",
+            serve: "admin:preview:production",
+        },
+    });
+});
+
 test("builds a pnpm workspace launch plan without Turborepo metadata", () => {
     const result = resolve_next_workspace(
         {
@@ -86,5 +118,21 @@ test("builds a pnpm workspace launch plan without Turborepo metadata", () => {
         applicationPath: "apps/marketing",
         installDirectory: ".",
         launchCommand: "pnpm --filter @acme/marketing run dev",
+    });
+});
+
+test("resolves every changed application for a replay workspace", () => {
+    const result = resolve_next_workspaces(
+        { ...twoAppInspection, changedApplicationPaths: ["apps/admin", "apps/marketing"] },
+        ["apps/marketing/app/page.tsx", "apps/admin/pages/users.tsx"],
+        null,
+    );
+
+    expect(result).toMatchObject({
+        diagnostics: [],
+        plans: [
+            { applicationPath: "apps/admin", framework: "NextPagesRouter" },
+            { applicationPath: "apps/marketing", framework: "NextAppRouter" },
+        ],
     });
 });

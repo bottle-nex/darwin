@@ -1,0 +1,16 @@
+body {
+    margin: 0;
+    font-family: sans-serif;
+}
+
+.rive-orbit {
+    animation: rive-orbit 1.4s ease-in-out infinite alternate;
+    height: 4rem;
+    width: 4rem;
+}
+
+@keyframes rive-orbit {
+    to {
+        transform: rotate(20deg) scale(1.08);
+    }
+}

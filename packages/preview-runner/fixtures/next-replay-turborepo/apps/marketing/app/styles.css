@@ -1,0 +1,15 @@
+body {
+    margin: 0;
+    font-family: sans-serif;
+}
+
+.shared-banner {
+    animation: shared-banner 1.5s ease-in-out infinite alternate;
+    margin: 4rem;
+}
+
+@keyframes shared-banner {
+    to {
+        opacity: 0.7;
+    }
+}

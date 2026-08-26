@@ -84,6 +84,52 @@ test("keeps the resolver's Bun Nx serve command on the local target", () => {
     );
 });
 
+test("uses declared Nx production targets instead of application package scripts", () => {
+    const workspacePlan = {
+        repositoryRoot: ".",
+        applicationPath: "apps/admin",
+        workspaceKind: "Nx",
+        installDirectory: ".",
+        launchCommand: "bun nx run admin:preview",
+        healthPath: "/",
+        router: "AppRouter",
+        framework: "NextAppRouter",
+        rootLayoutMode: null,
+        nxTargets: {
+            build: "admin:compile:production",
+            serve: "admin:preview:production",
+        },
+        dependency: {
+            packageManager: "bun" as const,
+            lockfileRelPath: "bun.lock",
+            lockfileSha256: "lock-hash",
+            workspaceDirs: ["."],
+        },
+    };
+
+    expect(
+        NextPreviewLauncher.build_from_workspace_plan({
+            workspaceRoot: "/workspace/head",
+            workspacePlan,
+        }),
+    ).toMatchObject({
+        command: "bun x --no-install nx run admin:compile:production",
+        workingDirectory: "/workspace/head",
+    });
+    expect(
+        NextPreviewLauncher.from_workspace_plan({
+            mode: "production",
+            workspaceRoot: "/workspace/head",
+            workspacePlan,
+            port: 41337,
+        }),
+    ).toMatchObject({
+        command:
+            "bun x --no-install nx run admin:preview:production -- --host=127.0.0.1 --port=41337",
+        workingDirectory: "/workspace/head",
+    });
+});
+
 test("converts a resolved pnpm workspace dev script into direct Next startup", () => {
     const plan = NextPreviewLauncher.from_workspace_plan({
         workspaceRoot: "/home/user/workspace/head",

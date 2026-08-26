@@ -24,13 +24,13 @@ const workspacePlan: ProductDiffWorkspacePlan = {
 };
 const originalCreateNextPreviewSurface = PreviewRunner.create_next_preview_surface;
 
-test("creates a validated job-scoped route for the selected workspace router", async () => {
+test("uses the policy-selected layout mode for the job-scoped route", async () => {
     const sandbox = {} as Sandbox;
     const create = mock(PreviewRunner.create_next_preview_surface).mockResolvedValue({
         routePath: "/preview-run-a",
         generatedFiles: ["/workspace/apps/web/app/preview-run-a/[targetId]/page.tsx"],
         router: "AppRouter",
-        rootLayoutMode: "inherit",
+        rootLayoutMode: "isolate",
         rootLayoutRestore: null,
     });
     PreviewRunner.create_next_preview_surface = create;
@@ -48,7 +48,7 @@ test("creates a validated job-scoped route for the selected workspace router", a
         applicationPath: "apps/web",
         routeSegment: "preview-run-a",
         router: "AppRouter",
-        rootLayoutMode: "inherit",
+        rootLayoutMode: "isolate",
     });
     expect(surface.generatedFiles).toHaveLength(1);
 });

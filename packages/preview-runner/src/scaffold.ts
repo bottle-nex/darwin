@@ -8,6 +8,7 @@ import {
     type ScaffoldInput,
     type ScaffoldOutput,
 } from "./contract";
+import { prepare_next_preview_runtime } from "./adapters/next/preview_runtime";
 
 const PROBE_TARGET_SOURCE = `export default function Target() {
     return <span>ok</span>;
@@ -91,8 +92,9 @@ export function scaffold(input: ScaffoldInput): ScaffoldOutput {
     const appAbsoluteDir = join(workspaceRoot, detected.nextAppDir);
     const harnessAbsoluteDir = join(appAbsoluteDir, HARNESS_DIR);
 
+    const previewRuntime = prepare_next_preview_runtime(workspaceRoot, appAbsoluteDir);
     const probeFile = join(harnessAbsoluteDir, "targets", `${PROBE_TARGET_ID}.tsx`);
-    const routeFiles: string[] = [];
+    const routeFiles: string[] = [...previewRuntime.generatedFiles];
     if (!existsSync(probeFile)) {
         write_file(probeFile, PROBE_TARGET_SOURCE);
         routeFiles.push(to_posix(relative(workspaceRoot, probeFile)));

@@ -317,6 +317,11 @@ export default function ActivityFeed({
               : commentsPageError
                 ? "Older comments failed to load."
                 : "";
+    const loadOlder = capped
+        ? continueHistory
+        : nextAutomaticStream
+          ? () => void loadStream(nextAutomaticStream)
+          : null;
     const liveStatus = initialLoading
         ? "Loading issue timeline."
         : initialError
@@ -371,13 +376,9 @@ export default function ActivityFeed({
                 </div>
             ) : (
                 <>
-                    <div className="flex min-h-8 items-center gap-2 text-[12px] text-neutral-500">
+                    <div className="flex items-center gap-2 text-[12px] text-neutral-500 empty:hidden">
                         {fetchingOlder ? (
-                            <span>
-                                {fetchingActivity
-                                    ? "Loading older activity..."
-                                    : "Loading older comments..."}
-                            </span>
+                            <LogoLoader size={18} className="py-1.5" />
                         ) : pageErrorLabel ? (
                             <>
                                 <span>{pageErrorLabel}</span>
@@ -400,19 +401,9 @@ export default function ActivityFeed({
                                     </Button>
                                 )}
                             </>
-                        ) : capped ? (
-                            <Button type="button" variant="tertiary" onClick={continueHistory}>
-                                Continue loading older history
-                            </Button>
-                        ) : historyExhausted ? (
-                            <span className="text-[11px] text-neutral-600">Start of history</span>
-                        ) : nextAutomaticStream ? (
-                            <Button
-                                type="button"
-                                variant="tertiary"
-                                onClick={() => void loadStream(nextAutomaticStream)}
-                            >
-                                Load older history
+                        ) : loadOlder ? (
+                            <Button type="button" variant="tertiary" onClick={loadOlder}>
+                                Load older
                             </Button>
                         ) : null}
                     </div>

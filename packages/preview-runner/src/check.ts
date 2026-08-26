@@ -15,6 +15,28 @@ import { read_harness_manifest } from "./scaffold";
 const CHECK_VIEWPORT = { width: 1280, height: 800 };
 const MAX_DETAIL = 2000;
 const DETERMINISM = { frozenNowMs: 1_750_000_000_000, randomSeed: 1 };
+const NEXT_ERROR_OVERLAY_SELECTOR = [
+    "[data-nextjs-dialog-overlay]:has([data-nextjs-error-overlay-nav])",
+    "[data-nextjs-dialog-overlay]:has([data-nextjs-error-code])",
+    "[data-nextjs-dialog-overlay]:has([data-nextjs-error-label-group])",
+    "nextjs-container-errors",
+].join(", ");
+
+export interface BrowserCheckRuntime {
+    open_browser(): Promise<Browser>;
+    open_deterministic_context(
+        browser: Browser,
+        viewport: { width: number; height: number },
+        options: { frozenNowMs: number; randomSeed: number },
+    ): ReturnType<typeof open_deterministic_context>;
+    settle_page(page: Parameters<typeof settle_page>[0], settleMs: number): Promise<void>;
+}
+
+const browser_check_runtime: BrowserCheckRuntime = {
+    open_browser,
+    open_deterministic_context,
+    settle_page,
+};
 
 function fail(
     targetId: string,
@@ -35,10 +57,10 @@ function fail(
     };
 }
 
-export async function next_error_overlay_detail(
-    portal: Pick<Locator, "evaluate">,
-): Promise<string> {
-    return portal
+export async function next_error_overlay_detail(portal: Pick<Locator, "locator">): Promise<string> {
+    const overlay = portal.locator(NEXT_ERROR_OVERLAY_SELECTOR);
+    if ((await overlay.count()) === 0) return "";
+    return overlay
         .evaluate((element) => {
             const text: string[] = [];
             const collect = (root: Node) => {
@@ -84,6 +106,7 @@ function expected_navigation(url: string, finalUrl: string): boolean {
 }
 
 async function check_one(
+    runtime: BrowserCheckRuntime,
     browser: Browser,
     baseUrl: string,
     routePath: string,
@@ -92,7 +115,7 @@ async function check_one(
     navigationTimeoutMs: number,
 ): Promise<CheckResult> {
     const url = preview_url(baseUrl, routePath, targetId, stateId);
-    const context = await open_deterministic_context(browser, CHECK_VIEWPORT, DETERMINISM);
+    const context = await runtime.open_deterministic_context(browser, CHECK_VIEWPORT, DETERMINISM);
     const page = await context.newPage();
     const pageErrors: string[] = [];
     const consoleErrors: string[] = [];
@@ -141,7 +164,7 @@ async function check_one(
             );
         }
 
-        await settle_page(page, 150);
+        await runtime.settle_page(page, 150);
 
         if (!expected_navigation(url, page.url())) {
             return fail(
@@ -230,17 +253,21 @@ async function check_one(
  * await check({ baseUrl: "http://127.0.0.1:41337", workspaceRoot, nextAppDir: "apps/web", navigationTimeoutMs: 45000 });
  * // { ok: false, results: [{ targetId: "header-nav", problem: "PageError", detail: "TypeError: ..." }] }
  */
-export async function check(input: CheckInput): Promise<CheckOutput> {
+export async function check(
+    input: CheckInput,
+    runtime: BrowserCheckRuntime = browser_check_runtime,
+): Promise<CheckOutput> {
     const manifest = read_harness_manifest(join(input.workspaceRoot, input.nextAppDir));
     const wanted = input.targetIds;
     const targets = manifest.targets.filter((target) => !wanted || wanted.includes(target.id));
 
-    const browser = await open_browser();
+    const browser = await runtime.open_browser();
     const results: CheckResult[] = [];
 
     try {
         results.push(
             await check_one(
+                runtime,
                 browser,
                 input.baseUrl,
                 input.routePath,
@@ -253,6 +280,7 @@ export async function check(input: CheckInput): Promise<CheckOutput> {
             for (const state of target.states) {
                 results.push(
                     await check_one(
+                        runtime,
                         browser,
                         input.baseUrl,
                         input.routePath,

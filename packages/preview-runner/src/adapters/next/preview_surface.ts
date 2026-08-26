@@ -1,5 +1,5 @@
 import { existsSync, mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
-import { dirname, extname, join, relative, resolve } from "node:path";
+import { basename, dirname, extname, join, relative, resolve } from "node:path";
 
 import {
     SAFE_ID,
@@ -122,10 +122,40 @@ function restore_root_layout_isolation(restore: RootLayoutRestore): void {
     rmSync(dirname(restore.backupPath), { recursive: true, force: true });
 }
 
-function app_route_source(routeDirectory: string, registryFile: string): string {
-    const registry = import_specifier(routeDirectory, registryFile);
+function generated_route_root(surface: PreviewSurface): string | null {
+    const routeSegment = surface.routePath.slice(1);
+    for (const file of surface.generatedFiles) {
+        if (surface.router === "AppRouter") {
+            const targetDirectory = dirname(file);
+            const surfaceDirectory = dirname(targetDirectory);
+            if (
+                basename(file) === "page.tsx" &&
+                basename(targetDirectory) === "[targetId]" &&
+                basename(surfaceDirectory) === routeSegment
+            ) {
+                return surfaceDirectory;
+            }
+            continue;
+        }
 
-    return `import { TARGETS } from "${registry}";
+        const surfaceDirectory = dirname(file);
+        if (basename(file) === "[targetId].tsx" && basename(surfaceDirectory) === routeSegment) {
+            return surfaceDirectory;
+        }
+    }
+    return null;
+}
+
+function app_route_source(
+    routeDirectory: string,
+    registryFile: string,
+    runtimeFile: string,
+): string {
+    const registry = import_specifier(routeDirectory, registryFile);
+    const runtime = import_specifier(routeDirectory, runtimeFile);
+
+    return `import MatchaPreviewRuntime from "${runtime}";
+import { TARGETS } from "${registry}";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -151,17 +181,23 @@ export default async function MatchaPreviewPage({
 
     return (
         <div data-matcha-harness-root style={{ width: "100%", background: "#fff" }}>
-            <Component state={stateId} />
+            <MatchaPreviewRuntime><Component state={stateId} /></MatchaPreviewRuntime>
         </div>
     );
 }
 `;
 }
 
-function pages_route_source(routeDirectory: string, registryFile: string): string {
+function pages_route_source(
+    routeDirectory: string,
+    registryFile: string,
+    runtimeFile: string,
+): string {
     const registry = import_specifier(routeDirectory, registryFile);
+    const runtime = import_specifier(routeDirectory, runtimeFile);
 
-    return `import { TARGETS } from "${registry}";
+    return `import MatchaPreviewRuntime from "${runtime}";
+import { TARGETS } from "${registry}";
 
 export function getServerSideProps(context: {
     params?: { targetId?: string };
@@ -183,7 +219,7 @@ export default function MatchaPreviewPage({ targetId, state }: { targetId: strin
 
     return (
         <div data-matcha-harness-root style={{ width: "100%", background: "#fff" }}>
-            <Component state={stateId} />
+            <MatchaPreviewRuntime><Component state={stateId} /></MatchaPreviewRuntime>
         </div>
     );
 }
@@ -210,6 +246,10 @@ export function create_next_preview_surface(
     if (!existsSync(registryFile)) {
         throw new Error("preview harness registry was not found");
     }
+    const runtimeFile = join(applicationDirectory, "matcha_preview", "PreviewRuntime.tsx");
+    if (!existsSync(runtimeFile)) {
+        throw new Error("preview runtime bootstrap was not found");
+    }
     if (rootLayoutMode === "isolate" && input.router !== "AppRouter") {
         throw new Error("Pages Router does not support root layout isolation");
     }
@@ -233,8 +273,8 @@ export function create_next_preview_surface(
         writeFileSync(
             pageFile,
             input.router === "AppRouter"
-                ? app_route_source(routeDirectory, registryFile)
-                : pages_route_source(routeDirectory, registryFile),
+                ? app_route_source(routeDirectory, registryFile, runtimeFile)
+                : pages_route_source(routeDirectory, registryFile, runtimeFile),
             "utf8",
         );
     } catch (error) {
@@ -256,10 +296,18 @@ export function remove_next_preview_surface(
     surface: PreviewSurface,
     removeFile: (path: string) => void = (path) => rmSync(path, { force: true }),
 ): void {
-    for (const file of [...new Set(surface.generatedFiles)].sort(
-        (left, right) => right.split(/[\\/]/).length - left.split(/[\\/]/).length,
-    )) {
-        removeFile(file);
+    try {
+        const routeRoot = generated_route_root(surface);
+        if (routeRoot) {
+            rmSync(routeRoot, { recursive: true, force: true });
+            return;
+        }
+        for (const file of [...new Set(surface.generatedFiles)].sort(
+            (left, right) => right.split(/[\\/]/).length - left.split(/[\\/]/).length,
+        )) {
+            removeFile(file);
+        }
+    } finally {
+        if (surface.rootLayoutRestore) restore_root_layout_isolation(surface.rootLayoutRestore);
     }
-    if (surface.rootLayoutRestore) restore_root_layout_isolation(surface.rootLayoutRestore);
 }

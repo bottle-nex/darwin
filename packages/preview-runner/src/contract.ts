@@ -65,6 +65,13 @@ export const nextApplicationCandidateSchema = z.object({
     packageName: z.string().min(1).nullable(),
     router: nextApplicationRouterSchema,
     hasPagesDirectory: z.boolean(),
+    nxTargets: z
+        .object({
+            build: z.string().min(1),
+            serve: z.string().min(1),
+        })
+        .strict()
+        .optional(),
 });
 export type NextApplicationCandidate = z.infer<typeof nextApplicationCandidateSchema>;
 
@@ -95,6 +102,169 @@ export const viewportSchema = z.object({
     height: z.number().int().min(240).max(3840),
 });
 export type Viewport = z.infer<typeof viewportSchema>;
+
+const replayViewportSchema = viewportSchema.strict();
+
+const boundedReplayString = z.string().min(1).max(300);
+const replayRelativePathSchema = boundedReplayString.refine(
+    (value) => !value.includes("..") && !value.startsWith("/"),
+    "must not escape the application directory",
+);
+const replayRoutePathSchema = boundedReplayString.refine(
+    (value) => value.startsWith("/") && !value.includes(".."),
+    "must be an application route path",
+);
+
+export const replaySelectorSchema = z
+    .object({
+        testId: boundedReplayString.optional(),
+        role: boundedReplayString.optional(),
+        name: boundedReplayString.optional(),
+        label: boundedReplayString.optional(),
+    })
+    .strict()
+    .refine(
+        (selector) =>
+            selector.testId !== undefined ||
+            selector.role !== undefined ||
+            selector.name !== undefined ||
+            selector.label !== undefined,
+        "must include a semantic selector",
+    );
+export type ReplaySelector = z.infer<typeof replaySelectorSchema>;
+
+const replayActionBaseSchema = z.object({ selector: replaySelectorSchema }).strict();
+export const replayActionSchema = z.discriminatedUnion("kind", [
+    replayActionBaseSchema.extend({ kind: z.literal("click") }),
+    replayActionBaseSchema.extend({ kind: z.literal("fill"), value: boundedReplayString }),
+    replayActionBaseSchema.extend({ kind: z.literal("select"), value: boundedReplayString }),
+    replayActionBaseSchema.extend({ kind: z.literal("check"), checked: z.boolean().optional() }),
+    replayActionBaseSchema.extend({ kind: z.literal("waitFor") }),
+]);
+export type ReplayAction = z.infer<typeof replayActionSchema>;
+
+export const replayScenarioSchema = z
+    .object({
+        id: z.string().regex(SAFE_ID),
+        label: boundedReplayString,
+        actions: z.array(replayActionSchema).max(12),
+    })
+    .strict();
+export type ReplayScenario = z.infer<typeof replayScenarioSchema>;
+
+export const replayEntrySchema = z.discriminatedUnion("kind", [
+    z.object({ kind: z.literal("route"), path: replayRoutePathSchema }).strict(),
+    z.object({ kind: z.literal("component"), targetId: z.string().regex(SAFE_ID) }).strict(),
+]);
+export type ReplayEntry = z.infer<typeof replayEntrySchema>;
+
+export const replayApplicationSchema = z
+    .object({
+        id: z.string().regex(SAFE_ID),
+        applicationPath: replayRelativePathSchema,
+        adapterId: boundedReplayString.optional(),
+    })
+    .strict();
+export type ReplayApplication = z.infer<typeof replayApplicationSchema>;
+
+export const replaySurfaceSchema = z
+    .object({
+        id: z.string().regex(SAFE_ID),
+        applicationId: z.string().regex(SAFE_ID),
+        label: boundedReplayString,
+        sourcePaths: z.array(replayRelativePathSchema).min(1).max(12),
+        entry: replayEntrySchema,
+        rootLayoutMode: rootLayoutModeSchema,
+        states: z
+            .array(
+                z
+                    .object({
+                        id: z.string().regex(SAFE_ID),
+                        label: boundedReplayString,
+                        scenarios: z.array(replayScenarioSchema).max(12),
+                    })
+                    .strict(),
+            )
+            .min(1)
+            .max(6),
+        viewports: z.array(replayViewportSchema).min(1).max(4),
+    })
+    .strict();
+export type ReplaySurface = z.infer<typeof replaySurfaceSchema>;
+
+export const replayReviewPlanSchema = z
+    .object({
+        applications: z.array(replayApplicationSchema).min(1).max(12),
+        surfaces: z.array(replaySurfaceSchema).min(1).max(12),
+    })
+    .strict()
+    .superRefine((plan, context) => {
+        const addDuplicateIssues = (
+            ids: string[],
+            issuePath: (index: number) => Array<string | number>,
+            message: string,
+        ) => {
+            const seen = new Set<string>();
+            for (const [index, id] of ids.entries()) {
+                if (seen.has(id)) {
+                    context.addIssue({ code: "custom", path: issuePath(index), message });
+                }
+                seen.add(id);
+            }
+        };
+        addDuplicateIssues(
+            plan.applications.map((application) => application.id),
+            (index) => ["applications", index, "id"],
+            "must be unique within the review plan",
+        );
+        const applicationIds = new Set(plan.applications.map((application) => application.id));
+        const surfaceIdsByApplication = new Map<string, Set<string>>();
+        for (const [index, surface] of plan.surfaces.entries()) {
+            if (!applicationIds.has(surface.applicationId)) {
+                context.addIssue({
+                    code: "custom",
+                    path: ["surfaces", index, "applicationId"],
+                    message: "must reference a declared application",
+                });
+            }
+            const surfaceIds = surfaceIdsByApplication.get(surface.applicationId) ?? new Set();
+            if (surfaceIds.has(surface.id)) {
+                context.addIssue({
+                    code: "custom",
+                    path: ["surfaces", index, "id"],
+                    message: "must be unique within the application",
+                });
+            }
+            surfaceIds.add(surface.id);
+            surfaceIdsByApplication.set(surface.applicationId, surfaceIds);
+            addDuplicateIssues(
+                surface.states.map((state) => state.id),
+                (stateIndex) => ["surfaces", index, "states", stateIndex, "id"],
+                "must be unique within the surface",
+            );
+            addDuplicateIssues(
+                surface.viewports.map((viewport) => viewport.id),
+                (viewportIndex) => ["surfaces", index, "viewports", viewportIndex, "id"],
+                "must be unique within the surface",
+            );
+            for (const [stateIndex, state] of surface.states.entries()) {
+                addDuplicateIssues(
+                    state.scenarios.map((scenario) => scenario.id),
+                    (scenarioIndex) => [
+                        "surfaces",
+                        index,
+                        "states",
+                        stateIndex,
+                        "scenarios",
+                        scenarioIndex,
+                        "id",
+                    ],
+                    "must be unique within the state",
+                );
+            }
+        }
+    });
+export type ReplayReviewPlan = z.infer<typeof replayReviewPlanSchema>;
 
 export const harnessManifestSchema = z.object({
     targets: z
@@ -277,6 +447,7 @@ export const doctorOutputSchema = z.object({
     ok: z.boolean(),
     chromiumVersion: z.string().nullable(),
     chromiumPath: z.string().nullable(),
+    replayCommandAvailable: z.boolean(),
     error: z.string().nullable(),
 });
 export type DoctorOutput = z.infer<typeof doctorOutputSchema>;

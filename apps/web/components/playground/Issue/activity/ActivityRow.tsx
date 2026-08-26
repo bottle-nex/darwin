@@ -77,7 +77,7 @@ export function ActorAvatar({
     );
 }
 
-const RAIL_CLASS = "absolute left-[10.5px] w-px bg-edge";
+const RAIL_CLASS = "absolute left-[10.5px] w-[0.5px] bg-snow/28";
 
 const ACTOR_NAME_CLASS =
     "font-medium text-snow/60 hover:text-snow transition-colors transform duration-200";

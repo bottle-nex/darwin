@@ -1,0 +1,78 @@
+{
+    "applications": [
+        {
+            "id": "web",
+            "applicationPath": "apps/web",
+            "adapterId": "next"
+        },
+        {
+            "id": "admin",
+            "applicationPath": "apps/admin",
+            "adapterId": "next"
+        }
+    ],
+    "surfaces": [
+        {
+            "id": "web-route",
+            "applicationId": "web",
+            "label": "Web route",
+            "sourcePaths": ["app/replay/page.tsx"],
+            "entry": { "kind": "route", "path": "/replay" },
+            "rootLayoutMode": "inherit",
+            "states": [
+                {
+                    "id": "default",
+                    "label": "Default",
+                    "scenarios": [
+                        {
+                            "id": "activate-web",
+                            "label": "Activate web",
+                            "actions": [
+                                {
+                                    "kind": "click",
+                                    "selector": { "role": "button", "name": "Activate web" }
+                                },
+                                {
+                                    "kind": "waitFor",
+                                    "selector": { "testId": "web-changed" }
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ],
+            "viewports": [{ "id": "desktop", "label": "Desktop", "width": 1280, "height": 800 }]
+        },
+        {
+            "id": "admin-route",
+            "applicationId": "admin",
+            "label": "Admin route",
+            "sourcePaths": ["app/replay/page.tsx"],
+            "entry": { "kind": "route", "path": "/replay" },
+            "rootLayoutMode": "inherit",
+            "states": [
+                {
+                    "id": "default",
+                    "label": "Default",
+                    "scenarios": [
+                        {
+                            "id": "activate-admin",
+                            "label": "Activate admin",
+                            "actions": [
+                                {
+                                    "kind": "click",
+                                    "selector": { "role": "button", "name": "Activate admin" }
+                                },
+                                {
+                                    "kind": "waitFor",
+                                    "selector": { "testId": "admin-changed" }
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ],
+            "viewports": [{ "id": "desktop", "label": "Desktop", "width": 1280, "height": 800 }]
+        }
+    ]
+}

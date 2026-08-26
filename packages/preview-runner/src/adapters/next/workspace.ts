@@ -73,6 +73,31 @@ function package_directories(root: string): string[] {
     return found.sort((left, right) => left.localeCompare(right));
 }
 
+function project_directories(root: string): string[] {
+    const found: string[] = [];
+    const visit = (directory: string) => {
+        if (existsSync(join(directory, "project.json"))) {
+            found.push(relative(root, directory).split(sep).join("/") || ".");
+        }
+
+        let entries: string[];
+        try {
+            entries = readdirSync(directory);
+        } catch {
+            return;
+        }
+
+        for (const entry of entries) {
+            if (IGNORED_DIRECTORIES.has(entry)) continue;
+            const child = join(directory, entry);
+            if (is_directory(child)) visit(child);
+        }
+    };
+
+    visit(root);
+    return found.sort((left, right) => left.localeCompare(right));
+}
+
 function next_dependency(manifest: Record<string, unknown>): boolean {
     return ["dependencies", "devDependencies"].some((field) => {
         const dependencies = manifest[field];
@@ -83,6 +108,47 @@ function next_dependency(manifest: Record<string, unknown>): boolean {
             typeof (dependencies as Record<string, unknown>).next === "string"
         );
     });
+}
+
+function record(value: unknown): Record<string, unknown> | null {
+    return value !== null && typeof value === "object" ? (value as Record<string, unknown>) : null;
+}
+
+function nx_next_targets(manifest: Record<string, unknown>): {
+    projectName: string;
+    build: string;
+    serve: string;
+} | null {
+    const projectName = typeof manifest.name === "string" ? manifest.name : null;
+    const targets = record(manifest.targets);
+    if (!projectName || !targets) return null;
+
+    const buildEntry = Object.entries(targets).find(([, value]) => {
+        const target = record(value);
+        return target?.executor === "@nx/next:build";
+    });
+    const serveEntry = Object.entries(targets).find(([, value]) => {
+        const target = record(value);
+        return target?.executor === "@nx/next:server";
+    });
+    if (!buildEntry || !serveEntry) return null;
+
+    const serveTarget = record(serveEntry[1]);
+    const configurations = record(serveTarget?.configurations);
+    const production = record(configurations?.production);
+    const productionBuildTarget =
+        typeof production?.buildTarget === "string"
+            ? production.buildTarget
+            : `${projectName}:${buildEntry[0]}:production`;
+    const productionServeTarget = configurations?.production
+        ? `${projectName}:${serveEntry[0]}:production`
+        : `${projectName}:${serveEntry[0]}`;
+
+    return {
+        projectName,
+        build: productionBuildTarget,
+        serve: productionServeTarget,
+    };
 }
 
 function application_path(packageDirectory: string, candidate: string): string {
@@ -174,7 +240,7 @@ export function inspect_next_workspace(
         };
     }
 
-    const applications = package_directories(workspaceRoot)
+    const packageApplications = package_directories(workspaceRoot)
         .map((packageDirectory) => {
             const manifest = read_package_manifest(
                 join(
@@ -192,6 +258,49 @@ export function inspect_next_workspace(
             } satisfies NextApplicationCandidate;
         })
         .filter((application): application is NextApplicationCandidate => application !== null);
+    const nxApplications = project_directories(workspaceRoot).flatMap(
+        (projectDirectory): NextApplicationCandidate[] => {
+            const manifest = read_package_manifest(
+                join(
+                    workspaceRoot,
+                    projectDirectory === "." ? "project.json" : `${projectDirectory}/project.json`,
+                ),
+            );
+            const router = manifest ? application_router(workspaceRoot, projectDirectory) : null;
+            const nxTargets = manifest ? nx_next_targets(manifest) : null;
+            if (!manifest || !router || !nxTargets) return [];
+            return [
+                {
+                    applicationPath: projectDirectory,
+                    packageName: nxTargets.projectName,
+                    router: router.router,
+                    hasPagesDirectory: router.hasPagesDirectory,
+                    nxTargets: { build: nxTargets.build, serve: nxTargets.serve },
+                },
+            ];
+        },
+    );
+    const nxApplicationsByPath = new Map(
+        nxApplications.map((application) => [application.applicationPath, application]),
+    );
+    const packageApplicationPaths = new Set(
+        packageApplications.map((application) => application.applicationPath),
+    );
+    const applications = [
+        ...packageApplications.map((application) => {
+            const nxApplication = nxApplicationsByPath.get(application.applicationPath);
+            return nxApplication
+                ? {
+                      ...application,
+                      packageName: nxApplication.packageName,
+                      nxTargets: nxApplication.nxTargets,
+                  }
+                : application;
+        }),
+        ...nxApplications.filter(
+            (application) => !packageApplicationPaths.has(application.applicationPath),
+        ),
+    ].sort((left, right) => left.applicationPath.localeCompare(right.applicationPath));
 
     return {
         workspaceKind: workspace_kind(workspaceRoot),

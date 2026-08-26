@@ -75,7 +75,7 @@ export default function CustomKanbanColumn({ column, draggable = true }: CustomK
             ref={setNodeRef}
             style={style}
             className={cn(
-                "group flex max-h-full min-h-0 w-84 shrink-0 flex-col rounded-lg bg-ink/20 p-2 ring-1 ring-snow/3 transition-colors",
+                "group flex max-h-full min-h-0 w-84 shrink-0 flex-col rounded-lg bg-ink/20 p-2 ring-[0.5px] ring-snow/3 transition-colors",
                 isDragging && "opacity-40",
             )}
         >

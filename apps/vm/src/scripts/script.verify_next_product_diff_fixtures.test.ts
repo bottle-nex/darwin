@@ -51,4 +51,99 @@ test("verifies generated launch plans and categorizes the real missing provider 
         expect.objectContaining({ name: "next-turborepo", ready: true }),
         expect.objectContaining({ name: "next-nx", ready: true }),
     ]);
-}, 120_000);
+
+    expect(verified.replay[0]).toEqual({
+        name: "next-replay-standalone",
+        workspaceKind: "Standalone",
+        productionBuild: true,
+        productionStart: true,
+        interactionChangedDom: true,
+        animationPresent: true,
+        unexpectedRequests: [],
+        credentialedRequestMetadata: false,
+        workspacePackages: ["@matcha-fixture/next-replay-standalone"],
+        layoutModes: ["inherit"],
+        localWasm: false,
+        wasmInitialized: false,
+    });
+    expect(verified.replay[1]).toEqual({
+        name: "next-replay-turborepo",
+        workspaceKind: "Turborepo",
+        productionBuild: true,
+        productionStart: true,
+        interactionChangedDom: true,
+        animationPresent: true,
+        unexpectedRequests: [],
+        credentialedRequestMetadata: false,
+        workspacePackages: [
+            "@matcha-fixture/next-replay-turborepo",
+            "@matcha-fixture/replay-marketing",
+            "@matcha-fixture/replay-ui",
+        ],
+        layoutModes: ["inherit"],
+        localWasm: false,
+        wasmInitialized: false,
+    });
+    expect(verified.replay[2]).toEqual({
+        name: "next-replay-nx",
+        workspaceKind: "Nx",
+        productionBuild: true,
+        productionStart: true,
+        interactionChangedDom: true,
+        animationPresent: true,
+        unexpectedRequests: [],
+        credentialedRequestMetadata: false,
+        workspacePackages: ["@matcha-fixture/next-replay-nx"],
+        layoutModes: ["inherit"],
+        localWasm: false,
+        wasmInitialized: false,
+    });
+    expect(verified.replay[3]).toEqual({
+        name: "next-replay-provider-isolation",
+        workspaceKind: "Standalone",
+        productionBuild: true,
+        productionStart: true,
+        interactionChangedDom: true,
+        animationPresent: true,
+        unexpectedRequests: [],
+        credentialedRequestMetadata: false,
+        workspacePackages: ["@matcha-fixture/next-replay-provider-isolation"],
+        layoutModes: ["inherit", "isolate"],
+        localWasm: false,
+        wasmInitialized: false,
+    });
+    expect(verified.replay[4]).toEqual({
+        name: "next-replay-rive",
+        workspaceKind: "Turborepo",
+        productionBuild: true,
+        productionStart: true,
+        interactionChangedDom: true,
+        animationPresent: true,
+        unexpectedRequests: [],
+        credentialedRequestMetadata: false,
+        workspacePackages: ["@matcha-fixture/next-replay-rive", "@matcha-fixture/replay-rive-app"],
+        layoutModes: ["inherit"],
+        localWasm: true,
+        wasmInitialized: true,
+    });
+    expect(verified.runtime).toEqual({
+        protocolVersion: 11,
+        chromiumAvailable: true,
+        replayCommandAvailable: true,
+    });
+    expect(verified.multiApplicationReplay).toEqual({
+        name: "next-replay-multi-app",
+        applicationPaths: ["apps/admin", "apps/web"],
+        buildCommands: ["bun run --cwd apps/admin build", "bun run --cwd apps/web build"],
+        startCommands: [
+            "bun run --cwd apps/admin next start --hostname 127.0.0.1 --port 41439",
+            "bun run --cwd apps/web next start --hostname 127.0.0.1 --port 41439",
+        ],
+        revisionCoordinates: [
+            "head:web:web-route",
+            "head:admin:admin-route",
+            "base:web:web-route",
+            "base:admin:admin-route",
+        ],
+    });
+}, 600_000);

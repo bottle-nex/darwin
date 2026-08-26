@@ -30,6 +30,17 @@ const application_path_schema = z.string().min(1).max(240).refine(valid_applicat
 const launch_command_schema = z.string().trim().min(1).max(500).refine(valid_launch_command);
 const health_path_schema = z.string().max(240).regex(SAFE_HEALTH_PATH);
 const root_layout_mode_schema = z.enum(["inherit", "isolate"]);
+const replay_data_path_schema = z
+    .string()
+    .min(2)
+    .max(240)
+    .regex(/^\/(?!\*)(?:[A-Za-z0-9._~-]+\/)*(?:[A-Za-z0-9._~-]+|\*)$/)
+    .refine((path) => !path.includes("?") && !path.includes("#"));
+const replay_data_policy_schema = z
+    .object({
+        sameOriginJsonPaths: z.array(replay_data_path_schema).min(1).max(20),
+    })
+    .strict();
 
 export const product_diff_preview_config_schema = z
     .object({
@@ -37,6 +48,7 @@ export const product_diff_preview_config_schema = z
         launchCommand: launch_command_schema.optional(),
         healthPath: health_path_schema.optional(),
         rootLayoutMode: root_layout_mode_schema.optional(),
+        replayDataPolicy: replay_data_policy_schema.optional(),
     })
     .strict()
     .refine((configuration) => Object.keys(configuration).length > 0);
@@ -50,11 +62,13 @@ export function read_product_diff_preview_config(
     const launch_command = launch_command_schema.safeParse(source.launchCommand);
     const health_path = health_path_schema.safeParse(source.healthPath);
     const root_layout_mode = root_layout_mode_schema.safeParse(source.rootLayoutMode);
+    const replay_data_policy = replay_data_policy_schema.safeParse(source.replayDataPolicy);
     const configuration = {
         ...(application_path.success && { applicationPath: application_path.data }),
         ...(launch_command.success && { launchCommand: launch_command.data }),
         ...(health_path.success && { healthPath: health_path.data }),
         ...(root_layout_mode.success && { rootLayoutMode: root_layout_mode.data }),
+        ...(replay_data_policy.success && { replayDataPolicy: replay_data_policy.data }),
     };
     return Object.keys(configuration).length > 0 ? configuration : null;
 }

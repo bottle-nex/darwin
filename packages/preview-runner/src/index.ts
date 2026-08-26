@@ -17,13 +17,14 @@ import {
 import { detect } from "./detect";
 import { scaffold } from "./scaffold";
 import { pair } from "./pair";
+import { replayCaptureInputSchema, runReplayCapture } from "./replay/replay_runner";
 import { inspect_next_workspace } from "./adapters/next/workspace";
 import {
     create_next_preview_surface,
     remove_next_preview_surface,
 } from "./adapters/next/preview_surface";
 
-const RUNTIME_PROTOCOL_VERSION = 7;
+const RUNTIME_PROTOCOL_VERSION = 11;
 const COMMANDS = [
     "detect",
     "inspect-next-workspace",
@@ -33,6 +34,7 @@ const COMMANDS = [
     "check",
     "capture",
     "pair",
+    "replay-capture",
     "doctor",
     "version",
 ] as const;
@@ -71,6 +73,7 @@ async function doctor(): Promise<DoctorOutput> {
             ok: true,
             chromiumVersion: version,
             chromiumPath: executablePath,
+            replayCommandAvailable: COMMANDS.includes("replay-capture"),
             error: null,
         };
     } catch (error) {
@@ -78,6 +81,7 @@ async function doctor(): Promise<DoctorOutput> {
             ok: false,
             chromiumVersion: null,
             chromiumPath: null,
+            replayCommandAvailable: false,
             error: error instanceof Error ? error.message : String(error),
         };
     }
@@ -106,6 +110,19 @@ async function run(command: Command, input: unknown): Promise<unknown> {
             return capture(captureInputSchema.parse(input));
         case "pair":
             return pair(pairInputSchema.parse(input));
+        case "replay-capture":
+            return runReplayCapture(replayCaptureInputSchema.parse(input)).then((result) => ({
+                artifactKey: result.artifactKey,
+                fidelity: result.fidelity,
+                diagnostics: result.diagnostics
+                    .slice(0, 20)
+                    .map((diagnostic) => diagnostic.slice(0, 300)),
+                resourceCount: result.resourceCount,
+                packageBytes: result.packageBytes,
+                captureDurationMs: result.captureDurationMs,
+                validationOutcome: result.validationOutcome,
+                evidence: result.evidence,
+            }));
         case "doctor":
             return doctor();
         case "version":

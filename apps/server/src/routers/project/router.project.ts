@@ -15,6 +15,7 @@ import get_project_controller from "../../controllers/project/controller.get_pro
 import get_project_config_controller from "../../controllers/project/controller.get_project_config";
 import get_review_controller from "../../controllers/project/controller.get_review";
 import get_review_file_controller from "../../controllers/project/controller.get_review_file";
+import launch_product_diff_replay_controller from "../../controllers/project/controller.launch_product_diff_replay";
 import list_members_controller from "../../controllers/project/controller.list_members";
 import list_presence_controller from "../../controllers/project/controller.list_presence";
 import list_product_diffs_controller from "../../controllers/project/controller.list_product_diffs";
@@ -56,6 +57,11 @@ project_router.post(
     "/:project_id/product-diffs/:product_diff_id/artifact-urls",
     require_auth,
     product_diff_artifact_urls_controller,
+);
+project_router.post(
+    "/:project_id/product-diffs/:product_diff_id/replay",
+    require_auth,
+    launch_product_diff_replay_controller,
 );
 project_router.post(
     "/:project_id/product-diffs/:issue_id/regenerate",

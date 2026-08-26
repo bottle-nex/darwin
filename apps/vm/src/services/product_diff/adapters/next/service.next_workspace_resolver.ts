@@ -186,6 +186,7 @@ export function resolve_next_workspace(
         router: application.router,
         framework: application.router === "AppRouter" ? "NextAppRouter" : "NextPagesRouter",
         rootLayoutMode: configuration?.rootLayoutMode ?? null,
+        ...(application.nxTargets && { nxTargets: application.nxTargets }),
         dependency: {
             packageManager: inspection.packageManager,
             lockfileRelPath: "",
@@ -193,4 +194,42 @@ export function resolve_next_workspace(
             workspaceDirs: [],
         },
     };
+}
+
+export function resolve_next_workspaces(
+    inspection: NextWorkspaceInspection,
+    changedPaths: string[],
+    configuration: ProductDiffPreviewConfiguration | null,
+): { plans: ProductDiffWorkspacePlan[]; diagnostics: ProductDiffDiagnostic[] } {
+    const configuredPath = configuration?.applicationPath
+        ? normalized_path(configuration.applicationPath)
+        : null;
+    const applicationPaths = configuredPath
+        ? [configuredPath]
+        : inspection.changedApplicationPaths.length > 0
+          ? [...inspection.changedApplicationPaths].sort((left, right) => left.localeCompare(right))
+          : inspection.applications.length === 1
+            ? [inspection.applications[0]!.applicationPath]
+            : [];
+
+    if (applicationPaths.length === 0) {
+        const unresolved = resolve_next_workspace(inspection, changedPaths, configuration);
+        return {
+            plans: [],
+            diagnostics: "code" in unresolved ? [unresolved] : [],
+        };
+    }
+
+    const plans: ProductDiffWorkspacePlan[] = [];
+    const diagnostics: ProductDiffDiagnostic[] = [];
+    for (const applicationPath of applicationPaths) {
+        const resolved = resolve_next_workspace(inspection, changedPaths, {
+            ...(configuration ?? {}),
+            applicationPath,
+            ...(configuredPath ? {} : { launchCommand: undefined }),
+        });
+        if ("code" in resolved) diagnostics.push(resolved);
+        else plans.push(resolved);
+    }
+    return { plans, diagnostics };
 }

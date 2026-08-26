@@ -1,0 +1,15 @@
+body {
+    margin: 0;
+    font-family: sans-serif;
+}
+
+.provider-card {
+    animation: provider-card 1.75s ease-in-out infinite alternate;
+    margin: 4rem;
+}
+
+@keyframes provider-card {
+    to {
+        opacity: 0.72;
+    }
+}

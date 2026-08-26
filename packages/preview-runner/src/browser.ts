@@ -32,6 +32,11 @@ export interface DeterminismOptions {
     randomSeed: number;
 }
 
+export interface ReplayBrowserOptions {
+    viewport?: { width: number; height: number };
+    serviceWorkers?: "allow" | "block";
+}
+
 function determinism_script(options: DeterminismOptions): string {
     return `(() => {
     const FIXED = ${options.frozenNowMs};
@@ -127,6 +132,20 @@ export async function open_deterministic_context(
     });
 
     return context;
+}
+
+export async function open_replay_context(
+    browser: Browser,
+    options: ReplayBrowserOptions = {},
+): Promise<BrowserContext> {
+    return browser.newContext({
+        viewport: options.viewport,
+        isMobile: false,
+        hasTouch: false,
+        colorScheme: "light",
+        javaScriptEnabled: true,
+        serviceWorkers: options.serviceWorkers,
+    });
 }
 
 /**

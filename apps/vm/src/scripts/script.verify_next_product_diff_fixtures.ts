@@ -14,10 +14,24 @@ import { fileURLToPath } from "node:url";
 
 import type { ProductDiffDiagnostic } from "@trymatcha/types";
 
+import {
+    create_next_preview_surface,
+    remove_next_preview_surface,
+} from "../../../../packages/preview-runner/src/adapters/next/preview_surface";
 import { inspect_next_workspace } from "../../../../packages/preview-runner/src/adapters/next/workspace";
+import {
+    replayReviewPlanSchema,
+    type ReplayScenario,
+    type ReplaySurface,
+} from "../../../../packages/preview-runner/src/contract";
+import { runReplayCapture } from "../../../../packages/preview-runner/src/replay/replay_runner";
+import { scaffold } from "../../../../packages/preview-runner/src/scaffold";
 import type { ProductDiffWorkspacePlan } from "../services/product_diff/adapter.contract";
 import NextPreviewLauncher from "../services/product_diff/adapters/next/service.next_preview_launcher";
-import { resolve_next_workspace } from "../services/product_diff/adapters/next/service.next_workspace_resolver";
+import {
+    resolve_next_workspace,
+    resolve_next_workspaces,
+} from "../services/product_diff/adapters/next/service.next_workspace_resolver";
 import {
     preview_unavailable_diagnostic,
     product_diff_failure_status,
@@ -32,8 +46,63 @@ const expected = {
 } as const;
 
 const fixtureRoot = new URL("../../../../packages/preview-runner/fixtures/", import.meta.url);
+const repositoryRoot = fileURLToPath(new URL("../../../../", import.meta.url));
 const FIXTURE_NEXT_VERSION = "15.5.9";
 const READY_TIMEOUT_MS = 30_000;
+const REPLAY_READY_TIMEOUT_MS = 60_000;
+const REPLAY_PROTOCOL_VERSION = 11;
+
+const replayFixtureConfiguration = {
+    "next-replay-standalone": {
+        applicationPath: ".",
+        changedPaths: ["app/replay/page.tsx"],
+        expectedWorkspaceKind: "Standalone",
+        expectedWorkspacePackages: ["@matcha-fixture/next-replay-standalone"],
+        componentSurfaces: false,
+        prepareRuntime: false,
+    },
+    "next-replay-turborepo": {
+        applicationPath: "apps/marketing",
+        changedPaths: ["apps/marketing/app/replay/page.tsx"],
+        expectedWorkspaceKind: "Turborepo",
+        expectedWorkspacePackages: [
+            "@matcha-fixture/next-replay-turborepo",
+            "@matcha-fixture/replay-marketing",
+            "@matcha-fixture/replay-ui",
+        ],
+        componentSurfaces: false,
+        prepareRuntime: false,
+    },
+    "next-replay-nx": {
+        applicationPath: "apps/store",
+        changedPaths: ["apps/store/app/replay/page.tsx"],
+        expectedWorkspaceKind: "Nx",
+        expectedWorkspacePackages: ["@matcha-fixture/next-replay-nx"],
+        componentSurfaces: false,
+        prepareRuntime: false,
+    },
+    "next-replay-provider-isolation": {
+        applicationPath: ".",
+        changedPaths: ["matcha_preview/targets/provider-card.tsx"],
+        expectedWorkspaceKind: "Standalone",
+        expectedWorkspacePackages: ["@matcha-fixture/next-replay-provider-isolation"],
+        componentSurfaces: true,
+        prepareRuntime: true,
+    },
+    "next-replay-rive": {
+        applicationPath: "apps/rive",
+        changedPaths: ["apps/rive/matcha_preview/targets/rive-card.tsx"],
+        expectedWorkspaceKind: "Turborepo",
+        expectedWorkspacePackages: [
+            "@matcha-fixture/next-replay-rive",
+            "@matcha-fixture/replay-rive-app",
+        ],
+        componentSurfaces: false,
+        prepareRuntime: true,
+    },
+} as const;
+
+type ReplayFixtureName = keyof typeof replayFixtureConfiguration;
 
 const fixtureConfiguration = {
     "next-standalone": {
@@ -101,11 +170,44 @@ interface ReadyLaunchVerification {
     ready: boolean;
 }
 
+interface ReplayFixtureVerification {
+    name: ReplayFixtureName;
+    workspaceKind: "Standalone" | "Turborepo" | "Nx";
+    productionBuild: true;
+    productionStart: true;
+    interactionChangedDom: true;
+    animationPresent: true;
+    unexpectedRequests: string[];
+    credentialedRequestMetadata: false;
+    workspacePackages: string[];
+    layoutModes: ("inherit" | "isolate")[];
+    localWasm: boolean;
+    wasmInitialized: boolean;
+}
+
+interface ReplayRuntimeVerification {
+    protocolVersion: number;
+    chromiumAvailable: boolean;
+    replayCommandAvailable: boolean;
+}
+
+interface MultiApplicationReplayVerification {
+    name: "next-replay-multi-app";
+    applicationPaths: string[];
+    buildCommands: string[];
+    startCommands: string[];
+    revisionCoordinates: string[];
+}
+
 function assert(condition: unknown, message: string): asserts condition {
     if (!condition) throw new Error(message);
 }
 
 function fixturePath(name: keyof typeof expected): string {
+    return fileURLToPath(new URL(`${name}/`, fixtureRoot));
+}
+
+function replay_fixture_path(name: ReplayFixtureName | "next-replay-multi-app"): string {
     return fileURLToPath(new URL(`${name}/`, fixtureRoot));
 }
 
@@ -122,6 +224,92 @@ function has_exact_dependency(manifest: Record<string, unknown>, dependency: str
         typeof dependencies === "object" &&
         (dependencies as Record<string, unknown>)[dependency] === FIXTURE_NEXT_VERSION
     );
+}
+
+function read_workspace_package_names(lockfilePath: string): string[] {
+    return [...readFileSync(lockfilePath, "utf8").matchAll(/^\s+"name": "([^"]+)",?$/gm)]
+        .map((match) => match[1]!)
+        .sort((left, right) => left.localeCompare(right));
+}
+
+function assert_nx_replay_targets(root: string): void {
+    assert(
+        !existsSync(join(root, "apps/store/package.json")),
+        "next-replay-nx must not rely on an app-local package manifest",
+    );
+    const project = read_json(join(root, "apps/store/project.json"));
+    const targets = project.targets;
+    assert(targets !== null && typeof targets === "object", "next-replay-nx has no targets");
+    const targetGraph = targets as Record<string, unknown>;
+    const build = targetGraph.build;
+    const serve = targetGraph.serve;
+    assert(
+        build !== null &&
+            typeof build === "object" &&
+            (build as Record<string, unknown>).executor === "@nx/next:build",
+        "next-replay-nx does not declare an executable build target",
+    );
+    assert(
+        serve !== null &&
+            typeof serve === "object" &&
+            (serve as Record<string, unknown>).executor === "@nx/next:server",
+        "next-replay-nx does not declare an executable serve target",
+    );
+    const serveOptions = (serve as Record<string, unknown>).options;
+    assert(
+        serveOptions !== null &&
+            typeof serveOptions === "object" &&
+            (serveOptions as Record<string, unknown>).buildTarget ===
+                "@matcha-fixture/replay-store:build",
+        "next-replay-nx serve target is not backed by its build target",
+    );
+}
+
+function verify_multi_application_replay_fixture(): MultiApplicationReplayVerification {
+    const name = "next-replay-multi-app" as const;
+    const root = replay_fixture_path(name);
+    const changedPaths = ["apps/web/app/replay/page.tsx", "apps/admin/app/replay/page.tsx"];
+    const inspection = inspect_next_workspace(root, changedPaths);
+    const resolved = resolve_next_workspaces(inspection, changedPaths, null);
+    assert(resolved.diagnostics.length === 0, `${name} produced workspace diagnostics`);
+    assert(resolved.plans.length === 2, `${name} did not resolve both applications`);
+    const plan = replayReviewPlanSchema.parse(
+        JSON.parse(readFileSync(join(root, "matcha_preview/review-plan.json"), "utf8")),
+    );
+    const applicationPaths = resolved.plans.map((application) => application.applicationPath);
+    assert(
+        plan.applications.every((application) =>
+            applicationPaths.includes(application.applicationPath),
+        ),
+        `${name} declares an unresolved application`,
+    );
+    const buildCommands = resolved.plans.map(
+        (workspacePlan) =>
+            NextPreviewLauncher.build_from_workspace_plan({
+                workspaceRoot: root,
+                workspacePlan,
+            }).command,
+    );
+    const startCommands = resolved.plans.map(
+        (workspacePlan) =>
+            NextPreviewLauncher.from_workspace_plan({
+                mode: "production",
+                workspaceRoot: root,
+                workspacePlan,
+                port: 41439,
+            }).command,
+    );
+    const revisionCoordinates = ["head", "base"].flatMap((revision) =>
+        plan.surfaces.map((surface) => `${revision}:${surface.applicationId}:${surface.id}`),
+    );
+
+    return {
+        name,
+        applicationPaths,
+        buildCommands,
+        startCommands,
+        revisionCoordinates,
+    };
 }
 
 function verify_fixture_metadata(
@@ -415,8 +603,9 @@ async function wait_for_preview(
     url: string,
     preview: ReturnType<typeof spawn>,
     output: () => string,
+    timeoutMs = READY_TIMEOUT_MS,
 ): Promise<void> {
-    const deadline = Date.now() + READY_TIMEOUT_MS;
+    const deadline = Date.now() + timeoutMs;
     while (Date.now() < deadline) {
         if (preview.exitCode !== null) {
             throw new Error(`preview process exited before becoming ready: ${output()}`);
@@ -484,11 +673,448 @@ async function verify_ready_launch(
     }
 }
 
+function replay_application_root(root: string, applicationPath: string): string {
+    return applicationPath === "." ? root : join(root, applicationPath);
+}
+
+function read_replay_plan(root: string, applicationPath: string) {
+    return replayReviewPlanSchema.parse(
+        JSON.parse(
+            readFileSync(
+                join(
+                    replay_application_root(root, applicationPath),
+                    "matcha_preview/review-plan.json",
+                ),
+                "utf8",
+            ),
+        ),
+    );
+}
+
+function verify_declared_dom_change(
+    scenario: ReplayScenario,
+    outcomes: { outcome: string }[],
+): void {
+    const clickIndex = scenario.actions.findIndex((action) => action.kind === "click");
+    const changedStateIndex = scenario.actions.findIndex(
+        (action, index) => index > clickIndex && action.kind === "waitFor",
+    );
+    assert(clickIndex >= 0, `${scenario.id} does not declare an interaction`);
+    assert(changedStateIndex > clickIndex, `${scenario.id} does not declare its changed DOM state`);
+    assert(
+        outcomes.length === scenario.actions.length &&
+            outcomes.every((outcome) => outcome.outcome === "Succeeded"),
+        `${scenario.id} did not reach its declared changed DOM state`,
+    );
+}
+
+function artifact_has_credentialed_request_metadata(artifactPath: string): boolean {
+    const artifact = read_json(artifactPath);
+    const resources = artifact.resources;
+    assert(Array.isArray(resources), `${artifactPath} has no replay resources`);
+    const sensitiveNames = /^(authorization|cookie|set-cookie|proxy-authorization|x-api-key)$/i;
+    const sensitiveQueryNames = /(?:token|secret|password|credential|session|auth|key)/i;
+
+    for (const value of resources) {
+        assert(
+            value !== null && typeof value === "object",
+            `${artifactPath} has an invalid resource`,
+        );
+        const resource = value as Record<string, unknown>;
+        const request = resource.request;
+        const responseHeaders = resource.responseHeaders;
+        assert(
+            request !== null && typeof request === "object",
+            `${artifactPath} has an invalid request`,
+        );
+        assert(
+            responseHeaders !== null && typeof responseHeaders === "object",
+            `${artifactPath} has invalid response headers`,
+        );
+        const requestMetadata = request as Record<string, unknown>;
+        const url = new URL(String(requestMetadata.url));
+        if (url.username || url.password) return true;
+        if ([...url.searchParams.keys()].some((name) => sensitiveQueryNames.test(name)))
+            return true;
+        const variantHeaders = requestMetadata.variantHeaders;
+        if (
+            variantHeaders !== null &&
+            typeof variantHeaders === "object" &&
+            Object.keys(variantHeaders).some((name) => sensitiveNames.test(name))
+        ) {
+            return true;
+        }
+        if (Object.keys(responseHeaders).some((name) => sensitiveNames.test(name))) return true;
+    }
+    return false;
+}
+
+function run_replay_fixture_install(root: string, temporaryDirectory: string): void {
+    const lockfile = readFileSync(join(root, "bun.lock"), "utf8");
+    const install = spawnSync(
+        "bun",
+        [
+            "install",
+            "--frozen-lockfile",
+            "--ignore-scripts",
+            "--backend=copy",
+            "--registry",
+            "http://127.0.0.1:9",
+        ],
+        {
+            cwd: root,
+            encoding: "utf8",
+            env: fixture_environment(temporaryDirectory),
+        },
+    );
+    assert(
+        install.status === 0,
+        `replay fixture could not complete a frozen offline install: ${install.stderr || install.stdout}`,
+    );
+    assert(readFileSync(join(root, "bun.lock"), "utf8") === lockfile, "replay lockfile changed");
+}
+
+function prepare_component_replay_runtime(workspaceRoot: string, applicationPath: string): void {
+    const applicationRoot = replay_application_root(workspaceRoot, applicationPath);
+    const routeDirectory = applicationPath === "." ? "app" : `${applicationPath}/app`;
+    const scaffolded = scaffold({
+        workspaceRoot,
+        detect: {
+            supported: true,
+            reason: null,
+            framework: "NextAppRouter",
+            nextAppDir: applicationPath,
+            routeDir: routeDirectory,
+            pagesDir: null,
+            hasExistingPagesDir: false,
+            packageManager: "bun",
+            lockfileRelPath: "bun.lock",
+            lockfileSha256: "fixture",
+            nextMajor: 15,
+            globalStylesheet: `${routeDirectory}/styles.css`,
+            middlewarePaths: [],
+            envExampleKeys: [],
+            workspaceDirs: [],
+            warnings: [],
+        },
+    });
+    assert(scaffolded.ok, `${applicationPath} could not prepare its component runtime`);
+    assert(
+        existsSync(join(applicationRoot, "matcha_preview/registry.ts")),
+        `${applicationPath} did not generate its component registry`,
+    );
+}
+
+function replay_surface_path(
+    name: ReplayFixtureName,
+    surface: ReplaySurface,
+    generatedRoutePath: string | null,
+): string {
+    if (name === "next-replay-provider-isolation" || name === "next-replay-rive") {
+        return "/replay";
+    }
+    if (surface.entry.kind === "route") return surface.entry.path;
+    assert(generatedRoutePath !== null, `${surface.id} has no generated component route`);
+    return `${generatedRoutePath}/${surface.entry.targetId}?state=${surface.states[0]!.id}`;
+}
+
+async function verify_replay_fixture(name: ReplayFixtureName): Promise<ReplayFixtureVerification> {
+    const configuration = replayFixtureConfiguration[name];
+    const source = replay_fixture_path(name);
+    const temporaryRoot = mkdtempSync(join(tmpdir(), "matcha-next-replay-"));
+    const fixture = join(temporaryRoot, name);
+    const temporaryDirectory = join(temporaryRoot, "tmp");
+    const nxSocketDirectory = mkdtempSync("/tmp/matcha-replay-nx-");
+    mkdirSync(temporaryDirectory);
+    cpSync(source, fixture, { recursive: true });
+
+    try {
+        run_replay_fixture_install(fixture, temporaryDirectory);
+        const workspacePackages = read_workspace_package_names(join(fixture, "bun.lock"));
+        assert(
+            JSON.stringify(workspacePackages) ===
+                JSON.stringify([...configuration.expectedWorkspacePackages].sort()),
+            `${name} lockfile does not represent every workspace package`,
+        );
+        if (name === "next-replay-nx") assert_nx_replay_targets(fixture);
+
+        const inspection = inspect_next_workspace(fixture, [...configuration.changedPaths]);
+        assert(
+            inspection.workspaceKind === configuration.expectedWorkspaceKind,
+            `${name} resolved as ${inspection.workspaceKind}`,
+        );
+        const resolved = resolve_next_workspace(inspection, [...configuration.changedPaths], null);
+        assert(!("code" in resolved), `${name} did not resolve its replay application`);
+        assert(
+            resolved.applicationPath === configuration.applicationPath,
+            `${name} selected ${resolved.applicationPath}`,
+        );
+        const plan = read_replay_plan(fixture, configuration.applicationPath);
+        assert(
+            plan.applications.some(
+                (application) => application.applicationPath === configuration.applicationPath,
+            ),
+            `${name} replay plan does not declare its resolved application`,
+        );
+        if (configuration.prepareRuntime) {
+            prepare_component_replay_runtime(fixture, configuration.applicationPath);
+        }
+
+        const buildPlan = NextPreviewLauncher.build_from_workspace_plan({
+            workspaceRoot: fixture,
+            workspacePlan: resolved,
+            environment: { NEXT_TELEMETRY_DISABLED: "1" },
+        });
+        const launchPlan = NextPreviewLauncher.from_workspace_plan({
+            mode: "production",
+            workspaceRoot: fixture,
+            workspacePlan: resolved,
+            port: 41437,
+            environment: { NEXT_TELEMETRY_DISABLED: "1" },
+        });
+        let productionBuild = false;
+        let productionStart = false;
+        let interactionChangedDom = false;
+        let animationPresent = false;
+        let credentialedRequestMetadata = false;
+        let localWasm = false;
+        let wasmInitialized = false;
+        const unexpectedRequests: string[] = [];
+
+        for (const surface of plan.surfaces) {
+            const state = surface.states[0]!;
+            const scenario = state.scenarios[0]!;
+            let generatedSurface: ReturnType<typeof create_next_preview_surface> | null = null;
+            let preview: ReturnType<typeof spawn> | null = null;
+            let output = "";
+            try {
+                if (surface.entry.kind === "component") {
+                    if (configuration.componentSurfaces) {
+                        generatedSurface = create_next_preview_surface(fixture, {
+                            applicationPath: configuration.applicationPath,
+                            routeSegment: `replay-${surface.id}`,
+                            router: "AppRouter",
+                            rootLayoutMode: surface.rootLayoutMode,
+                        });
+                        const applicationRoot = replay_application_root(
+                            fixture,
+                            configuration.applicationPath,
+                        );
+                        rmSync(join(applicationRoot, "app", generatedSurface.routePath.slice(1)), {
+                            recursive: true,
+                            force: true,
+                        });
+                    }
+                }
+                const build = spawnSync("bash", ["-lc", buildPlan.command], {
+                    cwd: buildPlan.workingDirectory,
+                    encoding: "utf8",
+                    timeout: 120_000,
+                    env: {
+                        ...fixture_environment(temporaryDirectory, nxSocketDirectory),
+                        ...buildPlan.environment,
+                    },
+                });
+                assert(
+                    build.status === 0,
+                    `${name} production build failed: ${build.stderr || build.stdout}`,
+                );
+                productionBuild = true;
+                preview = spawn("bash", ["-lc", `exec ${launchPlan.command}`], {
+                    cwd: launchPlan.workingDirectory,
+                    detached: true,
+                    env: {
+                        ...fixture_environment(temporaryDirectory, nxSocketDirectory),
+                        ...launchPlan.environment,
+                    },
+                    stdio: ["ignore", "pipe", "pipe"],
+                });
+                preview.stdout?.on("data", (chunk: Buffer) => {
+                    output = `${output}${chunk}`.slice(-8_000);
+                });
+                preview.stderr?.on("data", (chunk: Buffer) => {
+                    output = `${output}${chunk}`.slice(-8_000);
+                });
+                const surfacePath = replay_surface_path(
+                    name,
+                    surface,
+                    generatedSurface?.routePath ?? null,
+                );
+                const url = `http://127.0.0.1:${launchPlan.port}${surfacePath}`;
+                await wait_for_preview(url, preview, () => output, REPLAY_READY_TIMEOUT_MS);
+                productionStart = true;
+                const artifactRoot = join(temporaryRoot, "artifacts", surface.id);
+                const capture = await runReplayCapture({
+                    url,
+                    artifactRoot,
+                    scenario,
+                    policy:
+                        surface.entry.kind === "component"
+                            ? { allowedQueryParameters: { state: [state.id] } }
+                            : undefined,
+                    browserAssets:
+                        name === "next-replay-rive"
+                            ? [
+                                  {
+                                      requestPath: "/matcha-preview-runtime/rive/rive.wasm",
+                                      sourcePath: join(
+                                          replay_application_root(
+                                              fixture,
+                                              configuration.applicationPath,
+                                          ),
+                                          "public/matcha-preview-runtime/rive/rive.wasm",
+                                      ),
+                                      contentType: "application/wasm",
+                                  },
+                              ]
+                            : [],
+                    viewport: {
+                        width: surface.viewports[0]!.width,
+                        height: surface.viewports[0]!.height,
+                    },
+                });
+                assert(
+                    capture.fidelity === "Verified",
+                    `${name} replay was ${capture.fidelity}: ${JSON.stringify({
+                        diagnostics: capture.diagnostics,
+                        recording: {
+                            actions: capture.recording.actions,
+                            pageErrors: capture.recording.pageErrors,
+                            consoleErrors: capture.recording.consoleErrors,
+                            failedRequests: capture.recording.failedRequests,
+                        },
+                        validation: capture.validation,
+                    })}`,
+                );
+                verify_declared_dom_change(scenario, capture.validation.actions);
+                interactionChangedDom = true;
+                assert(
+                    capture.validation.animationPresent,
+                    `${name}/${surface.id} replay has no CSS animation`,
+                );
+                animationPresent = true;
+                unexpectedRequests.push(...capture.validation.unexpectedRequests);
+                credentialedRequestMetadata ||= artifact_has_credentialed_request_metadata(
+                    join(artifactRoot, capture.artifactKey),
+                );
+                if (name === "next-replay-rive") {
+                    const applicationRoot = replay_application_root(
+                        fixture,
+                        configuration.applicationPath,
+                    );
+                    const localWasmPath = join(
+                        applicationRoot,
+                        "public/matcha-preview-runtime/rive/rive.wasm",
+                    );
+                    const artifact = read_json(join(artifactRoot, capture.artifactKey));
+                    const resources = artifact.resources as Array<{
+                        request: { url: string; responseContentType: string | null };
+                    }>;
+                    localWasm =
+                        existsSync(localWasmPath) &&
+                        WebAssembly.validate(readFileSync(localWasmPath)) &&
+                        resources.some((resource) => {
+                            const url = new URL(resource.request.url);
+                            return (
+                                url.pathname === "/matcha-preview-runtime/rive/rive.wasm" &&
+                                resource.request.responseContentType === "application/wasm"
+                            );
+                        });
+                    assert(localWasm, "next-replay-rive did not capture its local Rive WASM");
+                    const runtimeReadyActionIndex = scenario.actions.findIndex(
+                        (action) =>
+                            action.kind === "waitFor" &&
+                            action.selector.testId === "rive-runtime-ready",
+                    );
+                    wasmInitialized =
+                        runtimeReadyActionIndex >= 0 &&
+                        capture.validation.actions[runtimeReadyActionIndex]?.outcome ===
+                            "Succeeded";
+                    assert(
+                        wasmInitialized,
+                        "next-replay-rive did not initialize its local Rive runtime offline",
+                    );
+                }
+            } finally {
+                if (preview) await stop_preview(preview);
+                if (generatedSurface) remove_next_preview_surface(generatedSurface);
+            }
+        }
+
+        assert(unexpectedRequests.length === 0, `${name} made external offline requests`);
+        assert(!credentialedRequestMetadata, `${name} retained credentialed request metadata`);
+        return {
+            name,
+            workspaceKind: configuration.expectedWorkspaceKind,
+            productionBuild: productionBuild as true,
+            productionStart: productionStart as true,
+            interactionChangedDom: interactionChangedDom as true,
+            animationPresent: animationPresent as true,
+            unexpectedRequests,
+            credentialedRequestMetadata: false,
+            workspacePackages,
+            layoutModes: plan.surfaces.map((surface) => surface.rootLayoutMode),
+            localWasm,
+            wasmInitialized,
+        };
+    } finally {
+        rmSync(temporaryRoot, { recursive: true, force: true });
+        rmSync(nxSocketDirectory, { recursive: true, force: true });
+    }
+}
+
+function verify_replay_runtime(): ReplayRuntimeVerification {
+    const version = spawnSync("bun", ["packages/preview-runner/src/index.ts", "version"], {
+        cwd: repositoryRoot,
+        encoding: "utf8",
+    });
+    assert(version.status === 0, `preview runner version failed: ${version.stderr}`);
+    const versionOutput = read_json_output(version.stdout, "preview runner version");
+    assert(
+        versionOutput.version === REPLAY_PROTOCOL_VERSION,
+        `preview runner protocol is ${versionOutput.version}`,
+    );
+
+    const doctor = spawnSync("bun", ["packages/preview-runner/src/index.ts", "doctor"], {
+        cwd: repositoryRoot,
+        encoding: "utf8",
+    });
+    assert(doctor.status === 0, `preview runner doctor failed: ${doctor.stderr}`);
+    const doctorOutput = read_json_output(doctor.stdout, "preview runner doctor");
+    assert(doctorOutput.ok === true, "preview runner doctor is not healthy");
+    assert(
+        typeof doctorOutput.chromiumVersion === "string" && doctorOutput.chromiumVersion.length > 0,
+        "preview runner doctor cannot launch Chromium",
+    );
+    assert(
+        doctorOutput.replayCommandAvailable === true,
+        "preview runner doctor cannot run replay capture",
+    );
+    return {
+        protocolVersion: REPLAY_PROTOCOL_VERSION,
+        chromiumAvailable: true,
+        replayCommandAvailable: true,
+    };
+}
+
+function read_json_output(output: string, label: string): Record<string, unknown> {
+    try {
+        const parsed = JSON.parse(output);
+        assert(parsed !== null && typeof parsed === "object", `${label} returned a non-object`);
+        return parsed as Record<string, unknown>;
+    } catch {
+        throw new Error(`${label} returned invalid JSON`);
+    }
+}
+
 export async function verify_next_product_diff_fixtures(): Promise<{
     ready: ReadyFixtureVerification[];
     readyLaunch: ReadyLaunchVerification[];
     providerFailure: ProviderFailureVerification;
     installability: FixtureInstallability[];
+    replay: ReplayFixtureVerification[];
+    runtime: ReplayRuntimeVerification;
+    multiApplicationReplay: MultiApplicationReplayVerification;
 }> {
     for (const fixtureName of Object.keys(expected)) {
         const path = fixturePath(fixtureName as keyof typeof expected);
@@ -532,6 +1158,14 @@ export async function verify_next_product_diff_fixtures(): Promise<{
         readyLaunch.push(await verify_ready_launch(fixture));
     }
 
+    const replay: ReplayFixtureVerification[] = [];
+    for (const fixtureName of Object.keys(replayFixtureConfiguration) as ReplayFixtureName[]) {
+        const path = replay_fixture_path(fixtureName);
+        assert(existsSync(path), `Missing Next replay fixture: ${fixtureName}`);
+        assert(existsSync(join(path, "bun.lock")), `${fixtureName} is missing a lockfile`);
+        replay.push(await verify_replay_fixture(fixtureName));
+    }
+
     return {
         ready,
         readyLaunch,
@@ -539,6 +1173,9 @@ export async function verify_next_product_diff_fixtures(): Promise<{
         installability: (Object.keys(expected) as (keyof typeof expected)[]).map(
             verify_fixture_installability,
         ),
+        replay,
+        runtime: verify_replay_runtime(),
+        multiApplicationReplay: verify_multi_application_replay_fixture(),
     };
 }
 

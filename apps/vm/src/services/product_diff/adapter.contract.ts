@@ -27,6 +27,10 @@ export interface ProductDiffWorkspacePlan {
     router: string;
     framework: string;
     rootLayoutMode: ProductDiffRootLayoutMode | null;
+    nxTargets?: {
+        build: string;
+        serve: string;
+    };
     dependency: {
         packageManager: "bun" | "pnpm" | "yarn" | "npm";
         lockfileRelPath: string;
@@ -44,6 +48,11 @@ export interface ProductDiffWorkspaceResolution {
     diagnostics: ProductDiffDiagnostic[];
 }
 
+export interface ProductDiffWorkspaceCollection {
+    plans: ProductDiffWorkspacePlan[];
+    diagnostics: ProductDiffDiagnostic[];
+}
+
 export interface ProductDiffPrepareRevisionInput {
     revision: ProductDiffRevision;
     workspaceRoot: string;
@@ -55,6 +64,15 @@ export interface ProductDiffPreparedRevision {
     revision: ProductDiffRevision;
     workspaceRoot: string;
     generatedPaths: string[];
+}
+
+export interface ProductDiffPrepareReplayRevisionInput extends ProductDiffPrepareRevisionInput {
+    rootLayoutMode: ProductDiffRootLayoutMode;
+}
+
+export interface ProductDiffPreparedReplayRevision extends ProductDiffPreparedRevision {
+    applicationPath: string;
+    surfacePath: string;
 }
 
 export interface ProductDiffStartRevisionInput {
@@ -71,6 +89,31 @@ export interface ProductDiffRunningPreview {
     revision: ProductDiffRevision;
     url: string;
     surfacePath: string;
+}
+
+export interface ProductDiffReplayBrowserAsset {
+    requestPath: string;
+    sourcePath: string;
+    contentType: string;
+}
+
+export interface ProductDiffStartReplayRevisionInput {
+    revision: ProductDiffRevision;
+    workspaceRoot: string;
+    plan: ProductDiffWorkspacePlan;
+    preparedRevision: ProductDiffPreparedReplayRevision;
+    port: number;
+}
+
+export interface ProductDiffRunningReplay extends ProductDiffRunningPreview {
+    applicationPath: string;
+    browserAssets: ProductDiffReplayBrowserAsset[];
+}
+
+export interface ProductDiffCollectReplayBrowserAssetsInput {
+    revision: ProductDiffRevision;
+    workspaceRoot: string;
+    preparedRevision: ProductDiffPreparedReplayRevision;
 }
 
 export interface ProductDiffVerifyRevisionInput {
@@ -92,14 +135,34 @@ export interface ProductDiffCleanupRevisionInput {
     preview: ProductDiffRunningPreview | null;
 }
 
+export interface ProductDiffCleanupReplayRevisionInput {
+    revision: ProductDiffRevision;
+    workspaceRoot: string;
+    preparedRevision: ProductDiffPreparedReplayRevision | null;
+    preview: ProductDiffRunningReplay | null;
+}
+
 export interface ProductDiffAdapter {
     id: string;
-    detect(input: ProductDiffAdapterDetectionInput): Promise<ProductDiffAdapterDetection>;
+    detect(_input: ProductDiffAdapterDetectionInput): Promise<ProductDiffAdapterDetection>;
     resolve_workspace(
-        input: ProductDiffWorkspaceResolutionInput,
+        _input: ProductDiffWorkspaceResolutionInput,
     ): Promise<ProductDiffWorkspaceResolution>;
-    prepare_revision(input: ProductDiffPrepareRevisionInput): Promise<ProductDiffPreparedRevision>;
-    start_revision(input: ProductDiffStartRevisionInput): Promise<ProductDiffRunningPreview>;
-    verify_revision(input: ProductDiffVerifyRevisionInput): Promise<ProductDiffHealthCheck>;
-    cleanup_revision(input: ProductDiffCleanupRevisionInput): Promise<void>;
+    resolve_replay_workspaces?(
+        _input: ProductDiffWorkspaceResolutionInput,
+    ): Promise<ProductDiffWorkspaceCollection>;
+    prepare_revision(_input: ProductDiffPrepareRevisionInput): Promise<ProductDiffPreparedRevision>;
+    start_revision(_input: ProductDiffStartRevisionInput): Promise<ProductDiffRunningPreview>;
+    prepare_replay_revision(
+        _input: ProductDiffPrepareReplayRevisionInput,
+    ): Promise<ProductDiffPreparedReplayRevision>;
+    start_replay_revision(
+        _input: ProductDiffStartReplayRevisionInput,
+    ): Promise<ProductDiffRunningReplay>;
+    collect_replay_browser_assets(
+        _input: ProductDiffCollectReplayBrowserAssetsInput,
+    ): Promise<ProductDiffReplayBrowserAsset[]>;
+    verify_revision(_input: ProductDiffVerifyRevisionInput): Promise<ProductDiffHealthCheck>;
+    cleanup_revision(_input: ProductDiffCleanupRevisionInput): Promise<void>;
+    cleanup_replay_revision(_input: ProductDiffCleanupReplayRevisionInput): Promise<void>;
 }

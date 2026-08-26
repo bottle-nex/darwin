@@ -1,0 +1,15 @@
+body {
+    margin: 0;
+    font-family: sans-serif;
+}
+
+.surface {
+    animation: surface 1.25s linear infinite alternate;
+    margin: 4rem;
+}
+
+@keyframes surface {
+    to {
+        transform: translateY(2px);
+    }
+}

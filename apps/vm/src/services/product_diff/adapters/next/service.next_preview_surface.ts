@@ -30,10 +30,9 @@ export default class NextPreviewSurface {
         workspaceRoot: string,
         workspacePlan: ProductDiffWorkspacePlan,
         runId: string,
-        harnessRootLayoutMode: ProductDiffRootLayoutMode,
+        rootLayoutMode: ProductDiffRootLayoutMode,
     ): Promise<PreviewSurface> {
         const router = selected_router(workspacePlan);
-        const rootLayoutMode = workspacePlan.rootLayoutMode ?? harnessRootLayoutMode;
         return PreviewRunner.create_next_preview_surface(sandbox, {
             workspaceRoot,
             applicationPath: workspacePlan.applicationPath,

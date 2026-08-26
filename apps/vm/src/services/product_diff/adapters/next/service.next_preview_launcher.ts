@@ -22,6 +22,14 @@ export interface NextPreviewLaunchPlan {
     environment: Record<string, string>;
 }
 
+export interface NextPreviewBuildPlan {
+    command: string;
+    workingDirectory: string;
+    environment: Record<string, string>;
+}
+
+export type NextPreviewLaunchMode = "development" | "production";
+
 export interface NextPreviewLaunchInput {
     workspaceKind: NextWorkspaceKind;
     packageManager: PackageManager;
@@ -90,6 +98,41 @@ function standalone_command(packageManager: PackageManager, applicationPath: str
     }
 }
 
+function application_build_command(
+    packageManager: PackageManager,
+    applicationPath: string,
+): string {
+    const path = shell_argument(applicationPath);
+    switch (packageManager) {
+        case "bun":
+            return `bun run --cwd ${path} build`;
+        case "pnpm":
+            return `pnpm --dir ${path} run build`;
+        case "yarn":
+            return `yarn --cwd ${path} build`;
+        case "npm":
+            return `npm --prefix ${path} run build`;
+    }
+}
+
+function application_start_command(
+    packageManager: PackageManager,
+    applicationPath: string,
+    port: number,
+): string {
+    const path = shell_argument(applicationPath);
+    switch (packageManager) {
+        case "bun":
+            return `bun run --cwd ${path} next start --hostname 127.0.0.1 --port ${port}`;
+        case "pnpm":
+            return `pnpm --dir ${path} exec next start --hostname 127.0.0.1 --port ${port}`;
+        case "yarn":
+            return `yarn --cwd ${path} exec next start --hostname 127.0.0.1 --port ${port}`;
+        case "npm":
+            return `npm --prefix ${path} exec next start --hostname 127.0.0.1 --port ${port}`;
+    }
+}
+
 function workspace_command(
     packageManager: PackageManager,
     packageName: string | null | undefined,
@@ -125,6 +168,20 @@ function nx_command(
             return `yarn nx run ${target}`;
         case "npm":
             return `npm exec nx run ${target}`;
+    }
+}
+
+function nx_target_command(packageManager: PackageManager, target: string): string {
+    const targetArgument = shell_argument(target);
+    switch (packageManager) {
+        case "bun":
+            return `bun x --no-install nx run ${targetArgument}`;
+        case "pnpm":
+            return `pnpm nx run ${targetArgument}`;
+        case "yarn":
+            return `yarn nx run ${targetArgument}`;
+        case "npm":
+            return `npm exec nx run ${targetArgument}`;
     }
 }
 
@@ -214,6 +271,7 @@ export default class NextPreviewLauncher {
     }
 
     static from_workspace_plan(input: {
+        mode?: NextPreviewLaunchMode;
         workspaceRoot: string;
         workspacePlan: ProductDiffWorkspacePlan;
         port: number;
@@ -232,6 +290,35 @@ export default class NextPreviewLauncher {
         }
 
         const launchCommand = this.validate_override(input.workspacePlan.launchCommand);
+        if (input.mode === "production") {
+            if (workspaceKind === "Nx" && input.workspacePlan.nxTargets) {
+                return {
+                    command: append_network_arguments(
+                        nx_target_command(
+                            input.workspacePlan.dependency.packageManager,
+                            input.workspacePlan.nxTargets.serve,
+                        ),
+                        workspaceKind,
+                        input.port,
+                    ),
+                    workingDirectory: input.workspaceRoot,
+                    port: input.port,
+                    healthPath: input.workspacePlan.healthPath,
+                    environment: { ...input.environment },
+                };
+            }
+            return {
+                command: application_start_command(
+                    input.workspacePlan.dependency.packageManager,
+                    input.workspacePlan.applicationPath,
+                    input.port,
+                ),
+                workingDirectory: input.workspaceRoot,
+                port: input.port,
+                healthPath: input.workspacePlan.healthPath,
+                environment: { ...input.environment },
+            };
+        }
         const command =
             workspaceKind === "Nx"
                 ? nx_serve_command(launchCommand)
@@ -250,6 +337,39 @@ export default class NextPreviewLauncher {
             workingDirectory: input.workspaceRoot,
             port: input.port,
             healthPath: input.workspacePlan.healthPath,
+            environment: { ...input.environment },
+        };
+    }
+
+    static build_from_workspace_plan(input: {
+        workspaceRoot: string;
+        workspacePlan: ProductDiffWorkspacePlan;
+        environment?: Record<string, string>;
+    }): NextPreviewBuildPlan {
+        if (!PACKAGE_MANAGERS.has(input.workspacePlan.dependency.packageManager)) {
+            throw new Error("preview build plan has an unsupported package manager");
+        }
+        if (
+            !input.workspacePlan.applicationPath ||
+            input.workspacePlan.applicationPath.includes("\0")
+        ) {
+            throw new Error("preview build plan has an invalid application path");
+        }
+
+        const command =
+            input.workspacePlan.workspaceKind === "Nx" && input.workspacePlan.nxTargets
+                ? nx_target_command(
+                      input.workspacePlan.dependency.packageManager,
+                      input.workspacePlan.nxTargets.build,
+                  )
+                : application_build_command(
+                      input.workspacePlan.dependency.packageManager,
+                      input.workspacePlan.applicationPath,
+                  );
+
+        return {
+            command,
+            workingDirectory: input.workspaceRoot,
             environment: { ...input.environment },
         };
     }

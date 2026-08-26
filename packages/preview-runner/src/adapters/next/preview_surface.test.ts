@@ -24,6 +24,10 @@ function fixture_root(router: "AppRouter" | "PagesRouter"): string {
         join(applicationRoot, "matcha_preview", "registry.ts"),
         "export const TARGETS = {};\n",
     );
+    writeFileSync(
+        join(applicationRoot, "matcha_preview", "PreviewRuntime.tsx"),
+        "export default function MatchaPreviewRuntime({ children }: { children: React.ReactNode }) { return children; }\n",
+    );
     return root;
 }
 
@@ -42,6 +46,24 @@ test("creates only the selected App Router surface at its job-scoped route", () 
         generatedFiles: [join(root, "apps/web/app/preview-run-a/[targetId]/page.tsx")],
     });
     expect(existsSync(join(root, "apps/web/pages/preview-run-a/[targetId].tsx"))).toBe(false);
+});
+
+test("loads the preview runtime before mounting the selected target", () => {
+    const root = fixture_root("AppRouter");
+
+    const surface = create_next_preview_surface(root, {
+        applicationPath: "apps/web",
+        routeSegment: "preview-run-a",
+        router: "AppRouter",
+    });
+
+    const routeSource = readFileSync(surface.generatedFiles[0]!, "utf8");
+    expect(routeSource).toContain(
+        'import MatchaPreviewRuntime from "../../../matcha_preview/PreviewRuntime";',
+    );
+    expect(routeSource).toContain(
+        "<MatchaPreviewRuntime><Component state={stateId} /></MatchaPreviewRuntime>",
+    );
 });
 
 test("isolates an App Router root layout and restores it byte-for-byte", () => {
@@ -71,6 +93,37 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     remove_next_preview_surface(surface);
 
     expect(readFileSync(layoutFile, "utf8")).toBe(originalLayout);
+});
+
+test("removes an isolated App Router route before retrying the same route with inheritance", () => {
+    const root = fixture_root("AppRouter");
+    const layoutFile = join(root, "apps/web/app/layout.tsx");
+    const originalLayout = `import "./globals.css";
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+    return <html><body>{children}</body></html>;
+}
+`;
+    writeFileSync(layoutFile, originalLayout);
+
+    const isolated = create_next_preview_surface(root, {
+        applicationPath: "apps/web",
+        routeSegment: "preview-run-a",
+        router: "AppRouter",
+        rootLayoutMode: "isolate",
+    });
+
+    remove_next_preview_surface(isolated);
+
+    const inherited = create_next_preview_surface(root, {
+        applicationPath: "apps/web",
+        routeSegment: "preview-run-a",
+        router: "AppRouter",
+        rootLayoutMode: "inherit",
+    });
+
+    expect(readFileSync(layoutFile, "utf8")).toBe(originalLayout);
+    expect(existsSync(inherited.generatedFiles[0]!)).toBe(true);
 });
 
 test("rejects Pages Router isolation before creating a preview route", () => {

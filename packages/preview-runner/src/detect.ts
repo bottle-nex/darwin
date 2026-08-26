@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import { existsSync, lstatSync, readdirSync, readFileSync } from "node:fs";
 import { join, relative, sep } from "node:path";
 import type { DetectInput, DetectOutput, Framework, PackageManager } from "./contract";
+import { inspect_next_workspace } from "./adapters/next/workspace";
 
 const SKIP_DIRS = new Set([
     "node_modules",
@@ -223,12 +224,8 @@ export function detect(input: DetectInput): DetectOutput {
     }
 
     const workspaceDirs = find_package_dirs(root);
-    const nextApps = workspaceDirs.filter((dir) => {
-        const packageJson = read_json(
-            join(root, dir === "." ? "package.json" : `${dir}/package.json`),
-        );
-        return packageJson !== null && declared_next_version(packageJson) !== null;
-    });
+    const inspection = inspect_next_workspace(root, input.changedPaths);
+    const nextApps = inspection.applications.map((application) => application.applicationPath);
     if (nextApps.length === 0) return unsupported("no Next.js package found");
 
     const warnings: string[] = [];
@@ -272,7 +269,10 @@ export function detect(input: DetectInput): DetectOutput {
     const packageJson = read_json(
         join(root, nextAppDir === "." ? "package.json" : `${nextAppDir}/package.json`),
     );
-    const nextVersion = packageJson ? declared_next_version(packageJson) : null;
+    const rootPackageJson = read_json(join(root, "package.json"));
+    const nextVersion =
+        (packageJson ? declared_next_version(packageJson) : null) ??
+        (rootPackageJson ? declared_next_version(rootPackageJson) : null);
 
     const middlewarePaths = [
         "middleware.ts",

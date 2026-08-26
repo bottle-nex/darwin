@@ -25,12 +25,20 @@ export const ProductDiffRootLayoutMode = {
 export type ProductDiffRootLayoutMode =
     (typeof ProductDiffRootLayoutMode)[keyof typeof ProductDiffRootLayoutMode];
 
+export interface ProductDiffReplayDataPolicy {
+    sameOriginJsonPaths: string[];
+}
+
 export interface ProductDiffPreviewConfiguration {
     applicationPath?: string;
     launchCommand?: string;
     healthPath?: string;
     rootLayoutMode?: ProductDiffRootLayoutMode;
+    replayDataPolicy?: ProductDiffReplayDataPolicy;
 }
+
+export const PRODUCT_DIFF_REPLAY_ARTIFACT_KEY_PATTERN =
+    /^replay\/[a-z0-9][a-z0-9-]{0,48}\/[a-z0-9][a-z0-9-]{0,48}\/[a-z0-9][a-z0-9-]{0,48}\/[a-z0-9][a-z0-9-]{0,48}\/(?:base|head)\/artifact\.json$/;
 
 export const ProductDiffFramework = {
     NextAppRouter: "NextAppRouter",
@@ -108,8 +116,94 @@ export interface ProductDiffManifestV3 {
     warnings: string[];
 }
 
+export const ReplayFidelity = {
+    Verified: "Verified",
+    Partial: "Partial",
+    Unavailable: "Unavailable",
+} as const;
+export type ReplayFidelity = (typeof ReplayFidelity)[keyof typeof ReplayFidelity];
+
+export interface ReplayArtifactDiagnostic {
+    stage: string;
+    message: string;
+}
+
+export interface ReplayActionEvidence {
+    index: number;
+    kind: "click" | "fill" | "select" | "check" | "waitFor";
+    outcome: "Succeeded" | "Failed";
+    diagnostic?: string;
+}
+
+export interface ReplayScenarioEvidence {
+    id: string;
+    label: string;
+    outcome: "Succeeded" | "Failed";
+    actions: ReplayActionEvidence[];
+}
+
+export interface ReplayDomSummary {
+    elementCount: number;
+    interactiveElementCount: number;
+    visibleTextLength: number;
+}
+
+export interface ReplayAccessibilitySummary {
+    landmarkCount: number;
+    headingCount: number;
+    labeledControlCount: number;
+    unlabeledControlCount: number;
+}
+
+export interface ReplayRevisionEvidence {
+    scenarios: ReplayScenarioEvidence[];
+    dom: ReplayDomSummary | null;
+    accessibility: ReplayAccessibilitySummary | null;
+    consoleDiagnostics: string[];
+    failedRequestDiagnostics: string[];
+}
+
+export interface ReplayRevisionArtifact {
+    artifactKey: string | null;
+    fidelity: ReplayFidelity;
+    diagnostics: ReplayArtifactDiagnostic[] | string[];
+    evidence?: ReplayRevisionEvidence;
+}
+
+export interface ReplayViewportResult extends ProductDiffViewport {
+    base: ReplayRevisionArtifact;
+    head: ReplayRevisionArtifact;
+}
+
+export interface ReplayStateResult {
+    id: string;
+    label: string;
+    viewports: ReplayViewportResult[];
+}
+
+export interface ReplaySurfaceResult {
+    id: string;
+    applicationId: string;
+    label: string;
+    states: ReplayStateResult[];
+}
+
+export interface ReplayApplicationResult {
+    id: string;
+    applicationPath: string;
+    adapterId?: string;
+}
+
+export interface ProductDiffManifestV4 {
+    version: 4;
+    framework: ProductDiffFramework;
+    applications: ReplayApplicationResult[];
+    surfaces: ReplaySurfaceResult[];
+    warnings: string[];
+}
+
 export type ProductDiffManifest =
-    ProductDiffManifestV1 | ProductDiffManifestV2 | ProductDiffManifestV3;
+    ProductDiffManifestV1 | ProductDiffManifestV2 | ProductDiffManifestV3 | ProductDiffManifestV4;
 
 export interface ProductDiffSummary {
     id: string;
@@ -153,6 +247,12 @@ export function is_product_diff_manifest_v3(
     return manifest !== null && "version" in manifest && manifest.version === 3;
 }
 
+export function is_replay_product_diff_manifest(
+    manifest: ProductDiffManifest | null,
+): manifest is ProductDiffManifestV4 {
+    return manifest !== null && "version" in manifest && manifest.version === 4;
+}
+
 export function is_screenshot_product_review_manifest(
     manifest: ProductDiffManifest | null,
 ): manifest is ProductDiffManifestV2 | ProductDiffManifestV3 {
@@ -188,6 +288,22 @@ export function product_diff_artifact_keys(manifest: ProductDiffManifest | null)
         for (const shot of target.shots) {
             for (const key of [shot.baseKey, shot.headKey]) {
                 if (key) keys.add(key);
+            }
+        }
+    }
+    return keys;
+}
+
+export function replayArtifactKeys(manifest: ProductDiffManifest | null): Set<string> {
+    const keys = new Set<string>();
+    if (!is_replay_product_diff_manifest(manifest)) return keys;
+
+    for (const surface of manifest.surfaces) {
+        for (const state of surface.states) {
+            for (const viewport of state.viewports) {
+                for (const artifact of [viewport.base, viewport.head]) {
+                    if (artifact.artifactKey) keys.add(artifact.artifactKey);
+                }
             }
         }
     }

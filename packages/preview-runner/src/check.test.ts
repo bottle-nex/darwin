@@ -1,4 +1,4 @@
-import { afterEach, expect, mock, test } from "bun:test";
+import { afterEach, expect, test } from "bun:test";
 import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
@@ -53,13 +53,17 @@ const page = {
         count: async () => 1,
         evaluate: async () => "",
         boundingBox: async () => ({ width: 400, height: 200 }),
+        locator: () => ({
+            count: async () => 0,
+            evaluate: async () => "",
+        }),
         first() {
             return this;
         },
     }),
 };
 
-mock.module("./browser", () => ({
+const test_browser_runtime = {
     open_browser: async () => ({ close: async () => undefined }),
     open_deterministic_context: async () => ({
         newPage: async () => page,
@@ -68,20 +72,48 @@ mock.module("./browser", () => ({
     settle_page: async () => {
         if (redirectDuringSettle) currentUrl = "http://127.0.0.1:41337/sign-in";
     },
-}));
+};
 
-const { check } = await import("./check");
+const { check, next_error_overlay_detail } = await import("./check");
+
+function next_portal(hasErrorOverlay: boolean, detail: string) {
+    const errorOverlay = {
+        count: async () => (hasErrorOverlay ? 1 : 0),
+        evaluate: async () => detail,
+    };
+    return {
+        evaluate: async () => detail,
+        locator: () => errorOverlay,
+    };
+}
+
+test("ignores the Next development-tools issue indicator", async () => {
+    const detail = await next_error_overlay_detail(next_portal(false, "0\n1\nIssue") as never);
+
+    expect(detail).toBe("");
+});
+
+test("reports text from a real Next error overlay", async () => {
+    const detail = await next_error_overlay_detail(
+        next_portal(true, "TypeError: missing provider") as never,
+    );
+
+    expect(detail).toBe("TypeError: missing provider");
+});
 
 test("rejects a target that logs a console error before capture", async () => {
     const root = fixture_root();
 
-    const result = await check({
-        baseUrl: "http://127.0.0.1:41337",
-        routePath: "/preview-run-a",
-        workspaceRoot: root,
-        nextAppDir: "apps/web",
-        navigationTimeoutMs: 10_000,
-    });
+    const result = await check(
+        {
+            baseUrl: "http://127.0.0.1:41337",
+            routePath: "/preview-run-a",
+            workspaceRoot: root,
+            nextAppDir: "apps/web",
+            navigationTimeoutMs: 10_000,
+        },
+        test_browser_runtime as never,
+    );
 
     expect(result.ok).toBe(false);
     expect(result.results[1]).toMatchObject({ problem: "ConsoleError" });
@@ -92,13 +124,16 @@ test("rejects a redirect even when it returns to the expected preview route", as
     redirected = true;
     const root = fixture_root();
 
-    const result = await check({
-        baseUrl: "http://127.0.0.1:41337",
-        routePath: "/preview-run-a",
-        workspaceRoot: root,
-        nextAppDir: "apps/web",
-        navigationTimeoutMs: 10_000,
-    });
+    const result = await check(
+        {
+            baseUrl: "http://127.0.0.1:41337",
+            routePath: "/preview-run-a",
+            workspaceRoot: root,
+            nextAppDir: "apps/web",
+            navigationTimeoutMs: 10_000,
+        },
+        test_browser_runtime as never,
+    );
 
     expect(result.ok).toBe(false);
     expect(result.results[1]).toMatchObject({ problem: "Redirected" });
@@ -109,13 +144,16 @@ test("rejects a client-side redirect that occurs while the page settles", async 
     redirectDuringSettle = true;
     const root = fixture_root();
 
-    const result = await check({
-        baseUrl: "http://127.0.0.1:41337",
-        routePath: "/preview-run-a",
-        workspaceRoot: root,
-        nextAppDir: "apps/web",
-        navigationTimeoutMs: 10_000,
-    });
+    const result = await check(
+        {
+            baseUrl: "http://127.0.0.1:41337",
+            routePath: "/preview-run-a",
+            workspaceRoot: root,
+            nextAppDir: "apps/web",
+            navigationTimeoutMs: 10_000,
+        },
+        test_browser_runtime as never,
+    );
 
     expect(result.ok).toBe(false);
     expect(result.results[1]).toMatchObject({ problem: "Redirected" });
