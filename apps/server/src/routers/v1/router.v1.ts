@@ -1,7 +1,6 @@
 import { Router } from "express";
 
 import claude_mcp_router from "../../claude-mcp/router.claude-mcp";
-import serve_replay_artifact_controller from "../../controllers/replay/controller.serve_replay_artifact";
 import admin_router from "../admin/router.admin";
 import auth_router from "../auth/router.auth";
 import chats_router from "../chats/router.chats";
@@ -26,9 +25,6 @@ const v1_router: Router = Router();
 v1_router.get("/health", (_req, res) => {
     res.json({ status: "ok" });
 });
-
-v1_router.get("/replay", serve_replay_artifact_controller);
-v1_router.get("/replay/{*replay_path}", serve_replay_artifact_controller);
 
 v1_router.use("/auth", auth_router);
 v1_router.use("/org", org_router);

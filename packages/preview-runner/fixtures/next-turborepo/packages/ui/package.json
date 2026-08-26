@@ -1,5 +1,0 @@
-{
-    "name": "@matcha-fixture/ui",
-    "private": true,
-    "exports": "./Banner.tsx"
-}

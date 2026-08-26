@@ -41,8 +41,6 @@ export const REGENERATE_PRODUCT_DIFF_URL = (project_id: string, issue_id: string
     `${PRODUCT_DIFFS_URL(project_id)}/${issue_id}/regenerate`;
 export const PRODUCT_DIFF_ARTIFACT_URLS_URL = (project_id: string, product_diff_id: string) =>
     `${PRODUCT_DIFFS_URL(project_id)}/${product_diff_id}/artifact-urls`;
-export const PRODUCT_DIFF_REPLAY_URL = (project_id: string, product_diff_id: string) =>
-    `${PRODUCT_DIFFS_URL(project_id)}/${product_diff_id}/replay`;
 
 export const REVIEW_URL = (project_id: string, pull_number: number) =>
     `${PROJECT_URL}/${project_id}/review/${pull_number}`;

@@ -1,4 +1,4 @@
-import { Prisma, prisma } from "@trymatcha/database";
+import { prisma } from "@trymatcha/database";
 import Logger from "@trymatcha/logger";
 import {
     type DispatchJobData,
@@ -10,7 +10,7 @@ import { type Job, Worker } from "bullmq";
 
 import { ENV } from "../conf/config.env";
 import queue_config from "../conf/config.queue";
-import ProductDiffRunner, { configured_product_diff_mode } from "./service.product_diff";
+import ProductDiffRunner from "./service.product_diff";
 import E2B from "./services.e2b";
 
 const log = Logger.scope("queue");
@@ -18,24 +18,7 @@ const PRODUCT_DIFF_LOCK_MS = 60_000;
 const PRODUCT_DIFF_STALL_CHECK_MS = 30_000;
 
 export async function run_product_diff_job(job: Job<ProductDiffJobData>): Promise<void> {
-    const generationMode = configured_product_diff_mode();
-    const status = await ProductDiffRunner.run(job.data.productDiffId);
-    const maximumAttempts = Math.max(1, job.opts.attempts ?? 1);
-    const attemptsRemain = job.attemptsMade + 1 < maximumAttempts;
-    if (generationMode !== "replay" || status !== "PreviewUnavailable" || !attemptsRemain) return;
-
-    const reset = await prisma.productDiff.updateMany({
-        where: { id: job.data.productDiffId, status: "PreviewUnavailable" },
-        data: { status: "Pending", error: null, diagnostics: Prisma.JsonNull },
-    });
-    if (reset.count === 0) return;
-
-    log.warn("product diff preview unavailable; retrying", {
-        productDiff: job.data.productDiffId,
-        attempt: job.attemptsMade + 1,
-        maximumAttempts,
-    });
-    throw new Error("Product Diff preview is unavailable and will be retried");
+    await ProductDiffRunner.run(job.data.productDiffId);
 }
 
 export default class QueueService {
