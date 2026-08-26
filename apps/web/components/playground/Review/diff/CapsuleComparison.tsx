@@ -1,21 +1,23 @@
 "use client";
 import type { Capsule, CapsuleFidelity, CapsuleRevision } from "@trymatcha/types";
+import { useEffect, useRef, useState } from "react";
 
 import { MICRO_LABEL } from "@/components/playground/Core/components/paneBar";
 import { BLURRED_BG_ONE } from "@/components/playground/Home/KanbanDisplay/cardStyles";
 import { useUserConfig } from "@/hooks/user/useUserConfig";
 import { cn } from "@/lib/utils";
 import {
+    CAPSULE_FRAMES,
     type CapsuleCompareMode,
     type CapsuleViewport,
-    MOBILE_FRAME,
 } from "@/types/capsule.type";
 
 import CapsuleSlider from "./CapsuleSlider";
 import CapsuleToolbar from "./CapsuleToolbar";
 
 const IFRAME_SANDBOX = "allow-scripts allow-same-origin";
-const MAX_PANE_HEIGHT = 720;
+const SPLIT_GAP = 12;
+const TOOLBAR_CLEARANCE = 56;
 
 const ABSENT_REASON: Record<Capsule["change"], string> = {
     Modified: "This revision could not be rendered.",
@@ -47,13 +49,21 @@ export default function CapsuleComparison({
     onModeChange: (value: CapsuleCompareMode) => void;
 }) {
     const glass = useUserConfig().backgroundLightingEnabled;
+    const surface = useRef<HTMLDivElement>(null);
+    const available = useAvailableWidth(surface);
 
     const comparable = capsule.base !== null && capsule.head !== null;
     const activeMode = comparable ? mode : "split";
-    const height =
-        viewport === "mobile"
-            ? Math.min(MOBILE_FRAME.height, MAX_PANE_HEIGHT)
-            : Math.min(capsule.viewport.height, MAX_PANE_HEIGHT);
+
+    const intrinsic = CAPSULE_FRAMES[viewport];
+
+    // A desktop frame is 1440 wide: side by side it would scale to a third and be unreadable, so
+    // the revisions stack and each gets the whole pane. A phone frame is narrow enough to sit in a
+    // row, which is also the easier read for it.
+    const columns = activeMode === "split" && viewport === "mobile" ? 2 : 1;
+    const perPane = (available - SPLIT_GAP * (columns - 1)) / columns;
+    const scale = available === 0 ? 1 : Math.min(1, perPane / intrinsic.width);
+    const painted = { width: intrinsic.width * scale, height: intrinsic.height * scale };
 
     const frame = (label: string, revision: CapsuleRevision | null) => (
         <Frame
@@ -62,8 +72,9 @@ export default function CapsuleComparison({
             revision={revision}
             url={revision ? urls[revision.path] : undefined}
             controlHash={controlHash}
-            viewport={viewport}
-            height={height}
+            intrinsic={intrinsic}
+            scale={scale}
+            painted={painted}
         />
     );
 
@@ -71,20 +82,29 @@ export default function CapsuleComparison({
         <div className="flex min-h-0 flex-1 flex-col gap-3">
             <div className="relative min-h-0 flex-1">
                 <div
+                    ref={surface}
+                    data-lenis-prevent
                     className={cn(
-                        "overflow-hidden rounded-lg border border-snow/5 p-1.5",
+                        "h-full overflow-auto rounded-lg border border-snow/5 p-1.5 no-scrollbar",
                         BLURRED_BG_ONE(glass),
                     )}
                 >
                     {activeMode === "slider" ? (
                         <CapsuleSlider
-                            height={height}
-                            width={viewport === "mobile" ? MOBILE_FRAME.width : null}
+                            width={painted.width}
+                            height={painted.height}
                             before={frame("Before", capsule.base)}
                             after={frame("After", capsule.head)}
                         />
                     ) : (
-                        <div className="grid gap-3 lg:grid-cols-2">
+                        <div
+                            className="grid"
+                            style={{
+                                gap: SPLIT_GAP,
+                                gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`,
+                                paddingBottom: TOOLBAR_CLEARANCE,
+                            }}
+                        >
                             <Labelled label="Before" revision={capsule.base}>
                                 {frame("Before", capsule.base)}
                             </Labelled>
@@ -108,7 +128,7 @@ export default function CapsuleComparison({
                 </div>
             </div>
 
-            <Diagnostics capsule={capsule} />
+            <Diagnostics capsule={capsule} scale={scale} />
 
             <p className="text-[12px] text-neutral-500">
                 Sample data — the values shown are synthetic and identical on both sides. Layout,
@@ -116,6 +136,30 @@ export default function CapsuleComparison({
             </p>
         </div>
     );
+}
+
+/**
+ * The width the panes have to share, measured rather than assumed.
+ *
+ * The scale that keeps a desktop frame honest depends on how much room the pane actually has, and
+ * that changes with the sidebar, the window and the properties rail. Nothing but the element knows
+ * it, so it is observed.
+ */
+function useAvailableWidth(host: React.RefObject<HTMLDivElement | null>): number {
+    const [width, setWidth] = useState(0);
+
+    useEffect(() => {
+        const node = host.current;
+        if (!node) return;
+
+        const observer = new ResizeObserver(([entry]) => {
+            if (entry) setWidth(entry.contentRect.width);
+        });
+        observer.observe(node);
+        return () => observer.disconnect();
+    }, [host]);
+
+    return width;
 }
 
 function Labelled({
@@ -144,22 +188,24 @@ function Frame({
     revision,
     url,
     controlHash,
-    viewport,
-    height,
+    intrinsic,
+    scale,
+    painted,
 }: {
     label: string;
     capsule: Capsule;
     revision: CapsuleRevision | null;
     url: string | undefined;
     controlHash: string;
-    viewport: CapsuleViewport;
-    height: number;
+    intrinsic: { width: number; height: number };
+    scale: number;
+    painted: { width: number; height: number };
 }) {
     if (!revision || !url) {
         return (
             <p
                 className="flex items-center justify-center px-4 text-center text-[13px] text-neutral-500"
-                style={{ height }}
+                style={{ height: painted.height }}
             >
                 {ABSENT_REASON[capsule.change]}
             </p>
@@ -167,41 +213,51 @@ function Frame({
     }
 
     return (
-        <div className="flex justify-center" style={{ height }}>
+        <div
+            className="mx-auto overflow-hidden rounded-md bg-white/2"
+            style={{ width: painted.width, height: painted.height }}
+        >
             <iframe
-                key={`${revision.path}-${viewport}`}
+                key={`${revision.path}-${intrinsic.width}`}
                 title={`${capsule.title} ${label}`}
                 src={`${url}#${controlHash}`}
                 sandbox={IFRAME_SANDBOX}
                 style={{
-                    height,
-                    width: viewport === "mobile" ? MOBILE_FRAME.width : "100%",
+                    width: intrinsic.width,
+                    height: intrinsic.height,
+                    transform: `scale(${scale})`,
+                    transformOrigin: "top left",
                 }}
-                className="rounded-md bg-white/2"
+                className="border-0"
             />
         </div>
     );
 }
 
-function Diagnostics({ capsule }: { capsule: Capsule }) {
+function Diagnostics({ capsule, scale }: { capsule: Capsule; scale: number }) {
     const notes = [
         ...(capsule.base?.diagnostics ?? []).map((text) => ({ side: "Before", text })),
         ...(capsule.head?.diagnostics ?? []).map((text) => ({ side: "After", text })),
     ];
-    if (notes.length === 0) return null;
 
     return (
-        <ul className="flex flex-col gap-1">
+        <div className="flex flex-col gap-1">
+            {scale < 1 && (
+                <p className="text-[11px] text-neutral-500">
+                    Scaled to {Math.round(scale * 100)}% to fit. The page itself is rendered at full
+                    width, so its layout is the real one.
+                </p>
+            )}
             {notes.map((note) => (
-                <li
+                <p
                     key={`${note.side}-${note.text}`}
                     className="text-[11px] leading-relaxed text-amber-300/80"
                 >
                     <span className="text-neutral-500">{note.side} · </span>
                     {note.text}
-                </li>
+                </p>
             ))}
-        </ul>
+        </div>
     );
 }
 
