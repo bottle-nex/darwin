@@ -12,6 +12,7 @@ import { useActiveProject } from "@/hooks/useActiveProject";
 import type { CapsuleCompareMode, CapsuleViewport } from "@/types/capsule.type";
 
 import CapsuleComparison from "./CapsuleComparison";
+import CapsuleHeader from "./CapsuleHeader";
 import CapsuleControls from "./CapsuleControls";
 import CapsuleList from "./CapsuleList";
 
@@ -122,6 +123,12 @@ export default function DiffReviewDisplay({
 
     return (
         <Shell>
+            <CapsuleHeader
+                capsule={capsule}
+                total={capsules.length}
+                baseSha={detail.baseSha}
+                headSha={detail.headSha}
+            />
             <div className="flex min-h-0 flex-1 gap-6">
                 {capsules.length > 1 && (
                     <aside className="w-56 shrink-0">
@@ -180,7 +187,7 @@ function defaults_with(capsule: Capsule, values: Record<string, string>) {
 }
 
 function Shell({ children }: { children: ReactNode }) {
-    return <div className="flex min-h-0 min-w-0 flex-1 flex-col px-6 py-5">{children}</div>;
+    return <div className="flex min-h-0 min-w-0 flex-1 flex-col px-4 pt-3 pb-4">{children}</div>;
 }
 
 function DiffStatus({ title, body, action }: { title: string; body: string; action?: ReactNode }) {
