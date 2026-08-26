@@ -5,7 +5,6 @@ import z from "zod";
 
 import Access from "../../access-control/access";
 import ResponseWriter from "../../services/service.response";
-import { read_product_diff_preview_config } from "./product-diff-preview-config.schema";
 
 const params_schema = z.object({
     project_id: z.string(),
@@ -30,19 +29,10 @@ export default async function get_project_config_controller(req: Request, res: R
 
         const config = await prisma.projectConfig.findUniqueOrThrow({
             where: { projectId: project_id },
-            select: {
-                kanbanOptionView: true,
-                productDiffEnabled: true,
-                productDiffPreviewConfig: true,
-            },
+            select: { kanbanOptionView: true, productDiffEnabled: true },
         });
 
-        ResponseWriter.success(res, {
-            ...config,
-            productDiffPreviewConfig: read_product_diff_preview_config(
-                config.productDiffPreviewConfig,
-            ),
-        });
+        ResponseWriter.success(res, config);
     } catch (error) {
         console.error("error in get_project_config_controller:", error);
         ResponseWriter.system_error(res);

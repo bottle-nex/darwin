@@ -1,6 +1,6 @@
 import { Action, Permissions } from "@trymatcha/access-control";
 import { prisma } from "@trymatcha/database";
-import { is_product_diff_manifest_v2, type ProductDiffManifest } from "@trymatcha/types";
+import { type CapsuleManifest, is_capsule_manifest } from "@trymatcha/types";
 import type { Request, Response } from "express";
 import z from "zod";
 
@@ -8,23 +8,11 @@ import Access from "../../access-control/access";
 import GithubPullsService from "../../services/service.github_pulls";
 import ProductDiffService from "../../services/service.product_diff";
 import ResponseWriter from "../../services/service.response";
-import StorageService from "../../services/service.storage";
 
 const params_schema = z.object({
     project_id: z.string(),
     product_diff_id: z.string(),
 });
-
-const product_diff_diagnostic_schema = z
-    .object({
-        code: z.string(),
-        stage: z.string(),
-        message: z.string(),
-        adapter: z.string().nullable(),
-        applicationPath: z.string().nullable(),
-        workspaceKind: z.string().nullable(),
-    })
-    .strict();
 
 export default async function get_product_diff_controller(req: Request, res: Response) {
     try {
@@ -81,32 +69,13 @@ export default async function get_product_diff_controller(req: Request, res: Res
             }
         }
 
-        const manifest = product_diff.manifest as ProductDiffManifest | null;
-        const parsed_diagnostics = product_diff_diagnostic_schema.safeParse(
-            product_diff.diagnostics,
-        );
-        const serves_html =
-            status === "Ready" &&
-            Boolean(product_diff.artifactPrefix) &&
-            !is_product_diff_manifest_v2(manifest);
-
-        const urls = serves_html
-            ? await Promise.all([
-                  StorageService.signed_product_diff_url(
-                      `${product_diff.artifactPrefix}/base.html`,
-                  ),
-                  StorageService.signed_product_diff_url(
-                      `${product_diff.artifactPrefix}/head.html`,
-                  ),
-              ])
-            : [null, null];
+        const manifest = is_capsule_manifest(product_diff.manifest)
+            ? (product_diff.manifest as CapsuleManifest)
+            : null;
 
         ResponseWriter.success(res, {
             ...ProductDiffService.to_summary({ ...product_diff, status }),
             manifest,
-            baseUrl: urls[0],
-            headUrl: urls[1],
-            diagnostics: parsed_diagnostics.success ? parsed_diagnostics.data : null,
         });
     } catch (error) {
         console.error("error in get_product_diff_controller:", error);

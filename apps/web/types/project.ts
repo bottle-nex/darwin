@@ -1,7 +1,6 @@
 import type {
     BackgroundLightingColor,
     DefaultHomeView,
-    ProductDiffPreviewConfiguration,
     ProjectRole,
     TeamRole,
 } from "@trymatcha/types";
@@ -74,5 +73,4 @@ export type KanbanOptionView = "FLAT" | "GROUPED";
 export interface ProjectConfig {
     kanbanOptionView: KanbanOptionView;
     productDiffEnabled: boolean;
-    productDiffPreviewConfig: ProductDiffPreviewConfiguration | null;
 }
