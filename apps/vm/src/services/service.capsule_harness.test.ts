@@ -1,11 +1,9 @@
 import { expect, test } from "bun:test";
 
 import {
-    font_names_from,
     render_global_css,
     harness_dependencies,
     harness_dir,
-    render_font_shim,
     render_vite_config,
     resolve_aliases,
 } from "./service.capsule_harness";
@@ -43,8 +41,6 @@ test("every framework only module is shimmed, since plain vite cannot resolve th
     const aliases = resolve_aliases(profile());
     expect(aliases["next/image"]).toContain("shims/next-image");
     expect(aliases["next/link"]).toContain("shims/next-link");
-    expect(aliases["next/font/google"]).toContain("shims/next-font");
-    expect(aliases["next/font/local"]).toContain("shims/next-font");
     expect(aliases["next/navigation"]).toContain("shims/next-navigation");
 });
 
@@ -103,32 +99,9 @@ test("react is never aliased, because a string alias breaks react/jsx-runtime", 
     expect(render_vite_config(profile(), "faq-item")).toContain('dedupe: ["react", "react-dom"]');
 });
 
-test("whatever font a project imports becomes an export, not a guess from a list", () => {
-    const source = `import { Audiowide } from 'next/font/google';`;
-    expect(font_names_from(source)).toEqual(["Audiowide"]);
-    expect(render_font_shim(font_names_from(source))).toContain("export const Audiowide = load;");
-});
 
-test("several fonts across several files are all collected once", () => {
-    const source = [
-        `import { Inter, Roboto_Mono } from "next/font/google";`,
-        `import { Inter } from "next/font/google";`,
-        `import localFont from "next/font/local";`,
-    ].join("\n");
-    expect(font_names_from(source)).toEqual(["Inter", "Roboto_Mono"]);
-});
 
-test("a renamed font export keeps the name the module must provide", () => {
-    expect(font_names_from(`import { Geist_Mono as Mono } from "next/font/google";`)).toEqual([
-        "Geist_Mono",
-    ]);
-});
 
-test("a project using no google fonts still gets a working default export", () => {
-    const shim = render_font_shim([]);
-    expect(shim).toContain("export default load;");
-    expect(shim).toContain("localFont");
-});
 
 test("the modules a real next app reaches for are all shimmed", () => {
     const aliases = resolve_aliases(profile());
@@ -157,4 +130,12 @@ test("the stylesheet wrapper points tailwind back at the app it must scan", () =
 
     expect(css).toContain('@import "/home/user/repo/apps/web/app/globals.css"');
     expect(css).toContain('@source "../../"');
+});
+
+test("next/font is rewritten in place, so any font name in any project works", () => {
+    const config = render_vite_config(profile(), "faq-item");
+
+    expect(config).toContain("matcha:next-font");
+    expect(config).toContain("plugins: [nextFontShim,");
+    expect(config).not.toContain("shims/next-font");
 });

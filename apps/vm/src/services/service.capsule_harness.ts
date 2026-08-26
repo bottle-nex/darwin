@@ -56,8 +56,6 @@ export function resolve_aliases(
     const harness = harness_dir(profile);
     aliases["next/image"] = `${harness}/shims/next-image.tsx`;
     aliases["next/link"] = `${harness}/shims/next-link.tsx`;
-    aliases["next/font/google"] = `${harness}/shims/next-font.ts`;
-    aliases["next/font/local"] = `${harness}/shims/next-font.ts`;
     aliases["next/navigation"] = `${harness}/shims/next-navigation.ts`;
     aliases["next/dynamic"] = `${harness}/shims/next-dynamic.tsx`;
     aliases["next/script"] = `${harness}/shims/next-script.tsx`;
@@ -112,10 +110,12 @@ export function render_vite_config(
 ${tailwind_import}import { defineConfig } from "vite";
 import { viteSingleFile } from "vite-plugin-singlefile";
 
+${FONT_TRANSFORM_PLUGIN}
+
 export default defineConfig({
     root: ${JSON.stringify(`${harness}/pages`)},
     base: "./",
-    plugins: [react()${tailwind_plugin}, viteSingleFile()],
+    plugins: [nextFontShim, react()${tailwind_plugin}, viteSingleFile()],
     resolve: {
         alias: ${JSON.stringify(aliases, null, 8).replace(/\n}/, "\n    }")},
         dedupe: ["react", "react-dom"],
@@ -141,6 +141,36 @@ export function render_global_css(profile: AppProfile): string {
 @source "../../";
 `;
 }
+
+const FONT_TRANSFORM_PLUGIN = `const FONT_FACE = '{ className: "", variable: "", style: { fontFamily: "inherit" } }';
+const FONT_IMPORT = /import\\s+([^;]+?)\\s+from\\s+["']next\\/font\\/(?:google|local)["'];?/g;
+
+function fontDeclarations(clause) {
+    const names = [];
+    const fallback = clause.replace(/\\{[^}]*\\}/g, "").replace(/,/g, "").trim();
+    if (fallback) names.push(fallback);
+
+    const braced = clause.match(/\\{([^}]*)\\}/);
+    for (const part of (braced ? braced[1] : "").split(",")) {
+        const local = part.trim().split(/\\s+as\\s+/).pop()?.trim();
+        if (local) names.push(local);
+    }
+
+    return names
+        .filter((name) => /^[A-Za-z_$][\\w$]*$/.test(name))
+        .map((name) => "const " + name + " = () => (" + FONT_FACE + ");")
+        .join(" ");
+}
+
+const nextFontShim = {
+    name: "matcha:next-font",
+    enforce: "pre",
+    transform(code, id) {
+        if (!id.match(/\\.[jt]sx?$/) || !code.includes("next/font")) return null;
+        const out = code.replace(FONT_IMPORT, (_match, clause) => fontDeclarations(clause));
+        return out === code ? null : { code: out, map: null };
+    },
+};`;
 
 export function render_page_html(spec: CapsuleSpec): string {
     return `<!doctype html>
@@ -281,35 +311,6 @@ export default function Link({ href, children, prefetch, replace, scroll, shallo
 }
 `;
 
-const FONT_IMPORT = /import\s+([^;]*?)\s+from\s+["']next\/font\/(?:google|local)["']/g;
-
-export function font_names_from(sources: string): string[] {
-    const names = new Set<string>();
-
-    for (const [, clause] of sources.matchAll(FONT_IMPORT)) {
-        const named = clause?.match(/\{([^}]*)\}/)?.[1] ?? "";
-        for (const part of named.split(",")) {
-            const name = part.trim().split(/\s+as\s+/)[0]?.trim();
-            if (name && /^[A-Za-z_$][\w$]*$/.test(name)) names.add(name);
-        }
-    }
-    return [...names].sort();
-}
-
-export function render_font_shim(names: string[]): string {
-    const face = `const face = { className: "", variable: "", style: { fontFamily: "inherit" } };
-
-const load = () => face;
-`;
-    const exports = names.map((name) => `export const ${name} = load;`).join("\n");
-
-    return `${face}
-${exports}${exports ? "\n" : ""}
-export default load;
-export { load as localFont };
-`;
-}
-
 const NEXT_NAVIGATION_SHIM = `const noop = () => {};
 
 export function useRouter() {
@@ -401,12 +402,11 @@ export function unstable_cache(fn) {
 const PASSTHROUGH_SHIM = `export {};
 `;
 
-export function harness_files(font_names: string[] = []): Record<string, string> {
+export function harness_files(): Record<string, string> {
     return {
         "network-stub.ts": NETWORK_STUB,
         "shims/next-image.tsx": NEXT_IMAGE_SHIM,
         "shims/next-link.tsx": NEXT_LINK_SHIM,
-        "shims/next-font.ts": render_font_shim(font_names),
         "shims/next-navigation.ts": NEXT_NAVIGATION_SHIM,
         "shims/next-dynamic.tsx": NEXT_DYNAMIC_SHIM,
         "shims/next-script.tsx": NEXT_SCRIPT_SHIM,
@@ -430,8 +430,7 @@ export default class CapsuleHarness {
         const harness = harness_dir(profile);
         await sandbox.commands.run(`rm -rf ${harness}/pages && mkdir -p ${harness}/shims`);
 
-        const fonts = await this.discover_fonts(sandbox, profile);
-        for (const [name, contents] of Object.entries(harness_files(fonts))) {
+        for (const [name, contents] of Object.entries(harness_files())) {
             await sandbox.files.write(`${harness}/${name}`, contents);
         }
         if (profile.globalCssPath) {
@@ -470,19 +469,6 @@ export default class CapsuleHarness {
             `npm install --no-audit --no-fund ${harness_dependencies(profile).join(" ")}`,
             { cwd: harness_dir(profile), timeoutMs: 6 * 60_000 },
         );
-    }
-
-    private static async discover_fonts(
-        sandbox: Sandbox,
-        profile: AppProfile,
-    ): Promise<string[]> {
-        const found = await sandbox.commands
-            .run(
-                `grep -rhoE "import[^;]*from ['\"]next/font/(google|local)['\"]" ${app_root(profile)} --include='*.tsx' --include='*.ts' --exclude-dir=node_modules`,
-            )
-            .catch(() => null);
-
-        return font_names_from(found?.stdout ?? "");
     }
 
     private static async detect(sandbox: Sandbox, profile: AppProfile): Promise<HarnessOptions> {

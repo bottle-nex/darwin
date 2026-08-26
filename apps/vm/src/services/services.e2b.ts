@@ -21,6 +21,7 @@ import SandboxStream, { redact } from "./service.sandbox_stream";
 import SecretService from "./service.secret";
 import PlanService from "./services.plan";
 
+const SANDBOX_TEMPLATE = "node-py-claude-template:stable";
 const REPO_DIR = "/home/user/repo";
 const SAFE_BRANCH = /^[A-Za-z0-9._/-]+$/;
 const SANDBOX_TIMEOUT_MS = 15 * 60_000;
@@ -36,6 +37,17 @@ const PR_BODY_PATH = "/home/user/pr_body.md";
 const MCP_CONFIG_PATH = "/home/user/matcha_mcp_config.json";
 const SANDBOX_MCP_ENTRY = "/opt/matcha/sandbox-mcp/index.js";
 const ISSUE_SOLVE_TIMEOUT_MS = 30 * 60_000;
+const ISSUE_PUSH_TIMEOUT_MS = 10 * 60_000;
+
+export function requires_agent_run(
+    existing_pull: boolean,
+    already_pushed: boolean,
+    agent_done_at: Date | null,
+): boolean {
+    return !existing_pull && !already_pushed && agent_done_at === null;
+}
+
+class IssueBranchPushError extends Error {}
 
 export default class E2B {
     public static async run_onboarding_job(
@@ -173,6 +185,8 @@ export default class E2B {
 
         let sandbox_id = worker.sandboxId;
         let teardown_succeeded = false;
+        let retain_sandbox = false;
+        let gh_token = "";
         log.step("worker loop starting", { worker: worker_id, project: project.id, branch });
 
         try {
@@ -202,10 +216,11 @@ export default class E2B {
 
             const sandbox = await Sandbox.connect(sandbox_id, { apiKey: ENV.SERVER_E2B_API_KEY });
 
-            const [gh_token, worker_token] = await Promise.all([
+            const [installation_token, worker_token] = await Promise.all([
                 GithubService.getInstallationToken(installation_id),
                 Promise.resolve(sign_worker_jwt(worker_id)),
             ]);
+            gh_token = installation_token;
             log.info("minted github + worker tokens for the sandbox");
 
             await sandbox.files.write(
@@ -270,6 +285,13 @@ export default class E2B {
                 // issue whose PR already exists never runs claude, so it has no run.
                 let run_id: string | undefined;
 
+                let agent_done = issue.agentDoneAt !== null;
+                const needs_agent_run = requires_agent_run(
+                    existing_pull !== null,
+                    already_pushed,
+                    issue.agentDoneAt,
+                );
+
                 if (existing_pull) {
                     log.info(`existing PR found for issue #${issue.number}`, {
                         pull: existing_pull.number,
@@ -279,7 +301,7 @@ export default class E2B {
                     log.info(`branch already pushed for issue #${issue.number}`, {
                         branch: issue.prBranch,
                     });
-                } else {
+                } else if (needs_agent_run) {
                     run_id = randomUUID();
                     await RunReporter.started(worker_token, run_id, issue.id, log);
 
@@ -339,14 +361,26 @@ export default class E2B {
                         duration: format_duration(report.duration_ms),
                     });
                     log.block("final message from claude", report.result ?? "(empty)");
+
+                    await prisma.issue.update({
+                        where: { id: issue.id },
+                        data: { agentDoneAt: new Date() },
+                    });
+                    agent_done = true;
                 }
 
-                const agentDoneIssue = await prisma.issue.update({
-                    where: { id: issue.id },
-                    data: { agentDoneAt: new Date() },
-                });
+                if (!existing_pull && !already_pushed) {
+                    await E2B.push_issue_branch(sandbox, issue.prBranch);
+                }
 
-                console.log("agentDoneIssue", agentDoneIssue);
+                if (!agent_done) {
+                    const agentDoneIssue = await prisma.issue.update({
+                        where: { id: issue.id },
+                        data: { agentDoneAt: new Date() },
+                    });
+
+                    console.log("agentDoneIssue", agentDoneIssue);
+                }
 
                 let pull_request: PullRequestSummary;
                 try {
@@ -402,24 +436,34 @@ export default class E2B {
                 data: { status: WorkerStatus.Idle },
             });
         } catch (error) {
-            log.error("worker loop failed", error, { worker: worker_id });
+            const error_message = redact(error instanceof Error ? error.message : String(error), [
+                gh_token,
+                ENV.SERVER_CLAUDE_CODE_OAUTH_TOKEN,
+            ]);
+            log.error("worker loop failed", new Error(error_message), { worker: worker_id });
+            retain_sandbox = error instanceof IssueBranchPushError;
             try {
                 await prisma.worker.update({
                     where: { id: worker_id },
                     data: {
-                        status: WorkerStatus.Dead,
+                        status: retain_sandbox ? WorkerStatus.Idle : WorkerStatus.Dead,
                         contextSummary: {
-                            error: error instanceof Error ? error.message : String(error),
+                            error: error_message,
                             failedAt: new Date().toISOString(),
+                            retryable: retain_sandbox,
                         },
                     },
                 });
-                log.warn("worker marked Dead after failure");
+                log.warn(
+                    retain_sandbox
+                        ? "worker retained for branch push retry"
+                        : "worker marked Dead after failure",
+                );
             } catch (e) {
                 log.error("could not mark worker Dead", e, { worker: worker_id });
             }
         } finally {
-            if (sandbox_id) {
+            if (sandbox_id && !retain_sandbox) {
                 log.info("tearing down sandbox", { sandbox: sandbox_id });
                 try {
                     await E2B.destroy(sandbox_id);
@@ -439,8 +483,10 @@ export default class E2B {
                         log.error("could not clear destroyed sandbox", e, { sandbox: sandbox_id });
                     }
                 }
-            } else {
+            } else if (!sandbox_id) {
                 teardown_succeeded = true;
+            } else {
+                log.info("retaining sandbox for branch push retry", { sandbox: sandbox_id });
             }
         }
     }
@@ -469,7 +515,7 @@ ${issue.description}`;
             `Stay on the existing branch "${issue.prBranch}". Never switch branches or commit directly to "${base_branch}".`,
             `Implement the fix using your normal tools.`,
             `Commit your changes with a clear commit message.`,
-            `Push the branch to origin. Do not open a pull request — that is handled for you once you finish.`,
+            `Do not push the branch or open a pull request — that is handled for you once you finish.`,
             `Write a short markdown summary of your change to ${PR_BODY_PATH}. It becomes the pull request description.`,
         ];
 
@@ -534,6 +580,25 @@ Never start a long-running command in the background and end your turn waiting o
         return pulls[0] ?? null;
     }
 
+    public static async push_issue_branch(sandbox: Sandbox, issue_branch: string): Promise<void> {
+        this.validate_branch(issue_branch);
+        try {
+            const result = await sandbox.commands.run(`git push origin ${issue_branch}`, {
+                cwd: REPO_DIR,
+                timeoutMs: ISSUE_PUSH_TIMEOUT_MS,
+            });
+            if (result.exitCode !== 0) {
+                throw new Error(result.stderr.trim() || `git push exited with ${result.exitCode}`);
+            }
+        } catch (error) {
+            throw new IssueBranchPushError(
+                `could not push branch ${issue_branch}: ${
+                    error instanceof Error ? error.message : String(error)
+                }`,
+            );
+        }
+    }
+
     private static async ensure_pull_request(
         sandbox: Sandbox,
         token: string,
@@ -570,7 +635,7 @@ Never start a long-running command in the background and end your turn waiting o
     }
 
     public static async create(timeout_ms: number = SANDBOX_TIMEOUT_MS): Promise<string> {
-        const sandbox = await Sandbox.create("node-py-claude-template", {
+        const sandbox = await Sandbox.create(SANDBOX_TEMPLATE, {
             apiKey: ENV.SERVER_E2B_API_KEY,
             timeoutMs: timeout_ms,
         });
