@@ -1,6 +1,7 @@
 import { expect, test } from "bun:test";
 
 import {
+    GLOBAL_CSS_PATTERN,
     install_command,
     type PackageCandidate,
     pick_app_dir,
@@ -80,4 +81,20 @@ test("the deepest matching package wins over an ancestor that also has react", (
 test("a react package that holds no changed file still wins over nothing", () => {
     const candidates: PackageCandidate[] = [{ dir: "apps/web", dependencies: { react: "19.0.0" } }];
     expect(pick_app_dir(candidates, ["docs/readme.md"])).toBe("apps/web");
+});
+
+test("the global stylesheet is found whichever quotes the project imports with", () => {
+    const marker = new RegExp(GLOBAL_CSS_PATTERN);
+
+    expect(marker.test(`@import "tailwindcss";`)).toBe(true);
+    expect(marker.test(`@import 'tailwindcss';`)).toBe(true);
+    expect(marker.test("@import tailwindcss;")).toBe(true);
+    expect(marker.test("@tailwind base;")).toBe(true);
+});
+
+test("a stylesheet that merely mentions tailwind elsewhere is not the entry", () => {
+    const marker = new RegExp(GLOBAL_CSS_PATTERN);
+
+    expect(marker.test(".tailwindish { color: red }")).toBe(false);
+    expect(marker.test(`@import "./theme.css";`)).toBe(false);
 });

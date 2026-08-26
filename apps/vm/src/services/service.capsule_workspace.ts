@@ -4,7 +4,7 @@ import type { Sandbox } from "e2b";
 const REPO_DIR = "/home/user/repo";
 const INSTALL_TIMEOUT_MS = 12 * 60_000;
 const MAX_INSTALL_ERROR_CHARS = 2000;
-const GLOBAL_CSS_MARKERS = ["@tailwind", '@import "tailwindcss"', "@import 'tailwindcss'"];
+export const GLOBAL_CSS_PATTERN = "@tailwind |@import [\"']?tailwindcss";
 
 export type PackageManager = "bun" | "pnpm" | "yarn" | "npm";
 
@@ -171,15 +171,18 @@ export default class CapsuleWorkspace {
     }
 
     private static async find_global_css(sandbox: Sandbox, app_dir: string): Promise<string | null> {
-        const pattern = GLOBAL_CSS_MARKERS.join("|");
         const result = await sandbox.commands
-            .run(`grep -rlE '${pattern}' --include='*.css' ${app_dir} | head -1`, {
+            .run(`grep -rlE ${JSON.stringify(GLOBAL_CSS_PATTERN)} --include=*.css ${app_dir}`, {
                 cwd: REPO_DIR,
             })
             .catch(() => null);
 
-        const path = result?.stdout.trim().replace(/^\.\//, "");
-        return path ? path : null;
+        const matches = (result?.stdout ?? "")
+            .split("\n")
+            .map((line) => line.trim().replace(/^\.\//, ""))
+            .filter(Boolean);
+
+        return matches.sort((left, right) => left.length - right.length)[0] ?? null;
     }
 
     private static async read_tsconfig_paths(
