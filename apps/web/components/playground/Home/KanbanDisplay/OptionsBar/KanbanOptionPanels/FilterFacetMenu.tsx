@@ -1,6 +1,9 @@
 "use client";
-import { useState, type ReactNode } from "react";
+import { type ReactNode, useState } from "react";
 import { MdCheck, MdSearch } from "react-icons/md";
+
+import MemberOptionRow from "@/components/playground/Core/components/MemberOptionRow";
+import TagDisplay from "@/components/playground/Home/TagsDisplay/TagDisplay";
 import { Button } from "@/components/ui/button";
 import {
     DropdownMenu,
@@ -9,9 +12,9 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
-import TagDisplay from "@/components/playground/Home/TagsDisplay/TagDisplay";
 import { useKanbanFilterStore } from "@/store/kanban/useKanbanFilterStore";
 import type { ListFacetKey } from "@/types/boardFilter";
+
 import {
     FACET_MENU_CONTENT,
     FACET_META,
@@ -45,12 +48,9 @@ export function FilterFacetItems({ facetKey }: { facetKey: ListFacetKey }) {
 
     return (
         <>
-            <div className="flex shrink-0 flex-col gap-1.5 p-2">
-                <div className="flex items-center justify-between px-0.5">
-                    <span className="text-[11px] font-medium tracking-wide text-neutral-500 uppercase">
-                        {meta.label}
-                    </span>
-                    {selected.length > 0 && (
+            <div className="flex shrink-0 flex-col gap-1.5 p-1">
+                {selected.length > 0 && (
+                    <div className="flex items-center justify-end px-0.5">
                         <Button
                             variant="unstyled"
                             type="button"
@@ -59,12 +59,12 @@ export function FilterFacetItems({ facetKey }: { facetKey: ListFacetKey }) {
                         >
                             Clear
                         </Button>
-                    )}
-                </div>
+                    </div>
+                )}
                 {isSearchableFacet(facetKey) && (
                     <div className="relative">
                         <MdSearch
-                            className="pointer-events-none absolute top-1/2 left-2 size-3 -translate-y-1/2 text-neutral-500"
+                            className="pointer-events-none absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-neutral-500"
                             aria-hidden
                         />
                         <input
@@ -72,7 +72,7 @@ export function FilterFacetItems({ facetKey }: { facetKey: ListFacetKey }) {
                             onChange={(e) => setQuery(e.target.value)}
                             onKeyDown={(e) => e.stopPropagation()}
                             placeholder={`Search ${meta.label.toLowerCase()}...`}
-                            className="h-7 w-full rounded-md border border-white/10 bg-white/5 pr-2 pl-7 text-[12px] text-neutral-100 placeholder:text-neutral-500 focus:border-white/25 focus:outline-none"
+                            className="h-7 w-full rounded-md bg-transparent pr-2 pl-7 text-[12px] text-neutral-100 placeholder:text-neutral-500 focus:outline-none"
                         />
                     </div>
                 )}
@@ -96,32 +96,46 @@ export function FilterFacetItems({ facetKey }: { facetKey: ListFacetKey }) {
                                 onSelect={(e) => e.preventDefault()}
                                 className="flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 outline-none select-none data-highlighted:bg-white/5"
                             >
-                                <span
-                                    className={cn(
-                                        "flex size-3.5 shrink-0 items-center justify-center rounded border transition-colors",
-                                        isOn
-                                            ? "border-neutral-200 bg-neutral-200 text-neutral-900"
-                                            : "border-white/25",
-                                    )}
-                                >
-                                    {isOn && <MdCheck className="size-2.5" aria-hidden />}
-                                </span>
-                                {option.dotColor ? (
-                                    <TagDisplay name={option.label} color={option.dotColor} />
+                                {option.avatarSrc !== undefined ? (
+                                    <MemberOptionRow
+                                        id={option.value}
+                                        label={option.label}
+                                        avatarSrc={option.avatarSrc}
+                                        checked={isOn}
+                                    />
                                 ) : (
                                     <>
-                                        {option.icon && (
-                                            <option.icon
-                                                className={cn(
-                                                    "size-3.5 text-neutral-400",
-                                                    option.iconClassName,
-                                                )}
-                                                aria-hidden
-                                            />
-                                        )}
-                                        <span className="flex-1 truncate text-[13px] text-neutral-200">
-                                            {option.label}
+                                        <span
+                                            className={cn(
+                                                "flex size-3.5 shrink-0 items-center justify-center rounded border transition-colors",
+                                                isOn
+                                                    ? "border-neutral-200 bg-neutral-200 text-neutral-900"
+                                                    : "border-white/25",
+                                            )}
+                                        >
+                                            {isOn && <MdCheck className="size-2.5" aria-hidden />}
                                         </span>
+                                        {option.dotColor ? (
+                                            <TagDisplay
+                                                name={option.label}
+                                                color={option.dotColor}
+                                            />
+                                        ) : (
+                                            <>
+                                                {option.icon && (
+                                                    <option.icon
+                                                        className={cn(
+                                                            "size-3.5 text-neutral-400",
+                                                            option.iconClassName,
+                                                        )}
+                                                        aria-hidden
+                                                    />
+                                                )}
+                                                <span className="flex-1 truncate text-[13px] text-neutral-200">
+                                                    {option.label}
+                                                </span>
+                                            </>
+                                        )}
                                     </>
                                 )}
                             </DropdownMenuCheckboxItem>

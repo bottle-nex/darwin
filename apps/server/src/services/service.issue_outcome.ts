@@ -1,5 +1,6 @@
 import { ActivityType, ActorType, IssueStatus, prisma } from "@trymatcha/database";
-import { OutboundSocketMessageType, type IssueOutcomeJobData } from "@trymatcha/types";
+import { type IssueOutcomeJobData, OutboundSocketMessageType } from "@trymatcha/types";
+
 import { server_services } from "..";
 import ActivityService, { type ActivityEvent } from "./service.activity";
 import { location_of } from "./service.activity-diff";

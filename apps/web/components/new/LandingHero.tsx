@@ -1,6 +1,8 @@
-import { cn } from "@/lib/utils";
-import HeroBuddy from "../landing/v2/HeroBuddy";
 import { IoIosPlayCircle } from "react-icons/io";
+
+import { cn } from "@/lib/utils";
+
+import HeroBuddy from "../landing/v2/HeroBuddy";
 import HeroPanel from "./HeroPanel";
 
 export default function LandingHero() {

@@ -53,15 +53,12 @@ RUN apt-get update \
        unzip fonts-liberation fonts-dejavu-core fonts-noto-core fonts-noto-color-emoji \
     && rm -rf /var/lib/apt/lists/*
 
-COPY packages/preview-runner/dist/index.js /opt/matcha/preview-runner/index.js
-COPY docker/preview-runner.runtime.package.json /opt/matcha/preview-runner/package.json
-RUN cd /opt/matcha/preview-runner \
+COPY packages/capsule-check/dist/index.js /opt/matcha/capsule-check/index.js
+COPY docker/capsule-check.runtime.package.json /opt/matcha/capsule-check/package.json
+RUN cd /opt/matcha/capsule-check \
     && npm install --omit=dev \
     && npx playwright install --with-deps chromium \
-    && chmod -R a+rX /opt/matcha/preview-runner /home/user/.cache/ms-playwright
-
-COPY docker/preview-check.sh /usr/local/bin/preview-check
-RUN chmod 0755 /usr/local/bin/preview-check
+    && chmod -R a+rX /opt/matcha/capsule-check /home/user/.cache/ms-playwright
 
 # Prepared at build time rather than on demand: a sandbox may have no registry reach at the
 # moment it needs to install a project, and corepack would otherwise try to download the manager

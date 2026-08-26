@@ -1,6 +1,7 @@
 import { Router } from "express";
-import ListContentController from "../../controllers/content/controller.list-content";
+
 import GetContentController from "../../controllers/content/controller.get-content";
+import ListContentController from "../../controllers/content/controller.list-content";
 
 const content_router: Router = Router();
 

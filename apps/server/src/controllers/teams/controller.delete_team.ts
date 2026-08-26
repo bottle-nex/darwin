@@ -1,9 +1,10 @@
-import { Request, Response } from "express";
-import { z } from "zod";
-import { Prisma, prisma } from "@trymatcha/database";
-import ResponseWriter from "../../services/service.response";
-import Access from "../../access-control/access";
 import { Action, Permissions } from "@trymatcha/access-control";
+import { Prisma, prisma } from "@trymatcha/database";
+import type { Request, Response } from "express";
+import { z } from "zod";
+
+import Access from "../../access-control/access";
+import ResponseWriter from "../../services/service.response";
 
 const params_schema = z.object({
     teamId: z.string(),

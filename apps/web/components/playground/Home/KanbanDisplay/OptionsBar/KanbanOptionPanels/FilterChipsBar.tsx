@@ -1,22 +1,24 @@
 "use client";
-import { forwardRef, type ComponentProps } from "react";
 import { format, parseISO } from "date-fns";
+import { type ComponentProps, forwardRef } from "react";
 import { MdClose } from "react-icons/md";
+
 import { Button } from "@/components/ui/button";
 import IconWrapper from "@/components/ui/IconWrapper";
-import { cn } from "@/lib/utils";
 import { activeFacetKeys } from "@/lib/kanban/boardFilter";
+import { cn } from "@/lib/utils";
 import { useKanbanFilterStore } from "@/store/kanban/useKanbanFilterStore";
 import {
     DATE_FACET_KEYS,
-    LIST_FACET_KEYS,
     type DateFacetKey,
     type FacetKey,
+    LIST_FACET_KEYS,
     type ListFacetKey,
 } from "@/types/boardFilter";
-import { FACET_META, facetSummary, facetValues, useFacetOptions } from "./filterFacets";
-import FilterFacetMenu from "./FilterFacetMenu";
+
 import FilterDateMenu from "./FilterDateMenu";
+import FilterFacetMenu from "./FilterFacetMenu";
+import { FACET_META, facetSummary, facetValues, useFacetOptions } from "./filterFacets";
 import FilterQueryMenu from "./FilterQueryMenu";
 
 function isListFacet(key: FacetKey): key is ListFacetKey {

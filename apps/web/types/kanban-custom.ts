@@ -1,5 +1,5 @@
-import type { Assignee, Priority } from "@/types/kanban";
 import type { BoardIssue, BoardTag } from "@/types/board";
+import type { Assignee, Priority } from "@/types/kanban";
 
 /**
  * The Custom Kanban is a Trello-style board the user builds by hand: free-form

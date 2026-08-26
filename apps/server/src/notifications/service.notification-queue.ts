@@ -1,24 +1,25 @@
-import { Queue, Worker, type Job } from "bullmq";
-import { QueueName, type NotificationJobData } from "@trymatcha/types";
+import { type NotificationJobData, QueueName } from "@trymatcha/types";
+import { type Job, Queue, Worker } from "bullmq";
+
 import queue_config from "../configs/config.queue";
-import IssueAssignedNotification from "./actions/action.issue-assigned";
-import IssueUnassignedNotification from "./actions/action.issue-unassigned";
-import ChatMentionNotification from "./actions/action.chat-mention";
-import ProjectChatMentionNotification from "./actions/action.project-chat-mention";
-import TeamChatMentionNotification from "./actions/action.team-chat-mention";
-import IssueStatusChangedNotification from "./actions/action.issue-status-changed";
-import IssuePriorityChangedNotification from "./actions/action.issue-priority-changed";
-import IssueMovedNotification from "./actions/action.issue-moved";
-import IssueCommentedNotification from "./actions/action.issue-commented";
-import IssueReferencedNotification from "./actions/action.issue-referenced";
-import IssueDeletedNotification from "./actions/action.issue-deleted";
-import InviteAcceptedNotification from "./actions/action.invite-accepted";
 import AddedToProjectNotification from "./actions/action.added-to-project";
 import AddedToTeamNotification from "./actions/action.added-to-team";
-import RemovedFromTeamNotification from "./actions/action.removed-from-team";
-import RemovedFromOrgNotification from "./actions/action.removed-from-org";
-import RoleChangedNotification from "./actions/action.role-changed";
+import ChatMentionNotification from "./actions/action.chat-mention";
+import InviteAcceptedNotification from "./actions/action.invite-accepted";
+import IssueAssignedNotification from "./actions/action.issue-assigned";
+import IssueCommentedNotification from "./actions/action.issue-commented";
+import IssueDeletedNotification from "./actions/action.issue-deleted";
+import IssueMovedNotification from "./actions/action.issue-moved";
+import IssuePriorityChangedNotification from "./actions/action.issue-priority-changed";
+import IssueReferencedNotification from "./actions/action.issue-referenced";
+import IssueStatusChangedNotification from "./actions/action.issue-status-changed";
+import IssueUnassignedNotification from "./actions/action.issue-unassigned";
 import MessageReactedNotification from "./actions/action.message-reacted";
+import ProjectChatMentionNotification from "./actions/action.project-chat-mention";
+import RemovedFromOrgNotification from "./actions/action.removed-from-org";
+import RemovedFromTeamNotification from "./actions/action.removed-from-team";
+import RoleChangedNotification from "./actions/action.role-changed";
+import TeamChatMentionNotification from "./actions/action.team-chat-mention";
 
 export default class NotificationQueueService {
     private queue: Queue<NotificationJobData>;

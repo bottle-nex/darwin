@@ -1,4 +1,5 @@
 import jwt, { type SignOptions } from "jsonwebtoken";
+
 import { ENV } from "../conf/config.env";
 
 /**

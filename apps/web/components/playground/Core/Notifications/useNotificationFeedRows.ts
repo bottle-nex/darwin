@@ -1,6 +1,7 @@
 "use client";
-import { useMemo } from "react";
 import type { Notification } from "@trymatcha/types";
+import { useMemo } from "react";
+
 import {
     filter_notifications,
     flattenNotificationDayRows,

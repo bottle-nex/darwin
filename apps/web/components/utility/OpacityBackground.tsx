@@ -1,7 +1,8 @@
-import { cn } from "@/lib/utils";
-import { createPortal } from "react-dom";
-import { useEffect, useSyncExternalStore } from "react";
 import { motion } from "framer-motion";
+import { useEffect, useSyncExternalStore } from "react";
+import { createPortal } from "react-dom";
+
+import { cn } from "@/lib/utils";
 
 interface OpacityBackgroundProps {
     children: React.ReactNode;

@@ -1,6 +1,7 @@
 import { mergeAttributes, Node } from "@tiptap/core";
 import { TextSelection } from "@tiptap/pm/state";
 import { ReactNodeViewRenderer } from "@tiptap/react";
+
 import ToggleNodeView from "./ToggleNodeView";
 
 declare module "@tiptap/core" {

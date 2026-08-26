@@ -570,6 +570,7 @@
 .review-diff {
     --diff-add: var(--color-emerald-500);
     --diff-remove: var(--color-rose-500);
+    --diff-bar-width: 1.5px;
 
     --diff-background-color: transparent;
     --diff-text-color: #e6e6e6;
@@ -626,14 +627,19 @@
     padding-right: 0.75rem;
 }
 
+.review-diff .diff-gutter-insert,
+.review-diff .diff-gutter-delete {
+    box-shadow: inset var(--diff-bar-width) 0 0 0 var(--diff-bar-color);
+}
+
 .review-diff .diff-gutter-insert {
+    --diff-bar-color: var(--diff-add);
     color: var(--diff-gutter-insert-text-color);
-    box-shadow: inset 2px 0 0 0 var(--diff-add);
 }
 
 .review-diff .diff-gutter-delete {
+    --diff-bar-color: var(--diff-remove);
     color: var(--diff-gutter-delete-text-color);
-    box-shadow: inset 2px 0 0 0 var(--diff-remove);
 }
 
 .review-diff .diff-decoration-content {

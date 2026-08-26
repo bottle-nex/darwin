@@ -1,8 +1,9 @@
 "use client";
 
 import { useMemo } from "react";
-import { useActiveProject } from "@/hooks/useActiveProject";
+
 import { useBoardFeed } from "@/hooks/issues/useBoard";
+import { useActiveProject } from "@/hooks/useActiveProject";
 import { issueMatchesFilters } from "@/lib/kanban/boardFilter";
 
 export function useIssueFilter({ skipStatus = false }: { skipStatus?: boolean } = {}) {

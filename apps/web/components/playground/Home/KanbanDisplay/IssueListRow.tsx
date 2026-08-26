@@ -9,9 +9,10 @@ import type { IssueSelectionScope } from "@/store/issues/useIssueSelectionStore"
 import { usePaneRouteStore } from "@/store/playground/usePaneRouteStore";
 import type { BoardIssue, BoardTag } from "@/types/board";
 import type { Assignee } from "@/types/kanban";
+
+import { shortDate } from "./cards/IssueCardFace";
 import IssueDropdown from "./IssueDropdown";
 import IssueTags from "./IssueTags";
-import { shortDate } from "./cards/IssueCardFace";
 
 type IssueListRowProps = {
     issueId: string;

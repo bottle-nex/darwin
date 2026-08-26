@@ -1,10 +1,11 @@
 "use client";
 
-import * as React from "react";
 import * as SelectPrimitive from "@radix-ui/react-select";
+import * as React from "react";
 import { MdCheck, MdKeyboardArrowDown, MdKeyboardArrowUp } from "react-icons/md";
 
 import { cn } from "@/lib/utils";
+
 import {
     MENU_ITEM,
     MENU_LABEL,

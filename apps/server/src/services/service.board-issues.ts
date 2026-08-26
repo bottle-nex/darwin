@@ -1,6 +1,9 @@
 import { createHash } from "node:crypto";
-import { IssueStatus, Prisma, prisma } from "@trymatcha/database";
+
+import type { IssueStatus } from "@trymatcha/database";
+import { Prisma, prisma } from "@trymatcha/database";
 import z from "zod";
+
 import type {
     BoardFilters,
     BoardLaneSelector,

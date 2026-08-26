@@ -1,5 +1,5 @@
-import * as React from "react";
 import { OTPInput, OTPInputContext } from "input-otp";
+import * as React from "react";
 import { MdRemove } from "react-icons/md";
 
 import { cn } from "@/lib/utils";
@@ -66,4 +66,4 @@ const InputOTPSeparator = React.forwardRef<
 ));
 InputOTPSeparator.displayName = "InputOTPSeparator";
 
-export { InputOTP, InputOTPGroup, InputOTPSlot, InputOTPSeparator };
+export { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot };

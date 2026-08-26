@@ -1,10 +1,11 @@
-import { Request, Response } from "express";
-import { z } from "zod";
 import { Action, Permissions } from "@trymatcha/access-control";
 import { prisma } from "@trymatcha/database";
+import type { Request, Response } from "express";
+import { z } from "zod";
+
 import Access from "../../access-control/access";
-import ResponseWriter from "../../services/service.response";
 import GithubAppService from "../../services/service.github_app";
+import ResponseWriter from "../../services/service.response";
 
 const params_schema = z.object({
     orgId: z.string().min(1),

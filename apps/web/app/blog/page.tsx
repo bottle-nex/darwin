@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
-import { LandingNavbar } from "@/components/new/LandingNavbar";
-import LandingFooter from "@/components/landing/LandingFooter";
-import { landingContainer } from "@/components/landing/LandingSection";
-import BlogHero from "@/components/blog/BlogHero";
-import { resolveTab } from "@/components/blog/BlogTabs";
+
 import AllEntries from "@/components/blog/AllEntries";
 import BlogEntries from "@/components/blog/BlogEntries";
+import BlogHero from "@/components/blog/BlogHero";
+import { resolveTab } from "@/components/blog/BlogTabs";
 import ChangelogEntries from "@/components/blog/ChangelogEntries";
+import LandingFooter from "@/components/landing/LandingFooter";
+import { landingContainer } from "@/components/landing/LandingSection";
+import { LandingNavbar } from "@/components/new/LandingNavbar";
 import { getPosts, getReleases } from "@/lib/content";
 
 export const metadata: Metadata = {

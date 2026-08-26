@@ -1,5 +1,6 @@
 "use client";
 import { useEffect } from "react";
+
 import { paneRouteFromPath, usePaneRouteStore } from "@/store/playground/usePaneRouteStore";
 
 export function usePaneRoute({ sync = false }: { sync?: boolean } = {}) {

@@ -4,8 +4,10 @@ import { motion, useInView, useReducedMotion } from "motion/react";
 import { useRef, useState } from "react";
 import type { IconType } from "react-icons";
 import { LuSquareKanban, LuSquareTerminal } from "react-icons/lu";
-import { cn } from "@/lib/utils";
+
 import HeroBuddy from "@/components/landing/v2/HeroBuddy";
+import { cn } from "@/lib/utils";
+
 import Reveal from "../utility/Reveal";
 import LandingSection from "./LandingSection";
 import SectionHeader from "./SectionHeader";

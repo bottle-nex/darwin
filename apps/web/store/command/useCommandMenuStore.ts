@@ -1,4 +1,5 @@
 import { create } from "zustand";
+
 import type { CommandPage } from "@/types/command.type";
 
 interface CommandMenuState {

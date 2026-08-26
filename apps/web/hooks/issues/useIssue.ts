@@ -1,11 +1,13 @@
 "use client";
 
 import { queryOptions, useQueries, useQuery } from "@tanstack/react-query";
+
 import { apiClient } from "@/lib/axios";
-import { issueKey } from "./boardCache";
 import { ISSUE_URL } from "@/routes/api_routes";
 import type { ApiResponse } from "@/types/api";
 import type { BoardIssue } from "@/types/board";
+
+import { issueKey } from "./boardCache";
 
 export function issueQueryOptions(projectId: string, issueId: string) {
     return queryOptions({

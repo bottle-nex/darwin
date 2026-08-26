@@ -1,24 +1,26 @@
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { motion } from "motion/react";
-import { HiChevronDown } from "react-icons/hi2";
-import { cn } from "@/lib/utils";
-import PlaygroundAvatar, {
-    toneFor,
-    type AvatarTone,
-} from "@/components/playground/Core/components/PlaygroundAvatar";
 import {
     reference_issues,
-    to_plain_text,
     type ReferencedIssueLabel,
     type ThreadMessage,
+    to_plain_text,
 } from "@trymatcha/types";
-import MessageBody from "./MessageBody";
-import IssueReferenceCard from "./IssueReferenceCard";
-import MessageActions from "./MessageActions";
-import MessageReactions from "./MessageReactions";
+import { motion } from "motion/react";
+import { useState } from "react";
+import { HiChevronDown } from "react-icons/hi2";
+
+import PlaygroundAvatar, {
+    type AvatarTone,
+    toneFor,
+} from "@/components/playground/Core/components/PlaygroundAvatar";
+import { Button } from "@/components/ui/button";
 import { OPTIMISTIC_ID_PREFIX } from "@/hooks/chats/useChats";
 import { useReactionPending } from "@/hooks/chats/useMessageReactions";
+import { cn } from "@/lib/utils";
+
+import IssueReferenceCard from "./IssueReferenceCard";
+import MessageActions from "./MessageActions";
+import MessageBody from "./MessageBody";
+import MessageReactions from "./MessageReactions";
 
 type AnyChat = ThreadMessage;
 

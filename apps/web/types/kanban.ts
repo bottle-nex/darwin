@@ -1,7 +1,8 @@
-import type { IconType } from "react-icons";
 import { IssueStatus } from "@trymatcha/types";
-import type { BoardIssue, BoardTag } from "@/types/board";
+import type { IconType } from "react-icons";
+
 import type { AvatarTone } from "@/components/playground/Core/components/PlaygroundAvatar";
+import type { BoardIssue, BoardTag } from "@/types/board";
 
 export const KanbanStatus = {
     Todo: IssueStatus.Todo,

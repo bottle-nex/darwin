@@ -1,7 +1,8 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+
+import { TEMPLATES_QUERY_KEY } from "@/hooks/templates/useListTemplates";
 import { apiClient } from "@/lib/axios";
 import { DELETE_TEMPLATE_URL } from "@/routes/api_routes";
-import { TEMPLATES_QUERY_KEY } from "@/hooks/templates/useListTemplates";
 import type { ApiResponse } from "@/types/api";
 
 export interface DeleteTemplateInput {

@@ -49,3 +49,6 @@ graphify-out
 .worktrees
 docs
 AGENTS.md
+
+# capsule previews are built inside the sandbox, never committed
+.matcha/

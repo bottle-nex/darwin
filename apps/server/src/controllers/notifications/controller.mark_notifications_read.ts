@@ -1,5 +1,6 @@
-import { Request, Response } from "express";
 import { prisma } from "@trymatcha/database";
+import type { Request, Response } from "express";
+
 import NotificationFeedService, {
     type NotificationFeedScope,
 } from "../../services/service.notification-feed";

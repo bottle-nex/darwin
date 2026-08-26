@@ -1,11 +1,11 @@
 import type { BoardIssue } from "@/types/board";
 import {
-    EMPTY_FILTERS,
-    FACET_KEYS,
-    UNASSIGNED,
     type BoardFilters,
     type DateRangeFilter,
+    EMPTY_FILTERS,
+    FACET_KEYS,
     type FacetKey,
+    UNASSIGNED,
 } from "@/types/boardFilter";
 
 function isFacetActive(filters: BoardFilters, key: FacetKey): boolean {

@@ -1,16 +1,17 @@
 "use client";
-import { useKanbanOptionsStore } from "@/store/kanban/useKanbanOptionsStore";
-import { useFilteredCustomColumns } from "@/hooks/kanban/useFilteredCustomColumns";
-import FocusPanel from "./KanbanOptionPanels/FocusPanel";
-import FiltersPanel from "./KanbanOptionPanels/FiltersPanel";
-import FilterChipsBar from "./KanbanOptionPanels/FilterChipsBar";
-import BoardViewPanel from "./KanbanOptionPanels/BoardViewPanel";
+import PlaygroundBreadcrumb from "@/components/playground/Core/components/PlaygroundBreadcrumb";
 import {
     PaneActionsSlot,
     PaneLeadSlot,
 } from "@/components/playground/Core/components/PlaygroundPaneSlots";
-import PlaygroundBreadcrumb from "@/components/playground/Core/components/PlaygroundBreadcrumb";
+import { useFilteredCustomColumns } from "@/hooks/kanban/useFilteredCustomColumns";
+import { useKanbanOptionsStore } from "@/store/kanban/useKanbanOptionsStore";
+
 import AddTaskButton from "./KanbanOptionPanels/AddTaskButton";
+import BoardViewPanel from "./KanbanOptionPanels/BoardViewPanel";
+import FilterChipsBar from "./KanbanOptionPanels/FilterChipsBar";
+import FiltersPanel from "./KanbanOptionPanels/FiltersPanel";
+import FocusPanel from "./KanbanOptionPanels/FocusPanel";
 
 export default function KanbanOptionsBarFlatKeys() {
     const focus = useKanbanOptionsStore((s) => s.focus);

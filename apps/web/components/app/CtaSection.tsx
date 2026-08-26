@@ -1,9 +1,10 @@
 "use client";
 import Link from "next/link";
 import { RiRocketFill, RiTeamFill } from "react-icons/ri";
-import { cn } from "@/lib/utils";
-import { azeretMono } from "@/lib/fonts";
+
 import HeroBuddy from "@/components/landing/v2/HeroBuddy";
+import { azeretMono } from "@/lib/fonts";
+import { cn } from "@/lib/utils";
 import { useUserSessionStore } from "@/store/user/useUserSessionStore";
 
 const LOOP_LABELS = ["File the issue", "Agent ships the patch", "You review the PR"];

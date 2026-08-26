@@ -1,11 +1,12 @@
-import http from "http";
-import express from "express";
 import cors from "cors";
-import v1_router from "./routers/v1/router.v1";
+import express from "express";
+import http from "http";
+
 import { ENV } from "./configs/env";
-import RedisService from "./services/service.redis";
-import InitService from "./services/service.init";
 import SocketServer from "./real-time/socket.server";
+import v1_router from "./routers/v1/router.v1";
+import InitService from "./services/service.init";
+import RedisService from "./services/service.redis";
 
 export const server_services = new InitService();
 await RedisService.connect();

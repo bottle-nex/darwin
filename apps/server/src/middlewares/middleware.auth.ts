@@ -1,4 +1,5 @@
-import type { Request, Response, NextFunction } from "express";
+import type { NextFunction, Request, Response } from "express";
+
 import { verifySessionJwt } from "../services/service.jwt";
 import ResponseWriter from "../services/service.response";
 

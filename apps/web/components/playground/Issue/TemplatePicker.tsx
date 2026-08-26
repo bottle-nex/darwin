@@ -1,16 +1,18 @@
 "use client";
 
 import { useState } from "react";
-import { TbTemplateFilled } from "react-icons/tb";
-import { MdStar } from "react-icons/md";
 import { FaLongArrowAltRight } from "react-icons/fa";
-import { IconPickGlyph } from "@/components/ui/IconPicker";
+import { MdStar } from "react-icons/md";
+import { TbTemplateFilled } from "react-icons/tb";
+
 import { Command, CommandGroup, CommandItem, CommandList } from "@/components/ui/command";
+import { IconPickGlyph } from "@/components/ui/IconPicker";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { TooltipComponent } from "@/components/ui/tooltip-component";
 import { useListTemplates } from "@/hooks/templates/useListTemplates";
 import { BUILTIN_ISSUE_TEMPLATES } from "@/lib/templates/builtinTemplates";
 import type { PickableTemplate } from "@/types/issueTemplate";
+
 import { CapsuleTrigger } from "./Capsule";
 
 interface TemplatePickerProps {

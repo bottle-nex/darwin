@@ -1,4 +1,5 @@
 import { create } from "zustand";
+
 import type { ToastItem } from "@/types/toast.type";
 
 const MAX_VISIBLE_PER_POSITION = 4;

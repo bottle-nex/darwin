@@ -1,9 +1,10 @@
 "use client";
-import { Suspense, useEffect, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useMemo } from "react";
+
 import LogoLoader from "@/components/app/LogoLoader";
-import { useFetchOrganizations } from "@/hooks/playground/useFetchOrganizations";
 import { useGetDashboard } from "@/hooks/dashboard/useGetDashboard";
+import { useFetchOrganizations } from "@/hooks/playground/useFetchOrganizations";
 import { useLastVisited } from "@/hooks/user/useLastVisited";
 
 function PlaygroundResolver() {

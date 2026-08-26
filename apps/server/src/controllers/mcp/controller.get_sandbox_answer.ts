@@ -1,6 +1,7 @@
-import { Request, Response } from "express";
-import { z } from "zod";
 import { prisma, SetupQuestionStatus } from "@trymatcha/database";
+import type { Request, Response } from "express";
+import { z } from "zod";
+
 import ResponseWriter from "../../services/service.response";
 
 const query_schema = z.object({

@@ -1,7 +1,9 @@
 "use client";
-import { useEffect, useState } from "react";
-import { cn } from "@/lib/utils";
 import "./HeroBuddy.css";
+
+import { useEffect, useState } from "react";
+
+import { cn } from "@/lib/utils";
 
 const BODY = "var(--color-primary)";
 const EYE = "#262626";

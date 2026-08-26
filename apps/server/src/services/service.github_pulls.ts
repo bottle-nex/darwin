@@ -1,13 +1,14 @@
+import { Octokit } from "@octokit/rest";
 import {
-    ReviewMergeMethod,
     type ReviewActor,
     type ReviewComment,
     type ReviewFile,
     type ReviewFileStatus,
     type ReviewLabel,
+    ReviewMergeMethod,
     type ReviewState,
 } from "@trymatcha/types";
-import { Octokit } from "@octokit/rest";
+
 import GithubAppService from "./service.github_app";
 
 export interface PullRequestRef {

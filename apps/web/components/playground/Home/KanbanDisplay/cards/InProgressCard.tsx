@@ -1,7 +1,9 @@
 import { MdAutorenew, MdStorage } from "react-icons/md";
+
 import type { Issue } from "@/types/kanban";
-import BaseCard from "./BaseCard";
+
 import AgentChip from "./AgentChip";
+import BaseCard from "./BaseCard";
 
 /** In Progress: an agent is actively working the issue on a runner. */
 export default function InProgressCard({ issue }: { issue: Issue }) {

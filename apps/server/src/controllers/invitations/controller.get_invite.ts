@@ -1,8 +1,9 @@
-import { Request, Response } from "express";
-import z from "zod";
-import { createHash } from "crypto";
-import ResponseWriter from "../../services/service.response";
 import { prisma } from "@trymatcha/database";
+import { createHash } from "crypto";
+import type { Request, Response } from "express";
+import z from "zod";
+
+import ResponseWriter from "../../services/service.response";
 
 export default class GetInviteController {
     static get_invite_schema = z.object({

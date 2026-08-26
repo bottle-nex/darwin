@@ -1,9 +1,10 @@
-import { MdAutoAwesome, MdAutorenew, MdChat, MdCheckCircle, MdStorage } from "react-icons/md";
 import { FaCodePullRequest } from "react-icons/fa6";
-import { cn } from "@/lib/utils";
+import { MdAutoAwesome, MdAutorenew, MdChat, MdCheckCircle, MdStorage } from "react-icons/md";
+
 import PlaygroundAvatar, {
     type AvatarTone,
 } from "@/components/playground/Core/components/PlaygroundAvatar";
+import { cn } from "@/lib/utils";
 
 export type AboutIssue = {
     number: string;

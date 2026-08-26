@@ -1,5 +1,6 @@
-import { describe, expect, test } from "bun:test";
 import type { Chat, IssueActivity } from "@trymatcha/types";
+import { describe, expect, test } from "bun:test";
+
 import {
     buildActivityFeedEntries,
     coordinateTimelineCoverage,

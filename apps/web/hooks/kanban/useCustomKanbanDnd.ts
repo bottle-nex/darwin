@@ -1,6 +1,4 @@
 "use client";
-import { useRef } from "react";
-import { useQueryClient } from "@tanstack/react-query";
 import {
     type DragEndEvent,
     type DragOverEvent,
@@ -9,20 +7,23 @@ import {
     useSensor,
     useSensors,
 } from "@dnd-kit/core";
-import { toast } from "@/lib/toast";
-import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
-import { useActiveProject } from "@/hooks/useActiveProject";
-import { useUpdateIssue } from "@/hooks/issues/useUpdateIssue";
+import { useQueryClient } from "@tanstack/react-query";
+import { useRef } from "react";
+
+import { moveBoardIssueCaches, reconcileBoardProject } from "@/hooks/issues/boardCache";
 import { useReorderColumns } from "@/hooks/issues/useReorderColumns";
-import { findIssueInBoard, useKanbanBoardStore } from "@/store/kanban/useKanbanBoardStore";
+import { useUpdateIssue } from "@/hooks/issues/useUpdateIssue";
+import { useActiveProject } from "@/hooks/useActiveProject";
+import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
+import { toast } from "@/lib/toast";
 import {
     columnIdOfInColumns,
     findCardInColumns,
     useCustomKanbanStore,
 } from "@/store/kanban/useCustomKanbanStore";
+import { findIssueInBoard, useKanbanBoardStore } from "@/store/kanban/useKanbanBoardStore";
 import type { BoardState } from "@/types/kanban";
 import type { CustomColumn } from "@/types/kanban-custom";
-import { moveBoardIssueCaches, reconcileBoardProject } from "@/hooks/issues/boardCache";
 
 export function useCustomKanbanDnd(board: BoardState, sourceColumns: CustomColumn[]) {
     const projectId = useActiveProject()?.id;

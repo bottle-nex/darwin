@@ -1,8 +1,9 @@
 import { Action, Permissions } from "@trymatcha/access-control";
 import { prisma } from "@trymatcha/database";
-import { product_diff_artifact_keys, type ProductDiffManifest } from "@trymatcha/types";
-import { Request, Response } from "express";
+import { capsule_artifact_keys, type CapsuleManifest, is_capsule_manifest } from "@trymatcha/types";
+import type { Request, Response } from "express";
 import z from "zod";
+
 import Access from "../../access-control/access";
 import ResponseWriter from "../../services/service.response";
 import StorageService from "../../services/service.storage";
@@ -45,20 +46,22 @@ export default async function product_diff_artifact_urls_controller(req: Request
                 res,
                 false,
                 "PRODUCT_DIFF_NOT_READY",
-                "This Product Diff has no screenshots to show",
+                "This Product Diff has no capsules to show",
                 409,
             );
             return;
         }
 
-        const allowed = product_diff_artifact_keys(
-            product_diff.manifest as ProductDiffManifest | null,
+        const allowed = capsule_artifact_keys(
+            is_capsule_manifest(product_diff.manifest)
+                ? (product_diff.manifest as CapsuleManifest)
+                : null,
         );
         const requested = parsed_body.data.keys.filter((key) => allowed.has(key));
         if (requested.length !== parsed_body.data.keys.length) {
             ResponseWriter.invalid_data(
                 res,
-                "Requested a screenshot this Product Diff does not have",
+                "Requested a capsule page this Product Diff does not have",
             );
             return;
         }

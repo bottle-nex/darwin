@@ -1,7 +1,11 @@
 "use client";
 import { MdCheck } from "react-icons/md";
 import { RiLoader4Line } from "react-icons/ri";
-import { cn } from "@/lib/utils";
+
+import PlaygroundAvatar, {
+    initialOf,
+    toneFor,
+} from "@/components/playground/Core/components/PlaygroundAvatar";
 import { Button } from "@/components/ui/button";
 import {
     Dialog,
@@ -11,10 +15,7 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog";
 import { useProjectMembers } from "@/hooks/project/useProjectMembers";
-import PlaygroundAvatar, {
-    initialOf,
-    toneFor,
-} from "@/components/playground/Core/components/PlaygroundAvatar";
+import { cn } from "@/lib/utils";
 import type { Assignee } from "@/types/kanban";
 
 type AssigneePickerProps = {

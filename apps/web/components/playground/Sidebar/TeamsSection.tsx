@@ -1,5 +1,10 @@
 "use client";
 
+import { useParams } from "next/navigation";
+import { HiOutlineAnnotation } from "react-icons/hi";
+import { HiOutlinePlus, HiOutlineTrash } from "react-icons/hi2";
+import { MdMoreHoriz } from "react-icons/md";
+
 import { Button } from "@/components/ui/button";
 import {
     DropdownMenu,
@@ -7,21 +12,18 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { HiOutlineAnnotation } from "react-icons/hi";
-import { HiOutlinePlus, HiOutlineTrash } from "react-icons/hi2";
-import { MdMoreHoriz } from "react-icons/md";
-import { useParams } from "next/navigation";
-import { cn } from "@/lib/utils";
-import Row from "./SidebarRow";
-import Section from "./SidebarSection";
 import { useGetDashboard } from "@/hooks/dashboard/useGetDashboard";
 import { useGetProject } from "@/hooks/project/useGetProject";
-import { useNewTeamStore } from "@/store/team/useNewTeamStore";
-import { useDeleteTeamStore } from "@/store/team/useDeleteTeamStore";
-import { rowLeading } from "./shared";
-import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
+import { cn } from "@/lib/utils";
 import { useChatThreadStore } from "@/store/playground/useChatThreadStore";
+import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
+import { useDeleteTeamStore } from "@/store/team/useDeleteTeamStore";
+import { useNewTeamStore } from "@/store/team/useNewTeamStore";
+
 import { PlaygroundTab } from "../playgroundTabs";
+import { rowLeading } from "./shared";
+import Row from "./SidebarRow";
+import Section from "./SidebarSection";
 
 export default function PlaygroundSidebarTeamsSection() {
     const { orgSlug, projectSlug } = useParams<{ orgSlug: string; projectSlug?: string }>();

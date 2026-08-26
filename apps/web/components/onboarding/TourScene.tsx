@@ -1,10 +1,11 @@
 "use client";
 
-import { useRef } from "react";
 import { useAnimationFrame, useMotionValue, useReducedMotion } from "motion/react";
-import { SPEED, SPEED_LERP, WIND_SPEED, type SpeedTarget } from "./choreography";
-import type { BuddyPose } from "./CanvasBuddy";
+import { useRef } from "react";
+
 import BuddyRunner from "./BuddyRunner";
+import type { BuddyPose } from "./CanvasBuddy";
+import { SPEED, SPEED_LERP, type SpeedTarget, WIND_SPEED } from "./choreography";
 import ForegroundLayer from "./ForegroundLayer";
 import MountainLayer from "./MountainLayer";
 import SkyLayer from "./SkyLayer";

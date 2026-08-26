@@ -1,8 +1,11 @@
 "use client";
-import { MdCheck, MdList, MdVerticalSplit, MdViewKanban } from "react-icons/md";
-import { LuEye } from "react-icons/lu";
-import { type IconType } from "react-icons";
 import { motion } from "motion/react";
+import { type IconType } from "react-icons";
+import { LuEye } from "react-icons/lu";
+import { MdCheck, MdList, MdVerticalSplit, MdViewKanban } from "react-icons/md";
+
+import HeroBuddy from "@/components/landing/v2/HeroBuddy";
+import { Button } from "@/components/ui/button";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -13,12 +16,11 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import HeroBuddy from "@/components/landing/v2/HeroBuddy";
-import type { BoardView, KanbanView } from "@/types/kanban";
-import OptionButton from "./OptionButton";
 import { TooltipComponent } from "@/components/ui/tooltip-component";
+import { cn } from "@/lib/utils";
+import type { BoardView, KanbanView } from "@/types/kanban";
+
+import OptionButton from "./OptionButton";
 
 const OPTIONS: { value: BoardView; label: string; icon?: IconType; mascot?: boolean }[] = [
     { value: "llm", label: "Agent", mascot: true },

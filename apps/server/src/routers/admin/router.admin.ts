@@ -1,13 +1,14 @@
 import { Router } from "express";
-import { require_admin } from "../../middlewares/middleware.admin_auth";
-import ListPostsController from "../../controllers/admin/controller.list-posts";
-import GetPostController from "../../controllers/admin/controller.get-post";
-import CreatePostController from "../../controllers/admin/controller.create-post";
-import UpdatePostController from "../../controllers/admin/controller.update-post";
-import DeletePostController from "../../controllers/admin/controller.delete-post";
-import SignedUploadController from "../../controllers/admin/controller.signed-upload";
+
 import AdminOtpRequestController from "../../controllers/admin/controller.admin-otp-request";
 import AdminOtpVerifyController from "../../controllers/admin/controller.admin-otp-verify";
+import CreatePostController from "../../controllers/admin/controller.create-post";
+import DeletePostController from "../../controllers/admin/controller.delete-post";
+import GetPostController from "../../controllers/admin/controller.get-post";
+import ListPostsController from "../../controllers/admin/controller.list-posts";
+import SignedUploadController from "../../controllers/admin/controller.signed-upload";
+import UpdatePostController from "../../controllers/admin/controller.update-post";
+import { require_admin } from "../../middlewares/middleware.admin_auth";
 
 const admin_router: Router = Router();
 

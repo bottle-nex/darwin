@@ -1,6 +1,8 @@
 import { readFileSync } from "node:fs";
-import { Template, defaultBuildLogger } from "e2b";
+
 import Logger from "@trymatcha/logger";
+import { defaultBuildLogger, Template } from "e2b";
+
 import { ENV } from "../conf/config.env";
 
 const log = Logger.scope("template");
@@ -15,17 +17,16 @@ const log = Logger.scope("template");
  *
  * Run with: bun run template
  *
- * Prerequisite: `packages/sandbox-mcp/dist/index.js` and `packages/preview-runner/dist/index.js`
+ * Prerequisite: `packages/sandbox-mcp/dist/index.js` and `packages/capsule-check/dist/index.js`
  * must be current, since the Dockerfile copies them in — build them first with
- * `bun run build --filter=@trymatcha/sandbox-mcp --filter=@trymatcha/preview-runner`.
+ * `bun run build --filter=@trymatcha/sandbox-mcp --filter=@trymatcha/capsule-check`.
  */
 
 const TEMPLATE_NAME = "node-py-claude-template";
 const TEMPLATE_TAG = "stable";
-// E2B's default is 976 MB, of which roughly 700 MB is free once the box has booted. Webpack
-// compiling a real Next.js app's root layout wants more than that, so Next's own memory watchdog
-// restarts the dev server in a loop and no route ever finishes compiling. Raising this is what
-// makes Product Diff able to run a customer's app at all.
+// E2B's default is 976 MB, of which roughly 700 MB is free once the box has booted. Installing a
+// real project's dependencies and then bundling six components with vite wants more than that.
+// Raising this is what makes Product Diff able to build a customer's app at all.
 const SANDBOX_MEMORY_MB = 4096;
 const SANDBOX_CPU_COUNT = 4;
 const REPO_ROOT = new URL("../../../../", import.meta.url).pathname;
@@ -37,9 +38,9 @@ const BUNDLES: { name: string; path: string; filter: string }[] = [
         filter: "@trymatcha/sandbox-mcp",
     },
     {
-        name: "preview-runner",
-        path: `${REPO_ROOT}packages/preview-runner/dist/index.js`,
-        filter: "@trymatcha/preview-runner",
+        name: "capsule-check",
+        path: `${REPO_ROOT}packages/capsule-check/dist/index.js`,
+        filter: "@trymatcha/capsule-check",
     },
 ];
 

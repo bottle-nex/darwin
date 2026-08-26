@@ -1,9 +1,10 @@
 "use client";
 
-import { useRef, type CSSProperties } from "react";
-import Link from "next/link";
 import { useInView, useReducedMotion } from "motion/react";
+import Link from "next/link";
+import { type CSSProperties, useRef } from "react";
 import { MdChevronRight } from "react-icons/md";
+
 import { MatchaLogo } from "@/components/logo/MatchaLogo";
 import { cn } from "@/lib/utils";
 

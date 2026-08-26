@@ -1,6 +1,7 @@
+import type Logger from "@trymatcha/logger";
+
 import { ENV } from "../conf/config.env";
 import type { AgentReport } from "./service.claude_run";
-import type Logger from "@trymatcha/logger";
 
 export default class RunReporter {
     static async started(token: string, run_id: string, issue_id: string, log: Logger) {

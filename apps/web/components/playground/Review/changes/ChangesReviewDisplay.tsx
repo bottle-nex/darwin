@@ -1,8 +1,10 @@
 "use client";
-import { useState } from "react";
 import type { ReviewFile, ReviewHeader } from "@trymatcha/types";
+import { useState } from "react";
+
 import LogoLoader from "@/components/app/LogoLoader";
 import { useReviewFiles } from "@/hooks/review/useReviewFiles";
+
 import ReviewFileDiff from "./ReviewFileDiff";
 import ReviewFileRow from "./ReviewFileRow";
 
@@ -30,8 +32,8 @@ export default function CompareReviewDisplay({
 
     return (
         <div className="grid min-h-0 min-w-0 flex-1 grid-cols-[20rem_minmax(0,1fr)] gap-4 px-4 py-4">
-            <aside className="flex min-h-0 flex-col gap-2 overflow-y-auto pr-1" data-lenis-prevent>
-                <p className="px-2 font-headline text-[12.5px] text-neutral-500 tabular-nums">
+            <aside className="flex min-h-0 flex-col gap-2 overflow-y-auto px-1" data-lenis-prevent>
+                <p className="px-3 font-headline text-[12.5px] text-neutral-500 tabular-nums">
                     {files.length} {files.length === 1 ? "file" : "files"} changed{" "}
                     <span className="text-green-500">+{review.additions}</span>{" "}
                     <span className="text-rose-500">−{review.deletions}</span>

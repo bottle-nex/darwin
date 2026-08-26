@@ -1,7 +1,9 @@
 import { FaCodePullRequest } from "react-icons/fa6";
+
 import type { Issue } from "@/types/kanban";
-import BaseCard from "./BaseCard";
+
 import AgentChip from "./AgentChip";
+import BaseCard from "./BaseCard";
 
 /** In Review: the agent opened a PR back to the repo, awaiting human review. */
 export default function InReviewCard({ issue }: { issue: Issue }) {

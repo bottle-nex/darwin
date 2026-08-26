@@ -1,5 +1,7 @@
-import { ActivitySurface, ActivityType, IssueStatus } from "@trymatcha/database";
+import type { IssueStatus } from "@trymatcha/database";
+import { ActivitySurface, ActivityType } from "@trymatcha/database";
 import type { ActivityLocationRef } from "@trymatcha/types";
+
 import type { ActivityEvent } from "./service.activity";
 
 /**

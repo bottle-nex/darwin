@@ -1,7 +1,8 @@
-import type { Request, Response } from "express";
-import { z } from "zod";
 import { prisma } from "@trymatcha/database";
 import { SidebarTheme } from "@trymatcha/types";
+import type { Request, Response } from "express";
+import { z } from "zod";
+
 import ResponseWriter from "../../services/service.response";
 
 const body_schema = z.object({

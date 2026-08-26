@@ -1,20 +1,25 @@
-import { Worker, type Job } from "bullmq";
 import { prisma } from "@trymatcha/database";
-import queue_config from "../conf/config.queue";
-import { ENV } from "../conf/config.env";
-import E2B from "./services.e2b";
 import Logger from "@trymatcha/logger";
 import {
-    QueueName,
     type DispatchJobData,
     type OnboardJobData,
     type ProductDiffJobData,
+    QueueName,
 } from "@trymatcha/types";
+import { type Job, Worker } from "bullmq";
+
+import { ENV } from "../conf/config.env";
+import queue_config from "../conf/config.queue";
 import ProductDiffRunner from "./service.product_diff";
+import E2B from "./services.e2b";
 
 const log = Logger.scope("queue");
 const PRODUCT_DIFF_LOCK_MS = 60_000;
 const PRODUCT_DIFF_STALL_CHECK_MS = 30_000;
+
+export async function run_product_diff_job(job: Job<ProductDiffJobData>): Promise<void> {
+    await ProductDiffRunner.run(job.data.productDiffId);
+}
 
 export default class QueueService {
     private onboard_consumer: Worker<OnboardJobData> | null = null;
@@ -86,7 +91,7 @@ export default class QueueService {
     private init_product_diff_consumer() {
         this.product_diff_consumer = new Worker<ProductDiffJobData>(
             QueueName.ProductDiff,
-            async (job: Job<ProductDiffJobData>) => ProductDiffRunner.run(job.data.productDiffId),
+            run_product_diff_job,
             {
                 connection: queue_config.connection!,
                 concurrency: ENV.SERVER_PRODUCT_DIFF_CONCURRENCY,
@@ -101,11 +106,14 @@ export default class QueueService {
                 where: { id: job.data.productDiffId },
                 select: { status: true, error: true },
             });
-            if (productDiff?.status === "Failed") {
+            if (productDiff?.status !== "Ready") {
                 log.error(
-                    "product diff job recorded failure",
-                    new Error(productDiff.error ?? "Product Diff failed"),
-                    { productDiff: job.data.productDiffId },
+                    "product diff job settled without a ready artifact",
+                    new Error(productDiff?.error ?? "Product Diff did not produce an artifact"),
+                    {
+                        productDiff: job.data.productDiffId,
+                        status: productDiff?.status ?? "Missing",
+                    },
                 );
                 return;
             }

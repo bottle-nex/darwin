@@ -1,10 +1,12 @@
 "use client";
+import { DragOverlay } from "@dnd-kit/core";
 import { useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
-import { DragOverlay } from "@dnd-kit/core";
+
 import { useCustomKanbanStore } from "@/store/kanban/useCustomKanbanStore";
-import CustomKanbanCard from "./customkanban/CustomKanbanCard";
+
 import CardRenderer from "./cards/CardRenderer";
+import CustomKanbanCard from "./customkanban/CustomKanbanCard";
 
 const emptySubscribe = () => () => {};
 

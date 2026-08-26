@@ -1,5 +1,6 @@
 "use client";
 import { HiOutlineMagnifyingGlass, HiXMark } from "react-icons/hi2";
+
 import { Input } from "@/components/ui/input";
 
 type NotificationSearchProps = {

@@ -1,11 +1,12 @@
 import { Router } from "express";
-import { require_auth } from "../../middlewares/middleware.auth";
-import InviteMembersController from "../../controllers/invitations/controller.invite_member";
+
 import AcceptInviteController from "../../controllers/invitations/controller.accept_invite";
+import GetInviteController from "../../controllers/invitations/controller.get_invite";
+import InviteMembersController from "../../controllers/invitations/controller.invite_member";
+import ListInvitesController from "../../controllers/invitations/controller.list_invites";
 import RejectInviteController from "../../controllers/invitations/controller.reject_invite";
 import RevokeInviteController from "../../controllers/invitations/controller.revoke_invite";
-import GetInviteController from "../../controllers/invitations/controller.get_invite";
-import ListInvitesController from "../../controllers/invitations/controller.list_invites";
+import { require_auth } from "../../middlewares/middleware.auth";
 
 const invitations_router: Router = Router();
 

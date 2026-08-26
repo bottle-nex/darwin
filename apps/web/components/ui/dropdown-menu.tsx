@@ -1,9 +1,10 @@
 "use client";
 
-import * as React from "react";
 import { DropdownMenu as DropdownMenuPrimitive } from "radix-ui";
+import * as React from "react";
 
 import { cn } from "@/lib/utils";
+
 import {
     MENU_ITEM,
     MENU_ITEM_DESTRUCTIVE,
@@ -179,19 +180,19 @@ function DropdownMenuSubContent({
 
 export {
     DropdownMenu,
-    DropdownMenuPortal,
-    DropdownMenuTrigger,
+    DropdownMenuCheckboxItem,
     DropdownMenuContent,
     DropdownMenuGroup,
-    DropdownMenuLabel,
     DropdownMenuItem,
     DropdownMenuItemIndicator,
-    DropdownMenuCheckboxItem,
+    DropdownMenuLabel,
+    DropdownMenuPortal,
     DropdownMenuRadioGroup,
     DropdownMenuRadioItem,
     DropdownMenuSeparator,
     DropdownMenuShortcut,
     DropdownMenuSub,
-    DropdownMenuSubTrigger,
     DropdownMenuSubContent,
+    DropdownMenuSubTrigger,
+    DropdownMenuTrigger,
 };

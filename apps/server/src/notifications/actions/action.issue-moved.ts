@@ -1,5 +1,6 @@
-import { prisma, NotificationType } from "@trymatcha/database";
+import { NotificationType, prisma } from "@trymatcha/database";
 import type { NotificationJobData } from "@trymatcha/types";
+
 import NotificationCreateService from "../service.notification-create";
 
 type IssueMovedJobData = Extract<NotificationJobData, { action: "issue.moved" }>;

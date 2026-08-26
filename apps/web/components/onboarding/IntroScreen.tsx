@@ -1,8 +1,9 @@
 "use client";
 
 import { motion } from "motion/react";
-import { Button } from "@/components/ui/button";
 import { MdOutlineChevronRight } from "react-icons/md";
+
+import { Button } from "@/components/ui/button";
 
 const HEADLINE = ["First,", "a", "short", "run."];
 

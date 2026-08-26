@@ -1,8 +1,11 @@
 "use client";
-import { cn } from "@/lib/utils";
-import { Button } from "../ui/button";
+import { useQueryClient } from "@tanstack/react-query";
+import { TeamRole } from "@trymatcha/types";
+import axios from "axios";
 import Image from "next/image";
+import { MdKeyboardArrowRight, MdPersonOff, MdVerifiedUser } from "react-icons/md";
 import { PiDotsThreeOutlineVerticalLight } from "react-icons/pi";
+
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -13,13 +16,12 @@ import {
     DropdownMenuSubTrigger,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MdVerifiedUser, MdPersonOff, MdKeyboardArrowRight } from "react-icons/md";
-import axios from "axios";
-import { CHANGE_MEMBER_AUTHORITY, REMOVE_MEMBERS } from "@/routes/api_routes";
-import { TeamRole } from "@trymatcha/types";
-import { useUserSessionStore } from "@/store/user/useUserSessionStore";
-import { useQueryClient } from "@tanstack/react-query";
 import { TEAM_MEMBERS_QUERY_KEY } from "@/hooks/team/useGetTeamMembers";
+import { cn } from "@/lib/utils";
+import { CHANGE_MEMBER_AUTHORITY, REMOVE_MEMBERS } from "@/routes/api_routes";
+import { useUserSessionStore } from "@/store/user/useUserSessionStore";
+
+import { Button } from "../ui/button";
 
 interface ProfileCardProps {
     id: string;

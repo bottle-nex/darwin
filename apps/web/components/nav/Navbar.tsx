@@ -1,13 +1,14 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import AppLogo from "@/components/app/Applogo";
-import { FaDiscord, FaPhoneAlt } from "react-icons/fa";
-import { useUserSessionStore } from "@/store/user/useUserSessionStore";
-import { PiArrowRight } from "react-icons/pi";
 import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
+import { FaDiscord, FaPhoneAlt } from "react-icons/fa";
+import { PiArrowRight } from "react-icons/pi";
+
+import AppLogo from "@/components/app/Applogo";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { useUserSessionStore } from "@/store/user/useUserSessionStore";
 
 const NAV_ITEMS = [
     { label: "Why", href: "/why" },

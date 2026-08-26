@@ -1,9 +1,11 @@
 "use client";
 import { useState } from "react";
+
 import { cn } from "@/lib/utils";
-import IssueTitleField from "./IssueTitleField";
-import IssueBody from "./IssueBody";
+
 import ActivityFeed from "./activity/ActivityFeed";
+import IssueBody from "./IssueBody";
+import IssueTitleField from "./IssueTitleField";
 import type { IssueFormState } from "./useIssueForm";
 
 export default function IssueDetailBody({

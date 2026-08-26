@@ -1,8 +1,10 @@
 "use client";
 import type { ReviewHeader } from "@trymatcha/types";
-import Markdown from "@/components/utility/Markdown";
+
 import LogoLoader from "@/components/app/LogoLoader";
+import Markdown from "@/components/utility/Markdown";
 import { useReviewComments } from "@/hooks/review/useReviewComments";
+
 import ReviewActorAvatar from "../ReviewActorAvatar";
 import ReviewCommentCard from "./ReviewCommentCard";
 import ReviewComposer from "./ReviewComposer";

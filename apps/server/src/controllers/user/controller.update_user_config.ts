@@ -1,7 +1,8 @@
+import { prisma } from "@trymatcha/database";
+import { BackgroundLightingColor, DefaultHomeView } from "@trymatcha/types";
 import type { Request, Response } from "express";
 import { z } from "zod";
-import { prisma } from "@trymatcha/database";
-import { BackgroundLightingColor } from "@trymatcha/types";
+
 import ResponseWriter from "../../services/service.response";
 
 const body_schema = z.object({
@@ -13,6 +14,9 @@ const body_schema = z.object({
                 ...BackgroundLightingColor[],
             ],
         )
+        .optional(),
+    defaultHomeView: z
+        .enum(Object.values(DefaultHomeView) as [DefaultHomeView, ...DefaultHomeView[]])
         .optional(),
 });
 
@@ -30,7 +34,11 @@ export default class UpdateUserConfigController {
                 where: { userId },
                 create: { userId, ...parsed.data },
                 update: parsed.data,
-                select: { backgroundLightingEnabled: true, backgroundLightingColor: true },
+                select: {
+                    backgroundLightingEnabled: true,
+                    backgroundLightingColor: true,
+                    defaultHomeView: true,
+                },
             });
 
             return ResponseWriter.success(res, config, "Settings updated");

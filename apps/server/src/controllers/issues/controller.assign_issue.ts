@@ -1,11 +1,12 @@
-import { Request, Response } from "express";
-import z from "zod";
-import { ActivityType, ActorType, IssueStatus, prisma } from "@trymatcha/database";
 import { Action, Permissions } from "@trymatcha/access-control";
-import ResponseWriter from "../../services/service.response";
-import Access from "../../access-control/access";
+import { ActivityType, ActorType, IssueStatus, prisma } from "@trymatcha/database";
+import type { Request, Response } from "express";
+import z from "zod";
+
 import { server_services } from "../..";
+import Access from "../../access-control/access";
 import ActivityService from "../../services/service.activity";
+import ResponseWriter from "../../services/service.response";
 
 export default class IssueAssignController {
     static params_schema = z.object({

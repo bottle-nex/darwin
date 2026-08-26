@@ -1,19 +1,21 @@
-import { describe, expect, test } from "bun:test";
-import { QueryClient, type InfiniteData } from "@tanstack/react-query";
+import { type InfiniteData, QueryClient } from "@tanstack/react-query";
 import type { CursorPage } from "@trymatcha/types";
+import { describe, expect, test } from "bun:test";
+
+import type { BoardIssue, BoardLaneSelector, BoardMetadata } from "@/types/board";
+
 import {
-    flattenBoardLanePages,
     boardColumnsKey,
-    boardLanePageLimit,
     boardLaneKey,
+    boardLanePageLimit,
     boardOverlayKey,
+    flattenBoardLanePages,
     mergeBoardLaneRows,
-    patchBoardPageItem,
     patchBoardIssueCaches,
+    patchBoardPageItem,
     pruneBoardOverlayRows,
     removeBoardPageItem,
 } from "./boardCache";
-import type { BoardIssue, BoardLaneSelector, BoardMetadata } from "@/types/board";
 
 const issue = (
     id: string,

@@ -1,11 +1,12 @@
 import { Router } from "express";
-import CreateTeamController from "../../controllers/teams/controller.create_team";
-import UpdateTeamController from "../../controllers/teams/controller.update_team";
-import RemoveMembersController from "../../controllers/teams/controller.remove_members";
-import GetTeamMembersController from "../../controllers/teams/controller.get_team_members";
-import DeleteTeamController from "../../controllers/teams/controller.delete_team";
-import { require_auth } from "../../middlewares/middleware.auth";
+
 import ChangeMemberAuthority from "../../controllers/teams/controller.change_member_authority";
+import CreateTeamController from "../../controllers/teams/controller.create_team";
+import DeleteTeamController from "../../controllers/teams/controller.delete_team";
+import GetTeamMembersController from "../../controllers/teams/controller.get_team_members";
+import RemoveMembersController from "../../controllers/teams/controller.remove_members";
+import UpdateTeamController from "../../controllers/teams/controller.update_team";
+import { require_auth } from "../../middlewares/middleware.auth";
 
 const teams_router: Router = Router();
 

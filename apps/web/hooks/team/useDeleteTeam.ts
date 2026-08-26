@@ -1,7 +1,8 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+
+import { PROJECT_QUERY_KEY } from "@/hooks/project/useGetProject";
 import { apiClient } from "@/lib/axios";
 import { DELETE_TEAM } from "@/routes/api_routes";
-import { PROJECT_QUERY_KEY } from "@/hooks/project/useGetProject";
 import type { ApiResponse } from "@/types/api";
 
 export function useDeleteTeam() {

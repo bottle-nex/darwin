@@ -2,7 +2,12 @@
 
 import { useRef, useState } from "react";
 import { MdCheck } from "react-icons/md";
-import { cn } from "@/lib/utils";
+
+import PlaygroundAvatar, {
+    initialOf,
+    toneFor,
+} from "@/components/playground/Core/components/PlaygroundAvatar";
+import ProjectRoleTicker from "@/components/playground/Team/TeamView/ProjectRoleTicker";
 import {
     Command,
     CommandEmpty,
@@ -12,12 +17,8 @@ import {
     CommandList,
 } from "@/components/ui/command";
 import { Popover, PopoverAnchor, PopoverContent } from "@/components/ui/popover";
-import PlaygroundAvatar, {
-    initialOf,
-    toneFor,
-} from "@/components/playground/Core/components/PlaygroundAvatar";
-import ProjectRoleTicker from "@/components/playground/Team/TeamView/ProjectRoleTicker";
 import { useProjectMembers } from "@/hooks/project/useProjectMembers";
+import { cn } from "@/lib/utils";
 
 type ProjectTeamMemberPickerProps = {
     projectId: string;

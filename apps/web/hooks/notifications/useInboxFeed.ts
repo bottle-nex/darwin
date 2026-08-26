@@ -1,13 +1,15 @@
 "use client";
-import { useMemo } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { isAxiosError } from "axios";
 import type { Notification, NotificationFeedPage } from "@trymatcha/types";
+import { isAxiosError } from "axios";
+import { useMemo } from "react";
+
 import { apiClient } from "@/lib/axios";
 import { flattenInfinitePages } from "@/lib/pagination/infinitePages";
 import { PROJECT_NOTIFICATIONS_URL } from "@/routes/api_routes";
 import { useUserSessionStore } from "@/store/user/useUserSessionStore";
 import type { ApiResponse } from "@/types/api";
+
 import { inboxNotificationsKey } from "./notificationCache";
 import { NOTIFICATION_PAGE_LIMIT } from "./useMemberNotifications";
 

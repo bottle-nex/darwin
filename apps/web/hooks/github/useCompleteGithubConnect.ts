@@ -1,7 +1,8 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+
+import { ORGANIZATIONS_QUERY_KEY } from "@/hooks/playground/useFetchOrganizations";
 import { apiClient } from "@/lib/axios";
 import { GITHUB_CONNECT_COMPLETE } from "@/routes/api_routes";
-import { ORGANIZATIONS_QUERY_KEY } from "@/hooks/playground/useFetchOrganizations";
 import type { ApiResponse } from "@/types/api";
 
 export interface CompleteGithubConnectInput {

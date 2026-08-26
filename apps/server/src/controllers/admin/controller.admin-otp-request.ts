@@ -1,9 +1,10 @@
 import type { Request, Response } from "express";
 import { z } from "zod";
-import ResponseWriter from "../../services/service.response";
-import OtpService from "../../services/service.otp";
+
 import AdminService from "../../services/service.admin";
 import { sendOtpEmail } from "../../services/service.email";
+import OtpService from "../../services/service.otp";
+import ResponseWriter from "../../services/service.response";
 
 const body_schema = z.object({
     email: z.email(),

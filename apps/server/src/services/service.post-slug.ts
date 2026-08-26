@@ -1,4 +1,5 @@
 import { prisma } from "@trymatcha/database";
+
 import PostContentService from "./service.post-content";
 
 export default class PostSlugService {

@@ -1,6 +1,7 @@
 import type { Issue } from "@/types/kanban";
-import BaseCard from "./BaseCard";
+
 import AgentChip from "./AgentChip";
+import BaseCard from "./BaseCard";
 
 /** Queued: claimed by an agent, waiting for a runner to free up. */
 export default function QueuedCard({ issue }: { issue: Issue }) {

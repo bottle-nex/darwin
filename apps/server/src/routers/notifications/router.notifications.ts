@@ -1,8 +1,9 @@
 import { Router } from "express";
-import { require_auth } from "../../middlewares/middleware.auth";
+
 import ListMemberNotificationsController from "../../controllers/notifications/controller.list_member_notifications";
 import ListProjectNotificationsController from "../../controllers/notifications/controller.list_project_notifications";
 import MarkNotificationsReadController from "../../controllers/notifications/controller.mark_notifications_read";
+import { require_auth } from "../../middlewares/middleware.auth";
 
 const notifications_router: Router = Router();
 

@@ -1,11 +1,12 @@
 "use client";
 import { useFilteredKanbanBoard } from "@/hooks/kanban/useFilteredKanbanBoard";
 import { useKanbanOptionsStore } from "@/store/kanban/useKanbanOptionsStore";
-import KanbanBoardView from "./KanbanBoardView";
-import KanbanListView from "./KanbanListView";
-import KanbanFocusColumn from "./KanbanFocusColumn";
-import KanbanBothBoards from "./KanbanBothBoards";
+
 import CustomKanbanBoard from "./customkanban/CustomKanbanBoard";
+import KanbanBoardView from "./KanbanBoardView";
+import KanbanBothBoards from "./KanbanBothBoards";
+import KanbanFocusColumn from "./KanbanFocusColumn";
+import KanbanListView from "./KanbanListView";
 
 export default function KanbanContent() {
     const focus = useKanbanOptionsStore((s) => s.focus);

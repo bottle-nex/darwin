@@ -1,6 +1,6 @@
+import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
 import { cn } from "@/lib/utils";
 import type { ServerIssueStatus } from "@/types/board";
-import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
 import type { KanbanStatus } from "@/types/kanban";
 
 const SIZES = {

@@ -1,10 +1,11 @@
 "use client";
 import { HiCalendar } from "react-icons/hi2";
+
 import Capsule from "./Capsule";
-import MembersCapsule from "./MembersCapsule";
-import TagsCapsule from "./TagsCapsule";
-import PriorityCapsule from "./PriorityCapsule";
 import { DATE_ICON_COLOR, STACKED_CAPSULE } from "./issueHelpers";
+import MembersCapsule from "./MembersCapsule";
+import PriorityCapsule from "./PriorityCapsule";
+import TagsCapsule from "./TagsCapsule";
 import type { IssueFormState } from "./useIssueForm";
 
 export default function IssueFields({

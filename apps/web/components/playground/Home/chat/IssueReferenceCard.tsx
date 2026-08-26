@@ -1,10 +1,11 @@
 "use client";
 
-import { LuCircleDashed } from "react-icons/lu";
 import type { ReferencedIssueLabel } from "@trymatcha/types";
+import { LuCircleDashed } from "react-icons/lu";
+
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
+import { cn } from "@/lib/utils";
 import { usePaneRouteStore } from "@/store/playground/usePaneRouteStore";
 
 const STATUS_STYLE = new Map(

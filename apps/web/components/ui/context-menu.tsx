@@ -1,9 +1,10 @@
 "use client";
 
-import * as React from "react";
 import { ContextMenu as ContextMenuPrimitive } from "radix-ui";
+import * as React from "react";
 
 import { cn } from "@/lib/utils";
+
 import {
     MENU_ITEM,
     MENU_ITEM_DESTRUCTIVE,
@@ -176,19 +177,19 @@ function ContextMenuSubContent({
 
 export {
     ContextMenu,
-    ContextMenuPortal,
-    ContextMenuTrigger,
+    ContextMenuCheckboxItem,
     ContextMenuContent,
     ContextMenuGroup,
-    ContextMenuLabel,
     ContextMenuItem,
     ContextMenuItemIndicator,
-    ContextMenuCheckboxItem,
+    ContextMenuLabel,
+    ContextMenuPortal,
     ContextMenuRadioGroup,
     ContextMenuRadioItem,
     ContextMenuSeparator,
     ContextMenuShortcut,
     ContextMenuSub,
-    ContextMenuSubTrigger,
     ContextMenuSubContent,
+    ContextMenuSubTrigger,
+    ContextMenuTrigger,
 };

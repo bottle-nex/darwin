@@ -1,8 +1,10 @@
 "use client";
-import { SortableContext, horizontalListSortingStrategy } from "@dnd-kit/sortable";
+import { horizontalListSortingStrategy, SortableContext } from "@dnd-kit/sortable";
 import { useMemo } from "react";
-import { useFilteredCustomColumns } from "@/hooks/kanban/useFilteredCustomColumns";
+
 import { IssueSelectionOrderProvider } from "@/hooks/issues/useIssueSelection";
+import { useFilteredCustomColumns } from "@/hooks/kanban/useFilteredCustomColumns";
+
 import CustomKanbanColumn from "./CustomKanbanColumn";
 
 export default function CustomKanbanBoard() {

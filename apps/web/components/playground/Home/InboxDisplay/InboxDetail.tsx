@@ -1,25 +1,26 @@
 "use client";
-import { HiOutlineBell, HiOutlineInbox } from "react-icons/hi2";
 import {
-    TeamRole,
     type Notification,
     type ProjectChat,
     type TeamChat,
+    TeamRole,
     type ThreadMessage,
 } from "@trymatcha/types";
-import { useMemo } from "react";
 import { isAxiosError } from "axios";
-import { Button } from "@/components/ui/button";
+import { useMemo } from "react";
+import { HiOutlineBell, HiOutlineInbox } from "react-icons/hi2";
+
 import PaneEmptyState from "@/components/playground/Core/components/PaneEmptyState";
+import { notification_target } from "@/components/playground/Core/Notifications/notificationView";
 import ProjectChatThread from "@/components/playground/Home/chat/ProjectChatThread";
 import IssueDisplayPane from "@/components/playground/Issue/IssueDisplayPane";
-import { notification_target } from "@/components/playground/Core/Notifications/notificationView";
-import { useActiveProject } from "@/hooks/useActiveProject";
-import { useBoardColumns } from "@/hooks/issues/useBoardColumns";
-import { useIssue } from "@/hooks/issues/useIssue";
+import { Button } from "@/components/ui/button";
 import { useProjectChatThread } from "@/hooks/chats/useProjectChatThread";
 import { useTeamChatThread } from "@/hooks/chats/useTeamChatThread";
+import { useBoardColumns } from "@/hooks/issues/useBoardColumns";
+import { useIssue } from "@/hooks/issues/useIssue";
 import { useGetTeamMembers } from "@/hooks/team/useGetTeamMembers";
+import { useActiveProject } from "@/hooks/useActiveProject";
 import SessionServices from "@/lib/session";
 import { useInboxStore } from "@/store/playground/useInboxStore";
 

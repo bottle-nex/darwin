@@ -2,6 +2,7 @@
 
 import { HiOutlineBell } from "react-icons/hi2";
 import { IoPencilSharp } from "react-icons/io5";
+
 import { Button } from "@/components/ui/button";
 import { TooltipComponent } from "@/components/ui/tooltip-component";
 import { useNotificationBadges } from "@/hooks/notifications/useNotificationBadges";
@@ -9,6 +10,7 @@ import { useActiveProject } from "@/hooks/useActiveProject";
 import { cn } from "@/lib/utils";
 import { useCreateIssueStore } from "@/store/issues/useCreateIssueStore";
 import { useNotificationsPanelStore } from "@/store/playground/useNotificationsPanelStore";
+
 import { SIDEBAR_ICON_BUTTON_CLASS } from "./shared";
 
 export default function SidebarActions() {

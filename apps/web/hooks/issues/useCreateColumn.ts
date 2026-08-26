@@ -1,7 +1,8 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+
+import { boardColumnsKey } from "@/hooks/issues/boardCache";
 import { apiClient } from "@/lib/axios";
 import { CREATE_COLUMN_URL } from "@/routes/api_routes";
-import { boardColumnsKey } from "@/hooks/issues/boardCache";
 import type { ApiResponse } from "@/types/api";
 import type { BoardMetadata } from "@/types/board";
 

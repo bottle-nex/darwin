@@ -1,6 +1,8 @@
-import { Button } from "../ui/button";
 import { MdChevronRight } from "react-icons/md";
+
 import { cn } from "@/lib/utils";
+
+import { Button } from "../ui/button";
 import BlurFade from "./BlurFade";
 import HeroBoardMock from "./HeroBoardMock";
 import { landingContainer } from "./LandingSection";

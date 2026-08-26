@@ -1,5 +1,6 @@
+import { type IssueOutcomeJobData, QueueName } from "@trymatcha/types";
 import { Queue } from "bullmq";
-import { QueueName, type IssueOutcomeJobData } from "@trymatcha/types";
+
 import queue_config from "../conf/config.queue";
 
 const queue = new Queue<IssueOutcomeJobData>(QueueName.IssueOutcome, queue_config);

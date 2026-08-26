@@ -1,6 +1,7 @@
 "use client";
 import { motion, useInView, useReducedMotion } from "motion/react";
 import { useRef } from "react";
+
 import Reveal from "../utility/Reveal";
 import AgentCard from "./bento/AgentCard";
 import BoardCard from "./bento/BoardCard";

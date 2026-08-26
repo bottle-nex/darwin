@@ -1,18 +1,13 @@
-import {
-    LuCircle,
-    LuCircleDashed,
-    LuCircleDotDashed,
-    LuCircleCheck,
-    LuCirclePause,
-    LuCircleX,
-    LuCircleSlash,
-} from "react-icons/lu";
+import { AiFillStop } from "react-icons/ai";
+import { LuCircle, LuCircleDashed, LuCircleDotDashed, LuCirclePause } from "react-icons/lu";
 import { RiProgress4Line } from "react-icons/ri";
+
+import { DoneStatusIcon, FailedStatusIcon } from "@/components/icons/StatusIcons";
 import {
-    KanbanStatus,
     type BoardState,
     type Issue,
     type KanbanColumnDef,
+    KanbanStatus,
     type Priority,
 } from "@/types/kanban";
 
@@ -60,20 +55,20 @@ export class KanbanBoard {
         {
             status: KanbanStatus.Done,
             title: "Done",
-            icon: LuCircleCheck,
-            titleBox: "text-emerald-300",
+            icon: DoneStatusIcon,
+            titleBox: "text-green-500",
         },
         {
             status: KanbanStatus.Failed,
             title: "Failed",
-            icon: LuCircleX,
-            titleBox: "text-rose-400",
+            icon: FailedStatusIcon,
+            titleBox: "text-snow/60",
         },
         {
             status: KanbanStatus.Cancelled,
             title: "Cancelled",
-            icon: LuCircleSlash,
-            titleBox: "text-neutral-300",
+            icon: AiFillStop,
+            titleBox: "text-snow/60",
         },
     ];
 

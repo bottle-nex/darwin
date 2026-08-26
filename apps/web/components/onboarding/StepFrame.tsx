@@ -1,10 +1,12 @@
 "use client";
 
-import type { ReactNode } from "react";
 import { motion } from "motion/react";
+import type { ReactNode } from "react";
 import { MdOutlineChevronRight } from "react-icons/md";
+
 import { MatchaLogo } from "@/components/logo/MatchaLogo";
 import { Button } from "@/components/ui/button";
+
 import { stepItemVariants, stepVariants } from "./choreography";
 import { TOUR_STEPS, type TourStep } from "./steps";
 

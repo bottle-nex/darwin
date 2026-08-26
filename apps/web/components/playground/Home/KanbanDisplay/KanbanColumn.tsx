@@ -1,26 +1,26 @@
 "use client";
-import { Button } from "@/components/ui/button";
+import { useDroppable } from "@dnd-kit/core";
+import { IssueStatus } from "@trymatcha/types";
 import { MdAdd, MdChecklist, MdClose, MdMoreHoriz } from "react-icons/md";
+
+import { Button } from "@/components/ui/button";
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useDroppable } from "@dnd-kit/core";
+import { useBoardLaneModel } from "@/hooks/issues/useBoard";
+import { useActiveProject } from "@/hooks/useActiveProject";
 import { cn } from "@/lib/utils";
-import { IssueStatus } from "@trymatcha/types";
 import { useCreateIssueStore } from "@/store/issues/useCreateIssueStore";
 import { useIssueSelectionStore } from "@/store/issues/useIssueSelectionStore";
-import { useActiveProject } from "@/hooks/useActiveProject";
-import { useBoardLaneModel } from "@/hooks/issues/useBoard";
 import { useKanbanBoardStore } from "@/store/kanban/useKanbanBoardStore";
-import { useIssueFlightStore } from "@/store/kanban/useIssueFlightStore";
 import type { Issue, KanbanColumnDef } from "@/types/kanban";
+
 import CardRenderer from "./cards/CardRenderer";
 import DraggableIssue from "./DraggableIssue";
 import LLMIssueStatusTicker from "./LLMIssueStatusTicker";
-import { BoardLanePaginationView } from "./BoardLanePagination";
 import VirtualizedIssueCards from "./VirtualizedIssueCards";
 
 type KanbanColumnProps = {
@@ -47,7 +47,6 @@ export default function KanbanColumn({
     const clearSelection = useIssueSelectionStore((s) => s.clear);
     const projectId = useActiveProject()?.id;
     const dragActive = useKanbanBoardStore((state) => state.overlayActive);
-    const flightIssueId = useIssueFlightStore((state) => state.flight?.issue.id ?? null);
     const lane = useBoardLaneModel(projectId, { type: "system", status: column.status });
     const { title } = column;
     const grid = layout === "grid";
@@ -58,7 +57,7 @@ export default function KanbanColumn({
         <div
             data-column-status={column.status}
             className={cn(
-                "group flex max-h-full min-h-0 flex-col rounded-lg bg-ink/20 ring-1 ring-snow/3 p-2 transition-colors",
+                "group flex max-h-full min-h-0 flex-col rounded-lg bg-ink/20 ring-[0.5px] ring-snow/3 p-2 transition-colors",
                 fullWidth ? "min-w-0 flex-1" : "w-84 shrink-0",
             )}
         >
@@ -123,7 +122,6 @@ export default function KanbanColumn({
                 className="min-h-0 flex-1 rounded-lg p-0.5 no-scrollbar"
                 scrollElementRef={setNodeRef}
                 dataColumnList={column.status}
-                pinnedIssueId={flightIssueId}
                 renderItem={(issue) =>
                     draggableCards ? (
                         <DraggableIssue issue={issue} />
@@ -137,7 +135,7 @@ export default function KanbanColumn({
                         : lane.lanePending
                           ? `Loading issues in ${title}`
                           : lane.laneError || lane.basePageError || lane.fallbackError
-                            ? `Issues in ${title} could not be loaded. Retry is available.`
+                            ? `Issues in ${title} could not be loaded.`
                             : issues.length === 0
                               ? `No issues in ${title}`
                               : `${issues.length} loaded issues in ${title}`,
@@ -173,7 +171,6 @@ export default function KanbanColumn({
                     ) : undefined
                 }
             />
-            <BoardLanePaginationView lane={lane} />
         </div>
     );
 }

@@ -1,9 +1,10 @@
 "use client";
 import PlaygroundAvatar from "@/components/playground/Core/components/PlaygroundAvatar";
-import { useActiveProject } from "@/hooks/useActiveProject";
 import { useGetProject } from "@/hooks/project/useGetProject";
+import { useActiveProject } from "@/hooks/useActiveProject";
 import { useCommandActionStore } from "@/store/command/useCommandActionStore";
 import { useDeleteTeamStore } from "@/store/team/useDeleteTeamStore";
+
 import ResourcePickerDialog from "./ResourcePickerDialog";
 
 export default function DeleteTeamPickerDialog() {

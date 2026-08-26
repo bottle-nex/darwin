@@ -1,5 +1,6 @@
+import { type PostKind, prisma } from "@trymatcha/database";
 import type { Request, Response } from "express";
-import { prisma, type PostKind } from "@trymatcha/database";
+
 import ResponseWriter from "../../services/service.response";
 
 const SUMMARY_FIELDS = {

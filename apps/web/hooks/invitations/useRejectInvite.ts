@@ -1,7 +1,8 @@
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+
 import { apiClient } from "@/lib/axios";
 import { REJECT_INVITE_URL } from "@/routes/api_routes";
-import { ApiResponse } from "@/types/api";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { ApiResponse } from "@/types/api";
 
 export default function useRejectInvite() {
     const queryClient = useQueryClient();

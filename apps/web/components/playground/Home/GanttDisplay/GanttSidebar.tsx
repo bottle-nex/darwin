@@ -1,4 +1,5 @@
 import { MdPause } from "react-icons/md";
+
 import { GanttTimeline } from "@/lib/gantt/GanttTimeline";
 
 /**

@@ -1,6 +1,7 @@
 import { Action } from "@trymatcha/access-control";
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
 import z from "zod";
+
 import GithubPullsService, {
     ReviewDeleteUnsupportedError,
 } from "../../services/service.github_pulls";

@@ -1,606 +1,351 @@
-import { Prisma, prisma } from "@trymatcha/database";
+import type { Prisma } from "@trymatcha/database";
+import { prisma } from "@trymatcha/database";
 import Logger from "@trymatcha/logger";
-import type { ProductDiffViewport } from "@trymatcha/types";
-import { CommandExitError, Sandbox } from "e2b";
+import type { CapsuleManifest, ProductDiffStatus } from "@trymatcha/types";
+import { Sandbox } from "e2b";
+
 import { ENV } from "../conf/config.env";
-import ClaudeRun from "./service.claude_run";
+import CapsuleAuthor, { type CapsuleFailure, type CapsuleSpec } from "./service.capsule_author";
+import CapsuleBuild, { dist_dir } from "./service.capsule_build";
+import CapsuleHarness, { type CapsuleRevision } from "./service.capsule_harness";
+import CapsuleTargets from "./service.capsule_targets";
+import CapsuleUpload, { type GateResult, type GateResults } from "./service.capsule_upload";
+import CapsuleWorkspace, {
+    type AppProfile,
+    InstallFailedError,
+    NoFrontendAppError,
+} from "./service.capsule_workspace";
 import GithubService from "./service.github";
-import PreviewDeps from "./service.preview_deps";
-import PreviewRunner, { type PreviewDetect, type ScaffoldMode } from "./service.preview_runner";
-import PreviewServer, { type PreviewServerHandle } from "./service.preview_server";
-import PreviewWorkspace from "./service.preview_workspace";
-import ProductDiffArtifacts from "./service.product_diff_artifacts";
-import { redact } from "./service.sandbox_stream";
+import { command_error_text, describe_failure, failure_sentence } from "./service.sandbox_stream";
+import E2B from "./services.e2b";
 
-const SANDBOX_TIMEOUT_MS = 55 * 60_000;
-const AGENT_TIMEOUT_MS = 15 * 60_000;
-const SNAPSHOT_DEADLINE_MS = 30 * 60_000;
-const REPO_DIR = "/home/user/repo";
-const WORKSPACE_DIR = "/home/user/workspace";
-const PREVIEW_DIR = "/home/user/preview";
-const SHOTS_DIR = "/home/user/output/shots";
-const PROMPT_PATH = "/home/user/product_diff_prompt.txt";
-const HEAD_PORT = 41337;
-const BASE_PORT = 41338;
-const MAX_SHOTS = 48;
-const MAX_ERROR_OUTPUT = 400;
-const FROZEN_NOW_MS = 1_750_000_000_000;
-const SAFE_REPOSITORY = /^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/;
-const SAFE_SHA = /^[0-9a-f]{40,64}$/;
-const VIEWPORTS: ProductDiffViewport[] = [
-    { id: "desktop", label: "Desktop", width: 1280, height: 800 },
-];
-const SERVER_ENV = {
-    NODE_ENV: "development",
-    NODE_OPTIONS: "--max-old-space-size=2048",
-    NEXT_TELEMETRY_DISABLED: "1",
-    CI: "1",
-    TZ: "UTC",
-};
+const log = Logger.scope("product-diff");
 
-function is_current_product_diff(
-    pull: { state: string; baseSha: string; headSha: string },
-    baseSha: string,
-    headSha: string,
-): boolean {
-    return pull.state === "open" && pull.baseSha === baseSha && pull.headSha === headSha;
+const SANDBOX_TIMEOUT_MS = 40 * 60_000;
+const CHECK_TIMEOUT_MS = 6 * 60_000;
+const CHECK_ENTRY = "/opt/matcha/capsule-check/index.js";
+const REVISIONS: CapsuleRevision[] = ["base", "head"];
+const SAFE_SHA = /^[0-9a-f]{7,64}$/;
+
+export const MAX_REPAIR_ROUNDS = 2;
+
+export type BuildErrors = Record<CapsuleRevision, Record<string, string>>;
+
+export function collect_failures(
+    specs: CapsuleSpec[],
+    gates: GateResults,
+    build_errors: BuildErrors = { base: {}, head: {} },
+): CapsuleFailure[] {
+    const failures: CapsuleFailure[] = [];
+
+    for (const spec of specs) {
+        for (const revision of REVISIONS) {
+            if (!spec.entries[revision]) continue;
+
+            const gate = gates[revision][spec.id];
+            if (!gate) {
+                const build_error = build_errors[revision][spec.id];
+                failures.push({
+                    capsuleId: spec.id,
+                    revision,
+                    diagnostics: build_error
+                        ? [`the ${revision} revision did not compile:`, build_error]
+                        : [`the ${revision} revision did not build`],
+                });
+                continue;
+            }
+            if (gate.fidelity === "Failed") {
+                failures.push({ capsuleId: spec.id, revision, diagnostics: gate.diagnostics });
+            }
+        }
+    }
+    return failures;
 }
 
-function describe_product_diff_failure(stage: string, error: unknown): string {
-    const fallback = error instanceof Error ? error.message : String(error);
-    if (!(error instanceof CommandExitError)) return `${stage} failed: ${fallback}`;
-
-    const output = error.stderr.trim() || error.stdout.trim() || error.error?.trim() || fallback;
-    return `${stage} failed (exit ${error.exitCode}): ${output.slice(-MAX_ERROR_OUTPUT)}`;
+/**
+ * A run that built nothing is a failure, not an absence.
+ *
+ * Reporting it as Unsupported tells the reviewer this pull request changes nothing worth looking
+ * at, which is the most misleading thing it could say when every component failed to compile.
+ */
+export function terminal_status(manifest: CapsuleManifest, attempted: number): ProductDiffStatus {
+    if (manifest.capsules.length > 0) return "Ready";
+    return attempted > 0 ? "Failed" : "Unsupported";
 }
 
-function diagnostic_summary(output: string): string {
-    return output.replace(/\s+/g, " ").trim().slice(-MAX_ERROR_OUTPUT);
-}
-
-function prompt(input: {
-    baseSha: string;
-    headSha: string;
-    nextAppDir: string;
-    framework: string;
-}): string {
-    const appDir = `${WORKSPACE_DIR}/head/${input.nextAppDir}`;
-
-    return `You are preparing a visual preview for a pull request. You will NOT draw anything.
-You write React that mounts the project's REAL components with fixed data.
-
-Revisions
-  base commit:   ${input.baseSha}
-  head commit:   ${input.headSha}
-  base worktree: ${WORKSPACE_DIR}/base
-  head worktree: ${WORKSPACE_DIR}/head
-  Next.js app:   ${appDir}   (${input.framework})
-
-Work only inside ${appDir}/matcha_preview/. You write exactly two kinds of file there:
-  targets/<targetId>.tsx   one per target
-  manifest.json            the index of targets
-
-Step 1 - choose targets.
-  Run: git diff ${input.baseSha} ${input.headSha} --stat
-  Then read the changed files that matter.
-  A target is a component or page a human would look at to judge this pull request.
-  Pick between 1 and 4 targets. Prefer the smallest component that fully contains the visual
-  change over the page that renders it. Skip pure logic, tests, config, types, server actions,
-  and anything with no rendered output.
-
-Step 2 - write one target file per target.
-  Path: matcha_preview/targets/<targetId>.tsx
-  It must start with "use client" and default-export:
-      export default function Target({ state }: { state: string })
-  Import the real component from the real source using the project's own import alias.
-  Never copy a component's markup into the target file. Never reimplement it.
-  Supply every prop from a literal fixture defined in the target file.
-  Replace providers, context, data hooks, server data, cookies, headers, auth and backend calls
-  with local deterministic stand-ins wrapped around the real component. If the component needs a
-  provider to render, wrap it in the project's real provider with a literal value.
-  The fixture must be byte-stable: no Date.now(), no new Date() without arguments, no
-  Math.random(), no crypto.randomUUID(), no counters, no locale-dependent formatting, no network
-  access, no remote image URLs.
-  "state" selects between meaningful variants: default, empty, loading, error, long-content -
-  whatever this component actually distinguishes. One state is fine if there is only one.
-
-Step 3 - write matcha_preview/manifest.json
-  {
-    "targets": [
-      { "id": "header-nav",
-        "label": "Header navigation",
-        "sourcePath": "components/layout/HeaderNav.tsx",
-        "states": [ { "id": "default", "label": "Signed in" },
-                    { "id": "signed-out", "label": "Signed out" } ] }
-    ],
-    "warnings": []
-  }
-  id must match ^[a-z0-9][a-z0-9-]{0,48}$ and equal the target file's name.
-  sourcePath is relative to ${input.nextAppDir}.
-  At most 4 targets and at most 4 states each.
-  Put anything a reviewer should distrust into warnings.
-
-Step 4 - finish the harness.
-  The Product Diff pipeline validates every target in a real browser after you exit. Do not run
-  preview-check yourself; the server is intentionally stopped while you work to keep the sandbox
-  within its memory limit.
-
-Hard rules
-  Do not create, edit, move or delete any file outside matcha_preview/.
-  Do not write HTML files, do not write CSS, do not write screenshots.
-  Do not install or remove dependencies, run package scripts, or edit package.json.
-  Do not commit, push, or touch git state.
-  Do not start or stop servers.
-  Do not call any network service.
-  Finish with manifest.json listing at least one target.`;
+export function first_build_error(build_errors: BuildErrors): string | null {
+    for (const revision of REVISIONS) {
+        for (const message of Object.values(build_errors[revision])) {
+            if (message) return message;
+        }
+    }
+    return null;
 }
 
 export default class ProductDiffRunner {
-    private static async settle(
-        productDiffId: string,
-        status: "Ready" | "Stale" | "Failed" | "Unsupported",
-        data: Prisma.ProductDiffUpdateManyMutationInput = {},
-    ): Promise<void> {
+    public static async run(product_diff_id: string): Promise<ProductDiffStatus> {
+        const row = await prisma.productDiff.findUnique({
+            where: { id: product_diff_id },
+            select: {
+                baseSha: true,
+                headSha: true,
+                issue: {
+                    select: {
+                        project: {
+                            select: {
+                                id: true,
+                                githubRepoUrl: true,
+                                githubDefaultBranch: true,
+                                githubInstallation: { select: { installationId: true } },
+                            },
+                        },
+                    },
+                },
+            },
+        });
+
+        const project = row?.issue.project;
+        if (
+            !row ||
+            !project?.githubRepoUrl ||
+            !project.githubDefaultBranch ||
+            !project.githubInstallation
+        ) {
+            return this.settle(
+                product_diff_id,
+                "Failed",
+                "This project is not connected to GitHub",
+            );
+        }
+        if (!SAFE_SHA.test(row.baseSha) || !SAFE_SHA.test(row.headSha)) {
+            return this.settle(product_diff_id, "Failed", "This pull request has unusable commits");
+        }
+
         await prisma.productDiff.updateMany({
-            where: { id: productDiffId, status: "Generating" },
-            data: { status, ...data },
-        });
-    }
-
-    private static async prepare_revisions(
-        sandbox: Sandbox,
-        detect: PreviewDetect,
-        projectId: string,
-    ): Promise<void> {
-        for (const revision of ["head", "base"] as const) {
-            const worktree = `${WORKSPACE_DIR}/${revision}`;
-            await PreviewWorkspace.write_placeholder_env(
-                sandbox,
-                worktree,
-                detect.nextAppDir!,
-                detect,
-                projectId,
-            );
-            await PreviewWorkspace.disable_middleware(sandbox, worktree, detect.middlewarePaths);
-        }
-    }
-
-    private static async start_sandbox(
-        snapshotId: string | null,
-        projectId: string,
-        log: Logger,
-    ): Promise<Sandbox> {
-        if (snapshotId) {
-            try {
-                const warm = await Sandbox.create(snapshotId, {
-                    apiKey: ENV.SERVER_E2B_API_KEY,
-                    timeoutMs: SANDBOX_TIMEOUT_MS,
-                });
-                if (await PreviewRunner.supports_current_protocol(warm)) {
-                    log.info("booted from the project's dependency snapshot", {
-                        snapshot: snapshotId,
-                    });
-                    return warm;
-                }
-
-                log.warn("dependency snapshot has an outdated preview runner; starting cold", {
-                    snapshot: snapshotId,
-                });
-                await warm.kill();
-                await PreviewDeps.forget_snapshot(projectId);
-            } catch (error) {
-                log.warn("dependency snapshot could not be used; starting cold", {
-                    reason: error instanceof Error ? error.message : String(error),
-                });
-                await PreviewDeps.forget_snapshot(projectId);
-            }
-        }
-
-        return Sandbox.create(ENV.SERVER_SANDBOX_TEMPLATE, {
-            apiKey: ENV.SERVER_E2B_API_KEY,
-            timeoutMs: SANDBOX_TIMEOUT_MS,
-        });
-    }
-
-    private static async bring_up_head(
-        sandbox: Sandbox,
-        detect: PreviewDetect,
-        log: Logger,
-    ): Promise<{ server: PreviewServerHandle; mode: ScaffoldMode; routeFiles: string[] } | null> {
-        const worktree = `${WORKSPACE_DIR}/head`;
-        const modes: ScaffoldMode[] = detect.hasExistingPagesDir
-            ? ["AppRoute"]
-            : ["AppRoute", "PagesEscape"];
-
-        for (const mode of modes) {
-            const scaffold = await PreviewRunner.scaffold(sandbox, worktree, detect, mode);
-            const server = await PreviewServer.start(
-                sandbox,
-                { worktree, nextAppDir: detect.nextAppDir!, port: HEAD_PORT, label: "head" },
-                SERVER_ENV,
-            );
-
-            if (await PreviewServer.wait_until_ready(sandbox, server, log)) {
-                return { server, mode, routeFiles: scaffold.routeFiles };
-            }
-
-            const tail = await PreviewServer.log_tail(sandbox, server);
-            log.warn("head revision did not render with this mounting mode", { mode });
-            if (tail) log.block(`${mode} dev server output`, tail);
-            await PreviewServer.stop(server);
-        }
-        return null;
-    }
-
-    private static async preview_diagnostics(
-        sandbox: Sandbox,
-        server: PreviewServerHandle | null,
-    ): Promise<string> {
-        if (!server) return "";
-        const output = await PreviewServer.log_tail(sandbox, server);
-        return output ? `dev server\n${output}` : "";
-    }
-
-    static async run(productDiffId: string): Promise<void> {
-        const claim = await prisma.productDiff.updateMany({
-            where: { id: productDiffId, status: "Pending" },
+            where: { id: product_diff_id, status: { in: ["Pending", "Generating"] } },
             data: { status: "Generating", error: null },
         });
-        if (claim.count === 0) return;
 
-        const log = Logger.scope(`product-diff:${productDiffId.slice(-8)}`);
-        const startedAt = Date.now();
-        let sandbox: Sandbox | null = null;
-        let activeServer: PreviewServerHandle | null = null;
-        let githubToken = "";
-        let stage = "load Product Diff";
-        const step = (name: string) => {
-            stage = name;
-            log.step(name);
-        };
+        let sandbox_id: string | null = null;
+        let token = "";
 
         try {
-            const productDiff = await prisma.productDiff.findUniqueOrThrow({
-                where: { id: productDiffId },
-                include: {
-                    issue: { include: { project: { include: { githubInstallation: true } } } },
-                },
-            });
-            const project = productDiff.issue.project;
-
-            step("validate Product Diff metadata");
-            if (
-                !project.githubRepoFullName ||
-                !project.githubRepoId ||
-                !project.githubInstallation ||
-                !SAFE_REPOSITORY.test(project.githubRepoFullName) ||
-                !SAFE_SHA.test(productDiff.baseSha) ||
-                !SAFE_SHA.test(productDiff.headSha)
-            ) {
-                throw new Error("Product Diff repository metadata is invalid");
-            }
-
-            step("create GitHub installation token");
-            githubToken = await GithubService.getInstallationToken(
+            sandbox_id = await E2B.create(SANDBOX_TIMEOUT_MS);
+            token = await GithubService.getInstallationToken(
                 Number(project.githubInstallation.installationId),
-                Number(project.githubRepoId),
             );
 
-            step("start preview sandbox");
-            sandbox = await this.start_sandbox(project.previewSnapshotId, project.id, log);
-            await sandbox.commands.run(`mkdir -p ${PREVIEW_DIR} ${SHOTS_DIR}`);
-
-            step("fetch both revisions");
-            const remote = `https://x-access-token:${githubToken}@github.com/${project.githubRepoFullName}.git`;
-            await PreviewWorkspace.checkout(sandbox, {
-                repoDir: REPO_DIR,
-                workspaceDir: WORKSPACE_DIR,
-                remote,
-                baseSha: productDiff.baseSha,
-                headSha: productDiff.headSha,
-                pullNumber: productDiff.pullNumber,
-            });
-
-            step("inspect the project");
-            const changedPaths = await PreviewWorkspace.changed_paths(
-                sandbox,
-                REPO_DIR,
-                productDiff.baseSha,
-                productDiff.headSha,
-            );
-            const detect = await PreviewRunner.detect(
-                sandbox,
-                `${WORKSPACE_DIR}/head`,
-                changedPaths,
-            );
-
-            if (!detect.supported || !detect.nextAppDir || !detect.framework) {
-                log.info("project cannot be previewed", { reason: detect.reason });
-                await sandbox.kill();
-                sandbox = null;
-                await this.settle(productDiffId, "Unsupported", {
-                    error: `Product Diff currently supports Next.js projects only — ${detect.reason ?? "no supported app found"}`,
-                });
-                return;
-            }
-
-            step("prepare both revisions");
-            await this.prepare_revisions(sandbox, detect, project.id);
-
-            step("install dependencies");
-            const cacheKey = PreviewDeps.cache_key({
-                packageManager: detect.packageManager!,
-                lockfileRelPath: detect.lockfileRelPath!,
-                lockfileSha256: detect.lockfileSha256!,
-            });
-            const warmCache =
-                project.previewDepsHash === cacheKey && (await PreviewDeps.cache_present(sandbox));
-
-            if (warmCache) {
-                log.info("reusing the project's cached dependencies");
-            } else {
-                await PreviewDeps.install(sandbox, `${WORKSPACE_DIR}/head`, detect, log);
-                await PreviewDeps.move_to_cache(
-                    sandbox,
-                    `${WORKSPACE_DIR}/head`,
-                    detect.workspaceDirs,
-                );
-
-                if (Date.now() - startedAt < SNAPSHOT_DEADLINE_MS) {
-                    step("save the dependency snapshot");
-                    await sandbox.commands.run(`rm -rf ${REPO_DIR} ${WORKSPACE_DIR}`);
-                    await PreviewDeps.remember_snapshot(
-                        sandbox.sandboxId,
-                        project.id,
-                        cacheKey,
-                        log,
-                    );
-
-                    step("restore both revisions after snapshotting");
-                    await PreviewWorkspace.checkout(sandbox, {
-                        repoDir: REPO_DIR,
-                        workspaceDir: WORKSPACE_DIR,
-                        remote,
-                        baseSha: productDiff.baseSha,
-                        headSha: productDiff.headSha,
-                        pullNumber: productDiff.pullNumber,
-                    });
-                    await this.prepare_revisions(sandbox, detect, project.id);
-                } else {
-                    log.warn(
-                        "skipping the dependency snapshot to stay within the sandbox lifetime",
-                    );
-                }
-            }
-
-            step("populate both revisions with dependencies");
-            for (const revision of ["head", "base"] as const) {
-                await PreviewDeps.restore_into(
-                    sandbox,
-                    `${WORKSPACE_DIR}/${revision}`,
-                    detect.workspaceDirs,
-                );
-            }
-
-            step("run the harness agent");
-            await sandbox.files.write(
-                PROMPT_PATH,
-                prompt({
-                    baseSha: productDiff.baseSha,
-                    headSha: productDiff.headSha,
-                    nextAppDir: detect.nextAppDir,
-                    framework: detect.framework,
-                }),
-            );
-            await ClaudeRun.execute(sandbox, log, {
-                prompt_path: PROMPT_PATH,
-                model: ENV.SERVER_PREVIEW_MODEL,
-                effort: ENV.SERVER_PREVIEW_EFFORT,
-                envs: { CLAUDE_CODE_OAUTH_TOKEN: ENV.SERVER_CLAUDE_CODE_OAUTH_TOKEN },
-                timeout_ms: AGENT_TIMEOUT_MS,
-                label: "Product Diff harness agent",
-            });
-
-            step("read the harness the agent wrote");
-            const harness = await PreviewRunner.read_manifest(
-                sandbox,
-                `${WORKSPACE_DIR}/head/${detect.nextAppDir}`,
-            );
-            const restored = await PreviewWorkspace.restore_unexpected_edits(
-                sandbox,
-                `${WORKSPACE_DIR}/head`,
-                [],
+            await E2B.clone_repo(
+                sandbox_id,
+                project.githubRepoUrl,
+                project.githubDefaultBranch,
+                Number(project.githubInstallation.installationId),
+                project.id,
                 log,
             );
 
-            step("apply the harness to the base revision");
-            await PreviewWorkspace.copy_harness(
-                sandbox,
-                `${WORKSPACE_DIR}/head`,
-                `${WORKSPACE_DIR}/base`,
-                detect.nextAppDir,
-            );
-
-            step("start head dev server");
-            const head = await this.bring_up_head(sandbox, detect, log);
-            if (!head) {
-                const reason = detect.hasExistingPagesDir
-                    ? "the app's root layout could not render and the project already uses a pages directory"
-                    : "the app could not render with placeholder configuration";
-                await sandbox.kill();
-                sandbox = null;
-                await this.settle(productDiffId, "Unsupported", {
-                    error: `Product Diff could not start this project — ${reason}`,
-                });
-                return;
-            }
-            activeServer = head.server;
-
-            step("photograph the head revision");
-            const headShots = await PreviewRunner.capture(sandbox, {
-                url: head.server.url,
-                side: "head",
-                workspaceRoot: `${WORKSPACE_DIR}/head`,
-                nextAppDir: detect.nextAppDir,
-                outputDir: SHOTS_DIR,
-                viewports: VIEWPORTS,
-                frozenNowMs: FROZEN_NOW_MS,
-                maxShots: MAX_SHOTS,
-            });
-            const failedHeadShot = headShots.captures.find(
-                (capture) => capture.status === "failed",
-            );
-            if (!headShots.ok || failedHeadShot) {
-                throw new Error(
-                    `head screenshot validation failed${failedHeadShot ? `: ${failedHeadShot.targetId}/${failedHeadShot.stateId} ${failedHeadShot.error ?? "capture failed"}` : ""}`,
-                );
-            }
-
-            step("stop the head dev server");
-            await PreviewServer.stop(head.server);
-            activeServer = null;
-
-            step("start base dev server");
-            await PreviewRunner.scaffold(sandbox, `${WORKSPACE_DIR}/base`, detect, head.mode);
-            const baseServer = await PreviewServer.start(
-                sandbox,
-                {
-                    worktree: `${WORKSPACE_DIR}/base`,
-                    nextAppDir: detect.nextAppDir,
-                    port: BASE_PORT,
-                    label: "base",
-                },
-                SERVER_ENV,
-            );
-            activeServer = baseServer;
-            const baseUsable = await PreviewServer.wait_until_ready(sandbox, baseServer, log);
-            if (!baseUsable) {
-                const tail = await PreviewServer.log_tail(sandbox, baseServer);
-                log.warn("base revision never became ready");
-                if (tail) log.block("base dev server output", tail);
-                throw new Error(
-                    `base revision never became ready${tail ? `: ${diagnostic_summary(tail)}` : ""}`,
-                );
-            }
-
-            step("photograph the base revision");
-            const baseShots = await PreviewRunner.capture(sandbox, {
-                url: baseServer.url,
-                side: "base",
-                workspaceRoot: `${WORKSPACE_DIR}/base`,
-                nextAppDir: detect.nextAppDir,
-                outputDir: SHOTS_DIR,
-                viewports: VIEWPORTS,
-                frozenNowMs: FROZEN_NOW_MS,
-                maxShots: MAX_SHOTS,
-            });
-            const failedBaseShot = baseShots.captures.find(
-                (capture) => capture.status === "failed",
-            );
-            if (!baseShots.ok || failedBaseShot) {
-                throw new Error(
-                    `base screenshot validation failed${failedBaseShot ? `: ${failedBaseShot.targetId}/${failedBaseShot.stateId} ${failedBaseShot.error ?? "capture failed"}` : ""}`,
-                );
-            }
-
-            step("stop the base dev server");
-            await PreviewServer.stop(baseServer);
-            activeServer = null;
-
-            step("pair the screenshots");
-            const pair = await PreviewRunner.pair(sandbox, headShots.captures, baseShots.captures);
-            if (!pair.ok) {
-                const first = pair.shots.find((shot) => shot.error)?.error;
-                throw new Error(`no target could be rendered${first ? `: ${first}` : ""}`);
-            }
-
-            step("recheck the pull request before upload");
-            const beforeUpload = await GithubService.getPullRequest(
-                githubToken,
-                project.githubRepoFullName,
-                productDiff.pullNumber,
-            );
-            if (!is_current_product_diff(beforeUpload, productDiff.baseSha, productDiff.headSha)) {
-                await sandbox.kill();
-                sandbox = null;
-                await this.settle(productDiffId, "Stale");
-                return;
-            }
-
-            const prefix = `product-diffs/${project.id}/${productDiff.pullNumber}/${productDiff.baseSha}-${productDiff.headSha}/${productDiff.id}`;
-            step("upload the screenshots");
-            await ProductDiffArtifacts.upload(sandbox, SHOTS_DIR, prefix, log);
-
-            step("recheck the pull request after upload");
-            const afterUpload = await GithubService.getPullRequest(
-                githubToken,
-                project.githubRepoFullName,
-                productDiff.pullNumber,
-            );
-            const current = is_current_product_diff(
-                afterUpload,
-                productDiff.baseSha,
-                productDiff.headSha,
-            );
-
-            const warnings = [...detect.warnings];
-            if (detect.middlewarePaths.length) {
-                warnings.push("the project's middleware was disabled so targets could render");
-            }
-            if (restored.length) {
-                warnings.push(
-                    `the agent edited ${restored.length} file(s) outside its harness folder; they were restored`,
-                );
-            }
-            const manifest = ProductDiffArtifacts.build_manifest({
-                harness,
-                pair,
-                framework: detect.framework,
-                viewports: VIEWPORTS,
-                warnings,
-            });
-
-            step("destroy preview sandbox");
-            await sandbox.kill();
-            sandbox = null;
-
-            step("publish Product Diff");
-            await this.settle(productDiffId, current ? "Ready" : "Stale", {
-                manifest: manifest as unknown as Prisma.InputJsonValue,
-                artifactPrefix: prefix,
-            });
-            log.success("Product Diff ready", {
-                targets: manifest.targets.length,
-                shots: pair.shots.length,
-            });
+            const sandbox = await Sandbox.connect(sandbox_id, { apiKey: ENV.SERVER_E2B_API_KEY });
+            const status = await this.generate(sandbox, product_diff_id, row.baseSha, row.headSha);
+            return status;
         } catch (error) {
-            const diagnostics =
-                sandbox && activeServer
-                    ? await this.preview_diagnostics(sandbox, activeServer)
-                    : "";
-            const redactedDiagnostics = redact(diagnostics, [
-                githubToken,
+            const failure = describe_failure("generate capsule diff", error, [
+                token,
                 ENV.SERVER_CLAUDE_CODE_OAUTH_TOKEN,
             ]);
-            if (redactedDiagnostics) {
-                log.block("preview diagnostics", redactedDiagnostics);
+            log.error("capsule diff run failed", new Error(failure.message), {
+                productDiff: product_diff_id,
+                base: row.baseSha.slice(0, 8),
+                head: row.headSha.slice(0, 8),
+                stage: failure.stage,
+            });
+            return this.settle(
+                product_diff_id,
+                "Failed",
+                this.reason(error, failure_sentence(failure)),
+            );
+        } finally {
+            if (sandbox_id) {
+                await E2B.destroy(sandbox_id).catch((error) => {
+                    log.error("sandbox teardown failed", error, { sandbox: sandbox_id });
+                });
             }
-            if (sandbox) {
-                try {
-                    await sandbox.kill();
-                } catch {
-                    // E2B timeout remains final cleanup.
-                }
-            }
-            const failure = describe_product_diff_failure(stage, error);
-            const message = redact(
-                redactedDiagnostics
-                    ? `${failure} | dev server: ${diagnostic_summary(redactedDiagnostics)}`
-                    : failure,
-                [githubToken, ENV.SERVER_CLAUDE_CODE_OAUTH_TOKEN],
-            ).slice(0, 500);
-            log.error("generation failed", new Error(message));
-            await this.settle(productDiffId, "Failed", { error: message });
         }
+    }
+
+    private static async generate(
+        sandbox: Sandbox,
+        product_diff_id: string,
+        base_sha: string,
+        head_sha: string,
+    ): Promise<ProductDiffStatus> {
+        const { profile } = await CapsuleWorkspace.prepare(sandbox, base_sha, head_sha, log);
+        const { targets, warnings } = await CapsuleTargets.pick(
+            sandbox,
+            profile,
+            base_sha,
+            head_sha,
+        );
+
+        if (targets.length === 0) {
+            return this.settle(
+                product_diff_id,
+                "Unsupported",
+                "This pull request changes no previewable components",
+            );
+        }
+
+        const authored = await CapsuleAuthor.write_capsules(sandbox, log, targets, profile);
+        const specs = authored.specs;
+        if (specs.length === 0) {
+            return this.settle(
+                product_diff_id,
+                "Unsupported",
+                "None of the changed components could be prepared for preview",
+            );
+        }
+
+        await CapsuleHarness.install(sandbox, profile);
+
+        let attempt = await this.build_and_check(sandbox, profile, specs, base_sha, head_sha);
+
+        for (let round = 0; round < MAX_REPAIR_ROUNDS; round += 1) {
+            const failures = collect_failures(specs, attempt.gates, attempt.buildErrors);
+            if (failures.length === 0) break;
+
+            log.info("retrying capsules that did not render", {
+                round: round + 1,
+                failing: failures.length,
+            });
+            await CapsuleAuthor.repair(sandbox, log, profile, failures);
+            attempt = await this.build_and_check(sandbox, profile, specs, base_sha, head_sha);
+        }
+        const gates = attempt.gates;
+
+        const { manifest, prefix } = await CapsuleUpload.publish(
+            sandbox,
+            product_diff_id,
+            specs,
+            gates,
+            [...warnings, ...authored.warnings],
+            log,
+        );
+
+        const status = terminal_status(manifest, specs.length);
+        await prisma.productDiff.update({
+            where: { id: product_diff_id },
+            data: {
+                status,
+                manifest: manifest as unknown as Prisma.InputJsonValue,
+                artifactPrefix: prefix,
+                error:
+                    status === "Failed"
+                        ? (first_build_error(attempt.buildErrors) ??
+                          "No component could be built for preview")
+                        : null,
+            },
+        });
+
+        return status;
+    }
+
+    private static async build_and_check(
+        sandbox: Sandbox,
+        profile: AppProfile,
+        specs: CapsuleSpec[],
+        base_sha: string,
+        head_sha: string,
+    ): Promise<{ gates: GateResults; buildErrors: BuildErrors }> {
+        const gates: GateResults = { base: {}, head: {} };
+        const buildErrors: BuildErrors = { base: {}, head: {} };
+
+        for (const revision of REVISIONS) {
+            const capsule_ids = await CapsuleHarness.write(sandbox, profile, specs, revision);
+            if (capsule_ids.length === 0) continue;
+
+            await CapsuleBuild.checkout_revision(
+                sandbox,
+                profile,
+                revision,
+                revision === "base" ? base_sha : head_sha,
+                log,
+            );
+
+            const built: string[] = [];
+            for (const capsule_id of capsule_ids) {
+                const outcome = await CapsuleBuild.build_capsule(
+                    sandbox,
+                    profile,
+                    revision,
+                    capsule_id,
+                );
+                if (outcome.ok) {
+                    built.push(capsule_id);
+                    continue;
+                }
+                buildErrors[revision][capsule_id] =
+                    outcome.error ?? "the build produced no error text";
+                log.block(
+                    `${revision} build failure — ${capsule_id}`,
+                    buildErrors[revision][capsule_id]!,
+                );
+            }
+
+            log.info(`${revision} revision built`, {
+                built: built.length,
+                failed: capsule_ids.length - built.length,
+            });
+            if (built.length > 0) gates[revision] = await this.check(sandbox, revision, built);
+        }
+
+        return { gates, buildErrors };
+    }
+
+    private static async check(
+        sandbox: Sandbox,
+        revision: CapsuleRevision,
+        capsule_ids: string[],
+    ): Promise<Record<string, GateResult>> {
+        const result = await sandbox.commands
+            .run(`node ${CHECK_ENTRY} ${dist_dir(revision)} '${JSON.stringify(capsule_ids)}'`, {
+                timeoutMs: CHECK_TIMEOUT_MS,
+            })
+            .catch((error: unknown) => {
+                log.block(`${revision} check failure`, command_error_text(error));
+                return null;
+            });
+
+        if (!result) return {};
+
+        const graded: Record<string, GateResult> = {};
+        for (const line of result.stdout.split("\n")) {
+            if (!line.trim()) continue;
+            try {
+                const gate = JSON.parse(line) as GateResult;
+                graded[gate.capsuleId] = gate;
+            } catch {
+                log.warn("the capsule checker printed something unreadable");
+            }
+        }
+        return graded;
+    }
+
+    private static reason(error: unknown, message: string): string {
+        if (error instanceof NoFrontendAppError) return "No React application was found to preview";
+        if (error instanceof InstallFailedError) {
+            return `The project's dependencies could not be installed. ${message}`;
+        }
+        return message;
+    }
+
+    private static async settle(
+        product_diff_id: string,
+        status: ProductDiffStatus,
+        error: string | null,
+    ): Promise<ProductDiffStatus> {
+        await prisma.productDiff.update({
+            where: { id: product_diff_id },
+            data: { status, error },
+        });
+        return status;
     }
 }

@@ -1,14 +1,16 @@
 "use client";
 import { useRef, useState } from "react";
 import { MdAdd, MdDelete, MdUpload, MdVisibility, MdVisibilityOff, MdVpnKey } from "react-icons/md";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
-import { formatRelativeTime } from "@/lib/format";
-import parse_env from "@/lib/env_parser";
+import { useDeleteProjectSecret } from "@/hooks/project/useDeleteProjectSecret";
 import { useProjectSecrets } from "@/hooks/project/useProjectSecrets";
 import { useSetProjectSecrets } from "@/hooks/project/useSetProjectSecrets";
-import { useDeleteProjectSecret } from "@/hooks/project/useDeleteProjectSecret";
+import parse_env from "@/lib/env_parser";
+import { formatRelativeTime } from "@/lib/format";
+import { cn } from "@/lib/utils";
+
 import SettingsUtilityCard from "./SettingsUtilityCard";
 
 const FIELD =

@@ -1,15 +1,17 @@
 "use client";
 import { isAxiosError } from "axios";
-import { useIssue } from "@/hooks/issues/useIssue";
-import { useBoardColumns } from "@/hooks/issues/useBoardColumns";
-import { useActiveProject } from "@/hooks/useActiveProject";
-import { useEscapeExit } from "@/hooks/shortcuts/useEscapeExit";
-import { Button } from "@/components/ui/button";
+
 import LogoLoader from "@/components/app/LogoLoader";
 import { PLAYGROUND_PANE_SHELL } from "@/components/playground/Core/components/paneBar";
-import { PaneLeadSlot } from "@/components/playground/Core/components/PlaygroundPaneSlots";
 import PlaygroundBreadcrumb from "@/components/playground/Core/components/PlaygroundBreadcrumb";
+import { PaneLeadSlot } from "@/components/playground/Core/components/PlaygroundPaneSlots";
+import { Button } from "@/components/ui/button";
+import { useBoardColumns } from "@/hooks/issues/useBoardColumns";
+import { useIssue } from "@/hooks/issues/useIssue";
+import { useEscapeExit } from "@/hooks/shortcuts/useEscapeExit";
+import { useActiveProject } from "@/hooks/useActiveProject";
 import { usePaneRouteStore } from "@/store/playground/usePaneRouteStore";
+
 import IssueDisplayPane from "./IssueDisplayPane";
 
 export default function IssueDisplay({ issueId }: { issueId: string }) {

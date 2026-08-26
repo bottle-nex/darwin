@@ -1,6 +1,8 @@
 import { extname } from "node:path";
+
 import { prisma } from "@trymatcha/database";
 import type { ProductDiffStatus, ProductDiffSummary } from "@trymatcha/types";
+
 import GithubPullsService from "./service.github_pulls";
 import StorageService from "./service.storage";
 
@@ -19,6 +21,10 @@ type ProductDiffSummaryRow = {
 };
 
 export default class ProductDiffService {
+    static retryable_product_diff_status(status: ProductDiffStatus): boolean {
+        return status === "Failed" || status === "Stale";
+    }
+
     static has_frontend_candidate(files: string[]): boolean {
         return files.some((file) => FRONTEND_EXTENSIONS.has(extname(file).toLowerCase()));
     }
@@ -105,9 +111,9 @@ export default class ProductDiffService {
             select: { id: true, status: true },
         });
 
-        if (productDiff.status === "Failed" && retry_failed) {
+        if (retry_failed && this.retryable_product_diff_status(productDiff.status)) {
             const reset = await prisma.productDiff.updateMany({
-                where: { id: productDiff.id, status: "Failed" },
+                where: { id: productDiff.id, status: { in: ["Failed", "Stale"] } },
                 data: { status: "Pending", error: null },
             });
             if (reset.count === 0) return null;

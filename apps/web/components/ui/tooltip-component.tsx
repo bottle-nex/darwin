@@ -2,8 +2,8 @@
 
 import * as React from "react";
 
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import KeyCombo from "@/components/ui/KeyCombo";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 type TooltipComponentProps = {
     children: React.ReactNode;

@@ -1,9 +1,10 @@
-import { Request, Response } from "express";
-import ResponseWriter from "../../services/service.response";
-import { prisma } from "@trymatcha/database";
-import Access from "../../access-control/access";
 import { Action, Permissions } from "@trymatcha/access-control";
+import { prisma } from "@trymatcha/database";
+import type { Request, Response } from "express";
+
+import Access from "../../access-control/access";
 import PresenceService from "../../services/service.presence";
+import ResponseWriter from "../../services/service.response";
 
 export default async function list_presence_controller(req: Request, res: Response) {
     try {

@@ -1,8 +1,10 @@
 "use client";
 import type { KeyboardEvent } from "react";
-import { Textarea } from "@/components/ui/textarea";
+
 import { DIALOG_TITLE_FIELD, GHOST_FIELD } from "@/components/ui/fieldStyles";
+import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
+
 import type { IssueFormState } from "./useIssueForm";
 
 function blockNewline(event: KeyboardEvent<HTMLTextAreaElement>) {

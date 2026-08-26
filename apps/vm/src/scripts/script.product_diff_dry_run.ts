@@ -1,6 +1,8 @@
 import "../conf/config.env";
+
 import { Prisma, prisma } from "@trymatcha/database";
 import Logger from "@trymatcha/logger";
+
 import ProductDiffRunner from "../services/service.product_diff";
 
 const log = Logger.scope("diff-dry-run");

@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { MdCheck, MdPeople } from "react-icons/md";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { TooltipComponent } from "@/components/ui/tooltip-component";
+import { MdPeople } from "react-icons/md";
+
+import MemberOptionRow from "@/components/playground/Core/components/MemberOptionRow";
+import ProjectRoleTicker from "@/components/playground/Team/TeamView/ProjectRoleTicker";
 import {
     Command,
     CommandEmpty,
@@ -12,10 +13,11 @@ import {
     CommandItem,
     CommandList,
 } from "@/components/ui/command";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { TooltipComponent } from "@/components/ui/tooltip-component";
 import { useProjectMembers } from "@/hooks/project/useProjectMembers";
-import ProjectRoleTicker from "@/components/playground/Team/TeamView/ProjectRoleTicker";
+
 import { CapsuleTrigger } from "./Capsule";
-import MemberAvatar from "./MemberAvatar";
 
 interface MembersCapsuleProps {
     projectId: string | undefined;
@@ -97,21 +99,17 @@ export default function MembersCapsule({
                                         value={member.name ?? member.email}
                                         onSelect={() => toggle(member.id)}
                                     >
-                                        <MemberAvatar member={member} />
-                                        <span className="flex min-w-0 flex-1 flex-col">
-                                            <span className="truncate text-[13px] text-neutral-100">
-                                                {member.name ?? member.email}
-                                            </span>
-                                            {member.name && (
-                                                <span className="truncate text-[11px] text-neutral-500">
-                                                    {member.email}
-                                                </span>
-                                            )}
-                                        </span>
-                                        <ProjectRoleTicker role={member.role} size="sm" />
-                                        {isSelected && (
-                                            <MdCheck className="size-4 shrink-0 text-neutral-400" />
-                                        )}
+                                        <MemberOptionRow
+                                            id={member.id}
+                                            label={member.name ?? member.email}
+                                            avatarSrc={member.image}
+                                            avatarSize="lg"
+                                            checked={isSelected}
+                                            secondaryLabel={member.name ? member.email : undefined}
+                                            trailing={
+                                                <ProjectRoleTicker role={member.role} size="sm" />
+                                            }
+                                        />
                                     </CommandItem>
                                 );
                             })}

@@ -1,7 +1,8 @@
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
 import z from "zod";
-import ResponseWriter from "../../services/service.response";
+
 import IssueService from "../../services/service.issue";
+import ResponseWriter from "../../services/service.response";
 
 export default class IssueDeleteController {
     static params_schema = z.object({

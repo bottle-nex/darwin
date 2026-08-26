@@ -1,10 +1,11 @@
 "use client";
 
-import * as React from "react";
 import { Command as CommandPrimitive } from "cmdk";
+import * as React from "react";
 import { MdSearch } from "react-icons/md";
 
 import { cn } from "@/lib/utils";
+
 import { MENU_ITEM } from "./menuSurface";
 
 function Command({ className, ...props }: React.ComponentProps<typeof CommandPrimitive>) {
@@ -96,5 +97,5 @@ function CommandItem({ className, ...props }: React.ComponentProps<typeof Comman
     );
 }
 
-export { Command, CommandInput, CommandList, CommandEmpty, CommandGroup, CommandItem };
+export { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList };
 export { defaultFilter } from "cmdk";

@@ -1,3 +1,5 @@
+import type { ReactNode } from "react";
+
 import {
     AgentClaimsArt,
     FileIssueArt,
@@ -6,7 +8,6 @@ import {
     ReviewPrArt,
     VerifiedArt,
 } from "./WhyArt";
-import type { ReactNode } from "react";
 
 const SECTION_GROUND = "#F4EDE3";
 const TITLE_INK = "#2A2524";

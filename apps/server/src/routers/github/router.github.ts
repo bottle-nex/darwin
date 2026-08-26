@@ -1,11 +1,12 @@
 import { Router } from "express";
-import { require_auth } from "../../middlewares/middleware.auth";
-import ConnectStartController from "../../controllers/github/controller.connect_start";
+
 import ConnectCompleteController from "../../controllers/github/controller.connect_complete";
-import ListReposController from "../../controllers/github/controller.list_repos";
-import ListBranchesController from "../../controllers/github/controller.list_branches";
+import ConnectStartController from "../../controllers/github/controller.connect_start";
 import DisconnectController from "../../controllers/github/controller.disconnect";
 import GithubLinkController from "../../controllers/github/controller.link";
+import ListBranchesController from "../../controllers/github/controller.list_branches";
+import ListReposController from "../../controllers/github/controller.list_repos";
+import { require_auth } from "../../middlewares/middleware.auth";
 
 const github_router: Router = Router();
 

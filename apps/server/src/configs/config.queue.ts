@@ -1,4 +1,5 @@
-import { ConnectionOptions, QueueOptions } from "bullmq";
+import type { ConnectionOptions, QueueOptions } from "bullmq";
+
 import { ENV } from "./env";
 
 const queue_config: QueueOptions = {

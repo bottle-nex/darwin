@@ -1,8 +1,10 @@
 "use client";
-import { useMemo, type ReactNode } from "react";
-import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
+import { type ReactNode, useMemo } from "react";
+
 import { IssueSelectionOrderProvider } from "@/hooks/issues/useIssueSelection";
+import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
 import type { BoardState } from "@/types/kanban";
+
 import HiddenKanbanColumn from "./HiddenKanbanColumn";
 import KanbanColumn from "./KanbanColumn";
 

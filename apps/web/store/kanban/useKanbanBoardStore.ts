@@ -1,6 +1,7 @@
 import { create } from "zustand";
+
 import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
-import { KanbanStatus, type BoardState, type Issue } from "@/types/kanban";
+import { type BoardState, type Issue, KanbanStatus } from "@/types/kanban";
 import type { CustomCard } from "@/types/kanban-custom";
 
 interface KanbanBoardState {

@@ -1,7 +1,8 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import type { WorkerDef, PositionedNode } from "./types";
+
+import type { PositionedNode, WorkerDef } from "./types";
 
 interface SimPanelProps {
     workers: WorkerDef[];

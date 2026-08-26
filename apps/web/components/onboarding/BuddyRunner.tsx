@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect } from "react";
 import { useAnimate, useReducedMotion } from "motion/react";
+import { useEffect } from "react";
+
 import CanvasBuddy, { type BuddyPose } from "./CanvasBuddy";
-import DustTrail from "./DustTrail";
 import { JUMP_DELAY_MS } from "./choreography";
+import DustTrail from "./DustTrail";
 
 export default function BuddyRunner({
     jumpSignal,

@@ -1,16 +1,17 @@
 "use client";
 
 import {
+    type LabelledReference,
     parse_reference_token,
-    reference_key,
     reference_issues,
+    reference_key,
     reference_labels,
     reference_split_pattern,
-    type LabelledReference,
 } from "@trymatcha/types";
-import { cn } from "@/lib/utils";
-import { urlSplitPattern, withProtocol } from "@/lib/urls";
+
 import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
+import { urlSplitPattern, withProtocol } from "@/lib/urls";
+import { cn } from "@/lib/utils";
 import { usePaneRouteStore } from "@/store/playground/usePaneRouteStore";
 
 const TOMBSTONE_LABEL = { member: "@unknown", issue: "#deleted issue" } as const;

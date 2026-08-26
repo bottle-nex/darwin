@@ -1,5 +1,6 @@
 "use client";
 import { FaGithub, FaLock } from "react-icons/fa6";
+
 import { Button } from "@/components/ui/button";
 import { formatRelativeTime } from "@/lib/format";
 import type { GithubRepo } from "@/types/organization";

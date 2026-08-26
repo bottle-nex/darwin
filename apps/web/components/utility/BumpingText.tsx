@@ -1,6 +1,7 @@
-import { cn } from "@/lib/utils";
 import { useAnimate } from "framer-motion";
 import { useEffect } from "react";
+
+import { cn } from "@/lib/utils";
 
 export function BumpingText({
     text,

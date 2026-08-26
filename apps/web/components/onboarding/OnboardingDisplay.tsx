@@ -5,8 +5,9 @@ import { useUpdateProject } from "@/hooks/project/useUpdateProject";
 import { useCreateTeam } from "@/hooks/team/useCreateTeam";
 import { slugify } from "@/lib/format";
 import type { ProjectDetail } from "@/types/project";
-import type { TourDraft } from "./steps";
+
 import OnboardingCore from "./OnboardingCore";
+import type { TourDraft } from "./steps";
 
 export default function OnboardingDisplay({
     project,

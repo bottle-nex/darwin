@@ -1,4 +1,5 @@
-import { InputRule, Mark, Node, mergeAttributes, type Editor } from "@tiptap/core";
+import { type Editor, InputRule, Mark, mergeAttributes, Node } from "@tiptap/core";
+
 import { BLANK_QUESTION } from "@/lib/templates/promptHtml";
 
 const PROMPT_NAME = "prompt";

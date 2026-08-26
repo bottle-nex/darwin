@@ -1,9 +1,10 @@
 "use client";
 
-import Image from "next/image";
 import { motion } from "motion/react";
+import Image from "next/image";
 import { memo } from "react";
 import { LuAlarmClock, LuCornerDownRight, LuMessageSquare, LuPaperclip } from "react-icons/lu";
+
 import { appear, EASE_OUT, MockScene, PanelCard } from "./MockWindow";
 import ShowcaseFrame from "./ShowcaseFrame";
 

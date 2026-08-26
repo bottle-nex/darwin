@@ -1,4 +1,5 @@
 import type { Feature } from "@/types/feature.type";
+
 import { DETAIL_WIDTH } from "./cardMetrics";
 
 /**

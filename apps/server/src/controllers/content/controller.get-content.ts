@@ -1,6 +1,7 @@
+import { prisma } from "@trymatcha/database";
 import type { Request, Response } from "express";
 import { z } from "zod";
-import { prisma } from "@trymatcha/database";
+
 import ResponseWriter from "../../services/service.response";
 
 const params_schema = z.object({ slug: z.string().min(1) });

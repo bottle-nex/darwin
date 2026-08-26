@@ -1,11 +1,11 @@
 "use client";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { isAxiosError } from "axios";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { MdDelete } from "react-icons/md";
 import { PiSmileyFill } from "react-icons/pi";
+
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
     Dialog,
     DialogContent,
@@ -14,14 +14,16 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog";
-import { cn } from "@/lib/utils";
-import { useUpdateProject } from "@/hooks/project/useUpdateProject";
+import IconPicker, { type IconPick, IconPickGlyph } from "@/components/ui/IconPicker";
+import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
 import { useDeleteProject } from "@/hooks/project/useDeleteProject";
 import { useGetProjectConfig } from "@/hooks/project/useGetProjectConfig";
+import { useUpdateProject } from "@/hooks/project/useUpdateProject";
+import { cn } from "@/lib/utils";
 import type { KanbanOptionView, ProjectDetail } from "@/types/project";
-import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
-import IconPicker, { IconPickGlyph, type IconPick } from "@/components/ui/IconPicker";
+
 import ProjectSettingsBoardSection from "./ProjectSettingsBoardSection";
 import SettingsUtilityCard from "./SettingsUtilityCard";
 

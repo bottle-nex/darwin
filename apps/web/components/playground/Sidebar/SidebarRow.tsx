@@ -1,7 +1,8 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { HiOutlineLockClosed } from "react-icons/hi2";
+
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 type RowProps = {

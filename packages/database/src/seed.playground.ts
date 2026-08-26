@@ -1,5 +1,11 @@
 import "./load-env";
-import { prisma } from "./client";
+
+import {
+    NOTIFICATION_SCOPE,
+    NotificationScope,
+} from "@trymatcha/types/notifications/notification-scope";
+
+import type { CustomColumn } from "../generated/client";
 import {
     ActivitySurface,
     ActivityType,
@@ -22,11 +28,7 @@ import {
     TeamRole,
     WorkerStatus,
 } from "../generated/client";
-import type { CustomColumn } from "../generated/client";
-import {
-    NOTIFICATION_SCOPE,
-    NotificationScope,
-} from "@trymatcha/types/notifications/notification-scope";
+import { prisma } from "./client";
 
 const ORG = {
     slug: "appx",

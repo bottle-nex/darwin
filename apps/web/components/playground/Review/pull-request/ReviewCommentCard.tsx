@@ -1,26 +1,28 @@
 "use client";
 
+import type { ReviewComment } from "@trymatcha/types";
 import { useState } from "react";
 import { GoCheck, GoComment, GoFileDiff, GoXCircle } from "react-icons/go";
 import { IoMdCheckmark } from "react-icons/io";
 import { MdContentCopy, MdDelete, MdEdit, MdMoreHoriz } from "react-icons/md";
-import Markdown from "@/components/utility/Markdown";
-import ConfirmDialog from "@/components/utility/ConfirmDialog";
+
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import type { ReviewComment } from "@trymatcha/types";
-import { cn } from "@/lib/utils";
+import { Textarea } from "@/components/ui/textarea";
+import ConfirmDialog from "@/components/utility/ConfirmDialog";
+import Markdown from "@/components/utility/Markdown";
+import { useGithubLink } from "@/hooks/github/useGithubLink";
+import { useDeleteReviewComment } from "@/hooks/review/useDeleteReviewComment";
+import { useUpdateReviewComment } from "@/hooks/review/useUpdateReviewComment";
 import { formatRelativeTime } from "@/lib/format";
 import { markdownToPlainText } from "@/lib/markdown";
-import { useGithubLink } from "@/hooks/github/useGithubLink";
-import { useUpdateReviewComment } from "@/hooks/review/useUpdateReviewComment";
-import { useDeleteReviewComment } from "@/hooks/review/useDeleteReviewComment";
+import { cn } from "@/lib/utils";
+
 import ReviewActorAvatar from "../ReviewActorAvatar";
 
 const REVIEW_VERDICT: Record<string, { icon: typeof GoCheck; label: string; tone: string }> = {

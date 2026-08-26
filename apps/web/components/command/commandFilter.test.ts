@@ -1,7 +1,9 @@
 import { describe, expect, test } from "bun:test";
 import { defaultFilter } from "cmdk";
-import { CommandKind, type CommandEntry } from "@/types/command.type";
-import { commandEntryValue, filterCommandGroups, type CommandGroupEntries } from "./commandFilter";
+
+import { type CommandEntry, CommandKind } from "@/types/command.type";
+
+import { commandEntryValue, type CommandGroupEntries, filterCommandGroups } from "./commandFilter";
 
 function entry(kind: CommandKind, label: string, combo: string): CommandEntry {
     return { kind, label, combo, icon: (() => null) as never, run: () => {} };

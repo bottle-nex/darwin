@@ -1,6 +1,6 @@
 "use client";
-import { useState, type ReactNode } from "react";
-import { MdCheck } from "react-icons/md";
+import { type ReactNode, useState } from "react";
+import { HiCalendar } from "react-icons/hi2";
 import {
     LuColumns3,
     LuCopy,
@@ -10,8 +10,11 @@ import {
     LuTrash2,
     LuUsers,
 } from "react-icons/lu";
+import { MdCheck } from "react-icons/md";
 import { RxTriangleRight } from "react-icons/rx";
-import { HiCalendar } from "react-icons/hi2";
+
+import MemberOptionRow from "@/components/playground/Core/components/MemberOptionRow";
+import { PRIORITY_OPTIONS } from "@/components/playground/Issue/issueHelpers";
 import {
     ContextMenu,
     ContextMenuContent,
@@ -22,12 +25,12 @@ import {
     ContextMenuSubTrigger,
     ContextMenuTrigger,
 } from "@/components/ui/context-menu";
-import { cn } from "@/lib/utils";
-import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
-import { PRIORITY_TO_NUMBER } from "./customkanban/data";
-import { PRIORITY_OPTIONS } from "@/components/playground/Issue/issueHelpers";
 import { COPY_FIELDS, DATE_PRESETS, useIssueActions } from "@/hooks/issues/useIssueActions";
+import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
+import { cn } from "@/lib/utils";
 import type { BoardIssue } from "@/types/board";
+
+import { PRIORITY_TO_NUMBER } from "./customkanban/data";
 
 const ICON = "size-3.5 text-snow/50!";
 
@@ -174,10 +177,12 @@ export default function IssueDropdown({
                                 actions.toggleAssignee(member.id);
                             }}
                         >
-                            <span className="flex-1 truncate">{member.name ?? member.email}</span>
-                            {actions.assigneeIds.has(member.id) && (
-                                <MdCheck className="size-3.5 text-neutral-300" aria-hidden />
-                            )}
+                            <MemberOptionRow
+                                id={member.id}
+                                label={member.name ?? member.email}
+                                avatarSrc={member.image}
+                                checked={actions.assigneeIds.has(member.id)}
+                            />
                         </ContextMenuItem>
                     ))}
                     {actions.members.length === 0 && (

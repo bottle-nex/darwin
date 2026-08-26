@@ -1,9 +1,10 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { ProjectRole } from "@trymatcha/types";
+import type { ProjectRole } from "@trymatcha/types";
+
+import { TEAM_MEMBERS_QUERY_KEY } from "@/hooks/team/useGetTeamMembers";
 import { apiClient } from "@/lib/axios";
 import { INVITE_MEMBER_URL } from "@/routes/api_routes";
-import { ApiResponse } from "@/types/api";
-import { TEAM_MEMBERS_QUERY_KEY } from "@/hooks/team/useGetTeamMembers";
+import type { ApiResponse } from "@/types/api";
 
 interface InvitePayload {
     emails: string[];

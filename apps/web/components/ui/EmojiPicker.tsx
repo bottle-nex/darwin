@@ -1,7 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
 import { EMOJI_GROUPS, QUICK_REACTION_EMOJIS } from "@trymatcha/types";
+import { useMemo, useState } from "react";
+
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 const ALL_EMOJIS = EMOJI_GROUPS.flatMap((group) => group.emojis);

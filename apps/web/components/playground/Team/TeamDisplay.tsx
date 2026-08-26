@@ -1,8 +1,10 @@
 "use client";
-import { MdGroup } from "react-icons/md";
 import { useParams } from "next/navigation";
-import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
+import { MdGroup } from "react-icons/md";
+
 import PaneEmptyState from "@/components/playground/Core/components/PaneEmptyState";
+import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
+
 import TeamViewMain from "./TeamView/TeamViewMain";
 
 /**

@@ -1,6 +1,7 @@
+import { IssueStatus } from "@trymatcha/types";
 import type { IconType } from "react-icons";
 import { LuColumns3 } from "react-icons/lu";
-import { IssueStatus } from "@trymatcha/types";
+
 import { PRIORITY_OPTIONS } from "@/components/playground/Issue/issueHelpers";
 import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
 import type {

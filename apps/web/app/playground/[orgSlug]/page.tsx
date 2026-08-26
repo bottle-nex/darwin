@@ -1,13 +1,14 @@
 "use client";
-import { useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { FaSpinner } from "react-icons/fa6";
+
+import PlaygroundShell from "@/components/playground/Core/PlaygroundShell";
+import CreateProjectDialog from "@/components/project/CreateProjectDialog";
 import NoResource from "@/components/utility/NoResource";
 import ProjectsGlyph from "@/components/utility/ProjectsGlyph";
-import CreateProjectDialog from "@/components/project/CreateProjectDialog";
 import { useGetDashboard } from "@/hooks/dashboard/useGetDashboard";
 import { useNewProjectStore } from "@/store/project/useNewProjectStore";
-import PlaygroundShell from "@/components/playground/Core/PlaygroundShell";
 
 /**
  * The org-only URL redirects to the org's first project once the dashboard

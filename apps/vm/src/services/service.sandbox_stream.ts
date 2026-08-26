@@ -1,5 +1,5 @@
-import chalk from "chalk";
 import type Logger from "@trymatcha/logger";
+import chalk from "chalk";
 
 const MAX_LINE = 160;
 const CREDENTIAL_IN_URL = /\/\/[^/\s:@]+:[^/\s@]+@/g;
@@ -21,6 +21,44 @@ export function redact(text: string, secrets: string[]): string {
         text,
     );
     return known.replace(CREDENTIAL_IN_URL, "//***:***@");
+}
+
+/**
+ * Pull the readable part out of a failed sandbox command.
+ *
+ * E2B throws a CommandExitError whose message is only "exit status 1". The output that says what
+ * actually broke sits on the error itself, so reading the message alone records nothing useful and
+ * leaves a repair agent guessing.
+ */
+export function command_error_text(error: unknown): string {
+    const result = error as { stderr?: unknown; stdout?: unknown; exitCode?: unknown };
+    const parts = [result?.stderr, result?.stdout]
+        .filter((part): part is string => typeof part === "string" && part.trim().length > 0)
+        .map((part) => part.trim());
+
+    if (parts.length > 0) return parts.join("\n");
+    return error instanceof Error ? error.message : String(error);
+}
+
+export interface FailureReport {
+    stage: string;
+    message: string;
+}
+
+/**
+ * Describe a failure well enough to act on it without reading the code that raised it.
+ *
+ * A failure is only useful when it says which step broke and what that step actually printed. The
+ * stage supplies the first; command_error_text supplies the second. Redaction is not optional: the
+ * git remote carries a live installation token, git echoes that URL back in its own fatal
+ * messages, and these strings are written to the database.
+ */
+export function describe_failure(stage: string, error: unknown, secrets: string[]): FailureReport {
+    return { stage, message: redact(command_error_text(error), secrets) };
+}
+
+export function failure_sentence(failure: FailureReport): string {
+    return `${failure.stage}: ${failure.message}`;
 }
 
 export default class SandboxStream {

@@ -1,7 +1,9 @@
 "use client";
-import { useState, type ReactNode } from "react";
-import { PaneSlotsProvider } from "./PlaygroundPaneSlots";
+import { type ReactNode, useState } from "react";
+
 import { useSidebarWidthStore } from "@/store/playground/useSidebarWidthStore";
+
+import { PaneSlotsProvider } from "./PlaygroundPaneSlots";
 
 export const PANE_TOP_BAR_HEIGHT = 42;
 

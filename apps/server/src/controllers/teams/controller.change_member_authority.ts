@@ -1,11 +1,12 @@
-import { Request, Response } from "express";
-import z from "zod";
-import { prisma } from "@trymatcha/database";
-import { TeamRole } from "@trymatcha/types";
 import { Action, Permissions } from "@trymatcha/access-control";
-import ResponseWriter from "../../services/service.response";
-import Access from "../../access-control/access";
+import { prisma } from "@trymatcha/database";
+import type { TeamRole } from "@trymatcha/types";
+import type { Request, Response } from "express";
+import z from "zod";
+
 import { server_services } from "../..";
+import Access from "../../access-control/access";
+import ResponseWriter from "../../services/service.response";
 
 const body_schema = z.object({
     teamId: z.string().nonempty(),

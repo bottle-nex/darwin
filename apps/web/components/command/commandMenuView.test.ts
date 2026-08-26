@@ -1,4 +1,5 @@
 import { describe, expect, test } from "bun:test";
+
 import { commandMenuView, type CommandMenuViewInput } from "./commandMenuView";
 
 const idle: CommandMenuViewInput = {

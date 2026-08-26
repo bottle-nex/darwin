@@ -1,6 +1,7 @@
-import { Button } from "../ui/button";
 import { MdChevronRight } from "react-icons/md";
+
 import ShowcaseFrame from "../landing/showcase/ShowcaseFrame";
+import { Button } from "../ui/button";
 
 export default function WhyHero() {
     return (

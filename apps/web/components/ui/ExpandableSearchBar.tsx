@@ -1,6 +1,7 @@
 "use client";
-import { HiOutlineMagnifyingGlass, HiXMark } from "react-icons/hi2";
 import { motion } from "motion/react";
+import { HiOutlineMagnifyingGlass, HiXMark } from "react-icons/hi2";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";

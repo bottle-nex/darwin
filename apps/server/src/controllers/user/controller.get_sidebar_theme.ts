@@ -1,5 +1,6 @@
-import type { Request, Response } from "express";
 import { prisma } from "@trymatcha/database";
+import type { Request, Response } from "express";
+
 import ResponseWriter from "../../services/service.response";
 
 export default class GetSidebarThemeController {

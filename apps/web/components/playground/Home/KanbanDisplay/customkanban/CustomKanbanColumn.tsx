@@ -1,35 +1,36 @@
 "use client";
-import { Button } from "@/components/ui/button";
+import { SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import { useState } from "react";
 import {
-    MdMoreHoriz,
     MdAdd,
-    MdDelete,
-    MdEdit,
-    MdDragIndicator,
     MdChecklist,
     MdClose,
+    MdDelete,
+    MdDragIndicator,
+    MdEdit,
+    MdMoreHoriz,
 } from "react-icons/md";
+
+import { Button } from "@/components/ui/button";
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
-import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
-import { useCreateIssueStore } from "@/store/issues/useCreateIssueStore";
-import { useIssueSelectionStore } from "@/store/issues/useIssueSelectionStore";
+import { useBoardLaneModel } from "@/hooks/issues/useBoard";
 import { useCustomColumnActions } from "@/hooks/kanban/useCustomColumnActions";
 import { useActiveProject } from "@/hooks/useActiveProject";
-import { useBoardLaneModel } from "@/hooks/issues/useBoard";
+import { cn } from "@/lib/utils";
+import { useCreateIssueStore } from "@/store/issues/useCreateIssueStore";
+import { useIssueSelectionStore } from "@/store/issues/useIssueSelectionStore";
 import { useCustomKanbanStore } from "@/store/kanban/useCustomKanbanStore";
-import SortableCustomCard from "./SortableCustomCard";
-import { BoardLanePaginationView } from "../BoardLanePagination";
-import VirtualizedIssueCards from "../VirtualizedIssueCards";
 import type { CustomColumn } from "@/types/kanban-custom";
+
+import VirtualizedIssueCards from "../VirtualizedIssueCards";
+import SortableCustomCard from "./SortableCustomCard";
 
 type CustomKanbanColumnProps = {
     column: CustomColumn;
@@ -74,7 +75,7 @@ export default function CustomKanbanColumn({ column, draggable = true }: CustomK
             ref={setNodeRef}
             style={style}
             className={cn(
-                "group flex max-h-full min-h-0 w-84 shrink-0 flex-col rounded-lg bg-ink/20 p-2 ring-1 ring-snow/3 transition-colors",
+                "group flex max-h-full min-h-0 w-84 shrink-0 flex-col rounded-lg bg-ink/20 p-2 ring-[0.5px] ring-snow/3 transition-colors",
                 isDragging && "opacity-40",
             )}
         >
@@ -206,7 +207,7 @@ export default function CustomKanbanColumn({ column, draggable = true }: CustomK
                             : lane.lanePending
                               ? `Loading issues in ${column.title}`
                               : lane.laneError || lane.basePageError || lane.fallbackError
-                                ? `Issues in ${column.title} could not be loaded. Retry is available.`
+                                ? `Issues in ${column.title} could not be loaded.`
                                 : column.cards.length === 0
                                   ? `No issues in ${column.title}`
                                   : `${column.cards.length} loaded issues in ${column.title}`,
@@ -247,7 +248,6 @@ export default function CustomKanbanColumn({ column, draggable = true }: CustomK
                     }
                 />
             </SortableContext>
-            <BoardLanePaginationView lane={lane} />
         </div>
     );
 }

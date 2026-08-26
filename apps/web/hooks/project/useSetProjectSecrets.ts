@@ -1,7 +1,9 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+
 import { apiClient } from "@/lib/axios";
-import type { ApiResponse } from "@/types/api";
 import { SET_PROJECT_SECRET } from "@/routes/api_routes";
+import type { ApiResponse } from "@/types/api";
+
 import { PROJECT_SECRETS_QUERY_KEY } from "./useProjectSecrets";
 
 interface SetSecretsInput {

@@ -1,6 +1,6 @@
+import chalk from "chalk";
 import dotenv from "dotenv";
 import { z } from "zod";
-import chalk from "chalk";
 
 dotenv.config({ path: new URL("../../../../.env", import.meta.url).pathname });
 
@@ -24,8 +24,9 @@ const envSchema = z.object({
     SERVER_OTP_MAX_ATTEMPTS: z.coerce.number().default(5),
     SERVER_RESEND_API_KEY: z.string().min(1, "Resend api key is required"),
     SERVER_EMAIL_FROM: z.string().min(1).default("matcha <noreply@highgarden.app>"),
-    SERVER_WEB_URL: z.string().min(1, "Web URL is required"),
-    SERVER_ADMIN_URL: z.string().default("http://localhost:5174"),
+    SERVER_WEB_URL: z.url({ protocol: /^https?$/ }),
+    SERVER_PUBLIC_API_URL: z.url({ protocol: /^https?$/ }),
+    SERVER_ADMIN_URL: z.url({ protocol: /^https?$/ }).default("http://localhost:5174"),
     SERVER_ADMIN_EMAILS: z
         .string()
         .default("")

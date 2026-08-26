@@ -1,11 +1,19 @@
 "use client";
-import { useMemo } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { isAxiosError } from "axios";
 import { InboundSocketMessageType, type LabelledReference, type TeamChat } from "@trymatcha/types";
-import { toast } from "@/lib/toast";
-import SessionServices from "@/lib/session";
+import { isAxiosError } from "axios";
+import { useMemo } from "react";
+
 import { send_socket_message } from "@/hooks/socket/useWebSocket";
+import SessionServices from "@/lib/session";
+import { toast } from "@/lib/toast";
+
+import { flattenChatPages } from "./chatCache";
+import {
+    CHAT_CONVERSATION_PREVIEWS_QUERY_KEY,
+    mark_team_conversation_preview_deleted,
+    update_team_conversation_preview,
+} from "./useChatConversationPreviews";
 import { OPTIMISTIC_ID_PREFIX } from "./useChats";
 import { toggle_team_chat_reaction } from "./useMessageReactions";
 import {
@@ -14,12 +22,6 @@ import {
     mark_team_chat_deleted,
     useTeamChat,
 } from "./useTeamChat";
-import {
-    CHAT_CONVERSATION_PREVIEWS_QUERY_KEY,
-    mark_team_conversation_preview_deleted,
-    update_team_conversation_preview,
-} from "./useChatConversationPreviews";
-import { flattenChatPages } from "./chatCache";
 
 export function useTeamChatThread(teamId: string | undefined, projectId?: string) {
     const queryClient = useQueryClient();

@@ -1,23 +1,24 @@
 import { Router } from "express";
-import auth_router from "../auth/router.auth";
-import playground_router from "../playground/router.playground";
-import org_router from "../org/router.org";
-import user_router from "../user/router.user";
-import teams_router from "../teams/router.teams";
-import invitations_router from "../invitations/router.invitations";
-import github_router from "../github/router.github";
-import project_router from "../project/router.project";
-import issues_router from "../issues/router.issues";
-import chats_router from "../chats/router.chats";
-import project_chats_router from "../projectChats/router.project-chats";
-import notifications_router from "../notifications/router.notifications";
-import mcp_router from "../mcp/router.mcp";
-import claude_mcp_keys_router from "../claude-mcp/router.claude-mcp-keys";
+
 import claude_mcp_router from "../../claude-mcp/router.claude-mcp";
-import worker_router from "../worker/router.worker";
 import admin_router from "../admin/router.admin";
+import auth_router from "../auth/router.auth";
+import chats_router from "../chats/router.chats";
+import claude_mcp_keys_router from "../claude-mcp/router.claude-mcp-keys";
 import content_router from "../content/router.content";
+import github_router from "../github/router.github";
+import invitations_router from "../invitations/router.invitations";
+import issues_router from "../issues/router.issues";
+import mcp_router from "../mcp/router.mcp";
+import notifications_router from "../notifications/router.notifications";
+import org_router from "../org/router.org";
+import playground_router from "../playground/router.playground";
+import project_router from "../project/router.project";
+import project_chats_router from "../projectChats/router.project-chats";
 import search_router from "../search/router.search";
+import teams_router from "../teams/router.teams";
+import user_router from "../user/router.user";
+import worker_router from "../worker/router.worker";
 
 const v1_router: Router = Router();
 

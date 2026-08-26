@@ -1,10 +1,11 @@
-import { Request, Response } from "express";
-import z from "zod";
-import { ActivitySurface, prisma } from "@trymatcha/database";
 import { Action, Permissions } from "@trymatcha/access-control";
-import ResponseWriter from "../../services/service.response";
+import { ActivitySurface, prisma } from "@trymatcha/database";
+import type { Request, Response } from "express";
+import z from "zod";
+
 import Access from "../../access-control/access";
 import ActivityService, { ACTIVITY_ACTOR_SELECT } from "../../services/service.activity";
+import ResponseWriter from "../../services/service.response";
 
 const DEFAULT_LIMIT = 100;
 

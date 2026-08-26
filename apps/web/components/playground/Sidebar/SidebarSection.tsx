@@ -1,9 +1,10 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { Children, useState } from "react";
 import { motion, type Variants } from "motion/react";
+import { Children, useState } from "react";
 import { FaCaretDown, FaCaretRight } from "react-icons/fa";
+
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 const HEIGHT_SPRING = { type: "spring", stiffness: 800, damping: 48, mass: 0.6 } as const;

@@ -1,4 +1,5 @@
 import type { CursorPage, IssueStatus } from "@trymatcha/types";
+
 import type { BoardFilters } from "@/types/boardFilter";
 
 /**

@@ -1,6 +1,7 @@
 import { Router } from "express";
-import { require_auth } from "../../middlewares/middleware.auth";
+
 import GlobalSearchController from "../../controllers/search/controller.global_search";
+import { require_auth } from "../../middlewares/middleware.auth";
 
 const search_router: Router = Router();
 

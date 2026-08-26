@@ -1,22 +1,24 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { useState, type ReactNode } from "react";
-import { BubbleMenu } from "@tiptap/react/menus";
 import type { Editor } from "@tiptap/core";
+import { BubbleMenu } from "@tiptap/react/menus";
+import { type ReactNode, useState } from "react";
 import {
     LuBold,
+    LuChevronDown,
+    LuCode,
     LuItalic,
+    LuLink,
+    LuList,
+    LuMinus,
+    LuQuote,
     LuStrikethrough,
     LuUnderline,
-    LuCode,
-    LuChevronDown,
-    LuQuote,
-    LuMinus,
-    LuList,
-    LuLink,
 } from "react-icons/lu";
+
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+
 import { HEADING_ITEMS, LIST_ITEMS, type SlashCommandItem } from "./commandItems";
 
 type Dropdown = "text" | "list" | null;

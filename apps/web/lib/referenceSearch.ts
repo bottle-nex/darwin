@@ -1,9 +1,10 @@
 import type { QueryClient } from "@tanstack/react-query";
+import type { IssueStatus } from "@trymatcha/types";
+
+import { PROJECT_MEMBERS_QUERY_KEY, type ProjectMember } from "@/hooks/project/useProjectMembers";
 import { apiClient } from "@/lib/axios";
 import { LIST_PROJECT_MEMBERS_URL, SEARCH_ISSUES_URL } from "@/routes/api_routes";
-import { PROJECT_MEMBERS_QUERY_KEY, type ProjectMember } from "@/hooks/project/useProjectMembers";
 import type { ApiResponse } from "@/types/api";
-import type { IssueStatus } from "@trymatcha/types";
 
 export type IssueSuggestion = {
     id: string;

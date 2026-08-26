@@ -1,9 +1,10 @@
-import { Request, Response } from "express";
-import ResponseWriter from "../../services/service.response";
-import z from "zod";
 import { Action, Permissions } from "@trymatcha/access-control";
 import { prisma } from "@trymatcha/database";
-import { BackgroundLightingColor } from "@trymatcha/types";
+import { BackgroundLightingColor, DefaultHomeView } from "@trymatcha/types";
+import type { Request, Response } from "express";
+import z from "zod";
+
+import ResponseWriter from "../../services/service.response";
 
 const params_schema = z.object({
     org_slug: z.string().min(1),
@@ -12,6 +13,7 @@ const params_schema = z.object({
 const DEFAULT_USER_CONFIG = {
     backgroundLightingEnabled: true,
     backgroundLightingColor: BackgroundLightingColor.Violet,
+    defaultHomeView: DefaultHomeView.Kanban,
 };
 
 export default class GetDashboardController {
@@ -70,7 +72,11 @@ export default class GetDashboardController {
 
             const config = await prisma.userConfig.findUnique({
                 where: { userId: user_id },
-                select: { backgroundLightingEnabled: true, backgroundLightingColor: true },
+                select: {
+                    backgroundLightingEnabled: true,
+                    backgroundLightingColor: true,
+                    defaultHomeView: true,
+                },
             });
 
             ResponseWriter.success(res, {

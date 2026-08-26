@@ -1,5 +1,7 @@
 import axios from "axios";
+
 import { API_URL } from "@/routes/api_routes";
+
 import SessionServices from "./session";
 
 export const apiClient = axios.create({

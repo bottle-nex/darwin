@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
-import { Footer } from "@/components/app/Footer";
-import HowItWorksSection from "@/components/about/HowItWorksSection";
+
 import FoundersSection from "@/components/about/FoundersSection";
-import CtaSection from "@/components/app/CtaSection";
+import HowItWorksSection from "@/components/about/HowItWorksSection";
 import AboutRevampHero from "@/components/about-revamp/AboutRevampHero";
+import CtaSection from "@/components/app/CtaSection";
+import { Footer } from "@/components/app/Footer";
 import { NavBar } from "@/components/nav/Navbar";
 
 export const metadata: Metadata = {

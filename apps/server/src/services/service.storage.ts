@@ -1,10 +1,14 @@
 import { randomUUID } from "node:crypto";
+
 import { Storage } from "@google-cloud/storage";
 import { Client as MinioClient } from "minio";
+
 import { ENV } from "../configs/env";
 
 const SIGNED_URL_TTL_MS = 5 * 60 * 1000;
 const ARTIFACT_URL_TTL_MS = 15 * 60 * 1000;
+const SAFE_PRODUCT_DIFF_CONTENT_TYPE =
+    /^(application\/(javascript|json|manifest\+json|octet-stream|wasm)|font\/(otf|ttf|woff|woff2)|image\/(avif|gif|jpeg|png|svg\+xml|webp|x-icon)|text\/(css|html|plain))$/;
 
 const EXTENSIONS: Record<string, string> = {
     "image/png": "png",
@@ -110,16 +114,16 @@ export default class StorageService {
     }
 
     /**
-     * Signs several Product Diff screenshots in one request.
+     * Signs the pages of a Product Diff capsule in one request.
      *
-     * A screenshot preview shows many images and the reader clicks between targets and screen sizes
-     * for minutes at a time, so signing them one at a time would mean a round trip per image. The
-     * longer window exists for the same reason: a link that expires while someone is still reading
-     * the page is just a broken image.
+     * A capsule has a before and an after page and the reader moves between components for minutes
+     * at a time, so signing one at a time would mean a round trip per pane. The longer window
+     * exists for the same reason: a link that expires while someone is still reviewing turns a
+     * working preview into a blank frame.
      *
      * @example
-     * await StorageService.signed_product_diff_urls(["product-diffs/p1/42/a-b/pd1/shots/nav/default/desktop/head.png"]);
-     * // { "product-diffs/.../head.png": "https://minio.local/...?X-Amz-Signature=..." }
+     * await StorageService.signed_product_diff_urls(["product-diff/pd1/head/faq-item/index.html"]);
+     * // { "product-diff/pd1/head/faq-item/index.html": "https://minio.local/...?X-Amz-Signature=..." }
      */
     static async signed_product_diff_urls(keys: string[]): Promise<Record<string, string>> {
         const client = this.minio();
@@ -134,5 +138,52 @@ export default class StorageService {
             ]),
         );
         return Object.fromEntries(signed);
+    }
+
+    static async read_product_diff_object(key: string, maximum_bytes: number): Promise<Buffer> {
+        const object = await this.stream_product_diff_object(key);
+        if (object.size > maximum_bytes) {
+            object.body.destroy();
+            throw new Error("Product Diff object exceeds the read limit");
+        }
+
+        const chunks: Buffer[] = [];
+        let bytes = 0;
+        for await (const chunk of object.body) {
+            const body = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
+            bytes += body.length;
+            if (bytes > maximum_bytes) {
+                object.body.destroy();
+                throw new Error("Product Diff object exceeds the read limit");
+            }
+            chunks.push(body);
+        }
+        if (bytes !== object.size) {
+            throw new Error("Product Diff object size changed during read");
+        }
+        return Buffer.concat(chunks, bytes);
+    }
+
+    static async stream_product_diff_object(key: string) {
+        const client = this.minio();
+        const bucket = ENV.SERVER_PRODUCT_DIFF_BUCKET!;
+        const stat = await client.statObject(bucket, key);
+        const metadata = Object.fromEntries(
+            Object.entries(stat.metaData).map(([name, value]) => [
+                name.toLowerCase(),
+                typeof value === "string" ? value : "",
+            ]),
+        );
+        const stored_content_type = metadata["content-type"]?.toLowerCase().split(";", 1)[0];
+        const contentType =
+            stored_content_type && SAFE_PRODUCT_DIFF_CONTENT_TYPE.test(stored_content_type)
+                ? stored_content_type
+                : "application/octet-stream";
+
+        return {
+            body: await client.getObject(bucket, key),
+            size: stat.size,
+            contentType,
+        };
     }
 }

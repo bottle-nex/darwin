@@ -1,9 +1,10 @@
 "use client";
 
-import { createContext, createElement, useContext, type MouseEvent, type ReactNode } from "react";
+import { createContext, createElement, type MouseEvent, type ReactNode, useContext } from "react";
+
 import {
-    useIssueSelectionStore,
     type IssueSelectionScope,
+    useIssueSelectionStore,
 } from "@/store/issues/useIssueSelectionStore";
 
 const EMPTY: string[] = [];

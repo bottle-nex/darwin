@@ -1,7 +1,7 @@
 import { Extension } from "@tiptap/core";
-import Suggestion, { type SuggestionOptions } from "@tiptap/suggestion";
 import { ReactRenderer } from "@tiptap/react";
-import SlashCommandList, { type SlashCommandListHandle } from "./SlashCommandList";
+import Suggestion, { type SuggestionOptions } from "@tiptap/suggestion";
+
 import {
     isSlashCommandDateInsert,
     isSlashCommandSizedInsert,
@@ -9,6 +9,7 @@ import {
     SLASH_COMMAND_ITEMS,
     type SlashCommandSelection,
 } from "./commandItems";
+import SlashCommandList, { type SlashCommandListHandle } from "./SlashCommandList";
 
 export const SlashCommand = Extension.create({
     name: "slashCommand",

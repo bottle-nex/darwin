@@ -1,19 +1,19 @@
 import { TooltipProvider } from "@/components/ui/tooltip";
 import AccessControlProvider from "@/context/context.access-control";
 import {
-    SIDEBAR_MAX_WIDTH,
-    SIDEBAR_MIN_WIDTH,
-    SIDEBAR_PANEL_WIDTH_CSS_VAR,
-    SIDEBAR_WIDTH_CSS_VAR,
-    SIDEBAR_WIDTH_STORAGE_KEY,
-} from "@/store/playground/useSidebarWidthStore";
-import {
     GLOW_OPACITY_VAR,
     GLOW_RGB_VAR,
     GLOW_STORAGE_KEY,
     GLOW_X_VAR,
     GLOW_Y_VAR,
 } from "@/lib/backgroundLighting";
+import {
+    SIDEBAR_MAX_WIDTH,
+    SIDEBAR_MIN_WIDTH,
+    SIDEBAR_PANEL_WIDTH_CSS_VAR,
+    SIDEBAR_WIDTH_CSS_VAR,
+    SIDEBAR_WIDTH_STORAGE_KEY,
+} from "@/store/playground/useSidebarWidthStore";
 
 const restoreSidebarWidthScript = `try{var s=JSON.parse(localStorage.getItem("${SIDEBAR_WIDTH_STORAGE_KEY}")).state;var w=Math.min(${SIDEBAR_MAX_WIDTH},Math.max(${SIDEBAR_MIN_WIDTH},s.width));var r=document.documentElement.style;r.setProperty("${SIDEBAR_WIDTH_CSS_VAR}",(s.collapsed?0:w)+"px");r.setProperty("${SIDEBAR_PANEL_WIDTH_CSS_VAR}",w+"px")}catch(e){}`;
 

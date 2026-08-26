@@ -1,12 +1,14 @@
 "use client";
-import { HiOutlineCog6Tooth, HiOutlineInbox } from "react-icons/hi2";
 import { HiOutlineAnnotation } from "react-icons/hi";
+import { HiOutlineCog6Tooth, HiOutlineInbox } from "react-icons/hi2";
+import { LuClipboardList } from "react-icons/lu";
+
 import { useNotificationBadges } from "@/hooks/notifications/useNotificationBadges";
+
+import { PlaygroundTab } from "../playgroundTabs";
+import { type SidebarSectionProps } from "./shared";
 import Row from "./SidebarRow";
 import Section from "./SidebarSection";
-import { type SidebarSectionProps } from "./shared";
-import { PlaygroundTab } from "../playgroundTabs";
-import { LuClipboardList } from "react-icons/lu";
 
 // Everything waiting on you personally, as opposed to the board at large.
 const FOR_YOU_ROWS: { id: string; label: string; icon: React.ComponentType }[] = [

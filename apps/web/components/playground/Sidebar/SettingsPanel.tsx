@@ -8,11 +8,13 @@ import {
     HiOutlinePencilSquare,
     HiOutlineSquare3Stack3D,
 } from "react-icons/hi2";
+
 import { useActiveProject } from "@/hooks/useActiveProject";
+
+import { PlaygroundTab } from "../playgroundTabs";
+import type { SidebarSectionProps } from "./shared";
 import Row from "./SidebarRow";
 import Section from "./SidebarSection";
-import type { SidebarSectionProps } from "./shared";
-import { PlaygroundTab } from "../playgroundTabs";
 
 type SettingsItem = { tab: PlaygroundTab; label: string; icon: IconType };
 

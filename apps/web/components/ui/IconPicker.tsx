@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { MdCheck } from "react-icons/md";
+
 import { ColorPicker } from "@/components/ui/color-picker";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { EMOJI_GROUPS } from "@/data/emojis_bulk";

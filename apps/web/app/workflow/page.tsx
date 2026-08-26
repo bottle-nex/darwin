@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import Timeline, { type TimelineMarker } from "@/components/workflow/Timeline";
+import { useCallback, useEffect, useState } from "react";
+
 import Layer from "@/components/workflow/Layer";
 import Sidebar from "@/components/workflow/Sidebar";
 import SimPanel from "@/components/workflow/SimPanel";
+import Timeline, { type TimelineMarker } from "@/components/workflow/Timeline";
 import {
     computeLayout,
     type IssueNode,

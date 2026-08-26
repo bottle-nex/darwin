@@ -1,6 +1,7 @@
 "use client";
 
 import { motion, useReducedMotion } from "motion/react";
+
 import { fade, POP_ORIGIN } from "../diagramMotion";
 import BentoCard from "./BentoCard";
 import DiagramScene from "./DiagramScene";

@@ -1,12 +1,14 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiClient } from "@/lib/axios";
-import type { ApiResponse } from "@/types/api";
-import { UPDATE_PROJECT_URL } from "@/routes/api_routes";
-import { PROJECT_QUERY_KEY } from "./useGetProject";
-import { ORGANIZATIONS_QUERY_KEY } from "@/hooks/playground/useFetchOrganizations";
-import { DASHBOARD_QUERY_KEY } from "@/hooks/dashboard/useGetDashboard";
-import type { KanbanOptionView } from "@/types/project";
+
 import type { IconPick } from "@/components/ui/IconPicker";
+import { DASHBOARD_QUERY_KEY } from "@/hooks/dashboard/useGetDashboard";
+import { ORGANIZATIONS_QUERY_KEY } from "@/hooks/playground/useFetchOrganizations";
+import { apiClient } from "@/lib/axios";
+import { UPDATE_PROJECT_URL } from "@/routes/api_routes";
+import type { ApiResponse } from "@/types/api";
+import type { KanbanOptionView } from "@/types/project";
+
+import { PROJECT_QUERY_KEY } from "./useGetProject";
 
 export interface UpdateProjectInput {
     project_id: string;

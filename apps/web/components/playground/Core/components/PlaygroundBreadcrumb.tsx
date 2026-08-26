@@ -1,19 +1,20 @@
 "use client";
 import { Fragment } from "react";
-import { MdChevronRight } from "react-icons/md";
 import type { IconType } from "react-icons";
+import { MdChevronRight } from "react-icons/md";
+
+import { PlaygroundTab } from "@/components/playground/playgroundTabs";
 import { Button } from "@/components/ui/button";
+import type { IconPick } from "@/components/ui/IconPicker";
 import IconWrapper from "@/components/ui/IconWrapper";
 import { ICONS } from "@/data/icons_bulk";
-import { PlaygroundTab } from "@/components/playground/playgroundTabs";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { cn } from "@/lib/utils";
-import { usePaneRouteStore } from "@/store/playground/usePaneRouteStore";
 import { NO_FOCUS, useKanbanOptionsStore } from "@/store/kanban/useKanbanOptionsStore";
+import { usePaneRouteStore } from "@/store/playground/usePaneRouteStore";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
 import type { BoardIssue } from "@/types/board";
 import type { BoardView } from "@/types/kanban";
-import type { IconPick } from "@/components/ui/IconPicker";
 
 function ProjectIcon({ pick }: { pick: IconPick }) {
     if (pick.kind === "emoji") {

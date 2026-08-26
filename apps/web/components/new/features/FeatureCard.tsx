@@ -1,11 +1,13 @@
 "use client";
 
 import { motion } from "motion/react";
+
 import { cn } from "@/lib/utils";
 import type { Feature } from "@/types/feature.type";
+
+import { OPEN_GROW } from "./cardMetrics";
 import FeatureDetail from "./FeatureDetail";
 import FeatureTeaser from "./FeatureTeaser";
-import { OPEN_GROW } from "./cardMetrics";
 
 /**
  * One feature card, which springs open on hover.

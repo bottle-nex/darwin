@@ -1,7 +1,8 @@
 "use client";
 
 import { AnimatePresence } from "framer-motion";
-import { Fragment, useRef, useEffect, useState, type ReactNode } from "react";
+import { Fragment, type ReactNode, useEffect, useRef, useState } from "react";
+
 import TimelineStick from "./TimelineStick";
 import type { PositionedNode } from "./types";
 

@@ -1,11 +1,12 @@
-import { Queue } from "bullmq";
-import queue_config from "../configs/config.queue";
 import {
-    QueueName,
     type OnboardJobData,
     type ProductDiffJobData,
+    QueueName,
     type RouteJobData,
 } from "@trymatcha/types";
+import { Queue } from "bullmq";
+
+import queue_config from "../configs/config.queue";
 
 export default class QueueService {
     private queue: Queue<RouteJobData>;

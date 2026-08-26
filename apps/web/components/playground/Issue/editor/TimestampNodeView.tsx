@@ -1,13 +1,15 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { useEffect, useRef, useState } from "react";
 import { NodeViewWrapper, type ReactNodeViewProps } from "@tiptap/react";
+import { useEffect, useRef, useState } from "react";
+
+import { Button } from "@/components/ui/button";
+
 import DateTimePicker, {
     DATE_TIME_SEGMENTS,
-    stepDateTime,
     type DateTimeDraft,
     type DateTimeSegment,
+    stepDateTime,
 } from "./DateTimePicker";
 import { formatTimestamp, type TimestampMode } from "./timestamp";
 

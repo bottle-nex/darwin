@@ -1,11 +1,12 @@
 "use client";
-import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
-import type { BoardState } from "@/types/kanban";
-import type { FocusValue } from "@/store/kanban/useKanbanOptionsStore";
-import { useFilteredCustomColumns } from "@/hooks/kanban/useFilteredCustomColumns";
 import { IssueSelectionOrderProvider } from "@/hooks/issues/useIssueSelection";
-import KanbanColumn from "./KanbanColumn";
+import { useFilteredCustomColumns } from "@/hooks/kanban/useFilteredCustomColumns";
+import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
+import type { FocusValue } from "@/store/kanban/useKanbanOptionsStore";
+import type { BoardState } from "@/types/kanban";
+
 import CustomKanbanColumn from "./customkanban/CustomKanbanColumn";
+import KanbanColumn from "./KanbanColumn";
 
 type KanbanFocusColumnProps = {
     focus: FocusValue;

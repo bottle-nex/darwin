@@ -1,7 +1,8 @@
-import { Request, Response } from "express";
-import ResponseWriter from "../../services/service.response";
-import { z } from "zod";
 import { OrgRole, Prisma, prisma } from "@trymatcha/database";
+import type { Request, Response } from "express";
+import { z } from "zod";
+
+import ResponseWriter from "../../services/service.response";
 
 const body_schema = z.object({
     name: z.string().min(1),

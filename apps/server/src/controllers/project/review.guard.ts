@@ -1,6 +1,7 @@
 import { Action, Permissions, type ProjectAction } from "@trymatcha/access-control";
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
 import z from "zod";
+
 import Access from "../../access-control/access";
 import ResponseWriter from "../../services/service.response";
 import ReviewService, { type ResolvedReview } from "../../services/service.review";

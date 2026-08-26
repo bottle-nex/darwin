@@ -1,9 +1,10 @@
 "use client";
 import TagDisplay from "@/components/playground/Home/TagsDisplay/TagDisplay";
-import { useActiveProject } from "@/hooks/useActiveProject";
 import { useListTags } from "@/hooks/tags/useListTags";
+import { useActiveProject } from "@/hooks/useActiveProject";
 import { useCommandActionStore } from "@/store/command/useCommandActionStore";
 import { useDeleteTagStore } from "@/store/tags/useDeleteTagStore";
+
 import ResourcePickerDialog from "./ResourcePickerDialog";
 
 export default function DeleteTagPickerDialog() {

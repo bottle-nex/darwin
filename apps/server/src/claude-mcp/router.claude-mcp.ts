@@ -1,5 +1,7 @@
-import { Router, Request, Response } from "express";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
+import type { Request, Response } from "express";
+import { Router } from "express";
+
 import { require_api_key } from "../middlewares/middleware.api_key";
 import { build_claude_mcp_server } from "./mcp_server";
 

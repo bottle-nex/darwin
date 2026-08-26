@@ -1,7 +1,9 @@
 import { randomInt } from "node:crypto";
+
 import bcrypt from "bcryptjs";
-import { redis } from "./service.redis";
+
 import { ENV } from "../configs/env";
+import { redis } from "./service.redis";
 
 /**
  * Outcome of an OTP verification attempt.

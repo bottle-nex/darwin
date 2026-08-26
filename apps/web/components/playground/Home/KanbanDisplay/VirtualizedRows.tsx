@@ -1,18 +1,20 @@
 "use client";
 
-import { defaultRangeExtractor, useVirtualizer, type Range } from "@tanstack/react-virtual";
+import { defaultRangeExtractor, type Range, useVirtualizer } from "@tanstack/react-virtual";
 import {
     createContext,
+    type FocusEvent,
     useCallback,
     useContext,
     useLayoutEffect,
     useRef,
     useState,
-    type FocusEvent,
 } from "react";
+
 import { cn } from "@/lib/utils";
-import { activeStickyRowIndex, preservePrependScrollTop } from "./virtualizedIssueRows";
+
 import { useAutomaticPageLoading, useStickyHeaderPush } from "./useVirtualizedRows";
+import { activeStickyRowIndex, preservePrependScrollTop } from "./virtualizedIssueRows";
 import type { PrependAnchorCapture, VirtualizedRowsProps } from "./virtualizedRows.type";
 
 const VIRTUAL_OVERSCAN = 6;

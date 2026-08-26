@@ -1,19 +1,21 @@
 "use client";
-import { useEffect, useState } from "react";
+import { type Notification, NotificationScope } from "@trymatcha/types";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { useEffect, useState } from "react";
 import { HiXMark } from "react-icons/hi2";
-import { cn } from "@/lib/utils";
+
 import PlaygroundAvatar, {
     toneFor,
 } from "@/components/playground/Core/components/PlaygroundAvatar";
 import { BLURRED_BG_TWO } from "@/components/playground/Home/KanbanDisplay/cardStyles";
+import { PlaygroundTab } from "@/components/playground/playgroundTabs";
 import { useUserConfig } from "@/hooks/user/useUserConfig";
+import { cn } from "@/lib/utils";
+import { useCommandContextStore } from "@/store/command/useCommandContextStore";
 import { useFloatNotificationsStore } from "@/store/playground/useFloatNotificationsStore";
 import { useNotificationsPanelStore } from "@/store/playground/useNotificationsPanelStore";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
-import { useCommandContextStore } from "@/store/command/useCommandContextStore";
-import { PlaygroundTab } from "@/components/playground/playgroundTabs";
-import { NotificationScope, type Notification } from "@trymatcha/types";
+
 import { notification_target, notification_view, theme_of } from "./notificationView";
 import { useSelectNotification } from "./useSelectNotification";
 

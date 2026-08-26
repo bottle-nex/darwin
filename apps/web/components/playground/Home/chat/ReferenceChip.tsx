@@ -1,10 +1,12 @@
 "use client";
-import { NodeViewWrapper, type NodeViewProps } from "@tiptap/react";
+import { type NodeViewProps, NodeViewWrapper } from "@tiptap/react";
+
 import { displayNameOf } from "@/components/playground/Core/components/PlaygroundAvatar";
-import { useActiveProject } from "@/hooks/useActiveProject";
 import { useIssue } from "@/hooks/issues/useIssue";
 import { useProjectMembers } from "@/hooks/project/useProjectMembers";
-import { ISSUE_TRIGGER, MEMBER_TRIGGER, kindFor } from "./referenceTriggers";
+import { useActiveProject } from "@/hooks/useActiveProject";
+
+import { ISSUE_TRIGGER, kindFor, MEMBER_TRIGGER } from "./referenceTriggers";
 
 /**
  * The chip renders the target's current name, looked up by id, so a rename or a

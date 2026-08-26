@@ -1,6 +1,8 @@
 "use client";
-import { MdAdd, MdPlaylistAdd, MdUpload } from "react-icons/md";
+import { IoPencilSharp } from "react-icons/io5";
 import { LuChevronDown } from "react-icons/lu";
+import { MdAdd, MdPlaylistAdd, MdUpload } from "react-icons/md";
+
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -8,10 +10,10 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { TooltipComponent } from "@/components/ui/tooltip-component";
-import { useAddCustomColumnStore } from "@/store/kanban/useAddCustomColumnStore";
 import { useCreateIssueStore } from "@/store/issues/useCreateIssueStore";
+import { useAddCustomColumnStore } from "@/store/kanban/useAddCustomColumnStore";
+
 import OptionButton from "./OptionButton";
-import { IoPencilSharp } from "react-icons/io5";
 
 const TASK_OPTIONS = [
     { id: "issue", label: "New issue", icon: MdAdd },

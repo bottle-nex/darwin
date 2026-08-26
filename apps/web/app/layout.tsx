@@ -1,11 +1,14 @@
+import "./globals.css";
+
 import type { Metadata } from "next";
 import { Geist_Mono, Google_Sans_Flex, JetBrains_Mono, Titillium_Web } from "next/font/google";
-import "./globals.css";
-import QueryProvider from "@/providers/QueryProvider";
+import { getServerSession } from "next-auth";
+
 import SessionSetter from "@/components/utility/SessionSetter";
 import ThemeScope from "@/components/utility/ThemeScope";
 import { Toaster } from "@/components/utility/Toast";
-import { getServerSession } from "next-auth";
+import QueryProvider from "@/providers/QueryProvider";
+
 import { authOption } from "./api/auth/[...nextauth]/options";
 
 const geistMono = Geist_Mono({

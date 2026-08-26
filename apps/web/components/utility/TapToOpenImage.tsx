@@ -1,9 +1,10 @@
 "use client";
+import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { AnimatePresence, motion } from "motion/react";
 import { FiDownload } from "react-icons/fi";
 import { MdClose } from "react-icons/md";
+
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 

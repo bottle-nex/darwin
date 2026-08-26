@@ -2,7 +2,9 @@
 
 import { motion } from "motion/react";
 import { memo } from "react";
+
 import { cn } from "@/lib/utils";
+
 import {
     appear,
     EASE_OUT,

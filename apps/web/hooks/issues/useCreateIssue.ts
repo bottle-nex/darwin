@@ -1,9 +1,10 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { Issue } from "@trymatcha/types";
+
+import { upsertBoardIssue } from "@/hooks/issues/useBoard";
 import { apiClient } from "@/lib/axios";
 import { CREATE_ISSUE_URL } from "@/routes/api_routes";
-import { upsertBoardIssue } from "@/hooks/issues/useBoard";
 import type { ApiResponse } from "@/types/api";
-import type { Issue } from "@trymatcha/types";
 
 export interface CreateIssueInput {
     project_id: string;

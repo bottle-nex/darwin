@@ -1,7 +1,9 @@
 "use client";
 
 import { motion } from "motion/react";
+
 import { cn } from "@/lib/utils";
+
 import { FlagSprite } from "./PixelSprites";
 import { TOUR_STEPS } from "./steps";
 

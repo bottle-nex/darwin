@@ -1,7 +1,9 @@
 import { MdErrorOutline } from "react-icons/md";
+
 import type { Issue } from "@/types/kanban";
-import BaseCard from "./BaseCard";
+
 import AgentChip from "./AgentChip";
+import BaseCard from "./BaseCard";
 
 /** Failed: the agent's run errored out before it could open a PR. */
 export default function FailedCard({ issue }: { issue: Issue }) {

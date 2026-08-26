@@ -1,13 +1,15 @@
 "use client";
-import { useState } from "react";
 import type { Notification } from "@trymatcha/types";
-import { cn } from "@/lib/utils";
-import { PaneLeadSlot } from "@/components/playground/Core/components/PlaygroundPaneSlots";
+import { useState } from "react";
+
 import PlaygroundBreadcrumb from "@/components/playground/Core/components/PlaygroundBreadcrumb";
+import { PaneLeadSlot } from "@/components/playground/Core/components/PlaygroundPaneSlots";
 import NotificationFeed from "@/components/playground/Core/Notifications/NotificationFeed";
 import NotificationSearch from "@/components/playground/Core/Notifications/NotificationSearch";
 import { useMarkNotificationsRead } from "@/hooks/notifications/useMarkNotificationsRead";
-import { useInboxStore, type InboxFilter } from "@/store/playground/useInboxStore";
+import { cn } from "@/lib/utils";
+import { type InboxFilter, useInboxStore } from "@/store/playground/useInboxStore";
+
 import InboxDetail from "./InboxDetail";
 import { useInboxNotifications } from "./useInboxNotifications";
 

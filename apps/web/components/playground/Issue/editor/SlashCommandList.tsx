@@ -1,10 +1,12 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
 import { RxTriangleRight } from "react-icons/rx";
-import { cn } from "@/lib/utils";
+
+import { Button } from "@/components/ui/button";
 import { MENU_ITEM, MENU_SURFACE } from "@/components/ui/menuSurface";
+import { cn } from "@/lib/utils";
+
 import {
     isSlashCommandDateInsert,
     isSlashCommandGroup,
@@ -12,13 +14,13 @@ import {
     type SlashCommandEntry,
     type SlashCommandSelection,
 } from "./commandItems";
-import TableSizePicker, { TABLE_PICKER_MAX_COLS, TABLE_PICKER_MAX_ROWS } from "./TableSizePicker";
 import DateTimePicker, {
     DATE_TIME_SEGMENTS,
-    stepDateTime,
     type DateTimeDraft,
     type DateTimeSegment,
+    stepDateTime,
 } from "./DateTimePicker";
+import TableSizePicker, { TABLE_PICKER_MAX_COLS, TABLE_PICKER_MAX_ROWS } from "./TableSizePicker";
 
 interface SlashCommandListProps {
     items: SlashCommandEntry[];

@@ -1,5 +1,5 @@
-import type { BoardIssue, BoardResponse } from "@/types/board";
 import { KanbanMappers } from "@/lib/kanban/KanbanMappers";
+import type { BoardIssue, BoardResponse } from "@/types/board";
 import type { CustomCard, CustomColumn } from "@/types/kanban-custom";
 
 /** Maps the real API's board payload onto the Custom Kanban's display shapes. */

@@ -1,8 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
+
 import { apiClient } from "@/lib/axios";
+import { LIST_TAGS_URL } from "@/routes/api_routes";
 import type { ApiResponse } from "@/types/api";
 import type { Tag } from "@/types/tags";
-import { LIST_TAGS_URL } from "@/routes/api_routes";
 
 export const TAGS_QUERY_KEY = ["tags"] as const;
 

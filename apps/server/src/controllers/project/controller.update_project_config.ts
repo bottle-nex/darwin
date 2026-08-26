@@ -1,17 +1,20 @@
-import { Request, Response } from "express";
-import ResponseWriter from "../../services/service.response";
-import z from "zod";
 import { Action, Permissions } from "@trymatcha/access-control";
-import Access from "../../access-control/access";
 import { Prisma, prisma } from "@trymatcha/database";
+import type { Request, Response } from "express";
+import z from "zod";
+
+import Access from "../../access-control/access";
+import ResponseWriter from "../../services/service.response";
 
 const params_schema = z.object({
     project_id: z.string(),
 });
 
-const body_schema = z.object({
-    kanban_option_view: z.enum(["FLAT", "GROUPED"]).optional(),
-});
+const body_schema = z
+    .object({
+        kanban_option_view: z.enum(["FLAT", "GROUPED"]).optional(),
+    })
+    .strict();
 
 export default async function update_project_config_controller(req: Request, res: Response) {
     try {
@@ -37,10 +40,13 @@ export default async function update_project_config_controller(req: Request, res
             return;
         }
 
+        const config_data = {
+            ...(kanban_option_view !== undefined && { kanbanOptionView: kanban_option_view }),
+        };
         const config = await prisma.projectConfig.upsert({
             where: { projectId: project_id },
-            create: { projectId: project_id, kanbanOptionView: kanban_option_view },
-            update: { kanbanOptionView: kanban_option_view },
+            create: { projectId: project_id, ...config_data },
+            update: config_data,
             select: { kanbanOptionView: true, productDiffEnabled: true },
         });
 

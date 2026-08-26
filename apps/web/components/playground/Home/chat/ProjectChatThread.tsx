@@ -1,38 +1,40 @@
 "use client";
 
-import { defaultRangeExtractor, useVirtualizer, type Range } from "@tanstack/react-virtual";
+import { defaultRangeExtractor, type Range, useVirtualizer } from "@tanstack/react-virtual";
 import {
+    type LabelledReference,
+    ProjectRole,
+    type ThreadMessage,
+    to_plain_text,
+} from "@trymatcha/types";
+import {
+    type FocusEvent,
     useCallback,
     useEffect,
     useLayoutEffect,
     useMemo,
     useRef,
     useState,
-    type FocusEvent,
 } from "react";
 import { IoMdClose } from "react-icons/io";
 import { MdChat } from "react-icons/md";
-import {
-    ProjectRole,
-    to_plain_text,
-    type LabelledReference,
-    type ThreadMessage,
-} from "@trymatcha/types";
+
+import LogoLoader from "@/components/app/LogoLoader";
 import { Button } from "@/components/ui/button";
-import SessionServices from "@/lib/session";
-import { useProjectMembers } from "@/hooks/project/useProjectMembers";
 import {
     CHAT_AUTO_FILL_PAGE_CAP,
     CHAT_VIRTUAL_OVERSCAN,
+    type ChatQuoteDiscoveryResult,
     discoverChatQuote,
     preservePrependScrollTop,
     shouldPrefetchOlderHistory,
-    type ChatQuoteDiscoveryResult,
 } from "@/hooks/chats/chatCache";
 import { OPTIMISTIC_ID_PREFIX } from "@/hooks/chats/useChats";
-import LogoLoader from "@/components/app/LogoLoader";
-import ChatMessage from "./ChatMessage";
+import { useProjectMembers } from "@/hooks/project/useProjectMembers";
+import SessionServices from "@/lib/session";
+
 import ChatComposer, { type ChatComposerHandle } from "./ChatComposer";
+import ChatMessage from "./ChatMessage";
 
 type QuoteNavigation = {
     targetId: string;

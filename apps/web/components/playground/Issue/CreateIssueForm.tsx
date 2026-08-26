@@ -1,14 +1,16 @@
 "use client";
-import type { IssueTarget } from "@/store/issues/useCreateIssueStore";
-import TemplatePicker from "./TemplatePicker";
-import IssueTitleField from "./IssueTitleField";
-import IssueFields from "./IssueFields";
-import IssueBody from "./IssueBody";
-import IssueSubmitAction from "./IssueSubmitAction";
-import { useIssueForm } from "./useIssueForm";
-import { useActiveProject } from "@/hooks/useActiveProject";
 import { MdOutlineKeyboardArrowRight } from "react-icons/md";
+
+import { useActiveProject } from "@/hooks/useActiveProject";
+import type { IssueTarget } from "@/store/issues/useCreateIssueStore";
+
 import PlaygroundAvatar, { toneFor } from "../Core/components/PlaygroundAvatar";
+import IssueBody from "./IssueBody";
+import IssueFields from "./IssueFields";
+import IssueSubmitAction from "./IssueSubmitAction";
+import IssueTitleField from "./IssueTitleField";
+import TemplatePicker from "./TemplatePicker";
+import { useIssueForm } from "./useIssueForm";
 
 export default function CreateIssueForm({
     target,

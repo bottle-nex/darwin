@@ -1,6 +1,7 @@
 "use client";
-import { useEffect, useState } from "react";
 import { motion } from "motion/react";
+import { useEffect, useState } from "react";
+
 import { cn } from "@/lib/utils";
 import {
     SIDEBAR_DEFAULT_WIDTH,
@@ -8,6 +9,7 @@ import {
     SIDEBAR_WIDTH_CSS_VAR,
     useSidebarWidthStore,
 } from "@/store/playground/useSidebarWidthStore";
+
 import SidebarContent from "./SidebarContent";
 
 export default function PlaygroundSidebar() {

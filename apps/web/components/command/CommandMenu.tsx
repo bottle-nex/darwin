@@ -1,8 +1,7 @@
 "use client";
 import { useMemo, useState } from "react";
 import { HiOutlineArrowLeft } from "react-icons/hi2";
-import { cn } from "@/lib/utils";
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+
 import {
     Command,
     CommandGroup,
@@ -10,23 +9,26 @@ import {
     CommandItem,
     CommandList,
 } from "@/components/ui/command";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import KeyCombo from "@/components/ui/KeyCombo";
-import { useCommandMenuStore } from "@/store/command/useCommandMenuStore";
-import { useCommandContextStore } from "@/store/command/useCommandContextStore";
-import { useIssueSelectionStore } from "@/store/issues/useIssueSelectionStore";
 import { useIssueActions } from "@/hooks/issues/useIssueActions";
+import { isSearchableQuery, useGlobalSearch } from "@/hooks/search/useGlobalSearch";
 import {
-    COMMAND_ENTRIES,
     comboToKeys,
+    COMMAND_ENTRIES,
     isCommandAvailable,
 } from "@/hooks/shortcuts/usePlaygroundShortcuts";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
-import { isSearchableQuery, useGlobalSearch } from "@/hooks/search/useGlobalSearch";
-import { COMMAND_KIND_ORDER, CommandKind, type CommandEntry } from "@/types/command.type";
-import CommandIssuePage, { ISSUE_PAGE_TITLE } from "./CommandIssuePage";
-import CommandSearchResults from "./CommandSearchResults";
+import { cn } from "@/lib/utils";
+import { useCommandContextStore } from "@/store/command/useCommandContextStore";
+import { useCommandMenuStore } from "@/store/command/useCommandMenuStore";
+import { useIssueSelectionStore } from "@/store/issues/useIssueSelectionStore";
+import { COMMAND_KIND_ORDER, type CommandEntry, CommandKind } from "@/types/command.type";
+
 import { commandEntryValue, filterCommandGroups } from "./commandFilter";
+import CommandIssuePage, { ISSUE_PAGE_TITLE } from "./CommandIssuePage";
 import { commandMenuView } from "./commandMenuView";
+import CommandSearchResults from "./CommandSearchResults";
 
 const SEARCH_DEBOUNCE_MS = 200;
 

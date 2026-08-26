@@ -1,8 +1,9 @@
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+
+import { TEAM_MEMBERS_QUERY_KEY } from "@/hooks/team/useGetTeamMembers";
 import { apiClient } from "@/lib/axios";
 import { REVOKE_INVITE_URL } from "@/routes/api_routes";
-import { TEAM_MEMBERS_QUERY_KEY } from "@/hooks/team/useGetTeamMembers";
-import { ApiResponse } from "@/types/api";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { ApiResponse } from "@/types/api";
 
 export default function useRevokeInvite(teamId: string) {
     const queryClient = useQueryClient();

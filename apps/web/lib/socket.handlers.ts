@@ -1,14 +1,12 @@
 import type { QueryClient } from "@tanstack/react-query";
 import {
     NotificationType,
-    OutboundSocketMessageType,
     type OutboundSocketMessage,
+    OutboundSocketMessageType,
 } from "@trymatcha/types";
-import { toast } from "@/lib/toast";
-import { upsertBoardIssue, updateBoardIssue } from "@/hooks/issues/useBoard";
-import { upsert_chat, mark_chat_deleted } from "@/hooks/chats/useChats";
-import { upsert_project_chat, mark_project_chat_deleted } from "@/hooks/chats/useProjectChat";
-import { upsert_team_chat, mark_team_chat_deleted } from "@/hooks/chats/useTeamChat";
+
+import { append_activities, update_agent_session } from "@/hooks/activity/useActivity";
+import { rollbackPendingChatCreate } from "@/hooks/chats/chatCache";
 import {
     CHAT_CONVERSATION_PREVIEWS_QUERY_KEY,
     mark_project_conversation_preview_deleted,
@@ -16,23 +14,26 @@ import {
     update_project_conversation_preview,
     update_team_conversation_preview,
 } from "@/hooks/chats/useChatConversationPreviews";
+import { mark_chat_deleted, upsert_chat } from "@/hooks/chats/useChats";
 import {
     reconcile_chat_reaction,
     reconcile_project_chat_reaction,
     reconcile_team_chat_reaction,
     rollback_reaction,
 } from "@/hooks/chats/useMessageReactions";
-import SessionServices from "@/lib/session";
+import { mark_project_chat_deleted, upsert_project_chat } from "@/hooks/chats/useProjectChat";
+import { mark_team_chat_deleted, upsert_team_chat } from "@/hooks/chats/useTeamChat";
+import { updateBoardIssue, upsertBoardIssue } from "@/hooks/issues/useBoard";
 import { upsert_notification } from "@/hooks/notifications/notificationCache";
-import { should_float_notification } from "@/lib/notifications/floatSuppression";
-import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
-import { useCommandContextStore } from "@/store/command/useCommandContextStore";
-import { useNotificationsPanelStore } from "@/store/playground/useNotificationsPanelStore";
-import { useFloatNotificationsStore } from "@/store/playground/useFloatNotificationsStore";
-import { append_activities, update_agent_session } from "@/hooks/activity/useActivity";
 import { PROJECT_QUERY_KEY } from "@/hooks/project/useGetProject";
 import { TEAM_MEMBERS_QUERY_KEY } from "@/hooks/team/useGetTeamMembers";
-import { rollbackPendingChatCreate } from "@/hooks/chats/chatCache";
+import { should_float_notification } from "@/lib/notifications/floatSuppression";
+import SessionServices from "@/lib/session";
+import { toast } from "@/lib/toast";
+import { useCommandContextStore } from "@/store/command/useCommandContextStore";
+import { useFloatNotificationsStore } from "@/store/playground/useFloatNotificationsStore";
+import { useNotificationsPanelStore } from "@/store/playground/useNotificationsPanelStore";
+import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
 
 export class SocketHandlers {
     static handle_issue_created(queryClient: QueryClient, message: OutboundSocketMessage) {

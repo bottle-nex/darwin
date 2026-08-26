@@ -1,8 +1,9 @@
 "use client";
 
-import { cn } from "@/lib/utils";
-import { useAnimationControls, motion } from "motion/react";
+import { motion, useAnimationControls } from "motion/react";
 import { useEffect, useRef } from "react";
+
+import { cn } from "@/lib/utils";
 
 interface DialProps {
     size?: number;

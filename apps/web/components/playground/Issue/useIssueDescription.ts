@@ -1,9 +1,11 @@
 "use client";
 
 import { useState } from "react";
+
 import { promptsFromBraces, stripPrompts } from "@/lib/templates/promptHtml";
-import type { IssueDescriptionState } from "./editor/IssueDescriptionEditor";
 import type { PickableTemplate } from "@/types/issueTemplate";
+
+import type { IssueDescriptionState } from "./editor/IssueDescriptionEditor";
 
 type DescriptionDraft = {
     html: string;

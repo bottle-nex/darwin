@@ -1,12 +1,13 @@
-import { Request, Response } from "express";
-import z from "zod";
-import ResponseWriter from "../../services/service.response";
 import { prisma } from "@trymatcha/database";
-import IssueService, { BULK_ISSUE_LIMIT, ISSUE_PATCH_SCHEMA } from "../../services/service.issue";
+import type { Request, Response } from "express";
+import z from "zod";
+
 import BoardIssueService, {
     type BoardIssueRow,
     type IssueLane,
 } from "../../services/service.board-issues";
+import IssueService, { BULK_ISSUE_LIMIT, ISSUE_PATCH_SCHEMA } from "../../services/service.issue";
+import ResponseWriter from "../../services/service.response";
 
 export default class IssueBulkUpdateController {
     static body_schema = ISSUE_PATCH_SCHEMA.omit({ tag_ids: true, assignee_ids: true }).extend({

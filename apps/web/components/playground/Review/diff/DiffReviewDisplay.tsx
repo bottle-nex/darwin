@@ -1,28 +1,20 @@
 "use client";
-import { useMemo, useState, type ReactNode } from "react";
+import { type Capsule, capsule_control_hash } from "@trymatcha/types";
+import { type ReactNode, useMemo, useState } from "react";
 import { FiRefreshCw } from "react-icons/fi";
-import { is_screenshot_product_review_manifest } from "@trymatcha/types";
-import { Button } from "@/components/ui/button";
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
+
 import LogoLoader from "@/components/app/LogoLoader";
-import { PaneActionsSlot } from "@/components/playground/Core/components/PlaygroundPaneSlots";
-import { useActiveProject } from "@/hooks/useActiveProject";
+import { Button } from "@/components/ui/button";
 import { useProductDiff } from "@/hooks/project/useProductDiff";
 import { useProductDiffArtifacts } from "@/hooks/project/useProductDiffArtifacts";
 import { useRegenerateProductDiff } from "@/hooks/project/useRegenerateProductDiff";
-import DiffComparison from "./DiffComparison";
+import { useActiveProject } from "@/hooks/useActiveProject";
+import type { CapsuleCompareMode, CapsuleViewport } from "@/types/capsule.type";
 
-const OUTCOME_SUFFIX: Record<string, string> = {
-    Added: " · added",
-    Removed: " · removed",
-    Unavailable: " · unavailable",
-};
+import CapsuleComparison from "./CapsuleComparison";
+import CapsuleControls from "./CapsuleControls";
+import CapsuleHeader from "./CapsuleHeader";
+import CapsuleList from "./CapsuleList";
 
 export default function DiffReviewDisplay({
     productDiffId,
@@ -35,34 +27,21 @@ export default function DiffReviewDisplay({
     const { data: detail } = useProductDiff(projectId, productDiffId);
     const regenerate = useRegenerateProductDiff();
 
-    const [targetId, setTargetId] = useState("");
-    const [stateId, setStateId] = useState("");
+    const [selectedId, setSelectedId] = useState("");
+    const [controlValues, setControlValues] = useState<Record<string, string>>({});
+    const [viewport, setViewport] = useState<CapsuleViewport>("desktop");
+    const [mode, setMode] = useState<CapsuleCompareMode>("split");
 
-    const stored = detail?.manifest ?? null;
-    const manifest = is_screenshot_product_review_manifest(stored) ? stored : null;
-    const target = manifest?.targets.find((item) => item.id === targetId) ?? manifest?.targets[0];
-    const state = target?.states.find((item) => item.id === stateId) ?? target?.states[0];
-    const viewport = manifest?.viewports[0];
-    const shot = target?.shots.find(
-        (item) => item.stateId === state?.id && item.viewportId === viewport?.id,
-    );
+    const capsules = useMemo(() => detail?.manifest?.capsules ?? [], [detail?.manifest]);
+    const capsule = capsules.find((item) => item.id === selectedId) ?? capsules[0];
+    const artifactKeys = useMemo(() => revision_paths(capsule), [capsule]);
+    const { data: urls } = useProductDiffArtifacts(projectId, productDiffId, artifactKeys);
 
-    const artifactKeys = useMemo(() => {
-        if (!target) return [];
-        return target.shots
-            .flatMap((item) => [item.baseKey, item.headKey])
-            .filter((key): key is string => key !== null);
-    }, [target]);
-    const { data: artifactUrls = {} } = useProductDiffArtifacts(
-        projectId,
-        productDiffId,
-        artifactKeys,
-    );
+    const controlHash = capsule ? capsule_control_hash(defaults_with(capsule, controlValues)) : "";
 
-    function handleTargetChange(nextId: string) {
-        const next = manifest?.targets.find((item) => item.id === nextId);
-        setTargetId(nextId);
-        setStateId(next?.states[0]?.id ?? "");
+    function handleSelect(id: string) {
+        setSelectedId(id);
+        setControlValues({});
     }
 
     function handleRegenerate() {
@@ -70,118 +49,145 @@ export default function DiffReviewDisplay({
         regenerate.mutate({ projectId, issueId });
     }
 
-    return (
-        <div className="flex min-h-0 min-w-0 flex-1 flex-col px-6 py-5">
-            <PaneActionsSlot>
-                <div className="flex items-center gap-2">
-                    {manifest && target && manifest.targets.length > 1 && (
-                        <Picker
-                            value={target.id}
-                            onChange={handleTargetChange}
-                            options={manifest.targets.map((item) => ({
-                                value: item.id,
-                                label: `${item.label}${OUTCOME_SUFFIX[item.outcome] ?? ""}`,
-                            }))}
-                        />
-                    )}
-                    {target && state && target.states.length > 1 && (
-                        <Picker
-                            value={state.id}
-                            onChange={setStateId}
-                            options={target.states.map((item) => ({
-                                value: item.id,
-                                label: item.label,
-                            }))}
-                        />
-                    )}
-                </div>
-            </PaneActionsSlot>
+    const retry = (
+        <Button size="sm" loading={regenerate.isPending} onClick={handleRegenerate}>
+            <FiRefreshCw />
+            Retry
+        </Button>
+    );
 
-            {!productDiffId && (
+    if (!productDiffId) {
+        return (
+            <Shell>
                 <DiffStatus
-                    title="No diff yet"
-                    body="A diff is captured once the agent opens a frontend pull request for this issue."
+                    title="No preview yet"
+                    body="A preview is built once the agent opens a frontend pull request for this issue."
                 />
-            )}
-            {productDiffId && !detail && <LogoLoader className="h-full w-full text-snow" />}
-            {detail && detail.status === "Pending" && (
+            </Shell>
+        );
+    }
+
+    if (!detail) {
+        return (
+            <Shell>
+                <LogoLoader className="h-full w-full text-snow" />
+            </Shell>
+        );
+    }
+
+    if (detail.status === "Pending" || detail.status === "Generating") {
+        return (
+            <Shell>
                 <DiffStatus
-                    title="Queued"
-                    body="A sandbox is about to build both revisions and photograph them."
+                    title={detail.status === "Pending" ? "Queued" : "Building"}
+                    body="Both revisions of every changed component are compiling in a clean sandbox. This updates on its own."
                 />
-            )}
-            {detail && detail.status === "Generating" && (
+            </Shell>
+        );
+    }
+
+    if (detail.status === "Unsupported") {
+        return (
+            <Shell>
                 <DiffStatus
-                    title="Capturing screenshots"
-                    body="Both revisions are building in a clean sandbox. This updates on its own."
+                    title="Nothing to preview"
+                    body={detail.error ?? "This pull request changes no previewable components."}
                 />
-            )}
-            {detail && detail.status === "Unsupported" && (
+            </Shell>
+        );
+    }
+
+    if (detail.status === "Failed" || detail.status === "Stale") {
+        return (
+            <Shell>
                 <DiffStatus
-                    title="Not supported yet"
-                    body={detail.error ?? "Diffs currently cover Next.js projects only."}
+                    title={detail.status === "Stale" ? "Out of date" : "Preview failed"}
+                    body={detail.error ?? "The pull request changed after this preview was built."}
+                    action={retry}
                 />
-            )}
-            {detail && (detail.status === "Failed" || detail.status === "Stale") && (
+            </Shell>
+        );
+    }
+
+    if (!capsule) {
+        return (
+            <Shell>
                 <DiffStatus
-                    title={detail.status === "Stale" ? "Out of date" : "Capture failed"}
-                    body={detail.error ?? "The pull request changed after this diff was taken."}
-                    action={
-                        <Button size="sm" loading={regenerate.isPending} onClick={handleRegenerate}>
-                            <FiRefreshCw />
-                            {detail.status === "Stale" ? "Regenerate" : "Retry"}
-                        </Button>
-                    }
+                    title="Nothing rendered"
+                    body="No component in this pull request could be rendered on its own."
+                    action={retry}
                 />
+            </Shell>
+        );
+    }
+
+    return (
+        <Shell>
+            <CapsuleHeader
+                capsule={capsule}
+                total={capsules.length}
+                baseSha={detail.baseSha}
+                headSha={detail.headSha}
+            />
+            <div className="flex min-h-0 flex-1 gap-6">
+                {capsules.length > 1 && (
+                    <aside className="w-56 shrink-0">
+                        <CapsuleList
+                            capsules={capsules}
+                            selectedId={capsule.id}
+                            onSelect={handleSelect}
+                        />
+                    </aside>
+                )}
+                <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-4">
+                    <CapsuleControls
+                        controls={capsule.controls}
+                        values={controlValues}
+                        onChange={(name, value) =>
+                            setControlValues((current) => ({ ...current, [name]: value }))
+                        }
+                    />
+                    <CapsuleComparison
+                        capsule={capsule}
+                        urls={urls ?? {}}
+                        controlHash={controlHash}
+                        viewport={viewport}
+                        onViewportChange={setViewport}
+                        mode={mode}
+                        onModeChange={setMode}
+                    />
+                </div>
+            </div>
+            {detail.manifest && detail.manifest.warnings.length > 0 && (
+                <ul className="mt-4 flex flex-col gap-1 border-t border-white/5 pt-3">
+                    {detail.manifest.warnings.map((warning) => (
+                        <li key={warning} className="text-[11px] text-neutral-500">
+                            {warning}
+                        </li>
+                    ))}
+                </ul>
             )}
-            {detail && detail.status === "Ready" && !manifest && (
-                <DiffStatus
-                    title="Captured in an older format"
-                    body="This diff predates screenshot capture. Regenerate it to see the real components."
-                    action={
-                        <Button size="sm" loading={regenerate.isPending} onClick={handleRegenerate}>
-                            <FiRefreshCw />
-                            Regenerate
-                        </Button>
-                    }
-                />
-            )}
-            {detail && detail.status === "Ready" && manifest && shot && (
-                <DiffComparison shot={shot} urls={artifactUrls} />
-            )}
-            {detail && detail.status === "Ready" && manifest && !shot && (
-                <DiffStatus
-                    title="Nothing captured"
-                    body="No screenshot exists for this component and state."
-                />
-            )}
-        </div>
+        </Shell>
     );
 }
 
-function Picker({
-    value,
-    onChange,
-    options,
-}: {
-    value: string;
-    onChange: (next: string) => void;
-    options: { value: string; label: string }[];
-}) {
-    return (
-        <Select value={value} onValueChange={onChange}>
-            <SelectTrigger size="sm" className="max-w-52 text-[14px]">
-                <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-                {options.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                        {option.label}
-                    </SelectItem>
-                ))}
-            </SelectContent>
-        </Select>
+function revision_paths(capsule: Capsule | undefined): string[] {
+    if (!capsule) return [];
+    return [capsule.base?.path, capsule.head?.path].filter(
+        (path): path is string => path !== undefined,
     );
+}
+
+function defaults_with(capsule: Capsule, values: Record<string, string>) {
+    const merged: Record<string, string> = {};
+    for (const control of capsule.controls) {
+        merged[control.name] = values[control.name] ?? String(control.default);
+    }
+    return merged;
+}
+
+function Shell({ children }: { children: ReactNode }) {
+    return <div className="flex min-h-0 min-w-0 flex-1 flex-col px-4 pt-3 pb-4">{children}</div>;
 }
 
 function DiffStatus({ title, body, action }: { title: string; body: string; action?: ReactNode }) {

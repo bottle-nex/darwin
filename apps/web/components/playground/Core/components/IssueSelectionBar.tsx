@@ -1,14 +1,15 @@
 "use client";
 
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { useEffect } from "react";
 import { MdClose } from "react-icons/md";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+
 import { Button } from "@/components/ui/button";
-import { useIssueSelectionStore } from "@/store/issues/useIssueSelectionStore";
-import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
+import { useIssueSelectionShortcuts } from "@/hooks/issues/useIssueSelectionShortcuts";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { useCommandMenuStore } from "@/store/command/useCommandMenuStore";
-import { useIssueSelectionShortcuts } from "@/hooks/issues/useIssueSelectionShortcuts";
+import { useIssueSelectionStore } from "@/store/issues/useIssueSelectionStore";
+import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
 
 export default function IssueSelectionBar() {
     const ids = useIssueSelectionStore((s) => s.ids);

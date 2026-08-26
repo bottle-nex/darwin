@@ -1,9 +1,10 @@
 "use client";
 import { MdAdd, MdDelete } from "react-icons/md";
-import { Button } from "@/components/ui/button";
+
 import PlaygroundAvatar from "@/components/playground/Core/components/PlaygroundAvatar";
-import { useNewTeamStore } from "@/store/team/useNewTeamStore";
+import { Button } from "@/components/ui/button";
 import { useDeleteTeamStore } from "@/store/team/useDeleteTeamStore";
+import { useNewTeamStore } from "@/store/team/useNewTeamStore";
 import type { ProjectDetail } from "@/types/project";
 
 export default function ProjectSettingsTeamSection({

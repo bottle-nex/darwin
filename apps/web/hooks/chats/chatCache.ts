@@ -1,5 +1,6 @@
 import type { InfiniteData, QueryClient } from "@tanstack/react-query";
 import type { CursorPage, ReactionSummary } from "@trymatcha/types";
+
 import { mapInfinitePages } from "@/lib/pagination/infinitePages";
 
 export const CHAT_PAGE_LIMIT = 50;

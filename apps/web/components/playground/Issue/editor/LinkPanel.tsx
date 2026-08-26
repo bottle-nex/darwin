@@ -1,12 +1,14 @@
 "use client";
 
+import type { Editor } from "@tiptap/core";
 import { useEffect, useRef, useState } from "react";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
 import { MENU_SURFACE } from "@/components/ui/menuSurface";
 import { withProtocol } from "@/lib/urls";
-import type { Editor } from "@tiptap/core";
+import { cn } from "@/lib/utils";
+
 import type { LinkPromptRequest } from "./link";
 
 interface LinkPanelProps {

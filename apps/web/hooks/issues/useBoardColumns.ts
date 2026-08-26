@@ -1,11 +1,13 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
+
 import { apiClient } from "@/lib/axios";
-import { boardColumnsKey } from "./boardCache";
 import { BOARD_COLUMNS_URL } from "@/routes/api_routes";
 import type { ApiResponse } from "@/types/api";
 import type { BoardMetadata } from "@/types/board";
+
+import { boardColumnsKey } from "./boardCache";
 
 export function useBoardColumns(projectId: string | undefined) {
     return useQuery({

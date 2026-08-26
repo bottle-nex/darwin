@@ -1,8 +1,10 @@
 "use client";
 import { useEffect } from "react";
+
+import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
 import { useSidebarWidthStore } from "@/store/playground/useSidebarWidthStore";
-import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
+
 import SidebarContent from "./SidebarContent";
 
 export default function PlaygroundSheetSidebar() {

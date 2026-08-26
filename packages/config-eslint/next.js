@@ -17,7 +17,13 @@ module.exports = {
     env: {
         node: true,
     },
-    plugins: ["only-warn"],
+    plugins: ["only-warn", "simple-import-sort", "@typescript-eslint", "import"],
+    rules: {
+        "simple-import-sort/imports": "error",
+        "simple-import-sort/exports": "error",
+        "@typescript-eslint/consistent-type-imports": "error",
+        "import/no-duplicates": "error",
+    },
     settings: {
         "import/resolver": {
             typescript: {

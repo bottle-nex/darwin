@@ -1,9 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
+
 import { apiClient } from "@/lib/axios";
+import SessionServices from "@/lib/session";
 import { LAST_VISITED_URL } from "@/routes/api_routes";
 import type { ApiResponse } from "@/types/api";
 import type { LastVisited } from "@/types/user";
-import SessionServices from "@/lib/session";
 
 export const LAST_VISITED_QUERY_KEY = ["user", "last-visited"] as const;
 

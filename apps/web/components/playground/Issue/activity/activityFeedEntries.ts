@@ -1,4 +1,5 @@
 import type { Chat, IssueActivity } from "@trymatcha/types";
+
 import type { CommentThread } from "./CommentCard";
 
 export type TimelineStream = "activity" | "comments";

@@ -1,9 +1,11 @@
-import { prisma, Prisma } from "@trymatcha/database";
+import type { Prisma } from "@trymatcha/database";
+import { prisma } from "@trymatcha/database";
 import {
-    OutboundSocketMessageType,
     type MemberNotificationType,
+    OutboundSocketMessageType,
     type ProjectNotificationType,
 } from "@trymatcha/types";
+
 import { server_services } from "..";
 
 type NotificationPayload = Prisma.InputJsonObject;

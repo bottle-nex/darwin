@@ -1,17 +1,18 @@
 "use client";
 import { useState } from "react";
 import { HiOutlineMagnifyingGlass } from "react-icons/hi2";
+
+import { Input } from "@/components/ui/input";
+import KeyCombo from "@/components/ui/KeyCombo";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import {
-    COMMAND_ENTRIES,
     comboToKeys,
+    COMMAND_ENTRIES,
     isCommandAvailable,
 } from "@/hooks/shortcuts/usePlaygroundShortcuts";
-import { useShortcutSheetStore } from "@/store/playground/useShortcutSheetStore";
-import { useCommandContextStore } from "@/store/command/useCommandContextStore";
-import { Input } from "@/components/ui/input";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import KeyCombo from "@/components/ui/KeyCombo";
 import { cn } from "@/lib/utils";
+import { useCommandContextStore } from "@/store/command/useCommandContextStore";
+import { useShortcutSheetStore } from "@/store/playground/useShortcutSheetStore";
 import { COMMAND_KIND_ORDER } from "@/types/command.type";
 
 export default function PlaygroundShortcutSheet() {

@@ -1,38 +1,40 @@
 "use client";
-import { useEffect, useLayoutEffect } from "react";
 import { useParams } from "next/navigation";
-import PlaygroundCollapsedLead from "@/components/playground/Core/TopBar/PlaygroundCollapsedLead";
-import PlaygroundPaneFrame from "@/components/playground/Core/components/PlaygroundPaneFrame";
-import PlaygroundSidebar from "@/components/playground/Sidebar/PlaygroundSidebar";
-import PlaygroundSheetSidebar from "@/components/playground/Sidebar/PlaygroundSheetSidebar";
-import SidebarResizeHandle from "@/components/playground/Sidebar/SidebarResizeHandle";
-import PlaygroundDisplay from "@/components/playground/Core/PlaygroundDisplay";
+import { useEffect, useLayoutEffect } from "react";
+
+import CommandDialogs from "@/components/command/CommandDialogs";
+import CommandMenu from "@/components/command/CommandMenu";
 import OnboardingDisplay from "@/components/onboarding/OnboardingDisplay";
+import IssueSelectionBar from "@/components/playground/Core/components/IssueSelectionBar";
+import PlaygroundPaneFrame from "@/components/playground/Core/components/PlaygroundPaneFrame";
+import FloatNotifications from "@/components/playground/Core/Notifications/FloatNotifications";
+import NotificationsPanel from "@/components/playground/Core/Notifications/NotificationsPanel";
+import PlaygroundDisplay from "@/components/playground/Core/PlaygroundDisplay";
+import PlaygroundCollapsedLead from "@/components/playground/Core/TopBar/PlaygroundCollapsedLead";
+import CreateIssueDialog from "@/components/playground/Issue/CreateIssueDialog";
+import IssueDisplay from "@/components/playground/Issue/IssueDisplay";
+import { defaultHomeViewToTab, isSettingsTab } from "@/components/playground/playgroundTabs";
+import ReviewDisplay from "@/components/playground/Review/ReviewDisplay";
+import PlaygroundSheetSidebar from "@/components/playground/Sidebar/PlaygroundSheetSidebar";
+import PlaygroundShortcutSheet from "@/components/playground/Sidebar/PlaygroundShortcutSheet";
+import PlaygroundSidebar from "@/components/playground/Sidebar/PlaygroundSidebar";
+import SidebarResizeHandle from "@/components/playground/Sidebar/SidebarResizeHandle";
 import CreateProjectDialog from "@/components/project/CreateProjectDialog";
 import CreateTeamDialog from "@/components/team/CreateTeamDialog";
 import DeleteTeamDialog from "@/components/team/DeleteTeamDialog";
-import CreateIssueDialog from "@/components/playground/Issue/CreateIssueDialog";
-import IssueDisplay from "@/components/playground/Issue/IssueDisplay";
-import PlaygroundShortcutSheet from "@/components/playground/Sidebar/PlaygroundShortcutSheet";
-import NotificationsPanel from "@/components/playground/Core/Notifications/NotificationsPanel";
-import FloatNotifications from "@/components/playground/Core/Notifications/FloatNotifications";
-import { usePaneRoute } from "@/hooks/playground/usePaneRoute";
-import ReviewDisplay from "@/components/playground/Review/ReviewDisplay";
 import { useGetDashboard } from "@/hooks/dashboard/useGetDashboard";
+import { usePaneRoute } from "@/hooks/playground/usePaneRoute";
 import { useGetProject } from "@/hooks/project/useGetProject";
-import { useSetLastVisited } from "@/hooks/user/useSetLastVisited";
-import { usePlaygroundUrlSync } from "./usePlaygroundUrlSync";
-import { useSubscribeEventHandlers } from "@/hooks/socket/useSubscribeEventHandlers";
 import usePlaygroundShortcuts from "@/hooks/shortcuts/usePlaygroundShortcuts";
-import { useSidebarWidthStore } from "@/store/playground/useSidebarWidthStore";
+import { useSubscribeEventHandlers } from "@/hooks/socket/useSubscribeEventHandlers";
+import { useSetLastVisited } from "@/hooks/user/useSetLastVisited";
 import { useCommandContextStore } from "@/store/command/useCommandContextStore";
-import CommandMenu from "@/components/command/CommandMenu";
-import CommandDialogs from "@/components/command/CommandDialogs";
-import IssueSelectionBar from "@/components/playground/Core/components/IssueSelectionBar";
-import BackgroundLighting from "./BackgroundLighting";
 import { useBackgroundLightingStore } from "@/store/playground/useBackgroundLightingStore";
-import { isSettingsTab } from "@/components/playground/playgroundTabs";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
+import { useSidebarWidthStore } from "@/store/playground/useSidebarWidthStore";
+
+import BackgroundLighting from "./BackgroundLighting";
+import { usePlaygroundUrlSync } from "./usePlaygroundUrlSync";
 
 export default function PlaygroundShell() {
     const { orgSlug, projectSlug } = useParams<{
@@ -56,7 +58,10 @@ export default function PlaygroundShell() {
     }, [orgSlug, activeProject, setLastVisited]);
 
     const activeTab = usePlaygroundNavStore((s) => s.tab);
-    usePlaygroundUrlSync(project?.teams);
+    const defaultHomeView = dashboard
+        ? defaultHomeViewToTab(dashboard.userConfig.defaultHomeView)
+        : undefined;
+    usePlaygroundUrlSync(project?.teams, defaultHomeView);
     const paneRoute = usePaneRoute({ sync: true });
     const openIssueId = paneRoute.kind === "issue" ? paneRoute.issueId : null;
     usePlaygroundShortcuts();

@@ -1,4 +1,5 @@
 import { prisma } from "@trymatcha/database";
+
 import MessageReferenceService, { type ResolvedReferences } from "./service.message-references";
 
 export default class DescriptionReferenceService {

@@ -1,23 +1,25 @@
 "use client";
+import { AxiosError } from "axios";
 import { useState } from "react";
 import { MdCheck, MdColorize, MdOutlineKeyboardArrowRight } from "react-icons/md";
-import { toast } from "@/lib/toast";
-import { AxiosError } from "axios";
-import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { Textarea } from "@/components/ui/textarea";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { ColorPicker } from "@/components/ui/color-picker";
-import { DIALOG_TITLE_FIELD, GHOST_FIELD } from "@/components/ui/fieldStyles";
+
 import PlaygroundAvatar, {
     toneFor,
 } from "@/components/playground/Core/components/PlaygroundAvatar";
-import { cn } from "@/lib/utils";
-import { useActiveProject } from "@/hooks/useActiveProject";
+import { Button } from "@/components/ui/button";
+import { ColorPicker } from "@/components/ui/color-picker";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { DIALOG_TITLE_FIELD, GHOST_FIELD } from "@/components/ui/fieldStyles";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Textarea } from "@/components/ui/textarea";
 import { useCreateTag } from "@/hooks/tags/useCreateTag";
 import { useUpdateTag } from "@/hooks/tags/useUpdateTag";
-import { TAG_COLORS, type Tag } from "@/types/tags";
+import { useActiveProject } from "@/hooks/useActiveProject";
+import { toast } from "@/lib/toast";
+import { cn } from "@/lib/utils";
 import type { ApiResponse } from "@/types/api";
+import { type Tag, TAG_COLORS } from "@/types/tags";
+
 import TagDisplay from "./TagDisplay";
 
 const NAME_LIMIT = 50;

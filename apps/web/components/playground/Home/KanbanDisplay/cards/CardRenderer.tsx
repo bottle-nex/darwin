@@ -1,15 +1,16 @@
 "use client";
 import { useIssueSelection } from "@/hooks/issues/useIssueSelection";
 import { usePaneRouteStore } from "@/store/playground/usePaneRouteStore";
-import { KanbanStatus, type Issue } from "@/types/kanban";
+import { type Issue, KanbanStatus } from "@/types/kanban";
+
 import IssueDropdown from "../IssueDropdown";
-import TodoCard from "./TodoCard";
-import QueuedCard from "./QueuedCard";
-import InProgressCard from "./InProgressCard";
-import InReviewCard from "./InReviewCard";
+import CancelledCard from "./CancelledCard";
 import DoneCard from "./DoneCard";
 import FailedCard from "./FailedCard";
-import CancelledCard from "./CancelledCard";
+import InProgressCard from "./InProgressCard";
+import InReviewCard from "./InReviewCard";
+import QueuedCard from "./QueuedCard";
+import TodoCard from "./TodoCard";
 
 /** Picks the card component for an issue based on its column. */
 function statusCard(issue: Issue) {

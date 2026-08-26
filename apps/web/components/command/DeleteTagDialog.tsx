@@ -1,8 +1,8 @@
 "use client";
-import { toast } from "@/lib/toast";
 import ConfirmDialog from "@/components/utility/ConfirmDialog";
-import { useActiveProject } from "@/hooks/useActiveProject";
 import { useDeleteTag } from "@/hooks/tags/useDeleteTag";
+import { useActiveProject } from "@/hooks/useActiveProject";
+import { toast } from "@/lib/toast";
 import { useDeleteTagStore } from "@/store/tags/useDeleteTagStore";
 
 export default function DeleteTagDialog() {

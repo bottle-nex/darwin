@@ -1,13 +1,15 @@
 "use client";
 import { useEffect } from "react";
-import { useActiveProject } from "@/hooks/useActiveProject";
+
 import { useListTemplates } from "@/hooks/templates/useListTemplates";
+import { useActiveProject } from "@/hooks/useActiveProject";
 import { useKanbanOptionsStore } from "@/store/kanban/useKanbanOptionsStore";
-import { useKanbanFilterUrlSync } from "./useKanbanFilterUrlSync";
-import { useKanbanBoardViewUrlSync } from "./useKanbanBoardViewUrlSync";
+
 import { useCustomKanbanDnd } from "./useCustomKanbanDnd";
-import { useFilteredKanbanBoard } from "./useFilteredKanbanBoard";
 import { useFilteredCustomColumns } from "./useFilteredCustomColumns";
+import { useFilteredKanbanBoard } from "./useFilteredKanbanBoard";
+import { useKanbanBoardViewUrlSync } from "./useKanbanBoardViewUrlSync";
+import { useKanbanFilterUrlSync } from "./useKanbanFilterUrlSync";
 
 export function useKanbanPane() {
     const activeProject = useActiveProject();

@@ -1,5 +1,6 @@
-import { ProjectRole, TeamRole } from "@trymatcha/types";
-import { INVITATION_STATUS } from "./types.invitation";
+import type { ProjectRole, TeamRole } from "@trymatcha/types";
+
+import type { INVITATION_STATUS } from "./types.invitation";
 
 export interface TeamMemberDetail {
     id: string;

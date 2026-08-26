@@ -1,10 +1,12 @@
 "use client";
 import { useParams } from "next/navigation";
+
 import PlaygroundAvatar from "@/components/playground/Core/components/PlaygroundAvatar";
-import { useActiveProject } from "@/hooks/useActiveProject";
 import { useGetProject } from "@/hooks/project/useGetProject";
+import { useActiveProject } from "@/hooks/useActiveProject";
 import { useCommandActionStore } from "@/store/command/useCommandActionStore";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
+
 import ResourcePickerDialog from "./ResourcePickerDialog";
 
 export default function SwitchTeamDialog() {

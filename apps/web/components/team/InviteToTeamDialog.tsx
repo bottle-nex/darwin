@@ -1,16 +1,18 @@
 "use client";
 
+import { ProjectRole } from "@trymatcha/types";
 import * as React from "react";
 import { MdClose, MdOutlineKeyboardArrowRight } from "react-icons/md";
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { GHOST_FIELD } from "@/components/ui/fieldStyles";
-import { CapsuleTrigger } from "@/components/playground/Issue/Capsule";
+
 import PlaygroundAvatar from "@/components/playground/Core/components/PlaygroundAvatar";
-import { ProjectRole } from "@trymatcha/types";
+import { CapsuleTrigger } from "@/components/playground/Issue/Capsule";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { GHOST_FIELD } from "@/components/ui/fieldStyles";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
+
 import ProjectTeamMemberPicker from "./ProjectTeamMemberPicker";
 
 const PROJECT_ROLES = Object.values(ProjectRole);

@@ -1,8 +1,8 @@
-import PublisherSystem from "../real-time/publisher.system";
-import QueueService from "./services.queue";
 import NotificationQueueService from "../notifications/service.notification-queue";
+import PublisherSystem from "../real-time/publisher.system";
 import IssueOutcomeQueueService from "./service.issue_outcome_queue";
 import ProductDiffService from "./service.product_diff";
+import QueueService from "./services.queue";
 
 const PRODUCT_DIFF_SWEEP_MS = 60 * 60 * 1000;
 

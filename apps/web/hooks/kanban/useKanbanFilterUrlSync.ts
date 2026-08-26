@@ -1,16 +1,17 @@
 "use client";
-import { useEffect, useRef } from "react";
 import { IssueStatus } from "@trymatcha/types";
+import { useEffect, useRef } from "react";
+
 import { hasActiveFilters } from "@/lib/kanban/boardFilter";
 import { useKanbanFilterStore } from "@/store/kanban/useKanbanFilterStore";
 import type { ServerIssueStatus } from "@/types/board";
 import {
-    DATE_FACET_KEYS,
-    EMPTY_FILTERS,
-    LIST_FACET_KEYS,
     type BoardFilters,
+    DATE_FACET_KEYS,
     type DateFacetKey,
     type DateRangeFilter,
+    EMPTY_FILTERS,
+    LIST_FACET_KEYS,
     type ListFacetKey,
 } from "@/types/boardFilter";
 

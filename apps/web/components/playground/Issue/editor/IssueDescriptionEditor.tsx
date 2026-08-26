@@ -1,27 +1,29 @@
 "use client";
 
-import { Extension } from "@tiptap/core";
-import { cn } from "@/lib/utils";
-import { TableKit } from "@tiptap/extension-table";
-import { Timestamp } from "./timestamp";
-import { SlashCommand } from "./slash-command";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { EditorPlaceholder } from "./placeholder";
-import { TableFigure, TableTitle } from "./table";
-import { Toggle, ToggleBody, ToggleSummary } from "./toggle";
-import { Prompt, PromptMark, countPrompts } from "./prompt";
-import { EditorContent, ReactNodeViewRenderer, useEditor, type Editor } from "@tiptap/react";
-import Image from "@tiptap/extension-image";
-import TaskList from "@tiptap/extension-task-list";
-import TaskItem from "@tiptap/extension-task-item";
-import StarterKit from "@tiptap/starter-kit";
-import ImageNodeView from "./ImageNodeView";
-import SelectionToolbar from "./SelectionToolbar";
-import LinkPanel from "./LinkPanel";
-import { LINK_ATTRIBUTES, LinkPrompt, type LinkPromptRequest } from "./link";
-import CharacterCount from "@tiptap/extension-character-count";
 import { useQueryClient } from "@tanstack/react-query";
+import { Extension } from "@tiptap/core";
+import CharacterCount from "@tiptap/extension-character-count";
+import Image from "@tiptap/extension-image";
+import { TableKit } from "@tiptap/extension-table";
+import TaskItem from "@tiptap/extension-task-item";
+import TaskList from "@tiptap/extension-task-list";
+import { type Editor, EditorContent, ReactNodeViewRenderer, useEditor } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+
 import { createReferenceMention } from "@/components/playground/Home/chat/referenceMention";
+import { cn } from "@/lib/utils";
+
+import ImageNodeView from "./ImageNodeView";
+import { LINK_ATTRIBUTES, LinkPrompt, type LinkPromptRequest } from "./link";
+import LinkPanel from "./LinkPanel";
+import { EditorPlaceholder } from "./placeholder";
+import { countPrompts, Prompt, PromptMark } from "./prompt";
+import SelectionToolbar from "./SelectionToolbar";
+import { SlashCommand } from "./slash-command";
+import { TableFigure, TableTitle } from "./table";
+import { Timestamp } from "./timestamp";
+import { Toggle, ToggleBody, ToggleSummary } from "./toggle";
 
 const DESCRIPTION_CHAR_LIMIT = 2500;
 

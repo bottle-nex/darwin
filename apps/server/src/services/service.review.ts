@@ -1,5 +1,6 @@
 import { ActivityType, ActorType, prisma } from "@trymatcha/database";
-import { ReviewState, type ReviewHeader } from "@trymatcha/types";
+import { type ReviewHeader, ReviewState } from "@trymatcha/types";
+
 import ActivityService from "./service.activity";
 import GithubPullsService, { type PullRequestRef } from "./service.github_pulls";
 

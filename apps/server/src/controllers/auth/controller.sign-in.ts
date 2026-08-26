@@ -1,8 +1,9 @@
+import { prisma } from "@trymatcha/database";
 import type { Request, Response } from "express";
 import { z } from "zod";
-import { prisma } from "@trymatcha/database";
-import ResponseWriter from "../../services/service.response";
+
 import { signSessionJwt } from "../../services/service.jwt";
+import ResponseWriter from "../../services/service.response";
 
 const body_schema = z.object({
     user: z.object({

@@ -1,4 +1,4 @@
-import { ProjectRole } from "../../../packages/types";
+import type { ProjectRole } from "../../../packages/types";
 
 export enum INVITATION_STATUS {
     PENDING = "Pending",

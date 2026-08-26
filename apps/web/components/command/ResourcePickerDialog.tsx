@@ -1,7 +1,6 @@
 "use client";
 import type { ReactNode } from "react";
-import { cn } from "@/lib/utils";
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+
 import {
     Command,
     CommandEmpty,
@@ -9,6 +8,8 @@ import {
     CommandItem,
     CommandList,
 } from "@/components/ui/command";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { cn } from "@/lib/utils";
 
 export interface PickableResource {
     id: string;

@@ -1,13 +1,15 @@
 "use client";
+import type { ReviewHeader, ReviewState } from "@trymatcha/types";
 import type { ReactNode } from "react";
 import type { IconType } from "react-icons";
 import { BiChat } from "react-icons/bi";
 import { GoGitCommit, GoGitMerge, GoGitPullRequest, GoGitPullRequestClosed } from "react-icons/go";
 import { LuFileDiff } from "react-icons/lu";
 import { MdChevronLeft } from "react-icons/md";
-import type { ReviewHeader, ReviewState } from "@trymatcha/types";
-import { cn } from "@/lib/utils";
+
 import { formatRelativeTime } from "@/lib/format";
+import { cn } from "@/lib/utils";
+
 import ReviewActorAvatar from "../ReviewActorAvatar";
 
 const TITLE = "text-[20px] leading-[1.3] font-medium tracking-[-0.011em] text-neutral-100";

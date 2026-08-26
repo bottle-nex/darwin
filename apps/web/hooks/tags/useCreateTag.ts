@@ -1,7 +1,8 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+
+import { TAGS_QUERY_KEY } from "@/hooks/tags/useListTags";
 import { apiClient } from "@/lib/axios";
 import { CREATE_TAG_URL } from "@/routes/api_routes";
-import { TAGS_QUERY_KEY } from "@/hooks/tags/useListTags";
 import type { ApiResponse } from "@/types/api";
 import type { Tag } from "@/types/tags";
 

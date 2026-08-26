@@ -1,6 +1,7 @@
 import type { Feature } from "@/types/feature.type";
-import ScatterField from "./ScatterField";
+
 import { TEASER_WIDTH } from "./cardMetrics";
+import ScatterField from "./ScatterField";
 
 /**
  * The collapsed face of a feature card: index top-left, scattered squares, title

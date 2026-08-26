@@ -1,17 +1,19 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
 import type { Editor } from "@tiptap/react";
-import { toast } from "@/lib/toast";
-import { useActiveProject } from "@/hooks/useActiveProject";
+import { useEffect, useRef, useState } from "react";
+
+import { PRIORITY_TO_NUMBER } from "@/components/playground/Home/KanbanDisplay/customkanban/data";
 import { useCreateIssue } from "@/hooks/issues/useCreateIssue";
 import { useUpdateIssue } from "@/hooks/issues/useUpdateIssue";
+import { useActiveProject } from "@/hooks/useActiveProject";
 import { KanbanMappers } from "@/lib/kanban/KanbanMappers";
-import { PRIORITY_TO_NUMBER } from "@/components/playground/Home/KanbanDisplay/customkanban/data";
-import type { Priority } from "@/types/kanban";
-import type { BoardIssue } from "@/types/board";
+import { toast } from "@/lib/toast";
 import type { IssueTarget } from "@/store/issues/useCreateIssueStore";
-import { useIssueDescription } from "./useIssueDescription";
+import type { BoardIssue } from "@/types/board";
+import type { Priority } from "@/types/kanban";
+
 import { useSubmitWarning } from "./SubmitWarningToast";
+import { useIssueDescription } from "./useIssueDescription";
 
 type UseIssueFormArgs = {
     target: IssueTarget;

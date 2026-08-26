@@ -1,7 +1,8 @@
 import type { CSSProperties, ReactNode } from "react";
-import { cn } from "@/lib/utils";
 import type { IconType } from "react-icons";
+
 import { TooltipComponent } from "@/components/ui/tooltip-component";
+import { cn } from "@/lib/utils";
 
 type IconWrapperVariant = "solid" | "ghost" | "outline" | "ring";
 

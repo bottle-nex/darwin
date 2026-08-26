@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+
 import { useKanbanOptionsStore } from "@/store/kanban/useKanbanOptionsStore";
 import type { BoardView } from "@/types/kanban";
 

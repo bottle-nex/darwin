@@ -12,7 +12,9 @@ import {
     BsListUl,
     BsThreeDots,
 } from "react-icons/bs";
+
 import { cn } from "@/lib/utils";
+
 import { appear, EASE_OUT, MockScene, PanelCard } from "./MockWindow";
 import ShowcaseFrame from "./ShowcaseFrame";
 

@@ -1,5 +1,5 @@
 "use client";
-import { motion, useReducedMotion, type Transition, type Variants } from "motion/react";
+import { motion, type Transition, useReducedMotion, type Variants } from "motion/react";
 
 export type AnimatedIcon = (props: { className?: string }) => React.ReactElement;
 
