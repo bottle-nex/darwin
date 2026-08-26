@@ -8,8 +8,6 @@ import {
 import { useEffect, useRef, useState } from "react";
 
 import { MICRO_LABEL } from "@/components/playground/Core/components/paneBar";
-import { BLURRED_BG_ONE } from "@/components/playground/Home/KanbanDisplay/cardStyles";
-import { useUserConfig } from "@/hooks/user/useUserConfig";
 import { cn } from "@/lib/utils";
 import {
     CAPSULE_FRAMES,
@@ -21,6 +19,7 @@ import CapsuleSlider from "./CapsuleSlider";
 import CapsuleToolbar from "./CapsuleToolbar";
 
 const IFRAME_SANDBOX = "allow-scripts allow-same-origin";
+const FRAME_SHELL = "overflow-hidden rounded-lg border border-snow/10 bg-white/2";
 const SPLIT_GAP = 12;
 const TOOLBAR_CLEARANCE = 56;
 
@@ -53,7 +52,6 @@ export default function CapsuleComparison({
     mode: CapsuleCompareMode;
     onModeChange: (value: CapsuleCompareMode) => void;
 }) {
-    const glass = useUserConfig().backgroundLightingEnabled;
     const surface = useRef<HTMLDivElement>(null);
     const available = useAvailableWidth(surface);
 
@@ -89,13 +87,11 @@ export default function CapsuleComparison({
                 <div
                     ref={surface}
                     data-lenis-prevent
-                    className={cn(
-                        "h-full overflow-auto rounded-lg border border-snow/5 p-1.5 no-scrollbar",
-                        BLURRED_BG_ONE(glass),
-                    )}
+                    className="h-full overflow-auto no-scrollbar"
                 >
                     {activeMode === "slider" ? (
                         <CapsuleSlider
+                            className={FRAME_SHELL}
                             width={painted.width}
                             height={painted.height}
                             before={frame("Before", capsule.base)}
@@ -110,10 +106,20 @@ export default function CapsuleComparison({
                                 paddingBottom: TOOLBAR_CLEARANCE,
                             }}
                         >
-                            <Labelled label="Before" revision={capsule.base}>
+                            <Labelled
+                                label="Before"
+                                revision={capsule.base}
+                                width={painted.width}
+                                height={painted.height}
+                            >
                                 {frame("Before", capsule.base)}
                             </Labelled>
-                            <Labelled label="After" revision={capsule.head}>
+                            <Labelled
+                                label="After"
+                                revision={capsule.head}
+                                width={painted.width}
+                                height={painted.height}
+                            >
                                 {frame("After", capsule.head)}
                             </Labelled>
                         </div>
@@ -165,10 +171,14 @@ function useAvailableWidth(host: React.RefObject<HTMLDivElement | null>): number
 function Labelled({
     label,
     revision,
+    width,
+    height,
     children,
 }: {
     label: string;
     revision: CapsuleRevision | null;
+    width: number;
+    height: number;
     children: React.ReactNode;
 }) {
     return (
@@ -177,7 +187,9 @@ function Labelled({
                 <span className={MICRO_LABEL}>{label}</span>
                 {revision && <Fidelity value={revision.fidelity} />}
             </div>
-            {children}
+            <div className={cn(FRAME_SHELL, "mx-auto")} style={{ width, height }}>
+                {children}
+            </div>
         </section>
     );
 }
@@ -214,7 +226,7 @@ function Frame({
 
     return (
         <div
-            className="mx-auto overflow-hidden rounded-md bg-white/2"
+            className="mx-auto h-full w-full overflow-hidden"
             style={{ width: painted.width, height: painted.height }}
         >
             <iframe

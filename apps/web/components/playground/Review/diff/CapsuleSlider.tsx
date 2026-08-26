@@ -24,11 +24,13 @@ export default function CapsuleSlider({
     after,
     height,
     width,
+    className,
 }: {
     before: ReactNode;
     after: ReactNode;
     height: number;
     width: number | null;
+    className?: string;
 }) {
     const [position, setPosition] = useState(50);
     const track = useRef<HTMLDivElement>(null);
@@ -65,7 +67,7 @@ export default function CapsuleSlider({
     return (
         <div
             ref={track}
-            className="relative isolate mx-auto"
+            className={cn("relative isolate mx-auto", className)}
             style={{ height, width: width ?? undefined }}
         >
             <div className="absolute inset-0">{after}</div>
