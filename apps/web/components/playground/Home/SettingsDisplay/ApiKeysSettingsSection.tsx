@@ -9,7 +9,7 @@ import { useApiKeys } from "@/hooks/apiKeys/useApiKeys";
 import { useCreateApiKey } from "@/hooks/apiKeys/useCreateApiKey";
 import { useRevokeApiKey } from "@/hooks/apiKeys/useRevokeApiKey";
 import { cn } from "@/lib/utils";
-import { CLAUDE_MCP_CONNECTOR_URL,CLAUDE_MCP_URL } from "@/routes/api_routes";
+import { CLAUDE_MCP_CONNECTOR_URL, CLAUDE_MCP_URL } from "@/routes/api_routes";
 import type { CreatedApiKey } from "@/types/apiKey.type";
 
 import SettingsUtilityCard from "./SettingsUtilityCard";

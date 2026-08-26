@@ -1,6 +1,5 @@
-import { afterEach, expect, mock, spyOn, test } from "bun:test";
-
 import { Prisma } from "@trymatcha/database";
+import { afterEach, expect, mock, spyOn, test } from "bun:test";
 
 import GithubPullsService from "./service.github_pulls";
 import StorageService from "./service.storage";

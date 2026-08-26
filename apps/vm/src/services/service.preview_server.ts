@@ -210,7 +210,7 @@ export default class PreviewServer {
                 .catch(() => ""),
             sandbox.commands
                 .run(
-                    `(curl -sS -D - -o /dev/null --max-time 10 ${shell_argument(`${server.url}${probePath}`)}; printf 'curl_exit=%s\\n' \"$?\") 2>&1`,
+                    `(curl -sS -D - -o /dev/null --max-time 10 ${shell_argument(`${server.url}${probePath}`)}; printf 'curl_exit=%s\\n' "$?") 2>&1`,
                     { timeoutMs: 15_000 },
                 )
                 .then((result) => result.stdout.trim())

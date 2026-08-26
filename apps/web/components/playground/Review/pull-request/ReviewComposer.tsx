@@ -5,6 +5,8 @@ import type { ReviewHeader } from "@trymatcha/types";
 import axios from "axios";
 import { useEffect, useRef, useState } from "react";
 import { FaGithub } from "react-icons/fa6";
+import { IoSendSharp } from "react-icons/io5";
+import { RiSendPlane2Fill } from "react-icons/ri";
 
 import IssueDescriptionEditor from "@/components/playground/Issue/editor/IssueDescriptionEditor";
 import { Button } from "@/components/ui/button";
@@ -12,8 +14,6 @@ import { useGithubLink, useStartGithubLink } from "@/hooks/github/useGithubLink"
 import { useGetProject } from "@/hooks/project/useGetProject";
 import { GITHUB_NOT_LINKED, usePostReviewComment } from "@/hooks/review/usePostReviewComment";
 import { htmlToMarkdown } from "@/lib/markdown";
-import { IoSendSharp } from "react-icons/io5";
-import { RiSendPlane2Fill } from "react-icons/ri";
 
 export default function ReviewComposer({
     projectId,

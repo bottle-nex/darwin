@@ -1,10 +1,10 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { ProductDiffPreviewConfiguration } from "@trymatcha/types";
 
 import { apiClient } from "@/lib/axios";
 import { UPDATE_PROJECT_CONFIG_URL } from "@/routes/api_routes";
 import type { ApiResponse } from "@/types/api";
 import type { KanbanOptionView, ProjectConfig } from "@/types/project";
-import type { ProductDiffPreviewConfiguration } from "@trymatcha/types";
 
 import { PROJECT_QUERY_KEY } from "./useGetProject";
 

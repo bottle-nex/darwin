@@ -27,11 +27,11 @@ import { useKanbanFilterStore } from "@/store/kanban/useKanbanFilterStore";
 import { useKanbanOptionsStore } from "@/store/kanban/useKanbanOptionsStore";
 
 import AddTaskButton from "./KanbanOptionPanels/AddTaskButton";
-import { BOARD_VIEW_PANEL_WIDTH,BoardViewPanelItems } from "./KanbanOptionPanels/BoardViewPanel";
+import { BOARD_VIEW_PANEL_WIDTH, BoardViewPanelItems } from "./KanbanOptionPanels/BoardViewPanel";
 import EagerSubmenu from "./KanbanOptionPanels/EagerSubmenu";
 import FilterChipsBar from "./KanbanOptionPanels/FilterChipsBar";
-import { FILTERS_PANEL_WIDTH,FiltersPanelItems } from "./KanbanOptionPanels/FiltersPanel";
-import { FOCUS_PANEL_WIDTH,FocusPanelItems } from "./KanbanOptionPanels/FocusPanel";
+import { FILTERS_PANEL_WIDTH, FiltersPanelItems } from "./KanbanOptionPanels/FiltersPanel";
+import { FOCUS_PANEL_WIDTH, FocusPanelItems } from "./KanbanOptionPanels/FocusPanel";
 
 /**
  * Every toolbar option collapsed behind one "Options" menu. The panels that have

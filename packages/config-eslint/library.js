@@ -36,5 +36,17 @@ module.exports = {
         {
             files: ["*.js?(x)", "*.ts?(x)"],
         },
+        {
+            files: ["*.ts?(x)"],
+            rules: {
+                "no-unused-vars": "off",
+                "no-dupe-class-members": "off",
+                "@typescript-eslint/no-unused-vars": [
+                    "error",
+                    { argsIgnorePattern: "^_", varsIgnorePattern: "^_" },
+                ],
+                "@typescript-eslint/no-dupe-class-members": "error",
+            },
+        },
     ],
 };
