@@ -64,7 +64,7 @@ export function capsule_artifact_keys(manifest: CapsuleManifest | null): Set<str
     return keys;
 }
 
-export function capsule_control_query(values: Record<string, CapsuleControlValue>): string {
+export function capsule_control_hash(values: Record<string, CapsuleControlValue>): string {
     const query = new URLSearchParams();
     for (const [name, value] of Object.entries(values)) {
         query.set(name, String(value));

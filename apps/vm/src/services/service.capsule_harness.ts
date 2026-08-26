@@ -28,7 +28,7 @@ export interface HarnessOptions {
 const DEFAULT_OPTIONS: HarnessOptions = { tailwindConfigPath: null };
 
 export function harness_dependencies(profile: AppProfile): string[] {
-    const packages = ["vite@^7", "@vitejs/plugin-react@^5"];
+    const packages = ["vite@^7", "@vitejs/plugin-react@^5", "vite-plugin-singlefile@^2"];
     if (profile.tailwindMajor === 4) packages.push("@tailwindcss/vite@^4");
     if (profile.tailwindMajor === 3) packages.push("tailwindcss@^3", "postcss@^8", "autoprefixer@^10");
     return packages;
@@ -105,11 +105,12 @@ export function render_vite_config(
 
     return `import react from "@vitejs/plugin-react";
 ${tailwind_import}import { defineConfig } from "vite";
+import { viteSingleFile } from "vite-plugin-singlefile";
 
 export default defineConfig({
     root: ${JSON.stringify(`${harness}/pages`)},
     base: "./",
-    plugins: [react()${tailwind_plugin}],
+    plugins: [react()${tailwind_plugin}, viteSingleFile()],
     resolve: {
         alias: ${JSON.stringify(aliases, null, 8).replace(/\n}/, "\n    }")},
         dedupe: ["react", "react-dom"],
@@ -119,6 +120,8 @@ ${postcss}    server: {
     },
     build: {
         emptyOutDir: true,
+        assetsInlineLimit: Number.MAX_SAFE_INTEGER,
+        cssCodeSplit: false,
         rollupOptions: {
             input: ${JSON.stringify(inputs, null, 12).replace(/\n}/, "\n        }")},
         },
@@ -152,10 +155,16 @@ import { createRoot } from "react-dom/client";
 
 import Capsule from ${JSON.stringify(capsule_alias(spec.id))};
 
-const controls = Object.fromEntries(new URLSearchParams(window.location.search));
 const container = document.getElementById("root");
 
-if (container) createRoot(container).render(<Capsule controls={controls} />);
+if (container) {
+    const root = createRoot(container);
+    const read = () => Object.fromEntries(new URLSearchParams(window.location.hash.slice(1)));
+    const paint = () => root.render(<Capsule controls={read()} />);
+
+    window.addEventListener("hashchange", paint);
+    paint();
+}
 `;
 }
 

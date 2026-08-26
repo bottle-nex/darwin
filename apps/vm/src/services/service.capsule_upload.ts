@@ -156,7 +156,7 @@ export default class CapsuleUpload {
 
     private static async download(sandbox: Sandbox, log: Logger): Promise<string> {
         await sandbox.commands.run(
-            `tar -czf ${ARCHIVE_PATH} -C ${DIST_ROOT} $(ls ${DIST_ROOT})`,
+            `mkdir -p ${DIST_ROOT} && tar -czf ${ARCHIVE_PATH} -C ${DIST_ROOT} .`,
             { timeoutMs: ARCHIVE_TIMEOUT_MS },
         );
 

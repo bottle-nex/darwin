@@ -145,6 +145,7 @@ Write these files for each capsule below, under ${root}/<id>/
    - Wrap the component in whatever providers its subtree needs, seeded from fixture.json, so nothing throws on mount.
    - Pass no-op functions for callback props.
    - controls values arrive as strings. Convert them: controls.open === "true" for a boolean.
+   - The controls object changes while the page is open. Read it from props on every render; never cache it in module scope.
    - Do NOT stub fetch, XMLHttpRequest or WebSocket. The harness already replaced all three before your code runs.
    - Do NOT edit any file outside ${root}/. The repository must stay exactly as it is.
 

@@ -77,6 +77,13 @@ test("assets are addressed relatively so the bundle works from any storage prefi
     expect(render_vite_config(profile(), ["faq-item"])).toContain('base: "./"');
 });
 
+test("each page is self contained, because only the page itself gets a signed link", () => {
+    const config = render_vite_config(profile(), ["faq-item"]);
+    expect(config).toContain("viteSingleFile()");
+    expect(config).toContain("assetsInlineLimit");
+    expect(harness_dependencies(profile()).join(" ")).toContain("vite-plugin-singlefile@");
+});
+
 test("the repo is allowed as a filesystem root, since the entries import out of the harness", () => {
     expect(render_vite_config(profile(), ["faq-item"])).toContain("/home/user/repo");
 });

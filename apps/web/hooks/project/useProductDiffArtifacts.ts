@@ -11,16 +11,16 @@ const REFRESH_MS = 4 * 60_000;
 const STALE_MS = 3.5 * 60_000;
 
 /**
- * Fetches temporary image links for the screenshots currently on screen.
+ * Fetches temporary links for the capsule pages currently on screen.
  *
- * Only the selected target's images are requested, because a preview can hold close to a hundred
- * pictures and the reader looks at a handful. The refresh matters as much as the fetch: the links
- * expire after fifteen minutes and this panel is often left open far longer, so without it the
- * screenshots would quietly go blank mid-review.
+ * Only the selected capsule's two pages are requested, because a pull request can hold six
+ * components and the reader looks at one. The refresh matters as much as the fetch: the links
+ * expire after fifteen minutes and this panel is often left open far longer, so without it both
+ * panes would quietly go blank mid-review.
  *
  * @example
- * const { data } = useProductDiffArtifacts(projectId, diffId, ["shots/nav/default/desktop/head.png"]);
- * // { "shots/nav/default/desktop/head.png": "https://minio.local/...?X-Amz-Signature=..." }
+ * const { data } = useProductDiffArtifacts(projectId, diffId, ["head/faq-item/index.html"]);
+ * // { "head/faq-item/index.html": "https://minio.local/...?X-Amz-Signature=..." }
  */
 export function useProductDiffArtifacts(
     projectId: string | undefined,
