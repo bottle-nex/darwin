@@ -53,11 +53,7 @@ export interface FailureReport {
  * git remote carries a live installation token, git echoes that URL back in its own fatal
  * messages, and these strings are written to the database.
  */
-export function describe_failure(
-    stage: string,
-    error: unknown,
-    secrets: string[],
-): FailureReport {
+export function describe_failure(stage: string, error: unknown, secrets: string[]): FailureReport {
     return { stage, message: redact(command_error_text(error), secrets) };
 }
 

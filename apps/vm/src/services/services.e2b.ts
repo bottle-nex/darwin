@@ -524,7 +524,9 @@ export default class E2B {
                     issueId: current_issue.id,
                     workerId: worker_id,
                     reason: failure_sentence(failure),
-                }).catch((e) => log.error("could not report the failed issue", e, failure_fields()));
+                }).catch((e) =>
+                    log.error("could not report the failed issue", e, failure_fields()),
+                );
             }
         } finally {
             if (sandbox_id && !retain_sandbox) {

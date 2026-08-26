@@ -57,7 +57,8 @@ export default function CapsuleSlider({
 
     function onKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
         if (event.key === "ArrowLeft") setPosition((current) => clamp(current - KEYBOARD_STEP));
-        else if (event.key === "ArrowRight") setPosition((current) => clamp(current + KEYBOARD_STEP));
+        else if (event.key === "ArrowRight")
+            setPosition((current) => clamp(current + KEYBOARD_STEP));
         else if (event.key === "Home") setPosition(MIN_POSITION);
         else if (event.key === "End") setPosition(MAX_POSITION);
         else return;
@@ -106,15 +107,7 @@ export default function CapsuleSlider({
     );
 }
 
-function Edge({
-    label,
-    className,
-    hidden,
-}: {
-    label: string;
-    className: string;
-    hidden: boolean;
-}) {
+function Edge({ label, className, hidden }: { label: string; className: string; hidden: boolean }) {
     return (
         <span
             className={cn(

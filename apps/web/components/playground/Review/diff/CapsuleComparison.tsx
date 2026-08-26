@@ -84,11 +84,7 @@ export default function CapsuleComparison({
     return (
         <div className="flex min-h-0 flex-1 flex-col gap-3">
             <div className="relative min-h-0 flex-1">
-                <div
-                    ref={surface}
-                    data-lenis-prevent
-                    className="h-full overflow-auto no-scrollbar"
-                >
+                <div ref={surface} data-lenis-prevent className="h-full overflow-auto no-scrollbar">
                     {activeMode === "slider" ? (
                         <CapsuleSlider
                             className={FRAME_SHELL}

@@ -67,10 +67,7 @@ export function collect_failures(
  * Reporting it as Unsupported tells the reviewer this pull request changes nothing worth looking
  * at, which is the most misleading thing it could say when every component failed to compile.
  */
-export function terminal_status(
-    manifest: CapsuleManifest,
-    attempted: number,
-): ProductDiffStatus {
+export function terminal_status(manifest: CapsuleManifest, attempted: number): ProductDiffStatus {
     if (manifest.capsules.length > 0) return "Ready";
     return attempted > 0 ? "Failed" : "Unsupported";
 }

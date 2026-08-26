@@ -1,19 +1,10 @@
 {
     "extends": "@trymatcha/typescript-config/base.json",
-    "include": [
-        "src/**/*.ts",
-        "tsup.config.ts"
-    ],
-    "exclude": [
-        "node_modules",
-        "dist"
-    ],
+    "include": ["src/**/*.ts", "tsup.config.ts"],
+    "exclude": ["node_modules", "dist"],
     "compilerOptions": {
         "target": "ESNext",
-        "types": [
-            "bun",
-            "node"
-        ],
+        "types": ["bun", "node"],
         "strictNullChecks": true
     }
 }

@@ -1,10 +1,5 @@
 import { AiFillStop } from "react-icons/ai";
-import {
-    LuCircle,
-    LuCircleDashed,
-    LuCircleDotDashed,
-    LuCirclePause,
-} from "react-icons/lu";
+import { LuCircle, LuCircleDashed, LuCircleDotDashed, LuCirclePause } from "react-icons/lu";
 import { RiProgress4Line } from "react-icons/ri";
 
 import { DoneStatusIcon, FailedStatusIcon } from "@/components/icons/StatusIcons";
