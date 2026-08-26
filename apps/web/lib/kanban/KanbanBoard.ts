@@ -4,11 +4,10 @@ import {
     LuCircleDotDashed,
     LuCirclePause,
     LuCircleSlash,
-    LuCircleX,
 } from "react-icons/lu";
 import { RiProgress4Line } from "react-icons/ri";
 
-import { DoneStatusIcon } from "@/components/icons/StatusIcons";
+import { DoneStatusIcon, FailedStatusIcon } from "@/components/icons/StatusIcons";
 
 import {
     type BoardState,
@@ -68,8 +67,8 @@ export class KanbanBoard {
         {
             status: KanbanStatus.Failed,
             title: "Failed",
-            icon: LuCircleX,
-            titleBox: "text-rose-400",
+            icon: FailedStatusIcon,
+            titleBox: "text-snow/60",
         },
         {
             status: KanbanStatus.Cancelled,
