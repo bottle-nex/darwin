@@ -353,6 +353,7 @@ export default class CapsuleHarness {
     }
 
     public static async install(sandbox: Sandbox, profile: AppProfile): Promise<void> {
+        await sandbox.commands.run(`mkdir -p ${harness_dir(profile)}`);
         await sandbox.files.write(
             `${harness_dir(profile)}/package.json`,
             `${JSON.stringify({ name: "matcha-capsule-harness", private: true, type: "module" }, null, 4)}\n`,
