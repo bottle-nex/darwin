@@ -7,6 +7,7 @@ import CapsuleHarness, {
     harness_dir,
 } from "./service.capsule_harness";
 import type { AppProfile } from "./service.capsule_workspace";
+import { command_error_text } from "./service.sandbox_stream";
 
 const REPO_DIR = "/home/user/repo";
 const DIST_ROOT = "/home/user/dist";
@@ -75,8 +76,7 @@ export default class CapsuleBuild {
             });
             return { ok: true, error: null };
         } catch (error) {
-            const message = error instanceof Error ? error.message : String(error);
-            return { ok: false, error: trim_build_error(message) };
+            return { ok: false, error: trim_build_error(command_error_text(error)) };
         }
     }
 }

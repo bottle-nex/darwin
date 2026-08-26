@@ -23,6 +23,23 @@ export function redact(text: string, secrets: string[]): string {
     return known.replace(CREDENTIAL_IN_URL, "//***:***@");
 }
 
+/**
+ * Pull the readable part out of a failed sandbox command.
+ *
+ * E2B throws a CommandExitError whose message is only "exit status 1". The output that says what
+ * actually broke sits on the error itself, so reading the message alone records nothing useful and
+ * leaves a repair agent guessing.
+ */
+export function command_error_text(error: unknown): string {
+    const result = error as { stderr?: unknown; stdout?: unknown; exitCode?: unknown };
+    const parts = [result?.stderr, result?.stdout]
+        .filter((part): part is string => typeof part === "string" && part.trim().length > 0)
+        .map((part) => part.trim());
+
+    if (parts.length > 0) return parts.join("\n");
+    return error instanceof Error ? error.message : String(error);
+}
+
 export default class SandboxStream {
     /**
      * Turn e2b's chunk callbacks into whole lines.

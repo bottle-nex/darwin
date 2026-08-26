@@ -16,7 +16,7 @@ import CapsuleWorkspace, {
 } from "./service.capsule_workspace";
 import GithubService from "./service.github";
 import E2B from "./services.e2b";
-import { redact } from "./service.sandbox_stream";
+import { command_error_text, redact } from "./service.sandbox_stream";
 
 const log = Logger.scope("product-diff");
 
@@ -267,10 +267,16 @@ export default class ProductDiffRunner {
         revision: CapsuleRevision,
         capsule_ids: string[],
     ): Promise<Record<string, GateResult>> {
-        const result = await sandbox.commands.run(
-            `node ${CHECK_ENTRY} ${dist_dir(revision)} '${JSON.stringify(capsule_ids)}'`,
-            { timeoutMs: CHECK_TIMEOUT_MS },
-        );
+        const result = await sandbox.commands
+            .run(`node ${CHECK_ENTRY} ${dist_dir(revision)} '${JSON.stringify(capsule_ids)}'`, {
+                timeoutMs: CHECK_TIMEOUT_MS,
+            })
+            .catch((error: unknown) => {
+                log.block(`${revision} check failure`, command_error_text(error));
+                return null;
+            });
+
+        if (!result) return {};
 
         const graded: Record<string, GateResult> = {};
         for (const line of result.stdout.split("\n")) {
