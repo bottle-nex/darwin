@@ -73,11 +73,13 @@ export function reject_split_fixture(entries: {
 
     for (const entry of present) {
         if (ANY_FIXTURE_IMPORT.test(entry) && !FIXTURE_IMPORT.test(entry)) {
-            return "each entry must import ./fixture.json so both revisions render identical data";
+            return "an entry reads a fixture other than ./fixture.json, so the two revisions would not render identical data";
         }
-        if (!FIXTURE_IMPORT.test(entry)) {
-            return "each entry must import its data from ./fixture.json";
-        }
+    }
+
+    const reading = present.filter((entry) => FIXTURE_IMPORT.test(entry));
+    if (reading.length > 0 && reading.length !== present.length) {
+        return "only one revision reads the fixture, so the two sides would not render identical data";
     }
     return null;
 }
@@ -114,8 +116,9 @@ ${styling}
 
 Write these files for each capsule below, under ${root}/<id>/
 
-1. fixture.json
-   The synthetic data the component needs. One file per capsule.
+1. fixture.json, only when the component actually takes data
+   A component that hardcodes its own content needs no fixture. Skip the file, and have the entries render the component with no props.
+   Otherwise: the synthetic data the component needs, one file per capsule.
    THIS FILE IS SHARED BY BOTH REVISIONS AND MUST STAY THAT WAY. Never write a second fixture. The reviewer is comparing before against after, so both sides must receive identical data. If the two sides get different data, every difference you invent shows up as a fake change in the review.
    Give it believable content, not "foo" and "bar". Realistic lengths matter: if a title is normally forty characters, do not write four.
 

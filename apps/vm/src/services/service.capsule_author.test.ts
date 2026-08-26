@@ -132,7 +132,19 @@ test("a head-only capsule cannot split its fixture", () => {
     expect(reject_split_fixture({ base: null, head: 'import f from "./fixture.json";' })).toBe(null);
 });
 
-test("an entry importing no fixture at all is rejected", () => {
-    const problem = reject_split_fixture({ base: null, head: "export default () => null;" });
-    expect(problem).toContain("fixture");
+test("a component that hardcodes its own content needs no fixture", () => {
+    const parameterless = "export default function Capsule() { return <LandingFooter />; }";
+    expect(reject_split_fixture({ base: parameterless, head: parameterless })).toBe(null);
+});
+
+test("a fixture read by only one side is rejected, since the sides would then differ", () => {
+    const problem = reject_split_fixture({
+        base: "export default () => <Thing />;",
+        head: 'import fixture from "./fixture.json";\nexport default () => <Thing {...fixture} />;',
+    });
+    expect(problem).toContain("identical");
+});
+
+test("a capsule with no entry at all is still rejected", () => {
+    expect(reject_split_fixture({ base: null, head: null })).toContain("no capsule entry");
 });

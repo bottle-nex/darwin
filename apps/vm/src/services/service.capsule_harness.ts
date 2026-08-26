@@ -59,6 +59,13 @@ export function resolve_aliases(
     aliases["next/font/google"] = `${harness}/shims/next-font.ts`;
     aliases["next/font/local"] = `${harness}/shims/next-font.ts`;
     aliases["next/navigation"] = `${harness}/shims/next-navigation.ts`;
+    aliases["next/dynamic"] = `${harness}/shims/next-dynamic.tsx`;
+    aliases["next/script"] = `${harness}/shims/next-script.tsx`;
+    aliases["next/head"] = `${harness}/shims/next-head.tsx`;
+    aliases["next/router"] = `${harness}/shims/next-router.ts`;
+    aliases["next/cache"] = `${harness}/shims/next-cache.ts`;
+    aliases["server-only"] = `${harness}/shims/passthrough.ts`;
+    aliases["client-only"] = `${harness}/shims/passthrough.ts`;
 
     if (profile.globalCssPath) {
         aliases[GLOBAL_CSS_ALIAS] = `${REPO_DIR}/${profile.globalCssPath}`;
@@ -269,17 +276,34 @@ export default function Link({ href, children, prefetch, replace, scroll, shallo
 }
 `;
 
-const NEXT_FONT_SHIM = `const face = { className: "", variable: "", style: { fontFamily: "inherit" } };
+const FONT_IMPORT = /import\s+([^;]*?)\s+from\s+["']next\/font\/(?:google|local)["']/g;
+
+export function font_names_from(sources: string): string[] {
+    const names = new Set<string>();
+
+    for (const [, clause] of sources.matchAll(FONT_IMPORT)) {
+        const named = clause?.match(/\{([^}]*)\}/)?.[1] ?? "";
+        for (const part of named.split(",")) {
+            const name = part.trim().split(/\s+as\s+/)[0]?.trim();
+            if (name && /^[A-Za-z_$][\w$]*$/.test(name)) names.add(name);
+        }
+    }
+    return [...names].sort();
+}
+
+export function render_font_shim(names: string[]): string {
+    const face = `const face = { className: "", variable: "", style: { fontFamily: "inherit" } };
 
 const load = () => face;
+`;
+    const exports = names.map((name) => `export const ${name} = load;`).join("\n");
 
-export const Inter = load;
-export const Geist = load;
-export const Geist_Mono = load;
-export const Roboto = load;
+    return `${face}
+${exports}${exports ? "\n" : ""}
 export default load;
 export { load as localFont };
 `;
+}
 
 const NEXT_NAVIGATION_SHIM = `const noop = () => {};
 
@@ -310,13 +334,81 @@ export function redirect() {}
 export function notFound() {}
 `;
 
-export function harness_files(): Record<string, string> {
+const NEXT_DYNAMIC_SHIM = `import { lazy, Suspense } from "react";
+
+export default function dynamic(loader, options = {}) {
+    const Loaded = lazy(() =>
+        Promise.resolve(loader()).then((module) =>
+            module && typeof module === "object" && "default" in module
+                ? module
+                : { default: module },
+        ),
+    );
+    const fallback = options.loading ? options.loading() : null;
+
+    return function Dynamic(props) {
+        return (
+            <Suspense fallback={fallback}>
+                <Loaded {...props} />
+            </Suspense>
+        );
+    };
+}
+`;
+
+const NEXT_SCRIPT_SHIM = `export default function Script() {
+    return null;
+}
+`;
+
+const NEXT_HEAD_SHIM = `export default function Head() {
+    return null;
+}
+`;
+
+const NEXT_ROUTER_SHIM = `const noop = () => {};
+
+export function useRouter() {
+    return {
+        pathname: "/",
+        route: "/",
+        query: {},
+        asPath: "/",
+        push: noop,
+        replace: noop,
+        reload: noop,
+        back: noop,
+        prefetch: () => Promise.resolve(),
+        events: { on: noop, off: noop, emit: noop },
+    };
+}
+
+export default { useRouter };
+`;
+
+const NEXT_CACHE_SHIM = `export function revalidatePath() {}
+export function revalidateTag() {}
+export function unstable_cache(fn) {
+    return fn;
+}
+`;
+
+const PASSTHROUGH_SHIM = `export {};
+`;
+
+export function harness_files(font_names: string[] = []): Record<string, string> {
     return {
         "network-stub.ts": NETWORK_STUB,
         "shims/next-image.tsx": NEXT_IMAGE_SHIM,
         "shims/next-link.tsx": NEXT_LINK_SHIM,
-        "shims/next-font.ts": NEXT_FONT_SHIM,
+        "shims/next-font.ts": render_font_shim(font_names),
         "shims/next-navigation.ts": NEXT_NAVIGATION_SHIM,
+        "shims/next-dynamic.tsx": NEXT_DYNAMIC_SHIM,
+        "shims/next-script.tsx": NEXT_SCRIPT_SHIM,
+        "shims/next-head.tsx": NEXT_HEAD_SHIM,
+        "shims/next-router.ts": NEXT_ROUTER_SHIM,
+        "shims/next-cache.ts": NEXT_CACHE_SHIM,
+        "shims/passthrough.ts": PASSTHROUGH_SHIM,
     };
 }
 
@@ -333,7 +425,8 @@ export default class CapsuleHarness {
         const harness = harness_dir(profile);
         await sandbox.commands.run(`rm -rf ${harness}/pages && mkdir -p ${harness}/shims`);
 
-        for (const [name, contents] of Object.entries(harness_files())) {
+        const fonts = await this.discover_fonts(sandbox, profile);
+        for (const [name, contents] of Object.entries(harness_files(fonts))) {
             await sandbox.files.write(`${harness}/${name}`, contents);
         }
 
@@ -362,6 +455,19 @@ export default class CapsuleHarness {
             `npm install --no-audit --no-fund ${harness_dependencies(profile).join(" ")}`,
             { cwd: harness_dir(profile), timeoutMs: 6 * 60_000 },
         );
+    }
+
+    private static async discover_fonts(
+        sandbox: Sandbox,
+        profile: AppProfile,
+    ): Promise<string[]> {
+        const found = await sandbox.commands
+            .run(
+                `grep -rhoE "import[^;]*from ['\"]next/font/(google|local)['\"]" ${app_root(profile)} --include=*.tsx --include=*.ts --exclude-dir=node_modules`,
+            )
+            .catch(() => null);
+
+        return font_names_from(found?.stdout ?? "");
     }
 
     private static async detect(sandbox: Sandbox, profile: AppProfile): Promise<HarnessOptions> {
