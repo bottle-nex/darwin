@@ -64,6 +64,24 @@ export function capsule_artifact_keys(manifest: CapsuleManifest | null): Set<str
     return keys;
 }
 
+const ENVIRONMENT_NOISE = [/^Failed to load resource:/i, /^[A-Z]+ \S+ failed$/];
+
+/**
+ * A capsule page is offline on purpose, so a blocked request says nothing about the change.
+ *
+ * The harness replaces fetch, XMLHttpRequest and WebSocket before any component runs, and the page
+ * is served self contained from object storage where a public/ path cannot resolve. Every external
+ * image, font and CDN script therefore fails by design. Reporting those as findings buries the one
+ * diagnostic that would have mattered under twenty that never could.
+ */
+export function is_environment_noise(diagnostic: string): boolean {
+    return ENVIRONMENT_NOISE.some((pattern) => pattern.test(diagnostic.trim()));
+}
+
+export function meaningful_diagnostics(diagnostics: string[]): string[] {
+    return diagnostics.filter((diagnostic) => !is_environment_noise(diagnostic));
+}
+
 export function capsule_control_hash(values: Record<string, CapsuleControlValue>): string {
     const query = new URLSearchParams();
     for (const [name, value] of Object.entries(values)) {

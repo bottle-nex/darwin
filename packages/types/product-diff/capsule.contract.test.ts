@@ -5,6 +5,8 @@ import {
     type CapsuleManifest,
     capsule_artifact_keys,
     is_capsule_manifest,
+    is_environment_noise,
+    meaningful_diagnostics,
 } from "./capsule.contract";
 
 function capsule(overrides: Partial<Capsule> = {}): Capsule {
@@ -80,4 +82,32 @@ test("only version 5 manifests are recognised", () => {
     expect(is_capsule_manifest(null)).toBe(false);
     expect(is_capsule_manifest({ version: 4, surfaces: [] })).toBe(false);
     expect(is_capsule_manifest({ targets: [], warnings: [] })).toBe(false);
+});
+
+test("a blocked external asset is not a finding about the change", () => {
+    expect(is_environment_noise("Failed to load resource: net::ERR_NAME_NOT_RESOLVED")).toBe(true);
+    expect(
+        is_environment_noise("Failed to load resource: the server responded with a status of 404"),
+    ).toBe(true);
+    expect(is_environment_noise("GET https://cdn.example.com/avatars/avatar-3.jpg failed")).toBe(
+        true,
+    );
+    expect(is_environment_noise("GET http://127.0.0.1:33677/fonts/Nocturn-semibold.woff2 failed")).toBe(
+        true,
+    );
+});
+
+test("an error the component itself raised is kept", () => {
+    expect(is_environment_noise("TypeError: issues.map is not a function")).toBe(false);
+    expect(is_environment_noise("Warning: Each child in a list needs a key")).toBe(false);
+});
+
+test("filtering leaves only what a reviewer can act on", () => {
+    expect(
+        meaningful_diagnostics([
+            "Failed to load resource: net::ERR_NAME_NOT_RESOLVED",
+            "TypeError: issues.map is not a function",
+            "GET https://cdn.example.com/a.jpg failed",
+        ]),
+    ).toEqual(["TypeError: issues.map is not a function"]);
 });

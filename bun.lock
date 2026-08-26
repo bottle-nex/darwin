@@ -302,6 +302,7 @@
       "name": "@trymatcha/capsule-check",
       "version": "0.0.0",
       "dependencies": {
+        "@trymatcha/types": "*",
         "@types/node": "^25.9.3",
         "playwright": "^1.50.0",
       },

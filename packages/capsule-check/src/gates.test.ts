@@ -8,7 +8,6 @@ function observation(overrides: Partial<PageObservation> = {}): PageObservation 
         timedOut: false,
         pageErrors: [],
         consoleErrors: [],
-        failedRequests: [],
         renderedHeight: 120,
         visibleTextLength: 40,
         imageCount: 0,
@@ -52,10 +51,7 @@ test("a mounted page that painted nothing visible is failed", () => {
 });
 
 test("a tall region holding no text and no images is still nothing visible", () => {
-    const result = grade_page(
-        "faq-item",
-        observation({ visibleTextLength: 0, imageCount: 0 }),
-    );
+    const result = grade_page("faq-item", observation({ visibleTextLength: 0, imageCount: 0 }));
     expect(result.fidelity).toBe("Failed");
     expect(result.diagnostics.join(" ")).toContain("rendered nothing visible");
 });
@@ -74,12 +70,18 @@ test("a console error on a page that still painted is partial, not failed", () =
     expect(result.diagnostics[0]).toContain("needs a key");
 });
 
-test("a failed request on a page that still painted is partial", () => {
+test("a blocked external asset leaves the page verified, because the sandbox blocked it", () => {
     const result = grade_page(
         "faq-item",
-        observation({ failedRequests: ["GET /fonts/inter.woff2 failed"] }),
+        observation({
+            consoleErrors: [
+                "Failed to load resource: net::ERR_NAME_NOT_RESOLVED",
+                "Failed to load resource: the server responded with a status of 404 (Not Found)",
+            ],
+        }),
     );
-    expect(result.fidelity).toBe("Partial");
+    expect(result.fidelity).toBe("Verified");
+    expect(result.diagnostics).toEqual([]);
 });
 
 test("diagnostics are capped so one noisy page cannot fill the manifest", () => {

@@ -1,3 +1,5 @@
+import { meaningful_diagnostics } from "@trymatcha/types";
+
 export type CapsuleFidelity = "Verified" | "Partial" | "Failed";
 
 export const MIN_VISIBLE_HEIGHT_PX = 24;
@@ -12,7 +14,6 @@ export interface PageObservation {
     timedOut: boolean;
     pageErrors: string[];
     consoleErrors: string[];
-    failedRequests: string[];
     renderedHeight: number;
     visibleTextLength: number;
     imageCount: number;
@@ -44,7 +45,10 @@ export function grade_page(capsule_id: string, observation: PageObservation): Ga
 
     if (observation.pageErrors.length > 0) return failed(observation.pageErrors);
     if (observation.timedOut) {
-        return failed([`the page timed out after ${PAGE_TIMEOUT_MS}ms`, ...observation.consoleErrors]);
+        return failed([
+            `the page timed out after ${PAGE_TIMEOUT_MS}ms`,
+            ...observation.consoleErrors,
+        ]);
     }
     if (!observation.mounted) {
         return failed([
@@ -59,7 +63,7 @@ export function grade_page(capsule_id: string, observation: PageObservation): Ga
         ]);
     }
 
-    const noise = [...observation.consoleErrors, ...observation.failedRequests];
+    const noise = meaningful_diagnostics(observation.consoleErrors);
     if (noise.length > 0) {
         return { capsuleId: capsule_id, fidelity: "Partial", diagnostics: trim(noise) };
     }

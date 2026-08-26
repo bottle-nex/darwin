@@ -14,24 +14,22 @@ const VIEWPORT = { width: 1280, height: 900 };
 interface PageSignals {
     pageErrors: string[];
     consoleErrors: string[];
-    failedRequests: string[];
 }
 
 function listen(page: Page): PageSignals {
-    const signals: PageSignals = { pageErrors: [], consoleErrors: [], failedRequests: [] };
+    const signals: PageSignals = { pageErrors: [], consoleErrors: [] };
 
     page.on("pageerror", (error) => signals.pageErrors.push(error.message));
     page.on("console", (message) => {
         if (message.type() === "error") signals.consoleErrors.push(message.text());
     });
-    page.on("requestfailed", (request) => {
-        signals.failedRequests.push(`${request.method()} ${request.url()} failed`);
-    });
 
     return signals;
 }
 
-async function measure(page: Page): Promise<Omit<PageObservation, keyof PageSignals | "mounted" | "timedOut">> {
+async function measure(
+    page: Page,
+): Promise<Omit<PageObservation, keyof PageSignals | "mounted" | "timedOut">> {
     return page.evaluate(() => {
         const root = document.getElementById("root");
         if (!root) return { renderedHeight: 0, visibleTextLength: 0, imageCount: 0 };

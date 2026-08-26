@@ -1,5 +1,10 @@
 "use client";
-import type { Capsule, CapsuleFidelity, CapsuleRevision } from "@trymatcha/types";
+import {
+    type Capsule,
+    type CapsuleFidelity,
+    type CapsuleRevision,
+    meaningful_diagnostics,
+} from "@trymatcha/types";
 import { useEffect, useRef, useState } from "react";
 
 import { MICRO_LABEL } from "@/components/playground/Core/components/paneBar";
@@ -128,12 +133,7 @@ export default function CapsuleComparison({
                 </div>
             </div>
 
-            <Diagnostics capsule={capsule} scale={scale} />
-
-            <p className="text-[12px] text-neutral-500">
-                Sample data — the values shown are synthetic and identical on both sides. Layout,
-                styling and behaviour are real.
-            </p>
+            {/*<Diagnostics capsule={capsule} scale={scale} />*/}
         </div>
     );
 }
@@ -236,8 +236,14 @@ function Frame({
 
 function Diagnostics({ capsule, scale }: { capsule: Capsule; scale: number }) {
     const notes = [
-        ...(capsule.base?.diagnostics ?? []).map((text) => ({ side: "Before", text })),
-        ...(capsule.head?.diagnostics ?? []).map((text) => ({ side: "After", text })),
+        ...meaningful_diagnostics(capsule.base?.diagnostics ?? []).map((text) => ({
+            side: "Before",
+            text,
+        })),
+        ...meaningful_diagnostics(capsule.head?.diagnostics ?? []).map((text) => ({
+            side: "After",
+            text,
+        })),
     ];
 
     return (
