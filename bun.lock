@@ -298,6 +298,21 @@
         "typescript": "^5",
       },
     },
+    "packages/capsule-check": {
+      "name": "@trymatcha/capsule-check",
+      "version": "0.0.0",
+      "dependencies": {
+        "@types/node": "^25.9.3",
+        "playwright": "^1.50.0",
+      },
+      "devDependencies": {
+        "@trymatcha/eslint-config": "*",
+        "@trymatcha/typescript-config": "*",
+        "@types/bun": "latest",
+        "tsup": "^8.0.0",
+        "typescript": "^5",
+      },
+    },
     "packages/config-eslint": {
       "name": "@trymatcha/eslint-config",
       "version": "0.0.0",
@@ -375,21 +390,6 @@
         "@types/bun": "latest",
       },
       "peerDependencies": {
-        "typescript": "^5",
-      },
-    },
-    "packages/preview-runner": {
-      "name": "@trymatcha/preview-runner",
-      "version": "0.0.0",
-      "dependencies": {
-        "playwright": "1.62.1",
-        "zod": "^4.4.3",
-      },
-      "devDependencies": {
-        "@trymatcha/typescript-config": "*",
-        "@types/bun": "latest",
-        "@types/node": "^25.9.3",
-        "tsup": "^8.0.0",
         "typescript": "^5",
       },
     },
@@ -1113,6 +1113,8 @@
 
     "@trymatcha/access-control": ["@trymatcha/access-control@workspace:packages/access-control"],
 
+    "@trymatcha/capsule-check": ["@trymatcha/capsule-check@workspace:packages/capsule-check"],
+
     "@trymatcha/database": ["@trymatcha/database@workspace:packages/database"],
 
     "@trymatcha/editorial": ["@trymatcha/editorial@workspace:packages/editorial"],
@@ -1120,8 +1122,6 @@
     "@trymatcha/eslint-config": ["@trymatcha/eslint-config@workspace:packages/config-eslint"],
 
     "@trymatcha/logger": ["@trymatcha/logger@workspace:packages/logger"],
-
-    "@trymatcha/preview-runner": ["@trymatcha/preview-runner@workspace:packages/preview-runner"],
 
     "@trymatcha/sandbox-mcp": ["@trymatcha/sandbox-mcp@workspace:packages/sandbox-mcp"],
 
