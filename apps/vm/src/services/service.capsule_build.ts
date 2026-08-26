@@ -58,7 +58,9 @@ export default class CapsuleBuild {
         for (const step of checkout_steps(profile, sha)) {
             await sandbox.commands.run(step, { cwd: REPO_DIR });
         }
-        await sandbox.commands.run(`rm -rf ${dist_dir(revision)} && mkdir -p ${dist_dir(revision)}`);
+        await sandbox.commands.run(
+            `rm -rf ${dist_dir(revision)} && mkdir -p ${dist_dir(revision)}`,
+        );
     }
 
     public static async build_capsule(

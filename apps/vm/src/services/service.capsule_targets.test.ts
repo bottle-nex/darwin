@@ -61,9 +61,7 @@ test("tests, stories and api routes are never previewed", () => {
 });
 
 test("the id is the whole path, so two Card.tsx never collide", () => {
-    expect(capsule_id("apps/web/components/board/Card.tsx")).toBe(
-        "apps-web-components-board-card",
-    );
+    expect(capsule_id("apps/web/components/board/Card.tsx")).toBe("apps-web-components-board-card");
     expect(capsule_id("apps/web/components/board/Card.tsx")).not.toBe(
         capsule_id("apps/web/components/marketing/Card.tsx"),
     );
@@ -71,8 +69,17 @@ test("the id is the whole path, so two Card.tsx never collide", () => {
 
 test("a server component is skipped with a reason the reviewer can read", () => {
     const { targets, warnings } = select_targets(
-        [{ change: "Modified", componentPath: "apps/web/app/Page.tsx", basePath: "apps/web/app/Page.tsx" }],
-        { "apps/web/app/Page.tsx": 'import { db } from "@/db";\n\nexport default async function Page() {}' },
+        [
+            {
+                change: "Modified",
+                componentPath: "apps/web/app/Page.tsx",
+                basePath: "apps/web/app/Page.tsx",
+            },
+        ],
+        {
+            "apps/web/app/Page.tsx":
+                'import { db } from "@/db";\n\nexport default async function Page() {}',
+        },
     );
     expect(targets).toHaveLength(0);
     expect(warnings[0]).toContain("apps/web/app/Page.tsx");
@@ -81,7 +88,13 @@ test("a server component is skipped with a reason the reviewer can read", () => 
 
 test("a file marked use server is skipped", () => {
     const { targets } = select_targets(
-        [{ change: "Modified", componentPath: "apps/web/actions/Save.tsx", basePath: "apps/web/actions/Save.tsx" }],
+        [
+            {
+                change: "Modified",
+                componentPath: "apps/web/actions/Save.tsx",
+                basePath: "apps/web/actions/Save.tsx",
+            },
+        ],
         { "apps/web/actions/Save.tsx": '"use server";\n\nexport function Save() {}' },
     );
     expect(targets).toHaveLength(0);
@@ -89,8 +102,17 @@ test("a file marked use server is skipped", () => {
 
 test("a client component survives selection", () => {
     const { targets, warnings } = select_targets(
-        [{ change: "Modified", componentPath: "apps/web/components/Card.tsx", basePath: "apps/web/components/Card.tsx" }],
-        { "apps/web/components/Card.tsx": '"use client";\n\nexport function Card() { return <div />; }' },
+        [
+            {
+                change: "Modified",
+                componentPath: "apps/web/components/Card.tsx",
+                basePath: "apps/web/components/Card.tsx",
+            },
+        ],
+        {
+            "apps/web/components/Card.tsx":
+                '"use client";\n\nexport function Card() { return <div />; }',
+        },
     );
     expect(warnings).toHaveLength(0);
     expect(targets).toEqual([

@@ -9,6 +9,7 @@ import { useProductDiff } from "@/hooks/project/useProductDiff";
 import { useProductDiffArtifacts } from "@/hooks/project/useProductDiffArtifacts";
 import { useRegenerateProductDiff } from "@/hooks/project/useRegenerateProductDiff";
 import { useActiveProject } from "@/hooks/useActiveProject";
+import type { CapsuleCompareMode, CapsuleViewport } from "@/types/capsule.type";
 
 import CapsuleComparison from "./CapsuleComparison";
 import CapsuleControls from "./CapsuleControls";
@@ -27,6 +28,8 @@ export default function DiffReviewDisplay({
 
     const [selectedId, setSelectedId] = useState("");
     const [controlValues, setControlValues] = useState<Record<string, string>>({});
+    const [viewport, setViewport] = useState<CapsuleViewport>("desktop");
+    const [mode, setMode] = useState<CapsuleCompareMode>("split");
 
     const capsules = useMemo(() => detail?.manifest?.capsules ?? [], [detail?.manifest]);
     const capsule = capsules.find((item) => item.id === selectedId) ?? capsules[0];
@@ -141,6 +144,10 @@ export default function DiffReviewDisplay({
                         capsule={capsule}
                         urls={urls ?? {}}
                         controlHash={controlHash}
+                        viewport={viewport}
+                        onViewportChange={setViewport}
+                        mode={mode}
+                        onModeChange={setMode}
                     />
                 </div>
             </div>
