@@ -1,5 +1,5 @@
-import { HiMenuAlt2 } from "react-icons/hi";
+import { HiBars3CenterLeft } from "react-icons/hi2";
 
 import { createIcon } from "../createIcon";
 
-export const GanttNavIcon = createIcon(HiMenuAlt2);
+export const GanttNavIcon = createIcon(HiBars3CenterLeft);

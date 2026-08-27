@@ -1,5 +1,5 @@
-import { HiOutlineAnnotation } from "react-icons/hi";
+import { HiOutlineChatBubbleLeftRight } from "react-icons/hi2";
 
 import { createIcon } from "../createIcon";
 
-export const ChatsNavIcon = createIcon(HiOutlineAnnotation);
+export const ChatsNavIcon = createIcon(HiOutlineChatBubbleLeftRight);
