@@ -39,7 +39,7 @@ export default function IssueSelectionBar() {
                     }}
                     className="pointer-events-none absolute inset-x-0 bottom-6 z-40 flex justify-center"
                 >
-                    <div className="pointer-events-auto flex items-center gap-1 rounded-full bg-cement py-1.75 pr-2 pl-5 shadow-xl shadow-black/20">
+                    <div className="pointer-events-auto flex items-center gap-1 rounded-lg bg-cement py-1.75 pr-2 pl-5 shadow-xl shadow-black/20">
                         <span className="text-[13px] text-snow/90">{ids.length} selected</span>
                         <span className="hidden text-[12px] text-neutral-500 sm:inline">
                             · press X to add
