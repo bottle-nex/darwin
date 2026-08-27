@@ -1,6 +1,6 @@
-import { NotificationsBellIcon } from "@trymatcha/ui/icons";
+"use client";
 
-("use client");
+import { NotificationsBellIcon } from "@trymatcha/ui/icons";
 
 export default function NotificationFeedEmpty({
     title,
