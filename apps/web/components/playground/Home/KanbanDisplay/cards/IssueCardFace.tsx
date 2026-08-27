@@ -1,7 +1,6 @@
 "use client";
+import { CalendarIcon, UnknownStatusIcon } from "@trymatcha/ui/icons";
 import type { ReactNode } from "react";
-import { HiCalendar } from "react-icons/hi2";
-import { LuCircleDashed } from "react-icons/lu";
 
 import PlaygroundAvatar from "@/components/playground/Core/components/PlaygroundAvatar";
 import { DATE_ICON_COLOR, PRIORITY_OPTIONS } from "@/components/playground/Issue/issueHelpers";
@@ -95,7 +94,7 @@ export default function IssueCardFace({
     children?: ReactNode;
 }) {
     const column = KanbanBoard.COLUMNS.find((c) => c.status === status);
-    const StatusIcon = column?.icon ?? LuCircleDashed;
+    const StatusIcon = column?.icon ?? UnknownStatusIcon;
     const priorityOption = PRIORITY_OPTIONS.find((option) => option.value === priority);
 
     const priorityChip =
@@ -141,7 +140,7 @@ export default function IssueCardFace({
                     {targetDate && (
                         <IconWrapper
                             variant="outline"
-                            icon={HiCalendar}
+                            icon={CalendarIcon}
                             iconClassName={DATE_ICON_COLOR.target}
                             className="px-2.5 text-neutral-300"
                         >

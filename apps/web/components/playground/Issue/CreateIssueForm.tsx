@@ -1,5 +1,5 @@
 "use client";
-import { MdOutlineKeyboardArrowRight } from "react-icons/md";
+import { BreadcrumbSeparatorIcon } from "@trymatcha/ui/icons";
 
 import { useActiveProject } from "@/hooks/useActiveProject";
 import type { IssueTarget } from "@/store/issues/useCreateIssueStore";
@@ -33,7 +33,7 @@ export default function CreateIssueForm({
                             className="uppercase"
                         />
                         <span>
-                            <MdOutlineKeyboardArrowRight />
+                            <BreadcrumbSeparatorIcon />
                         </span>
                         <span className="text-sm">New Issue</span>
                     </div>

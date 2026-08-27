@@ -1,8 +1,7 @@
 "use client";
+import { DeleteIcon, InviteMemberIcon } from "@trymatcha/ui/icons";
 import { useParams } from "next/navigation";
 import { useState } from "react";
-import { LuUserPlus } from "react-icons/lu";
-import { MdDelete } from "react-icons/md";
 
 import PlaygroundBreadcrumb from "@/components/playground/Core/components/PlaygroundBreadcrumb";
 import {
@@ -51,7 +50,7 @@ export default function PlaygroundTeamViewMain({ team }: PlaygroundTeamViewProps
                 <div className="flex shrink-0 items-center gap-1.5">
                     {isAdmin && (
                         <OptionButton
-                            icon={LuUserPlus}
+                            icon={InviteMemberIcon}
                             label="add user"
                             onClick={() => setInviteOpen(true)}
                         />
@@ -65,7 +64,7 @@ export default function PlaygroundTeamViewMain({ team }: PlaygroundTeamViewProps
                             aria-label="Delete team"
                             className="flex size-7 cursor-pointer items-center justify-center rounded-md text-neutral-400 hover:bg-white/5 hover:text-rose-300"
                         >
-                            <MdDelete className="size-4" aria-hidden />
+                            <DeleteIcon className="size-4" aria-hidden />
                         </Button>
                     </TooltipComponent>
                 </div>

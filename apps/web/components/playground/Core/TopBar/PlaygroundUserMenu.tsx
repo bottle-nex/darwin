@@ -1,9 +1,15 @@
 "use client";
+import type { IconType } from "@trymatcha/ui/icons";
+import {
+    AddIcon,
+    CheckIcon,
+    LogoutIcon,
+    SettingsIcon,
+    SubmenuDisclosureIcon,
+} from "@trymatcha/ui/icons";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
-import { type IconType } from "react-icons";
-import { MdAdd, MdCheck, MdKeyboardArrowRight, MdLogout, MdSettings } from "react-icons/md";
 
 import PlaygroundAvatar from "@/components/playground/Core/components/PlaygroundAvatar";
 import { PlaygroundTab } from "@/components/playground/playgroundTabs";
@@ -26,7 +32,7 @@ import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore"
 import { useUserSessionStore } from "@/store/user/useUserSessionStore";
 
 const MENU_ITEMS: { id: string; label: string; icon: IconType }[] = [
-    { id: "settings", label: "Settings", icon: MdSettings },
+    { id: "settings", label: "Settings", icon: SettingsIcon },
 ];
 
 function OrgSwitcherSubMenu() {
@@ -46,7 +52,7 @@ function OrgSwitcherSubMenu() {
                     <PlaygroundAvatar letter={activeOrgInitial} tone="emerald" size="sm" />
                     <span className="truncate">{activeOrgName}</span>
                 </span>
-                <MdKeyboardArrowRight className="size-3.5 text-neutral-500" aria-hidden />
+                <SubmenuDisclosureIcon className="size-3.5 text-neutral-500" aria-hidden />
             </DropdownMenuSubTrigger>
 
             <DropdownMenuSubContent className="max-h-80 w-60 overflow-y-auto p-1">
@@ -67,7 +73,7 @@ function OrgSwitcherSubMenu() {
                             />
                             <span className="min-w-0 flex-1 truncate">{org.name}</span>
                             {org.slug === orgSlug && (
-                                <MdCheck
+                                <CheckIcon
                                     className="size-3.5 shrink-0 text-neutral-400"
                                     aria-hidden
                                 />
@@ -79,7 +85,7 @@ function OrgSwitcherSubMenu() {
                 <DropdownMenuSeparator />
 
                 <DropdownMenuItem onSelect={() => router.push("/workspace")}>
-                    <MdAdd className="size-4 text-neutral-400" aria-hidden />
+                    <AddIcon className="size-4 text-neutral-400" aria-hidden />
                     Create organization
                 </DropdownMenuItem>
             </DropdownMenuSubContent>
@@ -151,7 +157,7 @@ export default function PlaygroundUserMenu() {
                         onSelect={() => signOut({ callbackUrl: "/" })}
                         variant="destructive"
                     >
-                        <MdLogout className="size-4" aria-hidden />
+                        <LogoutIcon className="size-4" aria-hidden />
                         Logout
                     </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -166,7 +172,7 @@ export default function PlaygroundUserMenu() {
                         aria-label="Settings"
                         className={SIDEBAR_ICON_BUTTON_CLASS}
                     >
-                        <MdSettings className="size-4" aria-hidden />
+                        <SettingsIcon className="size-4" aria-hidden />
                     </Button>
                 </TooltipComponent>
             </div>

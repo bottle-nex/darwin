@@ -1,7 +1,7 @@
+import { LoadingSpinnerIcon } from "@trymatcha/ui/icons";
 import { cva, type VariantProps } from "class-variance-authority";
 import { Slot } from "radix-ui";
 import * as React from "react";
-import { RiLoader4Line } from "react-icons/ri";
 
 import { cn } from "@/lib/utils";
 
@@ -71,7 +71,7 @@ export function Button({
     const replacesChildren = iconOnly ?? (typeof size === "string" && size.startsWith("icon"));
 
     const spinner = loading ? (
-        <RiLoader4Line aria-hidden className={cn("animate-spin", unstyled && "size-[1em]")} />
+        <LoadingSpinnerIcon aria-hidden className={cn("animate-spin", unstyled && "size-[1em]")} />
     ) : null;
 
     const rootClassName = unstyled

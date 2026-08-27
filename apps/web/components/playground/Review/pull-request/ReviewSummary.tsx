@@ -1,11 +1,16 @@
 "use client";
 import type { ReviewHeader, ReviewState } from "@trymatcha/types";
+import type { IconType } from "@trymatcha/ui/icons";
+import {
+    BranchMergeDirectionIcon,
+    ChangedFilesIcon,
+    CommentCountIcon,
+    CommitsIcon,
+    MergeIcon,
+    PullRequestClosedIcon,
+    PullRequestOpenIcon,
+} from "@trymatcha/ui/icons";
 import type { ReactNode } from "react";
-import type { IconType } from "react-icons";
-import { BiChat } from "react-icons/bi";
-import { GoGitCommit, GoGitMerge, GoGitPullRequest, GoGitPullRequestClosed } from "react-icons/go";
-import { LuFileDiff } from "react-icons/lu";
-import { MdChevronLeft } from "react-icons/md";
 
 import { formatRelativeTime } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -18,9 +23,9 @@ const MONO = "font-mono text-[11.5px] leading-none tracking-tight text-neutral-5
 const QUIET = "text-neutral-500";
 
 const STATE_STYLE: Record<ReviewState, { icon: IconType; label: string; tone: string }> = {
-    open: { icon: GoGitPullRequest, label: "Open", tone: "bg-green-500/12 text-green-400" },
-    merged: { icon: GoGitMerge, label: "Merged", tone: "bg-violet-500/12 text-violet-400" },
-    closed: { icon: GoGitPullRequestClosed, label: "Closed", tone: "bg-rose-500/12 text-rose-400" },
+    open: { icon: PullRequestOpenIcon, label: "Open", tone: "bg-green-500/12 text-green-400" },
+    merged: { icon: MergeIcon, label: "Merged", tone: "bg-violet-500/12 text-violet-400" },
+    closed: { icon: PullRequestClosedIcon, label: "Closed", tone: "bg-rose-500/12 text-rose-400" },
 };
 
 export default function ReviewSummary({ review }: { review: ReviewHeader }) {
@@ -64,7 +69,10 @@ export default function ReviewSummary({ review }: { review: ReviewHeader }) {
                     )}
                 >
                     <span className="truncate">{review.baseBranch}</span>
-                    <MdChevronLeft className="size-3.5 shrink-0 text-neutral-600" aria-hidden />
+                    <BranchMergeDirectionIcon
+                        className="size-3.5 shrink-0 text-neutral-600"
+                        aria-hidden
+                    />
                     <span className="truncate">{review.headBranch}</span>
                 </span>
                 <Dot />
@@ -72,7 +80,7 @@ export default function ReviewSummary({ review }: { review: ReviewHeader }) {
             </MetaRow>
 
             <MetaRow className="gap-x-4">
-                <Stat icon={LuFileDiff}>
+                <Stat icon={ChangedFilesIcon}>
                     <span className="tabular-nums">{review.changedFiles}</span>
                     <span className={QUIET}>{review.changedFiles === 1 ? "file" : "files"}</span>
                     <span className="tabular-nums">
@@ -80,11 +88,11 @@ export default function ReviewSummary({ review }: { review: ReviewHeader }) {
                         <span className="text-rose-500">−{review.deletions}</span>
                     </span>
                 </Stat>
-                <Stat icon={GoGitCommit}>
+                <Stat icon={CommitsIcon}>
                     <span className="tabular-nums">{review.commits}</span>
                     <span className={QUIET}>{review.commits === 1 ? "commit" : "commits"}</span>
                 </Stat>
-                <Stat icon={BiChat}>
+                <Stat icon={CommentCountIcon}>
                     <span className="tabular-nums">{review.comments}</span>
                     <span className={QUIET}>{review.comments === 1 ? "comment" : "comments"}</span>
                 </Stat>

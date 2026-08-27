@@ -1,9 +1,8 @@
 "use client";
+import { DeleteIcon, ProjectAvatarPickerIcon } from "@trymatcha/ui/icons";
 import { isAxiosError } from "axios";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { MdDelete } from "react-icons/md";
-import { PiSmileyFill } from "react-icons/pi";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -136,7 +135,10 @@ export default function ProjectSettingsGeneralSection({
                                 {icon ? (
                                     <IconPickGlyph pick={icon} className="size-4 text-base" />
                                 ) : (
-                                    <PiSmileyFill className="size-4 text-white/60" aria-hidden />
+                                    <ProjectAvatarPickerIcon
+                                        className="size-4 text-white/60"
+                                        aria-hidden
+                                    />
                                 )}
                             </Button>
                         </IconPicker>
@@ -207,7 +209,7 @@ export default function ProjectSettingsGeneralSection({
                             variant="destructive"
                             onClick={() => setConfirmOpen(true)}
                         >
-                            <MdDelete className="size-3" aria-hidden />
+                            <DeleteIcon className="size-3" aria-hidden />
                             Delete project
                         </Button>
                     }

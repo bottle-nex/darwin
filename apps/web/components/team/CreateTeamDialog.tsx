@@ -1,7 +1,7 @@
 "use client";
+import { BreadcrumbSeparatorIcon } from "@trymatcha/ui/icons";
 import { isAxiosError } from "axios";
 import { useState } from "react";
-import { MdOutlineKeyboardArrowRight } from "react-icons/md";
 
 import PlaygroundAvatar, {
     toneFor,
@@ -96,7 +96,7 @@ function CreateTeamForm({ projectId, onClose }: { projectId: string | null; onCl
                         className="uppercase"
                     />
                     <span>
-                        <MdOutlineKeyboardArrowRight />
+                        <BreadcrumbSeparatorIcon />
                     </span>
                     <span className="text-sm">New Team</span>
                 </div>

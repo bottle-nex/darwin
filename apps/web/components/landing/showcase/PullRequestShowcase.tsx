@@ -1,9 +1,14 @@
 "use client";
 
+import {
+    AttachmentCountIcon,
+    CommentCountIcon,
+    ShowcaseDueDateIcon,
+    ShowcaseReplyIndicatorIcon,
+} from "@trymatcha/ui/icons";
 import { motion } from "motion/react";
 import Image from "next/image";
 import { memo } from "react";
-import { LuAlarmClock, LuCornerDownRight, LuMessageSquare, LuPaperclip } from "react-icons/lu";
 
 import { appear, EASE_OUT, MockScene, PanelCard } from "./MockWindow";
 import ShowcaseFrame from "./ShowcaseFrame";
@@ -76,15 +81,15 @@ function TaskCard({ task }: { task: ReviewTask }) {
                 {task.description}
             </p>
             <div className="mt-3 flex items-center gap-3.5 text-[11px] text-neutral-500">
-                <LuCornerDownRight className="size-3.5" />
+                <ShowcaseReplyIndicatorIcon className="size-3.5" />
                 <span className="flex items-center gap-1">
-                    <LuMessageSquare className="size-3" /> {task.comments}
+                    <CommentCountIcon className="size-3" /> {task.comments}
                 </span>
                 <span className="flex items-center gap-1">
-                    <LuPaperclip className="size-3" /> {task.files}
+                    <AttachmentCountIcon className="size-3" /> {task.files}
                 </span>
                 <span className="flex items-center gap-1">
-                    <LuAlarmClock className="size-3" /> {task.eta}
+                    <ShowcaseDueDateIcon className="size-3" /> {task.eta}
                 </span>
             </div>
             <div className="mt-3.5 flex items-center gap-2.5 border-t border-white/4 pt-3">

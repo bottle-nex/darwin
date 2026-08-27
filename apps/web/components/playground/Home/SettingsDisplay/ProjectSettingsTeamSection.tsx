@@ -1,5 +1,5 @@
 "use client";
-import { MdAdd, MdDelete } from "react-icons/md";
+import { AddIcon, DeleteIcon } from "@trymatcha/ui/icons";
 
 import PlaygroundAvatar from "@/components/playground/Core/components/PlaygroundAvatar";
 import { Button } from "@/components/ui/button";
@@ -38,7 +38,7 @@ export default function ProjectSettingsTeamSection({
                             setOpen(true);
                         }}
                     >
-                        <MdAdd className="size-3" aria-hidden />
+                        <AddIcon className="size-3" aria-hidden />
                         Add team
                     </Button>
                 )}
@@ -70,7 +70,7 @@ export default function ProjectSettingsTeamSection({
                                     onClick={() => requestDelete(t)}
                                     className="flex size-6 shrink-0 cursor-pointer items-center justify-center rounded text-neutral-400 hover:bg-neutral-700/50 hover:text-red-500"
                                 >
-                                    <MdDelete className="size-3" aria-hidden />
+                                    <DeleteIcon className="size-3" aria-hidden />
                                 </Button>
                             )}
                         </div>

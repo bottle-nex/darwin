@@ -1,6 +1,6 @@
+import { LinkedInLogoIcon, XLogoIcon } from "@trymatcha/ui/icons";
 import Image from "next/image";
 import Link from "next/link";
-import { FaLinkedinIn, FaXTwitter } from "react-icons/fa6";
 
 import Reveal from "@/components/utility/Reveal";
 import { azeretMono } from "@/lib/fonts";
@@ -71,7 +71,7 @@ export default function FoundersSection() {
                                             aria-label={`${founder.name} on LinkedIn`}
                                             className="text-neutral-500 transition-colors duration-200 hover:text-neutral-100"
                                         >
-                                            <FaLinkedinIn className="size-4" />
+                                            <LinkedInLogoIcon className="size-4" />
                                         </Link>
                                         <Link
                                             href={founder.x}
@@ -80,7 +80,7 @@ export default function FoundersSection() {
                                             aria-label={`${founder.name} on X`}
                                             className="text-neutral-500 transition-colors duration-200 hover:text-neutral-100"
                                         >
-                                            <FaXTwitter className="size-4" />
+                                            <XLogoIcon className="size-4" />
                                         </Link>
                                     </div>
                                 </div>

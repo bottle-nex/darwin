@@ -1,9 +1,9 @@
 "use client";
 
+import { CalendarNavNextIcon, CalendarNavPrevIcon } from "@trymatcha/ui/icons";
 import { addDays, isBefore, startOfDay } from "date-fns";
 import * as React from "react";
 import { type ChevronProps, DayPicker, type Matcher } from "react-day-picker";
-import { MdChevronLeft, MdChevronRight } from "react-icons/md";
 
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -30,9 +30,9 @@ function rangeModifiers(range?: CalendarRange): Record<string, Matcher> | undefi
 
 function Chevron({ orientation }: ChevronProps) {
     return orientation === "left" ? (
-        <MdChevronLeft className="size-4" />
+        <CalendarNavPrevIcon className="size-4" />
     ) : (
-        <MdChevronRight className="size-4" />
+        <CalendarNavNextIcon className="size-4" />
     );
 }
 

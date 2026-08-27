@@ -1,6 +1,6 @@
 "use client";
+import { GitBranchIcon, GithubLogoIcon, LoadingSpinnerIcon } from "@trymatcha/ui/icons";
 import { useMemo, useState } from "react";
-import { FaCodeBranch, FaGithub, FaSpinner } from "react-icons/fa6";
 
 import { CapsuleTrigger } from "@/components/playground/Issue/Capsule";
 import {
@@ -68,7 +68,7 @@ export default function CreateProjectDialogRepository({
                 disabled={!org || connect.isPending}
                 onClick={() => org && connect.mutate(org.id)}
             >
-                <FaGithub className="size-3.5 text-white/60" aria-hidden />
+                <GithubLogoIcon className="size-3.5 text-white/60" aria-hidden />
                 Connect GitHub
             </CapsuleTrigger>
         );
@@ -79,7 +79,7 @@ export default function CreateProjectDialogRepository({
             <Popover open={repoOpen} onOpenChange={setRepoOpen}>
                 <PopoverTrigger asChild>
                     <CapsuleTrigger>
-                        <FaGithub className="size-3.5 text-white/60" aria-hidden />
+                        <GithubLogoIcon className="size-3.5 text-white/60" aria-hidden />
                         <span className="max-w-52 truncate">
                             {selectedRepo?.fullName ?? "Repository"}
                         </span>
@@ -98,7 +98,7 @@ export default function CreateProjectDialogRepository({
                     >
                         {repos.isLoading ? (
                             <div className="flex items-center gap-2 px-2 py-2 text-xs text-neutral-500">
-                                <FaSpinner className="size-3 animate-spin" aria-hidden />
+                                <LoadingSpinnerIcon className="size-3 animate-spin" aria-hidden />
                                 Loading…
                             </div>
                         ) : filteredRepos.length === 0 ? (
@@ -124,7 +124,7 @@ export default function CreateProjectDialogRepository({
                 <Popover open={branchOpen} onOpenChange={setBranchOpen} modal>
                     <PopoverTrigger asChild>
                         <CapsuleTrigger>
-                            <FaCodeBranch className="size-3.5 text-white/60" aria-hidden />
+                            <GitBranchIcon className="size-3.5 text-white/60" aria-hidden />
                             <span className="max-w-40 truncate font-mono">{selectedBranch}</span>
                         </CapsuleTrigger>
                     </PopoverTrigger>

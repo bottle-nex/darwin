@@ -1,4 +1,4 @@
-import { FaCodePullRequest } from "react-icons/fa6";
+import { PullRequestOpenIcon } from "@trymatcha/ui/icons";
 
 import type { Issue } from "@/types/kanban";
 
@@ -12,7 +12,7 @@ export default function InReviewCard({ issue }: { issue: Issue }) {
             <div className="mt-2.5 flex flex-col gap-1.5">
                 <div className="flex items-center justify-between">
                     <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-violet-300">
-                        <FaCodePullRequest className="size-3" aria-hidden />
+                        <PullRequestOpenIcon className="size-3" aria-hidden />
                         {issue.pr?.number}
                     </span>
                     {issue.pr && (

@@ -1,4 +1,4 @@
-import { type IconType } from "react-icons";
+import type { IconType } from "@trymatcha/ui/icons";
 
 type PaneEmptyStateProps = {
     icon: IconType;

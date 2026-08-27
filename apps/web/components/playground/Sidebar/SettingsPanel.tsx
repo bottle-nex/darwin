@@ -1,13 +1,13 @@
 "use client";
-import { type IconType } from "react-icons";
+import type { IconType } from "@trymatcha/ui/icons";
 import {
-    HiOutlineArrowLeft,
-    HiOutlineDocumentText,
-    HiOutlineKey,
-    HiOutlinePaintBrush,
-    HiOutlinePencilSquare,
-    HiOutlineSquare3Stack3D,
-} from "react-icons/hi2";
+    EnvSecretIcon,
+    SettingsApiKeysIcon,
+    SettingsAppearanceIcon,
+    SettingsBackIcon,
+    SettingsGeneralIcon,
+    SettingsTemplatesIcon,
+} from "@trymatcha/ui/icons";
 
 import { useActiveProject } from "@/hooks/useActiveProject";
 
@@ -19,14 +19,14 @@ import Section from "./SidebarSection";
 type SettingsItem = { tab: PlaygroundTab; label: string; icon: IconType };
 
 const ACCOUNT_SETTINGS: SettingsItem[] = [
-    { tab: PlaygroundTab.SettingsAppearance, label: "Appearance", icon: HiOutlinePaintBrush },
-    { tab: PlaygroundTab.SettingsApiKeys, label: "API keys", icon: HiOutlineSquare3Stack3D },
+    { tab: PlaygroundTab.SettingsAppearance, label: "Appearance", icon: SettingsAppearanceIcon },
+    { tab: PlaygroundTab.SettingsApiKeys, label: "API keys", icon: SettingsApiKeysIcon },
 ];
 
 const PROJECT_SETTINGS: SettingsItem[] = [
-    { tab: PlaygroundTab.SettingsProject, label: "General", icon: HiOutlinePencilSquare },
-    { tab: PlaygroundTab.SettingsTemplates, label: "Issue templates", icon: HiOutlineDocumentText },
-    { tab: PlaygroundTab.SettingsEnv, label: "Environment variables", icon: HiOutlineKey },
+    { tab: PlaygroundTab.SettingsProject, label: "General", icon: SettingsGeneralIcon },
+    { tab: PlaygroundTab.SettingsTemplates, label: "Issue templates", icon: SettingsTemplatesIcon },
+    { tab: PlaygroundTab.SettingsEnv, label: "Environment variables", icon: EnvSecretIcon },
 ];
 
 export default function PlaygroundSidebarSettingsPanel({
@@ -52,7 +52,7 @@ export default function PlaygroundSidebarSettingsPanel({
         <div className="flex flex-col gap-3">
             <div className="flex flex-col gap-1">
                 <Row
-                    leading={{ kind: "icon", icon: HiOutlineArrowLeft }}
+                    leading={{ kind: "icon", icon: SettingsBackIcon }}
                     label="Back"
                     onClick={onBack}
                 />

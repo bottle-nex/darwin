@@ -7,6 +7,7 @@ import {
     type ThreadMessage,
     to_plain_text,
 } from "@trymatcha/types";
+import { CloseIcon, CommentCountIcon } from "@trymatcha/ui/icons";
 import {
     type FocusEvent,
     useCallback,
@@ -16,8 +17,6 @@ import {
     useRef,
     useState,
 } from "react";
-import { IoMdClose } from "react-icons/io";
-import { MdChat } from "react-icons/md";
 
 import LogoLoader from "@/components/app/LogoLoader";
 import { Button } from "@/components/ui/button";
@@ -531,7 +530,7 @@ export default function ChatThread({
                                 className="flex size-11 items-center justify-center rounded-2xl bg-charcoal text-neutral-500 ring-1 ring-white/10"
                                 aria-hidden
                             >
-                                <MdChat className="size-5" />
+                                <CommentCountIcon className="size-5" />
                             </span>
                             <p className="text-[13px] text-neutral-500">{emptyMessage}</p>
                         </div>
@@ -584,7 +583,7 @@ export default function ChatThread({
                                 aria-label="Cancel reply"
                                 className="flex size-6 shrink-0 cursor-pointer items-center justify-center rounded-md text-neutral-500 transition-colors hover:bg-white/6 hover:text-neutral-200"
                             >
-                                <IoMdClose className="size-3.5" />
+                                <CloseIcon className="size-3.5" />
                             </Button>
                         </div>
                     ) : null}

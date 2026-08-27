@@ -1,7 +1,7 @@
 "use client";
+import { CtaArrowIcon } from "@trymatcha/ui/icons";
 import { useInView } from "motion/react";
 import { useEffect, useRef, useState } from "react";
-import { BsChevronRight } from "react-icons/bs";
 
 import { cn } from "@/lib/utils";
 
@@ -99,7 +99,7 @@ export default function LandingFeatureShowcase() {
                             >
                                 <span className="font-mono text-xs">{feature.index}</span>
                                 <span className="text-sm">{feature.nav}</span>
-                                <BsChevronRight
+                                <CtaArrowIcon
                                     className={cn(
                                         "size-3.5 transition-all duration-300",
                                         active === i

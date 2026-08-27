@@ -1,6 +1,5 @@
 "use client";
-
-import { HiOutlineLockClosed } from "react-icons/hi2";
+import { AccessRestrictedIcon } from "@trymatcha/ui/icons";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -75,7 +74,7 @@ export default function PlaygroundSidebarRow({
 
             {isLocked && (
                 <span className="flex size-5 shrink-0 items-center justify-center text-neutral-400 ">
-                    <HiOutlineLockClosed className="size-3.5" />
+                    <AccessRestrictedIcon className="size-3.5" />
                 </span>
             )}
         </Button>

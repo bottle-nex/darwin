@@ -1,5 +1,5 @@
+import { FooterLinkHoverArrowIcon } from "@trymatcha/ui/icons";
 import Link from "next/link";
-import { FiArrowUpRight } from "react-icons/fi";
 
 import { cn } from "@/lib/utils";
 
@@ -99,7 +99,7 @@ export function Footer({ isMarkettingPage = false }: { isMarkettingPage?: boolea
                                                 )}
                                             >
                                                 {link.label}
-                                                <FiArrowUpRight className="size-3.5 -translate-y-px -translate-x-0.5 opacity-0 transition-[opacity,transform] duration-200 ease-out group-hover:translate-x-0 group-hover:opacity-100" />
+                                                <FooterLinkHoverArrowIcon className="size-3.5 -translate-y-px -translate-x-0.5 -rotate-135 opacity-0 transition-[opacity,transform] duration-200 ease-out group-hover:translate-x-0 group-hover:opacity-100" />
                                             </Link>
                                         </li>
                                     ))}

@@ -1,6 +1,6 @@
 "use client";
+import { CheckIcon } from "@trymatcha/ui/icons";
 import { type ReactNode, useState } from "react";
-import { MdCheck } from "react-icons/md";
 
 import {
     Command,
@@ -75,7 +75,7 @@ export default function PriorityCapsule({
                                     />
                                     <span className="flex-1">{option.label}</span>
                                     {option.value === value && (
-                                        <MdCheck className="size-4 text-neutral-200" />
+                                        <CheckIcon className="size-4 text-neutral-200" />
                                     )}
                                     <span className="w-3 text-right text-[12px] text-neutral-500">
                                         {option.rank}

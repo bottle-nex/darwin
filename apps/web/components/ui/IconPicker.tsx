@@ -1,8 +1,7 @@
 "use client";
 
+import { CheckIcon, ICONS } from "@trymatcha/ui/icons";
 import { useMemo, useState } from "react";
-import { MdCheck } from "react-icons/md";
-import { ICONS } from "@trymatcha/ui/icons";
 
 import { ColorPicker } from "@/components/ui/color-picker";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -100,7 +99,7 @@ function IconsTab({ onPick }: { onPick: (pick: IconPick) => void }) {
                         style={{ background: swatch }}
                         className="flex size-4.75 aspect-square cursor-pointer items-center justify-center rounded-full"
                     >
-                        {color === swatch && <MdCheck className="size-3.5 text-neutral-900" />}
+                        {color === swatch && <CheckIcon className="size-3.5 text-neutral-900" />}
                     </button>
                 ))}
 

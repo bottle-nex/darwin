@@ -1,8 +1,13 @@
 "use client";
+import type { IconType } from "@trymatcha/ui/icons";
+import {
+    CopyFieldIdIcon,
+    CopyFieldMarkdownIcon,
+    CopyFieldNumberIcon,
+    CopyFieldTitleIcon,
+    CopyFieldUrlIcon,
+} from "@trymatcha/ui/icons";
 import { isAxiosError } from "axios";
-import type { IconType } from "react-icons";
-import { LuFingerprint, LuHash, LuLink, LuType } from "react-icons/lu";
-import { TbFileInvoiceFilled } from "react-icons/tb";
 
 import { PRIORITY_TO_NUMBER } from "@/components/playground/Home/KanbanDisplay/customkanban/data";
 import { isEditable } from "@/components/playground/Issue/issueHelpers";
@@ -33,13 +38,13 @@ export const COPY_FIELDS: {
     icon: IconType;
     value: (issue: BoardIssue, url: string) => string;
 }[] = [
-    { label: "URL", icon: LuLink, value: (_issue, url) => url },
-    { label: "title", icon: LuType, value: (issue) => issue.title },
-    { label: "issue number", icon: LuHash, value: (issue) => `#${issue.number}` },
-    { label: "issue ID", icon: LuFingerprint, value: (issue) => issue.id },
+    { label: "URL", icon: CopyFieldUrlIcon, value: (_issue, url) => url },
+    { label: "title", icon: CopyFieldTitleIcon, value: (issue) => issue.title },
+    { label: "issue number", icon: CopyFieldNumberIcon, value: (issue) => `#${issue.number}` },
+    { label: "issue ID", icon: CopyFieldIdIcon, value: (issue) => issue.id },
     {
         label: "description as markdown",
-        icon: TbFileInvoiceFilled,
+        icon: CopyFieldMarkdownIcon,
         value: (issue) => htmlToMarkdown(issue.description),
     },
 ];

@@ -1,6 +1,5 @@
 "use client";
-
-import { HiOutlineRectangleGroup } from "react-icons/hi2";
+import { ProjectReferenceIcon } from "@trymatcha/ui/icons";
 
 import PlaygroundAvatar, {
     displayNameOf,
@@ -62,7 +61,7 @@ export default function UserInfoCard({ userId, fallbackName, fallbackImage }: Us
                 </div>
                 {member && project && (
                     <div className="flex items-center gap-2">
-                        <HiOutlineRectangleGroup className="size-3.5 shrink-0 text-neutral-500" />
+                        <ProjectReferenceIcon className="size-3.5 shrink-0 text-neutral-500" />
                         <span className="truncate">{project.name}</span>
                     </div>
                 )}

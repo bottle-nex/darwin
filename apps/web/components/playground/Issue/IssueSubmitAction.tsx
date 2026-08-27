@@ -1,9 +1,7 @@
 "use client";
+import { CommandKeyIcon, EnterKeyIcon, InlineHintIcon } from "@trymatcha/ui/icons";
 import { motion } from "motion/react";
 import type { ReactNode } from "react";
-import { GrReturn } from "react-icons/gr";
-import { LuInfo } from "react-icons/lu";
-import { MdOutlineKeyboardCommandKey } from "react-icons/md";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -27,7 +25,7 @@ export default function IssueSubmitAction({
         return (
             <section className={cn("h-fit flex items-center", className)}>
                 <div className="flex items-center gap-x-1 text-xs text-white/70">
-                    <LuInfo size={10} />
+                    <InlineHintIcon size={10} />
                     <span>
                         The agent has picked this issue up. It can&apos;t be edited while it runs.
                     </span>
@@ -51,11 +49,11 @@ export default function IssueSubmitAction({
                             {isEdit ? "Save" : "Create Issue"}
                             <ShortcutHint>
                                 {isMac ? (
-                                    <MdOutlineKeyboardCommandKey className="text-snow!" />
+                                    <CommandKeyIcon className="text-snow!" />
                                 ) : (
                                     <span className="text-[10px] text-snow!">Ctrl</span>
                                 )}
-                                <GrReturn className="text-snow!" />
+                                <EnterKeyIcon className="text-snow!" />
                             </ShortcutHint>
                         </Button>
                     </motion.div>

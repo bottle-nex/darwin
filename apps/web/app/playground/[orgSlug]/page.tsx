@@ -1,7 +1,7 @@
 "use client";
+import { LoadingSpinnerIcon } from "@trymatcha/ui/icons";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect } from "react";
-import { FaSpinner } from "react-icons/fa6";
 
 import PlaygroundShell from "@/components/playground/Core/PlaygroundShell";
 import CreateProjectDialog from "@/components/project/CreateProjectDialog";
@@ -60,7 +60,7 @@ export default function OrgRedirectPage() {
 
     return (
         <main className="flex h-dvh items-center justify-center bg-charcoal text-neutral-500">
-            {isPending ? <FaSpinner className="size-5 animate-spin" aria-hidden /> : null}
+            {isPending ? <LoadingSpinnerIcon className="size-5 animate-spin" aria-hidden /> : null}
         </main>
     );
 }

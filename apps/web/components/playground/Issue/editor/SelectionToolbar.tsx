@@ -2,19 +2,19 @@
 
 import type { Editor } from "@tiptap/core";
 import { BubbleMenu } from "@tiptap/react/menus";
-import { type ReactNode, useState } from "react";
 import {
-    LuBold,
-    LuChevronDown,
-    LuCode,
-    LuItalic,
-    LuLink,
-    LuList,
-    LuMinus,
-    LuQuote,
-    LuStrikethrough,
-    LuUnderline,
-} from "react-icons/lu";
+    BlockquoteFormatIcon,
+    BoldFormatIcon,
+    BulletListIcon,
+    CodeFormatIcon,
+    DropdownCaretIcon,
+    ItalicFormatIcon,
+    LinkFormatIcon,
+    StrikethroughFormatIcon,
+    TextParagraphIcon,
+    UnderlineFormatIcon,
+} from "@trymatcha/ui/icons";
+import { type ReactNode, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -24,23 +24,23 @@ import { HEADING_ITEMS, LIST_ITEMS, type SlashCommandItem } from "./commandItems
 type Dropdown = "text" | "list" | null;
 
 const MARKS = [
-    { name: "bold", icon: LuBold, label: "Bold" },
-    { name: "italic", icon: LuItalic, label: "Italic" },
-    { name: "underline", icon: LuUnderline, label: "Underline" },
-    { name: "strike", icon: LuStrikethrough, label: "Strikethrough" },
-    { name: "code", icon: LuCode, label: "Inline code" },
+    { name: "bold", icon: BoldFormatIcon, label: "Bold" },
+    { name: "italic", icon: ItalicFormatIcon, label: "Italic" },
+    { name: "underline", icon: UnderlineFormatIcon, label: "Underline" },
+    { name: "strike", icon: StrikethroughFormatIcon, label: "Strikethrough" },
+    { name: "code", icon: CodeFormatIcon, label: "Inline code" },
 ] as const;
 
 const PARAGRAPH: SlashCommandItem = {
     title: "Text",
-    icon: LuMinus,
+    icon: TextParagraphIcon,
     command: ({ editor }) => editor.chain().focus().setParagraph().run(),
 };
 
 const BLOCK_ITEMS: SlashCommandItem[] = [
     {
         title: "Blockquote",
-        icon: LuQuote,
+        icon: BlockquoteFormatIcon,
         command: ({ editor }) => editor.chain().focus().toggleBlockquote().run(),
     },
 ];
@@ -118,7 +118,7 @@ export default function SelectionToolbar({ editor }: { editor: Editor }) {
                     onClick={() => setDropdown(dropdown === "text" ? null : "text")}
                 >
                     <span className="text-[13px]">Aa</span>
-                    <LuChevronDown className="size-3 text-neutral-500" />
+                    <DropdownCaretIcon className="size-3 text-neutral-500" />
                 </ToolbarButton>
                 {dropdown === "text" && menu([PARAGRAPH, ...HEADING_ITEMS])}
             </div>
@@ -160,7 +160,7 @@ export default function SelectionToolbar({ editor }: { editor: Editor }) {
                 active={editor.isActive("link")}
                 onClick={() => editor.chain().focus().openLinkPrompt().run()}
             >
-                <LuLink className="size-4" />
+                <LinkFormatIcon className="size-4" />
             </ToolbarButton>
 
             <div className="relative">
@@ -169,8 +169,8 @@ export default function SelectionToolbar({ editor }: { editor: Editor }) {
                     active={dropdown === "list"}
                     onClick={() => setDropdown(dropdown === "list" ? null : "list")}
                 >
-                    <LuList className="size-4" />
-                    <LuChevronDown className="size-3 text-neutral-500" />
+                    <BulletListIcon className="size-4" />
+                    <DropdownCaretIcon className="size-3 text-neutral-500" />
                 </ToolbarButton>
                 {dropdown === "list" && menu(LIST_ITEMS)}
             </div>

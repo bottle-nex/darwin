@@ -1,6 +1,9 @@
 "use client";
-import { MdJoinLeft, MdPersonRemove } from "react-icons/md";
-import { PiDotsThreeOutlineVerticalLight } from "react-icons/pi";
+import {
+    InvitationPendingIcon,
+    OverflowMenuVerticalIcon,
+    RevokeInviteIcon,
+} from "@trymatcha/ui/icons";
 
 import PlaygroundAvatar, {
     initialOf,
@@ -81,7 +84,7 @@ export default function PlaygroundTeamMemberRow({
                 ) : (
                     <span className="inline-flex gap-x-1.25 max-w-full items-center truncate rounded-[4px] bg-pink-400/10 px-2 py-0.5 text-[11px] font-medium text-pink-300">
                         {pendingMember.status}
-                        <MdJoinLeft size={14} />
+                        <InvitationPendingIcon size={14} />
                     </span>
                 )}
             </div>
@@ -109,12 +112,12 @@ function RevokeInviteMenu({ invitationId, teamId }: { invitationId: string; team
                     className="rounded-sm p-0.5 text-neutral-500 outline-none hover:text-neutral-200 disabled:opacity-50 [&_svg]:size-4"
                     aria-label="Invite actions"
                 >
-                    <PiDotsThreeOutlineVerticalLight size={16} />
+                    <OverflowMenuVerticalIcon size={16} />
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-44">
                 <DropdownMenuItem className={"group"} onClick={() => revoke(invitationId)}>
-                    <MdPersonRemove
+                    <RevokeInviteIcon
                         className="size-4 text-neutral-400 group-hover:text-red-300"
                         aria-hidden
                     />

@@ -1,25 +1,24 @@
 import { type Notification, NotificationType } from "@trymatcha/types";
-import { format, formatDistanceToNowStrict, isToday, isYesterday } from "date-fns";
-import type { IconType } from "react-icons";
+import type { IconType } from "@trymatcha/ui/icons";
 import {
-    HiOutlineArrowPath,
-    HiOutlineArrowsRightLeft,
-    HiOutlineAtSymbol,
-    HiOutlineBell,
-    HiOutlineChatBubbleLeftRight,
-    HiOutlineCheckBadge,
-    HiOutlineExclamationTriangle,
-    HiOutlineFaceSmile,
-    HiOutlineHashtag,
-    HiOutlineKey,
-    HiOutlineNoSymbol,
-    HiOutlineRectangleGroup,
-    HiOutlineTrash,
-    HiOutlineUserGroup,
-    HiOutlineUserMinus,
-    HiOutlineUserPlus,
-} from "react-icons/hi2";
-
+    AccessChangedIcon,
+    CommentCountIcon,
+    DeleteIcon,
+    EmojiReactionIcon,
+    InviteAcceptedIcon,
+    IssueAssignedIcon,
+    IssueMovedIcon,
+    IssueReferencedIcon,
+    MentionIcon,
+    NotificationsBellIcon,
+    PersonRemovedNotificationIcon,
+    ProjectReferenceIcon,
+    RemovedFromOrgIcon,
+    StatusChangedIcon,
+    TeamEntityIcon,
+    WarningTriangleIcon,
+} from "@trymatcha/ui/icons";
+import { format, formatDistanceToNowStrict, isToday, isYesterday } from "date-fns";
 export type NotificationView = {
     actorId: string;
     actorName: string;
@@ -32,33 +31,39 @@ export type NotificationView = {
 type NotificationTheme = { icon: IconType; tint: string };
 
 const THEME: Record<NotificationType, NotificationTheme> = {
-    [NotificationType.IssueAssigned]: { icon: HiOutlineUserPlus, tint: "text-primary" },
-    [NotificationType.IssueUnassigned]: { icon: HiOutlineUserMinus, tint: "text-neutral-400" },
-    [NotificationType.ChatMention]: { icon: HiOutlineAtSymbol, tint: "text-primary" },
-    [NotificationType.ProjectChatMention]: { icon: HiOutlineAtSymbol, tint: "text-matcha" },
-    [NotificationType.TeamChatMention]: { icon: HiOutlineAtSymbol, tint: "text-matcha" },
-    [NotificationType.IssueStatusChanged]: { icon: HiOutlineArrowPath, tint: "text-matcha" },
+    [NotificationType.IssueAssigned]: { icon: IssueAssignedIcon, tint: "text-primary" },
+    [NotificationType.IssueUnassigned]: {
+        icon: PersonRemovedNotificationIcon,
+        tint: "text-neutral-400",
+    },
+    [NotificationType.ChatMention]: { icon: MentionIcon, tint: "text-primary" },
+    [NotificationType.ProjectChatMention]: { icon: MentionIcon, tint: "text-matcha" },
+    [NotificationType.TeamChatMention]: { icon: MentionIcon, tint: "text-matcha" },
+    [NotificationType.IssueStatusChanged]: { icon: StatusChangedIcon, tint: "text-matcha" },
     [NotificationType.IssuePriorityChanged]: {
-        icon: HiOutlineExclamationTriangle,
+        icon: WarningTriangleIcon,
         tint: "text-brick-foreground",
     },
-    [NotificationType.IssueMoved]: { icon: HiOutlineArrowsRightLeft, tint: "text-primary" },
+    [NotificationType.IssueMoved]: { icon: IssueMovedIcon, tint: "text-primary" },
     [NotificationType.IssueCommented]: {
-        icon: HiOutlineChatBubbleLeftRight,
+        icon: CommentCountIcon,
         tint: "text-primary",
     },
-    [NotificationType.IssueReferenced]: { icon: HiOutlineHashtag, tint: "text-primary" },
-    [NotificationType.IssueDeleted]: { icon: HiOutlineTrash, tint: "text-neutral-400" },
-    [NotificationType.InviteAccepted]: { icon: HiOutlineCheckBadge, tint: "text-matcha" },
-    [NotificationType.AddedToProject]: { icon: HiOutlineRectangleGroup, tint: "text-primary" },
-    [NotificationType.AddedToTeam]: { icon: HiOutlineUserGroup, tint: "text-primary" },
-    [NotificationType.RemovedFromTeam]: { icon: HiOutlineUserMinus, tint: "text-neutral-400" },
-    [NotificationType.RemovedFromOrg]: { icon: HiOutlineNoSymbol, tint: "text-brick-foreground" },
-    [NotificationType.RoleChanged]: { icon: HiOutlineKey, tint: "text-primary" },
-    [NotificationType.MessageReacted]: { icon: HiOutlineFaceSmile, tint: "text-matcha" },
+    [NotificationType.IssueReferenced]: { icon: IssueReferencedIcon, tint: "text-primary" },
+    [NotificationType.IssueDeleted]: { icon: DeleteIcon, tint: "text-neutral-400" },
+    [NotificationType.InviteAccepted]: { icon: InviteAcceptedIcon, tint: "text-matcha" },
+    [NotificationType.AddedToProject]: { icon: ProjectReferenceIcon, tint: "text-primary" },
+    [NotificationType.AddedToTeam]: { icon: TeamEntityIcon, tint: "text-primary" },
+    [NotificationType.RemovedFromTeam]: {
+        icon: PersonRemovedNotificationIcon,
+        tint: "text-neutral-400",
+    },
+    [NotificationType.RemovedFromOrg]: { icon: RemovedFromOrgIcon, tint: "text-brick-foreground" },
+    [NotificationType.RoleChanged]: { icon: AccessChangedIcon, tint: "text-primary" },
+    [NotificationType.MessageReacted]: { icon: EmojiReactionIcon, tint: "text-matcha" },
 };
 
-const FALLBACK_THEME: NotificationTheme = { icon: HiOutlineBell, tint: "text-neutral-400" };
+const FALLBACK_THEME: NotificationTheme = { icon: NotificationsBellIcon, tint: "text-neutral-400" };
 
 export function theme_of(notification: Notification): NotificationTheme {
     return THEME[notification.type] ?? FALLBACK_THEME;

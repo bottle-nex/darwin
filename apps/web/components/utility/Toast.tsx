@@ -1,15 +1,15 @@
 "use client";
+import type { IconType } from "@trymatcha/ui/icons";
+import {
+    CloseIcon,
+    ErrorCircleIcon,
+    StatusInfoIcon,
+    SuccessCircleIcon,
+    ToastDefaultIcon,
+    ToastWarningIcon,
+} from "@trymatcha/ui/icons";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { IconType } from "react-icons";
-import {
-    HiBell,
-    HiCheckCircle,
-    HiExclamationTriangle,
-    HiInformationCircle,
-    HiXCircle,
-    HiXMark,
-} from "react-icons/hi2";
 
 import { cn } from "@/lib/utils";
 import { useToastStore } from "@/store/toast/useToastStore";
@@ -41,11 +41,11 @@ const VIEWPORT_CLASSES: Record<ToastPosition, string> = {
 };
 
 const STATUS_CONFIG: Record<ToastStatus, { icon: IconType; iconClassName: string }> = {
-    default: { icon: HiBell, iconClassName: "text-neutral-300" },
-    success: { icon: HiCheckCircle, iconClassName: "text-matcha" },
-    info: { icon: HiInformationCircle, iconClassName: "text-blue-400" },
-    warning: { icon: HiExclamationTriangle, iconClassName: "text-yellow-400" },
-    error: { icon: HiXCircle, iconClassName: "text-rose-500" },
+    default: { icon: ToastDefaultIcon, iconClassName: "text-neutral-300" },
+    success: { icon: SuccessCircleIcon, iconClassName: "text-matcha" },
+    info: { icon: StatusInfoIcon, iconClassName: "text-blue-400" },
+    warning: { icon: ToastWarningIcon, iconClassName: "text-yellow-400" },
+    error: { icon: ErrorCircleIcon, iconClassName: "text-rose-500" },
 };
 
 type ToasterProps = {
@@ -256,7 +256,7 @@ function ToastCard({
                 aria-label="Dismiss notification"
                 className="absolute top-2 right-2 flex size-5 items-center justify-center rounded-md text-neutral-600 opacity-0 transition-opacity group-hover:opacity-100 hover:bg-white/6 hover:text-neutral-200 focus-visible:opacity-100 focus-visible:outline-none"
             >
-                <HiXMark className="size-3" aria-hidden />
+                <CloseIcon className="size-3" aria-hidden />
             </button>
         </motion.div>
     );

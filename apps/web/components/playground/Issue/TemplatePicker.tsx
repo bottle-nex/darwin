@@ -1,9 +1,11 @@
 "use client";
 
+import {
+    DefaultTemplateIcon,
+    TemplateFallbackIcon,
+    TemplateTriggerIcon,
+} from "@trymatcha/ui/icons";
 import { useState } from "react";
-import { FaLongArrowAltRight } from "react-icons/fa";
-import { MdStar } from "react-icons/md";
-import { TbTemplateFilled } from "react-icons/tb";
 
 import { Command, CommandGroup, CommandItem, CommandList } from "@/components/ui/command";
 import { IconPickGlyph } from "@/components/ui/IconPicker";
@@ -42,11 +44,14 @@ export default function TemplatePicker({ projectId, onPick }: TemplatePickerProp
                 {template.icon ? (
                     <IconPickGlyph pick={template.icon} className="size-3.5 shrink-0" />
                 ) : (
-                    <FaLongArrowAltRight className="size-3.5 shrink-0 text-white/30" aria-hidden />
+                    <TemplateFallbackIcon className="size-3.5 shrink-0 text-white/30" aria-hidden />
                 )}
                 <span className="min-w-0 flex-1 truncate">{template.name}</span>
                 {template.id === defaultId && (
-                    <MdStar className="size-3.5 shrink-0 text-matcha" aria-label="Default" />
+                    <DefaultTemplateIcon
+                        className="size-3.5 shrink-0 text-matcha"
+                        aria-label="Default"
+                    />
                 )}
             </CommandItem>
         );
@@ -60,7 +65,7 @@ export default function TemplatePicker({ projectId, onPick }: TemplatePickerProp
                         aria-label="Start from a template"
                         className="size-7 shrink-0 justify-center rounded-full p-0 hover:text-white/80"
                     >
-                        <TbTemplateFilled className="size-3.5 text-white/60" />
+                        <TemplateTriggerIcon className="size-3.5 text-white/60" />
                     </CapsuleTrigger>
                 </PopoverTrigger>
             </TooltipComponent>

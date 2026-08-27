@@ -1,9 +1,13 @@
 "use client";
 import type { CapsuleControl } from "@trymatcha/types";
+import {
+    CapsuleSplitViewIcon,
+    DesktopViewportIcon,
+    MobileViewportIcon,
+    OptionsMenuIcon,
+    SliderCompareIcon,
+} from "@trymatcha/ui/icons";
 import { useState } from "react";
-import { IoDesktopOutline } from "react-icons/io5";
-import { LuSlidersHorizontal } from "react-icons/lu";
-import { MdCompare, MdOutlinePhoneIphone, MdVerticalSplit } from "react-icons/md";
 
 import { BLURRED_BG_TWO } from "@/components/playground/Home/KanbanDisplay/cardStyles";
 import { Button } from "@/components/ui/button";
@@ -16,8 +20,8 @@ import CapsuleControls from "./CapsuleControls";
 import SegmentedControl, { type SegmentedOption } from "./SegmentedControl";
 
 const VIEWPORTS: SegmentedOption<CapsuleViewport>[] = [
-    { value: "desktop", label: "Desktop", icon: IoDesktopOutline },
-    { value: "mobile", label: "Mobile", icon: MdOutlinePhoneIphone },
+    { value: "desktop", label: "Desktop", icon: DesktopViewportIcon },
+    { value: "mobile", label: "Mobile", icon: MobileViewportIcon },
 ];
 
 export default function CapsuleToolbar({
@@ -42,8 +46,13 @@ export default function CapsuleToolbar({
     const glass = useUserConfig().backgroundLightingEnabled;
 
     const modes: SegmentedOption<CapsuleCompareMode>[] = [
-        { value: "split", label: "Split", icon: MdVerticalSplit },
-        { value: "slider", label: "Slider", icon: MdCompare, disabledReason: sliderDisabledReason },
+        { value: "split", label: "Split", icon: CapsuleSplitViewIcon },
+        {
+            value: "slider",
+            label: "Slider",
+            icon: SliderCompareIcon,
+            disabledReason: sliderDisabledReason,
+        },
     ];
 
     return (
@@ -107,7 +116,7 @@ function PropsMenu({
                             : "border-transparent text-neutral-500 hover:text-neutral-300",
                     )}
                 >
-                    <LuSlidersHorizontal className="size-3.5" aria-hidden />
+                    <OptionsMenuIcon className="size-3.5" aria-hidden />
                     Props
                 </Button>
             </PopoverTrigger>

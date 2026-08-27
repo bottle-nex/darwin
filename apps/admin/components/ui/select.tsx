@@ -2,9 +2,8 @@
 
 import * as React from "react";
 import * as SelectPrimitive from "@radix-ui/react-select";
-import { MdCheck, MdKeyboardArrowDown, MdKeyboardArrowUp } from "react-icons/md";
-
 import { cn } from "@/lib/utils";
+import { CheckIcon, DropdownCaretIcon, DropdownCaretUpIcon } from "@trymatcha/ui/icons";
 
 function Select({ ...props }: React.ComponentProps<typeof SelectPrimitive.Root>) {
     return <SelectPrimitive.Root data-slot="select" {...props} />;
@@ -38,7 +37,7 @@ function SelectTrigger({
         >
             {children}
             <SelectPrimitive.Icon asChild>
-                <MdKeyboardArrowDown className="size-4 opacity-50" />
+                <DropdownCaretIcon className="size-4 opacity-50" />
             </SelectPrimitive.Icon>
         </SelectPrimitive.Trigger>
     );
@@ -105,7 +104,7 @@ function SelectItem({
         >
             <span className="absolute right-2 flex size-3.5 items-center justify-center">
                 <SelectPrimitive.ItemIndicator>
-                    <MdCheck className="size-4" />
+                    <CheckIcon className="size-4" />
                 </SelectPrimitive.ItemIndicator>
             </span>
             <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
@@ -136,7 +135,7 @@ function SelectScrollUpButton({
             className={cn("flex cursor-default items-center justify-center py-1", className)}
             {...props}
         >
-            <MdKeyboardArrowUp className="size-4" />
+            <DropdownCaretUpIcon className="size-4" />
         </SelectPrimitive.ScrollUpButton>
     );
 }
@@ -151,7 +150,7 @@ function SelectScrollDownButton({
             className={cn("flex cursor-default items-center justify-center py-1", className)}
             {...props}
         >
-            <MdKeyboardArrowDown className="size-4" />
+            <DropdownCaretIcon className="size-4" />
         </SelectPrimitive.ScrollDownButton>
     );
 }

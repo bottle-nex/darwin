@@ -1,9 +1,8 @@
 "use client";
+import { BreadcrumbSeparatorIcon, ProjectAvatarPickerIcon } from "@trymatcha/ui/icons";
 import { useParams } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { useState } from "react";
-import { MdOutlineKeyboardArrowRight } from "react-icons/md";
-import { PiSmileyFill } from "react-icons/pi";
 
 import PlaygroundAvatar from "@/components/playground/Core/components/PlaygroundAvatar";
 import CreateProjectDialogDetailsStep from "@/components/project/CreateProjectDialogDetailsStep";
@@ -99,7 +98,7 @@ export default function CreateProjectDialog() {
                         className="uppercase"
                     />
                     <span>
-                        <MdOutlineKeyboardArrowRight />
+                        <BreadcrumbSeparatorIcon />
                     </span>
                     {!createdProjectId && (
                         <IconPicker open={iconOpen} onOpenChange={setIconOpen} onSelect={setIcon}>
@@ -122,13 +121,16 @@ export default function CreateProjectDialog() {
                                 {icon ? (
                                     <IconPickGlyph pick={icon} className="size-3.5 text-sm" />
                                 ) : (
-                                    <PiSmileyFill className="size-3.5 text-white/60" aria-hidden />
+                                    <ProjectAvatarPickerIcon
+                                        className="size-3.5 text-white/60"
+                                        aria-hidden
+                                    />
                                 )}
                             </Button>
                         </IconPicker>
                     )}
                     <span>
-                        <MdOutlineKeyboardArrowRight />
+                        <BreadcrumbSeparatorIcon />
                     </span>
                     <span className="text-sm">
                         {createdProjectId ? "Environment variables" : "New Project"}

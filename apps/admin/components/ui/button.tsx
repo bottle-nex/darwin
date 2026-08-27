@@ -3,7 +3,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { Slot } from "radix-ui";
 import { Azeret_Mono } from "next/font/google";
 import { cn } from "@/lib/utils";
-import { RiLoader4Line } from "react-icons/ri";
+import { LoadingSpinnerIcon } from "@trymatcha/ui/icons";
 
 export const azeretMono = Azeret_Mono({
     subsets: ["latin"],
@@ -77,7 +77,7 @@ export function Button({
     const replacesChildren = iconOnly ?? (typeof size === "string" && size.startsWith("icon"));
 
     const spinner = loading ? (
-        <RiLoader4Line aria-hidden className={cn("animate-spin", unstyled && "size-[1em]")} />
+        <LoadingSpinnerIcon aria-hidden className={cn("animate-spin", unstyled && "size-[1em]")} />
     ) : null;
 
     const rootClassName = unstyled

@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReferencedIssueLabel } from "@trymatcha/types";
-import { LuCircleDashed } from "react-icons/lu";
+import { UnknownStatusIcon } from "@trymatcha/ui/icons";
 
 import { Button } from "@/components/ui/button";
 import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
@@ -15,7 +15,7 @@ const STATUS_STYLE = new Map(
 export default function IssueReferenceCard({ issue }: { issue: ReferencedIssueLabel }) {
     const openIssue = usePaneRouteStore((s) => s.openIssue);
     const status = issue.status ? STATUS_STYLE.get(issue.status) : undefined;
-    const StatusIcon = status?.icon ?? LuCircleDashed;
+    const StatusIcon = status?.icon ?? UnknownStatusIcon;
 
     return (
         <Button

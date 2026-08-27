@@ -1,7 +1,14 @@
 "use client";
 
+import {
+    AddIcon,
+    DefaultTemplateIcon,
+    DeleteIcon,
+    EditIcon,
+    MakeDefaultTemplateIcon,
+    TemplateDocumentIcon,
+} from "@trymatcha/ui/icons";
 import { useState } from "react";
-import { MdAdd, MdDelete, MdDescription, MdEdit, MdStar, MdStarOutline } from "react-icons/md";
 
 import { Button } from "@/components/ui/button";
 import { IconPickGlyph } from "@/components/ui/IconPicker";
@@ -76,7 +83,7 @@ export default function IssueTemplatesDisplay({ projectId }: { projectId: string
                     disabled={!projectId}
                     onClick={() => setView({ kind: "edit" })}
                 >
-                    <MdAdd className="size-3" aria-hidden />
+                    <AddIcon className="size-3" aria-hidden />
                     New template
                 </Button>
             }
@@ -113,7 +120,7 @@ export default function IssueTemplatesDisplay({ projectId }: { projectId: string
                                                     className="size-3.5 shrink-0 text-sm"
                                                 />
                                             ) : (
-                                                <MdDescription
+                                                <TemplateDocumentIcon
                                                     className="size-3.5 shrink-0 text-white/35"
                                                     aria-hidden
                                                 />
@@ -123,7 +130,10 @@ export default function IssueTemplatesDisplay({ projectId }: { projectId: string
                                             </h4>
                                             {template.isDefault && (
                                                 <span className="flex shrink-0 items-center gap-1 rounded-full bg-matcha/10 px-2 py-0.5 text-[10px] text-matcha">
-                                                    <MdStar className="size-2.5" aria-hidden />
+                                                    <DefaultTemplateIcon
+                                                        className="size-2.5"
+                                                        aria-hidden
+                                                    />
                                                     Default
                                                 </span>
                                             )}
@@ -140,7 +150,7 @@ export default function IssueTemplatesDisplay({ projectId }: { projectId: string
                                                         onClick={() => makeDefault(template)}
                                                         className="flex size-6 cursor-pointer items-center justify-center rounded text-neutral-400 hover:bg-neutral-700/50 hover:text-matcha disabled:opacity-40 [&_svg]:size-3"
                                                     >
-                                                        <MdStarOutline
+                                                        <MakeDefaultTemplateIcon
                                                             className="size-3"
                                                             aria-hidden
                                                         />
@@ -154,7 +164,7 @@ export default function IssueTemplatesDisplay({ projectId }: { projectId: string
                                                 onClick={() => setView({ kind: "edit", template })}
                                                 className="flex size-6 cursor-pointer items-center justify-center rounded text-neutral-400 hover:bg-neutral-700/50 hover:text-neutral-200"
                                             >
-                                                <MdEdit className="size-3" aria-hidden />
+                                                <EditIcon className="size-3" aria-hidden />
                                             </Button>
                                             <Button
                                                 variant="unstyled"
@@ -165,7 +175,7 @@ export default function IssueTemplatesDisplay({ projectId }: { projectId: string
                                                 onClick={() => setConfirmDelete(template)}
                                                 className="flex size-6 cursor-pointer items-center justify-center rounded text-neutral-400 hover:bg-neutral-700/50 hover:text-red-500 disabled:opacity-40 [&_svg]:size-3"
                                             >
-                                                <MdDelete className="size-3" aria-hidden />
+                                                <DeleteIcon className="size-3" aria-hidden />
                                             </Button>
                                         </menu>
                                     </article>

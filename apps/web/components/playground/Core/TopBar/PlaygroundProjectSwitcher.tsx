@@ -1,7 +1,7 @@
 "use client";
+import { CheckIcon, DropdownCaretIcon } from "@trymatcha/ui/icons";
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
-import { MdCheck, MdKeyboardArrowDown } from "react-icons/md";
 
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -52,7 +52,7 @@ export default function PlaygroundProjectSwitcher() {
                         letter={active?.name.slice(0, 2).toUpperCase() ?? "?"}
                     />
                     <span className="min-w-0 truncate">{active?.name ?? "Select a project"}</span>
-                    <MdKeyboardArrowDown className="size-4 shrink-0 text-neutral-500" aria-hidden />
+                    <DropdownCaretIcon className="size-4 shrink-0 text-neutral-500" aria-hidden />
                 </Button>
             </PopoverTrigger>
 
@@ -92,7 +92,7 @@ export default function PlaygroundProjectSwitcher() {
                                 />
                                 <span className="min-w-0 flex-1 truncate">{p.name}</span>
                                 {p.slug === projectSlug && (
-                                    <MdCheck
+                                    <CheckIcon
                                         className="size-3.5 shrink-0 text-neutral-400"
                                         aria-hidden
                                     />

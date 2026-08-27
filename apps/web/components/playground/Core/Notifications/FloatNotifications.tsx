@@ -1,8 +1,8 @@
 "use client";
 import { type Notification, NotificationScope } from "@trymatcha/types";
+import { CloseIcon } from "@trymatcha/ui/icons";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { useEffect, useState } from "react";
-import { HiXMark } from "react-icons/hi2";
 
 import PlaygroundAvatar, {
     toneFor,
@@ -162,7 +162,7 @@ function FloatNotificationCard({ notification, glass, onSelect }: FloatNotificat
                 aria-label="Dismiss notification"
                 className="absolute top-2 right-2 flex size-5 cursor-pointer items-center justify-center rounded-md text-neutral-500 opacity-0 transition-opacity group-hover:opacity-100 hover:bg-white/7 hover:text-neutral-100 focus-visible:opacity-100 focus-visible:outline-none"
             >
-                <HiXMark className="size-3" aria-hidden />
+                <CloseIcon className="size-3" aria-hidden />
             </button>
         </motion.div>
     );

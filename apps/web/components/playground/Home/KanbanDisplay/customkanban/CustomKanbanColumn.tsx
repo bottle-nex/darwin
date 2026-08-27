@@ -1,16 +1,16 @@
 "use client";
 import { SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { useState } from "react";
 import {
-    MdAdd,
-    MdChecklist,
-    MdClose,
-    MdDelete,
-    MdDragIndicator,
-    MdEdit,
-    MdMoreHoriz,
-} from "react-icons/md";
+    AddIcon,
+    BulkSelectIcon,
+    CloseIcon,
+    DeleteIcon,
+    DragHandleIcon,
+    EditIcon,
+    OverflowMenuIcon,
+} from "@trymatcha/ui/icons";
+import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -90,7 +90,7 @@ export default function CustomKanbanColumn({ column, draggable = true }: CustomK
                         aria-label={`Reorder ${column.title}`}
                         className="flex size-6 shrink-0 cursor-grab touch-none items-center justify-center rounded text-neutral-500 opacity-0 transition-opacity hover:bg-white/10 hover:text-neutral-300 group-hover:opacity-100 active:cursor-grabbing"
                     >
-                        <MdDragIndicator className="size-4" aria-hidden />
+                        <DragHandleIcon className="size-4" aria-hidden />
                     </Button>
                 )}
                 {renaming ? (
@@ -132,7 +132,7 @@ export default function CustomKanbanColumn({ column, draggable = true }: CustomK
                         aria-label={`Add an issue to ${column.title}`}
                         className="flex size-6 cursor-pointer items-center justify-center rounded text-neutral-400 opacity-0 transition-opacity hover:bg-white/10 hover:text-neutral-200 focus-visible:opacity-100 group-hover:opacity-100"
                     >
-                        <MdAdd className="size-4" aria-hidden />
+                        <AddIcon className="size-4" aria-hidden />
                     </Button>
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -142,7 +142,7 @@ export default function CustomKanbanColumn({ column, draggable = true }: CustomK
                                 aria-label={`${column.title} options`}
                                 className="flex size-6 cursor-pointer items-center justify-center rounded text-neutral-400 opacity-0 transition-opacity hover:bg-white/10 hover:text-neutral-200 focus-visible:opacity-100 group-hover:opacity-100 data-[state=open]:opacity-100"
                             >
-                                <MdMoreHoriz className="size-4" aria-hidden />
+                                <OverflowMenuIcon className="size-4" aria-hidden />
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-52">
@@ -155,7 +155,7 @@ export default function CustomKanbanColumn({ column, draggable = true }: CustomK
                                     )
                                 }
                             >
-                                <MdChecklist className="size-3.5" aria-hidden />
+                                <BulkSelectIcon className="size-3.5" aria-hidden />
                                 <span className="flex-1">Select loaded issues</span>
                                 <span className="text-[11px] text-neutral-500">
                                     {column.cards.length}
@@ -164,7 +164,7 @@ export default function CustomKanbanColumn({ column, draggable = true }: CustomK
 
                             {hasSelection && (
                                 <DropdownMenuItem onSelect={clearSelection}>
-                                    <MdClose className="size-3.5" aria-hidden />
+                                    <CloseIcon className="size-3.5" aria-hidden />
                                     <span className="flex-1">Clear selection</span>
                                 </DropdownMenuItem>
                             )}
@@ -175,7 +175,7 @@ export default function CustomKanbanColumn({ column, draggable = true }: CustomK
                                     setRenaming(true);
                                 }}
                             >
-                                <MdEdit className="size-3.5" aria-hidden />
+                                <EditIcon className="size-3.5" aria-hidden />
                                 <span className="flex-1">Rename list</span>
                             </DropdownMenuItem>
 
@@ -183,7 +183,7 @@ export default function CustomKanbanColumn({ column, draggable = true }: CustomK
                                 onSelect={() => removeColumn(column.id)}
                                 variant="destructive"
                             >
-                                <MdDelete className="size-3.5" aria-hidden />
+                                <DeleteIcon className="size-3.5" aria-hidden />
                                 <span className="flex-1">Delete list</span>
                             </DropdownMenuItem>
                         </DropdownMenuContent>
@@ -242,7 +242,7 @@ export default function CustomKanbanColumn({ column, draggable = true }: CustomK
                             }
                             className="w-full mt-2 flex shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-[9px] px-2 py-1.5 text-center text-[13px] font-medium text-neutral-400 opacity-0 transition-opacity hover:bg-white/5 hover:text-neutral-200 focus-visible:opacity-100 group-hover:opacity-100"
                         >
-                            <MdAdd className="size-3.5" aria-hidden />
+                            <AddIcon className="size-3.5" aria-hidden />
                             Add a card
                         </Button>
                     }

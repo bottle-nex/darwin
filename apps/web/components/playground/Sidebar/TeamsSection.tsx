@@ -1,9 +1,7 @@
 "use client";
 
+import { AddIcon, ChatsNavIcon, DeleteIcon, OverflowMenuIcon } from "@trymatcha/ui/icons";
 import { useParams } from "next/navigation";
-import { HiOutlineAnnotation } from "react-icons/hi";
-import { HiOutlinePlus, HiOutlineTrash } from "react-icons/hi2";
-import { MdMoreHoriz } from "react-icons/md";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -93,13 +91,13 @@ export default function PlaygroundSidebarTeamsSection() {
                                                 : "pointer-events-none opacity-0",
                                         )}
                                     >
-                                        <MdMoreHoriz className="size-4" aria-hidden />
+                                        <OverflowMenuIcon className="size-4" aria-hidden />
                                     </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end" className="w-40">
                                     {t.viewerRole && (
                                         <DropdownMenuItem onSelect={() => openTeamChat(t.id)}>
-                                            <HiOutlineAnnotation className="size-3.5" aria-hidden />
+                                            <ChatsNavIcon className="size-3.5" aria-hidden />
                                             <span className="flex-1">Chat</span>
                                         </DropdownMenuItem>
                                     )}
@@ -108,7 +106,7 @@ export default function PlaygroundSidebarTeamsSection() {
                                             variant="destructive"
                                             onSelect={() => requestDelete(t)}
                                         >
-                                            <HiOutlineTrash className="size-3.5" aria-hidden />
+                                            <DeleteIcon className="size-3.5" aria-hidden />
                                             <span className="flex-1">Delete</span>
                                         </DropdownMenuItem>
                                     )}
@@ -121,7 +119,7 @@ export default function PlaygroundSidebarTeamsSection() {
             {isAdmin && (
                 <Row
                     label="Add team"
-                    leading={{ kind: "icon", icon: HiOutlinePlus }}
+                    leading={{ kind: "icon", icon: AddIcon }}
                     onClick={openCreateTeam}
                 />
             )}

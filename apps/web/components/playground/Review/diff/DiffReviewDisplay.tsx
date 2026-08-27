@@ -1,9 +1,7 @@
 "use client";
 import type { Capsule } from "@trymatcha/types";
+import { DiffPreviewIcon, RetryActionIcon, WarningTriangleIcon } from "@trymatcha/ui/icons";
 import { useMemo, useState } from "react";
-import { FiRefreshCw } from "react-icons/fi";
-import { HiExclamationTriangle } from "react-icons/hi2";
-import { MdHorizontalSplit } from "react-icons/md";
 
 import LogoLoader from "@/components/app/LogoLoader";
 import { MICRO_LABEL } from "@/components/playground/Core/components/paneBar";
@@ -49,7 +47,7 @@ export default function DiffReviewDisplay({
 
     const retry = (
         <Button size="sm" loading={regenerate.isPending} onClick={handleRegenerate}>
-            <FiRefreshCw />
+            <RetryActionIcon />
             Retry
         </Button>
     );
@@ -57,7 +55,7 @@ export default function DiffReviewDisplay({
     if (!productDiffId) {
         return (
             <PaneEmptyState
-                icon={MdHorizontalSplit}
+                icon={DiffPreviewIcon}
                 title="No preview yet"
                 subtitle="A preview is built once the agent opens a frontend pull request for this issue."
             />
@@ -69,7 +67,7 @@ export default function DiffReviewDisplay({
     if (detail.status === "Pending" || detail.status === "Generating") {
         return (
             <PaneEmptyState
-                icon={MdHorizontalSplit}
+                icon={DiffPreviewIcon}
                 title={detail.status === "Pending" ? "Queued" : "Building"}
                 subtitle="Both revisions of every changed component are compiling in a clean sandbox. This updates on its own."
             />
@@ -79,7 +77,7 @@ export default function DiffReviewDisplay({
     if (detail.status === "Unsupported") {
         return (
             <PaneEmptyState
-                icon={MdHorizontalSplit}
+                icon={DiffPreviewIcon}
                 title="Nothing to preview"
                 subtitle={detail.error ?? "This pull request changes no previewable components."}
             />
@@ -89,7 +87,7 @@ export default function DiffReviewDisplay({
     if (detail.status === "Failed" || detail.status === "Stale") {
         return (
             <PaneEmptyState
-                icon={HiExclamationTriangle}
+                icon={WarningTriangleIcon}
                 title={detail.status === "Stale" ? "Out of date" : "Preview failed"}
                 subtitle={detail.error ?? "The pull request changed after this preview was built."}
             >
@@ -101,7 +99,7 @@ export default function DiffReviewDisplay({
     if (!capsule) {
         return (
             <PaneEmptyState
-                icon={MdHorizontalSplit}
+                icon={DiffPreviewIcon}
                 title="Nothing rendered"
                 subtitle="No component in this pull request could be rendered on its own."
             >

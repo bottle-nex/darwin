@@ -1,10 +1,7 @@
 "use client";
 import { type Chat, type LabelledReference, to_plain_text } from "@trymatcha/types";
+import { CopyIcon, DeleteIcon, EmojiReactionIcon, ReplyIcon } from "@trymatcha/ui/icons";
 import { useRef } from "react";
-import { BsReply } from "react-icons/bs";
-import { HiOutlineTrash } from "react-icons/hi";
-import { HiOutlineFaceSmile } from "react-icons/hi2";
-import { MdContentCopy } from "react-icons/md";
 
 import PlaygroundAvatar, {
     toneFor,
@@ -65,11 +62,11 @@ function CommentActions({
         <div className="absolute top-1.5 right-1.5 z-20 flex items-center gap-px rounded-lg border border-graphite/50 bg-charcoal p-0.5 opacity-0 shadow-lg transition-opacity group-hover/comment:opacity-100 focus-within:opacity-100 has-data-[state=open]:opacity-100">
             <EmojiPicker align="end" onSelect={(emoji) => onReaction(comment, emoji)}>
                 <ActionButton aria-label="Add reaction" disabled={reactionDisabled}>
-                    <HiOutlineFaceSmile className="size-3.5" />
+                    <EmojiReactionIcon className="size-3.5" />
                 </ActionButton>
             </EmojiPicker>
             <ActionButton aria-label="Reply" onClick={onReplyClick}>
-                <BsReply className="size-3.5" />
+                <ReplyIcon className="size-3.5" />
             </ActionButton>
             <ActionButton
                 aria-label="Copy comment"
@@ -79,7 +76,7 @@ function CommentActions({
                     )
                 }
             >
-                <MdContentCopy className="size-3" />
+                <CopyIcon className="size-3" />
             </ActionButton>
             {canDelete && (
                 <ActionButton
@@ -87,7 +84,7 @@ function CommentActions({
                     onClick={() => onDelete(comment)}
                     className="hover:bg-destructive/20 hover:text-destructive"
                 >
-                    <HiOutlineTrash className="size-3.5" />
+                    <DeleteIcon className="size-3.5" />
                 </ActionButton>
             )}
         </div>

@@ -1,7 +1,7 @@
 "use client";
+import { CloseIcon } from "@trymatcha/ui/icons";
 import { format, parseISO } from "date-fns";
 import { type ComponentProps, forwardRef } from "react";
-import { MdClose } from "react-icons/md";
 
 import { Button } from "@/components/ui/button";
 import IconWrapper from "@/components/ui/IconWrapper";
@@ -119,7 +119,7 @@ export default function FilterChipsBar() {
                         className="group shrink-0 cursor-pointer rounded-full"
                     >
                         <IconWrapper
-                            icon={MdClose}
+                            icon={CloseIcon}
                             variant="ghost"
                             className="size-6"
                             iconClassName="size-3"

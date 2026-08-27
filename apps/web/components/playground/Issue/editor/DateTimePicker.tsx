@@ -1,6 +1,5 @@
 "use client";
-
-import { LuChevronDown, LuChevronUp } from "react-icons/lu";
+import { StepperDecrementIcon, StepperIncrementIcon } from "@trymatcha/ui/icons";
 
 import { Button } from "@/components/ui/button";
 import { MENU_SURFACE } from "@/components/ui/menuSurface";
@@ -94,7 +93,7 @@ export default function DateTimePicker({
                             onClick={() => onStep(name, 1)}
                             className="cursor-pointer rounded-[3px] px-1 text-neutral-500 hover:bg-white/10 hover:text-neutral-200"
                         >
-                            <LuChevronUp className="size-3" />
+                            <StepperIncrementIcon className="size-3" />
                         </Button>
                         <Button
                             variant="unstyled"
@@ -118,7 +117,7 @@ export default function DateTimePicker({
                             onClick={() => onStep(name, -1)}
                             className="cursor-pointer rounded-[3px] px-1 text-neutral-500 hover:bg-white/10 hover:text-neutral-200"
                         >
-                            <LuChevronDown className="size-3" />
+                            <StepperDecrementIcon className="size-3" />
                         </Button>
                     </div>
                 ))}

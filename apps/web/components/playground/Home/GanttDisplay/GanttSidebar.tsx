@@ -1,4 +1,4 @@
-import { MdPause } from "react-icons/md";
+import { PausedStateIcon } from "@trymatcha/ui/icons";
 
 import { GanttTimeline } from "@/lib/gantt/GanttTimeline";
 
@@ -29,7 +29,7 @@ export default function GanttSidebar({ pausedWorkerIds }: { pausedWorkerIds: Set
                     </div>
                     {pausedWorkerIds.has(lane.id) && (
                         <span className="inline-flex w-fit items-center gap-1 rounded-full bg-amber-500/15 px-1.5 py-0.5 text-[10px] font-medium text-amber-400">
-                            <MdPause className="size-2.5" aria-hidden />
+                            <PausedStateIcon className="size-2.5" aria-hidden />
                             Paused
                         </span>
                     )}

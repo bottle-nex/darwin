@@ -1,17 +1,17 @@
 "use client";
-import { type ReactNode, useState } from "react";
-import { HiCalendar } from "react-icons/hi2";
 import {
-    LuColumns3,
-    LuCopy,
-    LuCopyPlus,
-    LuSquareArrowOutUpRight,
-    LuTag,
-    LuTrash2,
-    LuUsers,
-} from "react-icons/lu";
-import { MdCheck } from "react-icons/md";
-import { RxTriangleRight } from "react-icons/rx";
+    AssigneeGroupIcon,
+    CalendarIcon,
+    CheckIcon,
+    CopyIcon,
+    DeleteIcon,
+    DuplicateIcon,
+    ExternalLinkIcon,
+    KanbanColumnsIcon,
+    SubmenuDisclosureIcon,
+    TagIcon,
+} from "@trymatcha/ui/icons";
+import { type ReactNode, useState } from "react";
 
 import MemberOptionRow from "@/components/playground/Core/components/MemberOptionRow";
 import { PRIORITY_OPTIONS } from "@/components/playground/Issue/issueHelpers";
@@ -60,7 +60,7 @@ function Submenu({
                 onPointerEnter={() => !disabled && setOpen(true)}
             >
                 {trigger}
-                <RxTriangleRight className={CHEVRON} aria-hidden />
+                <SubmenuDisclosureIcon className={CHEVRON} aria-hidden />
             </ContextMenuSubTrigger>
             <ContextMenuSubContent className={className}>{children}</ContextMenuSubContent>
         </ContextMenuSub>
@@ -93,7 +93,7 @@ export default function IssueDropdown({
             <ContextMenuTrigger asChild>{children}</ContextMenuTrigger>
             <ContextMenuContent className="w-50">
                 <ContextMenuItem onSelect={actions.openInNewTab}>
-                    <LuSquareArrowOutUpRight className={ICON} aria-hidden />
+                    <ExternalLinkIcon className={ICON} aria-hidden />
                     <span className="flex-1">Open in new tab</span>
                 </ContextMenuItem>
 
@@ -120,7 +120,7 @@ export default function IssueDropdown({
                             <column.icon className={cn("size-3.5", column.titleBox)} aria-hidden />
                             <span className="flex-1">{column.title}</span>
                             {issue.status === column.status && (
-                                <MdCheck className="size-3.5 text-neutral-300" aria-hidden />
+                                <CheckIcon className="size-3.5 text-neutral-300" aria-hidden />
                             )}
                         </ContextMenuItem>
                     ))}
@@ -153,7 +153,7 @@ export default function IssueDropdown({
                             />
                             <span className="flex-1">{option.label}</span>
                             {issue.priority === PRIORITY_TO_NUMBER[option.value] && (
-                                <MdCheck className="size-3.5 text-neutral-300" aria-hidden />
+                                <CheckIcon className="size-3.5 text-neutral-300" aria-hidden />
                             )}
                         </ContextMenuItem>
                     ))}
@@ -164,7 +164,7 @@ export default function IssueDropdown({
                     className="w-52"
                     trigger={
                         <>
-                            <LuUsers className={ICON} aria-hidden />
+                            <AssigneeGroupIcon className={ICON} aria-hidden />
                             <span className="flex-1">Assignees</span>
                         </>
                     }
@@ -195,7 +195,7 @@ export default function IssueDropdown({
                     className="w-52"
                     trigger={
                         <>
-                            <LuTag className={ICON} aria-hidden />
+                            <TagIcon className={ICON} aria-hidden />
                             <span className="flex-1">Tags</span>
                         </>
                     }
@@ -215,7 +215,7 @@ export default function IssueDropdown({
                             />
                             <span className="flex-1 truncate">{tag.name}</span>
                             {actions.tagIds.has(tag.id) && (
-                                <MdCheck className="size-3.5 text-neutral-300" aria-hidden />
+                                <CheckIcon className="size-3.5 text-neutral-300" aria-hidden />
                             )}
                         </ContextMenuItem>
                     ))}
@@ -229,7 +229,7 @@ export default function IssueDropdown({
                     className="w-40"
                     trigger={
                         <>
-                            <HiCalendar className={ICON} aria-hidden />
+                            <CalendarIcon className={ICON} aria-hidden />
                             <span className="flex-1">Start date</span>
                         </>
                     }
@@ -249,7 +249,7 @@ export default function IssueDropdown({
                     className="w-40"
                     trigger={
                         <>
-                            <HiCalendar className={ICON} aria-hidden />
+                            <CalendarIcon className={ICON} aria-hidden />
                             <span className="flex-1">Target date</span>
                         </>
                     }
@@ -271,7 +271,7 @@ export default function IssueDropdown({
                     className="w-52"
                     trigger={
                         <>
-                            <LuColumns3 className={ICON} aria-hidden />
+                            <KanbanColumnsIcon className={ICON} aria-hidden />
                             <span className="flex-1">Move to</span>
                         </>
                     }
@@ -300,7 +300,7 @@ export default function IssueDropdown({
                     className="w-60"
                     trigger={
                         <>
-                            <LuCopy className={ICON} aria-hidden />
+                            <CopyIcon className={ICON} aria-hidden />
                             <span className="flex-1">Copy</span>
                         </>
                     }
@@ -321,7 +321,7 @@ export default function IssueDropdown({
                     ))}
                     <ContextMenuSeparator />
                     <ContextMenuItem onSelect={actions.duplicate}>
-                        <LuCopyPlus className={ICON} aria-hidden />
+                        <DuplicateIcon className={ICON} aria-hidden />
                         <span className="flex-1 whitespace-nowrap">Duplicate issue</span>
                     </ContextMenuItem>
                 </Submenu>
@@ -331,7 +331,7 @@ export default function IssueDropdown({
                     disabled={!editable}
                     onSelect={actions.requestDelete}
                 >
-                    <LuTrash2 className="size-3.5" aria-hidden />
+                    <DeleteIcon className="size-3.5" aria-hidden />
                     <span className="flex-1">Delete</span>
                 </ContextMenuItem>
             </ContextMenuContent>

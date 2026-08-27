@@ -4,9 +4,9 @@ import {
     type ThreadMessage,
     to_plain_text,
 } from "@trymatcha/types";
+import { DropdownCaretIcon } from "@trymatcha/ui/icons";
 import { motion } from "motion/react";
 import { useState } from "react";
-import { HiChevronDown } from "react-icons/hi2";
 
 import PlaygroundAvatar, {
     type AvatarTone,
@@ -372,7 +372,7 @@ export default function ChatMessage({
                                             animate={{ rotate: expanded ? 180 : 0 }}
                                             transition={EXPAND_TRANSITION}
                                         >
-                                            <HiChevronDown className="size-3" />
+                                            <DropdownCaretIcon className="size-3" />
                                         </motion.span>
                                     </Button>
                                     <MessageTime

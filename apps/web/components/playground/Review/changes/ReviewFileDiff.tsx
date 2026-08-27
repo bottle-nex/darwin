@@ -1,5 +1,6 @@
 "use client";
 import type { ReviewFile } from "@trymatcha/types";
+import { DiffExpandIcon, DiffFileRowIcon, ExternalLinkIcon } from "@trymatcha/ui/icons";
 import { useMemo, useState } from "react";
 import {
     computeNewLineNumber,
@@ -14,8 +15,6 @@ import {
     parseDiff,
     tokenize,
 } from "react-diff-view";
-import { GoFileCode } from "react-icons/go";
-import { LuChevronsUpDown, LuExternalLink } from "react-icons/lu";
 
 import { Button } from "@/components/ui/button";
 import { useReviewFileSource } from "@/hooks/review/useReviewFileSource";
@@ -82,7 +81,7 @@ export default function ReviewFileDiff({
     return (
         <section className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-lg border border-border bg-white/2">
             <header className="flex shrink-0 items-center gap-2 px-3 py-2.5">
-                <GoFileCode className="size-3.5 shrink-0 text-neutral-500" />
+                <DiffFileRowIcon className="size-3.5 shrink-0 text-neutral-500" />
                 <span className="shrink-0 font-headline text-[14px] font-medium text-neutral-100">
                     {name}
                 </span>
@@ -124,7 +123,7 @@ export default function ReviewFileDiff({
                         className="shrink-0 text-neutral-600 transition-colors hover:text-neutral-300"
                         aria-label={`Open ${name} on GitHub`}
                     >
-                        <LuExternalLink className="size-3.5" />
+                        <ExternalLinkIcon className="size-3.5" />
                     </a>
                 )}
             </header>
@@ -210,7 +209,7 @@ function HunkGap({ skipped, onExpand }: { skipped: number; onExpand?: () => void
                     onExpand && "cursor-pointer hover:bg-white/4 hover:text-neutral-300",
                 )}
             >
-                <LuChevronsUpDown className="size-3" />
+                <DiffExpandIcon className="size-3" />
                 {label}
             </Button>
         </Decoration>

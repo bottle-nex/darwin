@@ -1,6 +1,6 @@
 "use client";
+import { BreadcrumbSeparatorIcon } from "@trymatcha/ui/icons";
 import { useState } from "react";
-import { MdOutlineKeyboardArrowRight } from "react-icons/md";
 
 import PlaygroundAvatar, {
     toneFor,
@@ -58,7 +58,7 @@ export default function AddCustomColumnDialog() {
                                 className="uppercase"
                             />
                             <span>
-                                <MdOutlineKeyboardArrowRight />
+                                <BreadcrumbSeparatorIcon />
                             </span>
                             <span className="text-sm">New List</span>
                         </div>

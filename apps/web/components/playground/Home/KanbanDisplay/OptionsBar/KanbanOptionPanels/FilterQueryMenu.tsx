@@ -1,6 +1,6 @@
 "use client";
+import { SearchIcon } from "@trymatcha/ui/icons";
 import type { ReactNode } from "react";
-import { MdSearch } from "react-icons/md";
 
 import {
     DropdownMenu,
@@ -17,7 +17,7 @@ export function FilterQueryItems() {
 
     return (
         <div className="relative">
-            <MdSearch
+            <SearchIcon
                 className="pointer-events-none absolute top-1/2 left-2 size-3 -translate-y-1/2 text-neutral-500"
                 aria-hidden
             />

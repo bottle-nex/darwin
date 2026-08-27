@@ -1,6 +1,11 @@
 "use client";
-import { LuColumns3 } from "react-icons/lu";
-import { MdAutoAwesome, MdCheck, MdViewKanban, MdWindow } from "react-icons/md";
+import {
+    AgentIcon,
+    CheckIcon,
+    DefaultFocusIcon,
+    KanbanBoardLayoutIcon,
+    KanbanColumnsIcon,
+} from "@trymatcha/ui/icons";
 
 import {
     DropdownMenu,
@@ -35,10 +40,10 @@ export function FocusPanelItems({ value, onChange, customColumns }: FocusPanelPr
             <DropdownMenuLabel>Focus column</DropdownMenuLabel>
 
             <DropdownMenuItem onSelect={() => onChange({ kind: "default" })}>
-                <MdWindow className="size-3.5 text-neutral-400" aria-hidden />
+                <DefaultFocusIcon className="size-3.5 text-neutral-400" aria-hidden />
                 <span className="flex-1">Default</span>
                 {value.kind === "default" && (
-                    <MdCheck className="size-3.5 text-neutral-300" aria-hidden />
+                    <CheckIcon className="size-3.5 text-neutral-300" aria-hidden />
                 )}
             </DropdownMenuItem>
 
@@ -47,7 +52,10 @@ export function FocusPanelItems({ value, onChange, customColumns }: FocusPanelPr
                     className={`${FOCUS_PANEL_WIDTH} [direction:ltr]`}
                     trigger={
                         <>
-                            <MdViewKanban className="size-3.5 text-neutral-400" aria-hidden />
+                            <KanbanBoardLayoutIcon
+                                className="size-3.5 text-neutral-400"
+                                aria-hidden
+                            />
                             <span className="flex-1">Custom</span>
                         </>
                     }
@@ -59,14 +67,14 @@ export function FocusPanelItems({ value, onChange, customColumns }: FocusPanelPr
                         >
                             <span className="flex-1 truncate">{col.title}</span>
                             {value.kind === "custom" && value.columnId === col.id && (
-                                <MdCheck className="size-3.5 text-neutral-300" aria-hidden />
+                                <CheckIcon className="size-3.5 text-neutral-300" aria-hidden />
                             )}
                         </DropdownMenuItem>
                     ))}
                 </EagerSubmenu>
             ) : (
                 <DropdownMenuItem disabled>
-                    <MdViewKanban className="size-3.5 text-neutral-400" aria-hidden />
+                    <KanbanBoardLayoutIcon className="size-3.5 text-neutral-400" aria-hidden />
                     <span className="flex-1">Custom</span>
                     <span className="text-[11px] text-neutral-600">No lists yet</span>
                 </DropdownMenuItem>
@@ -76,7 +84,7 @@ export function FocusPanelItems({ value, onChange, customColumns }: FocusPanelPr
                 className={`${FOCUS_PANEL_WIDTH} [direction:ltr]`}
                 trigger={
                     <>
-                        <MdAutoAwesome className="size-3.5 text-neutral-400" aria-hidden />
+                        <AgentIcon className="size-3.5 text-neutral-400" aria-hidden />
                         <span className="flex-1">LLM</span>
                     </>
                 }
@@ -89,7 +97,7 @@ export function FocusPanelItems({ value, onChange, customColumns }: FocusPanelPr
                         <col.icon className={cn("size-3.5", col.titleBox)} aria-hidden />
                         <span className="flex-1">{col.title}</span>
                         {value.kind === "llm" && value.status === col.status && (
-                            <MdCheck className="size-3.5 text-neutral-300" aria-hidden />
+                            <CheckIcon className="size-3.5 text-neutral-300" aria-hidden />
                         )}
                     </DropdownMenuItem>
                 ))}
@@ -116,7 +124,7 @@ export default function FocusPanel({ value, onChange, customColumns }: FocusPane
                 <DropdownMenuTrigger asChild>
                     <OptionButton
                         label="Focus"
-                        icon={LuColumns3}
+                        icon={KanbanColumnsIcon}
                         active={value.kind !== "default"}
                     />
                 </DropdownMenuTrigger>

@@ -1,8 +1,7 @@
 import * as React from "react";
 import { OTPInput, OTPInputContext } from "input-otp";
-import { MdRemove } from "react-icons/md";
-
 import { cn } from "@/lib/utils";
+import { OtpSeparatorIcon } from "@trymatcha/ui/icons";
 
 const InputOTP = React.forwardRef<
     React.ElementRef<typeof OTPInput>,
@@ -61,7 +60,7 @@ const InputOTPSeparator = React.forwardRef<
     React.ComponentPropsWithoutRef<"div">
 >(({ ...props }, ref) => (
     <div ref={ref} role="separator" {...props}>
-        <MdRemove />
+        <OtpSeparatorIcon />
     </div>
 ));
 InputOTPSeparator.displayName = "InputOTPSeparator";

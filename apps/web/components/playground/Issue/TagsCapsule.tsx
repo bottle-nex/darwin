@@ -1,8 +1,7 @@
 "use client";
 
+import { AddIcon, CheckIcon, LoadingSpinnerIcon, TagIcon } from "@trymatcha/ui/icons";
 import { useState } from "react";
-import { MdAdd, MdCheck, MdLabel } from "react-icons/md";
-import { RiLoader4Line } from "react-icons/ri";
 
 import TagDisplay from "@/components/playground/Home/TagsDisplay/TagDisplay";
 import {
@@ -81,7 +80,7 @@ export default function TagsCapsule({
                 <CapsuleTrigger disabled={disabled} className={className}>
                     {selectedTags.length === 0 ? (
                         <>
-                            <MdLabel className="size-3.5 text-white/60" />
+                            <TagIcon className="size-3.5 text-white/60" />
                             {placeholder}
                         </>
                     ) : (
@@ -130,7 +129,7 @@ export default function TagsCapsule({
                                             className="flex-1"
                                         />
                                         {isSelected && (
-                                            <MdCheck className="size-4 shrink-0 text-neutral-400" />
+                                            <CheckIcon className="size-4 shrink-0 text-neutral-400" />
                                         )}
                                     </CommandItem>
                                 );
@@ -142,9 +141,9 @@ export default function TagsCapsule({
                                     onSelect={handleCreate}
                                 >
                                     {createTag.isPending ? (
-                                        <RiLoader4Line className="size-4 shrink-0 animate-spin text-neutral-400" />
+                                        <LoadingSpinnerIcon className="size-4 shrink-0 animate-spin text-neutral-400" />
                                     ) : (
-                                        <MdAdd className="size-4 shrink-0 text-neutral-400" />
+                                        <AddIcon className="size-4 shrink-0 text-neutral-400" />
                                     )}
                                     <span className="flex-1 truncate">
                                         Create &quot;{search.trim()}&quot;

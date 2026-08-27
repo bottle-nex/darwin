@@ -1,17 +1,17 @@
 "use client";
 
+import type { IconType } from "@trymatcha/ui/icons";
+import {
+    AttachmentCountIcon,
+    OverflowMenuIcon,
+    ShowcaseDueDateIcon,
+    ShowcaseKanbanViewIcon,
+    ShowcaseListViewIcon,
+    ShowcaseSubtaskCountIcon,
+    ShowcaseTimelineViewIcon,
+} from "@trymatcha/ui/icons";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { memo, useState } from "react";
-import type { IconType } from "react-icons";
-import {
-    BsArrowReturnRight,
-    BsBarChartSteps,
-    BsClock,
-    BsFiles,
-    BsKanban,
-    BsListUl,
-    BsThreeDots,
-} from "react-icons/bs";
 
 import { cn } from "@/lib/utils";
 
@@ -28,9 +28,9 @@ const BOARD_MODES: { value: BoardMode; label: string }[] = [
 ];
 
 const VIEW_TABS: { label: string; icon: IconType; active?: boolean }[] = [
-    { label: "Kanban", icon: BsKanban, active: true },
-    { label: "List", icon: BsListUl },
-    { label: "Timeline", icon: BsBarChartSteps },
+    { label: "Kanban", icon: ShowcaseKanbanViewIcon, active: true },
+    { label: "List", icon: ShowcaseListViewIcon },
+    { label: "Timeline", icon: ShowcaseTimelineViewIcon },
 ];
 
 type Task = {
@@ -235,15 +235,15 @@ function TaskCard({ task }: { task: Task }) {
             <p className="mt-2 truncate text-xs font-medium text-neutral-100">{task.title}</p>
             <div className="mt-2 flex items-center gap-2.5 text-[10px] text-neutral-500">
                 <span className="flex items-center gap-1">
-                    <BsArrowReturnRight className="size-2.5" />
+                    <ShowcaseSubtaskCountIcon className="size-2.5" />
                     {task.subtasks}
                 </span>
                 <span className="flex items-center gap-1">
-                    <BsFiles className="size-2.5" />
+                    <AttachmentCountIcon className="size-2.5" />
                     {task.files}
                 </span>
                 <span className="flex items-center gap-1">
-                    <BsClock className="size-2.5" />
+                    <ShowcaseDueDateIcon className="size-2.5" />
                     {task.due}
                 </span>
             </div>
@@ -336,7 +336,7 @@ export default memo(function BoardShowcase() {
                                                 />
                                                 {column.name}
                                             </span>
-                                            <BsThreeDots className="size-3 text-neutral-600" />
+                                            <OverflowMenuIcon className="size-3 text-neutral-600" />
                                         </div>
                                         <div className="mt-2.5 flex flex-col gap-2.5">
                                             {column.tasks.map((task) => (

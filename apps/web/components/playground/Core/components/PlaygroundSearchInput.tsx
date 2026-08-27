@@ -1,6 +1,6 @@
 "use client";
+import { SearchIcon } from "@trymatcha/ui/icons";
 import { useEffect, useRef } from "react";
-import { MdSearch } from "react-icons/md";
 
 import { Input } from "@/components/ui/input";
 
@@ -29,7 +29,7 @@ export default function PlaygroundSearchInput({
 
     return (
         <div className="relative flex w-full items-center">
-            <MdSearch
+            <SearchIcon
                 className="pointer-events-none absolute left-3 size-3.5 text-neutral-400"
                 aria-hidden
             />

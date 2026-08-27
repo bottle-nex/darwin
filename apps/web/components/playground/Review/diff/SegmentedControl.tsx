@@ -1,6 +1,6 @@
 "use client";
+import type { IconType } from "@trymatcha/ui/icons";
 import { motion } from "motion/react";
-import type { IconType } from "react-icons";
 
 import { Button } from "@/components/ui/button";
 import { TooltipComponent } from "@/components/ui/tooltip-component";

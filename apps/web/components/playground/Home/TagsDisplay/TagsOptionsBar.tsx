@@ -1,17 +1,18 @@
 "use client";
+import {
+    AddIcon,
+    CheckIcon,
+    ClockIcon,
+    CloseIcon,
+    DeleteIcon,
+    EditIcon,
+    SearchIcon,
+    SearchToggleIcon,
+    SortAlphabeticalIcon,
+    SortIcon,
+} from "@trymatcha/ui/icons";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useRef } from "react";
-import { LuArrowUpDown, LuSearch } from "react-icons/lu";
-import {
-    MdAccessTimeFilled,
-    MdAdd,
-    MdCheck,
-    MdClose,
-    MdDelete,
-    MdEdit,
-    MdSearch,
-    MdSortByAlpha,
-} from "react-icons/md";
 
 import PlaygroundBreadcrumb from "@/components/playground/Core/components/PlaygroundBreadcrumb";
 import {
@@ -28,9 +29,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { type TagSort, useTagsOptionsStore } from "@/store/tags/useTagsOptionsStore";
 
-const SORTS: { id: TagSort; label: string; icon: typeof MdSortByAlpha }[] = [
-    { id: "name", label: "Name (A–Z)", icon: MdSortByAlpha },
-    { id: "newest", label: "Newest first", icon: MdAccessTimeFilled },
+const SORTS: { id: TagSort; label: string; icon: typeof SortAlphabeticalIcon }[] = [
+    { id: "name", label: "Name (A–Z)", icon: SortAlphabeticalIcon },
+    { id: "newest", label: "Newest first", icon: ClockIcon },
 ];
 
 type TagsOptionsBarProps = {
@@ -84,19 +85,19 @@ export default function TagsOptionsBar({
             <PaneActionsSlot>
                 <div className="flex shrink-0 items-center gap-1.5">
                     {selectedCount === 1 && (
-                        <OptionButton label="Edit tag" icon={MdEdit} onClick={onEditSelected} />
+                        <OptionButton label="Edit tag" icon={EditIcon} onClick={onEditSelected} />
                     )}
 
                     {selectedCount > 0 && (
                         <>
                             <OptionButton
                                 label="Delete tag"
-                                icon={MdDelete}
+                                icon={DeleteIcon}
                                 onClick={onDeleteSelected}
                             />
                             <OptionButton
                                 label="Clear selection"
-                                icon={MdClose}
+                                icon={CloseIcon}
                                 onClick={onClearSelection}
                             />
                             <div className="mx-1 h-4 w-px bg-white/8" />
@@ -105,18 +106,14 @@ export default function TagsOptionsBar({
 
                     <OptionButton
                         label="Search"
-                        icon={LuSearch}
+                        icon={SearchToggleIcon}
                         active={searchOpen}
                         onClick={() => (searchOpen ? closeSearch() : openSearch())}
                     />
 
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <OptionButton
-                                label="Sort"
-                                icon={LuArrowUpDown}
-                                active={sort !== "name"}
-                            />
+                            <OptionButton label="Sort" icon={SortIcon} active={sort !== "name"} />
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-48">
                             {SORTS.map((option) => (
@@ -131,7 +128,7 @@ export default function TagsOptionsBar({
                                     />
                                     <span className="flex-1">{option.label}</span>
                                     {sort === option.id && (
-                                        <MdCheck
+                                        <CheckIcon
                                             className="size-3.5 text-neutral-200"
                                             aria-hidden
                                         />
@@ -143,7 +140,7 @@ export default function TagsOptionsBar({
 
                     <div className="mx-1 h-4 w-px bg-white/8" />
 
-                    <OptionButton label="New tag" icon={MdAdd} onClick={onCreate} />
+                    <OptionButton label="New tag" icon={AddIcon} onClick={onCreate} />
                 </div>
             </PaneActionsSlot>
         </>
@@ -172,7 +169,7 @@ function TagsSearchBar({ value, onChange, onClose }: TagsSearchBarProps) {
             transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
             className="relative flex shrink-0 items-center overflow-hidden"
         >
-            <MdSearch
+            <SearchIcon
                 className="pointer-events-none absolute left-2.5 size-3.5 text-neutral-500"
                 aria-hidden
             />
@@ -193,7 +190,7 @@ function TagsSearchBar({ value, onChange, onClose }: TagsSearchBarProps) {
                 aria-label="Close search"
                 className="absolute right-1.5 flex size-4 cursor-pointer items-center justify-center rounded-full bg-white/10 text-neutral-400 hover:bg-white/20 hover:text-neutral-100"
             >
-                <MdClose className="size-2.5" aria-hidden />
+                <CloseIcon className="size-2.5" aria-hidden />
             </Button>
         </motion.div>
     );

@@ -1,6 +1,6 @@
 "use client";
+import { TeamEntityIcon } from "@trymatcha/ui/icons";
 import { useParams } from "next/navigation";
-import { MdGroup } from "react-icons/md";
 
 import PaneEmptyState from "@/components/playground/Core/components/PaneEmptyState";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
@@ -18,7 +18,7 @@ export default function TeamDisplay() {
     const selectedTeamProjectSlug = usePlaygroundNavStore((s) => s.selectedTeamProjectSlug);
 
     if (!selectedTeam || selectedTeamProjectSlug !== projectSlug) {
-        return <PaneEmptyState icon={MdGroup} title="No team selected" />;
+        return <PaneEmptyState icon={TeamEntityIcon} title="No team selected" />;
     }
 
     return <TeamViewMain team={selectedTeam} />;

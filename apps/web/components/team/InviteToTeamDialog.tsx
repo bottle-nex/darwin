@@ -1,8 +1,8 @@
 "use client";
 
 import { ProjectRole } from "@trymatcha/types";
+import { BreadcrumbSeparatorIcon, CloseIcon } from "@trymatcha/ui/icons";
 import * as React from "react";
-import { MdClose, MdOutlineKeyboardArrowRight } from "react-icons/md";
 
 import PlaygroundAvatar from "@/components/playground/Core/components/PlaygroundAvatar";
 import { CapsuleTrigger } from "@/components/playground/Issue/Capsule";
@@ -227,7 +227,7 @@ function InviteForm({
                             className="uppercase"
                         />
                         <span>
-                            <MdOutlineKeyboardArrowRight />
+                            <BreadcrumbSeparatorIcon />
                         </span>
                         <span className="text-sm">Invite Members</span>
                     </div>
@@ -285,7 +285,7 @@ function InviteForm({
                                 aria-label={`Remove ${email}`}
                                 className="flex size-4 cursor-pointer items-center justify-center rounded-full text-neutral-400 hover:bg-white/10 hover:text-neutral-100"
                             >
-                                <MdClose className="size-3" />
+                                <CloseIcon className="size-3" />
                             </Button>
                         </span>
                     ))}

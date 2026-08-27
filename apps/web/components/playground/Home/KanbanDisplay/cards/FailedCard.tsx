@@ -1,4 +1,4 @@
-import { MdErrorOutline } from "react-icons/md";
+import { RunFailedIcon } from "@trymatcha/ui/icons";
 
 import type { Issue } from "@/types/kanban";
 
@@ -11,7 +11,7 @@ export default function FailedCard({ issue }: { issue: Issue }) {
         <BaseCard issue={issue}>
             <div className="mt-2.5 flex flex-col gap-1.5">
                 <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-rose-300/90">
-                    <MdErrorOutline className="size-3 shrink-0" aria-hidden />
+                    <RunFailedIcon className="size-3 shrink-0" aria-hidden />
                     {issue.error ?? "Run failed"}
                 </span>
                 {issue.agent && (

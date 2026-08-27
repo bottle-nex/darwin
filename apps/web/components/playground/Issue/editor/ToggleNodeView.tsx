@@ -1,13 +1,13 @@
 "use client";
 
 import { NodeViewContent, NodeViewWrapper, type ReactNodeViewProps } from "@tiptap/react";
-import { FaCaretDown, FaCaretRight } from "react-icons/fa";
+import { DropdownCaretIcon } from "@trymatcha/ui/icons";
 
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 export default function ToggleNodeView({ node, updateAttributes, editor }: ReactNodeViewProps) {
     const open = node.attrs.open as boolean;
-    const Caret = open ? FaCaretDown : FaCaretRight;
 
     return (
         <NodeViewWrapper
@@ -26,7 +26,7 @@ export default function ToggleNodeView({ node, updateAttributes, editor }: React
                 aria-expanded={open}
                 className="absolute top-[0.35rem] left-0 flex size-4 cursor-pointer items-center justify-center rounded-[3px] text-neutral-500 transition-colors hover:bg-white/10 hover:text-neutral-200"
             >
-                <Caret className="size-3" />
+                <DropdownCaretIcon className={cn("size-3", !open && "-rotate-90")} />
             </Button>
             <NodeViewContent />
         </NodeViewWrapper>

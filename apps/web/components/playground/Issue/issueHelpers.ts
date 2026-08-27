@@ -1,13 +1,13 @@
 import { IssueStatus } from "@trymatcha/types";
-import type { IconType } from "react-icons";
-import { BsExclamationSquareFill } from "react-icons/bs";
-import { LuEllipsis } from "react-icons/lu";
-
+import type { IconType } from "@trymatcha/ui/icons";
 import {
     HighPriorityIcon,
     LowPriorityIcon,
     MediumPriorityIcon,
-} from "@/components/icons/PriorityIcons";
+    NoPriorityIcon,
+    UrgentPriorityIcon,
+} from "@trymatcha/ui/icons";
+
 import type { IssueTarget } from "@/store/issues/useCreateIssueStore";
 import type { BoardColumn, BoardIssue } from "@/types/board";
 import type { Priority } from "@/types/kanban";
@@ -29,11 +29,11 @@ export type PriorityOption = {
 };
 
 export const PRIORITY_OPTIONS: PriorityOption[] = [
-    { value: "none", label: "No priority", icon: LuEllipsis, rank: 0 },
+    { value: "none", label: "No priority", icon: NoPriorityIcon, rank: 0 },
     {
         value: "urgent",
         label: "Urgent",
-        icon: BsExclamationSquareFill,
+        icon: UrgentPriorityIcon,
         rank: 1,
         iconClassName: "size-3! text-[#FF2C56]",
     },

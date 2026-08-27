@@ -1,6 +1,6 @@
 "use client";
 import type { ReviewTab } from "@trymatcha/types";
-import { LiaGithub } from "react-icons/lia";
+import { GithubLogoIcon } from "@trymatcha/ui/icons";
 
 import IconWrapper from "@/components/ui/IconWrapper";
 
@@ -17,7 +17,7 @@ export default function ReviewHeader({ tab, htmlUrl }: { tab: ReviewTab; htmlUrl
                 aria-label="Open on GitHub"
                 className="group cursor-pointer"
             >
-                <IconWrapper icon={LiaGithub} variant="outline" title="Open on GitHub" />
+                <IconWrapper icon={GithubLogoIcon} variant="outline" title="Open on GitHub" />
             </a>
         </header>
     );

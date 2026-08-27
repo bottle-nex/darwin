@@ -1,7 +1,11 @@
 "use client";
-import { IoPencilSharp } from "react-icons/io5";
-import { LuChevronDown } from "react-icons/lu";
-import { MdAdd, MdPlaylistAdd, MdUpload } from "react-icons/md";
+import {
+    AddCustomColumnIcon,
+    AddIcon,
+    ComposeIssueIcon,
+    DropdownCaretIcon,
+    ImportUploadIcon,
+} from "@trymatcha/ui/icons";
 
 import {
     DropdownMenu,
@@ -16,9 +20,9 @@ import { useAddCustomColumnStore } from "@/store/kanban/useAddCustomColumnStore"
 import OptionButton from "./OptionButton";
 
 const TASK_OPTIONS = [
-    { id: "issue", label: "New issue", icon: MdAdd },
-    { id: "custom_column", label: "Add custom col", icon: MdPlaylistAdd },
-    { id: "import", label: "Import issues", icon: MdUpload },
+    { id: "issue", label: "New issue", icon: AddIcon },
+    { id: "custom_column", label: "Add custom col", icon: AddCustomColumnIcon },
+    { id: "import", label: "Import issues", icon: ImportUploadIcon },
 ];
 
 export default function AddTaskButton() {
@@ -34,11 +38,11 @@ export default function AddTaskButton() {
     return (
         <div className="flex items-center gap-1">
             <TooltipComponent delayDuration={1000} content="New issue" side="bottom">
-                <OptionButton label="New issue" icon={IoPencilSharp} onClick={onAddTask} />
+                <OptionButton label="New issue" icon={ComposeIssueIcon} onClick={onAddTask} />
             </TooltipComponent>
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                    <OptionButton label="More task options" icon={LuChevronDown} />
+                    <OptionButton label="More task options" icon={DropdownCaretIcon} />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
                     {TASK_OPTIONS.map((option) => {

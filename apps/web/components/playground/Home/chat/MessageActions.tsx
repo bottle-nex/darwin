@@ -1,11 +1,8 @@
 "use client";
 
 import { type ThreadMessage, to_plain_text } from "@trymatcha/types";
+import { CopyIcon, DeleteIcon, EmojiReactionIcon, ReplyIcon } from "@trymatcha/ui/icons";
 import type { ComponentProps } from "react";
-import { BsReply } from "react-icons/bs";
-import { HiOutlineTrash } from "react-icons/hi";
-import { HiOutlineFaceSmile } from "react-icons/hi2";
-import { MdContentCopy } from "react-icons/md";
 
 import { Button } from "@/components/ui/button";
 import EmojiPicker from "@/components/ui/EmojiPicker";
@@ -56,11 +53,11 @@ export default function MessageActions({
                 onSelect={(emoji) => onReaction(chat, emoji)}
             >
                 <ActionButton aria-label="Add reaction" disabled={reactionDisabled}>
-                    <HiOutlineFaceSmile className="size-3.5" />
+                    <EmojiReactionIcon className="size-3.5" />
                 </ActionButton>
             </EmojiPicker>
             <ActionButton aria-label="Reply" onClick={() => onReply(chat)}>
-                <BsReply className="size-3.5" />
+                <ReplyIcon className="size-3.5" />
             </ActionButton>
             <ActionButton
                 aria-label="Copy message"
@@ -68,7 +65,7 @@ export default function MessageActions({
                     navigator.clipboard.writeText(to_plain_text(chat.message, chat.references))
                 }
             >
-                <MdContentCopy className="size-3" />
+                <CopyIcon className="size-3" />
             </ActionButton>
             {canDelete && (
                 <ActionButton
@@ -76,7 +73,7 @@ export default function MessageActions({
                     onClick={() => onDelete(chat)}
                     className="hover:bg-destructive/20 hover:text-destructive"
                 >
-                    <HiOutlineTrash className="size-3.5" />
+                    <DeleteIcon className="size-3.5" />
                 </ActionButton>
             )}
         </div>

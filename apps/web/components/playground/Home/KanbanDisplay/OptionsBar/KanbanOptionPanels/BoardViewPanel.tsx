@@ -1,8 +1,13 @@
 "use client";
+import type { IconType } from "@trymatcha/ui/icons";
+import {
+    BoardSplitViewIcon,
+    BoardViewIcon,
+    CheckIcon,
+    KanbanBoardLayoutIcon,
+    KanbanListViewIcon,
+} from "@trymatcha/ui/icons";
 import { motion } from "motion/react";
-import { type IconType } from "react-icons";
-import { LuEye } from "react-icons/lu";
-import { MdCheck, MdList, MdVerticalSplit, MdViewKanban } from "react-icons/md";
 
 import HeroBuddy from "@/components/landing/v2/HeroBuddy";
 import { Button } from "@/components/ui/button";
@@ -24,13 +29,13 @@ import OptionButton from "./OptionButton";
 
 const OPTIONS: { value: BoardView; label: string; icon?: IconType; mascot?: boolean }[] = [
     { value: "llm", label: "Agent", mascot: true },
-    { value: "custom", label: "My Board", icon: MdViewKanban },
-    { value: "default", label: "Split", icon: MdVerticalSplit },
+    { value: "custom", label: "My Board", icon: KanbanBoardLayoutIcon },
+    { value: "default", label: "Split", icon: BoardSplitViewIcon },
 ];
 
 const KANBAN_VIEW_TABS: { value: KanbanView; label: string; icon: IconType }[] = [
-    { value: "board", label: "Board", icon: MdViewKanban },
-    { value: "list", label: "List", icon: MdList },
+    { value: "board", label: "Board", icon: KanbanBoardLayoutIcon },
+    { value: "list", label: "List", icon: KanbanListViewIcon },
 ];
 
 type BoardViewPanelProps = {
@@ -106,7 +111,7 @@ export function BoardViewPanelItems({
                         )}
                         <span className="flex-1">{option.label}</span>
                         <DropdownMenuItemIndicator>
-                            <MdCheck className="size-3.5 text-neutral-300" aria-hidden />
+                            <CheckIcon className="size-3.5 text-neutral-300" aria-hidden />
                         </DropdownMenuItemIndicator>
                     </DropdownMenuRadioItem>
                 ))}
@@ -128,7 +133,7 @@ export default function BoardViewPanel({
                 <DropdownMenuTrigger asChild>
                     <OptionButton
                         label="Board"
-                        icon={LuEye}
+                        icon={BoardViewIcon}
                         active={value !== "default" || kanbanView !== "board"}
                     />
                 </DropdownMenuTrigger>

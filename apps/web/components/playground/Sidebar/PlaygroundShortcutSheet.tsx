@@ -1,6 +1,6 @@
 "use client";
+import { SearchIcon } from "@trymatcha/ui/icons";
 import { useState } from "react";
-import { HiOutlineMagnifyingGlass } from "react-icons/hi2";
 
 import { Input } from "@/components/ui/input";
 import KeyCombo from "@/components/ui/KeyCombo";
@@ -51,7 +51,7 @@ export default function PlaygroundShortcutSheet() {
                         Keyboard shortcuts
                     </SheetTitle>
                     <div className="relative">
-                        <HiOutlineMagnifyingGlass className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-neutral-500" />
+                        <SearchIcon className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-neutral-500" />
                         <Input
                             value={query}
                             onChange={(e) => setQuery(e.target.value)}

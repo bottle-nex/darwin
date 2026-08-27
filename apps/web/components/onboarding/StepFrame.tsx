@@ -1,8 +1,8 @@
 "use client";
 
+import { CtaArrowIcon } from "@trymatcha/ui/icons";
 import { motion } from "motion/react";
 import type { ReactNode } from "react";
-import { MdOutlineChevronRight } from "react-icons/md";
 
 import { MatchaLogo } from "@/components/logo/MatchaLogo";
 import { Button } from "@/components/ui/button";
@@ -65,7 +65,7 @@ export default function StepFrame({
                     ) : (
                         <>
                             <span>Continue</span>
-                            <MdOutlineChevronRight />
+                            <CtaArrowIcon />
                         </>
                     )}
                 </Button>

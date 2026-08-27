@@ -1,9 +1,8 @@
 "use client";
 
+import { ErrorCircleIcon, LoadingSpinnerIcon, SuccessCircleIcon } from "@trymatcha/ui/icons";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useRef, useState } from "react";
-import { FaCircleCheck, FaCircleXmark } from "react-icons/fa6";
-import { RiLoader4Line } from "react-icons/ri";
 
 import { Button } from "@/components/ui/button";
 import { useCompleteGithubConnect } from "@/hooks/github/useCompleteGithubConnect";
@@ -37,9 +36,10 @@ const COPY: Record<Flow, Record<Status, { title: string; hint: string }>> = {
 };
 
 function StatusIcon({ status }: { status: Status }) {
-    if (status === "success") return <FaCircleCheck className="size-5 text-matcha" aria-hidden />;
-    if (status === "error") return <FaCircleXmark className="size-5 text-red-400" aria-hidden />;
-    return <RiLoader4Line className="size-5 animate-spin text-neutral-400" aria-hidden />;
+    if (status === "success")
+        return <SuccessCircleIcon className="size-5 text-matcha" aria-hidden />;
+    if (status === "error") return <ErrorCircleIcon className="size-5 text-red-400" aria-hidden />;
+    return <LoadingSpinnerIcon className="size-5 animate-spin text-neutral-400" aria-hidden />;
 }
 
 function GithubCallback() {

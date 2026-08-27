@@ -1,8 +1,13 @@
 "use client";
+import {
+    GithubLogoIcon,
+    JiraLogoIcon,
+    LinearLogoIcon,
+    NotionLogoIcon,
+    SlackLogoIcon,
+} from "@trymatcha/ui/icons";
 import { motion, useReducedMotion } from "motion/react";
 import type { ComponentType, CSSProperties } from "react";
-import { RiGithubFill, RiSlackFill } from "react-icons/ri";
-import { SiJira, SiLinear, SiNotion } from "react-icons/si";
 
 import { MatchaLogo } from "@/components/logo/MatchaLogo";
 import { cn } from "@/lib/utils";
@@ -21,11 +26,11 @@ type IntegrationTileSpec = {
 };
 
 const TILES: IntegrationTileSpec[] = [
-    { name: "GitHub", icon: RiGithubFill, iconColor: "#cbb6f7", glow: "184, 152, 244" },
-    { name: "Notion", icon: SiNotion, iconColor: "#f4f4f5", glow: "226, 226, 231" },
-    { name: "Linear", icon: SiLinear, iconColor: "#b9aeff", glow: "171, 159, 242" },
-    { name: "Slack", icon: RiSlackFill, iconColor: "#ff9d8a", glow: "255, 122, 96" },
-    { name: "Jira", icon: SiJira, iconColor: "#7aaeff", glow: "96, 150, 255" },
+    { name: "GitHub", icon: GithubLogoIcon, iconColor: "#cbb6f7", glow: "184, 152, 244" },
+    { name: "Notion", icon: NotionLogoIcon, iconColor: "#f4f4f5", glow: "226, 226, 231" },
+    { name: "Linear", icon: LinearLogoIcon, iconColor: "#b9aeff", glow: "171, 159, 242" },
+    { name: "Slack", icon: SlackLogoIcon, iconColor: "#ff9d8a", glow: "255, 122, 96" },
+    { name: "Jira", icon: JiraLogoIcon, iconColor: "#7aaeff", glow: "96, 150, 255" },
 ];
 
 /** The hub key at the end of the trunk — everything flows into matcha. */

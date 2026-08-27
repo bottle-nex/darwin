@@ -1,4 +1,4 @@
-import { MdChevronRight } from "react-icons/md";
+import { CtaArrowIcon } from "@trymatcha/ui/icons";
 
 import ShowcaseFrame from "../landing/showcase/ShowcaseFrame";
 import { Button } from "../ui/button";
@@ -23,11 +23,11 @@ export default function WhyHero() {
                 <div className="mt-8 flex items-center gap-3">
                     <Button className="pl-3! pr-2! h-8 rounded-sm bg-white">
                         Get Started
-                        <MdChevronRight className="text-ink!" />
+                        <CtaArrowIcon className="text-ink!" />
                     </Button>
                     <Button className="bg-snow/10! text-snow rounded-sm pl-3 pr-2 h-8">
                         See how it works
-                        <MdChevronRight className="text-snow!" />
+                        <CtaArrowIcon className="text-snow!" />
                     </Button>
                 </div>
             </div>

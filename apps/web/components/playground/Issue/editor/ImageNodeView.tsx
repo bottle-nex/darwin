@@ -1,8 +1,8 @@
 "use client";
 
 import { NodeViewWrapper, type ReactNodeViewProps } from "@tiptap/react";
+import { CloseIcon, ExpandImageIcon } from "@trymatcha/ui/icons";
 import { useState } from "react";
-import { MdClose, MdZoomOutMap } from "react-icons/md";
 
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
@@ -32,7 +32,7 @@ export default function ImageNodeView({ node, deleteNode, selected }: ReactNodeV
                     aria-label="Zoom image"
                     className="flex size-6 cursor-pointer items-center justify-center rounded-md bg-black/60 text-white hover:bg-black/80"
                 >
-                    <MdZoomOutMap className="size-3.5" />
+                    <ExpandImageIcon className="size-3.5" />
                 </Button>
                 <Button
                     variant="unstyled"
@@ -42,7 +42,7 @@ export default function ImageNodeView({ node, deleteNode, selected }: ReactNodeV
                     aria-label="Delete image"
                     className="flex size-6 cursor-pointer items-center justify-center rounded-md bg-black/60 text-white hover:bg-rose-500/80"
                 >
-                    <MdClose className="size-3.5" />
+                    <CloseIcon className="size-3.5" />
                 </Button>
             </span>
             <Dialog open={zoomOpen} onOpenChange={setZoomOpen}>

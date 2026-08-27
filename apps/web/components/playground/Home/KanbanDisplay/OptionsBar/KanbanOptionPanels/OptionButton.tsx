@@ -1,6 +1,6 @@
 "use client";
+import type { IconType } from "@trymatcha/ui/icons";
 import { forwardRef } from "react";
-import type { IconType } from "react-icons";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";

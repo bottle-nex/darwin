@@ -1,7 +1,7 @@
 "use client";
+import { BreadcrumbSeparatorIcon, CheckIcon, ColorPickerIcon } from "@trymatcha/ui/icons";
 import { AxiosError } from "axios";
 import { useState } from "react";
-import { MdCheck, MdColorize, MdOutlineKeyboardArrowRight } from "react-icons/md";
 
 import PlaygroundAvatar, {
     toneFor,
@@ -132,7 +132,7 @@ function TagForm({ projectId, tag, onDone }: { projectId: string; tag?: Tag; onD
                         className="uppercase"
                     />
                     <span>
-                        <MdOutlineKeyboardArrowRight />
+                        <BreadcrumbSeparatorIcon />
                     </span>
                     <span className="text-sm">{tag ? "Edit Tag" : "New Tag"}</span>
                 </div>
@@ -170,7 +170,7 @@ function TagForm({ projectId, tag, onDone }: { projectId: string; tag?: Tag; onD
                                 style={{ backgroundColor: swatch }}
                             >
                                 {swatch === color && (
-                                    <MdCheck className="size-3.5 text-neutral-900" />
+                                    <CheckIcon className="size-3.5 text-neutral-900" />
                                 )}
                             </Button>
                         ))}
@@ -193,9 +193,9 @@ function TagForm({ projectId, tag, onDone }: { projectId: string; tag?: Tag; onD
                                     }}
                                 >
                                     {customActive ? (
-                                        <MdCheck className="size-3.5 text-neutral-900" />
+                                        <CheckIcon className="size-3.5 text-neutral-900" />
                                     ) : (
-                                        <MdColorize className="size-3.5 text-white drop-shadow" />
+                                        <ColorPickerIcon className="size-3.5 text-white drop-shadow" />
                                     )}
                                 </Button>
                             </PopoverTrigger>

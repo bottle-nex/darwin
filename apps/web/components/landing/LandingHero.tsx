@@ -1,4 +1,4 @@
-import { MdChevronRight } from "react-icons/md";
+import { CtaArrowIcon } from "@trymatcha/ui/icons";
 
 import { cn } from "@/lib/utils";
 
@@ -27,11 +27,11 @@ export default function LandingHero() {
                     <span className="flex-1 flex justify-end gap-2">
                         <Button variant={"tertiary"}>
                             Create Issue
-                            <MdChevronRight className="text-ink!" />
+                            <CtaArrowIcon className="text-ink!" />
                         </Button>
                         <Button className="text-snow/80! bg-snow/10! pl-4 rounded-full">
                             Learn more
-                            <MdChevronRight className="text-background!" />
+                            <CtaArrowIcon className="text-background!" />
                         </Button>
                     </span>
                 </div>

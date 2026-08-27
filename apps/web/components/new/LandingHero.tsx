@@ -1,4 +1,4 @@
-import { IoIosPlayCircle } from "react-icons/io";
+import { PlayCircleIcon } from "@trymatcha/ui/icons";
 
 import { cn } from "@/lib/utils";
 
@@ -40,7 +40,7 @@ export default function LandingHero() {
                 </button>
                 <button className="bg-[#F4EDE3] text-[#2A2524] px-4 py-2 font-medium rounded-md cursor-pointer text-[15px] flex items-center gap-1.5">
                     How it works
-                    <IoIosPlayCircle className="text-[#2a2524] size-4.5" />
+                    <PlayCircleIcon className="text-[#2a2524] size-4.5" />
                 </button>
             </div>
 

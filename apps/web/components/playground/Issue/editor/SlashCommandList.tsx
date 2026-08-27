@@ -1,7 +1,7 @@
 "use client";
 
+import { SubmenuDisclosureIcon } from "@trymatcha/ui/icons";
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
-import { RxTriangleRight } from "react-icons/rx";
 
 import { Button } from "@/components/ui/button";
 import { MENU_ITEM, MENU_SURFACE } from "@/components/ui/menuSurface";
@@ -211,7 +211,7 @@ const SlashCommandList = forwardRef<SlashCommandListHandle, SlashCommandListProp
                                 <Icon className="size-4 shrink-0 text-neutral-400" />
                                 {item.title}
                                 {hasSubmenu && (
-                                    <RxTriangleRight className="ml-auto size-3.5 shrink-0 text-neutral-500" />
+                                    <SubmenuDisclosureIcon className="ml-auto size-3.5 shrink-0 text-neutral-500" />
                                 )}
                             </Button>
                         );

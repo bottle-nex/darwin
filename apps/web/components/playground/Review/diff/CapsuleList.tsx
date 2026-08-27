@@ -1,6 +1,6 @@
 "use client";
 import type { Capsule } from "@trymatcha/types";
-import { GoFileCode } from "react-icons/go";
+import { DiffFileRowIcon } from "@trymatcha/ui/icons";
 
 import { splitPath } from "@/components/playground/Review/changes/ReviewFileRow";
 import { Button } from "@/components/ui/button";
@@ -53,7 +53,7 @@ function CapsuleRow({
                 selected ? "bg-white/8" : "hover:bg-white/4",
             )}
         >
-            <GoFileCode className="size-3.5 shrink-0 text-neutral-500" />
+            <DiffFileRowIcon className="size-3.5 shrink-0 text-neutral-500" />
             <span
                 className={cn(
                     "min-w-0 truncate font-headline text-[14px]",

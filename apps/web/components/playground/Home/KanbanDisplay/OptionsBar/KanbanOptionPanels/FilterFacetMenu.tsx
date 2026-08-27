@@ -1,6 +1,6 @@
 "use client";
+import { CheckIcon, SearchIcon } from "@trymatcha/ui/icons";
 import { type ReactNode, useState } from "react";
-import { MdCheck, MdSearch } from "react-icons/md";
 
 import MemberOptionRow from "@/components/playground/Core/components/MemberOptionRow";
 import TagDisplay from "@/components/playground/Home/TagsDisplay/TagDisplay";
@@ -63,7 +63,7 @@ export function FilterFacetItems({ facetKey }: { facetKey: ListFacetKey }) {
                 )}
                 {isSearchableFacet(facetKey) && (
                     <div className="relative">
-                        <MdSearch
+                        <SearchIcon
                             className="pointer-events-none absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-neutral-500"
                             aria-hidden
                         />
@@ -113,7 +113,7 @@ export function FilterFacetItems({ facetKey }: { facetKey: ListFacetKey }) {
                                                     : "border-white/25",
                                             )}
                                         >
-                                            {isOn && <MdCheck className="size-2.5" aria-hidden />}
+                                            {isOn && <CheckIcon className="size-2.5" aria-hidden />}
                                         </span>
                                         {option.dotColor ? (
                                             <TagDisplay

@@ -1,7 +1,7 @@
 "use client";
+import { CloseIcon } from "@trymatcha/ui/icons";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
-import { HiXMark } from "react-icons/hi2";
 
 import { PANE_TOP_BAR_HEIGHT } from "@/components/playground/Core/components/PlaygroundPaneFrame";
 import { BLURRED_BG_PANEL } from "@/components/playground/Home/KanbanDisplay/cardStyles";
@@ -73,7 +73,7 @@ export default function NotificationsPanel() {
                                     aria-label="Close notifications"
                                     className="flex size-7 cursor-pointer items-center justify-center rounded-md text-neutral-400 transition-colors hover:bg-white/5 hover:text-neutral-100"
                                 >
-                                    <HiXMark className="size-4" aria-hidden />
+                                    <CloseIcon className="size-4" aria-hidden />
                                 </button>
                             </div>
                         </header>

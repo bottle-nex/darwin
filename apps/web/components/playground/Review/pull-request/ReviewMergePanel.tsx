@@ -1,14 +1,18 @@
 "use client";
 import { Action, Permissions } from "@trymatcha/access-control";
 import { type ReviewHeader, ReviewState } from "@trymatcha/types";
+import type { IconType } from "@trymatcha/ui/icons";
+import {
+    CheckIcon,
+    ErrorCircleIcon,
+    GithubLogoIcon,
+    MergeIcon,
+    MergeToneWarningIcon,
+    PullRequestClosedIcon,
+    StatusInfoIcon,
+} from "@trymatcha/ui/icons";
 import axios from "axios";
 import { useState } from "react";
-import type { IconType } from "react-icons";
-import { AiFillMerge } from "react-icons/ai";
-import { FaGithub } from "react-icons/fa6";
-import { GoGitPullRequestClosed } from "react-icons/go";
-import { HiExclamationTriangle, HiInformationCircle, HiXCircle } from "react-icons/hi2";
-import { IoMdCheckmark } from "react-icons/io";
 
 import { Button } from "@/components/ui/button";
 import ConfirmDialog from "@/components/utility/ConfirmDialog";
@@ -23,14 +27,14 @@ type MergeTone = "clean" | "dirty" | "attention" | "checking";
 type ConfirmingAction = "merge" | "close" | null;
 
 const TONE_STYLE: Record<MergeTone, { icon: IconType; badge: string; border: string }> = {
-    clean: { icon: AiFillMerge, badge: "bg-green-600", border: "border-green-500/25" },
-    dirty: { icon: HiXCircle, badge: "bg-rose-500", border: "border-rose-500/25" },
+    clean: { icon: MergeIcon, badge: "bg-green-600", border: "border-green-500/25" },
+    dirty: { icon: ErrorCircleIcon, badge: "bg-rose-500", border: "border-rose-500/25" },
     attention: {
-        icon: HiExclamationTriangle,
+        icon: MergeToneWarningIcon,
         badge: "bg-amber-500",
         border: "border-amber-500/25",
     },
-    checking: { icon: HiInformationCircle, badge: "bg-sky-500", border: "border-sky-500/25" },
+    checking: { icon: StatusInfoIcon, badge: "bg-sky-500", border: "border-sky-500/25" },
 };
 
 function describeMergeability(
@@ -163,7 +167,7 @@ export default function ReviewMergePanel({
                             onClick={() => startLink.mutate()}
                             className="gap-x-1.5 rounded-sm bg-green-700 font-medium text-snow"
                         >
-                            <FaGithub />
+                            <GithubLogoIcon />
                             Connect GitHub
                         </Button>
                     ) : (
@@ -176,7 +180,7 @@ export default function ReviewMergePanel({
                                     disabled={!canManageReview}
                                     onClick={() => openConfirm("merge")}
                                 >
-                                    <IoMdCheckmark />
+                                    <CheckIcon />
                                     Merge pull request
                                 </Button>
                             )}
@@ -187,7 +191,7 @@ export default function ReviewMergePanel({
                                 disabled={!canManageReview}
                                 onClick={() => openConfirm("close")}
                             >
-                                <GoGitPullRequestClosed className="text-rose-500" />
+                                <PullRequestClosedIcon className="text-rose-500" />
                                 Close pull request
                             </Button>
                             {canAttemptMerge && (

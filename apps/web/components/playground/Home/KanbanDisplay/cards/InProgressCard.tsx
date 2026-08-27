@@ -1,4 +1,4 @@
-import { MdAutorenew, MdStorage } from "react-icons/md";
+import { ProcessingSpinnerIcon, RunnerIcon } from "@trymatcha/ui/icons";
 
 import type { Issue } from "@/types/kanban";
 
@@ -12,14 +12,14 @@ export default function InProgressCard({ issue }: { issue: Issue }) {
             <div className="mt-2.5 flex flex-col gap-1.5">
                 {issue.step && (
                     <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-amber-300/90">
-                        <MdAutorenew className="size-3 animate-spin" aria-hidden />
+                        <ProcessingSpinnerIcon className="size-3 animate-spin" aria-hidden />
                         {issue.step}
                     </span>
                 )}
                 <div className="flex items-center justify-between">
                     {issue.runner && (
                         <span className="inline-flex items-center gap-1 text-[11px] text-neutral-500">
-                            <MdStorage className="size-3" aria-hidden />
+                            <RunnerIcon className="size-3" aria-hidden />
                             {issue.runner}
                         </span>
                     )}

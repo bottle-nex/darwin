@@ -1,6 +1,6 @@
 "use client";
+import { XLogoIcon } from "@trymatcha/ui/icons";
 import Link from "next/link";
-import { FaXTwitter } from "react-icons/fa6";
 
 import HeroBuddy from "@/components/landing/v2/HeroBuddy";
 import { Button } from "@/components/ui/button";
@@ -49,7 +49,7 @@ export default function AboutRevampHero() {
                             <Button size="lg" variant="secondary" asChild>
                                 <Link href="#" className="uppercase">
                                     Connect on
-                                    <FaXTwitter className="size-3" />
+                                    <XLogoIcon className="size-3" />
                                 </Link>
                             </Button>
                         </div>

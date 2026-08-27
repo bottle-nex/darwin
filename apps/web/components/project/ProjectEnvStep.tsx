@@ -1,6 +1,12 @@
 "use client";
+import {
+    AddIcon,
+    CloseIcon,
+    HideSecretIcon,
+    ImportUploadIcon,
+    RevealSecretIcon,
+} from "@trymatcha/ui/icons";
 import { type Dispatch, type SetStateAction, useRef } from "react";
-import { FaEye, FaEyeSlash, FaFileArrowUp, FaPlus, FaXmark } from "react-icons/fa6";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -72,9 +78,9 @@ export default function ProjectEnvStep({
                         className="flex items-center gap-1.5 text-[11px] text-neutral-500 hover:text-neutral-300 cursor-pointer"
                     >
                         {reveal ? (
-                            <FaEyeSlash className="size-3" aria-hidden />
+                            <HideSecretIcon className="size-3" aria-hidden />
                         ) : (
-                            <FaEye className="size-3" aria-hidden />
+                            <RevealSecretIcon className="size-3" aria-hidden />
                         )}
                         {reveal ? "Hide values" : "Show values"}
                     </Button>
@@ -84,7 +90,7 @@ export default function ProjectEnvStep({
                         onClick={() => fileRef.current?.click()}
                         className="flex items-center gap-1.5 text-[11px] text-neutral-500 hover:text-neutral-300 cursor-pointer"
                     >
-                        <FaFileArrowUp className="size-3" aria-hidden />
+                        <ImportUploadIcon className="size-3" aria-hidden />
                         Import .env
                     </Button>
                     <input
@@ -149,7 +155,7 @@ export default function ProjectEnvStep({
                             onClick={() => removeRow(index)}
                             aria-label="Remove variable"
                         >
-                            <FaXmark className="size-3.5" aria-hidden />
+                            <CloseIcon className="size-3.5" aria-hidden />
                         </Button>
                     </div>
                 ))}
@@ -157,7 +163,7 @@ export default function ProjectEnvStep({
 
             <div className="flex items-center justify-between">
                 <Button type="button" variant="tertiary" size="sm" onClick={addRow}>
-                    <FaPlus className="size-3" aria-hidden />
+                    <AddIcon className="size-3" aria-hidden />
                     Add variable
                 </Button>
                 <p className="text-[11px] text-neutral-600">

@@ -1,4 +1,6 @@
 export * from "./catalog";
+export type { IconType } from "react-icons";
+export type { AnimatedIcon } from "./custom/AnimatedIcons";
 export { AccessChangedIcon } from "./settings-access/AccessChangedIcon";
 export { AccessRestrictedIcon } from "./settings-access/AccessRestrictedIcon";
 export { AddCustomColumnIcon } from "./actions/AddCustomColumnIcon";

@@ -1,6 +1,6 @@
 "use client";
+import { CloseIcon, SearchIcon } from "@trymatcha/ui/icons";
 import { motion } from "motion/react";
-import { HiOutlineMagnifyingGlass, HiXMark } from "react-icons/hi2";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -29,7 +29,7 @@ export default function ExpandableSearchBar({
             transition={{ duration: 0.18, ease: [0.25, 1, 0.35, 1] }}
             className={cn("relative w-full", className)}
         >
-            <HiOutlineMagnifyingGlass
+            <SearchIcon
                 className="pointer-events-none absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-neutral-400"
                 aria-hidden
             />
@@ -54,7 +54,7 @@ export default function ExpandableSearchBar({
                 aria-label="Close search"
                 className="absolute top-1/2 right-2 flex size-4 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-graphite text-neutral-400 transition-colors hover:text-neutral-100"
             >
-                <HiXMark className="size-2.5" aria-hidden />
+                <CloseIcon className="size-2.5" aria-hidden />
             </Button>
         </motion.div>
     );

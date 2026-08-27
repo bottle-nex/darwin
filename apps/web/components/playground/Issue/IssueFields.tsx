@@ -1,5 +1,5 @@
 "use client";
-import { HiCalendar } from "react-icons/hi2";
+import { CalendarIcon } from "@trymatcha/ui/icons";
 
 import Capsule from "./Capsule";
 import { DATE_ICON_COLOR, STACKED_CAPSULE } from "./issueHelpers";
@@ -59,7 +59,7 @@ export default function IssueFields({
             value={fields.startDate}
             onChange={fields.setStartDate}
             className={capsuleClass}
-            icon={HiCalendar}
+            icon={CalendarIcon}
             iconClassName={DATE_ICON_COLOR.start}
             range={dateRange}
             latest={fields.targetDate}
@@ -72,7 +72,7 @@ export default function IssueFields({
             value={fields.targetDate}
             onChange={fields.setTargetDate}
             className={capsuleClass}
-            icon={HiCalendar}
+            icon={CalendarIcon}
             iconClassName={DATE_ICON_COLOR.target}
             range={dateRange}
             earliest={fields.startDate}

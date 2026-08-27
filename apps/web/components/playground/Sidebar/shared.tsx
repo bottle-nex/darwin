@@ -1,7 +1,7 @@
 "use client";
 
-import { type IconType } from "react-icons";
-import { HiOutlinePlus } from "react-icons/hi2";
+import type { IconType } from "@trymatcha/ui/icons";
+import { AddIcon } from "@trymatcha/ui/icons";
 
 import PlaygroundAvatar, {
     type AvatarTone,
@@ -52,7 +52,7 @@ export function PlaygroundSidebarSectionAddButton({ label }: { label: string }) 
             aria-label={label}
             className="flex size-5 cursor-pointer items-center justify-center rounded text-neutral-400 hover:bg-white/5 hover:text-neutral-100 ring-inset focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-hidden"
         >
-            <HiOutlinePlus className="size-3.5" aria-hidden />
+            <AddIcon className="size-3.5" aria-hidden />
         </Button>
     );
 }

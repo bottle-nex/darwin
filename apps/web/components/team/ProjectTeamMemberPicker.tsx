@@ -1,7 +1,7 @@
 "use client";
 
+import { CheckIcon } from "@trymatcha/ui/icons";
 import { useRef, useState } from "react";
-import { MdCheck } from "react-icons/md";
 
 import PlaygroundAvatar, {
     initialOf,
@@ -149,7 +149,7 @@ export default function ProjectTeamMemberPicker({
                                                         role={member.role}
                                                         size="sm"
                                                     />
-                                                    <MdCheck
+                                                    <CheckIcon
                                                         className={cn(
                                                             "size-4 shrink-0 text-primary",
                                                             !selected && "invisible",

@@ -1,5 +1,5 @@
 "use client";
-import { TbLayoutSidebarFilled } from "react-icons/tb";
+import { SidebarToggleIcon } from "@trymatcha/ui/icons";
 
 import { Button } from "@/components/ui/button";
 import { TooltipComponent } from "@/components/ui/tooltip-component";
@@ -23,7 +23,7 @@ export default function PlaygroundCollapsedLead() {
                     aria-label="Expand sidebar"
                     className="flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-md text-neutral-400 transition-colors hover:bg-white/5 hover:text-neutral-100"
                 >
-                    <TbLayoutSidebarFilled className="size-4" aria-hidden />
+                    <SidebarToggleIcon className="size-4" aria-hidden />
                 </Button>
             </TooltipComponent>
             <PlaygroundLeadBar />

@@ -1,6 +1,13 @@
 "use client";
+import {
+    AddIcon,
+    DeleteIcon,
+    EnvSecretIcon,
+    HideSecretIcon,
+    ImportUploadIcon,
+    RevealSecretIcon,
+} from "@trymatcha/ui/icons";
 import { useRef, useState } from "react";
-import { MdAdd, MdDelete, MdUpload, MdVisibility, MdVisibilityOff, MdVpnKey } from "react-icons/md";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -84,7 +91,7 @@ export default function ProjectSettingsEnvSection({
                         disabled={!projectId}
                         onClick={() => fileRef.current?.click()}
                     >
-                        <MdUpload className="size-3" aria-hidden />
+                        <ImportUploadIcon className="size-3" aria-hidden />
                         Import .env
                     </Button>
                     <input
@@ -145,9 +152,9 @@ export default function ProjectSettingsEnvSection({
                                 className="absolute top-1/2 right-2 -translate-y-1/2 cursor-pointer text-neutral-500 hover:text-neutral-300"
                             >
                                 {reveal ? (
-                                    <MdVisibilityOff className="size-3" aria-hidden />
+                                    <HideSecretIcon className="size-3" aria-hidden />
                                 ) : (
-                                    <MdVisibility className="size-3" aria-hidden />
+                                    <RevealSecretIcon className="size-3" aria-hidden />
                                 )}
                             </Button>
                         </div>
@@ -160,7 +167,7 @@ export default function ProjectSettingsEnvSection({
                         disabled={!canAdd}
                         onClick={addSecret}
                     >
-                        <MdAdd className="size-3" aria-hidden />
+                        <AddIcon className="size-3" aria-hidden />
                         Add
                     </Button>
                 </div>
@@ -195,7 +202,7 @@ export default function ProjectSettingsEnvSection({
                                 >
                                     <section>
                                         <div className="flex items-center justify-center gap-x-3">
-                                            <MdVpnKey
+                                            <EnvSecretIcon
                                                 className="size-3 shrink-0 text-neutral-500"
                                                 aria-hidden
                                             />
@@ -223,7 +230,7 @@ export default function ProjectSettingsEnvSection({
                                             }
                                             className="flex size-6 shrink-0 cursor-pointer items-center justify-center rounded text-neutral-400 hover:bg-neutral-700/50 hover:text-red-500 disabled:opacity-40 [&_svg]:size-3"
                                         >
-                                            <MdDelete className="size-3" aria-hidden />
+                                            <DeleteIcon className="size-3" aria-hidden />
                                         </Button>
                                     </section>
                                 </div>

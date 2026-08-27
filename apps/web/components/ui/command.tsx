@@ -1,8 +1,8 @@
 "use client";
 
+import { SearchIcon } from "@trymatcha/ui/icons";
 import { Command as CommandPrimitive } from "cmdk";
 import * as React from "react";
-import { MdSearch } from "react-icons/md";
 
 import { cn } from "@/lib/utils";
 
@@ -37,7 +37,7 @@ function CommandInput({
             data-slot="command-input-wrapper"
             className={cn("flex items-center gap-2 px-3", border && "border-b border-white/10")}
         >
-            {icon && <MdSearch className="size-4 shrink-0 text-neutral-500" />}
+            {icon && <SearchIcon className="size-4 shrink-0 text-neutral-500" />}
             <CommandPrimitive.Input
                 data-slot="command-input"
                 className={cn(

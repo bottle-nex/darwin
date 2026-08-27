@@ -4,7 +4,7 @@ import type {
     GlobalSearchMessageThread,
     GlobalSearchResult,
 } from "@trymatcha/types";
-import { HiOutlineAnnotation } from "react-icons/hi";
+import { ChatsNavIcon } from "@trymatcha/ui/icons";
 
 import { PlaygroundTab } from "@/components/playground/playgroundTabs";
 import { CommandGroup, CommandItem } from "@/components/ui/command";
@@ -97,7 +97,7 @@ export default function CommandSearchResults({
                             }}
                             className={ITEM_CLASS}
                         >
-                            <HiOutlineAnnotation
+                            <ChatsNavIcon
                                 className="mt-0.5 size-4 shrink-0 text-neutral-400"
                                 aria-hidden
                             />

@@ -1,9 +1,9 @@
 "use client";
 
+import { CtaArrowIcon } from "@trymatcha/ui/icons";
 import { useInView, useReducedMotion } from "motion/react";
 import Link from "next/link";
 import { type CSSProperties, useRef } from "react";
-import { MdChevronRight } from "react-icons/md";
 
 import { MatchaLogo } from "@/components/logo/MatchaLogo";
 import { cn } from "@/lib/utils";
@@ -48,14 +48,14 @@ export default function EntryCta() {
                     className="flex h-10 items-center justify-center gap-x-1 rounded-lg bg-snow text-[14px] font-medium text-ink transition-colors"
                 >
                     Get started
-                    <MdChevronRight className="size-4" />
+                    <CtaArrowIcon className="size-4" />
                 </Link>
                 <Link
                     href="/why"
                     className="flex h-10 items-center justify-center gap-x-1 rounded-lg bg-white/6 text-[14px] font-medium text-snow transition-colors hover:bg-white/10"
                 >
                     See how it works
-                    <MdChevronRight className="size-4" />
+                    <CtaArrowIcon className="size-4" />
                 </Link>
             </div>
         </div>

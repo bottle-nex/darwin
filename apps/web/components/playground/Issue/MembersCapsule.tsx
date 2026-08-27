@@ -1,7 +1,7 @@
 "use client";
 
+import { AssigneeGroupIcon } from "@trymatcha/ui/icons";
 import { useState } from "react";
-import { MdPeople } from "react-icons/md";
 
 import MemberOptionRow from "@/components/playground/Core/components/MemberOptionRow";
 import ProjectRoleTicker from "@/components/playground/Team/TeamView/ProjectRoleTicker";
@@ -60,7 +60,7 @@ export default function MembersCapsule({
     const selectedMembers = (members ?? []).filter((member) => selected.includes(member.id));
     const trigger = (
         <CapsuleTrigger disabled={disabled} className={className}>
-            <MdPeople className="size-3.5 text-white/60" />
+            <AssigneeGroupIcon className="size-3.5 text-white/60" />
             {selectedMembers.length === 0
                 ? placeholder
                 : selectedMembers.length === 1

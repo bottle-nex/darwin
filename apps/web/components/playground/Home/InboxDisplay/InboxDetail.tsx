@@ -6,9 +6,9 @@ import {
     TeamRole,
     type ThreadMessage,
 } from "@trymatcha/types";
+import { InboxIcon, NotificationsBellIcon } from "@trymatcha/ui/icons";
 import { isAxiosError } from "axios";
 import { useMemo } from "react";
-import { HiOutlineBell, HiOutlineInbox } from "react-icons/hi2";
 
 import PaneEmptyState from "@/components/playground/Core/components/PaneEmptyState";
 import { notification_target } from "@/components/playground/Core/Notifications/notificationView";
@@ -40,7 +40,7 @@ export default function InboxDetail({ notification }: { notification: Notificati
     if (!notification) {
         return (
             <PaneEmptyState
-                icon={HiOutlineInbox}
+                icon={InboxIcon}
                 title="No notification selected"
                 subtitle="Pick a notification to read it here."
             />
@@ -56,7 +56,7 @@ export default function InboxDetail({ notification }: { notification: Notificati
         if (issueError && !(isAxiosError(error) && error.response?.status === 404)) {
             return (
                 <PaneEmptyState
-                    icon={HiOutlineBell}
+                    icon={NotificationsBellIcon}
                     title="This issue couldn't be loaded"
                     subtitle="Try again to open the linked issue."
                 >
@@ -69,7 +69,7 @@ export default function InboxDetail({ notification }: { notification: Notificati
         if (!issue) {
             return (
                 <PaneEmptyState
-                    icon={HiOutlineBell}
+                    icon={NotificationsBellIcon}
                     title="This issue no longer exists"
                     subtitle="It was deleted after the notification was sent."
                 />
@@ -88,7 +88,7 @@ export default function InboxDetail({ notification }: { notification: Notificati
 
     return (
         <PaneEmptyState
-            icon={HiOutlineBell}
+            icon={NotificationsBellIcon}
             title="Nothing to open"
             subtitle="This update doesn't link to an issue or a conversation."
         />

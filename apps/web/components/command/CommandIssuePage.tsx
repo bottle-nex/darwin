@@ -1,5 +1,5 @@
 "use client";
-import { MdCheck } from "react-icons/md";
+import { CheckIcon } from "@trymatcha/ui/icons";
 
 import { PRIORITY_TO_NUMBER } from "@/components/playground/Home/KanbanDisplay/customkanban/data";
 import { PRIORITY_OPTIONS } from "@/components/playground/Issue/issueHelpers";
@@ -233,5 +233,5 @@ export default function CommandIssuePage({
 }
 
 function Tick() {
-    return <MdCheck className="size-3.5 shrink-0 text-neutral-300" aria-hidden />;
+    return <CheckIcon className="size-3.5 shrink-0 text-neutral-300" aria-hidden />;
 }

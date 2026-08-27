@@ -2,11 +2,9 @@
 import type { Editor } from "@tiptap/react";
 import { Action, Permissions } from "@trymatcha/access-control";
 import type { ReviewHeader } from "@trymatcha/types";
+import { GithubLogoIcon, SendIcon } from "@trymatcha/ui/icons";
 import axios from "axios";
 import { useEffect, useRef, useState } from "react";
-import { FaGithub } from "react-icons/fa6";
-import { IoSendSharp } from "react-icons/io5";
-import { RiSendPlane2Fill } from "react-icons/ri";
 
 import IssueDescriptionEditor from "@/components/playground/Issue/editor/IssueDescriptionEditor";
 import { Button } from "@/components/ui/button";
@@ -95,7 +93,7 @@ export default function ReviewComposer({
                     loading={startLink.isPending}
                     onClick={() => startLink.mutate()}
                 >
-                    <FaGithub />
+                    <GithubLogoIcon />
                     Connect GitHub
                 </Button>
             </div>
@@ -131,7 +129,7 @@ export default function ReviewComposer({
                     loading={post.isPending}
                     onClick={submit}
                 >
-                    <RiSendPlane2Fill />
+                    <SendIcon />
                 </Button>
             </div>
         </div>

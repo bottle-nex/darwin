@@ -1,5 +1,5 @@
 "use client";
-import { LuListFilter, LuTrash2 } from "react-icons/lu";
+import { DeleteIcon, FilterIcon } from "@trymatcha/ui/icons";
 
 import {
     DropdownMenu,
@@ -82,7 +82,7 @@ export function FiltersPanelItems() {
                 <>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem variant="destructive" onSelect={clearAll}>
-                        <LuTrash2 className="size-3.5" aria-hidden />
+                        <DeleteIcon className="size-3.5" aria-hidden />
                         <span className="flex-1">Clear all filters</span>
                     </DropdownMenuItem>
                 </>
@@ -100,7 +100,7 @@ export default function FiltersPanel() {
                 <DropdownMenuTrigger asChild>
                     <OptionButton
                         label="Filter"
-                        icon={LuListFilter}
+                        icon={FilterIcon}
                         active={hasActiveFilters(filters)}
                     />
                 </DropdownMenuTrigger>

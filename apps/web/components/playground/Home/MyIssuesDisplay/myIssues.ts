@@ -1,6 +1,6 @@
 import { IssueStatus } from "@trymatcha/types";
-import type { IconType } from "react-icons";
-import { LuColumns3 } from "react-icons/lu";
+import type { IconType } from "@trymatcha/ui/icons";
+import { KanbanColumnsIcon } from "@trymatcha/ui/icons";
 
 import { PRIORITY_OPTIONS } from "@/components/playground/Issue/issueHelpers";
 import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
@@ -88,7 +88,7 @@ export function groupIssues(
         statusGroups.push({
             key: IssueStatus.Parked,
             label: "Parked",
-            icon: LuColumns3,
+            icon: KanbanColumnsIcon,
             iconClassName: "text-neutral-400",
             issues: parkedIssues,
         });

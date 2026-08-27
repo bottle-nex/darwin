@@ -1,7 +1,7 @@
 "use client";
 import { useDroppable } from "@dnd-kit/core";
 import { IssueStatus } from "@trymatcha/types";
-import { MdAdd, MdChecklist, MdClose, MdMoreHoriz } from "react-icons/md";
+import { AddIcon, BulkSelectIcon, CloseIcon, OverflowMenuIcon } from "@trymatcha/ui/icons";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -72,7 +72,7 @@ export default function KanbanColumn({
                             aria-label={`Add an issue to ${title}`}
                             className="flex size-6 cursor-pointer items-center justify-center rounded text-neutral-400 opacity-0 transition-opacity hover:bg-white/10 hover:text-neutral-200 focus-visible:opacity-100 group-hover:opacity-100"
                         >
-                            <MdAdd className="size-4" aria-hidden />
+                            <AddIcon className="size-4" aria-hidden />
                         </Button>
                     )}
                     <DropdownMenu>
@@ -83,7 +83,7 @@ export default function KanbanColumn({
                                 aria-label={`${title} options`}
                                 className="flex size-6 cursor-pointer items-center justify-center rounded text-neutral-400 opacity-0 transition-opacity hover:bg-white/10 hover:text-neutral-200 focus-visible:opacity-100 group-hover:opacity-100 data-[state=open]:opacity-100"
                             >
-                                <MdMoreHoriz className="size-4" aria-hidden />
+                                <OverflowMenuIcon className="size-4" aria-hidden />
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-52">
@@ -96,7 +96,7 @@ export default function KanbanColumn({
                                     )
                                 }
                             >
-                                <MdChecklist className="size-3.5" aria-hidden />
+                                <BulkSelectIcon className="size-3.5" aria-hidden />
                                 <span className="flex-1">Select loaded issues</span>
                                 <span className="text-[11px] text-neutral-500">
                                     {issues.length}
@@ -105,7 +105,7 @@ export default function KanbanColumn({
 
                             {selectedIds.length > 0 && (
                                 <DropdownMenuItem onSelect={clearSelection}>
-                                    <MdClose className="size-3.5" aria-hidden />
+                                    <CloseIcon className="size-3.5" aria-hidden />
                                     <span className="flex-1">Clear selection</span>
                                 </DropdownMenuItem>
                             )}
@@ -165,7 +165,7 @@ export default function KanbanColumn({
                             onClick={() => openCreate({ board: "llm" })}
                             className="mt-2 flex w-full shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-[9px] px-2 py-1.5 text-center text-[13px] font-medium text-neutral-400 opacity-0 transition-opacity hover:bg-white/5 hover:text-neutral-200 focus-visible:opacity-100 group-hover:opacity-100"
                         >
-                            <MdAdd className="size-3.5" aria-hidden />
+                            <AddIcon className="size-3.5" aria-hidden />
                             Add an Issue
                         </Button>
                     ) : undefined

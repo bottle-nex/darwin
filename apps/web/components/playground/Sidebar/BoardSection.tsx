@@ -1,7 +1,5 @@
 "use client";
-import { HiMenuAlt2 } from "react-icons/hi";
-import { HiOutlineTag } from "react-icons/hi2";
-import { PiColumnsLight } from "react-icons/pi";
+import { GanttNavIcon, KanbanColumnsIcon, TagIcon } from "@trymatcha/ui/icons";
 
 import { PlaygroundTab } from "../playgroundTabs";
 import { type SidebarSectionProps } from "./shared";
@@ -10,9 +8,9 @@ import Section from "./SidebarSection";
 
 // The ways you look at the project's work — the board itself and its lenses.
 const BOARD_ROWS: { id: string; label: string; icon: React.ComponentType }[] = [
-    { id: PlaygroundTab.Kanban, label: "Kanban", icon: PiColumnsLight },
-    { id: PlaygroundTab.Gantt, label: "Gantt", icon: HiMenuAlt2 },
-    { id: PlaygroundTab.Tags, label: "Tags", icon: HiOutlineTag },
+    { id: PlaygroundTab.Kanban, label: "Kanban", icon: KanbanColumnsIcon },
+    { id: PlaygroundTab.Gantt, label: "Gantt", icon: GanttNavIcon },
+    { id: PlaygroundTab.Tags, label: "Tags", icon: TagIcon },
 ];
 
 export default function PlaygroundSidebarBoardSection({

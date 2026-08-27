@@ -1,8 +1,8 @@
 "use client";
 import { type ChatPreviewMessage, to_plain_text } from "@trymatcha/types";
+import { AddIcon, SearchToggleIcon } from "@trymatcha/ui/icons";
 import { AnimatePresence } from "motion/react";
 import { useState } from "react";
-import { HiOutlineMagnifyingGlass, HiOutlinePlus } from "react-icons/hi2";
 
 import PlaygroundAvatar, {
     toneFor,
@@ -155,7 +155,7 @@ export default function ChatConversationSidebar({
                                             aria-label="Create team"
                                             className="flex size-6 cursor-pointer items-center justify-center rounded-md text-neutral-500 transition-colors hover:bg-white/5 hover:text-neutral-100"
                                         >
-                                            <HiOutlinePlus className="size-3.5" aria-hidden />
+                                            <AddIcon className="size-3.5" aria-hidden />
                                         </Button>
                                     )}
                                     <Button
@@ -165,10 +165,7 @@ export default function ChatConversationSidebar({
                                         aria-label="Search teams"
                                         className="flex size-6 cursor-pointer items-center justify-center rounded-md text-neutral-500 transition-colors hover:bg-white/5 hover:text-neutral-100"
                                     >
-                                        <HiOutlineMagnifyingGlass
-                                            className="size-3.5"
-                                            aria-hidden
-                                        />
+                                        <SearchToggleIcon className="size-3.5" aria-hidden />
                                     </Button>
                                 </div>
                             </div>

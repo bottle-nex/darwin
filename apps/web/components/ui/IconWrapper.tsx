@@ -1,5 +1,5 @@
+import type { IconType } from "@trymatcha/ui/icons";
 import type { CSSProperties, ReactNode } from "react";
-import type { IconType } from "react-icons";
 
 import { TooltipComponent } from "@/components/ui/tooltip-component";
 import { cn } from "@/lib/utils";

@@ -1,7 +1,7 @@
 "use client";
+import { DropdownCaretIcon } from "@trymatcha/ui/icons";
 import { motion, type Variants } from "motion/react";
 import { useState } from "react";
-import { MdArrowRight } from "react-icons/md";
 
 import { cn } from "@/lib/utils";
 import type { KanbanColumnDef } from "@/types/kanban";
@@ -44,10 +44,10 @@ export default function HiddenKanbanColumn({ columns }: HiddenKanbanColumnProps)
                 onClick={() => setCollapsed((c) => !c)}
                 className="mb-2 flex cursor-pointer items-center gap-1.5 rounded-md px-2 py-1 text-left hover:bg-white/5"
             >
-                <MdArrowRight
+                <DropdownCaretIcon
                     className={cn(
                         "size-4 shrink-0 text-neutral-500 transition-all",
-                        !collapsed && "rotate-90",
+                        collapsed && "-rotate-90",
                     )}
                     aria-hidden
                 />

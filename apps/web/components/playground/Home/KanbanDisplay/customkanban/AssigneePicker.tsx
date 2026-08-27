@@ -1,6 +1,5 @@
 "use client";
-import { MdCheck } from "react-icons/md";
-import { RiLoader4Line } from "react-icons/ri";
+import { CheckIcon, LoadingSpinnerIcon } from "@trymatcha/ui/icons";
 
 import PlaygroundAvatar, {
     initialOf,
@@ -89,13 +88,13 @@ export default function AssigneePicker({
                                         </span>
                                     </span>
                                     {pendingAssigneeId === member.id ? (
-                                        <RiLoader4Line
+                                        <LoadingSpinnerIcon
                                             className="size-4 shrink-0 animate-spin text-neutral-400"
                                             aria-hidden
                                         />
                                     ) : (
                                         assigned && (
-                                            <MdCheck
+                                            <CheckIcon
                                                 className="size-4 shrink-0 text-emerald-300"
                                                 aria-hidden
                                             />

@@ -1,6 +1,8 @@
 "use client";
 import {
     type AnimatedIcon,
+    CtaArrowIcon,
+    DropdownCaretIcon,
     MarketingBriefcaseIcon,
     MarketingChecklistIcon,
     MarketingNoteIcon,
@@ -10,8 +12,6 @@ import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { MdChevronRight } from "react-icons/md";
-import { PiCaretDownBold } from "react-icons/pi";
 
 import AppLogo from "@/components/app/Applogo";
 import { cn } from "@/lib/utils";
@@ -133,7 +133,7 @@ export function LandingNavbar() {
                                         )}
                                     >
                                         {item.label}
-                                        <PiCaretDownBold
+                                        <DropdownCaretIcon
                                             className={cn(
                                                 "size-2.5 transition-transform duration-200 motion-reduce:transition-none",
                                                 openMenu === item.label && "rotate-180",
@@ -194,7 +194,7 @@ export function LandingNavbar() {
 
                     <Button variant={"tertiary"} onClick={session ? handleRedirect : handleSignin}>
                         Get Started
-                        <MdChevronRight className="text-ink!" />
+                        <CtaArrowIcon className="text-ink!" />
                     </Button>
                 </div>
             </div>

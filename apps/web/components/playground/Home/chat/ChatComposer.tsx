@@ -6,9 +6,8 @@ import Placeholder from "@tiptap/extension-placeholder";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import type { LabelledReference } from "@trymatcha/types";
+import { EmojiReactionIcon, SendIcon } from "@trymatcha/ui/icons";
 import { forwardRef, useEffect, useId, useImperativeHandle, useMemo, useRef } from "react";
-import { HiOutlineFaceSmile } from "react-icons/hi2";
-import { RiTelegram2Line } from "react-icons/ri";
 
 import { Button } from "@/components/ui/button";
 import EmojiPicker from "@/components/ui/EmojiPicker";
@@ -186,7 +185,7 @@ const ChatComposer = forwardRef<ChatComposerHandle, ChatComposerProps>(function 
                     aria-label="Send message"
                     className="group absolute bottom-2 right-1.5 rounded-full"
                 >
-                    <IconWrapper icon={RiTelegram2Line} variant="ghost" />
+                    <IconWrapper icon={SendIcon} variant="ghost" />
                 </Button>
                 <EmojiPicker
                     onSelect={(emoji) => editor?.chain().focus().insertContent(emoji).run()}
@@ -197,7 +196,7 @@ const ChatComposer = forwardRef<ChatComposerHandle, ChatComposerProps>(function 
                         aria-label="Add emoji"
                         className="group absolute bottom-2 right-9 rounded-full"
                     >
-                        <IconWrapper icon={HiOutlineFaceSmile} variant="ghost" />
+                        <IconWrapper icon={EmojiReactionIcon} variant="ghost" />
                     </Button>
                 </EmojiPicker>
             </div>

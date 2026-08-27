@@ -1,10 +1,14 @@
 "use client";
 import { useQueryClient } from "@tanstack/react-query";
 import { TeamRole } from "@trymatcha/types";
+import {
+    ChangeRoleIcon,
+    OverflowMenuVerticalIcon,
+    RemoveMemberIcon,
+    SubmenuDisclosureIcon,
+} from "@trymatcha/ui/icons";
 import axios from "axios";
 import Image from "next/image";
-import { MdKeyboardArrowRight, MdPersonOff, MdVerifiedUser } from "react-icons/md";
-import { PiDotsThreeOutlineVerticalLight } from "react-icons/pi";
 
 import {
     DropdownMenu,
@@ -100,7 +104,7 @@ export default function ProfileCard({
                 <DropdownMenu modal={false}>
                     <DropdownMenuTrigger asChild>
                         <div className="absolute z-10 right-0 p-1 rounded-sm bg-linear-to-bl from-black/50 to-transparent cursor-pointer">
-                            <PiDotsThreeOutlineVerticalLight />
+                            <OverflowMenuVerticalIcon />
                         </div>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-52">
@@ -108,13 +112,13 @@ export default function ProfileCard({
                             <DropdownMenuSub>
                                 <DropdownMenuSubTrigger className="justify-between">
                                     <span className="flex items-center gap-2.5">
-                                        <MdVerifiedUser
+                                        <ChangeRoleIcon
                                             className="size-4 text-neutral-400"
                                             aria-hidden
                                         />
                                         Change authority
                                     </span>
-                                    <MdKeyboardArrowRight
+                                    <SubmenuDisclosureIcon
                                         className="size-3.5 text-neutral-500"
                                         aria-hidden
                                     />
@@ -137,7 +141,7 @@ export default function ProfileCard({
                         <DropdownMenuSeparator className="h-0.5 bg-[#0F0F0F] shadow-xs shadow-white/4" />
                         <div className="p-1">
                             <DropdownMenuItem className={"group"} onClick={handleKick}>
-                                <MdPersonOff
+                                <RemoveMemberIcon
                                     className="size-4 text-neutral-400 group-hover:text-red-300"
                                     aria-hidden
                                 />

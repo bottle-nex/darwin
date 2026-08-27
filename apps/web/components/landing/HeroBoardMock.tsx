@@ -1,21 +1,21 @@
 "use client";
 
+import {
+    AddIcon,
+    CheckIcon,
+    FilterIcon,
+    PlatformAgentsIcon,
+    PlatformBoardIcon,
+    PlatformInboxIcon,
+    PlatformInsightsIcon,
+    PlatformRunnersIcon,
+    PlatformSettingsIcon,
+    PullRequestOpenIcon,
+    SearchIcon,
+    SwitcherToggleIcon,
+} from "@trymatcha/ui/icons";
 import { AnimatePresence, motion, useInView, useReducedMotion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
-import {
-    LuBot,
-    LuChartLine,
-    LuCheck,
-    LuChevronsUpDown,
-    LuGitPullRequest,
-    LuInbox,
-    LuListFilter,
-    LuPlus,
-    LuSearch,
-    LuSettings,
-    LuSquareKanban,
-    LuSquareTerminal,
-} from "react-icons/lu";
 
 import HeroBuddy from "@/components/landing/v2/HeroBuddy";
 import { MatchaLogo } from "@/components/logo/MatchaLogo";
@@ -66,12 +66,12 @@ const LOGS = [
 ];
 
 const NAV = [
-    { label: "Board", icon: LuSquareKanban, active: true },
-    { label: "Inbox", icon: LuInbox },
-    { label: "Agents", icon: LuBot },
-    { label: "Runners", icon: LuSquareTerminal },
-    { label: "Insights", icon: LuChartLine },
-    { label: "Settings", icon: LuSettings },
+    { label: "Board", icon: PlatformBoardIcon, active: true },
+    { label: "Inbox", icon: PlatformInboxIcon },
+    { label: "Agents", icon: PlatformAgentsIcon },
+    { label: "Runners", icon: PlatformRunnersIcon },
+    { label: "Insights", icon: PlatformInsightsIcon },
+    { label: "Settings", icon: PlatformSettingsIcon },
 ];
 
 function Avatar({ initials, className }: { initials: string; className?: string }) {
@@ -115,7 +115,7 @@ function ActiveCard({ stage, animate }: { stage: number; animate: boolean }) {
                 <span className="font-mono text-[10px] text-neutral-400">MAT-142</span>
                 {stage === 3 ? (
                     <span className="flex items-center gap-1 font-mono text-[9px] text-emerald-400/90">
-                        <LuCheck className="size-2.5" /> merged
+                        <CheckIcon className="size-2.5" /> merged
                     </span>
                 ) : (
                     <Avatar initials="A3" />
@@ -147,7 +147,7 @@ function ActiveCard({ stage, animate }: { stage: number; animate: boolean }) {
                 {stage === 2 && (
                     <>
                         <span className="flex items-center gap-1 rounded border border-white/10 bg-white/4 px-1.5 py-px font-mono text-[9px] text-neutral-300">
-                            <LuGitPullRequest className="size-2.5" /> #482
+                            <PullRequestOpenIcon className="size-2.5" /> #482
                         </span>
                         <span className="font-mono text-[9px] text-neutral-500">checks 42/42</span>
                     </>
@@ -203,7 +203,7 @@ export default function HeroBoardMock({ className }: { className?: string }) {
                         </span>
                         <span className="text-[11px] font-medium text-neutral-300">apollo</span>
                     </span>
-                    <LuChevronsUpDown className="size-3 text-neutral-600" />
+                    <SwitcherToggleIcon className="size-3 text-neutral-600" />
                 </button>
 
                 <nav className="mt-4 flex flex-col gap-0.5">
@@ -263,7 +263,7 @@ export default function HeroBoardMock({ className }: { className?: string }) {
                         <span className="font-medium text-neutral-200">Board</span>
                     </span>
                     <div className="ml-2 hidden flex-1 items-center gap-2 rounded-md border border-white/7 bg-white/[0.03] px-2.5 py-1.5 md:flex md:max-w-56">
-                        <LuSearch className="size-3 text-neutral-600" />
+                        <SearchIcon className="size-3 text-neutral-600" />
                         <span className="text-[11px] text-neutral-600">Search issues…</span>
                         <span className="ml-auto rounded border border-white/8 px-1 font-mono text-[9px] text-neutral-600">
                             ⌘K
@@ -282,7 +282,7 @@ export default function HeroBoardMock({ className }: { className?: string }) {
                             <Avatar initials="SJ" />
                         </div>
                         <span className="flex items-center gap-1 rounded-md bg-snow px-2.5 py-1.5 text-[11px] font-medium text-ink">
-                            <LuPlus className="size-3" /> New issue
+                            <AddIcon className="size-3" /> New issue
                         </span>
                     </div>
                 </div>
@@ -295,7 +295,7 @@ export default function HeroBoardMock({ className }: { className?: string }) {
                     <span className="px-2 py-1 text-[10px] text-neutral-500">Mine</span>
                     <span className="px-2 py-1 text-[10px] text-neutral-500">Agents</span>
                     <span className="ml-auto flex items-center gap-1 text-[10px] text-neutral-500">
-                        <LuListFilter className="size-3" /> Filter
+                        <FilterIcon className="size-3" /> Filter
                     </span>
                 </div>
 
@@ -316,7 +316,7 @@ export default function HeroBoardMock({ className }: { className?: string }) {
                                 <StaticCard key={card.id} card={card} />
                             ))}
                             <div className="flex items-center gap-1 px-0.5 pt-0.5 text-[10px] text-neutral-600">
-                                <LuPlus className="size-3" /> Add issue
+                                <AddIcon className="size-3" /> Add issue
                             </div>
                         </div>
                     ))}

@@ -1,11 +1,10 @@
 "use client";
 
+import type { IconType } from "@trymatcha/ui/icons";
+import { CalendarIcon, CheckIcon } from "@trymatcha/ui/icons";
 import { format } from "date-fns";
 import { forwardRef, useState } from "react";
 import type { Matcher } from "react-day-picker";
-import type { IconType } from "react-icons";
-import { HiCalendar } from "react-icons/hi2";
-import { MdCheck } from "react-icons/md";
 
 import { Button } from "@/components/ui/button";
 import { Calendar, type CalendarRange } from "@/components/ui/calendar";
@@ -66,7 +65,7 @@ function CapsuleOptionList({ options, value, onSelect }: CapsuleOptionListProps)
                             )}
                             {option.label}
                         </span>
-                        {isSelected && <MdCheck className="size-4 shrink-0 text-neutral-400" />}
+                        {isSelected && <CheckIcon className="size-4 shrink-0 text-neutral-400" />}
                     </Button>
                 );
             })}
@@ -129,7 +128,7 @@ function CapsuleCalendar({
     placeholder = "Set date",
     disabled,
     className,
-    icon: Icon = HiCalendar,
+    icon: Icon = CalendarIcon,
     iconClassName = "text-white/60",
     range,
     earliest,

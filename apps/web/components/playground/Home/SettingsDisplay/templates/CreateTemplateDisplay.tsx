@@ -1,9 +1,9 @@
 "use client";
 
 import type { Editor } from "@tiptap/react";
+import { BackChevronIcon, CheckIcon, TemplateDocumentIcon } from "@trymatcha/ui/icons";
 import { AxiosError } from "axios";
 import { useState } from "react";
-import { MdCheck, MdChevronLeft, MdDescription } from "react-icons/md";
 
 import IssueDescriptionEditor from "@/components/playground/Issue/editor/IssueDescriptionEditor";
 import { Button } from "@/components/ui/button";
@@ -122,7 +122,7 @@ export default function CreateTemplateDisplay({
                     onClick={onDone}
                     className="flex w-fit cursor-pointer items-center gap-0.5 text-[12px] text-neutral-500 hover:text-neutral-300"
                 >
-                    <MdChevronLeft className="size-4" aria-hidden />
+                    <BackChevronIcon className="size-4" aria-hidden />
                     Issue templates
                 </Button>
             </nav>
@@ -144,7 +144,10 @@ export default function CreateTemplateDisplay({
                             {icon ? (
                                 <IconPickGlyph pick={icon} className="size-5 text-lg" />
                             ) : (
-                                <MdDescription className="size-5 text-white/40" aria-hidden />
+                                <TemplateDocumentIcon
+                                    className="size-5 text-white/40"
+                                    aria-hidden
+                                />
                             )}
                         </Button>
                     </IconPicker>
@@ -205,7 +208,7 @@ export default function CreateTemplateDisplay({
                         )}
                     >
                         {isDefault && (
-                            <MdCheck className="size-3 text-matcha-foreground" aria-hidden />
+                            <CheckIcon className="size-3 text-matcha-foreground" aria-hidden />
                         )}
                     </span>
                     <span className="text-[12px] text-neutral-400">

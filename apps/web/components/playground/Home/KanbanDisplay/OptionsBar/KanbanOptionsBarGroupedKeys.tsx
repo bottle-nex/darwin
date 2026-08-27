@@ -1,12 +1,12 @@
 "use client";
 import {
-    LuColumns3,
-    LuEye,
-    LuListFilter,
-    LuSettings,
-    LuShare2,
-    LuSlidersHorizontal,
-} from "react-icons/lu";
+    BoardViewIcon,
+    FilterIcon,
+    KanbanColumnsIcon,
+    OptionsMenuIcon,
+    SettingsIcon,
+    ShareIcon,
+} from "@trymatcha/ui/icons";
 
 import PlaygroundBreadcrumb from "@/components/playground/Core/components/PlaygroundBreadcrumb";
 import {
@@ -72,7 +72,7 @@ export default function KanbanOptionsBarGroupedKeys() {
                                 aria-label="Options"
                                 className="flex h-7 cursor-pointer items-center gap-1 rounded-md px-2 text-[12px] font-medium text-neutral-400 transition-colors hover:bg-white/5 hover:text-neutral-200"
                             >
-                                <LuSlidersHorizontal className="size-3.5" aria-hidden />
+                                <OptionsMenuIcon className="size-3.5" aria-hidden />
                                 Options
                             </Button>
                         </DropdownMenuTrigger>
@@ -82,7 +82,7 @@ export default function KanbanOptionsBarGroupedKeys() {
                                     className={`${FILTERS_PANEL_WIDTH} [direction:ltr]`}
                                     trigger={
                                         <>
-                                            <LuListFilter
+                                            <FilterIcon
                                                 className="size-3.5 text-neutral-400"
                                                 aria-hidden
                                             />
@@ -102,7 +102,7 @@ export default function KanbanOptionsBarGroupedKeys() {
                                     className={`${FOCUS_PANEL_WIDTH} [direction:ltr]`}
                                     trigger={
                                         <>
-                                            <LuColumns3
+                                            <KanbanColumnsIcon
                                                 className="size-3.5 text-neutral-400"
                                                 aria-hidden
                                             />
@@ -121,7 +121,7 @@ export default function KanbanOptionsBarGroupedKeys() {
                                     className={`${BOARD_VIEW_PANEL_WIDTH} [direction:ltr]`}
                                     trigger={
                                         <>
-                                            <LuEye
+                                            <BoardViewIcon
                                                 className="size-3.5 text-neutral-400"
                                                 aria-hidden
                                             />
@@ -141,12 +141,12 @@ export default function KanbanOptionsBarGroupedKeys() {
                             <DropdownMenuSeparator className="my-1 h-px bg-white/5" />
 
                             <DropdownMenuItem disabled>
-                                <LuShare2 className="size-3.5 text-neutral-400" aria-hidden />
+                                <ShareIcon className="size-3.5 text-neutral-400" aria-hidden />
                                 <span className="flex-1">Share</span>
                             </DropdownMenuItem>
 
                             <DropdownMenuItem disabled>
-                                <LuSettings className="size-3.5 text-neutral-400" aria-hidden />
+                                <SettingsIcon className="size-3.5 text-neutral-400" aria-hidden />
                                 <span className="flex-1">Settings</span>
                             </DropdownMenuItem>
                         </DropdownMenuContent>

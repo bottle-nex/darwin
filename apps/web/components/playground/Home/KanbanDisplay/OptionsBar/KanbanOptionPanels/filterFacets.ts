@@ -1,9 +1,13 @@
 "use client";
+import type { IconType } from "@trymatcha/ui/icons";
+import {
+    AssigneeGroupIcon,
+    CalendarIcon,
+    CreatorIcon,
+    SearchIcon,
+    TagIcon,
+} from "@trymatcha/ui/icons";
 import { useMemo } from "react";
-import type { IconType } from "react-icons";
-import { HiCalendar } from "react-icons/hi2";
-import { LuTag, LuUser, LuUsers } from "react-icons/lu";
-import { MdSearch } from "react-icons/md";
 
 import { DATE_ICON_COLOR, PRIORITY_OPTIONS } from "@/components/playground/Issue/issueHelpers";
 import { useProjectMembers } from "@/hooks/project/useProjectMembers";
@@ -29,23 +33,23 @@ export type FacetMeta = {
 export const FACET_META: Record<FacetKey, FacetMeta> = {
     statuses: { label: "Status", plural: "statuses", icon: KanbanBoard.COLUMNS[0].icon },
     priorities: { label: "Priority", plural: "priorities", icon: PRIORITY_OPTIONS[0].icon },
-    assigneeIds: { label: "Assignee", plural: "assignees", icon: LuUsers },
-    creatorIds: { label: "Creator", plural: "creators", icon: LuUser },
-    tagIds: { label: "Tag", plural: "tags", icon: LuTag },
-    createdAt: { label: "Created", plural: "dates", icon: HiCalendar },
+    assigneeIds: { label: "Assignee", plural: "assignees", icon: AssigneeGroupIcon },
+    creatorIds: { label: "Creator", plural: "creators", icon: CreatorIcon },
+    tagIds: { label: "Tag", plural: "tags", icon: TagIcon },
+    createdAt: { label: "Created", plural: "dates", icon: CalendarIcon },
     startDate: {
         label: "Start date",
         plural: "dates",
-        icon: HiCalendar,
+        icon: CalendarIcon,
         iconClassName: DATE_ICON_COLOR.start,
     },
     targetDate: {
         label: "Target date",
         plural: "dates",
-        icon: HiCalendar,
+        icon: CalendarIcon,
         iconClassName: DATE_ICON_COLOR.target,
     },
-    query: { label: "Title", plural: "titles", icon: MdSearch },
+    query: { label: "Title", plural: "titles", icon: SearchIcon },
 };
 
 export type FacetOption = {

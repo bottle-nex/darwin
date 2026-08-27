@@ -1,7 +1,7 @@
 "use client";
 
+import { CtaArrowIcon } from "@trymatcha/ui/icons";
 import { motion } from "motion/react";
-import { MdOutlineChevronRight } from "react-icons/md";
 
 import { Button } from "@/components/ui/button";
 
@@ -51,7 +51,7 @@ export default function IntroScreen({ onStart }: { onStart: () => void }) {
             >
                 <Button onClick={onStart}>
                     <span>Start Onboarding</span>
-                    <MdOutlineChevronRight />
+                    <CtaArrowIcon />
                 </Button>
             </motion.div>
         </motion.div>

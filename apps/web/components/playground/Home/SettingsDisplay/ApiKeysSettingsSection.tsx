@@ -1,6 +1,6 @@
 "use client";
+import { ApiKeyIcon, CopyIcon } from "@trymatcha/ui/icons";
 import { useState } from "react";
-import { MdContentCopy, MdKey } from "react-icons/md";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -48,7 +48,7 @@ function CreatedKeyBanner({
                             toast.success("Copied connector url");
                         }}
                     >
-                        <MdContentCopy className="size-3" />
+                        <CopyIcon className="size-3" />
                         Copy
                     </Button>
                 </div>
@@ -72,7 +72,7 @@ function CreatedKeyBanner({
                             toast.success("Copied to clipboard");
                         }}
                     >
-                        <MdContentCopy className="size-3" />
+                        <CopyIcon className="size-3" />
                         Copy
                     </Button>
                 </div>
@@ -131,7 +131,7 @@ export default function ApiKeysSettingsSection() {
                         toast.success("Copied MCP url");
                     }}
                 >
-                    <MdContentCopy className="size-3" />
+                    <CopyIcon className="size-3" />
                     Copy
                 </Button>
             </div>
@@ -172,7 +172,7 @@ export default function ApiKeysSettingsSection() {
                         key={key.id}
                         className="flex items-center gap-x-3 rounded-lg px-2.5 py-2 hover:bg-white/5"
                     >
-                        <MdKey className="size-4 shrink-0 text-neutral-500" aria-hidden />
+                        <ApiKeyIcon className="size-4 shrink-0 text-neutral-500" aria-hidden />
                         <div className="min-w-0 flex-1">
                             <p className="truncate text-[12px] text-neutral-200">{key.label}</p>
                             <p className="truncate font-mono text-[11px] text-neutral-500">

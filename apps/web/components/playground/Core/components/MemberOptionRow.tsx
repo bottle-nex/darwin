@@ -1,6 +1,6 @@
 "use client";
+import { CheckIcon } from "@trymatcha/ui/icons";
 import type { ReactNode } from "react";
-import { MdCheck } from "react-icons/md";
 
 import { cn } from "@/lib/utils";
 
@@ -36,7 +36,7 @@ export default function MemberOptionRow({
                         : "border-white/25",
                 )}
             >
-                {checked && <MdCheck className="size-2.5" aria-hidden />}
+                {checked && <CheckIcon className="size-2.5" aria-hidden />}
             </span>
             <PlaygroundAvatar
                 letter={label.charAt(0).toUpperCase()}

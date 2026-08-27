@@ -1,6 +1,6 @@
 "use client";
+import { SubmenuDisclosureIcon } from "@trymatcha/ui/icons";
 import { type ReactNode, useState } from "react";
-import { RxTriangleRight } from "react-icons/rx";
 
 import {
     DropdownMenuSub,
@@ -35,7 +35,7 @@ export default function EagerSubmenu({
                 onPointerEnter={() => !disabled && setOpen(true)}
             >
                 {trigger}
-                <RxTriangleRight className={CHEVRON} aria-hidden />
+                <SubmenuDisclosureIcon className={CHEVRON} aria-hidden />
             </DropdownMenuSubTrigger>
             <DropdownMenuSubContent className={className}>{children}</DropdownMenuSubContent>
         </DropdownMenuSub>

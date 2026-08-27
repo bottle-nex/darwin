@@ -1,7 +1,7 @@
 "use client";
 
-import type { IconType } from "react-icons";
-import { MdAdd, MdArrowRight } from "react-icons/md";
+import type { IconType } from "@trymatcha/ui/icons";
+import { AddIcon, DropdownCaretIcon } from "@trymatcha/ui/icons";
 
 import IconWrapper from "@/components/ui/IconWrapper";
 import { cn } from "@/lib/utils";
@@ -37,10 +37,10 @@ export default function IssueListGroupHeader({
                 className="absolute inset-0 cursor-pointer rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
             />
             <div className="pointer-events-none relative flex h-full items-center gap-3 px-3">
-                <MdArrowRight
+                <DropdownCaretIcon
                     className={cn(
                         "size-4 shrink-0 text-neutral-500 transition-all group-hover/header:text-neutral-200",
-                        !collapsed && "rotate-90",
+                        collapsed && "-rotate-90",
                     )}
                     aria-hidden
                 />
@@ -66,7 +66,7 @@ export default function IssueListGroupHeader({
                         onClick={onCreate}
                         className="pointer-events-auto shrink-0 cursor-pointer rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
                     >
-                        <IconWrapper icon={MdAdd} variant="ghost" />
+                        <IconWrapper icon={AddIcon} variant="ghost" />
                     </button>
                 )}
             </div>

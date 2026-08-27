@@ -1,6 +1,5 @@
 "use client";
-
-import { RiGithubFill } from "react-icons/ri";
+import { GithubLogoIcon } from "@trymatcha/ui/icons";
 
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -24,7 +23,7 @@ export default function StepGithub({
             <StepItem>
                 <Label className="text-[13px] text-neutral-500">Repository</Label>
                 <div className="mt-1.5 flex h-11 items-center gap-3 border-b border-white/12">
-                    <RiGithubFill className="size-5 shrink-0 text-neutral-400" />
+                    <GithubLogoIcon className="size-5 shrink-0 text-neutral-400" />
                     <span
                         className={cn(
                             "truncate font-mono text-[15px]",
@@ -52,7 +51,7 @@ export default function StepGithub({
                 ) : (
                     <>
                         <Button variant="secondary" loading={connecting} onClick={onConnect}>
-                            <RiGithubFill />
+                            <GithubLogoIcon />
                             Connect GitHub
                         </Button>
                         <span className="text-[13px] text-neutral-600">

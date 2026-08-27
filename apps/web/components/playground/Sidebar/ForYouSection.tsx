@@ -1,7 +1,5 @@
 "use client";
-import { HiOutlineAnnotation } from "react-icons/hi";
-import { HiOutlineCog6Tooth, HiOutlineInbox } from "react-icons/hi2";
-import { LuClipboardList } from "react-icons/lu";
+import { ChatsNavIcon, InboxIcon, MyIssuesIcon, SettingsIcon } from "@trymatcha/ui/icons";
 
 import { useNotificationBadges } from "@/hooks/notifications/useNotificationBadges";
 
@@ -12,14 +10,14 @@ import Section from "./SidebarSection";
 
 // Everything waiting on you personally, as opposed to the board at large.
 const FOR_YOU_ROWS: { id: string; label: string; icon: React.ComponentType }[] = [
-    { id: PlaygroundTab.Inbox, label: "Inbox", icon: HiOutlineInbox },
+    { id: PlaygroundTab.Inbox, label: "Inbox", icon: InboxIcon },
     {
         id: PlaygroundTab.AssignedToMe,
         label: "My issues",
-        icon: LuClipboardList,
+        icon: MyIssuesIcon,
     },
-    { id: PlaygroundTab.Chats, label: "Chats", icon: HiOutlineAnnotation },
-    { id: PlaygroundTab.SettingsAppearance, label: "Settings", icon: HiOutlineCog6Tooth },
+    { id: PlaygroundTab.Chats, label: "Chats", icon: ChatsNavIcon },
+    { id: PlaygroundTab.SettingsAppearance, label: "Settings", icon: SettingsIcon },
 ];
 
 export default function PlaygroundSidebarForYouSection({

@@ -1,9 +1,9 @@
 "use client";
 
+import type { IconType } from "@trymatcha/ui/icons";
+import { PlatformBoardIcon, PlatformRunnersIcon } from "@trymatcha/ui/icons";
 import { motion, useInView, useReducedMotion } from "motion/react";
 import { useRef, useState } from "react";
-import type { IconType } from "react-icons";
-import { LuSquareKanban, LuSquareTerminal } from "react-icons/lu";
 
 import HeroBuddy from "@/components/landing/v2/HeroBuddy";
 import { cn } from "@/lib/utils";
@@ -47,7 +47,7 @@ type GhostLayer = {
 
 const BOARD_LAYER: GhostLayer = {
     id: "board",
-    icon: LuSquareKanban,
+    icon: PlatformBoardIcon,
     title: "The board",
     description:
         "Teams drop issues onto a shared canvas. Every card carries the repo, the scope, and what done looks like: the full context an agent needs to start.",
@@ -55,7 +55,7 @@ const BOARD_LAYER: GhostLayer = {
 
 const RUNNER_LAYER: GhostLayer = {
     id: "runner",
-    icon: LuSquareTerminal,
+    icon: PlatformRunnersIcon,
     title: "Code runners",
     description:
         "Sandboxed, ephemeral compute clones your project and actually runs it. Build, test, validate, so nothing ships on faith.",

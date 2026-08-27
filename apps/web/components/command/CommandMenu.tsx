@@ -1,6 +1,6 @@
 "use client";
+import { CommandBackIcon } from "@trymatcha/ui/icons";
 import { useMemo, useState } from "react";
-import { HiOutlineArrowLeft } from "react-icons/hi2";
 
 import {
     Command,
@@ -143,7 +143,7 @@ function CommandMenuBody({ onDone }: { onDone: () => void }) {
                                 onClick={back}
                                 className="flex shrink-0 cursor-pointer items-center gap-1.5 rounded-md px-2 py-1 text-[11px] text-neutral-500 hover:bg-white/5 hover:text-neutral-300"
                             >
-                                <HiOutlineArrowLeft className="size-3" aria-hidden />
+                                <CommandBackIcon className="size-3" aria-hidden />
                                 Back
                             </button>
                         ) : null

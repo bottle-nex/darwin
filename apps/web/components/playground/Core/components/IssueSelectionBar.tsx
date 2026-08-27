@@ -1,8 +1,8 @@
 "use client";
 
+import { CloseIcon } from "@trymatcha/ui/icons";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { useEffect } from "react";
-import { MdClose } from "react-icons/md";
 
 import { Button } from "@/components/ui/button";
 import { useIssueSelectionShortcuts } from "@/hooks/issues/useIssueSelectionShortcuts";
@@ -60,7 +60,7 @@ export default function IssueSelectionBar() {
                             onClick={clear}
                             className="flex size-7 cursor-pointer items-center justify-center rounded-full text-neutral-400 transition-colors hover:bg-snow/6 hover:text-neutral-200"
                         >
-                            <MdClose className="size-4" aria-hidden />
+                            <CloseIcon className="size-4" aria-hidden />
                         </Button>
                     </div>
                 </motion.div>

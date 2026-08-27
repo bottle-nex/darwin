@@ -5,24 +5,26 @@ import {
     type ActivityPayloadMap,
     ActivityType,
 } from "@trymatcha/types";
-import type { ReactNode } from "react";
-import type { IconType } from "react-icons";
-import { FaRunning } from "react-icons/fa";
-import { GoGitMerge, GoGitPullRequestClosed } from "react-icons/go";
-import { HiCalendar } from "react-icons/hi2";
-import { IoMdPricetags } from "react-icons/io";
-import { IoPencilSharp } from "react-icons/io5";
+import type { IconType } from "@trymatcha/ui/icons";
 import {
-    LuActivity,
-    LuAlignLeft,
-    LuCircleDashed,
-    LuCircleX,
-    LuGitPullRequest,
-    LuPencil,
-} from "react-icons/lu";
-import { MdPersonAddAlt1, MdPersonRemove } from "react-icons/md";
-import { RiSignalCellular2Fill } from "react-icons/ri";
-import { TbSoupFilled } from "react-icons/tb";
+    AssigneeAddedActivityIcon,
+    AssigneeRemovedActivityIcon,
+    CalendarIcon,
+    ComposeIssueIcon,
+    DescriptionChangedActivityIcon,
+    EditIcon,
+    ErrorCircleIcon,
+    MergeIcon,
+    PriorityChangedActivityIcon,
+    PullRequestClosedIcon,
+    PullRequestOpenIcon,
+    RunCompletedActivityIcon,
+    RunStartedActivityIcon,
+    StatusChangedActivityIcon,
+    TagIcon,
+    UntrackedActivityIcon,
+} from "@trymatcha/ui/icons";
+import type { ReactNode } from "react";
 
 import TagDisplay from "@/components/playground/Home/TagsDisplay/TagDisplay";
 import { formatDate } from "@/lib/format";
@@ -70,7 +72,7 @@ function priority_glyph(rank: number | undefined): Glyph | undefined {
 function dates_glyph(from: DateRange | undefined, to: DateRange | undefined): Glyph {
     const startMoved = from?.startDate !== to?.startDate;
     return {
-        icon: HiCalendar,
+        icon: CalendarIcon,
         iconClassName: startMoved ? DATE_ICON_COLOR.start : DATE_ICON_COLOR.target,
     };
 }
@@ -141,13 +143,13 @@ const MUTED_ICON_COLOR = "text-snow/70";
 
 const REGISTRY: { [K in ActivityType]?: ActivityEntry<K> } = {
     [ActivityType.IssueCreated]: {
-        icon: IoPencilSharp,
+        icon: ComposeIssueIcon,
         iconClassName: "text-neutral-400",
         render: () => "created the issue",
         summary: "created the issue",
     },
     [ActivityType.StatusChanged]: {
-        icon: LuCircleDashed,
+        icon: StatusChangedActivityIcon,
         iconClassName: "text-[#F1BF00]",
         glyph: (payload) => location_glyph(payload.to),
         render: (payload) => (
@@ -159,7 +161,7 @@ const REGISTRY: { [K in ActivityType]?: ActivityEntry<K> } = {
         summary: "changed status",
     },
     [ActivityType.PriorityChanged]: {
-        icon: RiSignalCellular2Fill,
+        icon: PriorityChangedActivityIcon,
         iconClassName: "text-neutral-400",
         glyph: (payload) => priority_glyph(payload.to),
         render: (payload) => (
@@ -171,7 +173,7 @@ const REGISTRY: { [K in ActivityType]?: ActivityEntry<K> } = {
         summary: "changed priority",
     },
     [ActivityType.TitleChanged]: {
-        icon: LuPencil,
+        icon: EditIcon,
         iconClassName: "text-neutral-300",
         render: (payload) => (
             <>
@@ -182,13 +184,13 @@ const REGISTRY: { [K in ActivityType]?: ActivityEntry<K> } = {
         summary: "changed the title",
     },
     [ActivityType.DescriptionChanged]: {
-        icon: LuAlignLeft,
+        icon: DescriptionChangedActivityIcon,
         iconClassName: "text-neutral-300",
         render: () => "updated the description",
         summary: "updated the description",
     },
     [ActivityType.AssigneeAdded]: {
-        icon: MdPersonAddAlt1,
+        icon: AssigneeAddedActivityIcon,
         iconClassName: MUTED_ICON_COLOR,
         render: (payload) => (
             <>
@@ -198,7 +200,7 @@ const REGISTRY: { [K in ActivityType]?: ActivityEntry<K> } = {
         summary: "changed assignees",
     },
     [ActivityType.AssigneeRemoved]: {
-        icon: MdPersonRemove,
+        icon: AssigneeRemovedActivityIcon,
         iconClassName: MUTED_ICON_COLOR,
         render: (payload) => (
             <>
@@ -208,7 +210,7 @@ const REGISTRY: { [K in ActivityType]?: ActivityEntry<K> } = {
         summary: "changed assignees",
     },
     [ActivityType.LabelAdded]: {
-        icon: IoMdPricetags,
+        icon: TagIcon,
         iconClassName: MUTED_ICON_COLOR,
         render: (payload) => (
             <>
@@ -218,7 +220,7 @@ const REGISTRY: { [K in ActivityType]?: ActivityEntry<K> } = {
         summary: "changed labels",
     },
     [ActivityType.LabelRemoved]: {
-        icon: IoMdPricetags,
+        icon: TagIcon,
         iconClassName: MUTED_ICON_COLOR,
         render: (payload) => (
             <>
@@ -228,26 +230,26 @@ const REGISTRY: { [K in ActivityType]?: ActivityEntry<K> } = {
         summary: "changed labels",
     },
     [ActivityType.DatesChanged]: {
-        icon: HiCalendar,
+        icon: CalendarIcon,
         iconClassName: DATE_ICON_COLOR.start,
         glyph: (payload) => dates_glyph(payload.from, payload.to),
         render: (payload) => dates_predicate(payload.from, payload.to),
         summary: "changed dates",
     },
     [ActivityType.RunStarted]: {
-        icon: FaRunning,
+        icon: RunStartedActivityIcon,
         iconClassName: "text-snow/60",
         render: (payload) => `started attempt ${payload.attemptNumber}`,
         summary: "started an attempt",
     },
     [ActivityType.RunCompleted]: {
-        icon: TbSoupFilled,
+        icon: RunCompletedActivityIcon,
         iconClassName: "text-snow/60",
         render: (payload) => `finished attempt ${payload.attemptNumber}`,
         summary: "finished an attempt",
     },
     [ActivityType.AttemptFailed]: {
-        icon: LuCircleX,
+        icon: ErrorCircleIcon,
         iconClassName: "text-red-300",
         render: (payload) => (
             <>
@@ -257,7 +259,7 @@ const REGISTRY: { [K in ActivityType]?: ActivityEntry<K> } = {
         summary: "failed an attempt",
     },
     [ActivityType.PrOpened]: {
-        icon: LuGitPullRequest,
+        icon: PullRequestOpenIcon,
         iconClassName: "text-green-500/90",
         render: (payload) => (
             <>
@@ -275,7 +277,7 @@ const REGISTRY: { [K in ActivityType]?: ActivityEntry<K> } = {
         summary: "opened a pull request",
     },
     [ActivityType.PrMerged]: {
-        icon: GoGitMerge,
+        icon: MergeIcon,
         iconClassName: "text-violet-400",
         render: (payload) => (
             <>
@@ -293,7 +295,7 @@ const REGISTRY: { [K in ActivityType]?: ActivityEntry<K> } = {
         summary: "merged a pull request",
     },
     [ActivityType.PrClosed]: {
-        icon: GoGitPullRequestClosed,
+        icon: PullRequestClosedIcon,
         iconClassName: "text-rose-400",
         render: (payload) => (
             <>
@@ -312,7 +314,7 @@ const REGISTRY: { [K in ActivityType]?: ActivityEntry<K> } = {
     },
 };
 
-/** What a type without a template falls back to, alongside {@link LuActivity}. */
+/** What a type without a template falls back to, alongside {@link UntrackedActivityIcon}. */
 const UNTEMPLATED_TONE = "text-neutral-500";
 
 type ResolvedEntry = {
@@ -337,7 +339,7 @@ export function activity_entry(type: ActivityType): ResolvedEntry {
         | undefined;
     if (!entry) {
         return {
-            glyph: () => ({ icon: LuActivity, iconClassName: UNTEMPLATED_TONE }),
+            glyph: () => ({ icon: UntrackedActivityIcon, iconClassName: UNTEMPLATED_TONE }),
             render: () => humanize(type),
             detail: null,
             summary: humanize(type),

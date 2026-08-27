@@ -1,9 +1,13 @@
 "use client";
 
+import {
+    DiscordLogoIcon,
+    FooterLinkHoverArrowIcon,
+    GithubLogoIcon,
+    XLogoIcon,
+} from "@trymatcha/ui/icons";
 import { useInView, useReducedMotion } from "motion/react";
 import { type CSSProperties, useRef } from "react";
-import { BsArrowDownShort } from "react-icons/bs";
-import { FaDiscord, FaGithub, FaXTwitter } from "react-icons/fa6";
 
 import { MatchaLogo } from "@/components/logo/MatchaLogo";
 import { cn } from "@/lib/utils";
@@ -46,9 +50,9 @@ const FOOTER_COLUMNS = [
 ];
 
 const SOCIALS = [
-    { label: "GitHub", icon: FaGithub },
-    { label: "X", icon: FaXTwitter },
-    { label: "Discord", icon: FaDiscord },
+    { label: "GitHub", icon: GithubLogoIcon },
+    { label: "X", icon: XLogoIcon },
+    { label: "Discord", icon: DiscordLogoIcon },
 ];
 
 function FooterContent() {
@@ -68,7 +72,7 @@ function FooterContent() {
                                         className="group inline-flex gap-x-0.5 items-center text-[0.8125rem] text-neutral-500 transition-colors hover:text-snow/80"
                                     >
                                         {label}
-                                        <BsArrowDownShort className="size-4 -translate-y-0.5 opacity-0 transition-all duration-200 group-hover:translate-y-0 group-hover:opacity-90 -rotate-135" />
+                                        <FooterLinkHoverArrowIcon className="size-4 -translate-y-0.5 opacity-0 transition-all duration-200 group-hover:translate-y-0 group-hover:opacity-90 -rotate-135" />
                                     </a>
                                 </li>
                             ))}

@@ -1,5 +1,5 @@
 "use client";
-import { GoGitPullRequest } from "react-icons/go";
+import { PullRequestOpenIcon } from "@trymatcha/ui/icons";
 
 import { reviewSlugFor } from "@/components/playground/Review/reviewSlug";
 import { usePaneRouteStore } from "@/store/playground/usePaneRouteStore";
@@ -21,7 +21,7 @@ export default function IssueAttachments({ issue }: { issue: BoardIssue }) {
                 className={STACKED_CAPSULE}
                 onClick={() => openReview({ pullNumber, slug: reviewSlugFor(issue) })}
             >
-                <GoGitPullRequest className="size-3.75! text-green-500" />
+                <PullRequestOpenIcon className="size-3.75! text-green-500" />
                 Pull request
             </CapsuleTrigger>
         </PropertyGroup>

@@ -1,6 +1,6 @@
 "use client";
 import { type ReviewHeader as ReviewHeaderData, ReviewTab } from "@trymatcha/types";
-import { AiFillMerge } from "react-icons/ai";
+import { MergeIcon } from "@trymatcha/ui/icons";
 
 import LogoLoader from "@/components/app/LogoLoader";
 import { PLAYGROUND_PANE_SHELL } from "@/components/playground/Core/components/paneBar";
@@ -55,7 +55,7 @@ export default function ReviewDisplay({ route }: { route: ReviewRoute }) {
                         customColumnId: review.issueCustomColumnId,
                     }}
                     trailing={`#${review.pullNumber} ${review.title}`}
-                    trailingIcon={AiFillMerge}
+                    trailingIcon={MergeIcon}
                 />
             </PaneLeadSlot>
             <ReviewHeader tab={route.tab} htmlUrl={review.htmlUrl} />

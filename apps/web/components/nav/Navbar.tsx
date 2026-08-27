@@ -1,9 +1,13 @@
 "use client";
+import {
+    DiscordLogoIcon,
+    ExternalLinkIcon,
+    NavCtaArrowIcon,
+    PhoneContactIcon,
+} from "@trymatcha/ui/icons";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { FaDiscord, FaPhoneAlt } from "react-icons/fa";
-import { PiArrowRight } from "react-icons/pi";
 
 import AppLogo from "@/components/app/Applogo";
 import { Button } from "@/components/ui/button";
@@ -82,8 +86,10 @@ export function NavBar({ isMarkettingPage = false }: { isMarkettingPage?: boolea
                         ))}
                     </section>
                     <section className="flex">
-                        <FaDiscord className={cn(isMarkettingPage ? "text-neutral-200" : "")} />
-                        <PiArrowRight className="-rotate-45 ml-1 size-4 text-indigo-600" />
+                        <DiscordLogoIcon
+                            className={cn(isMarkettingPage ? "text-neutral-200" : "")}
+                        />
+                        <ExternalLinkIcon className="ml-1 size-4 text-indigo-600" />
                     </section>
                 </nav>
 
@@ -94,14 +100,14 @@ export function NavBar({ isMarkettingPage = false }: { isMarkettingPage?: boolea
                         onClick={session ? handleRedirect : handleSignin}
                     >
                         Connect with us
-                        <FaPhoneAlt className="size-3" />
+                        <PhoneContactIcon className="size-3" />
                     </Button>
                     <Button
                         className="flex items-center justify-center"
                         onClick={session ? handleRedirect : handleSignin}
                     >
                         {session ? "Get Started" : "Sign in"}
-                        <PiArrowRight className="h-3 w-3" />
+                        <NavCtaArrowIcon className="h-3 w-3" />
                     </Button>
                 </div>
             </div>

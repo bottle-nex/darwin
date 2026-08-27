@@ -1,6 +1,6 @@
 "use client";
+import { KanbanColumnsIcon } from "@trymatcha/ui/icons";
 import { useMemo, useState } from "react";
-import { LuColumns3 } from "react-icons/lu";
 
 import { useBoardFeed } from "@/hooks/issues/useBoard";
 import { useBoardColumns } from "@/hooks/issues/useBoardColumns";
@@ -183,7 +183,7 @@ export default function KanbanListView({ board, includeCustom = false }: KanbanL
                         <div className="pb-1">
                             <IssueListGroupHeader
                                 title={row.group.title}
-                                icon={statusColumn?.icon ?? LuColumns3}
+                                icon={statusColumn?.icon ?? KanbanColumnsIcon}
                                 iconClassName={statusColumn?.titleBox}
                                 count={row.group.issues.length}
                                 total={row.group.total}

@@ -1,8 +1,8 @@
 "use client";
 
+import { CloseIcon } from "@trymatcha/ui/icons";
 import { Dialog as SheetPrimitive } from "radix-ui";
 import * as React from "react";
-import { MdClose } from "react-icons/md";
 
 import { cn } from "@/lib/utils";
 
@@ -70,7 +70,7 @@ function SheetContent({
                 {children}
                 {showCloseButton && (
                     <SheetPrimitive.Close className="absolute p-1 top-4 right-4 rounded-full opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-primary focus:outline-hidden disabled:pointer-events-none data-[state=open]:bg-cement cursor-pointer">
-                        <MdClose className="size-4" />
+                        <CloseIcon className="size-4" />
                         <span className="sr-only">Close</span>
                     </SheetPrimitive.Close>
                 )}

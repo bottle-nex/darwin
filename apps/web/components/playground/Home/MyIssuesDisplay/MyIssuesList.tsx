@@ -1,7 +1,7 @@
 "use client";
 
+import { MyIssuesIcon } from "@trymatcha/ui/icons";
 import { type ReactNode, useMemo, useState } from "react";
-import { HiOutlineClipboardDocumentList } from "react-icons/hi2";
 
 import LogoLoader from "@/components/app/LogoLoader";
 import PaneEmptyState from "@/components/playground/Core/components/PaneEmptyState";
@@ -190,7 +190,7 @@ function resolveEmptyState({
         return (
             <div className="flex min-h-64 flex-col justify-center">
                 <PaneEmptyState
-                    icon={HiOutlineClipboardDocumentList}
+                    icon={MyIssuesIcon}
                     title="Couldn’t load your issues"
                     subtitle="Try again in a moment."
                 >
@@ -204,7 +204,7 @@ function resolveEmptyState({
     return (
         <div className="flex min-h-64 flex-col justify-center">
             <PaneEmptyState
-                icon={HiOutlineClipboardDocumentList}
+                icon={MyIssuesIcon}
                 title={
                     filtersActive
                         ? "No issues match your filters"

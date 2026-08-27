@@ -1,5 +1,5 @@
 "use client";
-import { FaGithub, FaLock } from "react-icons/fa6";
+import { GithubLogoIcon, PrivateRepoIcon } from "@trymatcha/ui/icons";
 
 import { Button } from "@/components/ui/button";
 import { formatRelativeTime } from "@/lib/format";
@@ -13,14 +13,17 @@ interface Props {
 export default function CreateProjectDialogRepoRow({ repo, onImport }: Props) {
     return (
         <div className="group flex shrink-0 items-center gap-2.5 rounded-md px-2 py-2 hover:bg-white/5">
-            <FaGithub className="size-3.5 shrink-0 text-neutral-500" aria-hidden />
+            <GithubLogoIcon className="size-3.5 shrink-0 text-neutral-500" aria-hidden />
             <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-1.5">
                     <span className="truncate font-mono text-xs text-neutral-300">
                         {repo.fullName}
                     </span>
                     {repo.private && (
-                        <FaLock className="size-2.5 shrink-0 text-neutral-500" aria-hidden />
+                        <PrivateRepoIcon
+                            className="size-2.5 shrink-0 text-neutral-500"
+                            aria-hidden
+                        />
                     )}
                 </div>
                 {(repo.language || repo.updatedAt) && (

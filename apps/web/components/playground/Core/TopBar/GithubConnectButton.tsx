@@ -1,7 +1,7 @@
 "use client";
 
+import { CheckIcon, GithubLogoIcon } from "@trymatcha/ui/icons";
 import { useParams } from "next/navigation";
-import { FaCheck, FaGithub } from "react-icons/fa6";
 
 import { Button } from "@/components/ui/button";
 import { useConnectGithub } from "@/hooks/github/useConnectGithub";
@@ -46,8 +46,8 @@ export default function GithubConnectButton() {
                 title="GitHub connected — click to disconnect"
                 className="flex h-6.75 cursor-pointer items-center gap-1 rounded-sm px-2.5 text-[11px] font-medium text-neutral-300 hover:bg-white/10"
             >
-                <FaGithub className="size-3.5" aria-hidden />
-                <FaCheck className="size-3 text-matcha" aria-hidden />
+                <GithubLogoIcon className="size-3.5" aria-hidden />
+                <CheckIcon className="size-3 text-matcha" aria-hidden />
             </Button>
         );
     }
@@ -61,7 +61,7 @@ export default function GithubConnectButton() {
             onClick={() => connect.mutate(org.id)}
             disabled={connect.isPending}
         >
-            {!connect.isPending && <FaGithub className="size-3.5" aria-hidden />}
+            {!connect.isPending && <GithubLogoIcon className="size-3.5" aria-hidden />}
             Connect GitHub
         </Button>
     );

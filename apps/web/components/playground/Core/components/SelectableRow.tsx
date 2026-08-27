@@ -1,7 +1,7 @@
 "use client";
 
+import { CheckIcon } from "@trymatcha/ui/icons";
 import type { ComponentPropsWithoutRef } from "react";
-import { MdCheck } from "react-icons/md";
 
 import { cn } from "@/lib/utils";
 
@@ -53,7 +53,7 @@ export default function SelectableRow({
                         : "invisible border-white/25 group-hover/selectable:visible focus-visible:visible",
                 )}
             >
-                {selected && <MdCheck className="size-2.5" aria-hidden />}
+                {selected && <CheckIcon className="size-2.5" aria-hidden />}
             </button>
             {children}
         </div>

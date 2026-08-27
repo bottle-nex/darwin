@@ -1,23 +1,23 @@
 import type { Editor, Range } from "@tiptap/core";
-import type { IconType } from "react-icons";
+import type { IconType } from "@trymatcha/ui/icons";
 import {
-    LuCalendarClock,
-    LuCode,
-    LuHeading,
-    LuHeading1,
-    LuHeading2,
-    LuHeading3,
-    LuImage,
-    LuLink,
-    LuList,
-    LuListCollapse,
-    LuListOrdered,
-    LuListTodo,
-    LuListTree,
-    LuMinus,
-    LuQuote,
-    LuTable,
-} from "react-icons/lu";
+    BlockquoteFormatIcon,
+    BulletListIcon,
+    ChecklistFormatIcon,
+    CodeFormatIcon,
+    DateTimeInsertIcon,
+    DividerIcon,
+    Heading1Icon,
+    Heading2Icon,
+    Heading3Icon,
+    HeadingGroupIcon,
+    LinkFormatIcon,
+    ListGroupIcon,
+    MediaInsertIcon,
+    NumberedListIcon,
+    TableInsertIcon,
+    ToggleListIcon,
+} from "@trymatcha/ui/icons";
 
 import type { TimestampMode } from "./timestamp";
 
@@ -93,19 +93,19 @@ function insertImage(editor: Editor, range: Range) {
 export const HEADING_ITEMS: SlashCommandItem[] = [
     {
         title: "Heading 1",
-        icon: LuHeading1,
+        icon: Heading1Icon,
         command: ({ editor, range }) =>
             editor.chain().focus().deleteRange(range).setNode("heading", { level: 1 }).run(),
     },
     {
         title: "Heading 2",
-        icon: LuHeading2,
+        icon: Heading2Icon,
         command: ({ editor, range }) =>
             editor.chain().focus().deleteRange(range).setNode("heading", { level: 2 }).run(),
     },
     {
         title: "Heading 3",
-        icon: LuHeading3,
+        icon: Heading3Icon,
         command: ({ editor, range }) =>
             editor.chain().focus().deleteRange(range).setNode("heading", { level: 3 }).run(),
     },
@@ -114,39 +114,39 @@ export const HEADING_ITEMS: SlashCommandItem[] = [
 export const LIST_ITEMS: SlashCommandItem[] = [
     {
         title: "Bulleted list",
-        icon: LuList,
+        icon: BulletListIcon,
         command: ({ editor, range }) =>
             editor.chain().focus().deleteRange(range).toggleBulletList().run(),
     },
     {
         title: "Numbered list",
-        icon: LuListOrdered,
+        icon: NumberedListIcon,
         command: ({ editor, range }) =>
             editor.chain().focus().deleteRange(range).toggleOrderedList().run(),
     },
     {
         title: "Checklist",
-        icon: LuListTodo,
+        icon: ChecklistFormatIcon,
         command: ({ editor, range }) =>
             editor.chain().focus().deleteRange(range).toggleTaskList().run(),
     },
     {
         title: "Toggle list",
-        icon: LuListCollapse,
+        icon: ToggleListIcon,
         command: ({ editor, range }) => editor.chain().focus().deleteRange(range).setToggle().run(),
     },
 ];
 
 const DATE_TIME_ENTRY: SlashCommandDateInsert = {
     title: "Date & time",
-    icon: LuCalendarClock,
+    icon: DateTimeInsertIcon,
     insertDate: ({ editor, range, iso, mode }) =>
         editor.chain().focus().deleteRange(range).insertTimestamp({ iso, mode }).run(),
 };
 
 const TABLE_ENTRY: SlashCommandSizedInsert = {
     title: "Table",
-    icon: LuTable,
+    icon: TableInsertIcon,
     insert: ({ editor, range, rows, cols }) =>
         editor.chain().focus().deleteRange(range).insertTableFigure({ rows, cols }).run(),
 };
@@ -154,38 +154,38 @@ const TABLE_ENTRY: SlashCommandSizedInsert = {
 const BLOCK_ITEMS: SlashCommandItem[] = [
     {
         title: "Link",
-        icon: LuLink,
+        icon: LinkFormatIcon,
         command: ({ editor, range }) =>
             editor.chain().focus().deleteRange(range).openLinkPrompt().run(),
     },
     {
         title: "Insert media",
-        icon: LuImage,
+        icon: MediaInsertIcon,
         command: ({ editor, range }) => insertImage(editor, range),
     },
     {
         title: "Code block",
-        icon: LuCode,
+        icon: CodeFormatIcon,
         command: ({ editor, range }) =>
             editor.chain().focus().deleteRange(range).toggleCodeBlock().run(),
     },
     {
         title: "Blockquote",
-        icon: LuQuote,
+        icon: BlockquoteFormatIcon,
         command: ({ editor, range }) =>
             editor.chain().focus().deleteRange(range).toggleBlockquote().run(),
     },
     {
         title: "Divider",
-        icon: LuMinus,
+        icon: DividerIcon,
         command: ({ editor, range }) =>
             editor.chain().focus().deleteRange(range).setHorizontalRule().run(),
     },
 ];
 
 export const SLASH_COMMAND_ENTRIES: SlashCommandEntry[] = [
-    { title: "Headings", icon: LuHeading, items: HEADING_ITEMS },
-    { title: "Lists", icon: LuListTree, items: LIST_ITEMS },
+    { title: "Headings", icon: HeadingGroupIcon, items: HEADING_ITEMS },
+    { title: "Lists", icon: ListGroupIcon, items: LIST_ITEMS },
     DATE_TIME_ENTRY,
     TABLE_ENTRY,
     ...BLOCK_ITEMS,

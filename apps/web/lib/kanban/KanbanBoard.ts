@@ -1,8 +1,14 @@
-import { AiFillStop } from "react-icons/ai";
-import { LuCircle, LuCircleDashed, LuCircleDotDashed, LuCirclePause } from "react-icons/lu";
-import { RiProgress4Line } from "react-icons/ri";
+import {
+    CancelledStatusIcon,
+    DoneStatusIcon,
+    FailedStatusIcon,
+    InProgressStatusIcon,
+    InReviewStatusIcon,
+    OffBoardStatusIcon,
+    QueuedStatusIcon,
+    TodoStatusIcon,
+} from "@trymatcha/ui/icons";
 
-import { DoneStatusIcon, FailedStatusIcon } from "@/components/icons/StatusIcons";
 import {
     type BoardState,
     type Issue,
@@ -31,25 +37,25 @@ export class KanbanBoard {
         {
             status: KanbanStatus.Todo,
             title: "To Do",
-            icon: LuCircle,
+            icon: TodoStatusIcon,
             titleBox: "text-neutral-100",
         },
         {
             status: KanbanStatus.Queued,
             title: "Queued",
-            icon: LuCircleDashed,
+            icon: QueuedStatusIcon,
             titleBox: "text-sky-300",
         },
         {
             status: KanbanStatus.InProgress,
             title: "In Progress",
-            icon: RiProgress4Line,
+            icon: InProgressStatusIcon,
             titleBox: "text-[#F1BF00]",
         },
         {
             status: KanbanStatus.InReview,
             title: "In Review",
-            icon: LuCircleDotDashed,
+            icon: InReviewStatusIcon,
             titleBox: "text-violet-400",
         },
         {
@@ -67,7 +73,7 @@ export class KanbanBoard {
         {
             status: KanbanStatus.Cancelled,
             title: "Cancelled",
-            icon: AiFillStop,
+            icon: CancelledStatusIcon,
             titleBox: "text-snow/60",
         },
     ];
@@ -95,7 +101,7 @@ export class KanbanBoard {
      * would add a lane to the board.
      */
     private static readonly OFF_BOARD_GLYPH: StatusGlyph = {
-        icon: LuCirclePause,
+        icon: OffBoardStatusIcon,
         titleBox: "text-neutral-500",
     };
 

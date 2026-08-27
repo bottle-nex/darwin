@@ -1,8 +1,8 @@
 "use client";
 
+import { DropdownCaretIcon } from "@trymatcha/ui/icons";
 import { motion, type Variants } from "motion/react";
 import { Children, useState } from "react";
-import { FaCaretDown, FaCaretRight } from "react-icons/fa";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -41,7 +41,6 @@ export default function PlaygroundSidebarSection({
     children,
 }: SectionProps) {
     const [open, setOpen] = useState(defaultOpen);
-    const Chevron = open ? FaCaretDown : FaCaretRight;
 
     return (
         <section className="flex flex-col">
@@ -58,7 +57,13 @@ export default function PlaygroundSidebarSection({
                     )}
                 >
                     <span>{title}</span>
-                    <Chevron className="size-3 text-neutral-500" aria-hidden />
+                    <DropdownCaretIcon
+                        className={cn(
+                            "size-3 text-neutral-500 transition-transform",
+                            !open && "-rotate-90",
+                        )}
+                        aria-hidden
+                    />
                 </Button>
                 {action && <span className="flex items-center">{action}</span>}
             </div>

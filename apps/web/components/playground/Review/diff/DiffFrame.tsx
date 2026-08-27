@@ -1,7 +1,6 @@
 "use client";
+import { BeforeAfterFrameIcon, HelpIcon } from "@trymatcha/ui/icons";
 import type { ReactNode } from "react";
-import { AiOutlineRotateLeft } from "react-icons/ai";
-import { HiQuestionMarkCircle } from "react-icons/hi2";
 
 import { MICRO_LABEL } from "@/components/playground/Core/components/paneBar";
 import { TooltipComponent } from "@/components/ui/tooltip-component";
@@ -31,7 +30,7 @@ export default function DiffFrame({
     return (
         <section className={`${FRAME_SHELL} mx-auto w-fit px-3 pb-3`}>
             <header className="flex shrink-0 items-center gap-1.5 py-2">
-                <AiOutlineRotateLeft
+                <BeforeAfterFrameIcon
                     className={cn("size-3.5 shrink-0 text-neutral-500", mirrored && "-scale-x-100")}
                     aria-hidden
                 />
@@ -43,7 +42,7 @@ export default function DiffFrame({
                         aria-label={APPROXIMATION_HINT}
                         className="ml-auto flex size-5 shrink-0 cursor-help items-center justify-center rounded-md text-neutral-600 transition-colors outline-none hover:bg-white/5 hover:text-neutral-300 focus-visible:text-neutral-300"
                     >
-                        <HiQuestionMarkCircle className="size-3.5" />
+                        <HelpIcon className="size-3.5" />
                     </span>
                 </TooltipComponent>
             </header>

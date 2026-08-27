@@ -1,9 +1,8 @@
 "use client";
+import { CloseIcon, DownloadIcon } from "@trymatcha/ui/icons";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { FiDownload } from "react-icons/fi";
-import { MdClose } from "react-icons/md";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -116,7 +115,7 @@ export default function TapToOpenImage({
                                         onClick={() => setExpansion(null)}
                                         className={ACTION_CHIP}
                                     >
-                                        <MdClose className="size-4" />
+                                        <CloseIcon className="size-4" />
                                     </Button>
                                 </div>
                                 <motion.img
@@ -182,7 +181,7 @@ function DownloadAction({ src, fileName }: { src: string; fileName: string }) {
             onClick={save}
             className={ACTION_CHIP}
         >
-            <FiDownload className="size-3.5" />
+            <DownloadIcon className="size-3.5" />
         </Button>
     );
 }

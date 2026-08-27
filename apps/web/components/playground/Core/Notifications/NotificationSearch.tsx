@@ -1,5 +1,5 @@
 "use client";
-import { HiOutlineMagnifyingGlass, HiXMark } from "react-icons/hi2";
+import { CloseIcon, SearchIcon } from "@trymatcha/ui/icons";
 
 import { Input } from "@/components/ui/input";
 
@@ -11,7 +11,7 @@ type NotificationSearchProps = {
 export default function NotificationSearch({ value, onChange }: NotificationSearchProps) {
     return (
         <div className="relative">
-            <HiOutlineMagnifyingGlass
+            <SearchIcon
                 className="pointer-events-none absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-neutral-400"
                 aria-hidden
             />
@@ -28,7 +28,7 @@ export default function NotificationSearch({ value, onChange }: NotificationSear
                     aria-label="Clear search"
                     className="absolute top-1/2 right-2 flex size-4 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-white/7 text-neutral-300 transition-colors hover:bg-white/12 hover:text-neutral-100"
                 >
-                    <HiXMark className="size-2.5" aria-hidden />
+                    <CloseIcon className="size-2.5" aria-hidden />
                 </button>
             )}
         </div>

@@ -1,13 +1,12 @@
 "use client";
+import type { IconType } from "@trymatcha/ui/icons";
+import { BreadcrumbSeparatorIcon, ICONS } from "@trymatcha/ui/icons";
 import { Fragment } from "react";
-import type { IconType } from "react-icons";
-import { MdChevronRight } from "react-icons/md";
 
 import { PlaygroundTab } from "@/components/playground/playgroundTabs";
 import { Button } from "@/components/ui/button";
 import type { IconPick } from "@/components/ui/IconPicker";
 import IconWrapper from "@/components/ui/IconWrapper";
-import { ICONS } from "@/data/icons_bulk";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { cn } from "@/lib/utils";
 import { NO_FOCUS, useKanbanOptionsStore } from "@/store/kanban/useKanbanOptionsStore";
@@ -177,7 +176,7 @@ export default function PlaygroundBreadcrumb({
 
                 return (
                     <Fragment key={`${label}-${index}`}>
-                        <MdChevronRight
+                        <BreadcrumbSeparatorIcon
                             className="size-3.5 shrink-0 text-neutral-600"
                             aria-hidden
                         />

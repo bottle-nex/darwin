@@ -1,5 +1,11 @@
-import { FaCodePullRequest } from "react-icons/fa6";
-import { MdAutoAwesome, MdAutorenew, MdChat, MdCheckCircle, MdStorage } from "react-icons/md";
+import {
+    AgentIcon,
+    CommentCountIcon,
+    ProcessingSpinnerIcon,
+    PullRequestOpenIcon,
+    RunnerIcon,
+    SuccessCircleIcon,
+} from "@trymatcha/ui/icons";
 
 import PlaygroundAvatar, {
     type AvatarTone,
@@ -39,7 +45,7 @@ const LABEL_CLASS: Record<string, string> = {
 function AgentChip({ name }: { name: string }) {
     return (
         <span className="inline-flex items-center gap-1 rounded-full bg-white/5 px-1.5 py-0.5 text-[10px] font-medium text-neutral-300 ring-1 ring-white/10">
-            <MdAutoAwesome className="size-2.5 text-amber-300" />
+            <AgentIcon className="size-2.5 text-amber-300" />
             {name}
         </span>
     );
@@ -51,14 +57,14 @@ function StatusRow({ issue }: { issue: AboutIssue }) {
             <div className="mt-2.5 flex flex-col gap-1.5">
                 {issue.step && (
                     <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-amber-300/90">
-                        <MdAutorenew className="size-3 animate-spin" aria-hidden />
+                        <ProcessingSpinnerIcon className="size-3 animate-spin" aria-hidden />
                         {issue.step}
                     </span>
                 )}
                 <div className="flex items-center justify-between">
                     {issue.runner && (
                         <span className="inline-flex items-center gap-1 text-[11px] text-neutral-500">
-                            <MdStorage className="size-3" aria-hidden />
+                            <RunnerIcon className="size-3" aria-hidden />
                             {issue.runner}
                         </span>
                     )}
@@ -73,7 +79,7 @@ function StatusRow({ issue }: { issue: AboutIssue }) {
             <div className="mt-2.5 flex flex-col gap-1.5">
                 <div className="flex items-center justify-between">
                     <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-violet-300">
-                        <FaCodePullRequest className="size-3" aria-hidden />
+                        <PullRequestOpenIcon className="size-3" aria-hidden />
                         {issue.pr?.number}
                     </span>
                     {issue.pr && (
@@ -95,7 +101,7 @@ function StatusRow({ issue }: { issue: AboutIssue }) {
     return (
         <div className="mt-2.5 flex items-center justify-between text-[11px]">
             <span className="inline-flex items-center gap-1.5 font-medium text-emerald-400/90">
-                <MdCheckCircle className="size-3" aria-hidden />
+                <SuccessCircleIcon className="size-3" aria-hidden />
                 Merged
             </span>
             <span className="text-neutral-500">{issue.duration}</span>
@@ -144,7 +150,7 @@ export default function AboutIssueCard({
             <div className="mt-3 flex items-center justify-between border-t border-white/5 pt-2.5">
                 <div className="flex min-w-0 items-center gap-2 text-[11px] text-neutral-500">
                     <span className="inline-flex items-center gap-1">
-                        <MdChat className="size-3" aria-hidden />
+                        <CommentCountIcon className="size-3" aria-hidden />
                         {issue.comments}
                     </span>
                     <span className="truncate text-neutral-600">{issue.project}</span>

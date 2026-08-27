@@ -1,5 +1,5 @@
 import { IssueStatus } from "@trymatcha/types";
-import type { IconType } from "react-icons";
+import type { IconType } from "@trymatcha/ui/icons";
 
 import type { AvatarTone } from "@/components/playground/Core/components/PlaygroundAvatar";
 import type { BoardIssue, BoardTag } from "@/types/board";

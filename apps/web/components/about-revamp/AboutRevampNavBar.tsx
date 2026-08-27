@@ -1,9 +1,8 @@
 "use client";
+import { NavCtaArrowIcon, PhoneContactIcon } from "@trymatcha/ui/icons";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { FaPhoneAlt } from "react-icons/fa";
-import { PiArrowRight } from "react-icons/pi";
 
 import AppLogo from "@/components/app/Applogo";
 import { Button } from "@/components/ui/button";
@@ -76,14 +75,14 @@ export function AboutRevampNavBar() {
                         onClick={session ? handleRedirect : handleSignin}
                     >
                         Connect with us
-                        <FaPhoneAlt className="size-3" />
+                        <PhoneContactIcon className="size-3" />
                     </Button>
                     <Button
                         className="flex items-center justify-center"
                         onClick={session ? handleRedirect : handleSignin}
                     >
                         {session ? "Get Started" : "Sign in"}
-                        <PiArrowRight className="h-3 w-3" />
+                        <NavCtaArrowIcon className="h-3 w-3" />
                     </Button>
                 </div>
             </div>

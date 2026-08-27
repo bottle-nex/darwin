@@ -1,7 +1,5 @@
 "use client";
-
-import { HiOutlineBell } from "react-icons/hi2";
-import { IoPencilSharp } from "react-icons/io5";
+import { ComposeIssueIcon, NotificationsBellIcon } from "@trymatcha/ui/icons";
 
 import { Button } from "@/components/ui/button";
 import { TooltipComponent } from "@/components/ui/tooltip-component";
@@ -31,7 +29,7 @@ export default function SidebarActions() {
                     aria-label="Create issue"
                     className={SIDEBAR_ICON_BUTTON_CLASS}
                 >
-                    <IoPencilSharp className="size-3.5" aria-hidden />
+                    <ComposeIssueIcon className="size-3.5" aria-hidden />
                 </Button>
             </TooltipComponent>
 
@@ -51,7 +49,7 @@ export default function SidebarActions() {
                         notificationsOpen && "bg-white/8 text-neutral-100",
                     )}
                 >
-                    <HiOutlineBell className="size-3.75" aria-hidden />
+                    <NotificationsBellIcon className="size-3.75" aria-hidden />
                     {memberUnread > 0 ? (
                         <span
                             className="absolute top-0 right-0 flex h-3 min-w-3 items-center justify-center rounded-full bg-primary px-0.5 text-[8px] leading-none font-medium text-ink tabular-nums"

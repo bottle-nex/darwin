@@ -1,8 +1,8 @@
 import { CardCover, ContentCard, Prose } from "@trymatcha/editorial";
+import { BlogBackNavIcon } from "@trymatcha/ui/icons";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { MdArrowBack } from "react-icons/md";
 
 import EntryByline from "@/components/blog/EntryByline";
 import EntryCta from "@/components/blog/EntryCta";
@@ -51,7 +51,7 @@ export default async function EntryPage({ params }: EntryPageProps) {
                     href={`/blog?tab=${tab}`}
                     className="group inline-flex items-center gap-x-2 rounded-full border border-graphite bg-charcoal/60 py-1.5 pr-4 pl-3 text-[13px] text-mist/50 transition-colors hover:border-edge hover:bg-charcoal hover:text-snow"
                 >
-                    <MdArrowBack className="size-3.5 transition-transform duration-200 group-hover:-translate-x-0.5" />
+                    <BlogBackNavIcon className="size-3.5 transition-transform duration-200 group-hover:-translate-x-0.5" />
                     {entry.kind === "Changelog" ? "All changelogs" : "All posts"}
                 </Link>
 

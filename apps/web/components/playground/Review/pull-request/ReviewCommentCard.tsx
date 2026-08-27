@@ -1,10 +1,18 @@
 "use client";
 
 import type { ReviewComment } from "@trymatcha/types";
+import {
+    CheckIcon,
+    CopyIcon,
+    DeleteIcon,
+    EditIcon,
+    OverflowMenuIcon,
+    ReviewCommentFileIcon,
+    ReviewVerdictApprovedIcon,
+    ReviewVerdictCommentIcon,
+    ReviewVerdictRejectedIcon,
+} from "@trymatcha/ui/icons";
 import { useState } from "react";
-import { GoCheck, GoComment, GoFileDiff, GoXCircle } from "react-icons/go";
-import { IoMdCheckmark } from "react-icons/io";
-import { MdContentCopy, MdDelete, MdEdit, MdMoreHoriz } from "react-icons/md";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -25,10 +33,21 @@ import { cn } from "@/lib/utils";
 
 import ReviewActorAvatar from "../ReviewActorAvatar";
 
-const REVIEW_VERDICT: Record<string, { icon: typeof GoCheck; label: string; tone: string }> = {
-    approved: { icon: GoCheck, label: "approved these changes", tone: "text-green-400" },
-    changes_requested: { icon: GoXCircle, label: "requested changes", tone: "text-rose-400" },
-    commented: { icon: GoComment, label: "reviewed", tone: "text-neutral-500" },
+const REVIEW_VERDICT: Record<
+    string,
+    { icon: typeof ReviewVerdictApprovedIcon; label: string; tone: string }
+> = {
+    approved: {
+        icon: ReviewVerdictApprovedIcon,
+        label: "approved these changes",
+        tone: "text-green-400",
+    },
+    changes_requested: {
+        icon: ReviewVerdictRejectedIcon,
+        label: "requested changes",
+        tone: "text-rose-400",
+    },
+    commented: { icon: ReviewVerdictCommentIcon, label: "reviewed", tone: "text-neutral-500" },
 };
 
 export default function ReviewCommentCard({
@@ -102,7 +121,7 @@ export default function ReviewCommentCard({
                 {comment.path && (
                     <div className="mt-1.5 overflow-hidden rounded-md border border-border">
                         <p className="flex items-center gap-1.5 bg-white/[0.02] px-2 py-1 font-mono text-[13.5px] text-neutral-500">
-                            <GoFileDiff className="size-3 shrink-0" />
+                            <ReviewCommentFileIcon className="size-3 shrink-0" />
                             <span className="truncate">
                                 {comment.path}
                                 {comment.line ? `:${comment.line}` : ""}
@@ -147,7 +166,7 @@ export default function ReviewCommentCard({
                                 disabled={!draft.trim()}
                                 onClick={saveEdit}
                             >
-                                <IoMdCheckmark />
+                                <CheckIcon />
                                 Save
                             </Button>
                         </div>
@@ -166,7 +185,7 @@ export default function ReviewCommentCard({
                             aria-label="Comment options"
                             className="absolute top-0 right-0 flex size-6 cursor-pointer items-center justify-center rounded-md text-neutral-400 opacity-0 transition-opacity hover:bg-white/10 hover:text-neutral-100 focus-visible:opacity-100 group-hover/comment:opacity-100 data-[state=open]:opacity-100"
                         >
-                            <MdMoreHoriz className="size-4" aria-hidden />
+                            <OverflowMenuIcon className="size-4" aria-hidden />
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-44">
@@ -175,18 +194,18 @@ export default function ReviewCommentCard({
                                 navigator.clipboard.writeText(markdownToPlainText(comment.body))
                             }
                         >
-                            <MdContentCopy className="size-3.5" aria-hidden />
+                            <CopyIcon className="size-3.5" aria-hidden />
                             <span className="flex-1">Copy</span>
                         </DropdownMenuItem>
                         <DropdownMenuItem
                             onSelect={() => navigator.clipboard.writeText(comment.body)}
                         >
-                            <MdContentCopy className="size-3.5" aria-hidden />
+                            <CopyIcon className="size-3.5" aria-hidden />
                             <span className="flex-1">Copy Markdown</span>
                         </DropdownMenuItem>
                         {isMine && (
                             <DropdownMenuItem onSelect={startEdit}>
-                                <MdEdit className="size-3.5" aria-hidden />
+                                <EditIcon className="size-3.5" aria-hidden />
                                 <span className="flex-1">Edit</span>
                             </DropdownMenuItem>
                         )}
@@ -195,7 +214,7 @@ export default function ReviewCommentCard({
                                 onSelect={() => setConfirmOpen(true)}
                                 variant="destructive"
                             >
-                                <MdDelete className="size-3.5" aria-hidden />
+                                <DeleteIcon className="size-3.5" aria-hidden />
                                 <span className="flex-1">Delete</span>
                             </DropdownMenuItem>
                         )}

@@ -1,4 +1,4 @@
-import { MdAccessTimeFilled, MdChat, MdPause } from "react-icons/md";
+import { ClockIcon, CommentCountIcon, PausedStateIcon } from "@trymatcha/ui/icons";
 
 import { GanttTimeline } from "@/lib/gantt/GanttTimeline";
 import { cn } from "@/lib/utils";
@@ -71,7 +71,7 @@ export default function GanttIssueCard({ issue, now }: { issue: GanttIssue; now:
                     </p>
 
                     <div className="mt-2 flex items-center gap-1 text-[11px] text-neutral-500">
-                        <MdAccessTimeFilled className="size-3 shrink-0" aria-hidden />
+                        <ClockIcon className="size-3 shrink-0" aria-hidden />
                         <span className="truncate">
                             <span style={{ color: accent }}>{statusLabel}</span> ·{" "}
                             {GanttTimeline.issueMeta(issue, now)}
@@ -80,7 +80,7 @@ export default function GanttIssueCard({ issue, now }: { issue: GanttIssue; now:
 
                     {isPaused && (
                         <div className="mt-2 flex items-center gap-1 text-[11px] text-amber-400">
-                            <MdPause className="size-3 shrink-0" aria-hidden />
+                            <PausedStateIcon className="size-3 shrink-0" aria-hidden />
                             <span className="truncate">
                                 Paused {pausedMinutes}m · {issue.pauseReason}
                             </span>
@@ -89,7 +89,7 @@ export default function GanttIssueCard({ issue, now }: { issue: GanttIssue; now:
 
                     <div className="mt-auto flex items-center justify-between border-t border-graphite pt-2">
                         <span className="flex items-center gap-1 text-[11px] text-neutral-500">
-                            <MdChat className="size-3" aria-hidden />
+                            <CommentCountIcon className="size-3" aria-hidden />
                             {issue.comments ? issue.comments : null}
                         </span>
                     </div>
