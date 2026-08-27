@@ -47,6 +47,7 @@ packages/database/generated
 .codex
 graphify-out
 .worktrees
+.superpowers
 docs
 AGENTS.md
 
