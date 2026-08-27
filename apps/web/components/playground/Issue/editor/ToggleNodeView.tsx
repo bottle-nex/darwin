@@ -26,7 +26,9 @@ export default function ToggleNodeView({ node, updateAttributes, editor }: React
                 aria-expanded={open}
                 className="absolute top-[0.35rem] left-0 flex size-4 cursor-pointer items-center justify-center rounded-[3px] text-neutral-500 transition-colors hover:bg-white/10 hover:text-neutral-200"
             >
-                <DropdownCaretIcon className={cn("size-3", !open && "-rotate-90")} />
+                <DropdownCaretIcon
+                    className={cn("size-3 transition-transform", !open && "-rotate-90")}
+                />
             </Button>
             <NodeViewContent />
         </NodeViewWrapper>

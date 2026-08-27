@@ -8,12 +8,14 @@ type IconProps = IconBaseProps & {
 };
 
 export function createIcon(Glyph: IconType) {
-    return function Icon({ children, ...props }: IconProps) {
+    function Icon({ children, ...props }: IconProps) {
         if (!children) return <Glyph {...props} />;
         return (
             <IconTooltip content={children}>
                 <Glyph {...props} />
             </IconTooltip>
         );
-    };
+    }
+    Icon.displayName = `Icon(${Glyph.name})`;
+    return Icon;
 }
