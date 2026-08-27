@@ -1,7 +1,6 @@
+import clsx from "clsx";
 import type { ReactNode } from "react";
 import type { IconBaseProps } from "react-icons";
-
-import { cn } from "@/lib/utils";
 
 const MARK = {
     stroke: "var(--color-ink)",
@@ -24,7 +23,7 @@ function StatusDisc({ className, children }: { className?: string; children: Rea
             fill="none"
             aria-hidden
             focusable="false"
-            className={cn("size-4", className)}
+            className={clsx("size-4", className)}
         >
             <circle cx="256" cy="256" r="208" fill="currentColor" />
             {children}

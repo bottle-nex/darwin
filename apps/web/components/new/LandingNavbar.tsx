@@ -1,4 +1,11 @@
 "use client";
+import {
+    type AnimatedIcon,
+    MarketingBriefcaseIcon,
+    MarketingChecklistIcon,
+    MarketingNoteIcon,
+    MarketingPeopleIcon,
+} from "@trymatcha/ui/icons";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -7,13 +14,6 @@ import { MdChevronRight } from "react-icons/md";
 import { PiCaretDownBold } from "react-icons/pi";
 
 import AppLogo from "@/components/app/Applogo";
-import {
-    type AnimatedIcon,
-    BriefcaseIcon,
-    ChecklistIcon,
-    NoteIcon,
-    PeopleIcon,
-} from "@/components/icons/AnimatedIcons";
 import { cn } from "@/lib/utils";
 import { useUserSessionStore } from "@/store/user/useUserSessionStore";
 
@@ -42,25 +42,25 @@ const NAV_ITEMS: NavItem[] = [
                 label: "About",
                 href: "/about",
                 description: "The team building matcha",
-                icon: PeopleIcon,
+                icon: MarketingPeopleIcon,
             },
             {
                 label: "Blog",
                 href: "/blog?tab=blogs",
                 description: "Notes on agents and shipping",
-                icon: NoteIcon,
+                icon: MarketingNoteIcon,
             },
             {
                 label: "Changelog",
                 href: "/blog?tab=changelog",
                 description: "What shipped, week by week",
-                icon: ChecklistIcon,
+                icon: MarketingChecklistIcon,
             },
             {
                 label: "Integrations",
                 href: "#",
                 description: "Connect matcha to your favorite tools",
-                icon: BriefcaseIcon,
+                icon: MarketingBriefcaseIcon,
             },
         ],
     },

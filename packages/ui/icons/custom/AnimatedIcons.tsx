@@ -13,7 +13,7 @@ function useStagger() {
 
 const REST_HOVER = (hover: Variants["hover"]): Variants => ({ rest: {}, hover: hover });
 
-export const PeopleIcon: AnimatedIcon = ({ className }) => {
+export const MarketingPeopleIcon: AnimatedIcon = ({ className }) => {
     const at = useStagger();
 
     return (
@@ -49,7 +49,7 @@ export const PeopleIcon: AnimatedIcon = ({ className }) => {
     );
 };
 
-export const NoteIcon: AnimatedIcon = ({ className }) => {
+export const MarketingNoteIcon: AnimatedIcon = ({ className }) => {
     const at = useStagger();
 
     return (
@@ -78,7 +78,7 @@ export const NoteIcon: AnimatedIcon = ({ className }) => {
     );
 };
 
-export const ChecklistIcon: AnimatedIcon = ({ className }) => {
+export const MarketingChecklistIcon: AnimatedIcon = ({ className }) => {
     const at = useStagger();
     const rows = [
         { y: 4.6, width: 13.6, origin: "3.9px 6.3px" },
@@ -116,7 +116,7 @@ export const ChecklistIcon: AnimatedIcon = ({ className }) => {
     );
 };
 
-export const BriefcaseIcon: AnimatedIcon = ({ className }) => {
+export const MarketingBriefcaseIcon: AnimatedIcon = ({ className }) => {
     const at = useStagger();
 
     return (
