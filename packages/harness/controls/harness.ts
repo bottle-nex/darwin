@@ -11,6 +11,13 @@ interface HarnessInvocationInput {
     extra: string[];
 }
 
+interface McpServerSpec {
+    name: string;
+    command: string;
+    args: string[];
+    env: Record<string, string>;
+}
+
 function effort_to_flag(effort: Effort): string {
     switch (effort) {
         case Effort.Low:
@@ -47,6 +54,21 @@ abstract class AgentHarness {
     abstract buildBypassFlags(): string[];
     abstract buildInvocation(input: HarnessInvocationInput): string[];
 
+    // this describes where will the harness MCP will be found in the sandbox
+    // there is one caveat here, this is not confirmed for codex/opencode as invocation/effort will be different.
+    abstract mcpConfigPath(): string;
+
+    // `existing` is whatever's already at mcpConfigPath() in the sandbox, or null if nothing's
+    // there yet. Claude and Codex own their config file outright and can ignore it — nothing
+    // else writes there. OpenCode's config path collides with graphify's own install output
+    // (both land in .opencode/opencode.json), so its implementation actually has to merge
+    // rather than clobber whatever graphify already wrote.
+    abstract buildMcpConfig(server: McpServerSpec, existing: string | null): string;
+
+    mcpConfigFlags(_path: string): string[] {
+        return [];
+    }
+
     buildEffortFlags(_effort: Effort): string[] {
         return [];
     }
@@ -65,124 +87,5 @@ abstract class AgentHarness {
     }
 }
 
-class ClaudeHarness extends AgentHarness {
-    readonly harness = Harness.Claude;
-    readonly binary = "claude";
-    readonly pinnedVersion = "";
-    readonly models = ["claude-fable-5", "claude-opus-5", "claude-sonnet-5", "claude-haiku-4-5"];
-    readonly credentialEnvVar = "ANTHROPIC_API_KEY";
-    readonly credentialSource = CredentialSource.PlatformKey;
-    readonly supportsEffort = true;
-
-    override buildEffortFlags(effort: Effort): string[] {
-        return ["--effort", effort_to_flag(effort)];
-    }
-
-    buildBypassFlags(): string[] {
-        return ["--permission-mode", "bypassPermissions"];
-    }
-
-    buildInvocation({ promptPath, model, extra }: HarnessInvocationInput): string[] {
-        return [
-            "-p",
-            `"$(cat ${promptPath})"`,
-            "--model",
-            model,
-            "--output-format",
-            "stream-json",
-            "--verbose",
-            ...extra,
-        ];
-    }
-}
-
-class CodexHarness extends AgentHarness {
-    readonly harness = Harness.Codex;
-    readonly binary = "codex";
-    readonly pinnedVersion = "";
-    readonly models = [
-        "gpt-5.6-luna",
-        "gpt-5.6-terra",
-        "gpt-5.6-sol",
-        "gpt-5.6-sol-pro",
-        "gpt-5.6-sol-ultra",
-    ];
-    readonly credentialEnvVar = "OPENAI_API_KEY";
-    readonly credentialSource = CredentialSource.PlatformKey;
-    readonly supportsEffort = true;
-
-    override buildEffortFlags(effort: Effort): string[] {
-        return ["-c", `model_reasoning_effort=${effort_to_flag(effort)}`];
-    }
-
-    buildBypassFlags(): string[] {
-        return ["--dangerously-bypass-approvals-and-sandbox"];
-    }
-
-    buildInvocation({ promptPath, model, extra }: HarnessInvocationInput): string[] {
-        return ["exec", `"$(cat ${promptPath})"`, "-c", `model=${model}`, "--json", ...extra];
-    }
-}
-
-class OpenCodeHarness extends AgentHarness {
-    readonly harness = Harness.OpenCode;
-    readonly binary = "opencode";
-    readonly pinnedVersion = "";
-    readonly models = [
-        "google/gemini-3-pro",
-        "minimax/minimax-m2.1",
-        "xai/grok-4.6",
-        "xai/grok-4.5",
-        "deepseek/deepseek-v4-flash",
-        "xiaomi/mimo-v2.5",
-    ];
-    readonly credentialEnvVar = "OPENCODE_PROVIDER_KEY";
-    readonly credentialSource = CredentialSource.ProjectSecret;
-    readonly supportsEffort = false;
-
-    buildBypassFlags(): string[] {
-        return ["--yolo"];
-    }
-
-    buildInvocation({ promptPath, model, extra }: HarnessInvocationInput): string[] {
-        return ["run", `"$(cat ${promptPath})"`, "--model", model, "--print-logs", ...extra];
-    }
-}
-
-const CLAUDE_HARNESS = new ClaudeHarness();
-const CODEX_HARNESS = new CodexHarness();
-const OPENCODE_HARNESS = new OpenCodeHarness();
-
-const HARNESS_REGISTRY: readonly AgentHarness[] = [CLAUDE_HARNESS, CODEX_HARNESS, OPENCODE_HARNESS];
-
-function get_harness(harness: Harness): AgentHarness {
-    switch (harness) {
-        case Harness.Claude:
-            return CLAUDE_HARNESS;
-        case Harness.Codex:
-            return CODEX_HARNESS;
-        case Harness.OpenCode:
-            return OPENCODE_HARNESS;
-    }
-}
-
-function is_model_supported(harness: Harness, model: string): boolean {
-    return get_harness(harness).supportsModel(model);
-}
-
-function is_effort_supported(harness: Harness): boolean {
-    return get_harness(harness).supportsEffort;
-}
-
-export {
-    CredentialSource,
-    AgentHarness,
-    ClaudeHarness,
-    CodexHarness,
-    OpenCodeHarness,
-    HARNESS_REGISTRY,
-    get_harness,
-    is_model_supported,
-    is_effort_supported,
-};
-export type { HarnessInvocationInput };
+export { CredentialSource, AgentHarness, effort_to_flag };
+export type { HarnessInvocationInput, McpServerSpec };

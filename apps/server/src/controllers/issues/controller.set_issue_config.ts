@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import z from "zod";
 import { ActivityType, ActorType, Effort, Harness, IssueStatus, prisma } from "@trymatcha/database";
 import { Action, Permissions } from "@trymatcha/access-control";
-import { is_effort_supported, is_model_supported } from "@trymatcha/harness";
+import { Registry } from "@trymatcha/harness";
 import ResponseWriter from "../../services/service.response";
 import Access from "../../access-control/access";
 import ActivityService from "../../services/service.activity";
@@ -46,7 +46,7 @@ export default class IssueSetConfigController {
 
         const { harness, model, effort } = body_data;
 
-        if (!is_model_supported(harness, model)) {
+        if (!Registry.supportsModel(harness, model)) {
             ResponseWriter.invalid_data(
                 res,
                 `"${model}" is not supported by the ${harness} harness`,
@@ -54,7 +54,7 @@ export default class IssueSetConfigController {
             return;
         }
 
-        if (effort && !is_effort_supported(harness)) {
+        if (effort && !Registry.supportsEffort(harness)) {
             ResponseWriter.invalid_data(
                 res,
                 `The ${harness} harness does not support an effort level`,

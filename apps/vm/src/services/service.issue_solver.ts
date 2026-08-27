@@ -1,5 +1,6 @@
-import { IssueStatus, prisma } from "@trymatcha/database";
+import { Effort, Harness, IssueStatus, prisma } from "@trymatcha/database";
 import type Logger from "@trymatcha/logger";
+import { ENV } from "../conf/config.env";
 
 export interface ClaimedIssue {
     id: string;
@@ -8,6 +9,19 @@ export interface ClaimedIssue {
     description: string;
     prBranch: string;
     agentDoneAt: Date | null;
+    harness: Harness;
+    model: string;
+    effort: Effort | null;
+}
+
+function resolve_config(
+    config: { harness: Harness; model: string; effort: Effort | null } | null,
+): {
+    harness: Harness;
+    model: string;
+    effort: Effort | null;
+} {
+    return config ?? { harness: Harness.Claude, model: ENV.SERVER_SOLVE_MODEL, effort: null };
 }
 
 export default class IssueSolver {
@@ -29,6 +43,7 @@ export default class IssueSolver {
                 description: true,
                 prBranch: true,
                 agentDoneAt: true,
+                issueConfig: { select: { harness: true, model: true, effort: true } },
             },
         });
 
@@ -43,13 +58,21 @@ export default class IssueSolver {
             log.step(`resuming issue #${unfinished_issue.number}`, {
                 title: unfinished_issue.title,
             });
-            return { ...unfinished_issue, prBranch: pr_branch };
+            const { issueConfig: resuming_config, ...resuming_rest } = unfinished_issue;
+            return { ...resuming_rest, prBranch: pr_branch, ...resolve_config(resuming_config) };
         }
 
         const issue = await prisma.issue.findFirst({
             where: { assignerWorkerId: worker_id, status: IssueStatus.Queued },
             orderBy: { queuePosition: "asc" },
-            select: { id: true, number: true, title: true, description: true, agentDoneAt: true },
+            select: {
+                id: true,
+                number: true,
+                title: true,
+                description: true,
+                agentDoneAt: true,
+                issueConfig: { select: { harness: true, model: true, effort: true } },
+            },
         });
 
         if (!issue) {
@@ -69,7 +92,8 @@ export default class IssueSolver {
         }
 
         log.step(`claimed issue #${issue.number}`, { title: issue.title });
-        return { ...issue, prBranch: pr_branch };
+        const { issueConfig: claimed_config, ...claimed_rest } = issue;
+        return { ...claimed_rest, prBranch: pr_branch, ...resolve_config(claimed_config) };
     }
 
     private static pr_branch(issue_id: string): string {

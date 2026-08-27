@@ -1,6 +1,6 @@
 import { Action, Permissions } from "@trymatcha/access-control";
 import { Effort, Harness, Prisma, prisma } from "@trymatcha/database";
-import { is_effort_supported, is_model_supported } from "@trymatcha/harness";
+import { Registry } from "@trymatcha/harness";
 import type { Request, Response } from "express";
 import z from "zod";
 
@@ -51,7 +51,7 @@ export default async function update_project_config_controller(req: Request, res
             });
             const effective_harness = harness ?? existing?.harness ?? Harness.Claude;
 
-            if (default_model && !is_model_supported(effective_harness, default_model)) {
+            if (default_model && !Registry.supportsModel(effective_harness, default_model)) {
                 ResponseWriter.invalid_data(
                     res,
                     `"${default_model}" is not supported by the ${effective_harness} harness`,
@@ -59,7 +59,7 @@ export default async function update_project_config_controller(req: Request, res
                 return;
             }
 
-            if (default_effort && !is_effort_supported(effective_harness)) {
+            if (default_effort && !Registry.supportsEffort(effective_harness)) {
                 ResponseWriter.invalid_data(
                     res,
                     `The ${effective_harness} harness does not support an effort level`,

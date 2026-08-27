@@ -15,6 +15,12 @@ export const routerPrompt = new PromptTemplate({
             {{ new_issues }}
 
         NOTE: there is a chance that in resolved issues worker id is not found in present, as workers are killed after sometime of no use
+
+        - these issue ids also need you to pick a model (and effort, if offered) for the {{ harness_name }} harness,
+          choosing only from this list: {{ available_models }}. Effort is offered={{ supports_effort }} for this
+          harness — only set effort if offered=true, using one of Low/Medium/High/XHigh/Max.
+            {{ needs_model_pick_ids }}
+          If this list is empty, ignore model/effort entirely for every assignment.
     `,
     inputVariables: [
         "plan_md",
@@ -23,6 +29,10 @@ export const routerPrompt = new PromptTemplate({
         "new_worker_count",
         "new_workers",
         "new_issues",
+        "harness_name",
+        "available_models",
+        "supports_effort",
+        "needs_model_pick_ids",
     ],
     templateFormat: "mustache",
 });

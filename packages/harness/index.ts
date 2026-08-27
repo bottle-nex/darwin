@@ -1,12 +1,6 @@
-export {
-    CredentialSource,
-    AgentHarness,
-    ClaudeHarness,
-    CodexHarness,
-    OpenCodeHarness,
-    HARNESS_REGISTRY,
-    get_harness,
-    is_model_supported,
-    is_effort_supported,
-} from "./controls/harness";
-export type { HarnessInvocationInput } from "./controls/harness";
+export { CredentialSource, AgentHarness } from "./controls/harness";
+export type { HarnessInvocationInput, McpServerSpec } from "./controls/harness";
+export { default as ClaudeHarness } from "./controls/claude";
+export { default as CodexHarness } from "./controls/codex";
+export { default as OpenCodeHarness } from "./controls/opencode";
+export { default as Registry } from "./controls/registry";

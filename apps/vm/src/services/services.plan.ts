@@ -1,9 +1,9 @@
-import { PlanStatus, prisma } from "@trymatcha/database";
+import { Harness, PlanStatus, prisma } from "@trymatcha/database";
 import Logger, { format_duration } from "@trymatcha/logger";
 import { Sandbox } from "e2b";
 
 import { ENV } from "../conf/config.env";
-import ClaudeRun from "./service.claude_run";
+import HarnessRun, { effort_from_env } from "./service.harness_run";
 
 const log = Logger.scope("plan");
 
@@ -48,19 +48,23 @@ export default class PlanService {
         const model = ENV.SERVER_BRIEF_MODEL;
         const effort = ENV.SERVER_BRIEF_EFFORT;
         log.step("generating project brief", { model, effort });
-        const report = await ClaudeRun.execute(sandbox, log, {
+        const report = await HarnessRun.execute(sandbox, log, {
+            harness: Harness.Claude,
             prompt_path: PROMPT_PATH,
             model,
-            effort,
+            effort: effort_from_env(effort),
             extra_flags: [`--tools "Read,Glob,Grep,Bash"`],
             envs: { CLAUDE_CODE_OAUTH_TOKEN: ENV.SERVER_CLAUDE_CODE_OAUTH_TOKEN },
             timeout_ms: AGENT_TIMEOUT_MS,
             label: "onboarding agent",
         });
 
+        const cost_usd = report.total_cost_usd ?? 0;
+        const num_turns = report.num_turns ?? 0;
+
         log.success("brief generated", {
-            turns: report.num_turns,
-            cost_usd: report.total_cost_usd.toFixed(4),
+            turns: num_turns,
+            cost_usd: cost_usd.toFixed(4),
             duration: format_duration(report.duration_ms),
         });
 
@@ -74,9 +78,9 @@ export default class PlanService {
             planMd: plan_md,
             model,
             effort,
-            costUsd: report.total_cost_usd,
+            costUsd: cost_usd,
             durationMs: report.duration_ms,
-            numTurns: report.num_turns,
+            numTurns: num_turns,
         };
     }
 
