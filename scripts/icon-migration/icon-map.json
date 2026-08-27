@@ -683,10 +683,10 @@
   ],
 
   "customIconMoves": [
-    { "name": "DoneStatusIcon", "kind": "custom-move", "newFile": "packages/ui/icons/status/DoneStatusIcon.tsx", "usages": [
+    { "name": "DoneStatusIcon", "kind": "custom-move", "newFile": "packages/ui/icons/status/StatusIcons.tsx", "usages": [
       { "file": "apps/web/lib/kanban/KanbanBoard.ts", "module": "@/components/icons/StatusIcons", "export": "DoneStatusIcon" }
     ]},
-    { "name": "FailedStatusIcon", "kind": "custom-move", "newFile": "packages/ui/icons/status/FailedStatusIcon.tsx", "usages": [
+    { "name": "FailedStatusIcon", "kind": "custom-move", "newFile": "packages/ui/icons/status/StatusIcons.tsx", "usages": [
       { "file": "apps/web/lib/kanban/KanbanBoard.ts", "module": "@/components/icons/StatusIcons", "export": "FailedStatusIcon" }
     ]},
     { "name": "HighPriorityIcon", "kind": "custom-move", "newFile": "packages/ui/icons/status/PriorityIcons.tsx", "usages": [

@@ -1,0 +1,5 @@
+import { HiOutlineArrowLeft } from "react-icons/hi2";
+
+import { createIcon } from "../createIcon";
+
+export const SettingsBackIcon = createIcon(HiOutlineArrowLeft);

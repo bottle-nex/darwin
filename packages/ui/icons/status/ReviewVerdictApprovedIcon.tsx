@@ -1,0 +1,5 @@
+import { GoCheck } from "react-icons/go";
+
+import { createIcon } from "../createIcon";
+
+export const ReviewVerdictApprovedIcon = createIcon(GoCheck);
