@@ -1,4 +1,4 @@
-import { Project } from "ts-morph";
+import { Node, Project } from "ts-morph";
 import { readFileSync } from "fs";
 import { dirname, join } from "path";
 import { fileURLToPath } from "url";
@@ -48,20 +48,41 @@ for (const [absPath, renames] of byFile) {
 
     for (const importDecl of sourceFile.getImportDeclarations()) {
         const moduleSpecifier = importDecl.getModuleSpecifierValue();
-        for (const namedImport of [...importDecl.getNamedImports()]) {
+
+        const matches: { name: string; newName: string }[] = [];
+        for (const namedImport of importDecl.getNamedImports()) {
             const importedName = namedImport.getName();
             const rename = renames.get(importedName);
             if (!rename || rename.module !== moduleSpecifier) continue;
+            matches.push({ name: importedName, newName: rename.newName });
+        }
 
+        for (const { name, newName } of matches) {
+            const namedImport = importDecl.getNamedImports().find((ni) => ni.getName() === name)!;
             const nameNode = namedImport.getNameNode();
             const localReferences = nameNode
                 .findReferencesAsNodes()
-                .filter((node) => node.getSourceFile() === sourceFile && node !== nameNode);
-            for (const reference of localReferences) reference.replaceWithText(rename.newName);
-            namedImport.remove();
-            neededImports.add(rename.newName);
+                .filter(
+                    (node) =>
+                        Node.isIdentifier(node) &&
+                        node.getSourceFile() === sourceFile &&
+                        node !== nameNode,
+                );
+            for (const reference of localReferences) reference.replaceWithText(newName);
+            neededImports.add(newName);
             touched = true;
         }
+
+        const namesToRemove = new Set(matches.map((m) => m.name));
+        while (namesToRemove.size > 0) {
+            const namedImport = importDecl
+                .getNamedImports()
+                .find((ni) => namesToRemove.has(ni.getName()));
+            if (!namedImport) break;
+            namesToRemove.delete(namedImport.getName());
+            namedImport.remove();
+        }
+
         if (
             importDecl.getNamedImports().length === 0 &&
             !importDecl.getDefaultImport() &&
@@ -86,7 +107,9 @@ for (const [absPath, renames] of byFile) {
             });
         }
         filesTouched++;
-        console.log(`${DRY_RUN ? "[dry-run] " : ""}${absPath.replace(ROOT + "/", "")}: +${names.join(", ")}`);
+        console.log(
+            `${DRY_RUN ? "[dry-run] " : ""}${absPath.replace(ROOT + "/", "")}: +${names.join(", ")}`,
+        );
     }
 }
 
