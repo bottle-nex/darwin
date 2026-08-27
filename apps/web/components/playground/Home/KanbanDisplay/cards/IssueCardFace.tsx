@@ -119,7 +119,10 @@ export default function IssueCardFace({
 
             <div className="mt-2 flex items-start gap-1.5">
                 <StatusIcon
-                    className={cn("mt-px size-4 shrink-0", column?.titleBox ?? "text-neutral-500")}
+                    className={cn(
+                        "mt-px size-4.25 shrink-0",
+                        column?.titleBox ?? "text-neutral-500",
+                    )}
                     aria-label={column?.title ?? "No status"}
                 />
                 <p className="line-clamp-2 text-[14px] leading-snug font-medium text-neutral-50">

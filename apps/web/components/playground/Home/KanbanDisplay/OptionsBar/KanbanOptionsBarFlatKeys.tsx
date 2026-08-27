@@ -8,18 +8,16 @@ import { useFilteredCustomColumns } from "@/hooks/kanban/useFilteredCustomColumn
 import { useKanbanOptionsStore } from "@/store/kanban/useKanbanOptionsStore";
 
 import AddTaskButton from "./KanbanOptionPanels/AddTaskButton";
-import BoardViewPanel from "./KanbanOptionPanels/BoardViewPanel";
 import FilterChipsBar from "./KanbanOptionPanels/FilterChipsBar";
 import FiltersPanel from "./KanbanOptionPanels/FiltersPanel";
 import FocusPanel from "./KanbanOptionPanels/FocusPanel";
+import KanbanViewPanel from "./KanbanOptionPanels/KanbanViewPanel";
 
 export default function KanbanOptionsBarFlatKeys() {
     const focus = useKanbanOptionsStore((s) => s.focus);
     const setFocus = useKanbanOptionsStore((s) => s.setFocus);
     const kanbanView = useKanbanOptionsStore((s) => s.kanbanView);
     const setKanbanView = useKanbanOptionsStore((s) => s.setKanbanView);
-    const boardView = useKanbanOptionsStore((s) => s.boardView);
-    const setBoardView = useKanbanOptionsStore((s) => s.setBoardView);
     const customColumns = useFilteredCustomColumns();
 
     return (
@@ -36,12 +34,7 @@ export default function KanbanOptionsBarFlatKeys() {
                 <div className="flex shrink-0 items-center gap-0.75">
                     <FiltersPanel />
                     <FocusPanel value={focus} onChange={setFocus} customColumns={customColumns} />
-                    <BoardViewPanel
-                        value={boardView}
-                        onChange={setBoardView}
-                        kanbanView={kanbanView}
-                        onKanbanViewChange={setKanbanView}
-                    />
+                    <KanbanViewPanel value={kanbanView} onChange={setKanbanView} />
                     <div className="mx-1 h-4 w-px bg-white/8" />
 
                     <AddTaskButton />

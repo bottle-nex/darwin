@@ -1,16 +1,29 @@
 "use client";
-import { GanttNavIcon, KanbanColumnsIcon, TagIcon } from "@trymatcha/ui/icons";
+import { GanttNavIcon, TagIcon } from "@trymatcha/ui/icons";
+
+import HeroBuddy from "@/components/landing/v2/HeroBuddy";
 
 import { PlaygroundTab } from "../playgroundTabs";
 import { type SidebarSectionProps } from "./shared";
 import Row from "./SidebarRow";
 import Section from "./SidebarSection";
 
-// The ways you look at the project's work — the board itself and its lenses.
-const BOARD_ROWS: { id: string; label: string; icon: React.ComponentType }[] = [
-    { id: PlaygroundTab.Kanban, label: "Kanban", icon: KanbanColumnsIcon },
-    { id: PlaygroundTab.Gantt, label: "Gantt", icon: GanttNavIcon },
-    { id: PlaygroundTab.Tags, label: "Tags", icon: TagIcon },
+type BoardRow = {
+    id: string;
+    label: string;
+    leading: React.ComponentProps<typeof Row>["leading"];
+};
+
+// The ways you look at the project's work — the agent's board and its lenses.
+// The user's own boards are chapters, and live in their own section.
+const BOARD_ROWS: BoardRow[] = [
+    {
+        id: PlaygroundTab.Agent,
+        label: "Agent",
+        leading: { kind: "node", node: <HeroBuddy move={false} className="size-4" /> },
+    },
+    { id: PlaygroundTab.Gantt, label: "Gantt", leading: { kind: "icon", icon: GanttNavIcon } },
+    { id: PlaygroundTab.Tags, label: "Tags", leading: { kind: "icon", icon: TagIcon } },
 ];
 
 export default function PlaygroundSidebarBoardSection({
@@ -23,7 +36,7 @@ export default function PlaygroundSidebarBoardSection({
                 <Row
                     key={r.id}
                     label={r.label}
-                    leading={{ kind: "icon", icon: r.icon }}
+                    leading={r.leading}
                     active={selectedRowId === r.id}
                     onClick={() => onSelect(r.id)}
                 />

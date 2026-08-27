@@ -16,13 +16,19 @@ export function useFilteredCustomColumns(): CustomColumn[] {
     const overlayActive = useCustomKanbanStore((state) => state.overlayActive);
     const overlayColumns = useCustomKanbanStore((state) => state.columns);
 
+    const scope = feed.scope;
     const columns = useMemo(
         () =>
             CustomKanbanMappers.boardToColumns({
-                columns: metadata?.columns ?? [],
+                columns:
+                    scope.kind === "chapter"
+                        ? (metadata?.columns ?? []).filter(
+                              (column) => column.chapterId === scope.chapterId,
+                          )
+                        : [],
                 issues: feed.rows,
             }),
-        [metadata?.columns, feed.rows],
+        [metadata?.columns, feed.rows, scope],
     );
 
     return overlayActive ? overlayColumns : columns;

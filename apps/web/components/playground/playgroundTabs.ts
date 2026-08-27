@@ -8,7 +8,8 @@ import { DefaultHomeView } from "@trymatcha/types";
 export enum PlaygroundTab {
     Inbox = "inbox",
     Chats = "chats",
-    Kanban = "kanban",
+    Agent = "agent",
+    Chapter = "chapter",
     Gantt = "gantt",
     Tags = "tags",
     AssignedToMe = "assigned-to-me",
@@ -37,7 +38,7 @@ export function isSettingsTab(tab: string): boolean {
     return SETTINGS_TABS.has(tab);
 }
 
-export const PLAYGROUND_DEFAULT_TAB: PlaygroundTab = PlaygroundTab.Kanban;
+export const PLAYGROUND_DEFAULT_TAB: PlaygroundTab = PlaygroundTab.Agent;
 
 const PLAYGROUND_TABS = new Set<string>(Object.values(PlaygroundTab));
 
@@ -48,7 +49,7 @@ export function isPlaygroundTab(tab: string): tab is PlaygroundTab {
 export const DEFAULT_HOME_VIEW_OPTIONS: { tab: PlaygroundTab; label: string }[] = [
     { tab: PlaygroundTab.Inbox, label: "Inbox" },
     { tab: PlaygroundTab.Chats, label: "Chats" },
-    { tab: PlaygroundTab.Kanban, label: "Kanban" },
+    { tab: PlaygroundTab.Agent, label: "Agent" },
     { tab: PlaygroundTab.Gantt, label: "Gantt" },
     { tab: PlaygroundTab.Tags, label: "Tags" },
     { tab: PlaygroundTab.AssignedToMe, label: "My issues" },
@@ -57,7 +58,7 @@ export const DEFAULT_HOME_VIEW_OPTIONS: { tab: PlaygroundTab; label: string }[] 
 const DEFAULT_HOME_VIEW_TO_TAB: Record<DefaultHomeView, PlaygroundTab> = {
     [DefaultHomeView.Inbox]: PlaygroundTab.Inbox,
     [DefaultHomeView.Chats]: PlaygroundTab.Chats,
-    [DefaultHomeView.Kanban]: PlaygroundTab.Kanban,
+    [DefaultHomeView.Kanban]: PlaygroundTab.Agent,
     [DefaultHomeView.Gantt]: PlaygroundTab.Gantt,
     [DefaultHomeView.Tags]: PlaygroundTab.Tags,
     [DefaultHomeView.AssignedToMe]: PlaygroundTab.AssignedToMe,

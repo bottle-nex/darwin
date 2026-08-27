@@ -8,33 +8,40 @@ import type { BoardMetadata } from "@/types/board";
 
 export interface ReorderColumnsInput {
     project_id: string;
+    chapter_id: string;
     column_ids: string[];
 }
 
-/** Persists the requesting user's personal column order for a project. */
+/** Persists the requesting user's personal column order for one chapter. */
 export function useReorderColumns() {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: async (input: ReorderColumnsInput) => {
-            await apiClient.patch<ApiResponse<{ ok: boolean }>>(REORDER_COLUMNS_URL, input);
+        mutationFn: async ({ chapter_id, column_ids }: ReorderColumnsInput) => {
+            await apiClient.patch<ApiResponse<{ ok: boolean }>>(REORDER_COLUMNS_URL, {
+                chapter_id,
+                column_ids,
+            });
         },
         onMutate: (variables) => {
             const key = boardColumnsKey(variables.project_id);
             const previous = queryClient.getQueryData<BoardMetadata>(key);
-            queryClient.setQueryData<BoardMetadata>(
-                boardColumnsKey(variables.project_id),
-                (data) => {
-                    if (!data) return data;
-                    const byId = new Map(data.columns.map((column) => [column.id, column]));
-                    return {
-                        ...data,
-                        columns: variables.column_ids.flatMap((id, order) => {
-                            const column = byId.get(id);
-                            return column ? [{ ...column, order }] : [];
-                        }),
-                    };
-                },
-            );
+            queryClient.setQueryData<BoardMetadata>(key, (data) => {
+                if (!data) return data;
+                const byId = new Map(data.columns.map((column) => [column.id, column]));
+                const reordered = variables.column_ids.flatMap((id, order) => {
+                    const column = byId.get(id);
+                    return column?.chapterId === variables.chapter_id ? [{ ...column, order }] : [];
+                });
+                let next = 0;
+                return {
+                    ...data,
+                    columns: data.columns.map((column) =>
+                        column.chapterId === variables.chapter_id
+                            ? (reordered[next++] ?? column)
+                            : column,
+                    ),
+                };
+            });
             return { key, previous };
         },
         onError: (_error, _variables, context) => {

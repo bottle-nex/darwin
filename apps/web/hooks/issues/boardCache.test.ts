@@ -120,6 +120,7 @@ describe("board page cache", () => {
     test("patches one project without changing another project's lanes or totals", () => {
         const queryClient = new QueryClient();
         const metadata = (): BoardMetadata => ({
+            chapters: [],
             columns: [],
             totals: { system: { Todo: 4 }, custom: {} },
         });
@@ -152,6 +153,7 @@ describe("board page cache", () => {
     test("ignores same-lane updates for issues outside every loaded cache", () => {
         const queryClient = new QueryClient();
         queryClient.setQueryData<BoardMetadata>(boardColumnsKey("project-a"), {
+            chapters: [],
             columns: [],
             totals: { system: { Todo: 4 }, custom: {} },
         });
@@ -170,6 +172,7 @@ describe("board page cache", () => {
     test("reconciles an unloaded move through the overlay and server totals", () => {
         const queryClient = new QueryClient();
         queryClient.setQueryData<BoardMetadata>(boardColumnsKey("project-a"), {
+            chapters: [],
             columns: [],
             totals: { system: { Todo: 4, Done: 2 }, custom: {} },
         });
@@ -196,6 +199,7 @@ describe("board page cache", () => {
             const queryClient = new QueryClient();
             queryClient.setQueryData(boardLaneKey("project-a", todoLane), pages());
             queryClient.setQueryData<BoardMetadata>(boardColumnsKey("project-a"), {
+                chapters: [],
                 columns: [],
                 totals: { system: { Todo: 4, Done: 2 }, custom: {} },
             });

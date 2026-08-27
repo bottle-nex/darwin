@@ -12,11 +12,15 @@ export function useCustomColumnActions() {
     const updateColumn = useUpdateColumn();
     const deleteColumn = useDeleteColumn();
 
-    const addColumn = async (title: string) => {
+    const addColumn = async (chapterId: string, title: string) => {
         const name = title.trim();
         if (!name || !projectId) return false;
         try {
-            const column = await createColumn.mutateAsync({ project_id: projectId, label: name });
+            const column = await createColumn.mutateAsync({
+                project_id: projectId,
+                chapter_id: chapterId,
+                label: name,
+            });
             useCustomKanbanStore
                 .getState()
                 .addColumnLocal({ id: column.id, title: column.label, cards: [] });

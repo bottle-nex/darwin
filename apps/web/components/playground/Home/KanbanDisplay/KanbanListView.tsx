@@ -20,7 +20,6 @@ import { VirtualizedRows } from "./VirtualizedRows";
 
 type KanbanListViewProps = {
     board?: BoardState;
-    includeCustom?: boolean;
 };
 
 type SelectionScope = "kanban" | "custom-kanban";
@@ -36,7 +35,7 @@ type ListGroup = {
     createTarget?: IssueTarget;
 };
 
-export default function KanbanListView({ board, includeCustom = false }: KanbanListViewProps) {
+export default function KanbanListView({ board }: KanbanListViewProps) {
     const [collapsedGroupKeys, setCollapsedGroupKeys] = useState<Set<string>>(() => new Set());
     const openCreate = useCreateIssueStore((state) => state.open);
     const project = useActiveProject();
@@ -45,34 +44,32 @@ export default function KanbanListView({ board, includeCustom = false }: KanbanL
     const { data: metadata } = useBoardColumns(projectId);
     const customColumns = useFilteredCustomColumns();
     const groups = useMemo<ListGroup[]>(() => {
-        const customGroups = includeCustom
-            ? customColumns.map((column) => ({
-                  key: `custom:${column.id}`,
-                  title: column.title,
-                  selector: { type: "custom" as const, columnId: column.id },
-                  selectionScope: "custom-kanban" as const,
-                  issues: column.cards.map<Issue>((card) => ({
-                      id: card.id,
-                      boardIssue: card.boardIssue,
-                      number: card.number ? `#${card.number}` : "#—",
-                      title: card.title,
-                      project: project?.name ?? "",
-                      tags: card.tags,
-                      priority: card.priority,
-                      assignees: card.assignees,
-                      comments: 0,
-                      status: (card.status as KanbanStatus | undefined) ?? KanbanStatus.Todo,
-                      createdAt: card.createdAt,
-                      targetDate: card.targetDate,
-                  })),
-                  total: metadata?.totals.custom[column.id] ?? column.cards.length,
-                  createTarget: {
-                      board: "custom" as const,
-                      columnId: column.id,
-                      columnTitle: column.title,
-                  },
-              }))
-            : [];
+        const customGroups = customColumns.map((column) => ({
+            key: `custom:${column.id}`,
+            title: column.title,
+            selector: { type: "custom" as const, columnId: column.id },
+            selectionScope: "custom-kanban" as const,
+            issues: column.cards.map<Issue>((card) => ({
+                id: card.id,
+                boardIssue: card.boardIssue,
+                number: card.number ? `#${card.number}` : "#—",
+                title: card.title,
+                project: project?.name ?? "",
+                tags: card.tags,
+                priority: card.priority,
+                assignees: card.assignees,
+                comments: 0,
+                status: (card.status as KanbanStatus | undefined) ?? KanbanStatus.Todo,
+                createdAt: card.createdAt,
+                targetDate: card.targetDate,
+            })),
+            total: metadata?.totals.custom[column.id] ?? column.cards.length,
+            createTarget: {
+                board: "custom" as const,
+                columnId: column.id,
+                columnTitle: column.title,
+            },
+        }));
         const systemGroups = board
             ? KanbanBoard.COLUMNS.map((column) => ({
                   key: column.status,
@@ -89,7 +86,7 @@ export default function KanbanListView({ board, includeCustom = false }: KanbanL
               }))
             : [];
         return [...customGroups, ...systemGroups];
-    }, [board, customColumns, includeCustom, metadata?.totals, project?.name]);
+    }, [board, customColumns, metadata?.totals, project?.name]);
     const rows = useMemo(
         () => flattenGroupedIssueRows(groups, (issue) => issue.id, true, collapsedGroupKeys),
         [collapsedGroupKeys, groups],

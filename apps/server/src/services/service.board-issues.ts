@@ -176,20 +176,41 @@ export default class BoardIssueService {
         column_id: string,
     ): Promise<{ id: string } | null> {
         return prisma.customColumn.findFirst({
-            where: { id: column_id, projectId: project_id },
+            where: { id: column_id, chapter: { projectId: project_id } },
             select: { id: true },
         });
     }
 
+    static sort_columns_for_viewer<T extends { id: string; order: number }>(
+        columns: readonly T[],
+        personal_order_by_column: ReadonlyMap<string, number>,
+    ) {
+        return [...columns].sort((left, right) => {
+            const left_order = personal_order_by_column.get(left.id);
+            const right_order = personal_order_by_column.get(right.id);
+            if (left_order !== undefined && right_order !== undefined) {
+                return left_order - right_order;
+            }
+            if (left_order !== undefined) return -1;
+            if (right_order !== undefined) return 1;
+            return left.order - right.order;
+        });
+    }
+
     static async get_board_metadata(project_id: string, viewer_id: string) {
-        const [columns, personal_orders, lane_counts] = await Promise.all([
-            prisma.customColumn.findMany({
+        const [chapters, columns, personal_orders, lane_counts] = await Promise.all([
+            prisma.chapter.findMany({
                 where: { projectId: project_id },
                 orderBy: { order: "asc" },
-                select: { id: true, label: true, order: true },
+                select: { id: true, name: true, slug: true, order: true },
+            }),
+            prisma.customColumn.findMany({
+                where: { chapter: { projectId: project_id } },
+                orderBy: { order: "asc" },
+                select: { id: true, chapterId: true, label: true, order: true },
             }),
             prisma.customColumnOrder.findMany({
-                where: { userId: viewer_id, projectId: project_id },
+                where: { userId: viewer_id, chapter: { projectId: project_id } },
                 select: { columnId: true, order: true },
             }),
             prisma.issue.groupBy({
@@ -202,16 +223,12 @@ export default class BoardIssueService {
         const personal_order_by_column = new Map(
             personal_orders.map((order) => [order.columnId, order.order]),
         );
-        const ordered_columns = [...columns].sort((left, right) => {
-            const left_order = personal_order_by_column.get(left.id);
-            const right_order = personal_order_by_column.get(right.id);
-            if (left_order !== undefined && right_order !== undefined) {
-                return left_order - right_order;
-            }
-            if (left_order !== undefined) return -1;
-            if (right_order !== undefined) return 1;
-            return left.order - right.order;
-        });
+        const ordered_columns = chapters.flatMap((chapter) =>
+            BoardIssueService.sort_columns_for_viewer(
+                columns.filter((column) => column.chapterId === chapter.id),
+                personal_order_by_column,
+            ),
+        );
         const system_count_by_status = new Map(
             lane_counts
                 .filter((entry) => entry.customColumnId === null)
@@ -220,6 +237,7 @@ export default class BoardIssueService {
         const custom_count_by_column = aggregate_custom_column_counts(lane_counts);
 
         return {
+            chapters,
             columns: ordered_columns,
             totals: {
                 system: Object.fromEntries(

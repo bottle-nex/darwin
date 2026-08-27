@@ -5,6 +5,8 @@ import { useEffect, useLayoutEffect } from "react";
 import CommandDialogs from "@/components/command/CommandDialogs";
 import CommandMenu from "@/components/command/CommandMenu";
 import OnboardingDisplay from "@/components/onboarding/OnboardingDisplay";
+import CreateChapterDialog from "@/components/playground/chapter/CreateChapterDialog";
+import DeleteChapterDialog from "@/components/playground/chapter/DeleteChapterDialog";
 import IssueSelectionBar from "@/components/playground/Core/components/IssueSelectionBar";
 import PlaygroundPaneFrame from "@/components/playground/Core/components/PlaygroundPaneFrame";
 import FloatNotifications from "@/components/playground/Core/Notifications/FloatNotifications";
@@ -23,6 +25,7 @@ import CreateProjectDialog from "@/components/project/CreateProjectDialog";
 import CreateTeamDialog from "@/components/team/CreateTeamDialog";
 import DeleteTeamDialog from "@/components/team/DeleteTeamDialog";
 import { useGetDashboard } from "@/hooks/dashboard/useGetDashboard";
+import { useChapters } from "@/hooks/issues/useBoardColumns";
 import { usePaneRoute } from "@/hooks/playground/usePaneRoute";
 import { useGetProject } from "@/hooks/project/useGetProject";
 import usePlaygroundShortcuts from "@/hooks/shortcuts/usePlaygroundShortcuts";
@@ -58,10 +61,22 @@ export default function PlaygroundShell() {
     }, [orgSlug, activeProject, setLastVisited]);
 
     const activeTab = usePlaygroundNavStore((s) => s.tab);
+    const selectedChapter = usePlaygroundNavStore((s) => s.selectedChapter);
+    const clearChapter = usePlaygroundNavStore((s) => s.clearChapter);
+    const chapters = useChapters(activeProject?.id);
     const defaultHomeView = dashboard
         ? defaultHomeViewToTab(dashboard.userConfig.defaultHomeView)
         : undefined;
-    usePlaygroundUrlSync(project?.teams, defaultHomeView);
+    usePlaygroundUrlSync(project?.teams, chapters, defaultHomeView);
+
+    // A chapter can disappear under us — deleted by a collaborator, or left
+    // behind by a project switch. Fall back to the agent board rather than
+    // rendering a pane for a chapter that no longer exists.
+    const selectedChapterId = selectedChapter?.id;
+    useEffect(() => {
+        if (!selectedChapterId || !chapters.length) return;
+        if (!chapters.some((chapter) => chapter.id === selectedChapterId)) clearChapter();
+    }, [selectedChapterId, chapters, clearChapter]);
     const paneRoute = usePaneRoute({ sync: true });
     const openIssueId = paneRoute.kind === "issue" ? paneRoute.issueId : null;
     usePlaygroundShortcuts();
@@ -109,6 +124,8 @@ export default function PlaygroundShell() {
             <CreateProjectDialog />
             <CreateTeamDialog />
             <DeleteTeamDialog />
+            <CreateChapterDialog projectSlug={projectSlug ?? ""} />
+            <DeleteChapterDialog />
             <CreateIssueDialog />
             <PlaygroundShortcutSheet />
             <CommandMenu />

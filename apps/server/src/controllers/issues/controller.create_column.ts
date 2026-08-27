@@ -8,7 +8,7 @@ import ResponseWriter from "../../services/service.response";
 
 export default class ColumnCreateController {
     static body_schema = z.object({
-        project_id: z.string().min(1),
+        chapter_id: z.string().min(1),
         label: z.string().min(1).max(100),
     });
 
@@ -26,7 +26,16 @@ export default class ColumnCreateController {
                 return;
             }
 
-            const role = await Access.project(user.id, parsed_body.data.project_id);
+            const chapter = await prisma.chapter.findUnique({
+                where: { id: parsed_body.data.chapter_id },
+                select: { projectId: true },
+            });
+            if (!chapter) {
+                ResponseWriter.not_found(res, "Chapter not found");
+                return;
+            }
+
+            const role = await Access.project(user.id, chapter.projectId);
             if (!role || !Permissions.project(role, Action.project.manage_columns)) {
                 ResponseWriter.not_authorized(
                     res,
@@ -37,18 +46,18 @@ export default class ColumnCreateController {
 
             const column = await prisma.$transaction(async (tx) => {
                 const last_column = await tx.customColumn.findFirst({
-                    where: { projectId: parsed_body.data.project_id },
+                    where: { chapterId: parsed_body.data.chapter_id },
                     orderBy: { order: "desc" },
                     select: { order: true },
                 });
 
                 return tx.customColumn.create({
                     data: {
-                        projectId: parsed_body.data.project_id,
+                        chapterId: parsed_body.data.chapter_id,
                         label: parsed_body.data.label,
                         order: (last_column?.order ?? 0) + 1,
                     },
-                    select: { id: true, label: true, order: true },
+                    select: { id: true, chapterId: true, label: true, order: true },
                 });
             });
 

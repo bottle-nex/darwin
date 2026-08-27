@@ -90,41 +90,59 @@ model IssueTemplate {
   @@index([projectId])
 }
 
-model CustomColumn {
+model Chapter {
   id        String @id @default(cuid())
   projectId String
-  label     String
+  name      String
+  slug      String
   order     Int
 
   project    Project             @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  columns    CustomColumn[]
+  userOrders CustomColumnOrder[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([projectId, slug])
+  @@index([projectId])
+}
+
+model CustomColumn {
+  id        String @id @default(cuid())
+  chapterId String
+  label     String
+  order     Int
+
+  chapter    Chapter             @relation(fields: [chapterId], references: [id], onDelete: Cascade)
   issues     Issue[]
   userOrders CustomColumnOrder[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@index([projectId])
+  @@index([chapterId])
 }
 
-/// A user's personal position for a custom column within a project. Only
+/// A user's personal position for a custom column within a chapter. Only
 /// pinned (reordered) columns get a row here — columns without one fall back
 /// to `CustomColumn.order`, sorted after every pinned column for that user.
 model CustomColumnOrder {
   id        String @id @default(cuid())
   userId    String
-  projectId String
+  chapterId String
   columnId  String
   order     Int
 
   user    User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  project Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  chapter Chapter      @relation(fields: [chapterId], references: [id], onDelete: Cascade)
   column  CustomColumn @relation(fields: [columnId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@unique([userId, columnId])
-  @@index([userId, projectId])
+  @@index([userId, chapterId])
 }
 
 enum IssueStatus {

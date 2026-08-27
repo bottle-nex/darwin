@@ -1,4 +1,5 @@
 import {
+    AgentIcon,
     AssigneeGroupIcon,
     CalendarIcon,
     ChatsNavIcon,
@@ -127,10 +128,10 @@ export const COMBINATIONS: Record<string, CommandAction> = {
     },
     "o k": {
         kind: CommandKind.Open,
-        label: "Open Kanban",
-        icon: KanbanColumnsIcon,
+        label: "Open Agent board",
+        icon: AgentIcon,
         isAvailable: inProject,
-        run: () => openTab(PlaygroundTab.Kanban),
+        run: () => openTab(PlaygroundTab.Agent),
     },
     "o g": {
         kind: CommandKind.Open,

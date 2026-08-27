@@ -14,6 +14,8 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { TooltipComponent } from "@/components/ui/tooltip-component";
+import { useBoardFeed } from "@/hooks/issues/useBoard";
+import { useActiveProject } from "@/hooks/useActiveProject";
 import { useCreateIssueStore } from "@/store/issues/useCreateIssueStore";
 import { useAddCustomColumnStore } from "@/store/kanban/useAddCustomColumnStore";
 
@@ -26,13 +28,15 @@ const TASK_OPTIONS = [
 ];
 
 export default function AddTaskButton() {
+    const projectId = useActiveProject()?.id;
+    const scope = useBoardFeed(projectId).scope;
     const openCreate = useCreateIssueStore((s) => s.open);
-    const setAddColumnOpen = useAddCustomColumnStore((s) => s.setOpen);
+    const openAddColumn = useAddCustomColumnStore((s) => s.openFor);
     const onAddTask = () => openCreate({ board: "llm" });
 
     const handlers: Record<string, (() => void) | undefined> = {
         issue: onAddTask,
-        custom_column: () => setAddColumnOpen(true),
+        custom_column: scope.kind === "chapter" ? () => openAddColumn(scope.chapterId) : undefined,
     };
 
     return (
@@ -46,7 +50,7 @@ export default function AddTaskButton() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
                     {TASK_OPTIONS.map((option) => {
-                        const disabled = option.id === "import";
+                        const disabled = option.id === "import" || !handlers[option.id];
                         return (
                             <DropdownMenuItem
                                 key={option.id}

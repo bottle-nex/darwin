@@ -24,7 +24,7 @@ import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
 import { BOARD_SEARCH_URL, BOARD_URL } from "@/routes/api_routes";
 import { useKanbanFilterStore } from "@/store/kanban/useKanbanFilterStore";
 import type { ApiResponse } from "@/types/api";
-import type { BoardIssue, BoardIssuePage, BoardLaneSelector } from "@/types/board";
+import type { BoardIssue, BoardIssuePage, BoardLaneSelector, BoardScope } from "@/types/board";
 import type { BoardFilters } from "@/types/boardFilter";
 
 import {
@@ -89,18 +89,29 @@ export function useBoardLane(projectId: string | undefined, selector: BoardLaneS
     });
 }
 
-function useLoadedBoardRows(projectId: string | undefined) {
+/**
+ * The lanes one pane actually shows. Board metadata stays project-wide, but the
+ * fan-out below opens one infinite query per lane — so an unscoped list would
+ * load every column of every chapter on mount.
+ */
+function laneSelectorsFor(
+    scope: BoardScope,
+    columns: { id: string; chapterId: string }[] | undefined,
+): BoardLaneSelector[] {
+    if (scope.kind === "agent") {
+        return KanbanBoard.STATUSES.map((status) => ({ type: "system", status }) as const);
+    }
+    return (columns ?? [])
+        .filter((column) => column.chapterId === scope.chapterId)
+        .map((column) => ({ type: "custom" as const, columnId: column.id }));
+}
+
+function useLoadedBoardRows(projectId: string | undefined, scope: BoardScope) {
     const metadataQuery = useBoardColumns(projectId);
     const metadata = metadataQuery.data;
     const selectors = useMemo<BoardLaneSelector[]>(
-        () => [
-            ...KanbanBoard.STATUSES.map((status) => ({ type: "system", status }) as const),
-            ...(metadata?.columns.map((column) => ({
-                type: "custom" as const,
-                columnId: column.id,
-            })) ?? []),
-        ],
-        [metadata?.columns],
+        () => laneSelectorsFor(scope, metadata?.columns),
+        [scope, metadata?.columns],
     );
     const queryClient = useQueryClient();
     const queries = useQueries({
@@ -169,9 +180,9 @@ export function useBoardSearch(
     });
 }
 
-function useBoardFeedValue(projectId: string | undefined) {
+function useBoardFeedValue(projectId: string | undefined, scope: BoardScope) {
     const filters = useKanbanFilterStore((state) => state.filters);
-    const loaded = useLoadedBoardRows(projectId);
+    const loaded = useLoadedBoardRows(projectId, scope);
     const fallbackDecision = useMemo(
         () => resolveBoardFilterFallback(loaded.rows, filters, loaded.baseSettled),
         [loaded.rows, filters, loaded.baseSettled],
@@ -185,6 +196,7 @@ function useBoardFeedValue(projectId: string | undefined) {
 
     return {
         ...loaded,
+        scope,
         baseRows: loaded.rows,
         filters,
         filtersActive: fallbackDecision.filtersActive,
@@ -216,12 +228,14 @@ const BoardFeedContext = createContext<BoardFeedContextValue | null>(null);
 
 export function BoardFeedProvider({
     projectId,
+    scope,
     children,
 }: {
     projectId: string | undefined;
+    scope: BoardScope;
     children: ReactNode;
 }) {
-    const feed = useBoardFeedValue(projectId);
+    const feed = useBoardFeedValue(projectId, scope);
     const value = useMemo(() => ({ projectId, feed }), [projectId, feed]);
     return createElement(BoardFeedContext.Provider, { value }, children);
 }
@@ -283,16 +297,16 @@ function BoardLaneLoader({
     return null;
 }
 
-export function BoardDataLoader({ projectId }: { projectId: string | undefined }) {
+export function BoardDataLoader({
+    projectId,
+    scope,
+}: {
+    projectId: string | undefined;
+    scope: BoardScope;
+}) {
     const { data: metadata } = useBoardColumns(projectId);
     if (!projectId) return null;
-    const lanes = [
-        ...KanbanBoard.STATUSES.map((status) => ({ type: "system", status }) as const),
-        ...(metadata?.columns.map((column) => ({
-            type: "custom" as const,
-            columnId: column.id,
-        })) ?? []),
-    ];
+    const lanes = laneSelectorsFor(scope, metadata?.columns);
 
     return createElement(
         Fragment,

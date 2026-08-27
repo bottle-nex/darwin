@@ -1,5 +1,5 @@
 "use client";
-import { type ReactNode, useMemo } from "react";
+import { useMemo } from "react";
 
 import { IssueSelectionOrderProvider } from "@/hooks/issues/useIssueSelection";
 import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
@@ -10,19 +10,15 @@ import KanbanColumn from "./KanbanColumn";
 
 type KanbanBoardViewProps = {
     board: BoardState;
-    /** Columns to render before the LLM columns (e.g. the Custom Kanban) so both
-     *  boards flow through one continuous scroll row. */
-    leading?: ReactNode;
 };
 
 /**
- * Board view: the LLM columns as a horizontal row. `leading` lets a caller
- * prepend the Custom Kanban so the two boards share one scroll. Only bridge
- * columns accept drops / let their cards be dragged out (see `BRIDGE_STATUSES`);
- * single-column focus is rendered by `KanbanDisplay`, not here. The shared
- * DndContext lives in `KanbanDisplay`.
+ * Board view: the LLM columns as a horizontal row. Only bridge columns accept
+ * drops / let their cards be dragged out (see `BRIDGE_STATUSES`); single-column
+ * focus is rendered by `KanbanDisplay`, not here. The shared DndContext lives in
+ * `KanbanDisplay`.
  */
-export default function KanbanBoardView({ board, leading }: KanbanBoardViewProps) {
+export default function KanbanBoardView({ board }: KanbanBoardViewProps) {
     const { visible: visibleColumns, hidden: hiddenColumns } = useMemo(
         () => KanbanBoard.partitionColumns(board),
         [board],
@@ -38,7 +34,6 @@ export default function KanbanBoardView({ board, leading }: KanbanBoardViewProps
             data-kanban-scroll-row
             className="flex min-h-0 flex-1 items-start gap-y-4 gap-x-2 overflow-x-auto px-3 pt-3 pb-3"
         >
-            {leading}
             <IssueSelectionOrderProvider issueIds={loadedIssueIds}>
                 {visibleColumns.map((column) => (
                     <KanbanColumn

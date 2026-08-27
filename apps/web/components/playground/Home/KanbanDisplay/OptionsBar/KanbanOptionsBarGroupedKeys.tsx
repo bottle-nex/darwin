@@ -27,11 +27,14 @@ import { useKanbanFilterStore } from "@/store/kanban/useKanbanFilterStore";
 import { useKanbanOptionsStore } from "@/store/kanban/useKanbanOptionsStore";
 
 import AddTaskButton from "./KanbanOptionPanels/AddTaskButton";
-import { BOARD_VIEW_PANEL_WIDTH, BoardViewPanelItems } from "./KanbanOptionPanels/BoardViewPanel";
 import EagerSubmenu from "./KanbanOptionPanels/EagerSubmenu";
 import FilterChipsBar from "./KanbanOptionPanels/FilterChipsBar";
 import { FILTERS_PANEL_WIDTH, FiltersPanelItems } from "./KanbanOptionPanels/FiltersPanel";
 import { FOCUS_PANEL_WIDTH, FocusPanelItems } from "./KanbanOptionPanels/FocusPanel";
+import {
+    KANBAN_VIEW_PANEL_WIDTH,
+    KanbanViewPanelItems,
+} from "./KanbanOptionPanels/KanbanViewPanel";
 
 /**
  * Every toolbar option collapsed behind one "Options" menu. The panels that have
@@ -46,8 +49,6 @@ export default function KanbanOptionsBarGroupedKeys() {
     const setFocus = useKanbanOptionsStore((s) => s.setFocus);
     const kanbanView = useKanbanOptionsStore((s) => s.kanbanView);
     const setKanbanView = useKanbanOptionsStore((s) => s.setKanbanView);
-    const boardView = useKanbanOptionsStore((s) => s.boardView);
-    const setBoardView = useKanbanOptionsStore((s) => s.setBoardView);
     const filters = useKanbanFilterStore((s) => s.filters);
     const customColumns = useFilteredCustomColumns();
     const activeCount = activeFacetKeys(filters).length;
@@ -118,22 +119,20 @@ export default function KanbanOptionsBarGroupedKeys() {
                                 </EagerSubmenu>
 
                                 <EagerSubmenu
-                                    className={`${BOARD_VIEW_PANEL_WIDTH} [direction:ltr]`}
+                                    className={`${KANBAN_VIEW_PANEL_WIDTH} [direction:ltr]`}
                                     trigger={
                                         <>
                                             <BoardViewIcon
                                                 className="size-3.5 text-neutral-400"
                                                 aria-hidden
                                             />
-                                            <span className="flex-1">Board</span>
+                                            <span className="flex-1">Layout</span>
                                         </>
                                     }
                                 >
-                                    <BoardViewPanelItems
-                                        value={boardView}
-                                        onChange={setBoardView}
-                                        kanbanView={kanbanView}
-                                        onKanbanViewChange={setKanbanView}
+                                    <KanbanViewPanelItems
+                                        value={kanbanView}
+                                        onChange={setKanbanView}
                                     />
                                 </EagerSubmenu>
                             </>

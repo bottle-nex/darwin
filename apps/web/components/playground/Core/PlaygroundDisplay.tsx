@@ -7,6 +7,7 @@ import {
 } from "@/components/playground/Core/components/PlaygroundPaneSlots";
 import GanttDisplay from "@/components/playground/Home/GanttDisplay/GanttDisplay";
 import InboxDisplay from "@/components/playground/Home/InboxDisplay/InboxDisplay";
+import ChapterPane from "@/components/playground/Home/KanbanDisplay/ChapterPane";
 import KanbanDisplay from "@/components/playground/Home/KanbanDisplay/KanbanDisplay";
 import MyIssuesDisplay from "@/components/playground/Home/MyIssuesDisplay/MyIssuesDisplay";
 import ChatsDisplay from "@/components/playground/Home/panes/ChatsDisplay";
@@ -20,6 +21,9 @@ import { isSettingsTab, PlaygroundTab } from "@/components/playground/playground
 import TeamDetailDisplay from "@/components/playground/Team/TeamDisplay";
 import { cn } from "@/lib/utils";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
+import type { BoardScope } from "@/types/board";
+
+const AGENT_SCOPE: BoardScope = { kind: "agent" };
 
 function TabPane({ tab }: { tab: string }) {
     switch (tab) {
@@ -44,11 +48,14 @@ function TabPane({ tab }: { tab: string }) {
         case PlaygroundTab.Inbox:
             return <InboxDisplay />;
 
-        case PlaygroundTab.Kanban:
+        case PlaygroundTab.Chapter:
+            return <ChapterPane />;
+
+        case PlaygroundTab.Agent:
         default:
             return (
                 <div className="flex min-h-0 flex-1 flex-col">
-                    <KanbanDisplay />
+                    <KanbanDisplay scope={AGENT_SCOPE} />
                 </div>
             );
     }

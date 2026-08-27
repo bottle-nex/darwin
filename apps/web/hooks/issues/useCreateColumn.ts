@@ -8,11 +8,13 @@ import type { BoardMetadata } from "@/types/board";
 
 export interface CreateColumnInput {
     project_id: string;
+    chapter_id: string;
     label: string;
 }
 
 export interface CreatedColumn {
     id: string;
+    chapterId: string;
     label: string;
     order: number;
 }
@@ -20,10 +22,10 @@ export interface CreatedColumn {
 export function useCreateColumn() {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: async (input: CreateColumnInput) => {
+        mutationFn: async ({ chapter_id, label }: CreateColumnInput) => {
             const res = await apiClient.post<ApiResponse<{ column: CreatedColumn }>>(
                 CREATE_COLUMN_URL,
-                input,
+                { chapter_id, label },
             );
             return res.data.data.column;
         },
@@ -33,6 +35,7 @@ export function useCreateColumn() {
                 (data) => {
                     if (!data) return data;
                     return {
+                        ...data,
                         columns: [...data.columns.filter((row) => row.id !== column.id), column],
                         totals: {
                             ...data.totals,

@@ -9,28 +9,32 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { DIALOG_TITLE_FIELD, GHOST_FIELD } from "@/components/ui/fieldStyles";
 import { Textarea } from "@/components/ui/textarea";
-import { useCustomColumnActions } from "@/hooks/kanban/useCustomColumnActions";
+import { useChapterActions } from "@/hooks/kanban/useChapterActions";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { cn } from "@/lib/utils";
-import { useAddCustomColumnStore } from "@/store/kanban/useAddCustomColumnStore";
+import { useNewChapterStore } from "@/store/chapter/useNewChapterStore";
+import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
 
-export default function AddCustomColumnDialog() {
-    const { open, setOpen, targetChapterId } = useAddCustomColumnStore();
+export default function CreateChapterDialog({ projectSlug }: { projectSlug: string }) {
+    const { open, setOpen } = useNewChapterStore();
     const project = useActiveProject();
-    const { addColumn, addingColumn } = useCustomColumnActions();
-    const [title, setTitle] = useState("");
+    const openChapter = usePlaygroundNavStore((s) => s.openChapter);
+    const { addChapter, addingChapter } = useChapterActions();
+    const [name, setName] = useState("");
 
-    const ready = Boolean(title.trim()) && Boolean(targetChapterId) && !addingColumn;
+    const ready = Boolean(name.trim()) && !addingChapter;
 
     function handleOpenChange(next: boolean) {
         setOpen(next);
-        if (!next) setTitle("");
+        if (!next) setName("");
     }
 
     async function submit() {
-        if (!ready || !targetChapterId) return;
-        const added = await addColumn(targetChapterId, title.trim());
-        if (added) handleOpenChange(false);
+        if (!ready) return;
+        const chapter = await addChapter(name);
+        if (!chapter) return;
+        openChapter(chapter, projectSlug);
+        handleOpenChange(false);
     }
 
     return (
@@ -46,7 +50,7 @@ export default function AddCustomColumnDialog() {
                     "rounded-3xl bg-charcoal",
                 )}
             >
-                <DialogTitle className="sr-only">Add custom column</DialogTitle>
+                <DialogTitle className="sr-only">Create chapter</DialogTitle>
 
                 <main className="flex min-w-0 flex-col *:px-6">
                     <section className="flex flex-col items-start gap-y-3 pt-4 pb-2">
@@ -60,15 +64,15 @@ export default function AddCustomColumnDialog() {
                             <span>
                                 <BreadcrumbSeparatorIcon />
                             </span>
-                            <span className="text-sm">New List</span>
+                            <span className="text-sm">New Chapter</span>
                         </div>
                         <Textarea
                             rows={1}
                             autoFocus
-                            placeholder="List title"
+                            placeholder="Chapter name"
                             maxLength={60}
-                            value={title}
-                            onChange={(e) => setTitle(e.target.value)}
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
                             onKeyDown={(e) => {
                                 if (e.key === "Enter") {
                                     e.preventDefault();
@@ -86,10 +90,10 @@ export default function AddCustomColumnDialog() {
                             size="xs"
                             className="text-ink!"
                             onClick={submit}
-                            loading={addingColumn}
+                            loading={addingChapter}
                             disabled={!ready}
                         >
-                            Add list
+                            Add chapter
                         </Button>
                     </section>
                 </main>

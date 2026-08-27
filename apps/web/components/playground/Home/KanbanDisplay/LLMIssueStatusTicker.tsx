@@ -4,7 +4,7 @@ import type { ServerIssueStatus } from "@/types/board";
 import type { KanbanStatus } from "@/types/kanban";
 
 const SIZES = {
-    md: { box: "gap-1.5 rounded-md px-2 py-1 text-[12px] font-medium", icon: "size-4" },
+    md: { box: "gap-1.5 rounded-md px-2 py-1 text-[12px] font-medium", icon: "size-4.25" },
     sm: { box: "gap-1 rounded px-1.5 py-0.5 text-[10px] font-medium", icon: "size-3" },
 } as const;
 

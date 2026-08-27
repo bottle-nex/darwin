@@ -8,6 +8,7 @@ import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore"
 
 import { isSettingsTab } from "../playgroundTabs";
 import BoardSection from "./BoardSection";
+import ChaptersSection from "./ChaptersSection";
 import ForYouSection from "./ForYouSection";
 import SettingsPanel from "./SettingsPanel";
 import SidebarActions from "./SidebarActions";
@@ -50,8 +51,9 @@ export default function SidebarContent() {
                             <SettingsPanel {...section} onBack={returnFromSettings} />
                         ) : (
                             <>
-                                <BoardSection {...section} />
                                 <ForYouSection {...section} />
+                                <BoardSection {...section} />
+                                <ChaptersSection />
                                 <TeamsSection />
                             </>
                         )}

@@ -74,11 +74,5 @@ export type KanbanColumnDef = {
 /** The two ways to view the board's issues. */
 export type KanbanView = "board" | "list";
 
-/**
- * Which board(s) the workspace shows. "default" stacks the user-built Custom
- * Kanban next to the agent-driven LLM Kanban; the other two focus one board.
- */
-export type BoardView = "default" | "custom" | "llm";
-
 /** Board state: each column's ordered issues, keyed by status. */
 export type BoardState = Record<KanbanStatus, Issue[]>;

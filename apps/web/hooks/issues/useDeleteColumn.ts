@@ -34,6 +34,7 @@ export function useDeleteColumn() {
                     const custom = { ...data.totals.custom };
                     delete custom[variables.id];
                     return {
+                        ...data,
                         columns: data.columns.filter((column) => column.id !== variables.id),
                         totals: { ...data.totals, custom },
                     };

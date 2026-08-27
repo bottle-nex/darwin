@@ -7,13 +7,13 @@ import { PlaygroundTab } from "@/components/playground/playgroundTabs";
 import { Button } from "@/components/ui/button";
 import type { IconPick } from "@/components/ui/IconPicker";
 import IconWrapper from "@/components/ui/IconWrapper";
+import { useBoardColumns } from "@/hooks/issues/useBoardColumns";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { cn } from "@/lib/utils";
 import { NO_FOCUS, useKanbanOptionsStore } from "@/store/kanban/useKanbanOptionsStore";
 import { usePaneRouteStore } from "@/store/playground/usePaneRouteStore";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
-import type { BoardIssue } from "@/types/board";
-import type { BoardView } from "@/types/kanban";
+import type { BoardChapter, BoardIssue } from "@/types/board";
 
 function ProjectIcon({ pick }: { pick: IconPick }) {
     if (pick.kind === "emoji") {
@@ -36,7 +36,7 @@ function ProjectIcon({ pick }: { pick: IconPick }) {
 
 export type PlaygroundBreadcrumbTarget = {
     tab: PlaygroundTab;
-    boardView?: BoardView;
+    chapter?: BoardChapter;
 };
 
 export type PlaygroundBreadcrumbSegment =
@@ -45,23 +45,25 @@ export type PlaygroundBreadcrumbSegment =
     | { label: string; target: PlaygroundBreadcrumbTarget };
 
 export const PROJECT_BREADCRUMB_TARGET: PlaygroundBreadcrumbTarget = {
-    tab: PlaygroundTab.Kanban,
-    boardView: "default",
+    tab: PlaygroundTab.Agent,
 };
 
 export const SETTINGS_BREADCRUMB_TARGET: PlaygroundBreadcrumbTarget = {
     tab: PlaygroundTab.SettingsAppearance,
 };
 
-export function breadcrumbTargetForBoard(custom: boolean): PlaygroundBreadcrumbTarget {
-    return {
-        tab: PlaygroundTab.Kanban,
-        boardView: custom ? "custom" : "llm",
-    };
+/**
+ * Where an issue's board crumb goes back to: the chapter it is parked in, or
+ * the agent board when it isn't parked anywhere.
+ */
+export function breadcrumbTargetForIssue(
+    chapter: BoardChapter | undefined,
+): PlaygroundBreadcrumbTarget {
+    return chapter ? { tab: PlaygroundTab.Chapter, chapter } : { tab: PlaygroundTab.Agent };
 }
 
 const TAB_TRAILS: Partial<Record<PlaygroundTab, PlaygroundBreadcrumbSegment[]>> = {
-    [PlaygroundTab.Kanban]: ["Kanban"],
+    [PlaygroundTab.Agent]: ["Agent"],
     [PlaygroundTab.Gantt]: ["Gantt"],
     [PlaygroundTab.Tags]: ["Tags"],
     [PlaygroundTab.Inbox]: ["Inbox"],
@@ -89,11 +91,6 @@ const TAB_TRAILS: Partial<Record<PlaygroundTab, PlaygroundBreadcrumbSegment[]>> 
     ],
 };
 
-const KANBAN_BOARD_LABELS: Partial<Record<BoardView, string>> = {
-    custom: "My Board",
-    llm: "Agent",
-};
-
 export default function PlaygroundBreadcrumb({
     issue,
     trail,
@@ -106,21 +103,28 @@ export default function PlaygroundBreadcrumb({
     trailingIcon?: IconType;
 }) {
     const project = useActiveProject();
+    const { data: metadata } = useBoardColumns(project?.id);
     const openIssue = usePaneRouteStore((state) => state.openIssue);
     const tab = usePlaygroundNavStore((state) => state.tab) as PlaygroundTab;
     const setTab = usePlaygroundNavStore((state) => state.setTab);
-    const boardView = useKanbanOptionsStore((state) => state.boardView);
-    const setBoardView = useKanbanOptionsStore((state) => state.setBoardView);
+    const openChapter = usePlaygroundNavStore((state) => state.openChapter);
+    const selectedChapter = usePlaygroundNavStore((state) => state.selectedChapter);
     const setFocus = useKanbanOptionsStore((state) => state.setFocus);
     const inIssue = issue !== undefined;
+    // An issue can be opened from Inbox or search, so its chapter is resolved
+    // from the project-wide metadata rather than from whatever pane is showing.
+    const issueChapterId = metadata?.columns.find(
+        (column) => column.id === issue?.customColumnId,
+    )?.chapterId;
+    const issueChapter = metadata?.chapters.find((chapter) => chapter.id === issueChapterId);
     const issueIdentifier = issue
         ? `${(project?.name ?? "ISS").slice(0, 3).toUpperCase()}-${issue.number}`
         : undefined;
     const issueTrail: PlaygroundBreadcrumbSegment[] = issue
         ? [
               {
-                  label: issue.customColumnId ? "My Board" : "Agent",
-                  target: breadcrumbTargetForBoard(Boolean(issue.customColumnId)),
+                  label: issueChapter?.name ?? "Agent",
+                  target: breadcrumbTargetForIssue(issueChapter),
               },
               trailing
                   ? {
@@ -131,17 +135,15 @@ export default function PlaygroundBreadcrumb({
               ...(trailing ? [trailing] : []),
           ]
         : [];
-    const kanbanTrail: PlaygroundBreadcrumbSegment[] = [KANBAN_BOARD_LABELS[boardView] ?? "Kanban"];
+    const chapterTrail: PlaygroundBreadcrumbSegment[] = [selectedChapter?.name ?? "Chapter"];
     const segments = inIssue
         ? issueTrail
-        : (trail ?? (tab === PlaygroundTab.Kanban ? kanbanTrail : (TAB_TRAILS[tab] ?? [])));
+        : (trail ?? (tab === PlaygroundTab.Chapter ? chapterTrail : (TAB_TRAILS[tab] ?? [])));
 
     function navigate(target: PlaygroundBreadcrumbTarget) {
-        if (target.boardView) {
-            setFocus(NO_FOCUS);
-            setBoardView(target.boardView);
-        }
-        setTab(target.tab);
+        setFocus(NO_FOCUS);
+        if (target.chapter) openChapter(target.chapter, project?.slug ?? "");
+        else setTab(target.tab);
     }
 
     return (

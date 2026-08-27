@@ -22,10 +22,15 @@ import {
     useCustomKanbanStore,
 } from "@/store/kanban/useCustomKanbanStore";
 import { findIssueInBoard, useKanbanBoardStore } from "@/store/kanban/useKanbanBoardStore";
+import type { BoardScope } from "@/types/board";
 import type { BoardState } from "@/types/kanban";
 import type { CustomColumn } from "@/types/kanban-custom";
 
-export function useCustomKanbanDnd(board: BoardState, sourceColumns: CustomColumn[]) {
+export function useCustomKanbanDnd(
+    board: BoardState,
+    sourceColumns: CustomColumn[],
+    scope: BoardScope,
+) {
     const projectId = useActiveProject()?.id;
     const updateIssue = useUpdateIssue();
     const reorderColumns = useReorderColumns();
@@ -163,10 +168,14 @@ export function useCustomKanbanDnd(board: BoardState, sourceColumns: CustomColum
     }
 
     function persistColumnOrder() {
-        if (!projectId) return;
+        if (!projectId || scope.kind !== "chapter") return;
         const columnIds = useCustomKanbanStore.getState().columns.map((c) => c.id);
         reorderColumns
-            .mutateAsync({ project_id: projectId, column_ids: columnIds })
+            .mutateAsync({
+                project_id: projectId,
+                chapter_id: scope.chapterId,
+                column_ids: columnIds,
+            })
             .catch(() => toast.error("Couldn't save the new column order."));
     }
 

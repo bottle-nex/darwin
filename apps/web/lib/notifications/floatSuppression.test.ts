@@ -22,13 +22,13 @@ const board = notification(NotificationType.IssueAssigned, "project-a");
 
 describe("member events follow the bell panel only", () => {
     test("float while the panel is closed", () => {
-        expect(should_float_notification(member, false, PlaygroundTab.Kanban, "project-a")).toBe(
+        expect(should_float_notification(member, false, PlaygroundTab.Agent, "project-a")).toBe(
             true,
         );
     });
 
     test("suppressed while the panel is open", () => {
-        expect(should_float_notification(member, true, PlaygroundTab.Kanban, "project-a")).toBe(
+        expect(should_float_notification(member, true, PlaygroundTab.Agent, "project-a")).toBe(
             false,
         );
     });
@@ -49,7 +49,7 @@ describe("board events follow the inbox pane only", () => {
     });
 
     test("floats on any other tab", () => {
-        for (const tab of [PlaygroundTab.Kanban, PlaygroundTab.Chats, PlaygroundTab.AssignedToMe]) {
+        for (const tab of [PlaygroundTab.Agent, PlaygroundTab.Chats, PlaygroundTab.AssignedToMe]) {
             expect(should_float_notification(board, false, tab, "project-a")).toBe(true);
         }
     });
@@ -71,8 +71,6 @@ describe("board events follow the inbox pane only", () => {
     });
 
     test("the bell panel does not suppress board events", () => {
-        expect(should_float_notification(board, true, PlaygroundTab.Kanban, "project-a")).toBe(
-            true,
-        );
+        expect(should_float_notification(board, true, PlaygroundTab.Agent, "project-a")).toBe(true);
     });
 });

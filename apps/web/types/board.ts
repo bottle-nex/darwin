@@ -46,12 +46,27 @@ export type BoardIssue = {
     tags: BoardTag[];
 };
 
+/** One custom kanban board in a project. `order` is its sidebar position. */
+export type BoardChapter = {
+    id: string;
+    name: string;
+    slug: string;
+    order: number;
+};
+
 /** A custom column row. `order` is its left-to-right board position. */
 export type BoardColumn = {
     id: string;
+    chapterId: string;
     label: string;
     order: number;
 };
+
+/**
+ * Which board a pane is showing. The agent board is the project's single
+ * status-driven board; a chapter is one of its user-built boards.
+ */
+export type BoardScope = { kind: "agent" } | { kind: "chapter"; chapterId: string };
 
 /** The full board payload: every column and every issue for the project. */
 export type BoardResponse = {
@@ -66,6 +81,7 @@ export type BoardLane =
     { type: "system"; status: ServerIssueStatus } | { type: "custom"; columnId: string };
 
 export type BoardMetadata = {
+    chapters: BoardChapter[];
     columns: BoardColumn[];
     totals: {
         system: Partial<Record<ServerIssueStatus, number>>;
