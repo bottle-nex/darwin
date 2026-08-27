@@ -2,21 +2,25 @@ import { useId } from "react";
 import type { ReactNode } from "react";
 import type { IconBaseProps } from "react-icons";
 
-const CENTER = 8;
 const STROKE = 1.5;
-const RING_RADIUS = 6.25;
-const DISC_RADIUS = 6.75;
-const INNER_RADIUS = 4;
-const PIE_RADIUS = INNER_RADIUS / 2;
-const PIE_SWEEP = 2 * Math.PI * PIE_RADIUS;
-const UPRIGHT = `rotate(-90 ${CENTER} ${CENTER})`;
 
-const ring = {
-    cx: CENTER,
-    cy: CENTER,
-    r: RING_RADIUS,
+const token = {
+    x: 2.75,
+    y: 2.75,
+    width: 10.5,
+    height: 10.5,
+    rx: 3,
     stroke: "currentColor",
     strokeWidth: STROKE,
+} as const;
+
+const solidToken = {
+    x: 2.25,
+    y: 2.25,
+    width: 11.5,
+    height: 11.5,
+    rx: 3.25,
+    fill: "currentColor",
 } as const;
 
 const mark = {
@@ -26,17 +30,11 @@ const mark = {
     strokeLinejoin: "round",
 } as const;
 
-function filled(portion: number) {
-    return {
-        cx: CENTER,
-        cy: CENTER,
-        r: PIE_RADIUS,
-        stroke: "currentColor",
-        strokeWidth: INNER_RADIUS,
-        strokeDasharray: `${(PIE_SWEEP * portion).toFixed(2)} ${PIE_SWEEP.toFixed(2)}`,
-        transform: UPRIGHT,
-    };
-}
+const CHECK = "M5.75 8.25 L7.2 9.65 L10.3 6.25";
+const CROSS = "M6 6 L10 10 M10 6 L6 10";
+const SLASH = "M6 6 L10 10";
+const HOLD = "M6.6 5.8 L6.6 10.2 M9.4 5.8 L9.4 10.2";
+const CHANGESET = "M5.8 6.7 H10.2 M5.8 9.3 H8.9";
 
 function StatusGlyph({
     size,
@@ -65,7 +63,7 @@ function StatusGlyph({
 export function TodoGlyph(props: IconBaseProps) {
     return (
         <StatusGlyph {...props}>
-            <circle {...ring} />
+            <rect {...token} />
         </StatusGlyph>
     );
 }
@@ -73,12 +71,7 @@ export function TodoGlyph(props: IconBaseProps) {
 export function QueuedGlyph(props: IconBaseProps) {
     return (
         <StatusGlyph {...props}>
-            <circle
-                {...ring}
-                strokeLinecap="round"
-                strokeDasharray="0.9 4.01"
-                transform={UPRIGHT}
-            />
+            <rect {...token} strokeLinecap="round" strokeDasharray="0.9 3.71" />
         </StatusGlyph>
     );
 }
@@ -86,8 +79,8 @@ export function QueuedGlyph(props: IconBaseProps) {
 export function InProgressGlyph(props: IconBaseProps) {
     return (
         <StatusGlyph {...props}>
-            <circle {...ring} />
-            <circle {...filled(0.5)} />
+            <rect {...token} />
+            <rect x={6} y={6} width={4} height={4} rx={1} fill="currentColor" />
         </StatusGlyph>
     );
 }
@@ -95,29 +88,21 @@ export function InProgressGlyph(props: IconBaseProps) {
 export function InReviewGlyph(props: IconBaseProps) {
     return (
         <StatusGlyph {...props}>
-            <circle {...ring} />
-            <circle {...filled(0.75)} />
+            <rect {...token} />
+            <path d={CHANGESET} {...mark} />
         </StatusGlyph>
     );
 }
-
-const CHECK = "M5.45 8.3 L7.1 9.9 L10.6 6";
 
 export function DoneGlyph(props: IconBaseProps) {
     const knockout = useId();
     return (
         <StatusGlyph {...props}>
             <mask id={knockout}>
-                <circle cx={CENTER} cy={CENTER} r={DISC_RADIUS} fill="white" />
+                <rect {...solidToken} fill="white" />
                 <path d={CHECK} {...mark} stroke="black" />
             </mask>
-            <circle
-                cx={CENTER}
-                cy={CENTER}
-                r={DISC_RADIUS}
-                fill="currentColor"
-                mask={`url(#${knockout})`}
-            />
+            <rect {...solidToken} mask={`url(#${knockout})`} />
         </StatusGlyph>
     );
 }
@@ -125,8 +110,8 @@ export function DoneGlyph(props: IconBaseProps) {
 export function FailedGlyph(props: IconBaseProps) {
     return (
         <StatusGlyph {...props}>
-            <circle {...ring} />
-            <path d="M5.7 5.7 L10.3 10.3 M10.3 5.7 L5.7 10.3" {...mark} />
+            <rect {...token} />
+            <path d={CROSS} {...mark} />
         </StatusGlyph>
     );
 }
@@ -134,8 +119,8 @@ export function FailedGlyph(props: IconBaseProps) {
 export function CancelledGlyph(props: IconBaseProps) {
     return (
         <StatusGlyph {...props}>
-            <circle {...ring} />
-            <path d="M5.7 5.7 L10.3 10.3" {...mark} />
+            <rect {...token} />
+            <path d={SLASH} {...mark} />
         </StatusGlyph>
     );
 }
@@ -143,8 +128,8 @@ export function CancelledGlyph(props: IconBaseProps) {
 export function OffBoardGlyph(props: IconBaseProps) {
     return (
         <StatusGlyph {...props}>
-            <circle {...ring} />
-            <path d="M6.5 5.4 L6.5 10.6 M9.5 5.4 L9.5 10.6" {...mark} />
+            <rect {...token} />
+            <path d={HOLD} {...mark} />
         </StatusGlyph>
     );
 }
