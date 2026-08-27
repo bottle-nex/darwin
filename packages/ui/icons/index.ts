@@ -51,6 +51,8 @@ export { CopyFieldUrlIcon } from "./editor/CopyFieldUrlIcon";
 export { CopyIcon } from "./actions/CopyIcon";
 export { CreatorIcon } from "./people/CreatorIcon";
 export { CtaArrowIcon } from "./navigation/CtaArrowIcon";
+export { CtaGetStartedIcon } from "./marketing/CtaGetStartedIcon";
+export { CtaMeetTeamIcon } from "./marketing/CtaMeetTeamIcon";
 export { DateTimeInsertIcon } from "./editor/DateTimeInsertIcon";
 export { DefaultFocusIcon } from "./kanban/DefaultFocusIcon";
 export { DefaultTemplateIcon } from "./templates/DefaultTemplateIcon";

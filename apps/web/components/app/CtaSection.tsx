@@ -1,6 +1,6 @@
 "use client";
+import { CtaGetStartedIcon, CtaMeetTeamIcon } from "@trymatcha/ui/icons";
 import Link from "next/link";
-import { RiRocketFill, RiTeamFill } from "react-icons/ri";
 
 import HeroBuddy from "@/components/landing/v2/HeroBuddy";
 import { azeretMono } from "@/lib/fonts";
@@ -65,7 +65,7 @@ export default function CtaSection() {
                                     href={session ? "/playground" : "/login"}
                                     className="rounded-[14px] bg-snow p-5"
                                 >
-                                    <RiRocketFill className="size-5 text-neutral-900" />
+                                    <CtaGetStartedIcon className="size-5 text-neutral-900" />
                                     <div className="mt-7 text-[15px] font-semibold text-neutral-900">
                                         Get started
                                     </div>
@@ -77,7 +77,7 @@ export default function CtaSection() {
                                     href="/about"
                                     className="rounded-[14px] bg-primary p-5 transition-colors hover:bg-[#BCAFFF]"
                                 >
-                                    <RiTeamFill className="size-5 text-neutral-900" />
+                                    <CtaMeetTeamIcon className="size-5 text-neutral-900" />
                                     <div className="mt-7 text-[15px] font-semibold text-neutral-900">
                                         Meet the team
                                     </div>

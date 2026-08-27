@@ -3278,6 +3278,26 @@
                     "export": "LuCornerDownRight"
                 }
             ]
+        },
+        {
+            "name": "CtaGetStartedIcon",
+            "usages": [
+                {
+                    "file": "apps/web/components/app/CtaSection.tsx",
+                    "module": "react-icons/ri",
+                    "export": "RiRocketFill"
+                }
+            ]
+        },
+        {
+            "name": "CtaMeetTeamIcon",
+            "usages": [
+                {
+                    "file": "apps/web/components/app/CtaSection.tsx",
+                    "module": "react-icons/ri",
+                    "export": "RiTeamFill"
+                }
+            ]
         }
     ],
     "customIconMoves": [
