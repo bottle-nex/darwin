@@ -427,6 +427,23 @@
         "typescript": "^5",
       },
     },
+    "packages/ui": {
+      "name": "@trymatcha/ui",
+      "dependencies": {
+        "react-icons": "^5.7.0",
+      },
+      "devDependencies": {
+        "@types/react": "^19",
+        "typescript": "^5",
+      },
+      "peerDependencies": {
+        "motion": "^12",
+        "next": "^16",
+        "radix-ui": "^1.4.3",
+        "react": "^19",
+        "typescript": "^5",
+      },
+    },
   },
   "packages": {
     "@alloc/quick-lru": ["@alloc/quick-lru@5.2.0", "", {}, "sha512-UrcABB+4bUrFABwbluTIBErXwvbsU/V7TZWfmbgJfbkwiBuziS9gxdODUyuiecfdGQ85jglMW6juS3+z5TsKLw=="],
@@ -1140,6 +1157,8 @@
     "@trymatcha/types": ["@trymatcha/types@workspace:packages/types"],
 
     "@trymatcha/typescript-config": ["@trymatcha/typescript-config@workspace:packages/config-typescript"],
+
+    "@trymatcha/ui": ["@trymatcha/ui@workspace:packages/ui"],
 
     "@trymatcha/vm": ["@trymatcha/vm@workspace:apps/vm"],
 
