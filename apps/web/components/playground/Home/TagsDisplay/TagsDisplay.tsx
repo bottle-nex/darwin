@@ -171,7 +171,7 @@ function TagRow({ tag, selected, selectionActive, onToggleSelect }: TagRowProps)
             selectionActive={selectionActive}
             selectionLabel={`Select ${tag.name}`}
             onToggleSelection={onToggleSelect}
-            className="px-2.5 py-3"
+            className="px-2.5 py-3 cursor-pointer"
         >
             <div className="grid min-w-0 flex-1 grid-cols-[1fr_180px_140px] items-center gap-4">
                 <div className="flex min-w-0 items-center">
