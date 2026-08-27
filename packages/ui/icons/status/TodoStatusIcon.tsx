@@ -1,5 +1,5 @@
-import { LuCircle } from "react-icons/lu";
-
 import { createIcon } from "../createIcon";
 
-export const TodoStatusIcon = createIcon(LuCircle);
+import { TodoGlyph } from "./StatusGlyphs";
+
+export const TodoStatusIcon = createIcon(TodoGlyph);

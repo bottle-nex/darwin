@@ -1,5 +1,5 @@
-import { LuCirclePause } from "react-icons/lu";
-
 import { createIcon } from "../createIcon";
 
-export const OffBoardStatusIcon = createIcon(LuCirclePause);
+import { OffBoardGlyph } from "./StatusGlyphs";
+
+export const OffBoardStatusIcon = createIcon(OffBoardGlyph);
