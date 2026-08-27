@@ -9,7 +9,7 @@ const token = {
     y: 2.75,
     width: 10.5,
     height: 10.5,
-    rx: 3,
+    rx: 2,
     stroke: "currentColor",
     strokeWidth: STROKE,
 } as const;
@@ -19,7 +19,7 @@ const solidToken = {
     y: 2.25,
     width: 11.5,
     height: 11.5,
-    rx: 3.25,
+    rx: 2.5,
     fill: "currentColor",
 } as const;
 
@@ -71,7 +71,7 @@ export function TodoGlyph(props: IconBaseProps) {
 export function QueuedGlyph(props: IconBaseProps) {
     return (
         <StatusGlyph {...props}>
-            <rect {...token} strokeLinecap="round" strokeDasharray="0.9 3.71" />
+            <rect {...token} strokeDasharray="2 1.214" />
         </StatusGlyph>
     );
 }
