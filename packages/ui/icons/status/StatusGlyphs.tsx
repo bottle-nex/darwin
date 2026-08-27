@@ -1,9 +1,11 @@
+import { useId } from "react";
 import type { ReactNode } from "react";
 import type { IconBaseProps } from "react-icons";
 
 const CENTER = 8;
 const STROKE = 1.5;
 const RING_RADIUS = 6.25;
+const DISC_RADIUS = 6.75;
 const INNER_RADIUS = 4;
 const PIE_RADIUS = INNER_RADIUS / 2;
 const PIE_SWEEP = 2 * Math.PI * PIE_RADIUS;
@@ -99,11 +101,23 @@ export function InReviewGlyph(props: IconBaseProps) {
     );
 }
 
+const CHECK = "M5.45 8.3 L7.1 9.9 L10.6 6";
+
 export function DoneGlyph(props: IconBaseProps) {
+    const knockout = useId();
     return (
         <StatusGlyph {...props}>
-            <circle {...ring} />
-            <path d="M5.45 8.3 L7.1 9.9 L10.6 6" {...mark} />
+            <mask id={knockout}>
+                <circle cx={CENTER} cy={CENTER} r={DISC_RADIUS} fill="white" />
+                <path d={CHECK} {...mark} stroke="black" />
+            </mask>
+            <circle
+                cx={CENTER}
+                cy={CENTER}
+                r={DISC_RADIUS}
+                fill="currentColor"
+                mask={`url(#${knockout})`}
+            />
         </StatusGlyph>
     );
 }
