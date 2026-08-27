@@ -77,14 +77,9 @@ function ReviewTabPanels({
         case ReviewTab.Changes:
             return <ChangesReviewDisplay projectId={projectId} review={review} />;
 
-        case ReviewTab.Diff:
+        case ReviewTab.VisualChanges:
             return (
-                <PaneColumns aside={<ReviewIssueProperties issueId={review.issueId} />}>
-                    <DiffReviewDisplay
-                        productDiffId={review.productDiffId}
-                        issueId={review.issueId}
-                    />
-                </PaneColumns>
+                <DiffReviewDisplay productDiffId={review.productDiffId} issueId={review.issueId} />
             );
 
         case ReviewTab.PullRequest:

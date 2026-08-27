@@ -1,19 +1,21 @@
 "use client";
-import { type Capsule, capsule_control_hash } from "@trymatcha/types";
-import { type ReactNode, useMemo, useState } from "react";
+import type { Capsule } from "@trymatcha/types";
+import { useMemo, useState } from "react";
 import { FiRefreshCw } from "react-icons/fi";
+import { HiExclamationTriangle } from "react-icons/hi2";
+import { MdHorizontalSplit } from "react-icons/md";
 
 import LogoLoader from "@/components/app/LogoLoader";
+import { MICRO_LABEL } from "@/components/playground/Core/components/paneBar";
+import PaneEmptyState from "@/components/playground/Core/components/PaneEmptyState";
 import { Button } from "@/components/ui/button";
 import { useProductDiff } from "@/hooks/project/useProductDiff";
 import { useProductDiffArtifacts } from "@/hooks/project/useProductDiffArtifacts";
 import { useRegenerateProductDiff } from "@/hooks/project/useRegenerateProductDiff";
 import { useActiveProject } from "@/hooks/useActiveProject";
-import type { CapsuleCompareMode, CapsuleViewport } from "@/types/capsule.type";
+import { cn } from "@/lib/utils";
 
 import CapsuleComparison from "./CapsuleComparison";
-import CapsuleControls from "./CapsuleControls";
-import CapsuleHeader from "./CapsuleHeader";
 import CapsuleList from "./CapsuleList";
 
 export default function DiffReviewDisplay({
@@ -29,15 +31,11 @@ export default function DiffReviewDisplay({
 
     const [selectedId, setSelectedId] = useState("");
     const [controlValues, setControlValues] = useState<Record<string, string>>({});
-    const [viewport, setViewport] = useState<CapsuleViewport>("desktop");
-    const [mode, setMode] = useState<CapsuleCompareMode>("split");
 
     const capsules = useMemo(() => detail?.manifest?.capsules ?? [], [detail?.manifest]);
     const capsule = capsules.find((item) => item.id === selectedId) ?? capsules[0];
     const artifactKeys = useMemo(() => revision_paths(capsule), [capsule]);
     const { data: urls } = useProductDiffArtifacts(projectId, productDiffId, artifactKeys);
-
-    const controlHash = capsule ? capsule_control_hash(defaults_with(capsule, controlValues)) : "";
 
     function handleSelect(id: string) {
         setSelectedId(id);
@@ -58,80 +56,77 @@ export default function DiffReviewDisplay({
 
     if (!productDiffId) {
         return (
-            <Shell>
-                <DiffStatus
-                    title="No preview yet"
-                    body="A preview is built once the agent opens a frontend pull request for this issue."
-                />
-            </Shell>
+            <PaneEmptyState
+                icon={MdHorizontalSplit}
+                title="No preview yet"
+                subtitle="A preview is built once the agent opens a frontend pull request for this issue."
+            />
         );
     }
 
-    if (!detail) {
-        return (
-            <Shell>
-                <LogoLoader className="h-full w-full text-snow" />
-            </Shell>
-        );
-    }
+    if (!detail) return <LogoLoader className="h-full w-full text-snow" />;
 
     if (detail.status === "Pending" || detail.status === "Generating") {
         return (
-            <Shell>
-                <DiffStatus
-                    title={detail.status === "Pending" ? "Queued" : "Building"}
-                    body="Both revisions of every changed component are compiling in a clean sandbox. This updates on its own."
-                />
-            </Shell>
+            <PaneEmptyState
+                icon={MdHorizontalSplit}
+                title={detail.status === "Pending" ? "Queued" : "Building"}
+                subtitle="Both revisions of every changed component are compiling in a clean sandbox. This updates on its own."
+            />
         );
     }
 
     if (detail.status === "Unsupported") {
         return (
-            <Shell>
-                <DiffStatus
-                    title="Nothing to preview"
-                    body={detail.error ?? "This pull request changes no previewable components."}
-                />
-            </Shell>
+            <PaneEmptyState
+                icon={MdHorizontalSplit}
+                title="Nothing to preview"
+                subtitle={detail.error ?? "This pull request changes no previewable components."}
+            />
         );
     }
 
     if (detail.status === "Failed" || detail.status === "Stale") {
         return (
-            <Shell>
-                <DiffStatus
-                    title={detail.status === "Stale" ? "Out of date" : "Preview failed"}
-                    body={detail.error ?? "The pull request changed after this preview was built."}
-                    action={retry}
-                />
-            </Shell>
+            <PaneEmptyState
+                icon={HiExclamationTriangle}
+                title={detail.status === "Stale" ? "Out of date" : "Preview failed"}
+                subtitle={detail.error ?? "The pull request changed after this preview was built."}
+            >
+                {retry}
+            </PaneEmptyState>
         );
     }
 
     if (!capsule) {
         return (
-            <Shell>
-                <DiffStatus
-                    title="Nothing rendered"
-                    body="No component in this pull request could be rendered on its own."
-                    action={retry}
-                />
-            </Shell>
+            <PaneEmptyState
+                icon={MdHorizontalSplit}
+                title="Nothing rendered"
+                subtitle="No component in this pull request could be rendered on its own."
+            >
+                {retry}
+            </PaneEmptyState>
         );
     }
 
+    const warnings = detail.manifest?.warnings ?? [];
+
     return (
-        <Shell>
-            <CapsuleHeader
-                capsule={capsule}
-                total={capsules.length}
-                baseSha={detail.baseSha}
-                headSha={detail.headSha}
-            />
-            <div className="flex min-h-0 flex-1 gap-6">
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col px-4 py-4">
+            <div
+                className={cn(
+                    "grid min-h-0 min-w-0 flex-1 gap-4",
+                    capsules.length > 1
+                        ? "grid-cols-[20rem_minmax(0,1fr)]"
+                        : "grid-cols-[minmax(0,1fr)]",
+                )}
+            >
                 {capsules.length > 1 && (
-                    <aside className="w-56 shrink-0">
+                    <aside
+                        data-lenis-prevent
+                        className="flex min-h-0 flex-col gap-2 overflow-y-auto px-1"
+                    >
                         <CapsuleList
                             capsules={capsules}
                             selectedId={capsule.id}
@@ -139,35 +134,26 @@ export default function DiffReviewDisplay({
                         />
                     </aside>
                 )}
-                <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-4">
-                    <CapsuleControls
-                        controls={capsule.controls}
-                        values={controlValues}
-                        onChange={(name, value) =>
-                            setControlValues((current) => ({ ...current, [name]: value }))
-                        }
-                    />
-                    <CapsuleComparison
-                        capsule={capsule}
-                        urls={urls ?? {}}
-                        controlHash={controlHash}
-                        viewport={viewport}
-                        onViewportChange={setViewport}
-                        mode={mode}
-                        onModeChange={setMode}
-                    />
-                </div>
+                <CapsuleComparison
+                    capsule={capsule}
+                    urls={urls ?? {}}
+                    controlValues={controlValues}
+                    onControlChange={(name, value) =>
+                        setControlValues((current) => ({ ...current, [name]: value }))
+                    }
+                />
             </div>
-            {detail.manifest && detail.manifest.warnings.length > 0 && (
-                <ul className="mt-4 flex flex-col gap-1 border-t border-white/5 pt-3">
-                    {detail.manifest.warnings.map((warning) => (
-                        <li key={warning} className="text-[11px] text-neutral-500">
+
+            {warnings.length > 0 && (
+                <ul className="mt-3 flex flex-col gap-1 px-1">
+                    {warnings.map((warning) => (
+                        <li key={warning} className={MICRO_LABEL}>
                             {warning}
                         </li>
                     ))}
                 </ul>
             )}
-        </Shell>
+        </div>
     );
 }
 
@@ -175,27 +161,5 @@ function revision_paths(capsule: Capsule | undefined): string[] {
     if (!capsule) return [];
     return [capsule.base?.path, capsule.head?.path].filter(
         (path): path is string => path !== undefined,
-    );
-}
-
-function defaults_with(capsule: Capsule, values: Record<string, string>) {
-    const merged: Record<string, string> = {};
-    for (const control of capsule.controls) {
-        merged[control.name] = values[control.name] ?? String(control.default);
-    }
-    return merged;
-}
-
-function Shell({ children }: { children: ReactNode }) {
-    return <div className="flex min-h-0 min-w-0 flex-1 flex-col px-4 pt-3 pb-4">{children}</div>;
-}
-
-function DiffStatus({ title, body, action }: { title: string; body: string; action?: ReactNode }) {
-    return (
-        <div className="flex flex-1 flex-col items-center justify-center gap-3 px-6 text-center">
-            <h2 className="text-sm font-medium text-neutral-200">{title}</h2>
-            <p className="max-w-md text-[13px] leading-relaxed text-neutral-500">{body}</p>
-            {action}
-        </div>
     );
 }

@@ -1,7 +1,6 @@
 "use client";
 import type { CapsuleControl } from "@trymatcha/types";
 
-import { MICRO_LABEL } from "@/components/playground/Core/components/paneBar";
 import { Input } from "@/components/ui/input";
 import {
     Select,
@@ -11,6 +10,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import { cn } from "@/lib/utils";
 
 export default function CapsuleControls({
     controls,
@@ -21,24 +21,17 @@ export default function CapsuleControls({
     values: Record<string, string>;
     onChange: (name: string, value: string) => void;
 }) {
-    if (controls.length === 0) return null;
-
     return (
-        <section className="flex flex-col gap-2">
-            <span className={MICRO_LABEL}>Props</span>
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-3">
-                {controls.map((control) => (
-                    <label key={control.name} className="flex items-center gap-2">
-                        <span className="text-[12px] text-neutral-400">{control.name}</span>
-                        <Field
-                            control={control}
-                            value={values[control.name] ?? String(control.default)}
-                            onChange={(next) => onChange(control.name, next)}
-                        />
-                    </label>
-                ))}
-            </div>
-        </section>
+        <div className="flex flex-col gap-2">
+            {controls.map((control) => (
+                <Field
+                    key={control.name}
+                    control={control}
+                    value={values[control.name] ?? ""}
+                    onChange={(next) => onChange(control.name, next)}
+                />
+            ))}
+        </div>
     );
 }
 
@@ -54,8 +47,8 @@ function Field({
     if (control.kind === "enum") {
         return (
             <Select value={value} onValueChange={onChange}>
-                <SelectTrigger size="sm" className="max-w-44 text-[13px]">
-                    <SelectValue />
+                <SelectTrigger size="sm" className="w-full text-[13px]">
+                    <SelectValue placeholder={control.name} />
                 </SelectTrigger>
                 <SelectContent>
                     {(control.options ?? []).map((option) => (
@@ -69,11 +62,14 @@ function Field({
     }
 
     if (control.kind === "boolean") {
+        const checked = (value === "" ? String(control.default) : value) === "true";
         return (
-            <Switch
-                checked={value === "true"}
-                onCheckedChange={(checked) => onChange(String(checked))}
-            />
+            <label className="flex h-8 items-center justify-between gap-4 px-2">
+                <span className="min-w-0 truncate font-headline text-[12.5px] text-neutral-400">
+                    {control.name}
+                </span>
+                <Switch checked={checked} onCheckedChange={(next) => onChange(String(next))} />
+            </label>
         );
     }
 
@@ -81,8 +77,13 @@ function Field({
         <Input
             type={control.kind === "number" ? "number" : "text"}
             value={value}
+            placeholder={control.name}
             onChange={(event) => onChange(event.target.value)}
-            className="h-7 max-w-56 text-[13px]"
+            className={cn(
+                "h-8 w-full rounded-lg px-2 text-[13px]",
+                control.kind === "number" &&
+                    "[appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none",
+            )}
         />
     );
 }

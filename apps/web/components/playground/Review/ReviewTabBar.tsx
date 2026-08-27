@@ -8,7 +8,7 @@ import { usePaneRouteStore } from "@/store/playground/usePaneRouteStore";
 const TABS: { id: ReviewTab; label: string }[] = [
     { id: ReviewTab.PullRequest, label: "Pull request" },
     { id: ReviewTab.Changes, label: "Changes" },
-    { id: ReviewTab.Diff, label: "Diff" },
+    { id: ReviewTab.VisualChanges, label: "Visual changes" },
 ];
 
 export default function ReviewTabBar({ active }: { active: ReviewTab }) {

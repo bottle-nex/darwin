@@ -5,8 +5,8 @@ import { MICRO_LABEL } from "@/components/playground/Core/components/paneBar";
 import { cn } from "@/lib/utils";
 
 const KEYBOARD_STEP = 2;
-const MIN_POSITION = 2;
-const MAX_POSITION = 98;
+const MIN_POSITION = 0;
+const MAX_POSITION = 100;
 
 function clamp(position: number): number {
     return Math.min(MAX_POSITION, Math.max(MIN_POSITION, position));
@@ -113,6 +113,7 @@ function Edge({ label, className, hidden }: { label: string; className: string; 
             className={cn(
                 "pointer-events-none absolute top-3 z-10 rounded-full bg-black/50 px-2 py-0.5 backdrop-blur-sm transition-opacity",
                 MICRO_LABEL,
+                "text-neutral-200",
                 className,
                 hidden && "opacity-0",
             )}

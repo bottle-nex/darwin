@@ -1,14 +1,10 @@
 "use client";
 import type { Capsule } from "@trymatcha/types";
+import { GoFileCode } from "react-icons/go";
 
-import { MICRO_LABEL } from "@/components/playground/Core/components/paneBar";
+import { splitPath } from "@/components/playground/Review/changes/ReviewFileRow";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-
-const CHANGE_LABEL: Record<Capsule["change"], string> = {
-    Modified: "changed",
-    Added: "new",
-    Removed: "removed",
-};
 
 export default function CapsuleList({
     capsules,
@@ -20,36 +16,55 @@ export default function CapsuleList({
     onSelect: (id: string) => void;
 }) {
     return (
-        <nav className="flex flex-col gap-1">
-            <span className={MICRO_LABEL}>Components</span>
-            <ul className="flex flex-col gap-0.5">
-                {capsules.map((capsule) => (
-                    <li key={capsule.id}>
-                        <button
-                            type="button"
-                            onClick={() => onSelect(capsule.id)}
-                            className={cn(
-                                "flex w-full flex-col items-start gap-0.5 rounded-md px-2 py-1.5 text-left transition-colors",
-                                capsule.id === selectedId
-                                    ? "bg-white/6 text-neutral-100"
-                                    : "text-neutral-400 hover:bg-white/3 hover:text-neutral-200",
-                            )}
-                        >
-                            <span className="flex w-full items-center justify-between gap-2">
-                                <span className="truncate text-[13px] font-medium">
-                                    {capsule.title}
-                                </span>
-                                <span className="shrink-0 text-[10px] text-neutral-500">
-                                    {CHANGE_LABEL[capsule.change]}
-                                </span>
-                            </span>
-                            <span className="w-full truncate text-[11px] text-neutral-500">
-                                {capsule.componentPath}
-                            </span>
-                        </button>
-                    </li>
-                ))}
-            </ul>
-        </nav>
+        <>
+            <p className="px-3 font-headline text-[12.5px] text-neutral-500 tabular-nums">
+                {capsules.length} {capsules.length === 1 ? "component" : "components"} changed
+            </p>
+            {capsules.map((capsule) => (
+                <CapsuleRow
+                    key={capsule.id}
+                    capsule={capsule}
+                    selected={capsule.id === selectedId}
+                    onSelect={() => onSelect(capsule.id)}
+                />
+            ))}
+        </>
+    );
+}
+
+function CapsuleRow({
+    capsule,
+    selected,
+    onSelect,
+}: {
+    capsule: Capsule;
+    selected: boolean;
+    onSelect: () => void;
+}) {
+    const { directory } = splitPath(capsule.componentPath);
+
+    return (
+        <Button
+            variant="unstyled"
+            onClick={onSelect}
+            aria-current={selected}
+            className={cn(
+                "flex w-full cursor-pointer items-center gap-2 rounded-md bg-white/3 px-3 py-1.5 text-left ring-[0.5px] ring-snow/5 transition-colors",
+                selected ? "bg-white/8" : "hover:bg-white/4",
+            )}
+        >
+            <GoFileCode className="size-3.5 shrink-0 text-neutral-500" />
+            <span
+                className={cn(
+                    "min-w-0 truncate font-headline text-[14px]",
+                    selected ? "text-neutral-100" : "text-neutral-400",
+                )}
+            >
+                {capsule.title}
+            </span>
+            <span className="min-w-0 flex-1 truncate font-headline text-[12.5px] text-neutral-600">
+                {directory}
+            </span>
+        </Button>
     );
 }

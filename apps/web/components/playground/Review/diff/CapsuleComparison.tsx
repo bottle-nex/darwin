@@ -1,9 +1,7 @@
 "use client";
-import type { Capsule, CapsuleFidelity, CapsuleRevision } from "@trymatcha/types";
+import { type Capsule, capsule_control_hash, type CapsuleRevision } from "@trymatcha/types";
 import { useEffect, useRef, useState } from "react";
 
-import { MICRO_LABEL } from "@/components/playground/Core/components/paneBar";
-import { cn } from "@/lib/utils";
 import {
     CAPSULE_FRAMES,
     type CapsuleCompareMode,
@@ -12,9 +10,9 @@ import {
 
 import CapsuleSlider from "./CapsuleSlider";
 import CapsuleToolbar from "./CapsuleToolbar";
+import DiffFrame, { FRAME_BORDER_X, FRAME_CHROME_X, FRAME_SHELL } from "./DiffFrame";
 
 const IFRAME_SANDBOX = "allow-scripts allow-same-origin";
-const FRAME_SHELL = "overflow-hidden rounded-lg border border-snow/10 bg-white/2";
 const SPLIT_GAP = 12;
 const TOOLBAR_CLEARANCE = 56;
 
@@ -33,22 +31,20 @@ const MISSING_SIDE_REASON: Record<Capsule["change"], string> = {
 export default function CapsuleComparison({
     capsule,
     urls,
-    controlHash,
-    viewport,
-    onViewportChange,
-    mode,
-    onModeChange,
+    controlValues,
+    onControlChange,
 }: {
     capsule: Capsule;
     urls: Record<string, string>;
-    controlHash: string;
-    viewport: CapsuleViewport;
-    onViewportChange: (value: CapsuleViewport) => void;
-    mode: CapsuleCompareMode;
-    onModeChange: (value: CapsuleCompareMode) => void;
+    controlValues: Record<string, string>;
+    onControlChange: (name: string, value: string) => void;
 }) {
+    const [viewport, setViewport] = useState<CapsuleViewport>("desktop");
+    const [mode, setMode] = useState<CapsuleCompareMode>("split");
     const surface = useRef<HTMLDivElement>(null);
     const available = useAvailableWidth(surface);
+
+    const controlHash = capsule_control_hash(defaults_with(capsule, controlValues));
 
     const comparable = capsule.base !== null && capsule.head !== null;
     const activeMode = comparable ? mode : "split";
@@ -59,7 +55,8 @@ export default function CapsuleComparison({
     // the revisions stack and each gets the whole pane. A phone frame is narrow enough to sit in a
     // row, which is also the easier read for it.
     const columns = activeMode === "split" && viewport === "mobile" ? 2 : 1;
-    const perPane = (available - SPLIT_GAP * (columns - 1)) / columns;
+    const chrome = activeMode === "slider" ? FRAME_BORDER_X : FRAME_CHROME_X;
+    const perPane = Math.max(0, (available - SPLIT_GAP * (columns - 1)) / columns - chrome);
     const scale = available === 0 ? 1 : Math.min(1, perPane / intrinsic.width);
     const painted = { width: intrinsic.width * scale, height: intrinsic.height * scale };
 
@@ -77,7 +74,7 @@ export default function CapsuleComparison({
     );
 
     return (
-        <div className="flex min-h-0 flex-1 flex-col gap-3">
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-3">
             <div className="relative min-h-0 flex-1">
                 <div ref={surface} data-lenis-prevent className="h-full overflow-auto no-scrollbar">
                     {activeMode === "slider" ? (
@@ -97,22 +94,17 @@ export default function CapsuleComparison({
                                 paddingBottom: TOOLBAR_CLEARANCE,
                             }}
                         >
-                            <Labelled
-                                label="Before"
-                                revision={capsule.base}
-                                width={painted.width}
-                                height={painted.height}
-                            >
+                            <DiffFrame label="Before" width={painted.width} height={painted.height}>
                                 {frame("Before", capsule.base)}
-                            </Labelled>
-                            <Labelled
+                            </DiffFrame>
+                            <DiffFrame
                                 label="After"
-                                revision={capsule.head}
+                                mirrored
                                 width={painted.width}
                                 height={painted.height}
                             >
                                 {frame("After", capsule.head)}
-                            </Labelled>
+                            </DiffFrame>
                         </div>
                     )}
                 </div>
@@ -120,12 +112,15 @@ export default function CapsuleComparison({
                 <div className="pointer-events-none absolute bottom-4 left-1/2 z-20 -translate-x-1/2">
                     <CapsuleToolbar
                         viewport={viewport}
-                        onViewportChange={onViewportChange}
+                        onViewportChange={setViewport}
                         mode={activeMode}
-                        onModeChange={onModeChange}
+                        onModeChange={setMode}
                         sliderDisabledReason={
                             comparable ? undefined : MISSING_SIDE_REASON[capsule.change]
                         }
+                        controls={capsule.controls}
+                        controlValues={controlValues}
+                        onControlChange={onControlChange}
                     />
                 </div>
             </div>
@@ -155,32 +150,6 @@ function useAvailableWidth(host: React.RefObject<HTMLDivElement | null>): number
     }, [host]);
 
     return width;
-}
-
-function Labelled({
-    label,
-    revision,
-    width,
-    height,
-    children,
-}: {
-    label: string;
-    revision: CapsuleRevision | null;
-    width: number;
-    height: number;
-    children: React.ReactNode;
-}) {
-    return (
-        <section className="flex min-w-0 flex-col gap-2">
-            <div className="flex items-center gap-2">
-                <span className={MICRO_LABEL}>{label}</span>
-                {revision && <Fidelity value={revision.fidelity} />}
-            </div>
-            <div className={cn(FRAME_SHELL, "mx-auto")} style={{ width, height }}>
-                {children}
-            </div>
-        </section>
-    );
 }
 
 function Frame({
@@ -238,17 +207,12 @@ function Frame({
     );
 }
 
-function Fidelity({ value }: { value: CapsuleFidelity }) {
-    const paint =
-        value === "Verified"
-            ? "bg-emerald-400/15 text-emerald-300"
-            : value === "Partial"
-              ? "bg-amber-400/15 text-amber-300"
-              : "bg-red-400/15 text-red-300";
-
-    return (
-        <span className={cn("rounded-full px-1.5 py-0.5 text-[10px] font-medium", paint)}>
-            {value}
-        </span>
-    );
+function defaults_with(capsule: Capsule, values: Record<string, string>) {
+    const merged: Record<string, string> = {};
+    for (const control of capsule.controls) {
+        const override = values[control.name];
+        merged[control.name] =
+            override === undefined || override === "" ? String(control.default) : override;
+    }
+    return merged;
 }

@@ -1,6 +1,6 @@
 export const ReviewTab = {
     Changes: "changes",
-    Diff: "diff",
+    VisualChanges: "visual-changes",
     PullRequest: "pull-request",
 } as const;
 export type ReviewTab = (typeof ReviewTab)[keyof typeof ReviewTab];
