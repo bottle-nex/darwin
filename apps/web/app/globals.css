@@ -568,9 +568,9 @@
 }
 
 .review-diff {
-    --diff-add: var(--color-emerald-500);
+    --diff-add: var(--color-green-500);
     --diff-remove: var(--color-rose-500);
-    --diff-bar-width: 1.5px;
+    --diff-bar-width: 4px;
 
     --diff-background-color: transparent;
     --diff-text-color: #e6e6e6;
@@ -629,17 +629,23 @@
 
 .review-diff .diff-gutter-insert,
 .review-diff .diff-gutter-delete {
-    box-shadow: inset var(--diff-bar-width) 0 0 0 var(--diff-bar-color);
+    background-position: left top;
+    background-repeat: no-repeat;
+    background-size: var(--diff-bar-width) 100%;
 }
 
 .review-diff .diff-gutter-insert {
-    --diff-bar-color: var(--diff-add);
     color: var(--diff-gutter-insert-text-color);
+    background-image: linear-gradient(var(--diff-add), var(--diff-add));
 }
 
 .review-diff .diff-gutter-delete {
-    --diff-bar-color: var(--diff-remove);
     color: var(--diff-gutter-delete-text-color);
+    background-image: repeating-linear-gradient(
+        to bottom,
+        var(--diff-remove) 0 1px,
+        color-mix(in oklab, var(--diff-remove) 25%, transparent) 1px 3px
+    );
 }
 
 .review-diff .diff-decoration-content {
