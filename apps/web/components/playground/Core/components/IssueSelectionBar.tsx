@@ -5,6 +5,7 @@ import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { useEffect } from "react";
 
 import { Button } from "@/components/ui/button";
+import IconWrapper from "@/components/ui/IconWrapper";
 import { useIssueSelectionShortcuts } from "@/hooks/issues/useIssueSelectionShortcuts";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { useCommandMenuStore } from "@/store/command/useCommandMenuStore";
@@ -48,7 +49,7 @@ export default function IssueSelectionBar() {
                             variant="unstyled"
                             type="button"
                             onClick={openCommandMenu}
-                            className="ml-2 flex cursor-pointer items-center gap-1.25 rounded-full bg-snow/4 py-1.25 pr-3.5 pl-3 text-[11px] text-snow transition-colors hover:bg-snow/6 border border-snow/5 shadow-sm shadow-black/7"
+                            className="ml-2 flex cursor-pointer items-center gap-1.25 rounded-lg bg-snow/4 py-1.25 pr-3.5 pl-3 text-[11px] text-snow transition-colors hover:bg-snow/6 border border-snow/5 shadow-sm shadow-black/7"
                         >
                             <kbd className="rounded text-[18px] leading-none pt-0.5">⌘</kbd>
                             Actions
@@ -58,9 +59,9 @@ export default function IssueSelectionBar() {
                             type="button"
                             aria-label="Clear selection"
                             onClick={clear}
-                            className="flex size-7 cursor-pointer items-center justify-center rounded-full text-neutral-400 transition-colors hover:bg-snow/6 hover:text-neutral-200"
+                            className="group cursor-pointer rounded-full"
                         >
-                            <CloseIcon className="size-4" aria-hidden />
+                            <IconWrapper icon={CloseIcon} variant="ghost" />
                         </Button>
                     </div>
                 </motion.div>
