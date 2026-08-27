@@ -5,6 +5,27 @@ import nextTs from "eslint-config-next/typescript";
 const eslintConfig = defineConfig([
     ...nextVitals,
     ...nextTs,
+    {
+        rules: {
+            "no-restricted-imports": [
+                "error",
+                {
+                    paths: [
+                        {
+                            name: "react-icons",
+                            message: 'Import icons from "@trymatcha/ui/icons" instead.',
+                        },
+                    ],
+                    patterns: [
+                        {
+                            group: ["react-icons/*"],
+                            message: 'Import icons from "@trymatcha/ui/icons" instead.',
+                        },
+                    ],
+                },
+            ],
+        },
+    },
     // Override default ignores of eslint-config-next.
     globalIgnores([
         // Default ignores of eslint-config-next:

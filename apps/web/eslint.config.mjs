@@ -13,6 +13,23 @@ const eslintConfig = defineConfig([
             "simple-import-sort/exports": "error",
             "@typescript-eslint/consistent-type-imports": "error",
             "import/no-duplicates": "error",
+            "no-restricted-imports": [
+                "error",
+                {
+                    paths: [
+                        {
+                            name: "react-icons",
+                            message: 'Import icons from "@trymatcha/ui/icons" instead.',
+                        },
+                    ],
+                    patterns: [
+                        {
+                            group: ["react-icons/*"],
+                            message: 'Import icons from "@trymatcha/ui/icons" instead.',
+                        },
+                    ],
+                },
+            ],
         },
     },
     // Override default ignores of eslint-config-next.
