@@ -56,13 +56,13 @@ export class KanbanBoard {
             status: KanbanStatus.InReview,
             title: "In Review",
             icon: InReviewStatusIcon,
-            titleBox: "text-violet-400",
+            titleBox: "text-green-500",
         },
         {
             status: KanbanStatus.Done,
             title: "Done",
             icon: DoneStatusIcon,
-            titleBox: "text-green-500",
+            titleBox: "text-[#7D8CFF]",
         },
         {
             status: KanbanStatus.Failed,

@@ -4,9 +4,8 @@ import type { IconBaseProps } from "react-icons";
 const CENTER = 8;
 const STROKE = 1.5;
 const RING_RADIUS = 6.25;
-const DISC_RADIUS = 6.75;
-const PIE_RADIUS = 2.25;
-const PIE_WIDTH = 4.5;
+const INNER_RADIUS = 4;
+const PIE_RADIUS = INNER_RADIUS / 2;
 const PIE_SWEEP = 2 * Math.PI * PIE_RADIUS;
 const UPRIGHT = `rotate(-90 ${CENTER} ${CENTER})`;
 
@@ -18,13 +17,6 @@ const ring = {
     strokeWidth: STROKE,
 } as const;
 
-const disc = {
-    cx: CENTER,
-    cy: CENTER,
-    r: DISC_RADIUS,
-    fill: "currentColor",
-} as const;
-
 const mark = {
     stroke: "currentColor",
     strokeWidth: STROKE,
@@ -32,15 +24,13 @@ const mark = {
     strokeLinejoin: "round",
 } as const;
 
-const markOnDisc = { ...mark, stroke: "var(--color-ink)" } as const;
-
 function filled(portion: number) {
     return {
         cx: CENTER,
         cy: CENTER,
         r: PIE_RADIUS,
         stroke: "currentColor",
-        strokeWidth: PIE_WIDTH,
+        strokeWidth: INNER_RADIUS,
         strokeDasharray: `${(PIE_SWEEP * portion).toFixed(2)} ${PIE_SWEEP.toFixed(2)}`,
         transform: UPRIGHT,
     };
@@ -112,8 +102,8 @@ export function InReviewGlyph(props: IconBaseProps) {
 export function DoneGlyph(props: IconBaseProps) {
     return (
         <StatusGlyph {...props}>
-            <circle {...disc} />
-            <path d="M5.2 8.2 L7.1 10.1 L11 6" {...markOnDisc} />
+            <circle {...ring} />
+            <path d="M5.45 8.3 L7.1 9.9 L10.6 6" {...mark} />
         </StatusGlyph>
     );
 }
@@ -121,8 +111,8 @@ export function DoneGlyph(props: IconBaseProps) {
 export function FailedGlyph(props: IconBaseProps) {
     return (
         <StatusGlyph {...props}>
-            <circle {...disc} />
-            <path d="M5.9 5.9 L10.1 10.1 M10.1 5.9 L5.9 10.1" {...markOnDisc} />
+            <circle {...ring} />
+            <path d="M5.7 5.7 L10.3 10.3 M10.3 5.7 L5.7 10.3" {...mark} />
         </StatusGlyph>
     );
 }
@@ -131,7 +121,7 @@ export function CancelledGlyph(props: IconBaseProps) {
     return (
         <StatusGlyph {...props}>
             <circle {...ring} />
-            <path d="M5.2 5.2 L10.8 10.8" {...mark} />
+            <path d="M5.7 5.7 L10.3 10.3" {...mark} />
         </StatusGlyph>
     );
 }
@@ -140,7 +130,7 @@ export function OffBoardGlyph(props: IconBaseProps) {
     return (
         <StatusGlyph {...props}>
             <circle {...ring} />
-            <path d="M6.6 5.9 L6.6 10.1 M9.4 5.9 L9.4 10.1" {...mark} />
+            <path d="M6.5 5.4 L6.5 10.6 M9.5 5.4 L9.5 10.6" {...mark} />
         </StatusGlyph>
     );
 }
