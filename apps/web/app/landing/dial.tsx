@@ -58,13 +58,16 @@ export default function Dial({
     const controls = useAnimationControls();
     const currentAngle = useRef(0);
 
-    useEffect(() => {
-        if (!rotation) return;
+    const isRotating = Boolean(rotation);
+    const step = rotation?.angle ?? 6;
+    const interval = (rotation?.interval ?? 1) * 1000;
+    const delay = (rotation?.delay ?? 0) * 1000;
+    const direction = rotation?.direction;
 
-        const step = rotation.angle ?? 6;
-        const interval = (rotation.interval ?? 1) * 1000;
-        const delay = (rotation.delay ?? 0) * 1000;
-        const signed = rotation.direction === "counterclockwise" ? -step : step;
+    useEffect(() => {
+        if (!isRotating) return;
+
+        const signed = direction === "counterclockwise" ? -step : step;
 
         const tick = () => {
             currentAngle.current += signed;
@@ -85,7 +88,7 @@ export default function Dial({
             clearTimeout(timeout);
             clearInterval(id);
         };
-    }, [rotation?.angle, rotation?.interval, rotation?.direction, rotation?.delay]);
+    }, [isRotating, step, interval, delay, direction, controls]);
 
     const ticks = Array.from({ length: tickCount }, (_, i) => {
         const angle = (i / tickCount) * 2 * Math.PI - Math.PI / 2;

@@ -29,7 +29,7 @@ export function BumpingText({
                 },
             );
         });
-    }, [trigger]);
+    }, [trigger, animate, scope]);
 
     return (
         <span ref={scope} className="inline-flex flex-wrap">

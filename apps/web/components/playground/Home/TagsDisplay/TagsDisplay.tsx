@@ -1,7 +1,7 @@
 "use client";
+import { TagIcon } from "@trymatcha/ui/icons";
 import { useParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { MdLabel } from "react-icons/md";
 
 import LogoLoader from "@/components/app/LogoLoader";
 import PaneEmptyState from "@/components/playground/Core/components/PaneEmptyState";
@@ -127,7 +127,7 @@ export default function TagsDisplay() {
                         />
                     ) : !visibleTags.length ? (
                         <PaneEmptyState
-                            icon={MdLabel}
+                            icon={TagIcon}
                             title="No tags match your search"
                             subtitle="Try a different name."
                         />

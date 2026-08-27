@@ -32,6 +32,14 @@ const eslintConfig = defineConfig([
             ],
         },
     },
+    {
+        files: [
+            "components/playground/Home/KanbanDisplay/VirtualizedRows.tsx",
+            "components/playground/Home/chat/ProjectChatThread.tsx",
+            "components/playground/Issue/activity/ActivityFeed.tsx",
+        ],
+        rules: { "react-hooks/incompatible-library": "off" },
+    },
     // Override default ignores of eslint-config-next.
     globalIgnores([
         // Default ignores of eslint-config-next:
