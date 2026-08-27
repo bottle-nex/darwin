@@ -1,8 +1,9 @@
-import { Request, Response } from "express";
-import z from "zod";
 import { Harness, prisma } from "@trymatcha/database";
-import ResponseWriter from "../../services/service.response";
+import type { Request, Response } from "express";
+import z from "zod";
+
 import Access from "../../access-control/access";
+import ResponseWriter from "../../services/service.response";
 
 export default class IssueGetConfigController {
     static params_schema = z.object({

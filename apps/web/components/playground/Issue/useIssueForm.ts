@@ -11,8 +11,8 @@ import { KanbanMappers } from "@/lib/kanban/KanbanMappers";
 import { toast } from "@/lib/toast";
 import type { IssueTarget } from "@/store/issues/useCreateIssueStore";
 import type { BoardIssue } from "@/types/board";
-import { HARNESS_MODELS, HARNESS_SUPPORTS_EFFORT } from "@/types/harness.type";
 import type { Effort, Harness } from "@/types/harness.type";
+import { HARNESS_MODELS, HARNESS_SUPPORTS_EFFORT } from "@/types/harness.type";
 import type { Priority } from "@/types/kanban";
 
 import { useSubmitWarning } from "./SubmitWarningToast";

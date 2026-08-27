@@ -1,4 +1,5 @@
 import chalk from "chalk";
+
 import { truncate } from "../service.sandbox_stream";
 import type { AgentReport, HarnessEventParser } from "./parser.types";
 

@@ -1,6 +1,4 @@
 "use client";
-import { forwardRef, type ComponentProps, type ReactNode } from "react";
-import { GoHubot } from "react-icons/go";
 import {
     type ActivityLocationRef,
     type ActivityPayload,
@@ -16,6 +14,7 @@ import {
     DescriptionChangedActivityIcon,
     EditIcon,
     ErrorCircleIcon,
+    HarnessIcon,
     MergeIcon,
     PriorityChangedActivityIcon,
     PullRequestClosedIcon,
@@ -26,12 +25,14 @@ import {
     TagIcon,
     UntrackedActivityIcon,
 } from "@trymatcha/ui/icons";
+import { type ComponentProps, forwardRef, type ReactNode } from "react";
 
 import TagDisplay from "@/components/playground/Home/TagsDisplay/TagDisplay";
+import InfoTooltip from "@/components/ui/InfoTooltip";
 import { formatDate } from "@/lib/format";
 import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
 import { cn } from "@/lib/utils";
-import InfoTooltip from "@/components/ui/InfoTooltip";
+
 import { DATE_ICON_COLOR, PRIORITY_OPTIONS } from "../issueHelpers";
 import TextDiff from "./TextDiff";
 
@@ -279,7 +280,7 @@ const REGISTRY: { [K in ActivityType]?: ActivityEntry<K> } = {
         summary: "failed an attempt",
     },
     [ActivityType.HarnessConfigChanged]: {
-        icon: GoHubot,
+        icon: HarnessIcon,
         iconClassName: "text-neutral-500 ",
         render: (payload) => (
             <>

@@ -11,6 +11,7 @@ import ColumnDeleteController from "../../controllers/issues/controller.delete_c
 import IssueDeleteController from "../../controllers/issues/controller.delete_issue";
 import BoardColumnsGetController from "../../controllers/issues/controller.get_board_columns";
 import IssueGetByIdController from "../../controllers/issues/controller.get_issue";
+import IssueGetConfigController from "../../controllers/issues/controller.get_issue_config";
 import IssueReferencesGetController from "../../controllers/issues/controller.get_issue_references";
 import IssueGetController from "../../controllers/issues/controller.get_issues";
 import IssueActivityListController from "../../controllers/issues/controller.list_activity";
@@ -18,13 +19,12 @@ import MyIssuesListController from "../../controllers/issues/controller.list_my_
 import ColumnReorderController from "../../controllers/issues/controller.reorder_columns";
 import BoardIssuesSearchController from "../../controllers/issues/controller.search_board_issues";
 import IssueSearchController from "../../controllers/issues/controller.search_issues";
+import IssueSetConfigController from "../../controllers/issues/controller.set_issue_config";
 import IssueUnassignController from "../../controllers/issues/controller.unassign_issue";
 import ChapterUpdateController from "../../controllers/issues/controller.update_chapter";
 import ColumnUpdateController from "../../controllers/issues/controller.update_column";
 import IssueUpdateController from "../../controllers/issues/controller.update_issue";
 import { require_auth } from "../../middlewares/middleware.auth";
-import IssueGetConfigController from "../../controllers/issues/controller.get_issue_config";
-import IssueSetConfigController from "../../controllers/issues/controller.set_issue_config";
 
 const issues_router: Router = Router();
 

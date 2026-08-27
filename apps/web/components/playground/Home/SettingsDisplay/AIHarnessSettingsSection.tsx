@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
-import NoResource from "@/components/utility/NoResource";
-import ProjectsGlyph from "@/components/utility/ProjectsGlyph";
+
+import SectionHeader from "@/components/landing/SectionHeader";
 import { Button } from "@/components/ui/button";
 import {
     Select,
@@ -10,18 +10,20 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
+import NoResource from "@/components/utility/NoResource";
+import ProjectsGlyph from "@/components/utility/ProjectsGlyph";
 import { useGetProjectConfig } from "@/hooks/project/useGetProjectConfig";
 import { useUpdateProjectConfig } from "@/hooks/project/useUpdateProjectConfig";
 import {
+    type Effort,
     EFFORT_OPTIONS,
+    type Harness,
     HARNESS_MODELS,
     HARNESS_OPTIONS,
     HARNESS_SUPPORTS_EFFORT,
-    type Effort,
-    type Harness,
 } from "@/types/harness.type";
+
 import SettingsPaneShell from "./SettingsPaneShell";
-import SectionHeader from "@/components/landing/SectionHeader";
 
 interface AIHarnessSettingsSectionProps {
     projectId: string;

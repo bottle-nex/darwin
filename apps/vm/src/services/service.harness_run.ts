@@ -1,10 +1,11 @@
-import type { Sandbox } from "e2b";
-import chalk from "chalk";
-import type Logger from "@trymatcha/logger";
-import { Registry } from "@trymatcha/harness";
 import { Effort, type Harness } from "@trymatcha/database";
+import { Registry } from "@trymatcha/harness";
+import type Logger from "@trymatcha/logger";
+import chalk from "chalk";
+import type { Sandbox } from "e2b";
+
+import { type AgentReport, get_parser } from "./harness_parsers/parser.index";
 import SandboxStream, { truncate } from "./service.sandbox_stream";
-import { get_parser, type AgentReport } from "./harness_parsers/parser.index";
 
 type EnvEffort = "low" | "medium" | "high" | "xhigh" | "max";
 

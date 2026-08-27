@@ -1,9 +1,7 @@
-import "../conf/config.env";
-
 import { Harness, IssueStatus, prisma, WorkerStatus } from "@trymatcha/database";
 import Logger from "@trymatcha/logger";
-import { ENV } from "../conf/config.env";
 
+import { ENV } from "../conf/config.env";
 import E2B from "../services/services.e2b";
 
 const log = Logger.scope("solve");

@@ -1,6 +1,7 @@
 "use client";
-import { EFFORT_OPTIONS, HARNESS_OPTIONS } from "@/types/harness.type";
 import type { Effort, Harness } from "@/types/harness.type";
+import { EFFORT_OPTIONS, HARNESS_OPTIONS } from "@/types/harness.type";
+
 import Capsule, { type CapsuleOption } from "./Capsule";
 import { STACKED_CAPSULE } from "./issueHelpers";
 import type { HarnessConfigState } from "./useIssueForm";

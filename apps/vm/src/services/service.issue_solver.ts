@@ -1,5 +1,7 @@
-import { Effort, Harness, IssueStatus, prisma } from "@trymatcha/database";
+import type { Effort } from "@trymatcha/database";
+import { Harness, IssueStatus, prisma } from "@trymatcha/database";
 import type Logger from "@trymatcha/logger";
+
 import { ENV } from "../conf/config.env";
 
 export interface ClaimedIssue {

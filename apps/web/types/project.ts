@@ -6,6 +6,7 @@ import type {
 } from "@trymatcha/types";
 
 import type { IconPick } from "@/components/ui/IconPicker";
+
 import type { Effort, Harness } from "./harness.type";
 
 export type PlanStatus = "Pending" | "Generating" | "Ready" | "Failed";

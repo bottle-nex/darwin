@@ -1,5 +1,6 @@
-import { CredentialSource, Registry } from "@trymatcha/harness";
 import type { Harness } from "@trymatcha/database";
+import { CredentialSource, Registry } from "@trymatcha/harness";
+
 import { ENV } from "../conf/config.env";
 import SecretService from "./service.secret";
 

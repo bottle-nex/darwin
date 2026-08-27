@@ -7,11 +7,11 @@ import ProjectsGlyph from "@/components/utility/ProjectsGlyph";
 import { useGetDashboard } from "@/hooks/dashboard/useGetDashboard";
 import { useGetProject } from "@/hooks/project/useGetProject";
 
+import AIHarnessSettingsSection from "./AIHarnessSettingsSection";
 import ProjectSettingsEnvSection from "./ProjectSettingsEnvSection";
 import ProjectSettingsGeneralSection from "./ProjectSettingsGeneralSection";
 import SettingsPaneShell from "./SettingsPaneShell";
 import IssueTemplatesDisplay from "./templates/IssueTemplatesDisplay";
-import AIHarnessSettingsSection from "./AIHarnessSettingsSection";
 
 export type ProjectSettingsSection = "project" | "env" | "templates" | "harness";
 

@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 
 import { Harness, Prisma, prisma, WorkerStatus } from "@trymatcha/database";
-import { Registry, type McpServerSpec } from "@trymatcha/harness";
+import { type McpServerSpec, Registry } from "@trymatcha/harness";
 import Logger, { format_duration } from "@trymatcha/logger";
 import type { CommandResult, SnapshotInfo } from "e2b";
 import { Sandbox } from "e2b";

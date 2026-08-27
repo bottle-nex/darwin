@@ -2,9 +2,9 @@
 import LLMIssueStatusTicker from "@/components/playground/Home/KanbanDisplay/LLMIssueStatusTicker";
 import type { BoardIssue } from "@/types/board";
 
+import HarnessCapsules from "./HarnessCapsule";
 import IssueAttachments from "./IssueAttachments";
 import IssueFields from "./IssueFields";
-import HarnessCapsules from "./HarnessCapsule";
 import PropertyGroup from "./PropertyGroup";
 import type { IssueFormState } from "./useIssueForm";
 
