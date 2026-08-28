@@ -16,6 +16,12 @@ interface DateRange {
     targetDate: string | null;
 }
 
+export interface ActivityHarnessConfigRef {
+    harness: string;
+    model: string | null;
+    effort: string | null;
+}
+
 interface WrittenActivityPayloads {
     StatusChanged: ActivityPayloadBase & { from: ActivityLocationRef; to: ActivityLocationRef };
     PriorityChanged: ActivityPayloadBase & { from: number; to: number };
@@ -31,6 +37,10 @@ interface WrittenActivityPayloads {
     PrOpened: ActivityPayloadBase & { url: string };
     PrMerged: ActivityPayloadBase & { url: string };
     PrClosed: ActivityPayloadBase & { url: string };
+    HarnessConfigChanged: ActivityPayloadBase & {
+        from: ActivityHarnessConfigRef | null;
+        to: ActivityHarnessConfigRef;
+    };
 }
 
 export interface ActivityUserRef {

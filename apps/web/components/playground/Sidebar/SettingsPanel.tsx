@@ -2,6 +2,7 @@
 import type { IconType } from "@trymatcha/ui/icons";
 import {
     EnvSecretIcon,
+    HarnessIcon,
     SettingsApiKeysIcon,
     SettingsAppearanceIcon,
     SettingsBackIcon,
@@ -27,6 +28,7 @@ const PROJECT_SETTINGS: SettingsItem[] = [
     { tab: PlaygroundTab.SettingsProject, label: "General", icon: SettingsGeneralIcon },
     { tab: PlaygroundTab.SettingsTemplates, label: "Issue templates", icon: SettingsTemplatesIcon },
     { tab: PlaygroundTab.SettingsEnv, label: "Environment variables", icon: EnvSecretIcon },
+    { tab: PlaygroundTab.SettingsHarness, label: "AI Harness", icon: HarnessIcon },
 ];
 
 export default function PlaygroundSidebarSettingsPanel({

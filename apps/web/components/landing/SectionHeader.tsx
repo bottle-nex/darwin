@@ -4,7 +4,7 @@ import BlurFade from "./BlurFade";
 
 type SectionHeaderProps = {
     title: string;
-    titleContinued: string;
+    titleContinued?: string;
     description: string;
     className?: string;
     delay?: number;

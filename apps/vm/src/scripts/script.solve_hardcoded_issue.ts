@@ -1,8 +1,7 @@
-import "../conf/config.env";
-
-import { IssueStatus, prisma, WorkerStatus } from "@trymatcha/database";
+import { Harness, IssueStatus, prisma, WorkerStatus } from "@trymatcha/database";
 import Logger from "@trymatcha/logger";
 
+import { ENV } from "../conf/config.env";
 import E2B from "../services/services.e2b";
 
 const log = Logger.scope("solve");
@@ -87,6 +86,16 @@ async function main() {
         },
     });
     log.success("issue queued", { number: `#${created_issue.number}`, issue: created_issue.id });
+
+    // This script bypasses the router, which is normally what materializes IssueConfig —
+    // do it here too so IssueSolver's claim never falls back to a bare platform default.
+    await prisma.issueConfig.create({
+        data: {
+            issueId: created_issue.id,
+            harness: Harness.Claude,
+            model: ENV.SERVER_SOLVE_MODEL,
+        },
+    });
 
     await E2B.run_worker_loop(worker.id);
 

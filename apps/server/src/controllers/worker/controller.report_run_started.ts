@@ -1,4 +1,4 @@
-import { ActivityType, ActorType, IssueStatus, prisma } from "@trymatcha/database";
+import { ActivityType, ActorType, Effort, Harness, IssueStatus, prisma } from "@trymatcha/database";
 import type { Request, Response } from "express";
 import z from "zod";
 
@@ -9,6 +9,10 @@ const body_schema = z.object({
     // minted by the VM, used as AgentSession.id
     run_id: z.string().min(1),
     issue_id: z.string().min(1),
+    harness: z.enum(Harness),
+    model: z.string().min(1),
+    effort: z.enum(Effort).optional(),
+    harness_version: z.string().min(1).optional(),
 });
 
 export default class ReportRunStarted {
@@ -47,6 +51,10 @@ export default class ReportRunStarted {
                         issueId: data.issue_id,
                         workerId: worker_id,
                         attemptNumber: previous_attempts + 1,
+                        harness: data.harness,
+                        harnessVersion: data.harness_version,
+                        model: data.model,
+                        effort: data.effort,
                     },
                     update: {},
                 });

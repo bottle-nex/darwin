@@ -7,12 +7,13 @@ import ProjectsGlyph from "@/components/utility/ProjectsGlyph";
 import { useGetDashboard } from "@/hooks/dashboard/useGetDashboard";
 import { useGetProject } from "@/hooks/project/useGetProject";
 
+import AIHarnessSettingsSection from "./AIHarnessSettingsSection";
 import ProjectSettingsEnvSection from "./ProjectSettingsEnvSection";
 import ProjectSettingsGeneralSection from "./ProjectSettingsGeneralSection";
 import SettingsPaneShell from "./SettingsPaneShell";
 import IssueTemplatesDisplay from "./templates/IssueTemplatesDisplay";
 
-export type ProjectSettingsSection = "project" | "env" | "templates";
+export type ProjectSettingsSection = "project" | "env" | "templates" | "harness";
 
 function RestrictedNotice() {
     return (
@@ -63,21 +64,27 @@ export default function SettingsDisplay({ section }: { section: ProjectSettingsS
     }
 
     const isAdmin = project.viewerRole === "Admin";
+    const currentProject = project;
 
-    return (
-        <SettingsPaneShell sectionKey={section}>
-            {section === "env" ? (
-                <ProjectSettingsEnvSection projectId={projectId} />
-            ) : section === "templates" ? (
-                <IssueTemplatesDisplay projectId={projectId} />
-            ) : (
-                <ProjectSettingsGeneralSection
-                    key={project.id}
-                    project={project}
-                    isAdmin={isAdmin}
-                    orgSlug={orgSlug ?? ""}
-                />
-            )}
-        </SettingsPaneShell>
-    );
+    function getSection() {
+        switch (section) {
+            case "env":
+                return <ProjectSettingsEnvSection projectId={projectId} />;
+            case "templates":
+                return <IssueTemplatesDisplay projectId={projectId} />;
+            case "project":
+                return (
+                    <ProjectSettingsGeneralSection
+                        key={currentProject.id}
+                        project={currentProject}
+                        isAdmin={isAdmin}
+                        orgSlug={orgSlug ?? ""}
+                    />
+                );
+            case "harness":
+                return <AIHarnessSettingsSection projectId={currentProject.id} isAdmin={isAdmin} />;
+        }
+    }
+
+    return <SettingsPaneShell sectionKey={section}>{getSection()}</SettingsPaneShell>;
 }

@@ -17,6 +17,7 @@
         "@langchain/anthropic": "^1.5.1",
         "@langchain/core": "^1.2.3",
         "@trymatcha/database": "*",
+        "@trymatcha/harness": "*",
         "@trymatcha/logger": "*",
         "@trymatcha/types": "*",
         "bullmq": "^5.79.1",

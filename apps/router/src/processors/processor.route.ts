@@ -1,11 +1,20 @@
 import Logger from "@trymatcha/logger";
-import { IssueStatus, prisma, WorkerStatus, type Issue, type Worker } from "@trymatcha/database";
+import {
+    Effort,
+    Harness,
+    IssueStatus,
+    prisma,
+    WorkerStatus,
+    type Issue,
+    type Worker,
+} from "@trymatcha/database";
 import type QueueService from "../services/services.queue";
 import { ChatAnthropic } from "@langchain/anthropic";
 import { ENV } from "../config/config.env";
 import z from "zod";
 import { RunnableSequence } from "@langchain/core/runnables";
 import { routerPrompt } from "../prompts/prompt.router";
+import { Registry } from "@trymatcha/harness";
 
 const log = Logger.scope("route");
 
@@ -13,6 +22,14 @@ interface Assignment {
     issueId: string;
     workerId: string;
     specialization: string;
+    model?: string;
+    effort?: Effort;
+}
+
+interface ResolvedConfig {
+    harness: Harness;
+    model: string;
+    effort: Effort | null;
 }
 
 const ai_value = z.object({
@@ -21,6 +38,16 @@ const ai_value = z.object({
             issueId: z.string().nonempty(),
             workerId: z.string().nonempty(),
             specialization: z.string().nonempty().describe("describe the issue is specialized for"),
+            model: z
+                .string()
+                .optional()
+                .describe(
+                    "Only set for issue ids listed as needing a model pick. Must be one of the provided available models.",
+                ),
+            effort: z
+                .enum(Effort)
+                .optional()
+                .describe("Only set when effort selection is offered for this project's harness."),
         }),
     ),
 });
@@ -75,6 +102,9 @@ export default class RouterProcessor {
                 orderBy: {
                     createdAt: "asc",
                 },
+                include: {
+                    issueConfig: { select: { harness: true } },
+                },
             }),
         ]);
 
@@ -106,7 +136,13 @@ export default class RouterProcessor {
             }),
             prisma.project.findUnique({
                 where: { id: projectId },
-                select: { planMd: true, maxWorkers: true },
+                select: {
+                    planMd: true,
+                    maxWorkers: true,
+                    projectConfig: {
+                        select: { harness: true, defaultModel: true, defaultEffort: true },
+                    },
+                },
             }),
         ]);
 
@@ -125,15 +161,62 @@ export default class RouterProcessor {
             project.maxWorkers,
         );
 
+        // The whole pass is scoped to one project, so there is exactly one Harness in play —
+        // resolved once here, not per issue.
+        const effective_harness = project.projectConfig?.harness ?? Harness.Claude;
+        const default_model = project.projectConfig?.defaultModel ?? null;
+        const default_effort = project.projectConfig?.defaultEffort ?? null;
+
+        // Issues that already carry an explicit IssueConfig are never re-resolved here —
+        // materialization only ever happens once, the first time an issue is actually routed.
+        const unconfigured = todos.filter((issue) => !issue.issueConfig);
+        const needs_pick_ids = default_model ? [] : unconfigured.map((issue) => issue.id);
+
+        const available_models = needs_pick_ids.length
+            ? Registry.get(effective_harness).models
+            : [];
+        const supports_effort = needs_pick_ids.length
+            ? Registry.supportsEffort(effective_harness)
+            : false;
+
         const assignment_data = {
             plan_md: plan_md,
             history,
             active_workers,
             new_workers,
             new_issues: todos,
+            harness_name: effective_harness,
+            available_models,
+            supports_effort,
+            needs_model_pick_ids: needs_pick_ids,
         };
         const assignments: Assignment[] = await this.route_issues(assignment_data);
         log.info("model returned assignments", { count: assignments.length });
+
+        // Resolved once per issue that needs materializing — a straight snapshot when the
+        // project already has a default, otherwise the LLM's pick, validated against the real
+        // harness manifest and never trusted blindly (models get hallucinated).
+        const resolved_configs = new Map<string, ResolvedConfig>();
+        for (const issue of unconfigured) {
+            if (default_model) {
+                resolved_configs.set(issue.id, {
+                    harness: effective_harness,
+                    model: default_model,
+                    effort: default_effort,
+                });
+                continue;
+            }
+
+            const picked = assignments.find((a) => a.issueId === issue.id);
+            const model =
+                picked?.model && Registry.supportsModel(effective_harness, picked.model)
+                    ? picked.model
+                    : (Registry.get(effective_harness).models[0] ?? null);
+            if (!model) continue; // harness has no models configured at all — nothing to snapshot
+
+            const effort = supports_effort && picked?.effort ? picked.effort : null;
+            resolved_configs.set(issue.id, { harness: effective_harness, model, effort });
+        }
 
         await prisma.$transaction(async (tx) => {
             for (const a of assignments) {
@@ -151,6 +234,17 @@ export default class RouterProcessor {
                         status: IssueStatus.Queued,
                     },
                 });
+
+                const resolved = resolved_configs.get(a.issueId);
+                if (resolved) {
+                    await tx.issueConfig.upsert({
+                        where: { issueId: a.issueId },
+                        create: { issueId: a.issueId, ...resolved },
+                        // Never clobber — an explicit override that raced in between our
+                        // pre-transaction snapshot and this write always wins.
+                        update: {},
+                    });
+                }
             }
         });
 
@@ -198,6 +292,10 @@ export default class RouterProcessor {
         active_workers: Worker[];
         new_workers: Worker[];
         new_issues: Issue[];
+        harness_name: Harness;
+        available_models: string[];
+        supports_effort: boolean;
+        needs_model_pick_ids: string[];
     }): Promise<Assignment[]> {
         const model = new ChatAnthropic({
             apiKey: ENV.SERVER_ANTHROPIC_API_KEY,
@@ -242,6 +340,10 @@ export default class RouterProcessor {
             new_worker_count: new_workers_view.length,
             new_workers: JSON.stringify(new_workers_view),
             new_issues: JSON.stringify(new_issues_view),
+            harness_name: data.harness_name,
+            available_models: JSON.stringify(data.available_models),
+            supports_effort: String(data.supports_effort),
+            needs_model_pick_ids: JSON.stringify(data.needs_model_pick_ids),
         });
 
         return result.assignments;

@@ -11,6 +11,7 @@ import ColumnDeleteController from "../../controllers/issues/controller.delete_c
 import IssueDeleteController from "../../controllers/issues/controller.delete_issue";
 import BoardColumnsGetController from "../../controllers/issues/controller.get_board_columns";
 import IssueGetByIdController from "../../controllers/issues/controller.get_issue";
+import IssueGetConfigController from "../../controllers/issues/controller.get_issue_config";
 import IssueReferencesGetController from "../../controllers/issues/controller.get_issue_references";
 import IssueGetController from "../../controllers/issues/controller.get_issues";
 import IssueActivityListController from "../../controllers/issues/controller.list_activity";
@@ -18,6 +19,7 @@ import MyIssuesListController from "../../controllers/issues/controller.list_my_
 import ColumnReorderController from "../../controllers/issues/controller.reorder_columns";
 import BoardIssuesSearchController from "../../controllers/issues/controller.search_board_issues";
 import IssueSearchController from "../../controllers/issues/controller.search_issues";
+import IssueSetConfigController from "../../controllers/issues/controller.set_issue_config";
 import IssueUnassignController from "../../controllers/issues/controller.unassign_issue";
 import ChapterUpdateController from "../../controllers/issues/controller.update_chapter";
 import ColumnUpdateController from "../../controllers/issues/controller.update_column";
@@ -49,6 +51,9 @@ issues_router.get("/:id", require_auth, IssueGetByIdController.process);
 
 issues_router.patch("/:id", require_auth, IssueUpdateController.process);
 issues_router.delete("/:id", require_auth, IssueDeleteController.process);
+
+issues_router.get("/:id/config", require_auth, IssueGetConfigController.process);
+issues_router.put("/:id/config", require_auth, IssueSetConfigController.process);
 
 issues_router.get("/:id/references", require_auth, IssueReferencesGetController.process);
 issues_router.get("/:id/activity", require_auth, IssueActivityListController.process);

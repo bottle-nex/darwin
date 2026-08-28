@@ -2,6 +2,7 @@
 import LLMIssueStatusTicker from "@/components/playground/Home/KanbanDisplay/LLMIssueStatusTicker";
 import type { BoardIssue } from "@/types/board";
 
+import HarnessCapsules from "./HarnessCapsule";
 import IssueAttachments from "./IssueAttachments";
 import IssueFields from "./IssueFields";
 import PropertyGroup from "./PropertyGroup";
@@ -28,6 +29,9 @@ export default function IssueProperties({
             </PropertyGroup>
             <PropertyGroup title="Tags">
                 <IssueFields form={form} layout="tags" />
+            </PropertyGroup>
+            <PropertyGroup title="Agent">
+                <HarnessCapsules harnessConfig={form.harnessConfig} />
             </PropertyGroup>
             <IssueAttachments issue={issue} />
         </aside>
