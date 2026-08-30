@@ -16,7 +16,7 @@ const FOR_YOU_ROWS: { id: string; label: string; icon: React.ComponentType }[] =
         icon: MyIssuesIcon,
     },
     { id: PlaygroundTab.Chats, label: "Chats", icon: ChatsNavIcon },
-    { id: PlaygroundTab.SettingsAppearance, label: "Settings", icon: SettingsIcon },
+    { id: PlaygroundTab.SettingsOverview, label: "Settings", icon: SettingsIcon },
 ];
 
 export default function PlaygroundSidebarForYouSection({

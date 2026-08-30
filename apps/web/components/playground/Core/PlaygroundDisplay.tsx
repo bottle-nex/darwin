@@ -13,6 +13,7 @@ import MyIssuesDisplay from "@/components/playground/Home/MyIssuesDisplay/MyIssu
 import ChatsDisplay from "@/components/playground/Home/panes/ChatsDisplay";
 import ApiKeysSettingsSection from "@/components/playground/Home/SettingsDisplay/ApiKeysSettingsSection";
 import AppearanceSettingsSection from "@/components/playground/Home/SettingsDisplay/AppearanceSettingsSection";
+import SettingsOverviewDisplay from "@/components/playground/Home/SettingsDisplay/overview/SettingsOverviewDisplay";
 import SettingsBreadcrumb from "@/components/playground/Home/SettingsDisplay/SettingsBreadcrumb";
 import SettingsDisplay from "@/components/playground/Home/SettingsDisplay/SettingsDisplay";
 import SettingsPaneShell from "@/components/playground/Home/SettingsDisplay/SettingsPaneShell";
@@ -67,6 +68,12 @@ function TabPane({ tab }: { tab: string }) {
 
 function SettingsPane({ tab }: { tab: string }) {
     switch (tab) {
+        case PlaygroundTab.SettingsOverview:
+            return (
+                <SettingsPaneShell sectionKey={tab}>
+                    <SettingsOverviewDisplay />
+                </SettingsPaneShell>
+            );
         case PlaygroundTab.SettingsAppearance:
             return (
                 <SettingsPaneShell sectionKey={tab}>

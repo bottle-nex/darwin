@@ -18,10 +18,12 @@ import {
     HiOutlineRectangleGroup,
     HiOutlineRectangleStack,
     HiOutlineSquare3Stack3D,
+    HiOutlineSquares2X2,
     HiOutlineUserMinus,
     HiOutlineUserPlus,
 } from "react-icons/hi2";
 import { MdKey, MdPersonOff, MdRemove, MdVerifiedUser, MdVpnKey } from "react-icons/md";
+import { RiConnectorLine } from "react-icons/ri";
 import { TbLayoutSidebarFilled } from "react-icons/tb";
 
 export const AccessChangedIcon = createIcon(HiOutlineKey);
@@ -71,6 +73,10 @@ export const SettingsAppearanceIcon = createIcon(HiOutlinePaintBrush);
 export const SettingsBackIcon = createIcon(HiOutlineArrowLeft);
 
 export const SettingsIcon = createIcon(HiOutlineCog6Tooth);
+
+export const SettingsIntegrationsIcon = createIcon(RiConnectorLine);
+
+export const SettingsOverviewIcon = createIcon(HiOutlineSquares2X2);
 
 export const SettingsTemplatesIcon = createIcon(HiOutlineDocumentText);
 
