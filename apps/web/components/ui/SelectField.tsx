@@ -23,6 +23,7 @@ export default function SelectField({
     size = "default",
     disabled,
     className,
+    itemClassName,
     "aria-label": ariaLabel,
 }: {
     options: SelectFieldOption[];
@@ -32,6 +33,7 @@ export default function SelectField({
     size?: "sm" | "default";
     disabled?: boolean;
     className?: string;
+    itemClassName?: string;
     "aria-label"?: string;
 }) {
     const [open, setOpen] = useState(false);
@@ -61,7 +63,7 @@ export default function SelectField({
             </SelectTrigger>
             <SelectContent>
                 {selectedFirst.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
+                    <SelectItem key={option.value} value={option.value} className={itemClassName}>
                         {option.label}
                     </SelectItem>
                 ))}

@@ -24,53 +24,20 @@ import { useBackgroundLightingStore } from "@/store/playground/useBackgroundLigh
 import SettingsRow, { SETTINGS_CONTROL_WIDTH } from "./SettingsRow";
 import SettingsUtilityCard from "./SettingsUtilityCard";
 
-function ColorSwatch({
-    color,
-    checked,
-    disabled,
-    onSelect,
-}: {
-    color: BackgroundLightingColor;
-    checked: boolean;
-    disabled: boolean;
-    onSelect: () => void;
-}) {
-    const { label, rgb } = BACKGROUND_LIGHTING_PRESETS[color];
-
+function ColorOption({ label, rgb }: { label: string; rgb: string }) {
     return (
-        <label
-            className={cn(
-                "flex flex-col items-center gap-2",
-                disabled ? "cursor-not-allowed" : "cursor-pointer",
-            )}
-        >
-            <input
-                type="radio"
-                name="background-lighting-color"
-                className="sr-only"
-                value={color}
-                checked={checked}
-                disabled={disabled}
-                onChange={onSelect}
-            />
+        <span className="flex items-center gap-2.5">
             <span
-                className="size-8 rounded-full transition-transform hover:scale-105"
+                className="h-6 w-10 shrink-0 overflow-hidden rounded-[5px] p-1.5 ring-1 ring-snow/10 ring-inset"
                 style={{
-                    background: `radial-gradient(circle at 50% 35%, rgba(${rgb}, 0.95), rgba(${rgb}, 0.3))`,
-                    outline: checked ? `1.5px solid rgba(${rgb}, 0.9)` : undefined,
-                    outlineOffset: 3,
-                    boxShadow: checked ? `0 0 14px rgba(${rgb}, 0.35)` : undefined,
+                    background: `linear-gradient(135deg, rgba(${rgb}, 0.25), transparent 70%), var(--color-charcoal)`,
                 }}
-            />
-            <span
-                className={cn(
-                    "text-[11px] transition-colors",
-                    checked ? "text-neutral-100" : "text-neutral-500",
-                )}
             >
-                {label}
+                <span className="block h-[3px] w-4 rounded-full bg-snow/30" />
+                <span className="mt-1 block h-[3px] w-2.5 rounded-full bg-snow/15" />
             </span>
-        </label>
+            {label}
+        </span>
     );
 }
 
@@ -127,19 +94,22 @@ export default function AppearanceSettingsSection() {
                 rows
             >
                 <SettingsRow label="Color" description="The hue the glow is tinted with.">
-                    <div className="flex flex-wrap items-start justify-end gap-x-6 gap-y-4">
-                        {BACKGROUND_LIGHTING_COLORS.map((color) => (
-                            <ColorSwatch
-                                key={color}
-                                color={color}
-                                checked={config.backgroundLightingColor === color}
-                                disabled={!enabled}
-                                onSelect={() =>
-                                    updateConfig.mutate({ backgroundLightingColor: color })
-                                }
-                            />
-                        ))}
-                    </div>
+                    <SelectField
+                        aria-label="Background lighting color"
+                        className="w-40 pl-1"
+                        itemClassName="pl-1"
+                        disabled={!enabled}
+                        value={config.backgroundLightingColor}
+                        onChange={(color) =>
+                            updateConfig.mutate({
+                                backgroundLightingColor: color as BackgroundLightingColor,
+                            })
+                        }
+                        options={BACKGROUND_LIGHTING_COLORS.map((color) => ({
+                            value: color,
+                            label: <ColorOption {...BACKGROUND_LIGHTING_PRESETS[color]} />,
+                        }))}
+                    />
                 </SettingsRow>
 
                 <SettingsRow label="Direction" description={`Sweep angle — ${angle}°.`}>

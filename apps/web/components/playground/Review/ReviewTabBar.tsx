@@ -24,10 +24,10 @@ export default function ReviewTabBar({ active }: { active: ReviewTab }) {
                     aria-selected={tab.id === active}
                     onClick={() => setReviewTab(tab.id)}
                     className={cn(
-                        "cursor-pointer rounded-full px-2 py-1 text-[12.5px] font-medium transition-colors ring-[0.5px] ring-white/10 hover:bg-white/2",
+                        "cursor-pointer rounded-full px-2 py-1 text-[12.5px] font-medium transition-colors ring-[0.5px] ring-white/10",
                         tab.id === active
                             ? "bg-active text-neutral-100"
-                            : "text-neutral-500 hover:text-neutral-200",
+                            : "text-neutral-500 hover:bg-hover hover:text-neutral-200",
                     )}
                 >
                     {tab.label}

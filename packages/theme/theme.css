@@ -6,7 +6,8 @@
     --color-graphite: #1d1d1e;
 
     /* The lifted surface a selected row, tab or group header sits on. */
-    --color-active: #1d1f21;
+    --color-active: #222222;
+    --color-hover: #1c1c1c;
 
     /* Light surfaces. */
     --color-snow: #ffffff;
@@ -107,7 +108,8 @@
     --color-charcoal: #141414;
     --color-cement: #1a1a1a;
     --color-graphite: #212121;
-    --color-active: #1d1f21;
+    --color-active: #222222;
+    --color-hover: #1c1c1c;
 
     --color-snow: #ffffff;
     --color-mist: #f4f4f4;

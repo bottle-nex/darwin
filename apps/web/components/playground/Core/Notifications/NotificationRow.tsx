@@ -38,7 +38,10 @@ export default function NotificationRow({
                 "group flex w-full items-start gap-2.5 rounded-lg px-2 py-2.5 text-left transition-colors duration-150",
                 selected && "bg-active",
                 clickable
-                    ? "cursor-pointer hover:bg-white/4 focus-visible:bg-white/4 focus-visible:outline-none"
+                    ? cn(
+                          "cursor-pointer focus-visible:outline-none",
+                          !selected && "hover:bg-hover focus-visible:bg-hover",
+                      )
                     : "cursor-default",
             )}
         >

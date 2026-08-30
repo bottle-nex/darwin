@@ -33,7 +33,7 @@ export default function MyIssuesViewBar({
                             "cursor-pointer rounded-full px-3 py-1 text-[11px] font-medium ring-1 ring-inset transition-colors",
                             view === option.value
                                 ? "bg-active text-neutral-100 ring-white/5"
-                                : "bg-white/[0.025] text-neutral-500 ring-white/7 hover:bg-white/5 hover:text-neutral-300",
+                                : "bg-white/[0.025] text-neutral-500 ring-white/7 hover:bg-hover hover:text-neutral-300",
                         )}
                     >
                         {option.label}

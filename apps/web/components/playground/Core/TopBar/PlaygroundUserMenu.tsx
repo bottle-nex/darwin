@@ -98,7 +98,7 @@ export default function PlaygroundUserMenu() {
     const setTab = usePlaygroundNavStore((s) => s.setTab);
 
     function openSettings() {
-        setTab(PlaygroundTab.SettingsAppearance);
+        setTab(PlaygroundTab.SettingsOverview);
     }
 
     const name = user?.name?.trim() || user?.email?.split("@")[0] || "User";

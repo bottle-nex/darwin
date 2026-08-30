@@ -5,6 +5,7 @@ import { useState } from "react";
 import { CapsuleTrigger } from "@/components/playground/Issue/Capsule";
 import IssueDescriptionEditor from "@/components/playground/Issue/editor/IssueDescriptionEditor";
 import { Button } from "@/components/ui/button";
+import DialogSubmitButton, { handleDialogSubmitKey } from "@/components/ui/DialogSubmitButton";
 import { DIALOG_TITLE_FIELD, GHOST_FIELD } from "@/components/ui/fieldStyles";
 import type { IconPick } from "@/components/ui/IconPicker";
 import { Input } from "@/components/ui/input";
@@ -74,7 +75,10 @@ export default function CreateProjectDialogDetailsStep({
     }
 
     return (
-        <main className="flex min-h-0 min-w-0 flex-1 flex-col justify-between *:px-6">
+        <main
+            className="flex min-h-0 min-w-0 flex-1 flex-col justify-between *:px-6"
+            onKeyDown={(event) => handleDialogSubmitKey(event, submit)}
+        >
             <section className="flex flex-col items-start gap-y-3 pt-4 pb-2">
                 <Textarea
                     rows={1}
@@ -157,17 +161,12 @@ export default function CreateProjectDialogDetailsStep({
                     >
                         {mustCreateProject ? "Log out" : "Cancel"}
                     </Button>
-                    <Button
-                        type="button"
-                        variant="tertiary"
-                        size="xs"
-                        className="text-ink!"
+                    <DialogSubmitButton
+                        label="Create Project"
                         onClick={submit}
                         loading={createProject.isPending}
                         disabled={!ready}
-                    >
-                        Create Project
-                    </Button>
+                    />
                 </div>
             </section>
         </main>

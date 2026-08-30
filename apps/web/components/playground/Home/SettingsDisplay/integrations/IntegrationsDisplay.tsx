@@ -31,10 +31,6 @@ export default function IntegrationsDisplay({ project }: { project: ProjectDetai
         <section className="flex flex-col gap-5">
             <header className="flex flex-col gap-1">
                 <h2 className="text-sm font-medium text-snow">Integrations</h2>
-                <p className="text-[13px] text-snow/60">
-                    Connect the tools your team already files work in. Issues flow onto this
-                    project&apos;s board automatically.
-                </p>
             </header>
 
             <ul className="grid list-none grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">

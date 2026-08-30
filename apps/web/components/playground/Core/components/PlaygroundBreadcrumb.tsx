@@ -53,7 +53,7 @@ export const PROJECT_BREADCRUMB_TARGET: PlaygroundBreadcrumbTarget = {
 };
 
 export const SETTINGS_BREADCRUMB_TARGET: PlaygroundBreadcrumbTarget = {
-    tab: PlaygroundTab.SettingsAppearance,
+    tab: PlaygroundTab.SettingsOverview,
 };
 
 export const SPACES_BREADCRUMB_TARGET: PlaygroundBreadcrumbTarget = {
@@ -78,6 +78,7 @@ const TAB_TRAILS: Partial<Record<PlaygroundTab, PlaygroundBreadcrumbSegment[]>> 
     [PlaygroundTab.Inbox]: ["Inbox"],
     [PlaygroundTab.Chats]: ["Chats"],
     [PlaygroundTab.AssignedToMe]: ["My issues"],
+    [PlaygroundTab.SettingsOverview]: ["Settings"],
     [PlaygroundTab.SettingsAppearance]: [
         { label: "Settings", target: SETTINGS_BREADCRUMB_TARGET },
         "Appearance",
@@ -97,6 +98,14 @@ const TAB_TRAILS: Partial<Record<PlaygroundTab, PlaygroundBreadcrumbSegment[]>> 
     [PlaygroundTab.SettingsEnv]: [
         { label: "Settings", target: SETTINGS_BREADCRUMB_TARGET },
         "Environment variables",
+    ],
+    [PlaygroundTab.SettingsHarness]: [
+        { label: "Settings", target: SETTINGS_BREADCRUMB_TARGET },
+        "AI Harness",
+    ],
+    [PlaygroundTab.SettingsIntegrations]: [
+        { label: "Settings", target: SETTINGS_BREADCRUMB_TARGET },
+        "Integrations",
     ],
 };
 

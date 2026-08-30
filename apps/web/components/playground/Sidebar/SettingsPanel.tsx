@@ -1,7 +1,10 @@
 "use client";
+import { SettingsOverviewIcon } from "@trymatcha/ui/icons";
+
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { cn } from "@/lib/utils";
 
+import { PlaygroundTab } from "../playgroundTabs";
 import { filterSettingsItems, type SettingsItem } from "./settingsItems";
 import type { SidebarSectionProps } from "./shared";
 import Row from "./SidebarRow";
@@ -37,6 +40,16 @@ export default function PlaygroundSidebarSettingsPanel({
 
     return (
         <>
+            {!query.trim() && (
+                <Row
+                    className="mt-2 -mb-1.5"
+                    leading={{ kind: "icon", icon: SettingsOverviewIcon }}
+                    label="Overview"
+                    active={selectedRowId === PlaygroundTab.SettingsOverview}
+                    onClick={() => onSelect(PlaygroundTab.SettingsOverview)}
+                />
+            )}
+
             {accountItems.length > 0 && (
                 <Section title="Account">{accountItems.map(renderItem)}</Section>
             )}

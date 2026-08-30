@@ -43,11 +43,9 @@ export default function SelectableRow({
                 onToggleSelection();
             }}
             className={cn(
-                "group/selectable flex items-center gap-3 rounded-md transition-colors hover:bg-snow/5",
+                "group/selectable flex items-center gap-3 rounded-md transition-colors",
                 selectionActive && "cursor-pointer select-none",
-                selected && SELECTED_TINT,
-                selected && joinedAbove && "rounded-t-none",
-                selected && joinedBelow && "rounded-b-none",
+                selected ? "bg-active" : "hover:bg-hover",
                 className,
             )}
         >

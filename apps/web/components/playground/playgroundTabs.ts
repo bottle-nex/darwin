@@ -15,6 +15,7 @@ export enum PlaygroundTab {
     Tags = "tags",
     AssignedToMe = "assigned-to-me",
     TeamDetail = "team-detail",
+    SettingsOverview = "settings-overview",
     SettingsAppearance = "settings-appearance",
     SettingsApiKeys = "settings-api-keys",
     SettingsProject = "settings-project",
@@ -37,7 +38,11 @@ export const PROJECT_SETTINGS_TABS: PlaygroundTab[] = [
     PlaygroundTab.SettingsIntegrations,
 ];
 
-const SETTINGS_TABS = new Set<string>([...ACCOUNT_SETTINGS_TABS, ...PROJECT_SETTINGS_TABS]);
+const SETTINGS_TABS = new Set<string>([
+    PlaygroundTab.SettingsOverview,
+    ...ACCOUNT_SETTINGS_TABS,
+    ...PROJECT_SETTINGS_TABS,
+]);
 
 export function isSettingsTab(tab: string): boolean {
     return SETTINGS_TABS.has(tab);

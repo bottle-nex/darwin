@@ -32,6 +32,7 @@ import InfoTooltip from "@/components/ui/InfoTooltip";
 import { formatDate } from "@/lib/format";
 import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
 import { cn } from "@/lib/utils";
+import { KanbanStatus } from "@/types/kanban";
 
 import { DATE_ICON_COLOR, PRIORITY_OPTIONS } from "../issueHelpers";
 import TextDiff from "./TextDiff";
@@ -310,7 +311,7 @@ const REGISTRY: { [K in ActivityType]?: ActivityEntry<K> } = {
     },
     [ActivityType.PrOpened]: {
         icon: PullRequestOpenIcon,
-        iconClassName: "text-green-500/90",
+        iconClassName: KanbanBoard.glyphFor(KanbanStatus.InReview).titleBox,
         render: (payload) => (
             <>
                 opened{" "}
@@ -328,7 +329,7 @@ const REGISTRY: { [K in ActivityType]?: ActivityEntry<K> } = {
     },
     [ActivityType.PrMerged]: {
         icon: MergeIcon,
-        iconClassName: "text-violet-400",
+        iconClassName: KanbanBoard.glyphFor(KanbanStatus.Done).titleBox,
         render: (payload) => (
             <>
                 merged{" "}

@@ -5,8 +5,8 @@ import { useState } from "react";
 import PlaygroundAvatar, {
     toneFor,
 } from "@/components/playground/Core/components/PlaygroundAvatar";
-import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import DialogSubmitButton, { handleDialogSubmitKey } from "@/components/ui/DialogSubmitButton";
 import { DIALOG_TITLE_FIELD, GHOST_FIELD } from "@/components/ui/fieldStyles";
 import { Textarea } from "@/components/ui/textarea";
 import { useCustomColumnActions } from "@/hooks/kanban/useCustomColumnActions";
@@ -43,12 +43,15 @@ export default function AddCustomColumnDialog() {
                 }}
                 className={cn(
                     "flex w-110 max-w-none flex-col gap-0 overflow-hidden p-0 sm:max-w-none",
-                    "rounded-3xl bg-charcoal",
+                    "rounded-3xl",
                 )}
             >
                 <DialogTitle className="sr-only">Add custom column</DialogTitle>
 
-                <main className="flex min-w-0 flex-col *:px-6">
+                <main
+                    className="flex min-w-0 flex-col *:px-6"
+                    onKeyDown={(event) => handleDialogSubmitKey(event, submit)}
+                >
                     <section className="flex flex-col items-start gap-y-3 pt-4 pb-2">
                         <div className="flex items-center justify-start gap-x-1 text-snow text-xs">
                             <PlaygroundAvatar
@@ -80,17 +83,12 @@ export default function AddCustomColumnDialog() {
                     </section>
 
                     <section className="flex h-fit items-center justify-end pb-4">
-                        <Button
-                            type="button"
-                            variant="tertiary"
-                            size="xs"
-                            className="text-ink!"
+                        <DialogSubmitButton
+                            label="Add list"
                             onClick={submit}
                             loading={addingColumn}
                             disabled={!ready}
-                        >
-                            Add list
-                        </Button>
+                        />
                     </section>
                 </main>
             </DialogContent>

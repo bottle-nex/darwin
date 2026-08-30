@@ -7,8 +7,8 @@ import PlaygroundAvatar, {
     toneFor,
 } from "@/components/playground/Core/components/PlaygroundAvatar";
 import { CapsuleTrigger } from "@/components/playground/Issue/Capsule";
-import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import DialogSubmitButton, { handleDialogSubmitKey } from "@/components/ui/DialogSubmitButton";
 import { DIALOG_TITLE_FIELD, GHOST_FIELD } from "@/components/ui/fieldStyles";
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -35,7 +35,7 @@ export default function CreateTeamDialog() {
                 }}
                 className={cn(
                     "flex flex-col max-h-[80vh] min-h-[40vh] w-187.5 max-w-none sm:max-w-none p-0 gap-0 overflow-hidden",
-                    "bg-charcoal rounded-3xl",
+                    "rounded-3xl",
                 )}
             >
                 <DialogTitle className="sr-only">Create team</DialogTitle>
@@ -86,7 +86,10 @@ function CreateTeamForm({ projectId, onClose }: { projectId: string | null; onCl
     }
 
     return (
-        <main className="flex min-h-0 min-w-0 flex-1 flex-col justify-between *:px-6">
+        <main
+            className="flex min-h-0 min-w-0 flex-1 flex-col justify-between *:px-6"
+            onKeyDown={(event) => handleDialogSubmitKey(event, submit)}
+        >
             <section className="flex flex-col items-start gap-y-3 pt-4 pb-2">
                 <div className="flex items-center justify-start gap-x-1 text-snow text-xs">
                     <PlaygroundAvatar
@@ -125,7 +128,7 @@ function CreateTeamForm({ projectId, onClose }: { projectId: string | null; onCl
                     maxLength={DESCRIPTION_LIMIT}
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    className={cn(GHOST_FIELD, "w-full text-[13px] leading-6 text-neutral-300")}
+                    className={cn(GHOST_FIELD, "w-full text-base leading-[1.65] text-neutral-200")}
                 />
             </section>
 
@@ -162,17 +165,12 @@ function CreateTeamForm({ projectId, onClose }: { projectId: string | null; onCl
                             That slug is already taken.
                         </span>
                     )}
-                    <Button
-                        type="button"
-                        variant="tertiary"
-                        size="xs"
-                        className="text-ink!"
+                    <DialogSubmitButton
+                        label="Create Team"
                         onClick={submit}
                         loading={createTeam.isPending}
                         disabled={!ready}
-                    >
-                        Create Team
-                    </Button>
+                    />
                 </div>
             </section>
         </main>

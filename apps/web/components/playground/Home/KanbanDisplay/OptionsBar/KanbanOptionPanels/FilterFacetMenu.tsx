@@ -46,39 +46,45 @@ export function FilterFacetItems({ facetKey }: { facetKey: ListFacetKey }) {
         );
     }
 
+    const hasHeader = selected.length > 0 || isSearchableFacet(facetKey);
+
     return (
         <>
-            <div className="flex shrink-0 flex-col gap-1.5 p-1">
-                {selected.length > 0 && (
-                    <div className="flex items-center justify-end px-0.5">
-                        <Button
-                            variant="unstyled"
-                            type="button"
-                            onClick={() => clearFacet(facetKey)}
-                            className="cursor-pointer bg-transparent text-[11px] font-medium text-neutral-400 hover:text-neutral-100"
-                        >
-                            Clear
-                        </Button>
+            {hasHeader && (
+                <>
+                    <div className="flex shrink-0 flex-col gap-1.5 p-1">
+                        {selected.length > 0 && (
+                            <div className="flex items-center justify-end px-0.5">
+                                <Button
+                                    variant="unstyled"
+                                    type="button"
+                                    onClick={() => clearFacet(facetKey)}
+                                    className="cursor-pointer bg-transparent text-[11px] font-medium text-neutral-400 hover:text-neutral-100"
+                                >
+                                    Clear
+                                </Button>
+                            </div>
+                        )}
+                        {isSearchableFacet(facetKey) && (
+                            <div className="relative">
+                                <SearchIcon
+                                    className="pointer-events-none absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-neutral-500"
+                                    aria-hidden
+                                />
+                                <input
+                                    value={query}
+                                    onChange={(e) => setQuery(e.target.value)}
+                                    onKeyDown={(e) => e.stopPropagation()}
+                                    placeholder={`Search ${meta.label.toLowerCase()}...`}
+                                    className="h-7 w-full rounded-md bg-transparent pr-2 pl-7 text-[12px] text-neutral-100 placeholder:text-neutral-500 focus:outline-none"
+                                />
+                            </div>
+                        )}
                     </div>
-                )}
-                {isSearchableFacet(facetKey) && (
-                    <div className="relative">
-                        <SearchIcon
-                            className="pointer-events-none absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-neutral-500"
-                            aria-hidden
-                        />
-                        <input
-                            value={query}
-                            onChange={(e) => setQuery(e.target.value)}
-                            onKeyDown={(e) => e.stopPropagation()}
-                            placeholder={`Search ${meta.label.toLowerCase()}...`}
-                            className="h-7 w-full rounded-md bg-transparent pr-2 pl-7 text-[12px] text-neutral-100 placeholder:text-neutral-500 focus:outline-none"
-                        />
-                    </div>
-                )}
-            </div>
 
-            <div className="h-px shrink-0 bg-white/5" />
+                    <div className="h-px shrink-0 bg-white/5" />
+                </>
+            )}
 
             <div data-lenis-prevent className="min-h-0 flex-1 overflow-y-auto p-1">
                 {visible.length === 0 ? (

@@ -98,6 +98,7 @@ export default function ProjectSettingsGeneralSection({
                         open={iconOpen}
                         onOpenChange={setIconOpen}
                         label="Pick project icon"
+                        align="end"
                     />
                 </SettingsRow>
 
@@ -106,7 +107,7 @@ export default function ProjectSettingsGeneralSection({
                         variant="outline"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
-                        className={cn(SETTINGS_CONTROL_WIDTH, "h-8 text-[13px]")}
+                        className={cn(SETTINGS_CONTROL_WIDTH, "h-8 px-2.5 text-[13px]")}
                     />
                 </SettingsRow>
 
@@ -126,20 +127,17 @@ export default function ProjectSettingsGeneralSection({
                         onChange={(e) =>
                             setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""))
                         }
-                        className={cn(SETTINGS_CONTROL_WIDTH, "h-8 font-mono text-[13px]")}
+                        className={cn(SETTINGS_CONTROL_WIDTH, "h-8 px-2.5 font-mono text-[13px]")}
                     />
                 </SettingsRow>
 
-                <SettingsRow label="Description" description="Up to 150 characters.">
+                <SettingsRow label="Description" description="Up to 150 characters." stack>
                     <Textarea
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}
                         maxLength={150}
                         rows={4}
-                        className={cn(
-                            SETTINGS_CONTROL_WIDTH,
-                            "max-h-40 resize-none overflow-y-auto rounded-[8px] border border-snow/5 bg-snow/6 px-2.5 py-2 text-[13px] hover:bg-snow/8",
-                        )}
+                        className="max-h-40 w-full resize-none overflow-y-auto rounded-[8px] border border-snow/5 bg-snow/6 px-2.5 py-2 text-[13px] hover:bg-snow/8"
                     />
                 </SettingsRow>
             </SettingsUtilityCard>
