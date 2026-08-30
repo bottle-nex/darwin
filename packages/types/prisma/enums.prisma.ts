@@ -33,6 +33,12 @@ export const IssueStatus = {
 } as const;
 export type IssueStatus = (typeof IssueStatus)[keyof typeof IssueStatus];
 
+export const GithubImportTarget = {
+    AgentBoard: "AgentBoard",
+    CustomColumn: "CustomColumn",
+} as const;
+export type GithubImportTarget = (typeof GithubImportTarget)[keyof typeof GithubImportTarget];
+
 export const AgentSessionStatus = {
     Running: "Running",
     Succeeded: "Succeeded",

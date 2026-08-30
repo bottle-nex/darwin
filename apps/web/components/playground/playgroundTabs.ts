@@ -19,6 +19,7 @@ export enum PlaygroundTab {
     SettingsProject = "settings-project",
     SettingsTemplates = "settings-templates",
     SettingsEnv = "settings-env",
+    SettingsIntegrations = "settings-integrations",
 }
 
 export const ACCOUNT_SETTINGS_TABS: PlaygroundTab[] = [
@@ -30,6 +31,7 @@ export const PROJECT_SETTINGS_TABS: PlaygroundTab[] = [
     PlaygroundTab.SettingsProject,
     PlaygroundTab.SettingsTemplates,
     PlaygroundTab.SettingsEnv,
+    PlaygroundTab.SettingsIntegrations,
 ];
 
 const SETTINGS_TABS = new Set<string>([...ACCOUNT_SETTINGS_TABS, ...PROJECT_SETTINGS_TABS]);

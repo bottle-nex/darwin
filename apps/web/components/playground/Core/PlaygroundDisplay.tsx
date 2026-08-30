@@ -81,6 +81,8 @@ function SettingsPane({ tab }: { tab: string }) {
             return <SettingsDisplay section="templates" />;
         case PlaygroundTab.SettingsEnv:
             return <SettingsDisplay section="env" />;
+        case PlaygroundTab.SettingsIntegrations:
+            return <SettingsDisplay section="integrations" />;
         default:
             return null;
     }

@@ -29,19 +29,19 @@ model Project {
   createdAt            DateTime            @default(now())
   updatedAt            DateTime            @updatedAt
 
-  routingClaimedAt   DateTime?
-  issues             Issue[]
-  projectChats       ProjectChat[]
-  chapters           Chapter[]
-  setupSessions      SetupSession[]
-  secrets            ProjectSecret[]
-  tags               Tag[]
-  issueTemplates     IssueTemplate[]
-  notifications      Notification[]
-  planMd             String?             @db.Text
-  planStatus         PlanStatus          @default(Pending)
-  planCommitSha      String?
-  planGeneratedAt    DateTime?
+  routingClaimedAt DateTime?
+  issues           Issue[]
+  projectChats     ProjectChat[]
+  chapters         Chapter[]
+  setupSessions    SetupSession[]
+  secrets          ProjectSecret[]
+  tags             Tag[]
+  issueTemplates   IssueTemplate[]
+  notifications    Notification[]
+  planMd           String?         @db.Text
+  planStatus       PlanStatus      @default(Pending)
+  planCommitSha    String?
+  planGeneratedAt  DateTime?
 
   workers    Worker[]
   maxWorkers Int      @default(1)
@@ -50,7 +50,8 @@ model Project {
   previewDepsHash   String?
   previewSnapshotAt DateTime?
 
-  projectConfig ProjectConfig?
+  projectConfig     ProjectConfig?
+  githubIssueImport GithubIssueImport?
 
   @@unique([orgId, slug])
   @@index([ownerId])

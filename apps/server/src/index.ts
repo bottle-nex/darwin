@@ -20,6 +20,7 @@ app.use(
         credentials: true,
     }),
 );
+app.use("/api/v1/github/webhook", express.raw({ type: "application/json", limit: "5mb" }));
 app.use(express.json());
 app.use("/api/v1", v1_router);
 

@@ -1,8 +1,9 @@
 "use client";
 
-import { CheckIcon, ICONS } from "@trymatcha/ui/icons";
+import { CheckIcon, ICONS, type IconType, ProjectAvatarPickerIcon } from "@trymatcha/ui/icons";
 import { useMemo, useState } from "react";
 
+import { Button } from "@/components/ui/button";
 import { ColorPicker } from "@/components/ui/color-picker";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { EMOJI_GROUPS } from "@/data/emojis_bulk";
@@ -280,5 +281,65 @@ export default function IconPicker({
                 )}
             </PopoverContent>
         </Popover>
+    );
+}
+
+type IconPickButtonSize = "sm" | "md" | "lg";
+
+const ICON_PICK_BUTTON: Record<IconPickButtonSize, { tile: string; glyph: string }> = {
+    sm: { tile: "size-5.5 rounded-[7px]", glyph: "size-3.5 text-sm" },
+    md: { tile: "size-9 rounded-lg", glyph: "size-4 text-base" },
+    lg: { tile: "size-10 rounded-lg", glyph: "size-5 text-lg" },
+};
+
+/**
+ * The picker trigger: a tile showing the current pick, tinted with the pick's own colour.
+ * Every surface that lets someone choose an icon uses this so the tint and hover cannot drift.
+ */
+export function IconPickButton({
+    pick,
+    onSelect,
+    open,
+    onOpenChange,
+    label,
+    size = "md",
+    align,
+    fallbackIcon: FallbackIcon = ProjectAvatarPickerIcon,
+    className,
+}: {
+    pick: IconPick | null | undefined;
+    onSelect: (pick: IconPick) => void;
+    open: boolean;
+    onOpenChange: (open: boolean) => void;
+    label: string;
+    size?: IconPickButtonSize;
+    align?: "start" | "center" | "end";
+    fallbackIcon?: IconType;
+    className?: string;
+}) {
+    const { tile, glyph } = ICON_PICK_BUTTON[size];
+    const tinted = pick?.kind === "icon";
+
+    return (
+        <IconPicker open={open} onOpenChange={onOpenChange} onSelect={onSelect} align={align}>
+            <Button
+                variant="unstyled"
+                type="button"
+                aria-label={label}
+                style={tinted ? { backgroundColor: `${pick.color}33` } : undefined}
+                className={cn(
+                    "flex shrink-0 cursor-pointer items-center justify-center transition-colors",
+                    tile,
+                    tinted ? "hover:brightness-125" : "bg-white/5 hover:bg-white/10",
+                    className,
+                )}
+            >
+                {pick ? (
+                    <IconPickGlyph pick={pick} className={glyph} />
+                ) : (
+                    <FallbackIcon className={cn(glyph, "text-white/60")} aria-hidden />
+                )}
+            </Button>
+        </IconPicker>
     );
 }

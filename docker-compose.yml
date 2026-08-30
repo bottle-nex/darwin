@@ -7,7 +7,7 @@ services:
       - POSTGRES_PASSWORD=password
       - POSTGRES_DB=nanbe
     ports:
-      - '5434:5432'
+      - '4403:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
@@ -15,7 +15,7 @@ services:
     image: redis:7-alpine
     container_name: nanbe-redis
     ports:
-      - '6370:6379'
+      - '4404:6379'
     command: redis-server --appendonly yes --notify-keyspace-events Ex
     volumes:
       - redis_data:/data
@@ -28,8 +28,8 @@ services:
       MINIO_ROOT_USER: ${SERVER_MINIO_ACCESS_KEY:-trymatcha-local}
       MINIO_ROOT_PASSWORD: ${SERVER_MINIO_SECRET_KEY:-trymatcha-local-dev-only}
     ports:
-      - "9000:9000"
-      - "9001:9001"
+      - "4405:9000"
+      - "4406:9001"
     volumes:
       - minio_data:/data
     healthcheck:

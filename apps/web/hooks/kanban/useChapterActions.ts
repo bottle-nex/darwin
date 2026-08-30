@@ -1,4 +1,5 @@
 "use client";
+import type { IconPick } from "@/components/ui/IconPicker";
 import { useCreateChapter } from "@/hooks/issues/useCreateChapter";
 import { useDeleteChapter } from "@/hooks/issues/useDeleteChapter";
 import { useUpdateChapter } from "@/hooks/issues/useUpdateChapter";
@@ -13,7 +14,10 @@ export function useChapterActions() {
     const updateChapter = useUpdateChapter();
     const deleteChapter = useDeleteChapter();
 
-    const addChapter = async (name: string): Promise<BoardChapter | null> => {
+    const addChapter = async (
+        name: string,
+        icon?: IconPick | null,
+    ): Promise<BoardChapter | null> => {
         const trimmed = name.trim();
         const slug = slugify(trimmed);
         if (!trimmed || !slug || !projectId) return null;
@@ -22,6 +26,7 @@ export function useChapterActions() {
                 project_id: projectId,
                 name: trimmed,
                 slug,
+                icon,
             });
         } catch {
             toast.error("Couldn't create the chapter.");

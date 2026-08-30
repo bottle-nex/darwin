@@ -31,6 +31,7 @@ import { formatRelativeTime } from "@/lib/format";
 import { markdownToPlainText } from "@/lib/markdown";
 import { cn } from "@/lib/utils";
 
+import GithubActorName from "../GithubActorName";
 import ReviewActorAvatar from "../ReviewActorAvatar";
 
 const REVIEW_VERDICT: Record<
@@ -105,7 +106,7 @@ export default function ReviewCommentCard({
                         rel="noreferrer"
                         className="font-medium text-neutral-200 transition-colors hover:text-neutral-50"
                     >
-                        {comment.author?.login ?? "Unknown"}
+                        <GithubActorName login={comment.author?.login} />
                     </a>
                     {verdict && VerdictIcon && (
                         <span className={cn("flex items-center gap-1", verdict.tone)}>

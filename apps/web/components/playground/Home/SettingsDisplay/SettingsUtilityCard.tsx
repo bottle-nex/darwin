@@ -1,5 +1,7 @@
 import { cn } from "@/lib/utils";
 
+export const SETTINGS_CARD_SHELL = "rounded-xl border border-border bg-snow/3";
+
 export default function SettingsUtilityCard({
     title,
     description,
@@ -16,12 +18,7 @@ export default function SettingsUtilityCard({
     className?: string;
 }) {
     return (
-        <div
-            className={cn(
-                "overflow-hidden rounded-xl border border-border bg-snow/3 flex flex-col py-4",
-                className,
-            )}
-        >
+        <div className={cn(SETTINGS_CARD_SHELL, "flex flex-col overflow-hidden py-4", className)}>
             <div className="w-full flex items-start justify-between gap-3 px-4">
                 <div className="flex flex-col gap-0.5 items-start">
                     <span className="text-sm font-medium text-snow">{title}</span>

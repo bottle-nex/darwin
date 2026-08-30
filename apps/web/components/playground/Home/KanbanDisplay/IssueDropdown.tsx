@@ -7,12 +7,14 @@ import {
     DeleteIcon,
     DuplicateIcon,
     ExternalLinkIcon,
+    KanbanBoardLayoutIcon,
     KanbanColumnsIcon,
     SubmenuDisclosureIcon,
     TagIcon,
 } from "@trymatcha/ui/icons";
 import { type ReactNode, useState } from "react";
 
+import HeroBuddy from "@/components/landing/v2/HeroBuddy";
 import MemberOptionRow from "@/components/playground/Core/components/MemberOptionRow";
 import { PRIORITY_OPTIONS } from "@/components/playground/Issue/issueHelpers";
 import {
@@ -25,6 +27,7 @@ import {
     ContextMenuSubTrigger,
     ContextMenuTrigger,
 } from "@/components/ui/context-menu";
+import { IconPickGlyph } from "@/components/ui/IconPicker";
 import { COPY_FIELDS, DATE_PRESETS, useIssueActions } from "@/hooks/issues/useIssueActions";
 import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
 import { cn } from "@/lib/utils";
@@ -278,21 +281,39 @@ export default function IssueDropdown({
                 >
                     {issue.customColumnId && (
                         <ContextMenuItem onSelect={() => actions.moveToColumn(null)}>
-                            <span className="flex-1">Back to board</span>
+                            <HeroBuddy move={false} className="size-3.5" />
+                            <span className="flex-1">Agent board</span>
                         </ContextMenuItem>
                     )}
-                    {actions.columns
-                        .filter((column) => column.id !== issue.customColumnId)
-                        .map((column) => (
-                            <ContextMenuItem
-                                key={column.id}
-                                onSelect={() => actions.moveToColumn(column.id)}
-                            >
-                                <span className="flex-1 truncate">{column.title}</span>
-                            </ContextMenuItem>
-                        ))}
-                    {actions.columns.length === 0 && !issue.customColumnId && (
-                        <ContextMenuItem disabled>No columns</ContextMenuItem>
+                    {actions.chapterBoards.map((chapter) => (
+                        <Submenu
+                            key={chapter.id}
+                            className="w-52"
+                            disabled={chapter.columns.length === 0}
+                            trigger={
+                                <>
+                                    {chapter.icon ? (
+                                        <IconPickGlyph pick={chapter.icon} className={ICON} />
+                                    ) : (
+                                        <KanbanBoardLayoutIcon className={ICON} aria-hidden />
+                                    )}
+                                    <span className="flex-1 truncate">{chapter.name}</span>
+                                </>
+                            }
+                        >
+                            {chapter.columns.map((column) => (
+                                <ContextMenuItem
+                                    key={column.id}
+                                    disabled={column.id === issue.customColumnId}
+                                    onSelect={() => actions.moveToColumn(column.id)}
+                                >
+                                    <span className="flex-1 truncate">{column.label}</span>
+                                </ContextMenuItem>
+                            ))}
+                        </Submenu>
+                    ))}
+                    {actions.chapterBoards.length === 0 && !issue.customColumnId && (
+                        <ContextMenuItem disabled>No boards</ContextMenuItem>
                     )}
                 </Submenu>
 

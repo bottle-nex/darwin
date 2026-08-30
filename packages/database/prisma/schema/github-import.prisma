@@ -1,0 +1,53 @@
+/// Where a GitHub-imported issue lands. `AgentBoard` leaves `Issue.customColumnId`
+/// null so the issue enters the agent's To Do lane; `CustomColumn` parks it in a
+/// column of one of the project's chapters.
+enum GithubImportTarget {
+  AgentBoard
+  CustomColumn
+}
+
+/// Per-project settings for mirroring newly opened GitHub issues onto the board.
+model GithubIssueImport {
+  id        String  @id @default(cuid())
+  projectId String  @unique
+  enabled   Boolean @default(true)
+
+  target         GithubImportTarget?
+  customColumnId String?
+  tagId          String?
+
+  configuredById String
+  backfillAt     DateTime?
+
+  project      Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  customColumn CustomColumn? @relation(fields: [customColumnId], references: [id], onDelete: SetNull)
+  tag          Tag?          @relation(fields: [tagId], references: [id], onDelete: SetNull)
+  configuredBy User          @relation(name: "GithubImportConfigurer", fields: [configuredById], references: [id], onDelete: Restrict)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([customColumnId])
+  @@index([tagId])
+  @@index([configuredById])
+}
+
+/// The GitHub issue a board issue was imported from. Its `[projectId, githubIssueId]`
+/// key is what stops a redelivered webhook creating a second card.
+model GithubIssueLink {
+  id      String @id @default(cuid())
+  issueId String @unique
+
+  projectId     String
+  githubIssueId BigInt
+  number        Int
+  url           String
+  authorLogin   String
+  authorAvatar  String?
+
+  issue Issue @relation(fields: [issueId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([projectId, githubIssueId])
+}

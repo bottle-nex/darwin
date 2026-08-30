@@ -12,7 +12,7 @@ export default function ReviewActorAvatar({
     actor: ReviewActor | null;
     className?: string;
 }) {
-    const shape = cn("size-5 shrink-0 rounded-full", className);
+    const shape = cn("size-5 shrink-0 rounded-[4px]", className);
 
     if (actor?.avatarUrl) {
         return (

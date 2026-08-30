@@ -6,9 +6,12 @@ import DisconnectController from "../../controllers/github/controller.disconnect
 import GithubLinkController from "../../controllers/github/controller.link";
 import ListBranchesController from "../../controllers/github/controller.list_branches";
 import ListReposController from "../../controllers/github/controller.list_repos";
+import GithubWebhookController from "../../controllers/github/controller.webhook";
 import { require_auth } from "../../middlewares/middleware.auth";
 
 const github_router: Router = Router();
+
+github_router.post("/webhook", GithubWebhookController.process);
 
 github_router.post("/connect/start", require_auth, ConnectStartController.process);
 github_router.post("/connect/complete", require_auth, ConnectCompleteController.process);

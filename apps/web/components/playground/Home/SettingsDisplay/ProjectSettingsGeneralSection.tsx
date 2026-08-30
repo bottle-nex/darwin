@@ -1,5 +1,5 @@
 "use client";
-import { DeleteIcon, ProjectAvatarPickerIcon } from "@trymatcha/ui/icons";
+import { DeleteIcon } from "@trymatcha/ui/icons";
 import { isAxiosError } from "axios";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -13,7 +13,8 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog";
-import IconPicker, { type IconPick, IconPickGlyph } from "@/components/ui/IconPicker";
+import { FIELD_LABEL } from "@/components/ui/fieldStyles";
+import { type IconPick, IconPickButton } from "@/components/ui/IconPicker";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
@@ -114,37 +115,18 @@ export default function ProjectSettingsGeneralSection({
             >
                 <div className="flex gap-3">
                     <div>
-                        <label className="text-[12px] text-neutral-300">Icon</label>
-                        <IconPicker open={iconOpen} onOpenChange={setIconOpen} onSelect={setIcon}>
-                            <Button
-                                variant="unstyled"
-                                type="button"
-                                aria-label="Pick project icon"
-                                style={
-                                    icon?.kind === "icon"
-                                        ? { backgroundColor: `${icon.color}33` }
-                                        : undefined
-                                }
-                                className={cn(
-                                    "mt-1.5 flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-lg transition-colors",
-                                    icon?.kind === "icon"
-                                        ? "hover:brightness-125"
-                                        : "bg-white/5 hover:bg-white/10",
-                                )}
-                            >
-                                {icon ? (
-                                    <IconPickGlyph pick={icon} className="size-4 text-base" />
-                                ) : (
-                                    <ProjectAvatarPickerIcon
-                                        className="size-4 text-white/60"
-                                        aria-hidden
-                                    />
-                                )}
-                            </Button>
-                        </IconPicker>
+                        <label className={FIELD_LABEL}>Icon</label>
+                        <IconPickButton
+                            pick={icon}
+                            onSelect={setIcon}
+                            open={iconOpen}
+                            onOpenChange={setIconOpen}
+                            label="Pick project icon"
+                            className="mt-1.5"
+                        />
                     </div>
                     <div className="flex-1">
-                        <label className="text-[12px] text-neutral-300">Name</label>
+                        <label className={FIELD_LABEL}>Name</label>
                         <Input
                             value={name}
                             onChange={(e) => setName(e.target.value)}
@@ -154,7 +136,7 @@ export default function ProjectSettingsGeneralSection({
                 </div>
 
                 <div>
-                    <label className="text-[12px] text-neutral-300">Slug</label>
+                    <label className={FIELD_LABEL}>Slug</label>
                     <Input
                         variant={"ghost"}
                         value={slug}
@@ -171,7 +153,7 @@ export default function ProjectSettingsGeneralSection({
                 </div>
 
                 <div>
-                    <label className="text-[12px] text-neutral-300">Description</label>
+                    <label className={FIELD_LABEL}>Description</label>
                     <Textarea
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}

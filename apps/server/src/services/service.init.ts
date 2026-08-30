@@ -1,5 +1,6 @@
 import NotificationQueueService from "../notifications/service.notification-queue";
 import PublisherSystem from "../real-time/publisher.system";
+import GithubImportQueueService from "./service.github_import_queue";
 import IssueOutcomeQueueService from "./service.issue_outcome_queue";
 import ProductDiffService from "./service.product_diff";
 import QueueService from "./services.queue";
@@ -11,6 +12,7 @@ export default class InitService {
     public queue: QueueService;
     public notifications: NotificationQueueService;
     public issue_outcomes: IssueOutcomeQueueService;
+    public github_imports: GithubImportQueueService;
     private product_diff_sweep: ReturnType<typeof setInterval>;
 
     constructor() {
@@ -18,6 +20,7 @@ export default class InitService {
         this.queue = new QueueService();
         this.notifications = new NotificationQueueService();
         this.issue_outcomes = new IssueOutcomeQueueService();
+        this.github_imports = new GithubImportQueueService();
         this.product_diff_sweep = setInterval(
             () => void sweep_product_diffs(this.queue),
             PRODUCT_DIFF_SWEEP_MS,

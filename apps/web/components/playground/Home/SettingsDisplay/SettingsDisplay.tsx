@@ -7,12 +7,13 @@ import ProjectsGlyph from "@/components/utility/ProjectsGlyph";
 import { useGetDashboard } from "@/hooks/dashboard/useGetDashboard";
 import { useGetProject } from "@/hooks/project/useGetProject";
 
+import IntegrationsDisplay from "./integrations/IntegrationsDisplay";
 import ProjectSettingsEnvSection from "./ProjectSettingsEnvSection";
 import ProjectSettingsGeneralSection from "./ProjectSettingsGeneralSection";
 import SettingsPaneShell from "./SettingsPaneShell";
 import IssueTemplatesDisplay from "./templates/IssueTemplatesDisplay";
 
-export type ProjectSettingsSection = "project" | "env" | "templates";
+export type ProjectSettingsSection = "project" | "env" | "templates" | "integrations";
 
 function RestrictedNotice() {
     return (
@@ -65,9 +66,11 @@ export default function SettingsDisplay({ section }: { section: ProjectSettingsS
     const isAdmin = project.viewerRole === "Admin";
 
     return (
-        <SettingsPaneShell sectionKey={section}>
+        <SettingsPaneShell sectionKey={section} wide={section === "integrations"}>
             {section === "env" ? (
                 <ProjectSettingsEnvSection projectId={projectId} />
+            ) : section === "integrations" ? (
+                <IntegrationsDisplay project={project} />
             ) : section === "templates" ? (
                 <IssueTemplatesDisplay projectId={projectId} />
             ) : (

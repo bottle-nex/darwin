@@ -7,7 +7,7 @@ import { useState } from "react";
 
 import IssueDescriptionEditor from "@/components/playground/Issue/editor/IssueDescriptionEditor";
 import { Button } from "@/components/ui/button";
-import IconPicker, { type IconPick, IconPickGlyph } from "@/components/ui/IconPicker";
+import { type IconPick, IconPickButton } from "@/components/ui/IconPicker";
 import ConfirmDialog from "@/components/utility/ConfirmDialog";
 import { useEscapeExit } from "@/hooks/shortcuts/useEscapeExit";
 import { useCreateTemplate } from "@/hooks/templates/useCreateTemplate";
@@ -129,28 +129,16 @@ export default function CreateTemplateDisplay({
 
             <header className="flex flex-col gap-1">
                 <div className="flex items-center gap-3">
-                    <IconPicker
+                    <IconPickButton
+                        pick={icon}
+                        onSelect={setIcon}
                         open={iconOpen}
                         onOpenChange={setIconOpen}
-                        onSelect={setIcon}
+                        label="Pick a template icon"
+                        size="lg"
                         align="start"
-                    >
-                        <Button
-                            variant="unstyled"
-                            type="button"
-                            aria-label="Pick a template icon"
-                            className="flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-lg bg-white/5 ring-1 ring-white/8 hover:bg-white/10"
-                        >
-                            {icon ? (
-                                <IconPickGlyph pick={icon} className="size-5 text-lg" />
-                            ) : (
-                                <TemplateDocumentIcon
-                                    className="size-5 text-white/40"
-                                    aria-hidden
-                                />
-                            )}
-                        </Button>
-                    </IconPicker>
+                        fallbackIcon={TemplateDocumentIcon}
+                    />
                     <input
                         autoFocus
                         value={name}

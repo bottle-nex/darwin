@@ -98,5 +98,9 @@ export default function IconWrapper({
         </span>
     );
 
-    return <TooltipComponent content={title}>{glyph}</TooltipComponent>;
+    return (
+        <TooltipComponent delayDuration={1000} content={title}>
+            {glyph}
+        </TooltipComponent>
+    );
 }

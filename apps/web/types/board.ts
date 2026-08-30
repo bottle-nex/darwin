@@ -1,5 +1,6 @@
 import type { CursorPage, IssueStatus } from "@trymatcha/types";
 
+import type { IconPick } from "@/components/ui/IconPicker";
 import type { BoardFilters } from "@/types/boardFilter";
 
 /**
@@ -52,6 +53,7 @@ export type BoardChapter = {
     name: string;
     slug: string;
     order: number;
+    icon: IconPick | null;
 };
 
 /** A custom column row. `order` is its left-to-right board position. */
