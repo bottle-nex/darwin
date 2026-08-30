@@ -5,7 +5,6 @@ import type { ReactNode } from "react";
 import PlaygroundAvatar from "@/components/playground/Core/components/PlaygroundAvatar";
 import { DATE_ICON_COLOR, PRIORITY_OPTIONS } from "@/components/playground/Issue/issueHelpers";
 import IconWrapper from "@/components/ui/IconWrapper";
-import { shortDate } from "@/lib/format";
 import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
 import { cn } from "@/lib/utils";
 import type { BoardIssue, BoardTag } from "@/types/board";

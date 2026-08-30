@@ -7,8 +7,8 @@ import PlaygroundAvatar, {
 } from "@/components/playground/Core/components/PlaygroundAvatar";
 import Capsule from "@/components/playground/Issue/Capsule";
 import { DATE_ICON_COLOR } from "@/components/playground/Issue/issueHelpers";
-import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import DialogSubmitButton, { handleDialogSubmitKey } from "@/components/ui/DialogSubmitButton";
 import { DIALOG_TITLE_FIELD, GHOST_FIELD } from "@/components/ui/fieldStyles";
 import { type IconPick, IconPickButton } from "@/components/ui/IconPicker";
 import { Textarea } from "@/components/ui/textarea";
@@ -63,7 +63,10 @@ function SpaceForm({ space, projectSlug }: { space: BoardSpace | null; projectSl
     }
 
     return (
-        <main className="flex min-w-0 flex-col *:px-6">
+        <main
+            className="flex min-w-0 flex-col *:px-6"
+            onKeyDown={(event) => handleDialogSubmitKey(event, submit)}
+        >
             <section className="flex flex-col items-start gap-y-3 pt-4 pb-2">
                 <div className="flex items-center justify-start gap-x-1 text-snow text-xs">
                     <PlaygroundAvatar
@@ -133,17 +136,12 @@ function SpaceForm({ space, projectSlug }: { space: BoardSpace | null; projectSl
             </section>
 
             <section className="flex h-fit items-center justify-end pb-4">
-                <Button
-                    type="button"
-                    variant="tertiary"
-                    size="xs"
-                    className="text-ink!"
+                <DialogSubmitButton
+                    label={space ? "Save changes" : "Add space"}
                     onClick={submit}
                     loading={saving}
                     disabled={!ready}
-                >
-                    {space ? "Save changes" : "Add space"}
-                </Button>
+                />
             </section>
         </main>
     );
@@ -166,7 +164,7 @@ export default function SpaceFormDialog({ projectSlug }: { projectSlug: string }
                 }}
                 className={cn(
                     "flex w-110 max-w-none flex-col gap-0 overflow-hidden p-0 sm:max-w-none",
-                    "rounded-3xl bg-charcoal",
+                    "rounded-3xl",
                 )}
             >
                 <DialogTitle className="sr-only">
