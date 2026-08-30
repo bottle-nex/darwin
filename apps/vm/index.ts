@@ -2,7 +2,7 @@ import Logger from "@trymatcha/logger";
 
 import { ENV } from "./src/conf/config.env";
 import { start_run_log_server } from "./src/http/server.run_logs";
-import { InitServices } from "./src/services/service.init";
+import { InitServices } from "./src/services/dispatch/service.init";
 
 export const vm_services = new InitServices();
 

@@ -1,13 +1,9 @@
 import type Logger from "@trymatcha/logger";
 import type { Sandbox } from "e2b";
 
-import CapsuleHarness, {
-    app_root,
-    type CapsuleRevision,
-    harness_dir,
-} from "./service.capsule_harness";
-import type { AppProfile } from "./service.capsule_workspace";
-import { command_error_text } from "./service.sandbox_stream";
+import { command_error_text } from "../sandbox/service.stream";
+import CapsuleHarness, { app_root, type CapsuleRevision, harness_dir } from "./service.harness";
+import type { AppProfile } from "./service.workspace";
 
 const REPO_DIR = "/home/user/repo";
 const DIST_ROOT = "/home/user/dist";

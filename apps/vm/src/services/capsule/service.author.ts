@@ -4,11 +4,11 @@ import type { CapsuleChange, CapsuleControl, CapsuleViewport } from "@trymatcha/
 import type { Sandbox } from "e2b";
 import { z } from "zod";
 
-import { ENV } from "../conf/config.env";
-import { capsules_dir, harness_dir, OVERRIDES_FILE } from "./service.capsule_harness";
-import type { CapsuleTarget } from "./service.capsule_targets";
-import type { AppProfile } from "./service.capsule_workspace";
-import HarnessRun, { effort_from_env } from "./service.harness_run";
+import { ENV } from "../../conf/config.env";
+import HarnessRun, { effort_from_env } from "../harness/service.run";
+import { capsules_dir, harness_dir, OVERRIDES_FILE } from "./service.harness";
+import type { CapsuleTarget } from "./service.targets";
+import type { AppProfile } from "./service.workspace";
 
 const AUTHOR_PROMPT_PATH = "/home/user/capsule_author_prompt.txt";
 const REPAIR_PROMPT_PATH = "/home/user/capsule_repair_prompt.txt";

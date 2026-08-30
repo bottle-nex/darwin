@@ -1,6 +1,6 @@
 import jwt, { type SignOptions } from "jsonwebtoken";
 
-import { ENV } from "../conf/config.env";
+import { ENV } from "../../conf/config.env";
 
 /**
  * Mints the same worker-scoped JWT shape the server verifies (see

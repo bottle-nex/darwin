@@ -1,7 +1,7 @@
 import type Logger from "@trymatcha/logger";
 import type { Sandbox } from "e2b";
 
-import { describe_failure } from "./service.sandbox_stream";
+import { describe_failure } from "../sandbox/service.stream";
 
 const REPO_DIR = "/home/user/repo";
 const INSTALL_TIMEOUT_MS = 12 * 60_000;

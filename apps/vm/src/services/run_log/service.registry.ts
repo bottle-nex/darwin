@@ -1,4 +1,4 @@
-import type RunLogWriter from "./service.run_log_writer";
+import type RunLogWriter from "./service.writer";
 
 type RegisteredRun = { writer: RunLogWriter; token: string };
 

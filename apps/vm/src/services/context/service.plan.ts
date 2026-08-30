@@ -2,8 +2,8 @@ import { Harness, PlanStatus, prisma } from "@trymatcha/database";
 import Logger, { format_duration } from "@trymatcha/logger";
 import { Sandbox } from "e2b";
 
-import { ENV } from "../conf/config.env";
-import HarnessRun, { effort_from_env } from "./service.harness_run";
+import { ENV } from "../../conf/config.env";
+import HarnessRun, { effort_from_env } from "../harness/service.run";
 
 const log = Logger.scope("plan");
 

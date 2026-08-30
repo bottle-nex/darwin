@@ -1,7 +1,7 @@
 import Logger from "@trymatcha/logger";
 import Redis from "ioredis";
 
-import { ENV } from "../conf/config.env";
+import { ENV } from "../../conf/config.env";
 
 const log = Logger.scope("redis");
 

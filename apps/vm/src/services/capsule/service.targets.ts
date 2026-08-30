@@ -1,7 +1,7 @@
 import type { CapsuleChange } from "@trymatcha/types";
 import type { Sandbox } from "e2b";
 
-import type { AppProfile } from "./service.capsule_workspace";
+import type { AppProfile } from "./service.workspace";
 
 const REPO_DIR = "/home/user/repo";
 

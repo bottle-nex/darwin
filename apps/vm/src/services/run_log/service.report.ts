@@ -1,8 +1,8 @@
 import type { Effort, Harness } from "@trymatcha/database";
 import type Logger from "@trymatcha/logger";
 
-import { ENV } from "../conf/config.env";
-import type { AgentReport } from "./harness_parsers/parser.index";
+import { ENV } from "../../conf/config.env";
+import type { AgentReport } from "../harness/parsers/parser.index";
 
 export interface RunStartedParams {
     run_id: string;

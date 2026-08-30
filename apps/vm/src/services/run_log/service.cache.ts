@@ -10,7 +10,7 @@ import {
     type RunLogEvent,
 } from "@trymatcha/types";
 
-import { redis } from "./service.redis";
+import { redis } from "../platform/service.redis";
 
 export type RunLogOwner = { projectId: string; issueId: string };
 

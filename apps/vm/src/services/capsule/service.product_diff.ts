@@ -4,20 +4,20 @@ import Logger from "@trymatcha/logger";
 import type { CapsuleManifest, ProductDiffStatus } from "@trymatcha/types";
 import { Sandbox } from "e2b";
 
-import { ENV } from "../conf/config.env";
-import CapsuleAuthor, { type CapsuleFailure, type CapsuleSpec } from "./service.capsule_author";
-import CapsuleBuild, { dist_dir } from "./service.capsule_build";
-import CapsuleHarness, { type CapsuleRevision } from "./service.capsule_harness";
-import CapsuleTargets from "./service.capsule_targets";
-import CapsuleUpload, { type GateResult, type GateResults } from "./service.capsule_upload";
+import { ENV } from "../../conf/config.env";
+import GithubService from "../platform/service.github";
+import E2B from "../sandbox/service.e2b";
+import { command_error_text, describe_failure, failure_sentence } from "../sandbox/service.stream";
+import CapsuleAuthor, { type CapsuleFailure, type CapsuleSpec } from "./service.author";
+import CapsuleBuild, { dist_dir } from "./service.build";
+import CapsuleHarness, { type CapsuleRevision } from "./service.harness";
+import CapsuleTargets from "./service.targets";
+import CapsuleUpload, { type GateResult, type GateResults } from "./service.upload";
 import CapsuleWorkspace, {
     type AppProfile,
     InstallFailedError,
     NoFrontendAppError,
-} from "./service.capsule_workspace";
-import GithubService from "./service.github";
-import { command_error_text, describe_failure, failure_sentence } from "./service.sandbox_stream";
-import E2B from "./services.e2b";
+} from "./service.workspace";
 
 const log = Logger.scope("product-diff");
 

@@ -4,8 +4,8 @@ import type Logger from "@trymatcha/logger";
 import chalk from "chalk";
 import type { Sandbox } from "e2b";
 
-import { type AgentReport, get_parser } from "./harness_parsers/parser.index";
-import SandboxStream, { truncate } from "./service.sandbox_stream";
+import SandboxStream, { truncate } from "../sandbox/service.stream";
+import { type AgentReport, get_parser } from "./parsers/parser.index";
 
 type EnvEffort = "low" | "medium" | "high" | "xhigh" | "max";
 

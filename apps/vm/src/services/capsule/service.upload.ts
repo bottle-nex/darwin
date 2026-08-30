@@ -13,9 +13,9 @@ import {
 import type { Sandbox } from "e2b";
 import { Client as MinioClient } from "minio";
 
-import { ENV } from "../conf/config.env";
-import type { CapsuleSpec } from "./service.capsule_author";
-import type { CapsuleRevision } from "./service.capsule_harness";
+import { ENV } from "../../conf/config.env";
+import type { CapsuleSpec } from "./service.author";
+import type { CapsuleRevision } from "./service.harness";
 
 const DIST_ROOT = "/home/user/dist";
 const ARCHIVE_PATH = "/home/user/dist.tar.gz";

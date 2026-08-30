@@ -2,7 +2,7 @@ import { Harness } from "@trymatcha/database";
 import type Logger from "@trymatcha/logger";
 import type { CommandStartOpts, Sandbox } from "e2b";
 
-import SandboxStream from "./service.sandbox_stream";
+import SandboxStream from "../sandbox/service.stream";
 
 const REPO_DIR = "/home/user/repo";
 const GRAPHIFY_ROOT = "/home/user/.matcha/graphify";

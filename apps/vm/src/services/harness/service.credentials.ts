@@ -1,8 +1,8 @@
 import type { Harness } from "@trymatcha/database";
 import { CredentialSource, Registry } from "@trymatcha/harness";
 
-import { ENV } from "../conf/config.env";
-import SecretService from "./service.secret";
+import { ENV } from "../../conf/config.env";
+import SecretService from "../platform/service.secret";
 
 const PLATFORM_CREDENTIAL: Partial<Record<Harness, string | undefined>> = {
     Claude: ENV.SERVER_CLAUDE_CODE_OAUTH_TOKEN,

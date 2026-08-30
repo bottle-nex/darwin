@@ -6,24 +6,24 @@ import Logger, { format_duration } from "@trymatcha/logger";
 import type { CommandResult, SnapshotInfo } from "e2b";
 import { Sandbox } from "e2b";
 
-import { ENV } from "../conf/config.env";
-import GithubService, { type PullRequestSummary } from "./service.github";
+import { ENV } from "../../conf/config.env";
 import GraphService, {
     GRAPHIFY_INTEGRATION,
     GRAPHIFY_OUT,
     GRAPHIFY_SETTINGS,
-} from "./service.graph";
-import { resolve_harness_env } from "./service.harness_credentials";
-import HarnessRun from "./service.harness_run";
-import IssueSolver, { type ClaimedIssue } from "./service.issue_solver";
-import { sign_worker_jwt } from "./service.jwt";
-import OutcomeReporter from "./service.outcome_queue";
-import RunLogRegistry from "./service.run_log_registry";
-import RunLogWriter from "./service.run_log_writer";
-import RunReporter from "./service.run_report";
-import SandboxStream, { describe_failure, failure_sentence } from "./service.sandbox_stream";
-import SecretService from "./service.secret";
-import PlanService from "./services.plan";
+} from "../context/service.graph";
+import PlanService from "../context/service.plan";
+import IssueSolver, { type ClaimedIssue } from "../dispatch/service.issue_solver";
+import OutcomeReporter from "../dispatch/service.outcome_queue";
+import { resolve_harness_env } from "../harness/service.credentials";
+import HarnessRun from "../harness/service.run";
+import GithubService, { type PullRequestSummary } from "../platform/service.github";
+import { sign_worker_jwt } from "../platform/service.jwt";
+import SecretService from "../platform/service.secret";
+import RunLogRegistry from "../run_log/service.registry";
+import RunReporter from "../run_log/service.report";
+import RunLogWriter from "../run_log/service.writer";
+import SandboxStream, { describe_failure, failure_sentence } from "./service.stream";
 
 const REPO_DIR = "/home/user/repo";
 const SAFE_BRANCH = /^[A-Za-z0-9._/-]+$/;

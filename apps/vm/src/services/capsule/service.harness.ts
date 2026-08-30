@@ -1,7 +1,7 @@
 import type { Sandbox } from "e2b";
 
-import type { CapsuleSpec } from "./service.capsule_author";
-import type { AppProfile } from "./service.capsule_workspace";
+import type { CapsuleSpec } from "./service.author";
+import type { AppProfile } from "./service.workspace";
 
 const REPO_DIR = "/home/user/repo";
 

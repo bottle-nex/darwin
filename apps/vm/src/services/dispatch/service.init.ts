@@ -1,4 +1,4 @@
-import QueueService from "./services.queue";
+import QueueService from "./service.queue";
 
 export class InitServices {
     public queue: QueueService;

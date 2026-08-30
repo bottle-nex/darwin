@@ -3,7 +3,7 @@ import { RunLogPhase } from "@trymatcha/types";
 import { z } from "zod";
 
 import { ENV } from "../conf/config.env";
-import RunLogRegistry from "../services/service.run_log_registry";
+import RunLogRegistry from "../services/run_log/service.registry";
 
 const log = Logger.scope("run-log-http");
 

@@ -1,7 +1,7 @@
 import { type RunLogEventBody, RunLogEventKind, type RunLogPhase } from "@trymatcha/types";
 import chalk from "chalk";
 
-import { truncate } from "./service.sandbox_stream";
+import { truncate } from "../sandbox/service.stream";
 
 const MAX_TEXT = 160;
 
