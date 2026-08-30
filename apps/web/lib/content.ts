@@ -1,6 +1,6 @@
 import type { ContentEntry, ContentSummary } from "@trymatcha/editorial";
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:4402";
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:8080";
 
 const CONTENT_URL = `${BACKEND_URL}/api/v1/content`;
 
