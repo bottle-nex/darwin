@@ -32,7 +32,7 @@ model Project {
   routingClaimedAt DateTime?
   issues           Issue[]
   projectChats     ProjectChat[]
-  chapters         Chapter[]
+  spaces           Space[]
   setupSessions    SetupSession[]
   secrets          ProjectSecret[]
   tags             Tag[]

@@ -3,7 +3,7 @@ import { create } from "zustand";
 import { isSettingsTab, PLAYGROUND_DEFAULT_TAB } from "@/components/playground/playgroundTabs";
 import { useCreateIssueStore } from "@/store/issues/useCreateIssueStore";
 import { usePaneRouteStore } from "@/store/playground/usePaneRouteStore";
-import type { BoardChapter } from "@/types/board";
+import type { BoardSpace } from "@/types/board";
 import type { ProjectTeam } from "@/types/project";
 
 /**
@@ -13,10 +13,10 @@ import type { ProjectTeam } from "@/types/project";
 export const TEAM_DETAIL_TAB = "team-detail";
 
 /**
- * The tab value used to render a chapter's custom board.
- * Mirrors `PlaygroundTab.Chapter`.
+ * The tab value used to render a space's custom board.
+ * Mirrors `PlaygroundTab.Space`.
  */
-export const CHAPTER_TAB = "chapter";
+export const SPACE_TAB = "space";
 
 /**
  * Central navigation state for the playground workspace.
@@ -33,15 +33,15 @@ interface PlaygroundNavState {
     selectedTeam: ProjectTeam | null;
     /** Slug of the project the selected team belongs to — guards stale detail. */
     selectedTeamProjectSlug: string | null;
-    selectedChapter: BoardChapter | null;
-    /** Slug of the project the selected chapter belongs to — guards stale detail. */
-    selectedChapterProjectSlug: string | null;
+    selectedSpace: BoardSpace | null;
+    /** Slug of the project the selected space belongs to — guards stale detail. */
+    selectedSpaceProjectSlug: string | null;
     setTab: (tabId: string) => void;
     returnFromSettings: () => void;
     openTeam: (team: ProjectTeam, projectSlug: string) => void;
     clearTeam: () => void;
-    openChapter: (chapter: BoardChapter, projectSlug: string) => void;
-    clearChapter: () => void;
+    openSpace: (space: BoardSpace, projectSlug: string) => void;
+    clearSpace: () => void;
 }
 
 function leave_pane() {
@@ -54,8 +54,8 @@ export const usePlaygroundNavStore = create<PlaygroundNavState>((set) => ({
     lastWorkspaceTab: PLAYGROUND_DEFAULT_TAB,
     selectedTeam: null,
     selectedTeamProjectSlug: null,
-    selectedChapter: null,
-    selectedChapterProjectSlug: null,
+    selectedSpace: null,
+    selectedSpaceProjectSlug: null,
     setTab: (tabId) => {
         leave_pane();
         set((state) => ({
@@ -83,19 +83,19 @@ export const usePlaygroundNavStore = create<PlaygroundNavState>((set) => ({
             tab: PLAYGROUND_DEFAULT_TAB,
             lastWorkspaceTab: PLAYGROUND_DEFAULT_TAB,
         }),
-    openChapter: (chapter, projectSlug) => {
+    openSpace: (space, projectSlug) => {
         leave_pane();
         set({
-            selectedChapter: chapter,
-            selectedChapterProjectSlug: projectSlug,
-            tab: CHAPTER_TAB,
-            lastWorkspaceTab: CHAPTER_TAB,
+            selectedSpace: space,
+            selectedSpaceProjectSlug: projectSlug,
+            tab: SPACE_TAB,
+            lastWorkspaceTab: SPACE_TAB,
         });
     },
-    clearChapter: () =>
+    clearSpace: () =>
         set({
-            selectedChapter: null,
-            selectedChapterProjectSlug: null,
+            selectedSpace: null,
+            selectedSpaceProjectSlug: null,
             tab: PLAYGROUND_DEFAULT_TAB,
             lastWorkspaceTab: PLAYGROUND_DEFAULT_TAB,
         }),

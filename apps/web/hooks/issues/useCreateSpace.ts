@@ -3,38 +3,38 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { IconPick } from "@/components/ui/IconPicker";
 import { boardColumnsKey } from "@/hooks/issues/boardCache";
 import { apiClient } from "@/lib/axios";
-import { CREATE_CHAPTER_URL } from "@/routes/api_routes";
+import { CREATE_SPACE_URL } from "@/routes/api_routes";
 import type { ApiResponse } from "@/types/api";
-import type { BoardChapter, BoardMetadata } from "@/types/board";
+import type { BoardMetadata, BoardSpace } from "@/types/board";
 
-export interface CreateChapterInput {
+export interface CreateSpaceInput {
     project_id: string;
     name: string;
     slug: string;
+    description?: string | null;
+    start_date?: string | null;
+    target_date?: string | null;
     icon?: IconPick | null;
 }
 
-export function useCreateChapter() {
+export function useCreateSpace() {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: async (input: CreateChapterInput) => {
-            const res = await apiClient.post<ApiResponse<{ chapter: BoardChapter }>>(
-                CREATE_CHAPTER_URL,
+        mutationFn: async (input: CreateSpaceInput) => {
+            const res = await apiClient.post<ApiResponse<{ space: BoardSpace }>>(
+                CREATE_SPACE_URL,
                 input,
             );
-            return res.data.data.chapter;
+            return res.data.data.space;
         },
-        onSuccess: (chapter, variables) => {
+        onSuccess: (space, variables) => {
             queryClient.setQueryData<BoardMetadata>(
                 boardColumnsKey(variables.project_id),
                 (data) => {
                     if (!data) return data;
                     return {
                         ...data,
-                        chapters: [
-                            ...data.chapters.filter((row) => row.id !== chapter.id),
-                            chapter,
-                        ],
+                        spaces: [...data.spaces.filter((row) => row.id !== space.id), space],
                     };
                 },
             );

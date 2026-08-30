@@ -1,7 +1,7 @@
 "use client";
 import type { IconType } from "@trymatcha/ui/icons";
 import { BreadcrumbSeparatorIcon, ICONS } from "@trymatcha/ui/icons";
-import { Fragment } from "react";
+import { Fragment, type ReactNode } from "react";
 
 import { PlaygroundTab } from "@/components/playground/playgroundTabs";
 import { Button } from "@/components/ui/button";
@@ -13,12 +13,16 @@ import { cn } from "@/lib/utils";
 import { NO_FOCUS, useKanbanOptionsStore } from "@/store/kanban/useKanbanOptionsStore";
 import { usePaneRouteStore } from "@/store/playground/usePaneRouteStore";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
-import type { BoardChapter, BoardIssue } from "@/types/board";
+import type { BoardIssue, BoardSpace } from "@/types/board";
 
-function ProjectIcon({ pick }: { pick: IconPick }) {
+/** Renders any picked icon or emoji — a project's, a space's, a template's. */
+function PickedIcon({ pick, className }: { pick: IconPick; className?: string }) {
     if (pick.kind === "emoji") {
         return (
-            <IconWrapper variant="ghost" className="size-4.25 shrink-0 px-0 text-[13px]">
+            <IconWrapper
+                variant="ghost"
+                className={cn("size-4.25 shrink-0 px-0 text-[13px]", className)}
+            >
                 {pick.char}
             </IconWrapper>
         );
@@ -28,7 +32,7 @@ function ProjectIcon({ pick }: { pick: IconPick }) {
             icon={ICONS[pick.name as keyof typeof ICONS]}
             iconStyle={{ color: pick.color }}
             variant="solid"
-            className="size-6 shrink-0"
+            className={cn("size-6 shrink-0", className)}
             iconClassName="size-4.5"
         />
     );
@@ -36,13 +40,13 @@ function ProjectIcon({ pick }: { pick: IconPick }) {
 
 export type PlaygroundBreadcrumbTarget = {
     tab: PlaygroundTab;
-    chapter?: BoardChapter;
+    space?: BoardSpace;
 };
 
 export type PlaygroundBreadcrumbSegment =
     | string
-    | { label: string; onClick: () => void }
-    | { label: string; target: PlaygroundBreadcrumbTarget };
+    | { label: string; icon?: IconPick | null; onClick: () => void }
+    | { label: string; icon?: IconPick | null; target: PlaygroundBreadcrumbTarget };
 
 export const PROJECT_BREADCRUMB_TARGET: PlaygroundBreadcrumbTarget = {
     tab: PlaygroundTab.Agent,
@@ -52,18 +56,23 @@ export const SETTINGS_BREADCRUMB_TARGET: PlaygroundBreadcrumbTarget = {
     tab: PlaygroundTab.SettingsAppearance,
 };
 
+export const SPACES_BREADCRUMB_TARGET: PlaygroundBreadcrumbTarget = {
+    tab: PlaygroundTab.Spaces,
+};
+
 /**
- * Where an issue's board crumb goes back to: the chapter it is parked in, or
+ * Where an issue's board crumb goes back to: the space it is parked in, or
  * the agent board when it isn't parked anywhere.
  */
 export function breadcrumbTargetForIssue(
-    chapter: BoardChapter | undefined,
+    space: BoardSpace | undefined,
 ): PlaygroundBreadcrumbTarget {
-    return chapter ? { tab: PlaygroundTab.Chapter, chapter } : { tab: PlaygroundTab.Agent };
+    return space ? { tab: PlaygroundTab.Space, space } : { tab: PlaygroundTab.Agent };
 }
 
 const TAB_TRAILS: Partial<Record<PlaygroundTab, PlaygroundBreadcrumbSegment[]>> = {
     [PlaygroundTab.Agent]: ["Agent"],
+    [PlaygroundTab.Spaces]: ["Spaces"],
     [PlaygroundTab.Gantt]: ["Gantt"],
     [PlaygroundTab.Tags]: ["Tags"],
     [PlaygroundTab.Inbox]: ["Inbox"],
@@ -96,35 +105,40 @@ export default function PlaygroundBreadcrumb({
     trail,
     trailing,
     trailingIcon,
+    action,
 }: {
     issue?: Pick<BoardIssue, "id" | "number" | "title" | "customColumnId">;
     trail?: PlaygroundBreadcrumbSegment[];
     trailing?: string;
     trailingIcon?: IconType;
+    /** Rendered after the last crumb — e.g. the edit button on an open space. */
+    action?: ReactNode;
 }) {
     const project = useActiveProject();
     const { data: metadata } = useBoardColumns(project?.id);
     const openIssue = usePaneRouteStore((state) => state.openIssue);
     const tab = usePlaygroundNavStore((state) => state.tab) as PlaygroundTab;
     const setTab = usePlaygroundNavStore((state) => state.setTab);
-    const openChapter = usePlaygroundNavStore((state) => state.openChapter);
-    const selectedChapter = usePlaygroundNavStore((state) => state.selectedChapter);
+    const openSpace = usePlaygroundNavStore((state) => state.openSpace);
+    const selectedSpace = usePlaygroundNavStore((state) => state.selectedSpace);
     const setFocus = useKanbanOptionsStore((state) => state.setFocus);
     const inIssue = issue !== undefined;
-    // An issue can be opened from Inbox or search, so its chapter is resolved
+    // An issue can be opened from Inbox or search, so its space is resolved
     // from the project-wide metadata rather than from whatever pane is showing.
-    const issueChapterId = metadata?.columns.find(
+    const issueSpaceId = metadata?.columns.find(
         (column) => column.id === issue?.customColumnId,
-    )?.chapterId;
-    const issueChapter = metadata?.chapters.find((chapter) => chapter.id === issueChapterId);
+    )?.spaceId;
+    const issueSpace = metadata?.spaces.find((space) => space.id === issueSpaceId);
     const issueIdentifier = issue
         ? `${(project?.name ?? "ISS").slice(0, 3).toUpperCase()}-${issue.number}`
         : undefined;
     const issueTrail: PlaygroundBreadcrumbSegment[] = issue
         ? [
+              ...(issueSpace ? [{ label: "Spaces", target: SPACES_BREADCRUMB_TARGET }] : []),
               {
-                  label: issueChapter?.name ?? "Agent",
-                  target: breadcrumbTargetForIssue(issueChapter),
+                  label: issueSpace?.name ?? "Agent",
+                  icon: issueSpace?.icon,
+                  target: breadcrumbTargetForIssue(issueSpace),
               },
               trailing
                   ? {
@@ -135,14 +149,21 @@ export default function PlaygroundBreadcrumb({
               ...(trailing ? [trailing] : []),
           ]
         : [];
-    const chapterTrail: PlaygroundBreadcrumbSegment[] = [selectedChapter?.name ?? "Chapter"];
+    const spaceTrail: PlaygroundBreadcrumbSegment[] = [
+        { label: "Spaces", target: SPACES_BREADCRUMB_TARGET },
+        {
+            label: selectedSpace?.name ?? "Space",
+            icon: selectedSpace?.icon,
+            target: { tab: PlaygroundTab.Space, space: selectedSpace ?? undefined },
+        },
+    ];
     const segments = inIssue
         ? issueTrail
-        : (trail ?? (tab === PlaygroundTab.Chapter ? chapterTrail : (TAB_TRAILS[tab] ?? [])));
+        : (trail ?? (tab === PlaygroundTab.Space ? spaceTrail : (TAB_TRAILS[tab] ?? [])));
 
     function navigate(target: PlaygroundBreadcrumbTarget) {
         setFocus(NO_FOCUS);
-        if (target.chapter) openChapter(target.chapter, project?.slug ?? "");
+        if (target.space) openSpace(target.space, project?.slug ?? "");
         else setTab(target.tab);
     }
 
@@ -157,17 +178,18 @@ export default function PlaygroundBreadcrumb({
                     onClick={() => navigate(PROJECT_BREADCRUMB_TARGET)}
                     className="flex min-w-0 cursor-pointer items-center gap-1.5 font-medium capitalize text-neutral-400 transition-colors hover:text-neutral-100"
                 >
-                    {project.icon && <ProjectIcon pick={project.icon} />}
+                    {project.icon && <PickedIcon pick={project.icon} />}
                     <span className="truncate">{project.name}</span>
                 </Button>
             ) : (
                 <span className="flex min-w-0 items-center gap-1.5 font-medium capitalize text-neutral-200">
-                    {project.icon && <ProjectIcon pick={project.icon} />}
+                    {project.icon && <PickedIcon pick={project.icon} />}
                     <span className="truncate">{project.name}</span>
                 </span>
             )}
             {segments.map((segment, index) => {
                 const label = typeof segment === "string" ? segment : segment.label;
+                const segmentIcon = typeof segment === "string" ? undefined : segment.icon;
                 const onClick =
                     typeof segment === "string"
                         ? undefined
@@ -187,8 +209,11 @@ export default function PlaygroundBreadcrumb({
                                 variant="unstyled"
                                 type="button"
                                 onClick={onClick}
-                                className="shrink-0 cursor-pointer font-medium text-neutral-400 transition-colors hover:text-neutral-100"
+                                className="flex shrink-0 cursor-pointer items-center gap-1.5 font-medium text-neutral-400 transition-colors hover:text-neutral-100"
                             >
+                                {segmentIcon && (
+                                    <PickedIcon pick={segmentIcon} className="size-5 shrink-0" />
+                                )}
                                 {label}
                             </Button>
                         ) : (
@@ -199,6 +224,9 @@ export default function PlaygroundBreadcrumb({
                                     current ? "text-neutral-100" : "shrink-0 text-neutral-400",
                                 )}
                             >
+                                {segmentIcon && (
+                                    <PickedIcon pick={segmentIcon} className="size-5 shrink-0" />
+                                )}
                                 {current && trailingIcon && (
                                     <IconWrapper
                                         icon={trailingIcon}
@@ -213,6 +241,7 @@ export default function PlaygroundBreadcrumb({
                     </Fragment>
                 );
             })}
+            {action}
         </nav>
     );
 }

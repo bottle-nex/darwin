@@ -6,7 +6,7 @@ import { useMemo } from "react";
 import { apiClient } from "@/lib/axios";
 import { BOARD_COLUMNS_URL } from "@/routes/api_routes";
 import type { ApiResponse } from "@/types/api";
-import type { BoardChapter, BoardColumn, BoardMetadata } from "@/types/board";
+import type { BoardColumn, BoardMetadata, BoardSpace } from "@/types/board";
 
 import { boardColumnsKey } from "./boardCache";
 
@@ -24,26 +24,26 @@ export function useBoardColumns(projectId: string | undefined) {
     });
 }
 
-const NO_CHAPTERS: BoardChapter[] = [];
+const NO_SPACES: BoardSpace[] = [];
 const NO_COLUMNS: BoardColumn[] = [];
 
-export function useChapters(projectId: string | undefined) {
+export function useSpaces(projectId: string | undefined) {
     const { data } = useBoardColumns(projectId);
-    return data?.chapters ?? NO_CHAPTERS;
+    return data?.spaces ?? NO_SPACES;
 }
 
-export type ChapterBoard = BoardChapter & { columns: BoardColumn[] };
+export type SpaceBoard = BoardSpace & { columns: BoardColumn[] };
 
-/** Each chapter with the columns it owns — the shape every chapter-grouped picker needs. */
-export function useChapterBoards(projectId: string | undefined): ChapterBoard[] {
+/** Each space with the columns it owns — the shape every space-grouped picker needs. */
+export function useSpaceBoards(projectId: string | undefined): SpaceBoard[] {
     const { data } = useBoardColumns(projectId);
 
     return useMemo(() => {
-        const chapters = data?.chapters ?? NO_CHAPTERS;
+        const spaces = data?.spaces ?? NO_SPACES;
         const columns = data?.columns ?? NO_COLUMNS;
-        return chapters.map((chapter) => ({
-            ...chapter,
-            columns: columns.filter((column) => column.chapterId === chapter.id),
+        return spaces.map((space) => ({
+            ...space,
+            columns: columns.filter((column) => column.spaceId === space.id),
         }));
     }, [data]);
 }

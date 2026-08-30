@@ -6,7 +6,7 @@ import z from "zod";
 import Access from "../../access-control/access";
 import ResponseWriter from "../../services/service.response";
 
-export default class ChapterDeleteController {
+export default class SpaceDeleteController {
     static params_schema = z.object({ id: z.string().min(1) });
 
     static async process(req: Request, res: Response) {
@@ -16,7 +16,7 @@ export default class ChapterDeleteController {
             return;
         }
 
-        const { data: params_data, success } = ChapterDeleteController.params_schema.safeParse(
+        const { data: params_data, success } = SpaceDeleteController.params_schema.safeParse(
             req.params,
         );
         if (!success) {
@@ -25,44 +25,44 @@ export default class ChapterDeleteController {
         }
 
         try {
-            const chapter = await prisma.chapter.findUnique({
+            const space = await prisma.space.findUnique({
                 where: { id: params_data.id },
                 select: { projectId: true },
             });
-            if (!chapter) {
-                ResponseWriter.not_found(res, "Chapter not found");
+            if (!space) {
+                ResponseWriter.not_found(res, "Space not found");
                 return;
             }
 
-            const role = await Access.project(user.id, chapter.projectId);
+            const role = await Access.project(user.id, space.projectId);
             if (!role || !Permissions.project(role, Action.project.manage_columns)) {
                 ResponseWriter.not_authorized(res, "You dont have access to the project");
                 return;
             }
 
-            // Both cascades below the chapter are destructive: Chapter deletes its
+            // Both cascades below the space are destructive: Space deletes its
             // CustomColumns, and CustomColumn deletes the Issues parked in them.
             // Detaching first sends those issues back to the agent board instead.
             // `Parked` is not a board status, so the status reset is required too.
             const { deleted_columns, released_issues } = await prisma.$transaction(async (tx) => {
                 const deleted_columns = await tx.customColumn.count({
-                    where: { chapterId: params_data.id },
+                    where: { spaceId: params_data.id },
                 });
                 const released = await tx.issue.updateMany({
-                    where: { customColumn: { chapterId: params_data.id } },
+                    where: { customColumn: { spaceId: params_data.id } },
                     data: { customColumnId: null, status: IssueStatus.Todo },
                 });
-                await tx.chapter.delete({ where: { id: params_data.id } });
+                await tx.space.delete({ where: { id: params_data.id } });
                 return { deleted_columns, released_issues: released.count };
             });
 
             ResponseWriter.success(
                 res,
                 { ok: true, deleted_columns, released_issues },
-                "Chapter deleted",
+                "Space deleted",
             );
         } catch (error) {
-            console.error("ChapterDeleteController error: ", error);
+            console.error("SpaceDeleteController error: ", error);
             ResponseWriter.system_error(res);
         }
     }

@@ -9,6 +9,7 @@ import { useFilteredCustomColumns } from "@/hooks/kanban/useFilteredCustomColumn
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
 import { type IssueTarget, useCreateIssueStore } from "@/store/issues/useCreateIssueStore";
+import { useIssueSelectionStore } from "@/store/issues/useIssueSelectionStore";
 import type { BoardLaneSelector } from "@/types/board";
 import { type BoardState, type Issue, KanbanStatus } from "@/types/kanban";
 
@@ -95,6 +96,13 @@ export default function KanbanListView({ board }: KanbanListViewProps) {
         () => groups.flatMap((group) => group.issues.map((issue) => issue.id)),
         [groups],
     );
+    const selectedIds = useIssueSelectionStore((s) => s.ids);
+    // A group header or a pagination row between two issues is not a selected row,
+    // so a run of selected rows never joins across one.
+    const selectedAt = (index: number) => {
+        const row = rows[index];
+        return row?.kind === "issue" && selectedIds.includes(row.issue.id);
+    };
     const selectionOrders = useMemo(
         () => ({
             kanban: groups
@@ -169,7 +177,7 @@ export default function KanbanListView({ board }: KanbanListViewProps) {
                           ? "No board issues"
                           : `${loadedIssueIds.length} loaded board issues`,
             }}
-            renderRow={(row) => {
+            renderRow={(row, index) => {
                 if (row.kind === "group") {
                     const collapsed = collapsedGroupKeys.has(row.group.key);
                     const createTarget = row.group.createTarget;
@@ -221,6 +229,8 @@ export default function KanbanListView({ board }: KanbanListViewProps) {
                                 createdAt={row.issue.createdAt}
                                 boardIssue={row.issue.boardIssue}
                                 selectionScope={row.group.selectionScope}
+                                joinedAbove={selectedAt(index - 1)}
+                                joinedBelow={selectedAt(index + 1)}
                             />
                         </IssueSelectionOrderProvider>
                     </div>

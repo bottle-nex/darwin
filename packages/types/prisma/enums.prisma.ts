@@ -210,6 +210,7 @@ export const DefaultHomeView = {
     Inbox: "Inbox",
     Chats: "Chats",
     Kanban: "Kanban",
+    Spaces: "Spaces",
     Gantt: "Gantt",
     Tags: "Tags",
     AssignedToMe: "AssignedToMe",

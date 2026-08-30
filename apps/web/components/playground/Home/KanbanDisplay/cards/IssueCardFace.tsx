@@ -5,6 +5,7 @@ import type { ReactNode } from "react";
 import PlaygroundAvatar from "@/components/playground/Core/components/PlaygroundAvatar";
 import { DATE_ICON_COLOR, PRIORITY_OPTIONS } from "@/components/playground/Issue/issueHelpers";
 import IconWrapper from "@/components/ui/IconWrapper";
+import { shortDate } from "@/lib/format";
 import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
 import { cn } from "@/lib/utils";
 import type { BoardIssue, BoardTag } from "@/types/board";
@@ -16,10 +17,6 @@ import PriorityChipMenu from "./PriorityChipMenu";
 const MAX_AVATARS = 3;
 
 const MAX_TAGS = 5;
-
-export function shortDate(iso: string): string {
-    return new Date(iso).toLocaleDateString([], { month: "short", day: "numeric" });
-}
 
 export function issueIdentifier(projectName: string | undefined, number: number | string): string {
     const key = (projectName ?? "ISS").slice(0, 3).toUpperCase();
@@ -101,6 +98,7 @@ export default function IssueCardFace({
         priorityOption && priority !== "none" ? (
             <IconWrapper
                 variant="outline"
+                hoverGroup="card"
                 icon={priorityOption.icon}
                 iconClassName={cn("text-neutral-300", priorityOption.iconClassName)}
                 className="size-6"
@@ -143,6 +141,7 @@ export default function IssueCardFace({
                     {targetDate && (
                         <IconWrapper
                             variant="outline"
+                            hoverGroup="card"
                             icon={CalendarIcon}
                             iconClassName={DATE_ICON_COLOR.target}
                             className="px-2.5 text-neutral-300"

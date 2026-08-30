@@ -6,7 +6,6 @@ import { useNotificationBadges } from "@/hooks/notifications/useNotificationBadg
 import { PlaygroundTab } from "../playgroundTabs";
 import { type SidebarSectionProps } from "./shared";
 import Row from "./SidebarRow";
-import Section from "./SidebarSection";
 
 // Everything waiting on you personally, as opposed to the board at large.
 const FOR_YOU_ROWS: { id: string; label: string; icon: React.ComponentType }[] = [
@@ -27,7 +26,7 @@ export default function PlaygroundSidebarForYouSection({
     const { inboxUnread } = useNotificationBadges();
 
     return (
-        <Section title="For you">
+        <section className="flex flex-col">
             {FOR_YOU_ROWS.map((r) => (
                 <Row
                     key={r.id}
@@ -40,6 +39,6 @@ export default function PlaygroundSidebarForYouSection({
                     onClick={() => onSelect(r.id)}
                 />
             ))}
-        </Section>
+        </section>
     );
 }

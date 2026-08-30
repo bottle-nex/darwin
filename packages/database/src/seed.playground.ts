@@ -159,7 +159,7 @@ const TAGS = [
     ["telemetry", "#60a5fa"],
 ] as const;
 
-const CHAPTER = { name: "Backlog", slug: "backlog" } as const;
+const SPACE = { name: "Backlog", slug: "backlog" } as const;
 const COLUMNS = ["Icebox", "Needs Triage", "Waiting on Review", "Someday"] as const;
 
 const SPECIALIZATIONS = ["frontend", "backend", "infra", "agent"] as const;
@@ -846,15 +846,15 @@ async function main() {
         tags.push(await prisma.tag.create({ data: { projectId, name, color } }));
     }
 
-    const chapter = await prisma.chapter.create({
-        data: { projectId, name: CHAPTER.name, slug: CHAPTER.slug, order: 1 },
+    const space = await prisma.space.create({
+        data: { projectId, name: SPACE.name, slug: SPACE.slug, order: 1 },
     });
 
     const columns: CustomColumn[] = [];
     for (let index = 0; index < COLUMNS.length; index++) {
         columns.push(
             await prisma.customColumn.create({
-                data: { chapterId: chapter.id, label: COLUMNS[index], order: index + 1 },
+                data: { spaceId: space.id, label: COLUMNS[index], order: index + 1 },
             }),
         );
     }
@@ -862,8 +862,8 @@ async function main() {
     for (const human of humans) {
         await prisma.customColumnOrder.createMany({
             data: [
-                { userId: human.id, chapterId: chapter.id, columnId: columns[1].id, order: 1 },
-                { userId: human.id, chapterId: chapter.id, columnId: columns[0].id, order: 2 },
+                { userId: human.id, spaceId: space.id, columnId: columns[1].id, order: 1 },
+                { userId: human.id, spaceId: space.id, columnId: columns[0].id, order: 2 },
             ],
         });
     }

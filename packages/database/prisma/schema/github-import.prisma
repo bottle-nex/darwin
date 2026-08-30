@@ -1,6 +1,6 @@
 /// Where a GitHub-imported issue lands. `AgentBoard` leaves `Issue.customColumnId`
 /// null so the issue enters the agent's To Do lane; `CustomColumn` parks it in a
-/// column of one of the project's chapters.
+/// column of one of the project's spaces.
 enum GithubImportTarget {
   AgentBoard
   CustomColumn

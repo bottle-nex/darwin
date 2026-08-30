@@ -168,12 +168,12 @@ export function useCustomKanbanDnd(
     }
 
     function persistColumnOrder() {
-        if (!projectId || scope.kind !== "chapter") return;
+        if (!projectId || scope.kind !== "space") return;
         const columnIds = useCustomKanbanStore.getState().columns.map((c) => c.id);
         reorderColumns
             .mutateAsync({
                 project_id: projectId,
-                chapter_id: scope.chapterId,
+                space_id: scope.spaceId,
                 column_ids: columnIds,
             })
             .catch(() => toast.error("Couldn't save the new column order."));

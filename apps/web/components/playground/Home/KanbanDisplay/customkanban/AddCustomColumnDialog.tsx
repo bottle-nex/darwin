@@ -15,12 +15,12 @@ import { cn } from "@/lib/utils";
 import { useAddCustomColumnStore } from "@/store/kanban/useAddCustomColumnStore";
 
 export default function AddCustomColumnDialog() {
-    const { open, setOpen, targetChapterId } = useAddCustomColumnStore();
+    const { open, setOpen, targetSpaceId } = useAddCustomColumnStore();
     const project = useActiveProject();
     const { addColumn, addingColumn } = useCustomColumnActions();
     const [title, setTitle] = useState("");
 
-    const ready = Boolean(title.trim()) && Boolean(targetChapterId) && !addingColumn;
+    const ready = Boolean(title.trim()) && Boolean(targetSpaceId) && !addingColumn;
 
     function handleOpenChange(next: boolean) {
         setOpen(next);
@@ -28,8 +28,8 @@ export default function AddCustomColumnDialog() {
     }
 
     async function submit() {
-        if (!ready || !targetChapterId) return;
-        const added = await addColumn(targetChapterId, title.trim());
+        if (!ready || !targetSpaceId) return;
+        const added = await addColumn(targetSpaceId, title.trim());
         if (added) handleOpenChange(false);
     }
 

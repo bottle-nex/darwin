@@ -6,6 +6,13 @@ import { cn } from "@/lib/utils";
 
 type IconWrapperVariant = "solid" | "ghost" | "outline" | "ring";
 
+/**
+ * Which ancestor's hover this icon follows. `ancestor` is the nearest unnamed
+ * `group`; `card` is the board card's own `group/card`, for icons that sit inside
+ * a column whose bare `group` would otherwise light every card at once.
+ */
+type HoverGroup = "ancestor" | "card";
+
 interface IconWrapperProps {
     icon?: IconType;
     iconClassName?: string;
@@ -15,6 +22,7 @@ interface IconWrapperProps {
     children?: ReactNode;
     active?: boolean;
     variant?: IconWrapperVariant;
+    hoverGroup?: HoverGroup;
     className?: string;
     /** Shown as a tooltip on hover. Rendered through `TooltipComponent`, not the native attribute. */
     title?: ReactNode;
@@ -28,14 +36,14 @@ const SURFACE: Record<
         shape: "rounded-sm",
         glyph: "size-3.25",
         rest: "bg-graphite/70 ring-[0.5px] ring-white/8",
-        hover: "hover:bg-white/8 group-hover:bg-white/8",
+        hover: "hover:bg-white/8",
         active: "bg-white/8 ring-[0.5px] ring-white/12",
     },
     ghost: {
         shape: "rounded-full",
         glyph: "size-3.75",
         rest: "bg-transparent",
-        hover: "hover:bg-white/8 group-hover:bg-white/8",
+        hover: "hover:bg-white/8",
         active: "bg-white/8",
     },
     outline: {
@@ -49,8 +57,24 @@ const SURFACE: Record<
         shape: "rounded-full ring-[0.5px] ring-snow/10",
         glyph: "size-3.75",
         rest: "bg-transparent",
-        hover: "hover:bg-white/8 group-hover:bg-white/8",
+        hover: "hover:bg-white/8",
         active: "bg-white/8 ring-snow/20",
+    },
+};
+
+/** Spelled out per group name because Tailwind only generates classes it can read literally. */
+const GROUP_HOVER: Record<HoverGroup, Record<IconWrapperVariant, string>> = {
+    ancestor: {
+        solid: "group-hover:bg-white/8 group-hover:text-neutral-200",
+        ghost: "group-hover:bg-white/8 group-hover:text-neutral-200",
+        outline: "group-hover:text-neutral-200",
+        ring: "group-hover:bg-white/8 group-hover:text-neutral-200",
+    },
+    card: {
+        solid: "group-hover/card:bg-white/8 group-hover/card:text-neutral-200",
+        ghost: "group-hover/card:bg-white/8 group-hover/card:text-neutral-200",
+        outline: "group-hover/card:text-neutral-200",
+        ring: "group-hover/card:bg-white/8 group-hover/card:text-neutral-200",
     },
 };
 
@@ -62,6 +86,7 @@ export default function IconWrapper({
     children,
     active,
     variant = "solid",
+    hoverGroup = "ancestor",
     className,
     title,
 }: IconWrapperProps) {
@@ -79,7 +104,8 @@ export default function IconWrapper({
                     : cn(
                           surface.rest,
                           surface.hover,
-                          "text-neutral-400 group-hover:text-neutral-200",
+                          "text-neutral-400",
+                          GROUP_HOVER[hoverGroup][variant],
                       ),
                 className,
             )}

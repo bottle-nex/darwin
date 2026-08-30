@@ -36,7 +36,7 @@ export default function AddTaskButton() {
 
     const handlers: Record<string, (() => void) | undefined> = {
         issue: onAddTask,
-        custom_column: scope.kind === "chapter" ? () => openAddColumn(scope.chapterId) : undefined,
+        custom_column: scope.kind === "space" ? () => openAddColumn(scope.spaceId) : undefined,
     };
 
     return (

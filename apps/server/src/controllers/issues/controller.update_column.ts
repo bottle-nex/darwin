@@ -41,14 +41,14 @@ export default class ColumnUpdateController {
         try {
             const column = await prisma.customColumn.findUnique({
                 where: { id: params_data.id },
-                select: { chapter: { select: { projectId: true } } },
+                select: { space: { select: { projectId: true } } },
             });
             if (!column) {
                 ResponseWriter.not_found(res, "Column not found");
                 return;
             }
 
-            const role = await Access.project(user.id, column.chapter.projectId);
+            const role = await Access.project(user.id, column.space.projectId);
             if (!role || !Permissions.project(role, Action.project.manage_columns)) {
                 ResponseWriter.not_authorized(res, "You dont have access to the project");
                 return;
@@ -60,7 +60,7 @@ export default class ColumnUpdateController {
                     label: body_data.label,
                     order: body_data.order,
                 },
-                select: { id: true, chapterId: true, label: true, order: true },
+                select: { id: true, spaceId: true, label: true, order: true },
             });
 
             ResponseWriter.success(res, { column: updated }, "Column updated");

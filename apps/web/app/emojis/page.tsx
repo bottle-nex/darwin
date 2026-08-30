@@ -24,7 +24,7 @@ export default function EmojisPage() {
                 )}
             </div>
 
-            <IconPicker open={open} onOpenChange={setOpen} onSelect={setPick}>
+            <IconPicker pick={pick} open={open} onOpenChange={setOpen} onSelect={setPick}>
                 <Button variant="secondary">{pick ? "Pick another" : "Pick an icon"}</Button>
             </IconPicker>
         </main>

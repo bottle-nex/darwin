@@ -1,7 +1,6 @@
 import { createHash } from "node:crypto";
 
-import type { IssueStatus } from "@trymatcha/database";
-import { Prisma, prisma } from "@trymatcha/database";
+import { IssueStatus, Prisma, prisma } from "@trymatcha/database";
 import z from "zod";
 
 import type {
@@ -118,15 +117,29 @@ function encode_payload(payload: object) {
     return Buffer.from(JSON.stringify(payload)).toString("base64url");
 }
 
+export const SPACE_SELECT = {
+    id: true,
+    name: true,
+    slug: true,
+    description: true,
+    startDate: true,
+    targetDate: true,
+    order: true,
+    icon: true,
+} as const;
+
 export function aggregate_custom_column_counts(
     lane_counts: readonly {
+        status: IssueStatus;
         customColumnId: string | null;
         _count: { _all: number };
     }[],
+    only_status?: IssueStatus,
 ) {
     const totals = new Map<string, number>();
     for (const entry of lane_counts) {
         if (entry.customColumnId === null) continue;
+        if (only_status !== undefined && entry.status !== only_status) continue;
         totals.set(
             entry.customColumnId,
             (totals.get(entry.customColumnId) ?? 0) + entry._count._all,
@@ -176,7 +189,7 @@ export default class BoardIssueService {
         column_id: string,
     ): Promise<{ id: string } | null> {
         return prisma.customColumn.findFirst({
-            where: { id: column_id, chapter: { projectId: project_id } },
+            where: { id: column_id, space: { projectId: project_id } },
             select: { id: true },
         });
     }
@@ -198,19 +211,19 @@ export default class BoardIssueService {
     }
 
     static async get_board_metadata(project_id: string, viewer_id: string) {
-        const [chapters, columns, personal_orders, lane_counts] = await Promise.all([
-            prisma.chapter.findMany({
+        const [spaces, columns, personal_orders, lane_counts] = await Promise.all([
+            prisma.space.findMany({
                 where: { projectId: project_id },
                 orderBy: { order: "asc" },
-                select: { id: true, name: true, slug: true, order: true, icon: true },
+                select: SPACE_SELECT,
             }),
             prisma.customColumn.findMany({
-                where: { chapter: { projectId: project_id } },
+                where: { space: { projectId: project_id } },
                 orderBy: { order: "asc" },
-                select: { id: true, chapterId: true, label: true, order: true },
+                select: { id: true, spaceId: true, label: true, order: true },
             }),
             prisma.customColumnOrder.findMany({
-                where: { userId: viewer_id, chapter: { projectId: project_id } },
+                where: { userId: viewer_id, space: { projectId: project_id } },
                 select: { columnId: true, order: true },
             }),
             prisma.issue.groupBy({
@@ -223,9 +236,9 @@ export default class BoardIssueService {
         const personal_order_by_column = new Map(
             personal_orders.map((order) => [order.columnId, order.order]),
         );
-        const ordered_columns = chapters.flatMap((chapter) =>
+        const ordered_columns = spaces.flatMap((space) =>
             BoardIssueService.sort_columns_for_viewer(
-                columns.filter((column) => column.chapterId === chapter.id),
+                columns.filter((column) => column.spaceId === space.id),
                 personal_order_by_column,
             ),
         );
@@ -235,9 +248,10 @@ export default class BoardIssueService {
                 .map((entry) => [entry.status, entry._count._all]),
         );
         const custom_count_by_column = aggregate_custom_column_counts(lane_counts);
+        const done_count_by_column = aggregate_custom_column_counts(lane_counts, IssueStatus.Done);
 
         return {
-            chapters,
+            spaces,
             columns: ordered_columns,
             totals: {
                 system: Object.fromEntries(
@@ -250,6 +264,12 @@ export default class BoardIssueService {
                     ordered_columns.map((column) => [
                         column.id,
                         custom_count_by_column.get(column.id) ?? 0,
+                    ]),
+                ),
+                done: Object.fromEntries(
+                    ordered_columns.map((column) => [
+                        column.id,
+                        done_count_by_column.get(column.id) ?? 0,
                     ]),
                 ),
             },

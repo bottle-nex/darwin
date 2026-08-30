@@ -92,17 +92,17 @@ export function useBoardLane(projectId: string | undefined, selector: BoardLaneS
 /**
  * The lanes one pane actually shows. Board metadata stays project-wide, but the
  * fan-out below opens one infinite query per lane — so an unscoped list would
- * load every column of every chapter on mount.
+ * load every column of every space on mount.
  */
 function laneSelectorsFor(
     scope: BoardScope,
-    columns: { id: string; chapterId: string }[] | undefined,
+    columns: { id: string; spaceId: string }[] | undefined,
 ): BoardLaneSelector[] {
     if (scope.kind === "agent") {
         return KanbanBoard.STATUSES.map((status) => ({ type: "system", status }) as const);
     }
     return (columns ?? [])
-        .filter((column) => column.chapterId === scope.chapterId)
+        .filter((column) => column.spaceId === scope.spaceId)
         .map((column) => ({ type: "custom" as const, columnId: column.id }));
 }
 

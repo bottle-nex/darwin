@@ -67,6 +67,11 @@ export default function TagsDisplay() {
         return () => window.removeEventListener("keydown", clearOnEscape);
     }, [selectedIds.length]);
 
+    const selectedAt = (index: number) => {
+        const tag = visibleTags[index];
+        return Boolean(tag) && selectedIds.includes(tag.id);
+    };
+
     function toggleSelect(tagId: string) {
         setSelectedIds((current) =>
             current.includes(tagId) ? current.filter((id) => id !== tagId) : [...current, tagId],
@@ -110,7 +115,7 @@ export default function TagsDisplay() {
                     </div>
                 )}
 
-                <div className="flex flex-col gap-0.5 pt-1.5">
+                <div className="flex flex-col pt-1.5">
                     {isLoading ? (
                         <LogoLoader size={32} className="py-16" />
                     ) : isError ? (
@@ -132,12 +137,14 @@ export default function TagsDisplay() {
                             subtitle="Try a different name."
                         />
                     ) : (
-                        visibleTags.map((tag) => (
+                        visibleTags.map((tag, index) => (
                             <TagRow
                                 key={tag.id}
                                 tag={tag}
                                 selected={selectedIds.includes(tag.id)}
                                 selectionActive={selectedTags.length > 0}
+                                joinedAbove={selectedAt(index - 1)}
+                                joinedBelow={selectedAt(index + 1)}
                                 onToggleSelect={() => toggleSelect(tag.id)}
                             />
                         ))
@@ -161,14 +168,25 @@ type TagRowProps = {
     tag: Tag;
     selected: boolean;
     selectionActive: boolean;
+    joinedAbove: boolean;
+    joinedBelow: boolean;
     onToggleSelect: () => void;
 };
 
-function TagRow({ tag, selected, selectionActive, onToggleSelect }: TagRowProps) {
+function TagRow({
+    tag,
+    selected,
+    selectionActive,
+    joinedAbove,
+    joinedBelow,
+    onToggleSelect,
+}: TagRowProps) {
     return (
         <SelectableRow
             selected={selected}
             selectionActive={selectionActive}
+            joinedAbove={joinedAbove}
+            joinedBelow={joinedBelow}
             selectionLabel={`Select ${tag.name}`}
             onToggleSelection={onToggleSelect}
             className="px-2.5 py-3 cursor-pointer"

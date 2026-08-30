@@ -1,5 +1,5 @@
 "use client";
-import { CheckIcon, KanbanBoardLayoutIcon } from "@trymatcha/ui/icons";
+import { CheckIcon, SpaceEntityIcon } from "@trymatcha/ui/icons";
 
 import HeroBuddy from "@/components/landing/v2/HeroBuddy";
 import { PRIORITY_TO_NUMBER } from "@/components/playground/Home/KanbanDisplay/customkanban/data";
@@ -7,14 +7,15 @@ import { PRIORITY_OPTIONS } from "@/components/playground/Issue/issueHelpers";
 import MemberAvatar from "@/components/playground/Issue/MemberAvatar";
 import { CommandEmpty, CommandGroup, CommandItem, CommandList } from "@/components/ui/command";
 import { IconPickGlyph } from "@/components/ui/IconPicker";
-import { COPY_FIELDS, DATE_PRESETS, type IssueActions } from "@/hooks/issues/useIssueActions";
+import { COPY_FIELDS, type IssueActions } from "@/hooks/issues/useIssueActions";
+import { DATE_SHORTCUTS_WITH_CLEAR } from "@/lib/dateShortcuts";
 import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
 import { cn } from "@/lib/utils";
-import type { CommandPage } from "@/types/command.type";
+import type { CommandPage, IssueCommandPage } from "@/types/command.type";
 
 const LIST = "no-scrollbar max-h-[min(60vh,26rem)] p-2";
 
-export const ISSUE_PAGE_TITLE: Record<CommandPage, string> = {
+export const ISSUE_PAGE_TITLE: Record<IssueCommandPage, string> = {
     status: "Change status",
     priority: "Set priority",
     assignees: "Assign to",
@@ -142,28 +143,32 @@ export default function CommandIssuePage({
             {page === "dates" && (
                 <>
                     <CommandGroup heading="Start date">
-                        {DATE_PRESETS.map((preset) => (
+                        {DATE_SHORTCUTS_WITH_CLEAR.map((shortcut) => (
                             <CommandItem
-                                key={`start-${preset.label}`}
-                                value={`start ${preset.label}`}
+                                key={`start-${shortcut.label}`}
+                                value={`start ${shortcut.label}`}
                                 disabled={!editable}
-                                onSelect={() => pick(() => actions.setStartDate(preset.days))}
+                                onSelect={() =>
+                                    pick(() => actions.setStartDate(shortcut.resolve()))
+                                }
                                 className="px-2.5 py-2"
                             >
-                                {preset.label}
+                                {shortcut.label}
                             </CommandItem>
                         ))}
                     </CommandGroup>
                     <CommandGroup heading="Target date">
-                        {DATE_PRESETS.map((preset) => (
+                        {DATE_SHORTCUTS_WITH_CLEAR.map((shortcut) => (
                             <CommandItem
-                                key={`target-${preset.label}`}
-                                value={`target ${preset.label}`}
+                                key={`target-${shortcut.label}`}
+                                value={`target ${shortcut.label}`}
                                 disabled={!editable}
-                                onSelect={() => pick(() => actions.setTargetDate(preset.days))}
+                                onSelect={() =>
+                                    pick(() => actions.setTargetDate(shortcut.resolve()))
+                                }
                                 className="px-2.5 py-2"
                             >
-                                {preset.label}
+                                {shortcut.label}
                             </CommandItem>
                         ))}
                     </CommandGroup>
@@ -183,31 +188,28 @@ export default function CommandIssuePage({
                             Agent board
                         </CommandItem>
                     )}
-                    {actions.chapterBoards.map((chapter) =>
-                        chapter.columns.length ? (
-                            <CommandGroup key={chapter.id} heading={chapter.name}>
-                                {chapter.columns
+                    {actions.spaceBoards.map((space) =>
+                        space.columns.length ? (
+                            <CommandGroup key={space.id} heading={space.name}>
+                                {space.columns
                                     .filter((column) => column.id !== actions.sharedColumnId)
                                     .map((column) => (
                                         <CommandItem
                                             key={column.id}
-                                            value={`${chapter.name} ${column.label}`}
+                                            value={`${space.name} ${column.label}`}
                                             disabled={!editable}
                                             onSelect={() =>
                                                 pick(() => actions.moveToColumn(column.id))
                                             }
                                             className="px-2.5 py-2"
                                         >
-                                            {chapter.icon ? (
+                                            {space.icon ? (
                                                 <IconPickGlyph
-                                                    pick={chapter.icon}
+                                                    pick={space.icon}
                                                     className="size-3.5"
                                                 />
                                             ) : (
-                                                <KanbanBoardLayoutIcon
-                                                    className="size-3.5"
-                                                    aria-hidden
-                                                />
+                                                <SpaceEntityIcon className="size-3.5" aria-hidden />
                                             )}
                                             <span className="truncate">{column.label}</span>
                                         </CommandItem>
@@ -215,7 +217,7 @@ export default function CommandIssuePage({
                             </CommandGroup>
                         ) : null,
                     )}
-                    {actions.chapterBoards.every((chapter) => chapter.columns.length === 0) &&
+                    {actions.spaceBoards.every((space) => space.columns.length === 0) &&
                         !actions.sharedColumnId && <CommandItem disabled>No columns</CommandItem>}
                 </CommandGroup>
             )}

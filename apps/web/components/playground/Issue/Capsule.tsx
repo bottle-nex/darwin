@@ -4,10 +4,10 @@ import type { IconType } from "@trymatcha/ui/icons";
 import { CalendarIcon, CheckIcon } from "@trymatcha/ui/icons";
 import { format } from "date-fns";
 import { forwardRef, useState } from "react";
-import type { Matcher } from "react-day-picker";
 
 import { Button } from "@/components/ui/button";
-import { Calendar, type CalendarRange } from "@/components/ui/calendar";
+import type { CalendarRange } from "@/components/ui/calendar";
+import DatePopover from "@/components/ui/DatePopover";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 
@@ -142,36 +142,20 @@ function CapsuleCalendar({
     earliest,
     latest,
 }: CapsuleCalendarProps) {
-    const [open, setOpen] = useState(false);
-
-    const outOfBounds: Matcher[] = [];
-    if (earliest) outOfBounds.push({ before: earliest });
-    if (latest) outOfBounds.push({ after: latest });
-
-    function handleSelect(next: Date | undefined) {
-        onChange?.(next);
-        setOpen(false);
-    }
-
     return (
-        <Popover open={open} onOpenChange={setOpen}>
-            <PopoverTrigger asChild>
-                <CapsuleTrigger disabled={disabled} className={className}>
-                    <Icon className={cn("size-3.5", iconClassName)} />
-                    {value ? format(value, "MMM d, yyyy") : placeholder}
-                </CapsuleTrigger>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0">
-                <Calendar
-                    mode="single"
-                    selected={value}
-                    onSelect={handleSelect}
-                    defaultMonth={value ?? range?.from ?? range?.to}
-                    range={range}
-                    disabled={outOfBounds}
-                />
-            </PopoverContent>
-        </Popover>
+        <DatePopover
+            value={value}
+            onChange={onChange}
+            title={placeholder}
+            range={range}
+            earliest={earliest}
+            latest={latest}
+        >
+            <CapsuleTrigger disabled={disabled} className={className}>
+                <Icon className={cn("size-3.5", iconClassName)} />
+                {value ? format(value, "MMM d, yyyy") : placeholder}
+            </CapsuleTrigger>
+        </DatePopover>
     );
 }
 

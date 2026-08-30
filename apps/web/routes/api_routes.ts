@@ -106,8 +106,8 @@ export const ISSUE_REFERENCES_URL = (id: string) => `${ISSUES_URL}/${id}/referen
 export const ISSUE_ACTIVITY_URL = (id: string) => `${ISSUES_URL}/${id}/activity`;
 export const COLUMN_URL = (id: string) => `${ISSUES_URL}/columns/${id}`;
 export const REORDER_COLUMNS_URL = ISSUES_URL + "/columns/reorder";
-export const CREATE_CHAPTER_URL = ISSUES_URL + "/chapters";
-export const CHAPTER_URL = (id: string) => `${ISSUES_URL}/chapters/${id}`;
+export const CREATE_SPACE_URL = ISSUES_URL + "/spaces";
+export const SPACE_URL = (id: string) => `${ISSUES_URL}/spaces/${id}`;
 export const ASSIGN_ISSUE_URL = (id: string) => `${ISSUES_URL}/${id}/assignees`;
 export const UNASSIGN_ISSUE_URL = (id: string, userId: string) =>
     `${ISSUES_URL}/${id}/assignees/${userId}`;

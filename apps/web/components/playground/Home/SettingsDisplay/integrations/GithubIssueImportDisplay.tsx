@@ -79,11 +79,11 @@ export default function GithubIssueImportDisplay({
 
     const agentLaneTitle = KanbanBoard.columnFor(KanbanStatus.Todo)?.title ?? "To Do";
 
-    const chapters = useMemo(
+    const spaces = useMemo(
         () =>
-            (board?.chapters ?? []).map((chapter) => ({
-                ...chapter,
-                columns: (board?.columns ?? []).filter((column) => column.chapterId === chapter.id),
+            (board?.spaces ?? []).map((space) => ({
+                ...space,
+                columns: (board?.columns ?? []).filter((column) => column.spaceId === space.id),
             })),
         [board],
     );
@@ -239,16 +239,16 @@ export default function GithubIssueImportDisplay({
                                         <SelectItem value={AGENT_BOARD_VALUE}>
                                             Agent board · {agentLaneTitle}
                                         </SelectItem>
-                                        {chapters.map((chapter) =>
-                                            chapter.columns.length ? (
-                                                <SelectGroup key={chapter.id}>
-                                                    <SelectLabel>{chapter.name}</SelectLabel>
-                                                    {chapter.columns.map((column) => (
+                                        {spaces.map((space) =>
+                                            space.columns.length ? (
+                                                <SelectGroup key={space.id}>
+                                                    <SelectLabel>{space.name}</SelectLabel>
+                                                    {space.columns.map((column) => (
                                                         <SelectItem
                                                             key={column.id}
                                                             value={column.id}
                                                         >
-                                                            {chapter.name} › {column.label}
+                                                            {space.name} › {column.label}
                                                         </SelectItem>
                                                     ))}
                                                 </SelectGroup>

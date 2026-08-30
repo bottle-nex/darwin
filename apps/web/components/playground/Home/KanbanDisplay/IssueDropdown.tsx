@@ -7,8 +7,8 @@ import {
     DeleteIcon,
     DuplicateIcon,
     ExternalLinkIcon,
-    KanbanBoardLayoutIcon,
     KanbanColumnsIcon,
+    SpaceEntityIcon,
     SubmenuDisclosureIcon,
     TagIcon,
 } from "@trymatcha/ui/icons";
@@ -28,7 +28,8 @@ import {
     ContextMenuTrigger,
 } from "@/components/ui/context-menu";
 import { IconPickGlyph } from "@/components/ui/IconPicker";
-import { COPY_FIELDS, DATE_PRESETS, useIssueActions } from "@/hooks/issues/useIssueActions";
+import { COPY_FIELDS, useIssueActions } from "@/hooks/issues/useIssueActions";
+import { DATE_SHORTCUTS_WITH_CLEAR } from "@/lib/dateShortcuts";
 import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
 import { cn } from "@/lib/utils";
 import type { BoardIssue } from "@/types/board";
@@ -237,12 +238,12 @@ export default function IssueDropdown({
                         </>
                     }
                 >
-                    {DATE_PRESETS.map((preset) => (
+                    {DATE_SHORTCUTS_WITH_CLEAR.map((shortcut) => (
                         <ContextMenuItem
-                            key={preset.label}
-                            onSelect={() => actions.setStartDate(preset.days)}
+                            key={shortcut.label}
+                            onSelect={() => actions.setStartDate(shortcut.resolve())}
                         >
-                            <span className="flex-1">{preset.label}</span>
+                            <span className="flex-1">{shortcut.label}</span>
                         </ContextMenuItem>
                     ))}
                 </Submenu>
@@ -257,12 +258,12 @@ export default function IssueDropdown({
                         </>
                     }
                 >
-                    {DATE_PRESETS.map((preset) => (
+                    {DATE_SHORTCUTS_WITH_CLEAR.map((shortcut) => (
                         <ContextMenuItem
-                            key={preset.label}
-                            onSelect={() => actions.setTargetDate(preset.days)}
+                            key={shortcut.label}
+                            onSelect={() => actions.setTargetDate(shortcut.resolve())}
                         >
-                            <span className="flex-1">{preset.label}</span>
+                            <span className="flex-1">{shortcut.label}</span>
                         </ContextMenuItem>
                     ))}
                 </Submenu>
@@ -285,23 +286,23 @@ export default function IssueDropdown({
                             <span className="flex-1">Agent board</span>
                         </ContextMenuItem>
                     )}
-                    {actions.chapterBoards.map((chapter) => (
+                    {actions.spaceBoards.map((space) => (
                         <Submenu
-                            key={chapter.id}
+                            key={space.id}
                             className="w-52"
-                            disabled={chapter.columns.length === 0}
+                            disabled={space.columns.length === 0}
                             trigger={
                                 <>
-                                    {chapter.icon ? (
-                                        <IconPickGlyph pick={chapter.icon} className={ICON} />
+                                    {space.icon ? (
+                                        <IconPickGlyph pick={space.icon} className={ICON} />
                                     ) : (
-                                        <KanbanBoardLayoutIcon className={ICON} aria-hidden />
+                                        <SpaceEntityIcon className={ICON} aria-hidden />
                                     )}
-                                    <span className="flex-1 truncate">{chapter.name}</span>
+                                    <span className="flex-1 truncate">{space.name}</span>
                                 </>
                             }
                         >
-                            {chapter.columns.map((column) => (
+                            {space.columns.map((column) => (
                                 <ContextMenuItem
                                     key={column.id}
                                     disabled={column.id === issue.customColumnId}
@@ -312,7 +313,7 @@ export default function IssueDropdown({
                             ))}
                         </Submenu>
                     ))}
-                    {actions.chapterBoards.length === 0 && !issue.customColumnId && (
+                    {actions.spaceBoards.length === 0 && !issue.customColumnId && (
                         <ContextMenuItem disabled>No boards</ContextMenuItem>
                     )}
                 </Submenu>

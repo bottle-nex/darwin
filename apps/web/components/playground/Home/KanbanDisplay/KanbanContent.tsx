@@ -21,7 +21,7 @@ export default function KanbanContent({ scope }: { scope: BoardScope }) {
         );
     }
 
-    if (scope.kind === "chapter") {
+    if (scope.kind === "space") {
         return kanbanView === "list" ? (
             <KanbanListView />
         ) : (

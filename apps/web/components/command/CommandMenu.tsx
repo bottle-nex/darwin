@@ -18,19 +18,32 @@ import {
     COMMAND_ENTRIES,
     isCommandAvailable,
 } from "@/hooks/shortcuts/usePlaygroundShortcuts";
+import { useSpaceCommandActions } from "@/hooks/spaces/useSpaceActions";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import { cn } from "@/lib/utils";
 import { useCommandContextStore } from "@/store/command/useCommandContextStore";
 import { useCommandMenuStore } from "@/store/command/useCommandMenuStore";
 import { useIssueSelectionStore } from "@/store/issues/useIssueSelectionStore";
-import { COMMAND_KIND_ORDER, type CommandEntry, CommandKind } from "@/types/command.type";
+import { useSpaceSelectionStore } from "@/store/space/useSpaceSelectionStore";
+import {
+    COMMAND_KIND_ORDER,
+    type CommandEntry,
+    CommandKind,
+    type CommandPage,
+    isSpaceCommandPage,
+} from "@/types/command.type";
 
 import { commandEntryValue, filterCommandGroups } from "./commandFilter";
 import CommandIssuePage, { ISSUE_PAGE_TITLE } from "./CommandIssuePage";
 import { commandMenuView } from "./commandMenuView";
 import CommandSearchResults from "./CommandSearchResults";
+import CommandSpacePage, { SPACE_PAGE_TITLE } from "./CommandSpacePage";
 
 const SEARCH_DEBOUNCE_MS = 200;
+
+function pageTitle(page: CommandPage) {
+    return isSpaceCommandPage(page) ? SPACE_PAGE_TITLE[page] : ISSUE_PAGE_TITLE[page];
+}
 
 export default function CommandMenu() {
     const isOpen = useCommandMenuStore((s) => s.isOpen);
@@ -57,13 +70,25 @@ function CommandMenuBody({ onDone }: { onDone: () => void }) {
     const orgSlug = useCommandContextStore((s) => s.orgSlug);
     const projectId = useCommandContextStore((s) => s.projectId);
     const issueId = useCommandContextStore((s) => s.issueId);
+    const spaceId = useCommandContextStore((s) => s.spaceId);
     const page = useCommandMenuStore((s) => s.page);
     const setPage = useCommandMenuStore((s) => s.setPage);
     const [query, setQuery] = useState("");
 
     const selectedIds = useIssueSelectionStore((s) => s.ids);
     const actions = useIssueActions(selectedIds.length ? selectedIds : issueId);
-    const context = useMemo(() => ({ orgSlug, projectId, issueId }), [orgSlug, projectId, issueId]);
+
+    const selectedSpaceIds = useSpaceSelectionStore((s) => s.ids);
+    const spaceTargets = useMemo(
+        () => (selectedSpaceIds.length ? selectedSpaceIds : spaceId ? [spaceId] : []),
+        [selectedSpaceIds, spaceId],
+    );
+    const spaceActions = useSpaceCommandActions(spaceTargets);
+
+    const context = useMemo(
+        () => ({ orgSlug, projectId, issueId, spaceId }),
+        [orgSlug, projectId, issueId, spaceId],
+    );
 
     const availableGroups = useMemo(
         () =>
@@ -73,10 +98,13 @@ function CommandMenuBody({ onDone }: { onDone: () => void }) {
                     (entry) =>
                         entry.kind === kind &&
                         entry.combo !== "mod+k" &&
-                        (kind !== CommandKind.Issue || Boolean(issueId) || selectedIds.length > 0),
+                        (kind !== CommandKind.Issue ||
+                            Boolean(issueId) ||
+                            selectedIds.length > 0) &&
+                        (kind !== CommandKind.Space || spaceTargets.length > 0),
                 ),
             })).filter((group) => group.entries.length > 0),
-        [issueId, selectedIds.length],
+        [issueId, selectedIds.length, spaceTargets.length],
     );
 
     const groups = useMemo(
@@ -106,8 +134,7 @@ function CommandMenuBody({ onDone }: { onDone: () => void }) {
 
     function run(entry: CommandEntry) {
         if (!isCommandAvailable(entry, context)) return;
-        const opensPage = entry.kind === CommandKind.Issue;
-        if (!opensPage) onDone();
+        if (!entry.opensPage) onDone();
         setQuery("");
         entry.run();
     }
@@ -132,9 +159,7 @@ function CommandMenuBody({ onDone }: { onDone: () => void }) {
                     border={false}
                     value={query}
                     onValueChange={setQuery}
-                    placeholder={
-                        page ? `${ISSUE_PAGE_TITLE[page]}...` : "Type a command or search..."
-                    }
+                    placeholder={page ? `${pageTitle(page)}...` : "Type a command or search..."}
                     className="text-[14px]"
                     trailing={
                         page ? (
@@ -151,14 +176,27 @@ function CommandMenuBody({ onDone }: { onDone: () => void }) {
                 />
             </div>
 
-            <IssueTargetHeader
-                count={actions.count}
-                title={actions.issue?.title}
-                number={actions.issue?.number}
-            />
+            {spaceTargets.length ? (
+                <CommandTargetHeader
+                    count={spaceActions.count}
+                    noun="space"
+                    title={spaceActions.space?.name}
+                />
+            ) : (
+                <CommandTargetHeader
+                    count={actions.count}
+                    noun="issue"
+                    title={actions.issue?.title}
+                    lead={actions.issue ? `#${actions.issue.number}` : undefined}
+                />
+            )}
 
             {page ? (
-                <CommandIssuePage page={page} actions={actions} onDone={onDone} />
+                isSpaceCommandPage(page) ? (
+                    <CommandSpacePage page={page} actions={spaceActions} onDone={onDone} />
+                ) : (
+                    <CommandIssuePage page={page} actions={actions} onDone={onDone} />
+                )
             ) : (
                 <CommandList
                     data-lenis-prevent
@@ -213,24 +251,33 @@ function CommandMenuBody({ onDone }: { onDone: () => void }) {
     );
 }
 
-function IssueTargetHeader({
+/** What the menu is about to act on: one thing by name, or how many are selected. */
+function CommandTargetHeader({
     count,
+    noun,
     title,
-    number,
+    lead,
 }: {
     count: number;
+    noun: string;
     title?: string;
-    number?: number;
+    lead?: string;
 }) {
     if (!count) return null;
     return (
         <div className="flex items-center gap-2 px-4 pt-3 text-[12.5px] text-neutral-500">
             {count > 1 ? (
-                <span className="font-medium text-neutral-400">{count} issues selected</span>
+                <span className="font-medium text-neutral-400">
+                    {count} {noun}s selected
+                </span>
             ) : (
                 <>
-                    <span className="shrink-0 font-medium">#{number}</span>
-                    <span aria-hidden>·</span>
+                    {lead && (
+                        <>
+                            <span className="shrink-0 font-medium">{lead}</span>
+                            <span aria-hidden>·</span>
+                        </>
+                    )}
                     <span className="truncate">{title}</span>
                 </>
             )}

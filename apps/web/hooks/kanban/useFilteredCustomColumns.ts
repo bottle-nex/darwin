@@ -21,9 +21,9 @@ export function useFilteredCustomColumns(): CustomColumn[] {
         () =>
             CustomKanbanMappers.boardToColumns({
                 columns:
-                    scope.kind === "chapter"
+                    scope.kind === "space"
                         ? (metadata?.columns ?? []).filter(
-                              (column) => column.chapterId === scope.chapterId,
+                              (column) => column.spaceId === scope.spaceId,
                           )
                         : [],
                 issues: feed.rows,

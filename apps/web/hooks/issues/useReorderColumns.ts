@@ -8,17 +8,17 @@ import type { BoardMetadata } from "@/types/board";
 
 export interface ReorderColumnsInput {
     project_id: string;
-    chapter_id: string;
+    space_id: string;
     column_ids: string[];
 }
 
-/** Persists the requesting user's personal column order for one chapter. */
+/** Persists the requesting user's personal column order for one space. */
 export function useReorderColumns() {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: async ({ chapter_id, column_ids }: ReorderColumnsInput) => {
+        mutationFn: async ({ space_id, column_ids }: ReorderColumnsInput) => {
             await apiClient.patch<ApiResponse<{ ok: boolean }>>(REORDER_COLUMNS_URL, {
-                chapter_id,
+                space_id,
                 column_ids,
             });
         },
@@ -30,13 +30,13 @@ export function useReorderColumns() {
                 const byId = new Map(data.columns.map((column) => [column.id, column]));
                 const reordered = variables.column_ids.flatMap((id, order) => {
                     const column = byId.get(id);
-                    return column?.chapterId === variables.chapter_id ? [{ ...column, order }] : [];
+                    return column?.spaceId === variables.space_id ? [{ ...column, order }] : [];
                 });
                 let next = 0;
                 return {
                     ...data,
                     columns: data.columns.map((column) =>
-                        column.chapterId === variables.chapter_id
+                        column.spaceId === variables.space_id
                             ? (reordered[next++] ?? column)
                             : column,
                     ),

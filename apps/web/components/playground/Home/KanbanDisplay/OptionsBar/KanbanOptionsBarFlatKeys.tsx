@@ -4,6 +4,7 @@ import {
     PaneActionsSlot,
     PaneLeadSlot,
 } from "@/components/playground/Core/components/PlaygroundPaneSlots";
+import SpaceEditAction from "@/components/playground/space/SpaceEditAction";
 import { useFilteredCustomColumns } from "@/hooks/kanban/useFilteredCustomColumns";
 import { useKanbanOptionsStore } from "@/store/kanban/useKanbanOptionsStore";
 
@@ -24,7 +25,7 @@ export default function KanbanOptionsBarFlatKeys() {
         <>
             <PaneLeadSlot>
                 <div className="flex min-w-0 items-center gap-1.5">
-                    <PlaygroundBreadcrumb />
+                    <PlaygroundBreadcrumb action={<SpaceEditAction />} />
 
                     <FilterChipsBar />
                 </div>

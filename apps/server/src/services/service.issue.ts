@@ -210,7 +210,7 @@ export default class IssueService {
 
         if (patch.custom_column_id) {
             const column = await prisma.customColumn.findFirst({
-                where: { id: patch.custom_column_id, chapter: { projectId: issue.projectId } },
+                where: { id: patch.custom_column_id, space: { projectId: issue.projectId } },
                 select: { id: true },
             });
             if (!column) {

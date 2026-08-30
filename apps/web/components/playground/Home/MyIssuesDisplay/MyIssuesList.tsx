@@ -12,6 +12,7 @@ import { VirtualizedRows } from "@/components/playground/Home/KanbanDisplay/Virt
 import { Button } from "@/components/ui/button";
 import { IssueSelectionOrderProvider } from "@/hooks/issues/useIssueSelection";
 import { KanbanMappers } from "@/lib/kanban/KanbanMappers";
+import { useIssueSelectionStore } from "@/store/issues/useIssueSelectionStore";
 import type {
     MyIssuesGroup,
     MyIssuesOrder,
@@ -61,6 +62,13 @@ export default function MyIssuesList({
         [collapsedGroupKeys, groups],
     );
     const loadedIssueIds = useMemo(() => issues.map((issue) => issue.id), [issues]);
+    const selectedIds = useIssueSelectionStore((s) => s.ids);
+    // A group header between two issues is not a selected row, so a run of selected
+    // rows never joins across one.
+    const selectedAt = (index: number) => {
+        const row = rows[index];
+        return row?.kind === "issue" && selectedIds.includes(row.issue.id);
+    };
     const issuePositions = useMemo(
         () => new Map(loadedIssueIds.map((issueId, index) => [issueId, index + 1])),
         [loadedIssueIds],
@@ -127,7 +135,7 @@ export default function MyIssuesList({
                     paused: false,
                     onLoadMore,
                 }}
-                renderRow={(row) => {
+                renderRow={(row, index) => {
                     if (row.kind === "group") {
                         if (groupBy === "none") return <div aria-hidden />;
                         return (
@@ -161,6 +169,8 @@ export default function MyIssuesList({
                                 createdAt={row.issue.createdAt}
                                 boardIssue={row.issue}
                                 selectionScope="my-issues"
+                                joinedAbove={selectedAt(index - 1)}
+                                joinedBelow={selectedAt(index + 1)}
                             />
                         </div>
                     );

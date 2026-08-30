@@ -7,13 +7,13 @@ import Access from "../../access-control/access";
 import ResponseWriter from "../../services/service.response";
 
 /**
- * Persists one user's personal display order for a chapter's custom columns.
+ * Persists one user's personal display order for a space's custom columns.
  * Unlike column create/rename/delete (gated on `manage_columns`), reordering
  * only changes what the requesting user sees, so any project member may do it.
  */
 export default class ColumnReorderController {
     static body_schema = z.object({
-        chapter_id: z.string().min(1),
+        space_id: z.string().min(1),
         column_ids: z.array(z.string().min(1)).min(1),
     });
 
@@ -30,16 +30,16 @@ export default class ColumnReorderController {
             return;
         }
 
-        const chapter = await prisma.chapter.findUnique({
-            where: { id: data.chapter_id },
+        const space = await prisma.space.findUnique({
+            where: { id: data.space_id },
             select: { projectId: true },
         });
-        if (!chapter) {
-            ResponseWriter.not_found(res, "Chapter not found");
+        if (!space) {
+            ResponseWriter.not_found(res, "Space not found");
             return;
         }
 
-        const role = await Access.project(user.id, chapter.projectId);
+        const role = await Access.project(user.id, space.projectId);
         if (!role || !Permissions.project(role, Action.project.read)) {
             ResponseWriter.not_authorized(res, "You dont have access to the project");
             return;
@@ -48,7 +48,7 @@ export default class ColumnReorderController {
         try {
             await prisma.$transaction(async (tx) => {
                 const existing_columns = await tx.customColumn.findMany({
-                    where: { chapterId: data.chapter_id },
+                    where: { spaceId: data.space_id },
                     select: { id: true },
                 });
                 const existing_ids = new Set(existing_columns.map((c) => c.id));
@@ -66,7 +66,7 @@ export default class ColumnReorderController {
                             where: { userId_columnId: { userId: user.id, columnId } },
                             create: {
                                 userId: user.id,
-                                chapterId: data.chapter_id,
+                                spaceId: data.space_id,
                                 columnId,
                                 order,
                             },

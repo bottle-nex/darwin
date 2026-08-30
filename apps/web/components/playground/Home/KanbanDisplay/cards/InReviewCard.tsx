@@ -35,6 +35,7 @@ export default function InReviewCard({ issue }: { issue: Issue }) {
                         <IconWrapper
                             icon={PullRequestOpenIcon}
                             variant="ring"
+                            hoverGroup="card"
                             iconClassName="text-green-500"
                             title={pullNumber === null ? undefined : "Open the review"}
                         >

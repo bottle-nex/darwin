@@ -1,11 +1,12 @@
 import {
     AgentIcon,
     AssigneeGroupIcon,
-    CalendarIcon,
     ChatsNavIcon,
     CommandMenuIcon,
     CopyIcon,
     DeleteIcon,
+    EditCalendarIcon,
+    EditIcon,
     GanttNavIcon,
     HelpIcon,
     IssueEntityIcon,
@@ -15,6 +16,7 @@ import {
     ProjectEntityIcon,
     SettingsIcon,
     SidebarToggleIcon,
+    SpaceEntityIcon,
     TagIcon,
     TeamEntityIcon,
 } from "@trymatcha/ui/icons";
@@ -34,6 +36,9 @@ import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore"
 import { useShortcutSheetStore } from "@/store/playground/useShortcutSheetStore";
 import { useSidebarWidthStore } from "@/store/playground/useSidebarWidthStore";
 import { useNewProjectStore } from "@/store/project/useNewProjectStore";
+import { useDeleteSpaceStore } from "@/store/space/useDeleteSpaceStore";
+import { useSpaceFormStore } from "@/store/space/useSpaceFormStore";
+import { useSpaceSelectionStore } from "@/store/space/useSpaceSelectionStore";
 import { useNewTeamStore } from "@/store/team/useNewTeamStore";
 import {
     type CommandAction,
@@ -55,6 +60,20 @@ function issueTargets(context: CommandContext): string[] {
 
 function onIssue(context: CommandContext): boolean {
     return issueTargets(context).length > 0;
+}
+
+function spaceTargets(context: CommandContext): string[] {
+    const selected = useSpaceSelectionStore.getState().ids;
+    if (selected.length) return selected;
+    return context.spaceId ? [context.spaceId] : [];
+}
+
+function onSpace(context: CommandContext): boolean {
+    return spaceTargets(context).length > 0;
+}
+
+function onOneSpace(context: CommandContext): boolean {
+    return spaceTargets(context).length === 1;
 }
 
 function openMenuPage(page: CommandPage) {
@@ -82,6 +101,7 @@ export const COMBINATIONS: Record<string, CommandAction> = {
         label: "Change status",
         icon: KanbanBoard.COLUMNS[0].icon,
         isAvailable: onIssue,
+        opensPage: true,
         run: openMenuPage("status"),
     },
     "e p": {
@@ -89,6 +109,7 @@ export const COMBINATIONS: Record<string, CommandAction> = {
         label: "Set priority",
         icon: PRIORITY_OPTIONS[0].icon,
         isAvailable: onIssue,
+        opensPage: true,
         run: openMenuPage("priority"),
     },
     "e a": {
@@ -96,6 +117,7 @@ export const COMBINATIONS: Record<string, CommandAction> = {
         label: "Assign to",
         icon: AssigneeGroupIcon,
         isAvailable: onIssue,
+        opensPage: true,
         run: openMenuPage("assignees"),
     },
     "e t": {
@@ -103,13 +125,15 @@ export const COMBINATIONS: Record<string, CommandAction> = {
         label: "Edit tags",
         icon: TagIcon,
         isAvailable: onIssue,
+        opensPage: true,
         run: openMenuPage("tags"),
     },
     "e d": {
         kind: CommandKind.Issue,
         label: "Set dates",
-        icon: CalendarIcon,
+        icon: EditCalendarIcon,
         isAvailable: onIssue,
+        opensPage: true,
         run: openMenuPage("dates"),
     },
     "e m": {
@@ -117,6 +141,7 @@ export const COMBINATIONS: Record<string, CommandAction> = {
         label: "Move to column",
         icon: KanbanColumnsIcon,
         isAvailable: onIssue,
+        opensPage: true,
         run: openMenuPage("move"),
     },
     "e c": {
@@ -124,7 +149,26 @@ export const COMBINATIONS: Record<string, CommandAction> = {
         label: "Copy from issue",
         icon: CopyIcon,
         isAvailable: onIssue,
+        opensPage: true,
         run: openMenuPage("copy"),
+    },
+    "g d": {
+        kind: CommandKind.Space,
+        label: "Set dates",
+        icon: EditCalendarIcon,
+        isAvailable: onSpace,
+        opensPage: true,
+        run: openMenuPage("space-dates"),
+    },
+    "g e": {
+        kind: CommandKind.Space,
+        label: "Edit space",
+        icon: EditIcon,
+        isAvailable: onOneSpace,
+        run: () => {
+            const [spaceId] = spaceTargets(commandContext());
+            if (spaceId) useSpaceFormStore.getState().openEdit(spaceId);
+        },
     },
     "o k": {
         kind: CommandKind.Open,
@@ -132,6 +176,13 @@ export const COMBINATIONS: Record<string, CommandAction> = {
         icon: AgentIcon,
         isAvailable: inProject,
         run: () => openTab(PlaygroundTab.Agent),
+    },
+    "o p": {
+        kind: CommandKind.Open,
+        label: "Open Spaces",
+        icon: SpaceEntityIcon,
+        isAvailable: inProject,
+        run: () => openTab(PlaygroundTab.Spaces),
     },
     "o g": {
         kind: CommandKind.Open,
@@ -181,6 +232,13 @@ export const COMBINATIONS: Record<string, CommandAction> = {
         icon: ProjectEntityIcon,
         isAvailable: inOrg,
         run: () => useNewProjectStore.getState().setOpen(true),
+    },
+    "n s": {
+        kind: CommandKind.New,
+        label: "New Space",
+        icon: SpaceEntityIcon,
+        isAvailable: inProject,
+        run: () => useSpaceFormStore.getState().openCreate(),
     },
     "n t": {
         kind: CommandKind.New,
@@ -247,6 +305,17 @@ export const COMBINATIONS: Record<string, CommandAction> = {
         run: () => {
             const targets = issueTargets(commandContext());
             if (targets.length) useDeleteIssueStore.getState().requestDelete(targets);
+        },
+    },
+    "d s": {
+        kind: CommandKind.Delete,
+        label: "Delete Space",
+        icon: DeleteIcon,
+        destructive: true,
+        isAvailable: onSpace,
+        run: () => {
+            const targets = spaceTargets(commandContext());
+            if (targets.length) useDeleteSpaceStore.getState().requestDelete(...targets);
         },
     },
     "d p": {

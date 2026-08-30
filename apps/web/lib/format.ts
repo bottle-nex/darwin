@@ -31,6 +31,21 @@ export function formatDate(date: string | Date): string {
     return value.toLocaleDateString("en-US", { month: "short", day: "2-digit", year: "numeric" });
 }
 
+function ordinalSuffix(day: number): string {
+    if (day % 100 >= 11 && day % 100 <= 13) return "th";
+    if (day % 10 === 1) return "st";
+    if (day % 10 === 2) return "nd";
+    if (day % 10 === 3) return "rd";
+    return "th";
+}
+
+/** Day-level date without the year, e.g. "Jan 10th". */
+export function shortDate(date: string | Date): string {
+    const value = typeof date === "string" ? new Date(date) : date;
+    const day = value.getDate();
+    return `${value.toLocaleDateString([], { month: "short" })} ${day}${ordinalSuffix(day)}`;
+}
+
 /** Turn an organization name into a url-safe slug, e.g. "Acme Labs" -> "acme-labs". */
 export function slugify(name: string): string {
     return name

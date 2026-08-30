@@ -8,7 +8,7 @@ import ResponseWriter from "../../services/service.response";
 
 export default class ColumnCreateController {
     static body_schema = z.object({
-        chapter_id: z.string().min(1),
+        space_id: z.string().min(1),
         label: z.string().min(1).max(100),
     });
 
@@ -26,16 +26,16 @@ export default class ColumnCreateController {
                 return;
             }
 
-            const chapter = await prisma.chapter.findUnique({
-                where: { id: parsed_body.data.chapter_id },
+            const space = await prisma.space.findUnique({
+                where: { id: parsed_body.data.space_id },
                 select: { projectId: true },
             });
-            if (!chapter) {
-                ResponseWriter.not_found(res, "Chapter not found");
+            if (!space) {
+                ResponseWriter.not_found(res, "Space not found");
                 return;
             }
 
-            const role = await Access.project(user.id, chapter.projectId);
+            const role = await Access.project(user.id, space.projectId);
             if (!role || !Permissions.project(role, Action.project.manage_columns)) {
                 ResponseWriter.not_authorized(
                     res,
@@ -46,18 +46,18 @@ export default class ColumnCreateController {
 
             const column = await prisma.$transaction(async (tx) => {
                 const last_column = await tx.customColumn.findFirst({
-                    where: { chapterId: parsed_body.data.chapter_id },
+                    where: { spaceId: parsed_body.data.space_id },
                     orderBy: { order: "desc" },
                     select: { order: true },
                 });
 
                 return tx.customColumn.create({
                     data: {
-                        chapterId: parsed_body.data.chapter_id,
+                        spaceId: parsed_body.data.space_id,
                         label: parsed_body.data.label,
                         order: (last_column?.order ?? 0) + 1,
                     },
-                    select: { id: true, chapterId: true, label: true, order: true },
+                    select: { id: true, spaceId: true, label: true, order: true },
                 });
             });
 

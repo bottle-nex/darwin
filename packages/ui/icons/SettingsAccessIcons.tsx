@@ -1,4 +1,5 @@
 import { createIcon } from "./createIcon";
+import { BsBoxes } from "react-icons/bs";
 import { GoHubot } from "react-icons/go";
 import {
     HiOutlineArrowLeft,
@@ -56,6 +57,8 @@ export const PersonRemovedNotificationIcon = createIcon(HiOutlineUserMinus);
 export const ProjectEntityIcon = createIcon(HiOutlineFolder);
 
 export const ProjectReferenceIcon = createIcon(HiOutlineRectangleGroup);
+
+export const SpaceEntityIcon = createIcon(BsBoxes);
 
 export const RemoveMemberIcon = createIcon(MdPersonOff);
 

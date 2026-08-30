@@ -12,7 +12,7 @@ import { isAxiosError } from "axios";
 import { PRIORITY_TO_NUMBER } from "@/components/playground/Home/KanbanDisplay/customkanban/data";
 import { isEditable } from "@/components/playground/Issue/issueHelpers";
 import { useAssignIssue, useUnassignIssue } from "@/hooks/issues/useAssignIssue";
-import { useChapterBoards } from "@/hooks/issues/useBoardColumns";
+import { useSpaceBoards } from "@/hooks/issues/useBoardColumns";
 import { useBulkUpdateIssues } from "@/hooks/issues/useBulkUpdateIssues";
 import { type CreateIssueInput, useCreateIssue } from "@/hooks/issues/useCreateIssue";
 import { useIssues } from "@/hooks/issues/useIssue";
@@ -25,13 +25,6 @@ import { toast } from "@/lib/toast";
 import { useDeleteIssueStore } from "@/store/issues/useDeleteIssueStore";
 import type { BoardIssue, ServerIssueStatus } from "@/types/board";
 import type { Priority } from "@/types/kanban";
-
-export const DATE_PRESETS: { label: string; days: number | null }[] = [
-    { label: "Today", days: 0 },
-    { label: "Tomorrow", days: 1 },
-    { label: "Next week", days: 7 },
-    { label: "Clear", days: null },
-];
 
 export const COPY_FIELDS: {
     label: string;
@@ -48,14 +41,6 @@ export const COPY_FIELDS: {
         value: (issue) => htmlToMarkdown(issue.description),
     },
 ];
-
-function presetToIso(days: number | null): string | null {
-    if (days === null) return null;
-    const date = new Date();
-    date.setDate(date.getDate() + days);
-    date.setHours(12, 0, 0, 0);
-    return date.toISOString();
-}
 
 export type IssueActions = ReturnType<typeof useIssueActions>;
 
@@ -100,7 +85,7 @@ export function useIssueActions(target: IssueActionTarget) {
     const isComplete = suppliedIssues.length > 0 || issueQuery.isComplete;
     const issue = issues.length === 1 ? issues[0] : undefined;
 
-    const chapterBoards = useChapterBoards(projectId);
+    const spaceBoards = useSpaceBoards(projectId);
     const { data: members } = useProjectMembers(projectId);
     const { data: tags } = useListTags(projectId);
 
@@ -160,7 +145,7 @@ export function useIssueActions(target: IssueActionTarget) {
         sharedPriority: shared(issues, (row) => row.priority),
         sharedColumnId: shared(issues, (row) => row.customColumnId),
         projectId,
-        chapterBoards,
+        spaceBoards,
         members: members ?? [],
         tags: tags ?? [],
         editable,
@@ -170,8 +155,8 @@ export function useIssueActions(target: IssueActionTarget) {
 
         setStatus: (status: ServerIssueStatus) => patch({ status, custom_column_id: null }),
         setPriority: (priority: Priority) => patch({ priority: PRIORITY_TO_NUMBER[priority] }),
-        setStartDate: (days: number | null) => patch({ start_date: presetToIso(days) }),
-        setTargetDate: (days: number | null) => patch({ target_date: presetToIso(days) }),
+        setStartDate: (iso: string | null) => patch({ start_date: iso }),
+        setTargetDate: (iso: string | null) => patch({ target_date: iso }),
         moveToColumn: (columnId: string | null) => patch({ custom_column_id: columnId }),
 
         toggleTag: (tagId: string) => {

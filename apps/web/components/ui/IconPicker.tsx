@@ -12,6 +12,18 @@ import { cn } from "@/lib/utils";
 export type IconPick =
     { kind: "icon"; name: string; color: string } | { kind: "emoji"; char: string };
 
+/**
+ * The tile a picked icon sits on: washed with the pick's own colour, so the icon reads
+ * the same everywhere it appears. Emoji carry their own colour, so they get a plain tile.
+ */
+export function iconPickSurface(pick: IconPick | null | undefined) {
+    const tinted = pick?.kind === "icon";
+    return {
+        style: tinted ? { backgroundColor: `${pick.color}33` } : undefined,
+        className: tinted ? "hover:brightness-125" : "bg-snow/6 hover:bg-snow/10",
+    };
+}
+
 export function IconPickGlyph({ pick, className }: { pick: IconPick; className?: string }) {
     if (pick.kind === "emoji") {
         return <span className={cn("leading-none", className)}>{pick.char}</span>;
@@ -78,9 +90,24 @@ function Empty({ query }: { query: string }) {
     );
 }
 
-function IconsTab({ onPick }: { onPick: (pick: IconPick) => void }) {
-    const [color, setColor] = useState(SWATCHES[0]);
+function IconsTab({
+    pick,
+    onPick,
+    onRecolor,
+}: {
+    pick: IconPick | null | undefined;
+    onPick: (pick: IconPick) => void;
+    onRecolor: (color: string) => void;
+}) {
+    const [color, setColor] = useState(pick?.kind === "icon" ? pick.color : SWATCHES[0]);
     const [query, setQuery] = useState("");
+
+    // Recolouring an already-picked icon is a pick in its own right, so the
+    // swatch commits it. Without an icon chosen yet it only arms the next pick.
+    function chooseColor(next: string) {
+        setColor(next);
+        onRecolor(next);
+    }
 
     const matches = useMemo(() => {
         const needle = query.trim().toLowerCase();
@@ -96,7 +123,7 @@ function IconsTab({ onPick }: { onPick: (pick: IconPick) => void }) {
                         key={swatch}
                         type="button"
                         aria-label={swatch}
-                        onClick={() => setColor(swatch)}
+                        onClick={() => chooseColor(swatch)}
                         style={{ background: swatch }}
                         className="flex size-4.75 aspect-square cursor-pointer items-center justify-center rounded-full"
                     >
@@ -116,7 +143,7 @@ function IconsTab({ onPick }: { onPick: (pick: IconPick) => void }) {
                         />
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-3">
-                        <ColorPicker value={color} onChange={setColor} />
+                        <ColorPicker value={color} onChange={chooseColor} />
                     </PopoverContent>
                 </Popover>
             </div>
@@ -219,12 +246,15 @@ function EmojisTab({ recents, onPick }: { recents: string[]; onPick: (pick: Icon
 }
 
 export default function IconPicker({
+    pick,
     open,
     onOpenChange,
     onSelect,
     align = "start",
     children,
 }: {
+    /** The current pick, so the icons tab opens on its colour. */
+    pick?: IconPick | null;
     open: boolean;
     onOpenChange: (open: boolean) => void;
     onSelect: (pick: IconPick) => void;
@@ -242,6 +272,12 @@ export default function IconPicker({
         }
         onSelect(pick);
         onOpenChange(false);
+    }
+
+    // A colour change keeps the picker open — you are still browsing icons.
+    function handleRecolor(color: string) {
+        if (pick?.kind !== "icon") return;
+        onSelect({ ...pick, color });
     }
 
     return (
@@ -275,7 +311,12 @@ export default function IconPicker({
                 </div>
 
                 {tab === "icons" ? (
-                    <IconsTab key="icons" onPick={handlePick} />
+                    <IconsTab
+                        key="icons"
+                        pick={pick}
+                        onPick={handlePick}
+                        onRecolor={handleRecolor}
+                    />
                 ) : (
                     <EmojisTab key="emojis" recents={recents} onPick={handlePick} />
                 )}
@@ -318,19 +359,25 @@ export function IconPickButton({
     className?: string;
 }) {
     const { tile, glyph } = ICON_PICK_BUTTON[size];
-    const tinted = pick?.kind === "icon";
+    const surface = iconPickSurface(pick);
 
     return (
-        <IconPicker open={open} onOpenChange={onOpenChange} onSelect={onSelect} align={align}>
+        <IconPicker
+            pick={pick}
+            open={open}
+            onOpenChange={onOpenChange}
+            onSelect={onSelect}
+            align={align}
+        >
             <Button
                 variant="unstyled"
                 type="button"
                 aria-label={label}
-                style={tinted ? { backgroundColor: `${pick.color}33` } : undefined}
+                style={surface.style}
                 className={cn(
                     "flex shrink-0 cursor-pointer items-center justify-center transition-colors",
                     tile,
-                    tinted ? "hover:brightness-125" : "bg-snow/6 hover:bg-snow/10",
+                    surface.className,
                     className,
                 )}
             >

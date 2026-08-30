@@ -7,8 +7,8 @@ import {
 } from "@/components/playground/Core/components/PlaygroundPaneSlots";
 import GanttDisplay from "@/components/playground/Home/GanttDisplay/GanttDisplay";
 import InboxDisplay from "@/components/playground/Home/InboxDisplay/InboxDisplay";
-import ChapterPane from "@/components/playground/Home/KanbanDisplay/ChapterPane";
 import KanbanDisplay from "@/components/playground/Home/KanbanDisplay/KanbanDisplay";
+import SpacePane from "@/components/playground/Home/KanbanDisplay/SpacePane";
 import MyIssuesDisplay from "@/components/playground/Home/MyIssuesDisplay/MyIssuesDisplay";
 import ChatsDisplay from "@/components/playground/Home/panes/ChatsDisplay";
 import ApiKeysSettingsSection from "@/components/playground/Home/SettingsDisplay/ApiKeysSettingsSection";
@@ -16,6 +16,7 @@ import AppearanceSettingsSection from "@/components/playground/Home/SettingsDisp
 import SettingsBreadcrumb from "@/components/playground/Home/SettingsDisplay/SettingsBreadcrumb";
 import SettingsDisplay from "@/components/playground/Home/SettingsDisplay/SettingsDisplay";
 import SettingsPaneShell from "@/components/playground/Home/SettingsDisplay/SettingsPaneShell";
+import SpacesDisplay from "@/components/playground/Home/SpacesDisplay/SpacesDisplay";
 import TagsDisplay from "@/components/playground/Home/TagsDisplay/TagsDisplay";
 import { isSettingsTab, PlaygroundTab } from "@/components/playground/playgroundTabs";
 import TeamDetailDisplay from "@/components/playground/Team/TeamDisplay";
@@ -48,8 +49,11 @@ function TabPane({ tab }: { tab: string }) {
         case PlaygroundTab.Inbox:
             return <InboxDisplay />;
 
-        case PlaygroundTab.Chapter:
-            return <ChapterPane />;
+        case PlaygroundTab.Spaces:
+            return <SpacesDisplay />;
+
+        case PlaygroundTab.Space:
+            return <SpacePane />;
 
         case PlaygroundTab.Agent:
         default:

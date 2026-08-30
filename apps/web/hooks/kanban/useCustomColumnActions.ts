@@ -12,13 +12,13 @@ export function useCustomColumnActions() {
     const updateColumn = useUpdateColumn();
     const deleteColumn = useDeleteColumn();
 
-    const addColumn = async (chapterId: string, title: string) => {
+    const addColumn = async (spaceId: string, title: string) => {
         const name = title.trim();
         if (!name || !projectId) return false;
         try {
             const column = await createColumn.mutateAsync({
                 project_id: projectId,
-                chapter_id: chapterId,
+                space_id: spaceId,
                 label: name,
             });
             useCustomKanbanStore

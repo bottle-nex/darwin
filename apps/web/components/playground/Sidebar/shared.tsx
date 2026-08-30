@@ -7,6 +7,7 @@ import PlaygroundAvatar, {
     type AvatarTone,
 } from "@/components/playground/Core/components/PlaygroundAvatar";
 import { Button } from "@/components/ui/button";
+import { type IconPick, IconPickGlyph } from "@/components/ui/IconPicker";
 
 // ── Shared row-leading helpers ──────────────────────────────────────────────
 // A row leads with either an icon or a letter avatar. Sections declare
@@ -14,15 +15,26 @@ import { Button } from "@/components/ui/button";
 // prop a row expects (it needs a ready-made node for avatars).
 
 export type LeadingSpec =
-    { kind: "icon"; icon: IconType } | { kind: "avatar"; letter: string; tone: AvatarTone };
+    | { kind: "icon"; icon: IconType }
+    | { kind: "avatar"; letter: string; tone: AvatarTone }
+    | { kind: "pick"; pick: IconPick | null; fallback: IconType };
 
 export function rowLeading(spec: LeadingSpec) {
-    return spec.kind === "icon"
-        ? ({ kind: "icon", icon: spec.icon } as const)
-        : ({
-              kind: "node",
-              node: <PlaygroundAvatar letter={spec.letter} tone={spec.tone} size="sm" />,
-          } as const);
+    if (spec.kind === "icon") return { kind: "icon", icon: spec.icon } as const;
+
+    if (spec.kind === "pick") {
+        return spec.pick
+            ? ({
+                  kind: "node",
+                  node: <IconPickGlyph pick={spec.pick} className="size-4 shrink-0 text-base" />,
+              } as const)
+            : ({ kind: "icon", icon: spec.fallback } as const);
+    }
+
+    return {
+        kind: "node",
+        node: <PlaygroundAvatar letter={spec.letter} tone={spec.tone} size="sm" />,
+    } as const;
 }
 
 /** Props threaded into every section by the sidebar. */

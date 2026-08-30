@@ -3,6 +3,7 @@
 import PlaygroundAvatar from "@/components/playground/Core/components/PlaygroundAvatar";
 import SelectableRow from "@/components/playground/Core/components/SelectableRow";
 import { useIssueSelection } from "@/hooks/issues/useIssueSelection";
+import { shortDate } from "@/lib/format";
 import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
 import { cn } from "@/lib/utils";
 import type { IssueSelectionScope } from "@/store/issues/useIssueSelectionStore";
@@ -10,7 +11,6 @@ import { usePaneRouteStore } from "@/store/playground/usePaneRouteStore";
 import type { BoardIssue, BoardTag } from "@/types/board";
 import type { Assignee } from "@/types/kanban";
 
-import { shortDate } from "./cards/IssueCardFace";
 import IssueDropdown from "./IssueDropdown";
 import IssueTags from "./IssueTags";
 
@@ -24,6 +24,10 @@ type IssueListRowProps = {
     createdAt?: string | null;
     boardIssue?: BoardIssue;
     selectionScope: IssueSelectionScope;
+    /** The row directly above is selected too — see `SelectableRow`. */
+    joinedAbove?: boolean;
+    /** The row directly below is selected too — see `SelectableRow`. */
+    joinedBelow?: boolean;
 };
 
 export default function IssueListRow({
@@ -36,6 +40,8 @@ export default function IssueListRow({
     createdAt,
     boardIssue,
     selectionScope,
+    joinedAbove,
+    joinedBelow,
 }: IssueListRowProps) {
     const openIssue = usePaneRouteStore((s) => s.openIssue);
     const { selectedIds, isSelected, toggleSelection, handleSelectClick } =
@@ -50,6 +56,8 @@ export default function IssueListRow({
             data-selected={selected}
             selected={selected}
             selectionActive={selectedIds.length > 0}
+            joinedAbove={joinedAbove}
+            joinedBelow={joinedBelow}
             selectionLabel={selected ? `Deselect issue ${number}` : `Select issue ${number}`}
             onToggleSelection={() => toggleSelection(issueId)}
             className="min-h-11 w-full px-3 text-left"

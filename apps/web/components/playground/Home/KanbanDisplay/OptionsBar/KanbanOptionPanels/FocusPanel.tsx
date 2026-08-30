@@ -52,7 +52,7 @@ export function FocusPanelItems({ value, onChange, customColumns }: FocusPanelPr
                 )}
             </DropdownMenuItem>
 
-            {scope.kind === "chapter" &&
+            {scope.kind === "space" &&
                 (hasCustom ? (
                     <EagerSubmenu
                         className={`${FOCUS_PANEL_WIDTH} [direction:ltr]`}
@@ -115,7 +115,7 @@ export function FocusPanelItems({ value, onChange, customColumns }: FocusPanelPr
 }
 
 /**
- * Focus column: pick a single column to expand full-width. A chapter pane
+ * Focus column: pick a single column to expand full-width. A space pane
  * offers its lists; the agent pane offers the agent statuses. "Default" clears
  * the focus. The trigger stays active while a column is focused.
  *

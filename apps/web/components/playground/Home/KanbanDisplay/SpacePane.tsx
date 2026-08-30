@@ -5,18 +5,18 @@ import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore"
 
 import KanbanDisplay from "./KanbanDisplay";
 
-export default function ChapterPane() {
-    const chapter = usePlaygroundNavStore((s) => s.selectedChapter);
+export default function SpacePane() {
+    const space = usePlaygroundNavStore((s) => s.selectedSpace);
     const scope = useMemo(
-        () => ({ kind: "chapter" as const, chapterId: chapter?.id ?? "" }),
-        [chapter?.id],
+        () => ({ kind: "space" as const, spaceId: space?.id ?? "" }),
+        [space?.id],
     );
 
-    if (!chapter) return null;
+    if (!space) return null;
 
     return (
         <div className="flex min-h-0 flex-1 flex-col">
-            <KanbanDisplay key={chapter.id} scope={scope} />
+            <KanbanDisplay key={space.id} scope={scope} />
         </div>
     );
 }

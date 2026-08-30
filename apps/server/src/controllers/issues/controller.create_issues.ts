@@ -64,7 +64,7 @@ export default class IssueCreateController {
                 const column = await prisma.customColumn.findFirst({
                     where: {
                         id: parsed_body.data.custom_column_id,
-                        chapter: { projectId: parsed_body.data.project_id },
+                        space: { projectId: parsed_body.data.project_id },
                     },
                     select: { id: true },
                 });

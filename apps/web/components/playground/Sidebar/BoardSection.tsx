@@ -1,5 +1,5 @@
 "use client";
-import { GanttNavIcon, TagIcon } from "@trymatcha/ui/icons";
+import { GanttNavIcon, SpaceEntityIcon, TagIcon } from "@trymatcha/ui/icons";
 
 import HeroBuddy from "@/components/landing/v2/HeroBuddy";
 
@@ -12,15 +12,23 @@ type BoardRow = {
     id: string;
     label: string;
     leading: React.ComponentProps<typeof Row>["leading"];
+    /** Extra tabs that keep this row lit — one space's board still belongs to Spaces. */
+    alsoActiveOn?: string[];
 };
 
-// The ways you look at the project's work — the agent's board and its lenses.
-// The user's own boards are chapters, and live in their own section.
+// The ways you look at the project's work — the agent's board, the user's own
+// boards, and the lenses over both.
 const BOARD_ROWS: BoardRow[] = [
     {
         id: PlaygroundTab.Agent,
         label: "Agent",
         leading: { kind: "node", node: <HeroBuddy move={false} className="size-4" /> },
+    },
+    {
+        id: PlaygroundTab.Spaces,
+        label: "Spaces",
+        leading: { kind: "icon", icon: SpaceEntityIcon },
+        alsoActiveOn: [PlaygroundTab.Space],
     },
     { id: PlaygroundTab.Gantt, label: "Gantt", leading: { kind: "icon", icon: GanttNavIcon } },
     { id: PlaygroundTab.Tags, label: "Tags", leading: { kind: "icon", icon: TagIcon } },
@@ -37,7 +45,9 @@ export default function PlaygroundSidebarBoardSection({
                     key={r.id}
                     label={r.label}
                     leading={r.leading}
-                    active={selectedRowId === r.id}
+                    active={
+                        selectedRowId === r.id || Boolean(r.alsoActiveOn?.includes(selectedRowId))
+                    }
                     onClick={() => onSelect(r.id)}
                 />
             ))}
