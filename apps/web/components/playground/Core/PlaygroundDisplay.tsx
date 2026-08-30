@@ -113,15 +113,18 @@ export default function PlaygroundDisplay({ isLoading }: { isLoading?: boolean }
                 <>
                     <div
                         aria-hidden={inSettings}
-                        className={cn("flex min-h-0 flex-1 flex-col", inSettings && "hidden")}
+                        className={cn(
+                            "absolute inset-0 flex min-h-0 flex-col",
+                            inSettings && "pointer-events-none invisible",
+                        )}
                     >
                         <RetainedWorkspacePane tab={lastWorkspaceTab} hidden={inSettings} />
                     </div>
                     {inSettings && (
-                        <>
+                        <div className="absolute inset-0 flex min-h-0 flex-col">
                             <SettingsBreadcrumb />
                             <SettingsPane tab={tab} />
-                        </>
+                        </div>
                     )}
                 </>
             )}
