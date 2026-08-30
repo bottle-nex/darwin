@@ -9,13 +9,7 @@ import {
     type PlaygroundTab,
     tabToDefaultHomeView,
 } from "@/components/playground/playgroundTabs";
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
+import SelectField from "@/components/ui/SelectField";
 import { Switch } from "@/components/ui/switch";
 import { useGetDashboard } from "@/hooks/dashboard/useGetDashboard";
 import { useUpdateUserConfig } from "@/hooks/user/useUpdateUserConfig";
@@ -27,6 +21,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useBackgroundLightingStore } from "@/store/playground/useBackgroundLightingStore";
 
+import SettingsRow, { SETTINGS_CONTROL_WIDTH } from "./SettingsRow";
 import SettingsUtilityCard from "./SettingsUtilityCard";
 
 function ColorSwatch({
@@ -91,40 +86,31 @@ export default function AppearanceSettingsSection() {
     const enabled = config.backgroundLightingEnabled;
 
     return (
-        <div className="flex flex-col gap-4">
-            <SettingsUtilityCard
-                title="Default home view"
-                description="The view a project opens on when you don't link to a specific tab."
-            >
-                <div className="flex items-center justify-between gap-4">
-                    <span className="text-[13px] text-neutral-300">Opens on</span>
-                    <Select
+        <div className="flex flex-col gap-12">
+            <SettingsUtilityCard title="Preferences" rows>
+                <SettingsRow
+                    label="Default home view"
+                    description="The view a project opens on when you don't link to a specific tab."
+                >
+                    <SelectField
+                        aria-label="Default home view"
+                        className="w-40"
                         value={defaultHomeViewToTab(config.defaultHomeView)}
-                        onValueChange={(tab) => {
+                        onChange={(tab) => {
                             const view = tabToDefaultHomeView(tab as PlaygroundTab);
                             if (view) updateConfig.mutate({ defaultHomeView: view });
                         }}
-                    >
-                        <SelectTrigger size="sm">
-                            <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {DEFAULT_HOME_VIEW_OPTIONS.map((option) => (
-                                <SelectItem key={option.tab} value={option.tab}>
-                                    {option.label}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                </div>
-            </SettingsUtilityCard>
+                        options={DEFAULT_HOME_VIEW_OPTIONS.map((option) => ({
+                            value: option.tab,
+                            label: option.label,
+                        }))}
+                    />
+                </SettingsRow>
 
-            <SettingsUtilityCard
-                title="Background lighting"
-                description="An ambient glow behind the workspace. These settings follow your account, not this project."
-            >
-                <div className="flex items-center justify-between gap-4">
-                    <span className="text-[13px] text-neutral-300">Enable</span>
+                <SettingsRow
+                    label="Background lighting"
+                    description="An ambient glow behind the workspace. Follows your account, not this project."
+                >
                     <Switch
                         checked={enabled}
                         onCheckedChange={(backgroundLightingEnabled) =>
@@ -132,17 +118,16 @@ export default function AppearanceSettingsSection() {
                         }
                         aria-label="Enable background lighting"
                     />
-                </div>
+                </SettingsRow>
             </SettingsUtilityCard>
 
             <SettingsUtilityCard
                 title="Color & direction"
-                description="Choose a hue and sweep angle for the glow."
                 className={cn(!enabled && "pointer-events-none opacity-50")}
+                rows
             >
-                <div>
-                    <span className="text-[12px] text-neutral-300">Color</span>
-                    <div className="mt-3 flex flex-wrap items-start gap-x-6 gap-y-4">
+                <SettingsRow label="Color" description="The hue the glow is tinted with.">
+                    <div className="flex flex-wrap items-start justify-end gap-x-6 gap-y-4">
                         {BACKGROUND_LIGHTING_COLORS.map((color) => (
                             <ColorSwatch
                                 key={color}
@@ -155,13 +140,9 @@ export default function AppearanceSettingsSection() {
                             />
                         ))}
                     </div>
-                </div>
+                </SettingsRow>
 
-                <div className="border-t border-white/5 pt-4">
-                    <div className="flex items-center justify-between gap-3">
-                        <span className="text-[12px] text-neutral-300">Direction</span>
-                        <span className="text-[11px] text-neutral-500 tabular-nums">{angle}°</span>
-                    </div>
+                <SettingsRow label="Direction" description={`Sweep angle — ${angle}°.`}>
                     <Slider.Root
                         value={[angle]}
                         min={0}
@@ -169,7 +150,10 @@ export default function AppearanceSettingsSection() {
                         step={1}
                         disabled={!enabled}
                         onValueChange={([nextAngle]) => setAngle(nextAngle)}
-                        className="relative mt-2.5 flex h-5 w-full touch-none items-center select-none"
+                        className={cn(
+                            SETTINGS_CONTROL_WIDTH,
+                            "relative flex h-5 touch-none items-center select-none",
+                        )}
                     >
                         <Slider.Track className="relative h-1 flex-1 overflow-hidden rounded-full bg-white/8">
                             <Slider.Range className="absolute h-full bg-white/25" />
@@ -180,7 +164,7 @@ export default function AppearanceSettingsSection() {
                             className="block size-3 cursor-grab rounded-full bg-white shadow-[0_1px_5px_rgba(0,0,0,0.55)] outline-none transition-transform hover:scale-110 focus-visible:ring-2 focus-visible:ring-primary/50 active:cursor-grabbing"
                         />
                     </Slider.Root>
-                </div>
+                </SettingsRow>
             </SettingsUtilityCard>
         </div>
     );
