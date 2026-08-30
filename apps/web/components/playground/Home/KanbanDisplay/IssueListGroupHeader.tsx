@@ -28,7 +28,7 @@ export default function IssueListGroupHeader({
     onCreate,
 }: IssueListGroupHeaderProps) {
     return (
-        <div className="group/header relative h-9 rounded-lg bg-cement backdrop-blur-2xl">
+        <div className="group/header relative h-9 rounded-lg bg-active backdrop-blur-2xl">
             <button
                 type="button"
                 aria-label={`${collapsed ? "Expand" : "Collapse"} ${title}`}

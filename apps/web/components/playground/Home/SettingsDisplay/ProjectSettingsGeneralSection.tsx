@@ -13,7 +13,6 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog";
-import { FIELD_LABEL } from "@/components/ui/fieldStyles";
 import { type IconPick, IconPickButton } from "@/components/ui/IconPicker";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
@@ -25,10 +24,8 @@ import { cn } from "@/lib/utils";
 import type { KanbanOptionView, ProjectDetail } from "@/types/project";
 
 import ProjectSettingsBoardSection from "./ProjectSettingsBoardSection";
+import SettingsRow, { SETTINGS_CONTROL_WIDTH } from "./SettingsRow";
 import SettingsUtilityCard from "./SettingsUtilityCard";
-
-const FIELD =
-    "border-white/10 bg-white/5 text-neutral-200 placeholder:text-neutral-500 focus-visible:border-matcha focus-visible:ring-matcha/30";
 
 export default function ProjectSettingsGeneralSection({
     project,
@@ -92,10 +89,64 @@ export default function ProjectSettingsGeneralSection({
     }
 
     return (
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-12">
+            <SettingsUtilityCard title="Project" rows>
+                <SettingsRow label="Icon" description="Shown next to the project everywhere.">
+                    <IconPickButton
+                        pick={icon}
+                        onSelect={setIcon}
+                        open={iconOpen}
+                        onOpenChange={setIconOpen}
+                        label="Pick project icon"
+                    />
+                </SettingsRow>
+
+                <SettingsRow label="Name">
+                    <Input
+                        variant="outline"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        className={cn(SETTINGS_CONTROL_WIDTH, "h-8 text-[13px]")}
+                    />
+                </SettingsRow>
+
+                <SettingsRow
+                    label="Slug"
+                    description={
+                        slugTaken ? (
+                            <span className="text-red-400">That slug is already taken.</span>
+                        ) : (
+                            "Used in this project's URLs."
+                        )
+                    }
+                >
+                    <Input
+                        variant="outline"
+                        value={slug}
+                        onChange={(e) =>
+                            setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""))
+                        }
+                        className={cn(SETTINGS_CONTROL_WIDTH, "h-8 font-mono text-[13px]")}
+                    />
+                </SettingsRow>
+
+                <SettingsRow label="Description" description="Up to 150 characters.">
+                    <Textarea
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                        maxLength={150}
+                        rows={4}
+                        className={cn(
+                            SETTINGS_CONTROL_WIDTH,
+                            "max-h-40 resize-none overflow-y-auto rounded-[8px] border border-snow/5 bg-snow/6 px-2.5 py-2 text-[13px] hover:bg-snow/8",
+                        )}
+                    />
+                </SettingsRow>
+            </SettingsUtilityCard>
+
             <SettingsUtilityCard
-                title="Project"
-                description="Change the name, slug, or description."
+                title="Board & previews"
+                rows
                 footer={
                     <>
                         {update.isSuccess && !dirty && (
@@ -103,6 +154,7 @@ export default function ProjectSettingsGeneralSection({
                         )}
                         <Button
                             type="button"
+                            variant="flat-primary"
                             size="sm"
                             loading={update.isPending}
                             disabled={!canSave}
@@ -113,93 +165,46 @@ export default function ProjectSettingsGeneralSection({
                     </>
                 }
             >
-                <div className="flex gap-3">
-                    <div>
-                        <label className={FIELD_LABEL}>Icon</label>
-                        <IconPickButton
-                            pick={icon}
-                            onSelect={setIcon}
-                            open={iconOpen}
-                            onOpenChange={setIconOpen}
-                            label="Pick project icon"
-                            className="mt-1.5"
-                        />
-                    </div>
-                    <div className="flex-1">
-                        <label className={FIELD_LABEL}>Name</label>
-                        <Input
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            className={cn(FIELD, "mt-1.5 h-9 text-[13px]")}
-                        />
-                    </div>
-                </div>
-
-                <div>
-                    <label className={FIELD_LABEL}>Slug</label>
-                    <Input
-                        variant={"ghost"}
-                        value={slug}
-                        onChange={(e) =>
-                            setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""))
-                        }
-                        className={cn(FIELD, "mt-1.5 h-9 font-mono text-[13px]")}
+                <SettingsRow
+                    label="Options bar"
+                    description="Choose how kanban controls are laid out."
+                    stack
+                >
+                    <ProjectSettingsBoardSection
+                        value={optionsBarView}
+                        onChange={setOptionsBarDraft}
                     />
-                    {slugTaken && (
-                        <p className="mt-1.5 text-[11px] text-red-400">
-                            That slug is already taken.
-                        </p>
-                    )}
-                </div>
+                </SettingsRow>
 
-                <div>
-                    <label className={FIELD_LABEL}>Description</label>
-                    <Textarea
-                        value={description}
-                        onChange={(e) => setDescription(e.target.value)}
-                        maxLength={150}
-                        rows={10}
-                        className="max-h-64 resize-none overflow-y-auto"
-                    />
-                </div>
-
-                <ProjectSettingsBoardSection value={optionsBarView} onChange={setOptionsBarDraft} />
-
-                <div className="flex items-center justify-between gap-4 rounded-lg border border-white/8 p-3">
-                    <div>
-                        <p className="text-[12px] font-medium text-neutral-200">Product Diff</p>
-                        <p className="mt-1 text-[11px] text-neutral-500">
-                            Generate visual base and head previews for frontend pull requests.
-                        </p>
-                    </div>
+                <SettingsRow
+                    label="Product Diff"
+                    description="Generate visual base and head previews for frontend pull requests."
+                >
                     <Switch
                         checked={productDiffEnabled}
                         onCheckedChange={setProductDiffDraft}
                         aria-label="Enable Product Diff"
                     />
-                </div>
+                </SettingsRow>
             </SettingsUtilityCard>
 
             {isAdmin && (
-                <SettingsUtilityCard
-                    title="Danger zone"
-                    description="Irreversible actions — proceed with caution."
-                    footer={
+                <SettingsUtilityCard title="Danger zone" rows>
+                    <SettingsRow
+                        label="Delete this project"
+                        description={`Removes ${project.name} and everything in it, teams, issues, and secrets, for good.`}
+                    >
                         <Button
                             type="button"
+                            variant="flat-destructive"
                             size="sm"
-                            variant="destructive"
                             onClick={() => setConfirmOpen(true)}
+                            className="h-7.5!"
                         >
                             <DeleteIcon className="size-3" aria-hidden />
                             Delete project
                         </Button>
-                    }
-                >
-                    <p className="text-[12px] text-neutral-500">
-                        Deleting <span className="text-neutral-300">{project.name}</span> removes it
-                        and everything in it, teams, issues, and secrets, for good.
-                    </p>
+                    </SettingsRow>
                 </SettingsUtilityCard>
             )}
 
@@ -219,7 +224,7 @@ export default function ProjectSettingsGeneralSection({
                         <Button
                             type="button"
                             size="sm"
-                            variant="tertiary"
+                            variant="flat"
                             disabled={del.isPending}
                             onClick={() => setConfirmOpen(false)}
                         >
@@ -228,7 +233,7 @@ export default function ProjectSettingsGeneralSection({
                         <Button
                             type="button"
                             size="sm"
-                            variant="destructive"
+                            variant="flat-destructive"
                             loading={del.isPending}
                             onClick={remove}
                         >

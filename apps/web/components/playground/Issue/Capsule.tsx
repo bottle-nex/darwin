@@ -80,11 +80,19 @@ interface CapsuleDropdownProps {
     onChange?: (value: string) => void;
     disabled?: boolean;
     className?: string;
+    placeholder?: string;
 }
 
-function CapsuleDropdown({ options, value, onChange, disabled, className }: CapsuleDropdownProps) {
+function CapsuleDropdown({
+    options,
+    value,
+    onChange,
+    disabled,
+    className,
+    placeholder = "Select",
+}: CapsuleDropdownProps) {
     const [open, setOpen] = useState(false);
-    const selected = options.find((option) => option.value === value) ?? options[0];
+    const selected = options.find((option) => option.value === value);
 
     function handleSelect(next: string) {
         onChange?.(next);
@@ -98,7 +106,7 @@ function CapsuleDropdown({ options, value, onChange, disabled, className }: Caps
                     {selected?.dotClassName && (
                         <span className={cn("size-2 rounded-full", selected.dotClassName)} />
                     )}
-                    {selected?.label}
+                    {selected?.label ?? placeholder}
                 </CapsuleTrigger>
             </PopoverTrigger>
             <PopoverContent className="w-44 p-1">

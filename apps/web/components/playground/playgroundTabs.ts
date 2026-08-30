@@ -19,6 +19,7 @@ export enum PlaygroundTab {
     SettingsProject = "settings-project",
     SettingsTemplates = "settings-templates",
     SettingsEnv = "settings-env",
+    SettingsHarness = "settings-harness",
     SettingsIntegrations = "settings-integrations",
 }
 
@@ -31,6 +32,7 @@ export const PROJECT_SETTINGS_TABS: PlaygroundTab[] = [
     PlaygroundTab.SettingsProject,
     PlaygroundTab.SettingsTemplates,
     PlaygroundTab.SettingsEnv,
+    PlaygroundTab.SettingsHarness,
     PlaygroundTab.SettingsIntegrations,
 ];
 

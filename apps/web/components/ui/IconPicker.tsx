@@ -288,7 +288,7 @@ type IconPickButtonSize = "sm" | "md" | "lg";
 
 const ICON_PICK_BUTTON: Record<IconPickButtonSize, { tile: string; glyph: string }> = {
     sm: { tile: "size-5.5 rounded-[7px]", glyph: "size-3.5 text-sm" },
-    md: { tile: "size-9 rounded-lg", glyph: "size-4 text-base" },
+    md: { tile: "size-8 rounded-[8px]", glyph: "size-4 text-base" },
     lg: { tile: "size-10 rounded-lg", glyph: "size-5 text-lg" },
 };
 
@@ -330,7 +330,7 @@ export function IconPickButton({
                 className={cn(
                     "flex shrink-0 cursor-pointer items-center justify-center transition-colors",
                     tile,
-                    tinted ? "hover:brightness-125" : "bg-white/5 hover:bg-white/10",
+                    tinted ? "hover:brightness-125" : "bg-snow/6 hover:bg-snow/10",
                     className,
                 )}
             >

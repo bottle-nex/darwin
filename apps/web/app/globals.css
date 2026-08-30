@@ -3,8 +3,9 @@
 /* All design tokens (colors, radii, fonts) live in the shared theme package,
    imported by both apps/web and apps/admin so they cannot drift. */
 @import "../../../packages/theme/theme.css";
-@import "../../../node_modules/react-diff-view/style/index.css";
-@import "../../../node_modules/prism-themes/themes/prism-z-touch.css";
+/*@import "../../../node_modules/react-diff-view/style/index.css";*/
+@import "prism-themes/themes/prism-z-touch.css";
+@import "react-diff-view/style/index.css";
 
 @source "../**/*.{ts,tsx}";
 @source "../../../packages/editorial/**/*.tsx";

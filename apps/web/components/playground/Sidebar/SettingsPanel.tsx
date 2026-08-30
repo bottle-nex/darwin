@@ -1,47 +1,32 @@
 "use client";
-import type { IconType } from "@trymatcha/ui/icons";
-import {
-    EnvSecretIcon,
-    GithubLogoIcon,
-    SettingsApiKeysIcon,
-    SettingsAppearanceIcon,
-    SettingsBackIcon,
-    SettingsGeneralIcon,
-    SettingsTemplatesIcon,
-} from "@trymatcha/ui/icons";
-
 import { useActiveProject } from "@/hooks/useActiveProject";
+import { cn } from "@/lib/utils";
 
-import { PlaygroundTab } from "../playgroundTabs";
+import { filterSettingsItems, type SettingsItem } from "./settingsItems";
 import type { SidebarSectionProps } from "./shared";
 import Row from "./SidebarRow";
 import Section from "./SidebarSection";
 
-type SettingsItem = { tab: PlaygroundTab; label: string; icon: IconType };
-
-const ACCOUNT_SETTINGS: SettingsItem[] = [
-    { tab: PlaygroundTab.SettingsAppearance, label: "Appearance", icon: SettingsAppearanceIcon },
-    { tab: PlaygroundTab.SettingsApiKeys, label: "API keys", icon: SettingsApiKeysIcon },
-];
-
-const PROJECT_SETTINGS: SettingsItem[] = [
-    { tab: PlaygroundTab.SettingsProject, label: "General", icon: SettingsGeneralIcon },
-    { tab: PlaygroundTab.SettingsTemplates, label: "Issue templates", icon: SettingsTemplatesIcon },
-    { tab: PlaygroundTab.SettingsEnv, label: "Environment variables", icon: EnvSecretIcon },
-    { tab: PlaygroundTab.SettingsIntegrations, label: "Integrations", icon: GithubLogoIcon },
-];
-
 export default function PlaygroundSidebarSettingsPanel({
     selectedRowId,
     onSelect,
-    onBack,
-}: SidebarSectionProps & { onBack: () => void }) {
+    query,
+}: SidebarSectionProps & { query: string }) {
     const activeProject = useActiveProject();
+    const { accountItems, projectItems, topMatch } = filterSettingsItems(
+        query,
+        Boolean(activeProject),
+    );
 
     function renderItem(item: SettingsItem) {
         return (
             <Row
                 key={item.tab}
+                className={cn(
+                    topMatch?.tab === item.tab &&
+                        selectedRowId !== item.tab &&
+                        "bg-white/3 text-neutral-100",
+                )}
                 leading={{ kind: "icon", icon: item.icon }}
                 label={item.label}
                 active={selectedRowId === item.tab}
@@ -51,19 +36,14 @@ export default function PlaygroundSidebarSettingsPanel({
     }
 
     return (
-        <div className="flex flex-col gap-3">
-            <div className="flex flex-col gap-1">
-                <Row
-                    leading={{ kind: "icon", icon: SettingsBackIcon }}
-                    label="Back"
-                    onClick={onBack}
-                />
-                <div className="h-px bg-white/5" />
-            </div>
+        <>
+            {accountItems.length > 0 && (
+                <Section title="Account">{accountItems.map(renderItem)}</Section>
+            )}
 
-            <Section title="Account">{ACCOUNT_SETTINGS.map(renderItem)}</Section>
-
-            {activeProject && <Section title="Project">{PROJECT_SETTINGS.map(renderItem)}</Section>}
-        </div>
+            {projectItems.length > 0 && (
+                <Section title="Project">{projectItems.map(renderItem)}</Section>
+            )}
+        </>
     );
 }

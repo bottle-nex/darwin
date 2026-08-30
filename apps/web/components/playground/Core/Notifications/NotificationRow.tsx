@@ -36,7 +36,7 @@ export default function NotificationRow({
             data-selected={selected}
             className={cn(
                 "group flex w-full items-start gap-2.5 rounded-lg px-2 py-2.5 text-left transition-colors duration-150",
-                selected && "bg-white/7",
+                selected && "bg-active",
                 clickable
                     ? "cursor-pointer hover:bg-white/4 focus-visible:bg-white/4 focus-visible:outline-none"
                     : "cursor-default",

@@ -20,7 +20,26 @@ RUN curl -fsSL "https://github.com/cli/cli/releases/download/v${GH_CLI_VERSION}/
     && mv "/tmp/gh_${GH_CLI_VERSION}_linux_amd64/bin/gh" /usr/local/bin/gh \
     && rm -rf /tmp/gh.tar.gz "/tmp/gh_${GH_CLI_VERSION}_linux_amd64"
 
-RUN npm install -g @anthropic-ai/claude-code
+# Claude/Codex/OpenCode CLIs — the three agent harnesses a project/issue can select
+# (packages/harness's AgentHarness classes). Pinned the same way gh/graphify/bun are: a
+# version that moves under us changes agent behavior without changing this repo.
+#
+# CODEX_CLI_VERSION and OPENCODE_CLI_VERSION are placeholders — the package names below
+# (`@openai/codex`, `opencode-ai`) are best-effort guesses, unverified against each
+# project's actual npm distribution. Confirm both (name and latest version) before
+# building this template for real; if either isn't actually npm-distributed, this whole
+# RUN needs a different install method (matching the gh-style static-binary pattern above).
+ENV CLAUDE_CODE_CLI_VERSION=<confirm-on-npm>
+RUN npm install -g "@anthropic-ai/claude-code@${CLAUDE_CODE_CLI_VERSION}" \
+    && claude --version
+
+ENV CODEX_CLI_VERSION=<confirm-on-npm>
+RUN npm install -g "@openai/codex@${CODEX_CLI_VERSION}" \
+    && codex --version
+
+ENV OPENCODE_CLI_VERSION=<confirm-on-npm>
+RUN npm install -g "opencode-ai@${OPENCODE_CLI_VERSION}" \
+    && opencode --version
 
 # graphify builds the code graph the solving agent queries instead of grepping for
 # structure. Baked in rather than installed per run so onboarding pays no install cost

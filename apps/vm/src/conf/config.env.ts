@@ -10,6 +10,9 @@ const envSchema = z.object({
     SERVER_E2B_API_KEY: z.string().nonempty(),
     SERVER_SANDBOX_TEMPLATE: z.string().min(1).default("node-py-claude-template:stable"),
     SERVER_CLAUDE_CODE_OAUTH_TOKEN: z.string().min(1, "Claude Code OAuth token is required"),
+    // Optional: VM boot shouldn't hard-fail for orgs not using Codex yet. A Codex-configured
+    // issue hitting a VM with no key set fails that one run with a clear error instead.
+    SERVER_OPENAI_API_KEY: z.string().min(1).optional(),
     SERVER_BRIEF_MODEL: z.string().default("claude-sonnet-5"),
     SERVER_BRIEF_EFFORT: z.enum(["low", "medium", "high", "xhigh", "max"]).default("low"),
     SERVER_SOLVE_MODEL: z.string().default("claude-sonnet-5"),

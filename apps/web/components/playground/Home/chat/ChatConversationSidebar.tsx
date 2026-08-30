@@ -53,9 +53,7 @@ function ConversationRow({
             onClick={onClick}
             className={cn(
                 "flex w-full cursor-pointer items-center gap-2.5 rounded-lg px-2.5 py-2.5 text-left transition-colors",
-                selected
-                    ? "bg-graphite/70 text-neutral-100"
-                    : "text-neutral-300 hover:bg-graphite/40",
+                selected ? "bg-active text-neutral-100" : "text-neutral-300 hover:bg-graphite/40",
             )}
         >
             <PlaygroundAvatar

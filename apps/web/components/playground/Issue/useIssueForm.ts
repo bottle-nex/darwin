@@ -4,16 +4,35 @@ import { useEffect, useRef, useState } from "react";
 
 import { PRIORITY_TO_NUMBER } from "@/components/playground/Home/KanbanDisplay/customkanban/data";
 import { useCreateIssue } from "@/hooks/issues/useCreateIssue";
+import { useGetIssueConfig, useSetIssueConfig } from "@/hooks/issues/useIssueConfig";
 import { useUpdateIssue } from "@/hooks/issues/useUpdateIssue";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { KanbanMappers } from "@/lib/kanban/KanbanMappers";
 import { toast } from "@/lib/toast";
 import type { IssueTarget } from "@/store/issues/useCreateIssueStore";
 import type { BoardIssue } from "@/types/board";
+import type { Effort, Harness } from "@/types/harness.type";
+import { HARNESS_MODELS, HARNESS_SUPPORTS_EFFORT } from "@/types/harness.type";
 import type { Priority } from "@/types/kanban";
 
 import { useSubmitWarning } from "./SubmitWarningToast";
 import { useIssueDescription } from "./useIssueDescription";
+
+const FROZEN_HARNESS_STATUSES = ["InProgress", "InReview", "Done", "Failed", "Cancelled"];
+
+type HarnessDraft = { harness: Harness; model: string | null; effort: Effort | null };
+
+export type HarnessConfigState = {
+    harness: Harness;
+    model: string | null;
+    effort: Effort | null;
+    modelOptions: string[];
+    supportsEffort: boolean;
+    frozen: boolean;
+    setHarness: (value: Harness) => void;
+    setModel: (value: string) => void;
+    setEffort: (value: Effort) => void;
+};
 
 type UseIssueFormArgs = {
     target: IssueTarget;
@@ -96,8 +115,58 @@ export function useIssueForm({
 
     const createIssue = useCreateIssue();
     const updateIssue = useUpdateIssue();
-    const pending = createIssue.isPending || updateIssue.isPending;
+    const { data: issueConfigData } = useGetIssueConfig(issue?.id);
+    const setIssueConfig = useSetIssueConfig();
+    const pending = createIssue.isPending || updateIssue.isPending || setIssueConfig.isPending;
     const { warning, fire: fireWarning, shakeControls } = useSubmitWarning();
+
+    const harnessFrozen = Boolean(issue && FROZEN_HARNESS_STATUSES.includes(issue.status));
+    const savedHarness = issueConfigData?.config.harness ?? "Claude";
+    const savedModel = issueConfigData?.config.model ?? null;
+    const savedEffort = issueConfigData?.config.effort ?? null;
+
+    const [harnessDraft, setHarnessDraft] = useState<HarnessDraft | null>(null);
+    const currentHarness = harnessDraft?.harness ?? savedHarness;
+    const currentModel = harnessDraft ? harnessDraft.model : savedModel;
+    const currentEffort = harnessDraft ? harnessDraft.effort : savedEffort;
+    const harnessSupportsEffort = HARNESS_SUPPORTS_EFFORT[currentHarness];
+
+    const harnessDirty =
+        harnessDraft !== null &&
+        (currentHarness !== savedHarness ||
+            currentModel !== savedModel ||
+            currentEffort !== savedEffort);
+
+    function setHarness(next: Harness) {
+        const nextModel = HARNESS_MODELS[next].includes(currentModel ?? "")
+            ? currentModel
+            : (HARNESS_MODELS[next][0] ?? null);
+        setHarnessDraft({
+            harness: next,
+            model: nextModel,
+            effort: HARNESS_SUPPORTS_EFFORT[next] ? currentEffort : null,
+        });
+    }
+
+    function setModel(next: string) {
+        setHarnessDraft({ harness: currentHarness, model: next, effort: currentEffort });
+    }
+
+    function setEffort(next: Effort) {
+        setHarnessDraft({ harness: currentHarness, model: currentModel, effort: next });
+    }
+
+    const harnessConfig: HarnessConfigState = {
+        harness: currentHarness,
+        model: currentModel,
+        effort: currentEffort,
+        modelOptions: HARNESS_MODELS[currentHarness],
+        supportsEffort: harnessSupportsEffort,
+        frozen: harnessFrozen,
+        setHarness,
+        setModel,
+        setEffort,
+    };
 
     const titleRef = useRef<HTMLTextAreaElement>(null);
     const editorRef = useRef<Editor | null>(null);
@@ -122,6 +191,9 @@ export function useIssueForm({
         if (memberIds.length === 0) {
             return { warning: "Assign at least one member.", focus: () => setMembersOpen(true) };
         }
+        if (harnessDirty && !currentModel) {
+            return { warning: "Pick a model for the agent.", focus: () => {} };
+        }
         return null;
     }
 
@@ -135,17 +207,32 @@ export function useIssueForm({
         }
         try {
             if (issue) {
-                await updateIssue.mutateAsync({
-                    id: issue.id,
-                    project_id: projectId,
-                    title: title.trim(),
-                    description: body.toHtml(),
-                    priority: PRIORITY_TO_NUMBER[priority],
-                    assignee_ids: memberIds,
-                    tag_ids: tagIds,
-                    start_date: startDate?.toISOString() ?? null,
-                    target_date: targetDate?.toISOString() ?? null,
-                });
+                await Promise.all([
+                    updateIssue.mutateAsync({
+                        id: issue.id,
+                        project_id: projectId,
+                        title: title.trim(),
+                        description: body.toHtml(),
+                        priority: PRIORITY_TO_NUMBER[priority],
+                        assignee_ids: memberIds,
+                        tag_ids: tagIds,
+                        start_date: startDate?.toISOString() ?? null,
+                        target_date: targetDate?.toISOString() ?? null,
+                    }),
+                    ...(harnessDirty && currentModel
+                        ? [
+                              setIssueConfig.mutateAsync({
+                                  issueId: issue.id,
+                                  harness: currentHarness,
+                                  model: currentModel,
+                                  ...(harnessSupportsEffort && currentEffort
+                                      ? { effort: currentEffort }
+                                      : {}),
+                              }),
+                          ]
+                        : []),
+                ]);
+                setHarnessDraft(null);
             } else {
                 await createIssue.mutateAsync({
                     project_id: projectId,
@@ -200,7 +287,8 @@ export function useIssueForm({
                 issue.tags.map((t) => t.id),
             ) ||
             startDate?.getTime() !== dateValue(issue.startDate) ||
-            targetDate?.getTime() !== dateValue(issue.targetDate)
+            targetDate?.getTime() !== dateValue(issue.targetDate) ||
+            harnessDirty
         );
     }
 
@@ -238,6 +326,7 @@ export function useIssueForm({
         projectId,
         readOnly,
         isDirty,
+        harnessConfig,
     };
 }
 

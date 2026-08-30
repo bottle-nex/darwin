@@ -45,15 +45,15 @@ export default function IssueSubmitAction({
                 <div className="relative isolate">
                     <SubmitWarningToast warning={warning} placement={warningPlacement} />
                     <motion.div animate={shakeControls} className="relative z-10">
-                        <Button variant="ghost" size="xs" onClick={submit} loading={pending}>
+                        <Button variant="flat-primary" size="sm" onClick={submit} loading={pending}>
                             {isEdit ? "Save" : "Create Issue"}
                             <ShortcutHint>
                                 {isMac ? (
-                                    <CommandKeyIcon className="text-snow!" />
+                                    <CommandKeyIcon />
                                 ) : (
-                                    <span className="text-[10px] text-snow!">Ctrl</span>
+                                    <span className="text-[10px]">Ctrl</span>
                                 )}
-                                <EnterKeyIcon className="text-snow!" />
+                                <EnterKeyIcon />
                             </ShortcutHint>
                         </Button>
                     </motion.div>

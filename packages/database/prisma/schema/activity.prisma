@@ -44,6 +44,14 @@ model AgentSession {
   attemptNumber Int                @default(1)
   status        AgentSessionStatus @default(Running)
 
+  /// What actually ran, stamped at spawn — not just what was requested. harnessVersion comes
+  /// from `binary --version` inside the sandbox, and templateBuild is the E2B build id rather
+  /// than the mutable `:stable` tag, since that's what makes a bad run reproducible later.
+  harness        Harness?
+  harnessVersion String?
+  model          String?
+  effort         Effort?
+
   // a basic summary of what changed
   summary  String?
   /// { numTurns, durationMs, commits?, filesChanged? }
@@ -104,6 +112,7 @@ enum ActivityType {
   DatesChanged
   ColumnChanged
   SpecializationChanged
+  HarnessConfigChanged
 
   // relationships
   RelationAdded

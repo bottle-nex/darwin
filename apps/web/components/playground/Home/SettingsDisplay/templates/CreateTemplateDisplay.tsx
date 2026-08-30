@@ -113,7 +113,7 @@ export default function CreateTemplateDisplay({
                 e.preventDefault();
                 handleSave();
             }}
-            className="flex flex-col gap-6 h-full"
+            className="flex flex-1 flex-col gap-6"
         >
             <nav>
                 <Button
@@ -205,10 +205,22 @@ export default function CreateTemplateDisplay({
                 </label>
 
                 <menu className="flex items-center gap-2">
-                    <Button type="button" variant="tertiary" onClick={onDone} disabled={pending}>
+                    <Button
+                        type="button"
+                        size="sm"
+                        variant="flat"
+                        onClick={onDone}
+                        disabled={pending}
+                    >
                         Cancel
                     </Button>
-                    <Button type="submit" loading={pending} disabled={!canSave}>
+                    <Button
+                        type="submit"
+                        size="sm"
+                        variant="flat-primary"
+                        loading={pending}
+                        disabled={!canSave}
+                    >
                         {isEdit ? "Save" : "Create"}
                     </Button>
                 </menu>

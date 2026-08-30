@@ -39,7 +39,7 @@ function SelectTrigger({
             data-slot="select-trigger"
             data-size={size}
             className={cn(
-                "data-placeholder:text-[#737373] [&_svg:not([class*='text-'])]:text-[#737373] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 flex w-fit items-center justify-between gap-2 rounded-lg border-0 bg-[#171717] px-3 py-2 text-sm text-[#e5e5e5] whitespace-nowrap transition-[color,box-shadow] outline-none hover:bg-[#1c1c1c] focus-visible:ring-0 disabled:cursor-not-allowed disabled:opacity-50 data-[size=default]:h-9 data-[size=sm]:h-8 *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-2 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 cursor-pointer",
+                "data-placeholder:text-neutral-500 [&_svg:not([class*='text-'])]:text-neutral-500 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 flex w-fit cursor-pointer items-center justify-between gap-1.5 rounded-[8px] border border-snow/5 bg-snow/6 px-3.5 text-[13.5px] whitespace-nowrap text-snow/90 transition-colors outline-none hover:bg-snow/10 focus-visible:ring-0 disabled:cursor-not-allowed disabled:opacity-50 data-[size=default]:h-8 data-[size=sm]:h-7 *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-2 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
                 className,
             )}
             {...props}
@@ -55,7 +55,7 @@ function SelectTrigger({
 function SelectContent({
     className,
     children,
-    position = "popper",
+    position = "item-aligned",
     ...props
 }: React.ComponentProps<typeof SelectPrimitive.Content>) {
     return (
@@ -70,7 +70,7 @@ function SelectContent({
                     className,
                 )}
                 position={position}
-                sideOffset={MENU_SIDE_OFFSET}
+                {...(position === "popper" && { sideOffset: MENU_SIDE_OFFSET })}
                 {...props}
             >
                 <SelectScrollUpButton />
@@ -106,7 +106,7 @@ function SelectItem({
     return (
         <SelectPrimitive.Item
             data-slot="select-item"
-            className={cn(MENU_ITEM, "w-full", className)}
+            className={cn(MENU_ITEM, "w-full leading-5", className)}
             {...props}
         >
             <SelectPrimitive.ItemText>

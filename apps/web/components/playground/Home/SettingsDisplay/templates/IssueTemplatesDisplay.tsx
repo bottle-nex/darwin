@@ -1,29 +1,26 @@
 "use client";
 
-import {
-    AddIcon,
-    DefaultTemplateIcon,
-    DeleteIcon,
-    EditIcon,
-    MakeDefaultTemplateIcon,
-    TemplateDocumentIcon,
-} from "@trymatcha/ui/icons";
+import { AddIcon, DeleteIcon, EditIcon, TemplateDocumentIcon } from "@trymatcha/ui/icons";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { IconPickGlyph } from "@/components/ui/IconPicker";
-import { TooltipComponent } from "@/components/ui/tooltip-component";
 import ConfirmDialog from "@/components/utility/ConfirmDialog";
 import { useDeleteTemplate } from "@/hooks/templates/useDeleteTemplate";
 import { useListTemplates } from "@/hooks/templates/useListTemplates";
 import { useUpdateTemplate } from "@/hooks/templates/useUpdateTemplate";
 import { toast } from "@/lib/toast";
+import { cn } from "@/lib/utils";
 import type { IssueTemplate } from "@/types/issueTemplate";
 
+import SettingsRow from "../SettingsRow";
 import SettingsUtilityCard from "../SettingsUtilityCard";
 import CreateTemplateDisplay from "./CreateTemplateDisplay";
 
 type View = { kind: "list" } | { kind: "edit"; template?: IssueTemplate };
+
+const ROW_ICON_BUTTON =
+    "flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-[8px] bg-snow/8 text-neutral-400 transition-colors hover:bg-snow/12 hover:text-neutral-200 disabled:opacity-40 [&_svg]:size-3.5";
 
 export default function IssueTemplatesDisplay({ projectId }: { projectId: string | undefined }) {
     const templates = useListTemplates(projectId);
@@ -74,12 +71,11 @@ export default function IssueTemplatesDisplay({ projectId }: { projectId: string
     return (
         <SettingsUtilityCard
             title="Issue templates"
-            description="A pre-written issue body. Write it the way you'd want issues filed, mark one as the default, and everyone starts from it. Every project also has built-in starters, which show up in the picker on their own."
             headerAction={
                 <Button
                     type="button"
                     size="sm"
-                    variant="tertiary"
+                    variant="flat"
                     disabled={!projectId}
                     onClick={() => setView({ kind: "edit" })}
                 >
@@ -87,104 +83,91 @@ export default function IssueTemplatesDisplay({ projectId }: { projectId: string
                     New template
                 </Button>
             }
+            rows
         >
-            <section>
-                <h3 className="mb-2 text-[11px] font-medium tracking-wide text-neutral-500 uppercase">
-                    {list.length} template{list.length === 1 ? "" : "s"}
-                </h3>
-                {templates.isLoading ? (
-                    <p className="px-1 py-3 text-[13px] text-neutral-500">Loading…</p>
-                ) : list.length === 0 ? (
-                    <p className="rounded-lg bg-white/5 px-3 py-6 text-center text-[13px] text-neutral-500 shadow-[inset_0_1px_0_0_var(--color-edge)]">
-                        No issue templates yet.
-                    </p>
-                ) : (
-                    <ul className="flex list-none flex-col gap-2">
-                        {list.map((template) => {
-                            const deleting =
-                                deleteTemplate.isPending &&
-                                deleteTemplate.variables?.templateId === template.id;
-                            const defaulting =
-                                updateTemplate.isPending &&
-                                updateTemplate.variables?.templateId === template.id;
-                            return (
-                                <li
-                                    key={template.id}
-                                    className="group flex flex-col gap-1 rounded-lg bg-white/5 px-3 py-2.5 shadow-[inset_0_1px_0_0_var(--color-edge)]"
-                                >
-                                    <article className="flex items-center justify-between gap-3">
-                                        <hgroup className="flex min-w-0 items-center gap-2">
-                                            {template.icon ? (
-                                                <IconPickGlyph
-                                                    pick={template.icon}
-                                                    className="size-3.5 shrink-0 text-sm"
-                                                />
-                                            ) : (
-                                                <TemplateDocumentIcon
-                                                    className="size-3.5 shrink-0 text-white/35"
-                                                    aria-hidden
-                                                />
-                                            )}
-                                            <h4 className="truncate text-[13px] font-normal text-neutral-200">
-                                                {template.name}
-                                            </h4>
-                                            {template.isDefault && (
-                                                <span className="flex shrink-0 items-center gap-1 rounded-full bg-matcha/10 px-2 py-0.5 text-[10px] text-matcha">
-                                                    <DefaultTemplateIcon
-                                                        className="size-2.5"
-                                                        aria-hidden
-                                                    />
-                                                    Default
-                                                </span>
-                                            )}
-                                        </hgroup>
-                                        <menu className="flex shrink-0 items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100 focus-within:opacity-100">
-                                            {!template.isDefault && (
-                                                <TooltipComponent content="Make default">
-                                                    <Button
-                                                        variant="unstyled"
-                                                        type="button"
-                                                        aria-label={`Make ${template.name} the default`}
-                                                        loading={defaulting}
-                                                        iconOnly
-                                                        onClick={() => makeDefault(template)}
-                                                        className="flex size-6 cursor-pointer items-center justify-center rounded text-neutral-400 hover:bg-neutral-700/50 hover:text-matcha disabled:opacity-40 [&_svg]:size-3"
-                                                    >
-                                                        <MakeDefaultTemplateIcon
-                                                            className="size-3"
-                                                            aria-hidden
-                                                        />
-                                                    </Button>
-                                                </TooltipComponent>
-                                            )}
-                                            <Button
-                                                variant="unstyled"
-                                                type="button"
-                                                aria-label={`Edit ${template.name}`}
-                                                onClick={() => setView({ kind: "edit", template })}
-                                                className="flex size-6 cursor-pointer items-center justify-center rounded text-neutral-400 hover:bg-neutral-700/50 hover:text-neutral-200"
-                                            >
-                                                <EditIcon className="size-3" aria-hidden />
-                                            </Button>
-                                            <Button
-                                                variant="unstyled"
-                                                type="button"
-                                                aria-label={`Delete ${template.name}`}
-                                                loading={deleting}
-                                                iconOnly
-                                                onClick={() => setConfirmDelete(template)}
-                                                className="flex size-6 cursor-pointer items-center justify-center rounded text-neutral-400 hover:bg-neutral-700/50 hover:text-red-500 disabled:opacity-40 [&_svg]:size-3"
-                                            >
-                                                <DeleteIcon className="size-3" aria-hidden />
-                                            </Button>
-                                        </menu>
-                                    </article>
-                                </li>
-                            );
-                        })}
-                    </ul>
-                )}
-            </section>
+            {templates.isLoading ? (
+                <div className="px-5 py-4 text-[13px] text-neutral-500">Loading…</div>
+            ) : list.length === 0 ? (
+                <div className="px-5 py-4 text-[13px] text-neutral-500">
+                    No issue templates yet.
+                </div>
+            ) : (
+                <>
+                    {list.map((template) => {
+                        const deleting =
+                            deleteTemplate.isPending &&
+                            deleteTemplate.variables?.templateId === template.id;
+                        const defaulting =
+                            updateTemplate.isPending &&
+                            updateTemplate.variables?.templateId === template.id;
+                        return (
+                            <SettingsRow
+                                key={template.id}
+                                className="group"
+                                label={
+                                    <span className="flex items-center gap-2">
+                                        {template.icon ? (
+                                            <IconPickGlyph
+                                                pick={template.icon}
+                                                className="size-3.5 shrink-0 text-sm"
+                                            />
+                                        ) : (
+                                            <TemplateDocumentIcon
+                                                className="size-3.5 shrink-0 text-white/35"
+                                                aria-hidden
+                                            />
+                                        )}
+                                        <span className="truncate">{template.name}</span>
+                                        {template.isDefault && (
+                                            <span className="shrink-0 rounded-full bg-matcha/10 px-2 py-0.5 text-[10px] text-matcha">
+                                                Default
+                                            </span>
+                                        )}
+                                    </span>
+                                }
+                            >
+                                <menu className="flex shrink-0 items-center gap-1.5 opacity-0 transition-opacity group-hover:opacity-100 focus-within:opacity-100">
+                                    {!template.isDefault && (
+                                        <Button
+                                            type="button"
+                                            variant="flat"
+                                            size="sm"
+                                            loading={defaulting}
+                                            onClick={() => makeDefault(template)}
+                                            className="hover:text-matcha"
+                                        >
+                                            Set as default
+                                        </Button>
+                                    )}
+                                    <Button
+                                        variant="unstyled"
+                                        type="button"
+                                        aria-label={`Edit ${template.name}`}
+                                        onClick={() => setView({ kind: "edit", template })}
+                                        className={ROW_ICON_BUTTON}
+                                    >
+                                        <EditIcon className="size-3.5" aria-hidden />
+                                    </Button>
+                                    <Button
+                                        variant="unstyled"
+                                        type="button"
+                                        aria-label={`Delete ${template.name}`}
+                                        loading={deleting}
+                                        iconOnly
+                                        onClick={() => setConfirmDelete(template)}
+                                        className={cn(
+                                            ROW_ICON_BUTTON,
+                                            "hover:bg-red-500/12 hover:text-red-300",
+                                        )}
+                                    >
+                                        <DeleteIcon className="size-3.5" aria-hidden />
+                                    </Button>
+                                </menu>
+                            </SettingsRow>
+                        );
+                    })}
+                </>
+            )}
 
             <ConfirmDialog
                 open={Boolean(confirmDelete)}

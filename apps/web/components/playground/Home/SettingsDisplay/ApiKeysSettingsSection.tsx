@@ -1,5 +1,5 @@
 "use client";
-import { ApiKeyIcon, CopyIcon } from "@trymatcha/ui/icons";
+import { ApiKeyIcon } from "@trymatcha/ui/icons";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -12,11 +12,24 @@ import { cn } from "@/lib/utils";
 import { CLAUDE_MCP_CONNECTOR_URL, CLAUDE_MCP_URL } from "@/routes/api_routes";
 import type { CreatedApiKey } from "@/types/apiKey.type";
 
+import CopyIconButton from "./CopyIconButton";
+import SettingsRow, { SETTINGS_CONTROL_WIDTH } from "./SettingsRow";
 import SettingsUtilityCard from "./SettingsUtilityCard";
 
 function formatDate(value: string | null) {
     if (!value) return "Never";
     return new Date(value).toLocaleDateString(undefined, { month: "short", day: "numeric" });
+}
+
+function CodeRow({ value, copyLabel }: { value: string; copyLabel: string }) {
+    return (
+        <div className="flex items-center gap-2">
+            <code className="h-8 min-w-0 flex-1 truncate rounded-[8px] border border-snow/5 bg-snow/6 px-2.5 text-[12px] leading-8 text-neutral-300">
+                {value}
+            </code>
+            <CopyIconButton value={value} label={copyLabel} />
+        </div>
+    );
 }
 
 function CreatedKeyBanner({
@@ -35,23 +48,7 @@ function CreatedKeyBanner({
                     Paste this as the &quot;Remote MCP server URL&quot; in Claude&apos;s Add custom
                     connector dialog — leave Name free-text and skip the OAuth fields.
                 </p>
-                <div className="flex items-center gap-x-2">
-                    <code className="min-w-0 flex-1 truncate rounded-md bg-charcoal px-2.5 py-1.5 text-[12px] text-neutral-200">
-                        {connectorUrl}
-                    </code>
-                    <Button
-                        type="button"
-                        variant="secondary"
-                        size="xs"
-                        onClick={() => {
-                            navigator.clipboard.writeText(connectorUrl);
-                            toast.success("Copied connector url");
-                        }}
-                    >
-                        <CopyIcon className="size-3" />
-                        Copy
-                    </Button>
-                </div>
+                <CodeRow value={connectorUrl} copyLabel="Copy connector url" />
             </div>
 
             <div className="flex flex-col gap-y-1.5">
@@ -59,23 +56,7 @@ function CreatedKeyBanner({
                     Or the raw key, if you&apos;re configuring headers by hand — you won&apos;t be
                     able to see it again.
                 </p>
-                <div className="flex items-center gap-x-2">
-                    <code className="min-w-0 flex-1 truncate rounded-md bg-charcoal px-2.5 py-1.5 text-[12px] text-neutral-200">
-                        {createdKey.key}
-                    </code>
-                    <Button
-                        type="button"
-                        variant="secondary"
-                        size="xs"
-                        onClick={() => {
-                            navigator.clipboard.writeText(createdKey.key);
-                            toast.success("Copied to clipboard");
-                        }}
-                    >
-                        <CopyIcon className="size-3" />
-                        Copy
-                    </Button>
-                </div>
+                <CodeRow value={createdKey.key} copyLabel="Copy api key" />
             </div>
             <Button
                 type="button"
@@ -114,91 +95,93 @@ export default function ApiKeysSettingsSection() {
     const activeKeys = (apiKeys ?? []).filter((key) => !key.revokedAt);
 
     return (
-        <SettingsUtilityCard
-            title="API keys"
-            description="Create an api key to let Claude create issues on your projects via MCP."
-        >
-            <div className="flex items-center gap-x-2">
-                <code className="min-w-0 flex-1 truncate rounded-md bg-charcoal px-2.5 py-1.5 text-[12px] text-neutral-400">
-                    {CLAUDE_MCP_URL}
-                </code>
-                <Button
-                    type="button"
-                    variant="secondary"
-                    size="xs"
-                    onClick={() => {
-                        navigator.clipboard.writeText(CLAUDE_MCP_URL);
-                        toast.success("Copied MCP url");
-                    }}
-                >
-                    <CopyIcon className="size-3" />
-                    Copy
-                </Button>
-            </div>
+        <SettingsUtilityCard title="API keys" rows>
+            <SettingsRow
+                label="MCP server URL"
+                description="Point Claude's custom connector at this address."
+            >
+                <div className={SETTINGS_CONTROL_WIDTH}>
+                    <CodeRow value={CLAUDE_MCP_URL} copyLabel="Copy MCP url" />
+                </div>
+            </SettingsRow>
 
             {createdKey && (
-                <CreatedKeyBanner createdKey={createdKey} onDismiss={() => setCreatedKey(null)} />
+                <SettingsRow
+                    label="Your new key"
+                    description="Copy it now — it won't be shown again."
+                    stack
+                >
+                    <CreatedKeyBanner
+                        createdKey={createdKey}
+                        onDismiss={() => setCreatedKey(null)}
+                    />
+                </SettingsRow>
             )}
 
-            <div className="flex items-center gap-x-2">
-                <Input
-                    value={label}
-                    onChange={(e) => setLabel(e.target.value)}
-                    placeholder="e.g. Claude Desktop"
-                    maxLength={60}
-                    onKeyDown={(e) => e.key === "Enter" && submit()}
-                    className="h-8 text-xs"
-                />
-                <Button
-                    type="button"
-                    variant="tertiary"
-                    size="xs"
-                    loading={createApiKey.isPending}
-                    disabled={!ready}
-                    onClick={submit}
-                    className="text-ink! shrink-0"
-                >
-                    Create key
-                </Button>
-            </div>
-
-            <div className="flex flex-col gap-y-1">
-                {isLoading && <p className="py-2 text-xs text-neutral-500">Loading...</p>}
-                {!isLoading && activeKeys.length === 0 && (
-                    <p className="py-2 text-xs text-neutral-500">No api keys yet.</p>
-                )}
-                {activeKeys.map((key) => (
-                    <div
-                        key={key.id}
-                        className="flex items-center gap-x-3 rounded-lg px-2.5 py-2 hover:bg-white/5"
+            <SettingsRow label="New key" description="Name it so you can tell your keys apart.">
+                <div className={cn(SETTINGS_CONTROL_WIDTH, "flex items-center gap-2")}>
+                    <Input
+                        variant="outline"
+                        value={label}
+                        onChange={(e) => setLabel(e.target.value)}
+                        placeholder="e.g. Claude Desktop"
+                        maxLength={60}
+                        onKeyDown={(e) => e.key === "Enter" && submit()}
+                        className="h-8 text-[13px]"
+                    />
+                    <Button
+                        type="button"
+                        variant="flat-primary"
+                        size="sm"
+                        loading={createApiKey.isPending}
+                        disabled={!ready}
+                        onClick={submit}
+                        className="h-8 shrink-0"
                     >
-                        <ApiKeyIcon className="size-4 shrink-0 text-neutral-500" aria-hidden />
-                        <div className="min-w-0 flex-1">
-                            <p className="truncate text-[12px] text-neutral-200">{key.label}</p>
-                            <p className="truncate font-mono text-[11px] text-neutral-500">
+                        Create key
+                    </Button>
+                </div>
+            </SettingsRow>
+
+            {isLoading && <div className="px-5 py-4 text-[12px] text-neutral-500">Loading...</div>}
+            {!isLoading && activeKeys.length === 0 && (
+                <div className="px-5 py-4 text-[12px] text-neutral-500">No api keys yet.</div>
+            )}
+            {!isLoading &&
+                activeKeys.map((key) => (
+                    <SettingsRow
+                        key={key.id}
+                        label={
+                            <span className="flex items-center gap-2">
+                                <ApiKeyIcon
+                                    className="size-3.5 shrink-0 text-neutral-500"
+                                    aria-hidden
+                                />
+                                <span className="truncate">{key.label}</span>
+                            </span>
+                        }
+                        description={
+                            <span className="font-mono">
                                 {key.prefix}••••••••{" · "}
                                 last used {formatDate(key.lastUsedAt)}
-                            </p>
-                        </div>
+                            </span>
+                        }
+                    >
                         <Button
                             type="button"
-                            variant="unstyled"
-                            size="xs"
+                            variant="flat-destructive"
+                            size="sm"
                             disabled={revokeApiKey.isPending}
                             onClick={() =>
                                 revokeApiKey.mutate(key.id, {
                                     onError: () => toast.error("Failed to revoke api key"),
                                 })
                             }
-                            className={cn(
-                                "cursor-pointer px-2 text-xs text-neutral-500 hover:text-red-300",
-                            )}
                         >
                             Revoke
                         </Button>
-                    </div>
+                    </SettingsRow>
                 ))}
-            </div>
         </SettingsUtilityCard>
     );
 }

@@ -1,18 +1,20 @@
 import { randomUUID } from "node:crypto";
 
-import { Prisma, prisma, WorkerStatus } from "@trymatcha/database";
+import { Harness, Prisma, prisma, WorkerStatus } from "@trymatcha/database";
+import { type McpServerSpec, Registry } from "@trymatcha/harness";
 import Logger, { format_duration } from "@trymatcha/logger";
 import type { CommandResult, SnapshotInfo } from "e2b";
 import { Sandbox } from "e2b";
 
 import { ENV } from "../conf/config.env";
-import ClaudeRun from "./service.claude_run";
 import GithubService, { type PullRequestSummary } from "./service.github";
 import GraphService, {
     GRAPHIFY_INTEGRATION,
     GRAPHIFY_OUT,
     GRAPHIFY_SETTINGS,
 } from "./service.graph";
+import { resolve_harness_env } from "./service.harness_credentials";
+import HarnessRun from "./service.harness_run";
 import IssueSolver, { type ClaimedIssue } from "./service.issue_solver";
 import { sign_worker_jwt } from "./service.jwt";
 import OutcomeReporter from "./service.outcome_queue";
@@ -21,7 +23,6 @@ import SandboxStream, { describe_failure, failure_sentence } from "./service.san
 import SecretService from "./service.secret";
 import PlanService from "./services.plan";
 
-const SANDBOX_TEMPLATE = "node-py-claude-template:stable";
 const REPO_DIR = "/home/user/repo";
 const SAFE_BRANCH = /^[A-Za-z0-9._/-]+$/;
 const SANDBOX_TIMEOUT_MS = 15 * 60_000;
@@ -34,7 +35,6 @@ const WORKER_SANDBOX_TIMEOUT_MS = 55 * 60_000;
 const CLONE_TIMEOUT_MS = 10 * 60_000;
 const ISSUE_PROMPT_PATH = "/home/user/issue_prompt.txt";
 const PR_BODY_PATH = "/home/user/pr_body.md";
-const MCP_CONFIG_PATH = "/home/user/matcha_mcp_config.json";
 const SANDBOX_MCP_ENTRY = "/opt/matcha/sandbox-mcp/index.js";
 const ISSUE_SOLVE_TIMEOUT_MS = 30 * 60_000;
 const ISSUE_PUSH_TIMEOUT_MS = 10 * 60_000;
@@ -250,26 +250,16 @@ export default class E2B {
 
             await E2B.refresh_origin(sandbox, repo_url, gh_token);
 
-            await sandbox.files.write(
-                MCP_CONFIG_PATH,
-                JSON.stringify(
-                    {
-                        mcpServers: {
-                            matcha: {
-                                command: "node",
-                                args: [SANDBOX_MCP_ENTRY],
-                                env: {
-                                    MATCHA_SERVER_URL: ENV.SERVER_PUBLIC_API_URL,
-                                    MATCHA_SANDBOX_TOKEN: worker_token,
-                                    MATCHA_SESSION_KIND: "worker",
-                                },
-                            },
-                        },
-                    },
-                    null,
-                    2,
-                ),
-            );
+            const mcp_server: McpServerSpec = {
+                name: "matcha",
+                command: "node",
+                args: [SANDBOX_MCP_ENTRY],
+                env: {
+                    MATCHA_SERVER_URL: ENV.SERVER_PUBLIC_API_URL,
+                    MATCHA_SANDBOX_TOKEN: worker_token,
+                    MATCHA_SESSION_KIND: "worker",
+                },
+            };
 
             log.info("worker marked Busy");
             const worker = await prisma.worker.update({
@@ -279,8 +269,6 @@ export default class E2B {
 
             console.log("worker is 4 : ", worker);
 
-            const model = ENV.SERVER_SOLVE_MODEL;
-            const effort = ENV.SERVER_SOLVE_EFFORT;
             let solved_count = 0;
 
             for (;;) {
@@ -314,11 +302,6 @@ export default class E2B {
                 let run_id: string | undefined;
 
                 let agent_done = issue.agentDoneAt !== null;
-                const needs_agent_run = requires_agent_run(
-                    existing_pull !== null,
-                    already_pushed,
-                    issue.agentDoneAt,
-                );
 
                 if (existing_pull) {
                     log.info(`existing PR found for issue #${issue.number}`, {
@@ -329,11 +312,37 @@ export default class E2B {
                     log.info(`branch already pushed for issue #${issue.number}`, {
                         branch: issue.prBranch,
                     });
-                } else if (needs_agent_run) {
-                    run_id = randomUUID();
-                    await RunReporter.started(worker_token, run_id, issue.id, log);
+                } else {
+                    const { harness, model, effort } = issue;
+                    const agent = Registry.get(harness);
 
-                    const graph_state = await GraphService.prepare(sandbox, log);
+                    run_id = randomUUID();
+                    const version_result = await sandbox.commands
+                        .run(`${agent.binary} --version`)
+                        .catch(() => null);
+                    const harness_version = version_result?.stdout?.trim() || undefined;
+
+                    await RunReporter.started(
+                        worker_token,
+                        { run_id, issue_id: issue.id, harness, model, effort, harness_version },
+                        log,
+                    );
+
+                    // graphify installs first — for OpenCode its own installer writes into
+                    // the same file our MCP config lives in (.opencode/opencode.json), so our
+                    // write has to go last and has to merge rather than overwrite, or one of
+                    // the two configs silently disappears depending on write order.
+                    const is_claude = harness === Harness.Claude;
+                    const graph_state = await GraphService.prepare(sandbox, log, harness);
+
+                    const mcp_config_path = agent.mcpConfigPath();
+                    const existing_mcp_config = await sandbox.files
+                        .read(mcp_config_path)
+                        .catch(() => null);
+                    await sandbox.files.write(
+                        mcp_config_path,
+                        agent.buildMcpConfig(mcp_server, existing_mcp_config),
+                    );
 
                     log.step(`issue #${issue.number} pushed into sandbox`, { title: issue.title });
                     await sandbox.files.write(
@@ -341,7 +350,7 @@ export default class E2B {
                         E2B.build_issue_prompt(issue, branch, project.planMd),
                     );
 
-                    log.info(`invoking claude for issue #${issue.number}`, {
+                    log.info(`invoking ${harness} for issue #${issue.number}`, {
                         model,
                         effort,
                         brief: project.planMd ? "included" : "absent",
@@ -349,13 +358,14 @@ export default class E2B {
 
                     let report;
                     try {
-                        report = await ClaudeRun.execute(sandbox, log, {
+                        report = await HarnessRun.execute(sandbox, log, {
+                            harness,
                             prompt_path: ISSUE_PROMPT_PATH,
                             model,
                             effort,
                             extra_flags: [
-                                `--mcp-config ${MCP_CONFIG_PATH}`,
-                                ...(graph_state === "ready"
+                                ...agent.mcpConfigFlags(mcp_config_path),
+                                ...(is_claude && graph_state === "ready"
                                     ? [
                                           `--settings ${GRAPHIFY_SETTINGS}`,
                                           `--add-dir ${GRAPHIFY_INTEGRATION}`,
@@ -363,7 +373,7 @@ export default class E2B {
                                     : []),
                             ],
                             envs: {
-                                CLAUDE_CODE_OAUTH_TOKEN: ENV.SERVER_CLAUDE_CODE_OAUTH_TOKEN,
+                                ...(await resolve_harness_env(harness, project.id)),
                                 GH_TOKEN: gh_token,
                                 ...(graph_state === "ready" ? { GRAPHIFY_OUT } : {}),
                             },
@@ -384,17 +394,11 @@ export default class E2B {
                     await RunReporter.completed(worker_token, run_id, issue.id, report, log);
 
                     log.success(`issue #${issue.number} run finished`, {
-                        turns: report.num_turns,
-                        cost_usd: report.total_cost_usd.toFixed(4),
+                        turns: report.num_turns ?? "unknown",
+                        cost_usd: (report.total_cost_usd ?? 0).toFixed(4),
                         duration: format_duration(report.duration_ms),
                     });
-                    log.block("final message from claude", report.result ?? "(empty)");
-
-                    await prisma.issue.update({
-                        where: { id: issue.id },
-                        data: { agentDoneAt: new Date() },
-                    });
-                    agent_done = true;
+                    log.block(`final message from ${harness}`, report.result ?? "(empty)");
                 }
 
                 if (!existing_pull && !already_pushed) {
@@ -562,14 +566,14 @@ export default class E2B {
         const brief = plan_md
             ? `## Project brief
 
-An earlier agent explored this repository and wrote the brief below. Lean on it to orient yourself instead of rediscovering the layout from scratch. It was written against an earlier commit, so confirm anything you depend on before acting on it.
+            An earlier agent explored this repository and wrote the brief below. Lean on it to orient yourself instead of rediscovering the layout from scratch. It was written against an earlier commit, so confirm anything you depend on before acting on it.
 
-${plan_md}`
+            ${plan_md}`
             : null;
 
         const issue_section = `## Issue #${issue.number}: ${issue.title}
 
-${issue.description}`;
+            ${issue.description}`;
 
         const actions = [
             `Investigate the issue and read every relevant file before changing it.`,
@@ -582,11 +586,11 @@ ${issue.description}`;
 
         const steps = `## What to do, in this exact order
 
-${actions.map((action, index) => `${index + 1}. ${action}`).join("\n")}
+            ${actions.map((action, index) => `${index + 1}. ${action}`).join("\n")}
 
-Do all of this yourself with your Bash tool — you have full permissions in this sandbox.
+            Do all of this yourself with your Bash tool — you have full permissions in this sandbox.
 
-Never start a long-running command in the background and end your turn waiting on it. This is a single non-interactive run: there is no later turn to come back to, so anything left running when you stop is lost and the issue goes unsolved. Run it in the foreground and wait for it to finish.`;
+            Never start a long-running command in the background and end your turn waiting on it. This is a single non-interactive run: there is no later turn to come back to, so anything left running when you stop is lost and the issue goes unsolved. Run it in the foreground and wait for it to finish.`;
 
         return [intro, brief, issue_section, steps].filter(Boolean).join("\n\n");
     }
@@ -696,7 +700,7 @@ Never start a long-running command in the background and end your turn waiting o
     }
 
     public static async create(timeout_ms: number = SANDBOX_TIMEOUT_MS): Promise<string> {
-        const sandbox = await Sandbox.create(SANDBOX_TEMPLATE, {
+        const sandbox = await Sandbox.create(ENV.SERVER_SANDBOX_TEMPLATE, {
             apiKey: ENV.SERVER_E2B_API_KEY,
             timeoutMs: timeout_ms,
         });

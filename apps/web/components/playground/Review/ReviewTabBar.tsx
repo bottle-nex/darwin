@@ -26,7 +26,7 @@ export default function ReviewTabBar({ active }: { active: ReviewTab }) {
                     className={cn(
                         "cursor-pointer rounded-full px-2 py-1 text-[12.5px] font-medium transition-colors ring-[0.5px] ring-white/10 hover:bg-white/2",
                         tab.id === active
-                            ? "bg-white/5 text-neutral-100"
+                            ? "bg-active text-neutral-100"
                             : "text-neutral-500 hover:text-neutral-200",
                     )}
                 >

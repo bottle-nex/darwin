@@ -1,3 +1,4 @@
+import { Harness } from "@trymatcha/database";
 import type Logger from "@trymatcha/logger";
 import type { CapsuleChange, CapsuleControl, CapsuleViewport } from "@trymatcha/types";
 import type { Sandbox } from "e2b";
@@ -7,7 +8,7 @@ import { ENV } from "../conf/config.env";
 import { capsules_dir, harness_dir, OVERRIDES_FILE } from "./service.capsule_harness";
 import type { CapsuleTarget } from "./service.capsule_targets";
 import type { AppProfile } from "./service.capsule_workspace";
-import ClaudeRun from "./service.claude_run";
+import HarnessRun, { effort_from_env } from "./service.harness_run";
 
 const AUTHOR_PROMPT_PATH = "/home/user/capsule_author_prompt.txt";
 const REPAIR_PROMPT_PATH = "/home/user/capsule_repair_prompt.txt";
@@ -213,10 +214,11 @@ export default class CapsuleAuthor {
         await sandbox.files.write(AUTHOR_PROMPT_PATH, build_author_prompt(targets, profile));
 
         log.step("authoring capsules", { count: targets.length });
-        await ClaudeRun.execute(sandbox, log, {
+        await HarnessRun.execute(sandbox, log, {
+            harness: Harness.Claude,
             prompt_path: AUTHOR_PROMPT_PATH,
             model: ENV.SERVER_PREVIEW_MODEL,
-            effort: ENV.SERVER_PREVIEW_EFFORT,
+            effort: effort_from_env(ENV.SERVER_PREVIEW_EFFORT),
             envs: { CLAUDE_CODE_OAUTH_TOKEN: ENV.SERVER_CLAUDE_CODE_OAUTH_TOKEN },
             timeout_ms: AUTHOR_TIMEOUT_MS,
             label: "capsule authoring agent",
@@ -241,10 +243,11 @@ export default class CapsuleAuthor {
         );
 
         log.step("repairing capsules", { count: failures.length });
-        await ClaudeRun.execute(sandbox, log, {
+        await HarnessRun.execute(sandbox, log, {
+            harness: Harness.Claude,
             prompt_path: REPAIR_PROMPT_PATH,
             model: ENV.SERVER_PREVIEW_MODEL,
-            effort: ENV.SERVER_PREVIEW_EFFORT,
+            effort: effort_from_env(ENV.SERVER_PREVIEW_EFFORT),
             envs: { CLAUDE_CODE_OAUTH_TOKEN: ENV.SERVER_CLAUDE_CODE_OAUTH_TOKEN },
             timeout_ms: REPAIR_TIMEOUT_MS,
             label: "capsule repair agent",

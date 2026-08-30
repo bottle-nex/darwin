@@ -7,6 +7,8 @@ import type {
 
 import type { IconPick } from "@/components/ui/IconPicker";
 
+import type { Effort, Harness } from "./harness.type";
+
 export type PlanStatus = "Pending" | "Generating" | "Ready" | "Failed";
 
 export interface Project {
@@ -73,4 +75,7 @@ export type KanbanOptionView = "FLAT" | "GROUPED";
 export interface ProjectConfig {
     kanbanOptionView: KanbanOptionView;
     productDiffEnabled: boolean;
+    harness: Harness;
+    defaultModel: string | null;
+    defaultEffort: Effort | null;
 }

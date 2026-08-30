@@ -1,11 +1,21 @@
+import type { Effort, Harness } from "@trymatcha/database";
 import type Logger from "@trymatcha/logger";
 
 import { ENV } from "../conf/config.env";
-import type { AgentReport } from "./service.claude_run";
+import type { AgentReport } from "./harness_parsers/parser.index";
+
+export interface RunStartedParams {
+    run_id: string;
+    issue_id: string;
+    harness: Harness;
+    model: string;
+    effort: Effort | null;
+    harness_version?: string;
+}
 
 export default class RunReporter {
-    static async started(token: string, run_id: string, issue_id: string, log: Logger) {
-        await RunReporter.post("/run-started", token, { run_id, issue_id }, log);
+    static async started(token: string, params: RunStartedParams, log: Logger) {
+        await RunReporter.post("/run-started", token, params, log);
     }
 
     static async completed(

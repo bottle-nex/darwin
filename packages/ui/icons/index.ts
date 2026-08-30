@@ -83,6 +83,7 @@ export { FooterLinkHoverArrowIcon } from "./navigation/FooterLinkHoverArrowIcon"
 export { GanttNavIcon } from "./misc/GanttNavIcon";
 export { GitBranchIcon } from "./git/GitBranchIcon";
 export { GithubLogoIcon } from "./git/GithubLogoIcon";
+export { HarnessIcon } from "./settings-access/HarnessIcon";
 export { Heading1Icon } from "./editor/Heading1Icon";
 export { Heading2Icon } from "./editor/Heading2Icon";
 export { Heading3Icon } from "./editor/Heading3Icon";
