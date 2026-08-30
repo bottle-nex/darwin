@@ -5,6 +5,9 @@
     --color-cement: #181819;
     --color-graphite: #1d1d1e;
 
+    /* The lifted surface a selected row, tab or group header sits on. */
+    --color-active: #1d1f21;
+
     /* Light surfaces. */
     --color-snow: #ffffff;
     --color-mist: #f4f4f4;
@@ -104,11 +107,17 @@
     --color-charcoal: #141414;
     --color-cement: #1a1a1a;
     --color-graphite: #212121;
+    --color-active: #1d1f21;
 
     --color-snow: #ffffff;
     --color-mist: #f4f4f4;
 
-    --color-primary: #ab9ff2;
+    /*
+     * Follows the background-lighting colour the user picked. The fallback is
+     * the static violet, so this resolves correctly before the glow vars are
+     * written and anywhere the playground scope is used outside the app shell.
+     */
+    --color-primary: rgb(var(--playground-primary-rgb, 171, 159, 242));
     --color-primary-foreground: var(--color-snow);
     --color-matcha: #9bc24f;
     --color-matcha-foreground: #14150c;
