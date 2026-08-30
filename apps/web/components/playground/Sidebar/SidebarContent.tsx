@@ -74,10 +74,11 @@ export default function SidebarContent() {
 
             <div className="relative min-h-0 flex-1">
                 <motion.div
+                    initial={false}
                     animate={{ opacity: inSettings ? 0 : 1, x: inSettings ? -PANEL_SLIDE : 0 }}
                     transition={PANEL_TRANSITION}
                     aria-hidden={inSettings}
-                    className={cn(PANE, inSettings && "pointer-events-none")}
+                    className={cn(PANE, inSettings && "pointer-events-none opacity-0")}
                 >
                     <ForYouSection {...section} />
                     <BoardSection {...section} />
@@ -86,10 +87,11 @@ export default function SidebarContent() {
                 </motion.div>
 
                 <motion.div
+                    initial={false}
                     animate={{ opacity: inSettings ? 1 : 0, x: inSettings ? 0 : PANEL_SLIDE }}
                     transition={PANEL_TRANSITION}
                     aria-hidden={!inSettings}
-                    className={cn(PANE, !inSettings && "pointer-events-none")}
+                    className={cn(PANE, !inSettings && "pointer-events-none opacity-0")}
                 >
                     <SettingsPanel {...section} query={settingsQuery} />
                 </motion.div>
