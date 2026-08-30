@@ -2,6 +2,14 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
 
+import {
+    deliver_run_log,
+    REPORT_PROGRESS_DESCRIPTION,
+    type ReportProgressArgs,
+    report_progress_schema,
+    to_run_log_event,
+} from "./run-log.tool";
+
 enum SetupStatus {
     PENDING = "Pending",
     PROVISIONING = "Provisioning",
@@ -152,6 +160,8 @@ export class WorkerMcpServerService {
     private static readonly SERVER = process.env.MATCHA_SERVER_URL!;
     private static readonly TOKEN = process.env.MATCHA_SANDBOX_TOKEN!; // per-worker token
 
+    private run_log_seq = 0;
+
     constructor() {
         this.mcp_server = new McpServer({
             name: "matcha-worker-mcp",
@@ -167,6 +177,44 @@ export class WorkerMcpServerService {
             { status: z.enum(WorkerRuntimeStatus) },
             this.report_status.bind(this),
         );
+
+        this.mcp_server.tool(
+            "report_progress",
+            REPORT_PROGRESS_DESCRIPTION,
+            report_progress_schema,
+            this.report_progress.bind(this),
+        );
+    }
+
+    /**
+     * Reports one action to the vm worker, which is the only process that writes the run's log.
+     *
+     * The sequence number is assigned here rather than on the receiving side because this is
+     * where a retry originates: the worker acknowledges a sequence only once the cache holds it,
+     * so an unacknowledged event can be sent again under the same number and land exactly once.
+     *
+     * Gives up rather than failing the run. Logging is not the work, and an agent that cannot
+     * report should still solve its issue.
+     */
+    private async report_progress(args: ReportProgressArgs) {
+        const event = to_run_log_event(args);
+        if (!event) return this.text("ignored");
+
+        const vm_url = process.env.MATCHA_VM_URL;
+        const run_id = process.env.MATCHA_RUN_ID;
+        if (!vm_url || !run_id) return this.text("progress reporting is not configured");
+
+        this.run_log_seq += 1;
+        const seq = this.run_log_seq;
+
+        const stored = await deliver_run_log(vm_url, WorkerMcpServerService.TOKEN, {
+            run_id,
+            seq,
+            event,
+        });
+        if (!stored) console.error(`[sandbox-mcp:worker] report_progress ${seq} not stored`);
+
+        return this.text(stored ? "ok" : "not recorded");
     }
 
     private async report_status({ status }: { status: WorkerRuntimeStatus }) {

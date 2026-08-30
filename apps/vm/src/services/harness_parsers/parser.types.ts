@@ -8,6 +8,6 @@ export interface AgentReport {
 }
 
 export interface HarnessEventParser {
-    render_line: (line: string) => string[];
+    observe_line: (line: string) => void;
     extract_report: (stderr_tail: string, duration_ms: number) => AgentReport;
 }

@@ -74,6 +74,7 @@ export default class ReportRunCompleted {
             });
 
             const project_id = existing.issue.projectId;
+
             await ActivityService.publish(project_id, data.issue_id, activities);
             await ActivityService.publish_session(project_id, session);
 

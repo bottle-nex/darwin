@@ -34,7 +34,7 @@ export function useWebSocket(project_id: string | undefined) {
 
         last_project_id.current = project_id;
         socket.current = get_socket_client(project_id, token);
-        socket.current.set_connection_state_handler(set_is_connected);
+        socket.current.add_connection_state_handler(set_is_connected);
         set_is_connected(socket.current.is_connected);
 
         return () => {

@@ -62,6 +62,11 @@ model AgentSession {
   traceUrl String?
   error    String?
 
+  logsKey          String?
+  logsLineCount    Int     @default(0)
+  logsDroppedLines Int     @default(0)
+  logsSizeBytes    Int     @default(0)
+
   activities IssueActivity[]
 
   startedAt DateTime  @default(now())

@@ -18,6 +18,8 @@ import HarnessRun from "./service.harness_run";
 import IssueSolver, { type ClaimedIssue } from "./service.issue_solver";
 import { sign_worker_jwt } from "./service.jwt";
 import OutcomeReporter from "./service.outcome_queue";
+import RunLogRegistry from "./service.run_log_registry";
+import RunLogWriter from "./service.run_log_writer";
 import RunReporter from "./service.run_report";
 import SandboxStream, { describe_failure, failure_sentence } from "./service.sandbox_stream";
 import SecretService from "./service.secret";
@@ -356,6 +358,14 @@ export default class E2B {
                         brief: project.planMd ? "included" : "absent",
                     });
 
+                    const writer = RunLogWriter.open(
+                        run_id,
+                        { projectId: project.id, issueId: issue.id },
+                        secrets(),
+                        log,
+                    );
+                    RunLogRegistry.register(run_id, writer, worker_token);
+
                     let report;
                     try {
                         report = await HarnessRun.execute(sandbox, log, {
@@ -375,12 +385,17 @@ export default class E2B {
                             envs: {
                                 ...(await resolve_harness_env(harness, project.id)),
                                 GH_TOKEN: gh_token,
+                                MATCHA_RUN_ID: run_id,
+                                ...(ENV.SERVER_VM_PUBLIC_URL
+                                    ? { MATCHA_VM_URL: ENV.SERVER_VM_PUBLIC_URL }
+                                    : {}),
                                 ...(graph_state === "ready" ? { GRAPHIFY_OUT } : {}),
                             },
                             timeout_ms: ISSUE_SOLVE_TIMEOUT_MS,
                             label: `solving agent for issue #${issue.number}`,
                         });
                     } catch (error) {
+                        RunLogRegistry.release(run_id);
                         await RunReporter.failed(
                             worker_token,
                             run_id,
@@ -391,6 +406,7 @@ export default class E2B {
                         throw error;
                     }
 
+                    RunLogRegistry.release(run_id);
                     await RunReporter.completed(worker_token, run_id, issue.id, report, log);
 
                     log.success(`issue #${issue.number} run finished`, {
@@ -589,6 +605,10 @@ export default class E2B {
             ${actions.map((action, index) => `${index + 1}. ${action}`).join("\n")}
 
             Do all of this yourself with your Bash tool — you have full permissions in this sandbox.
+
+            ## Reporting your progress
+
+            Someone is watching this run and sees only what you report. Call report_progress immediately after each action you take — every file you read, every file you edit or create, every search, and every command you run. Report the action, not its contents: the file changes and command output are shown separately, so send the path or the command and nothing more. A step you do not report did not happen as far as the person watching is concerned.
 
             Never start a long-running command in the background and end your turn waiting on it. This is a single non-interactive run: there is no later turn to come back to, so anything left running when you stop is lost and the issue goes unsolved. Run it in the foreground and wait for it to finish.`;
 

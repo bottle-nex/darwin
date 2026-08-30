@@ -9,11 +9,13 @@ import SpaceCreateController from "../../controllers/issues/controller.create_sp
 import ColumnDeleteController from "../../controllers/issues/controller.delete_column";
 import IssueDeleteController from "../../controllers/issues/controller.delete_issue";
 import SpaceDeleteController from "../../controllers/issues/controller.delete_space";
+import RunLogsDownloadController from "../../controllers/issues/controller.download_run_logs";
 import BoardColumnsGetController from "../../controllers/issues/controller.get_board_columns";
 import IssueGetByIdController from "../../controllers/issues/controller.get_issue";
 import IssueGetConfigController from "../../controllers/issues/controller.get_issue_config";
 import IssueReferencesGetController from "../../controllers/issues/controller.get_issue_references";
 import IssueGetController from "../../controllers/issues/controller.get_issues";
+import RunLogsGetController from "../../controllers/issues/controller.get_run_logs";
 import IssueActivityListController from "../../controllers/issues/controller.list_activity";
 import MyIssuesListController from "../../controllers/issues/controller.list_my_issues";
 import ColumnReorderController from "../../controllers/issues/controller.reorder_columns";
@@ -43,6 +45,9 @@ issues_router.post("/columns", require_auth, ColumnCreateController.process);
 issues_router.patch("/columns/reorder", require_auth, ColumnReorderController.process);
 issues_router.patch("/columns/:id", require_auth, ColumnUpdateController.process);
 issues_router.delete("/columns/:id", require_auth, ColumnDeleteController.process);
+
+issues_router.get("/runs/:run_id/logs", require_auth, RunLogsGetController.process);
+issues_router.get("/runs/:run_id/logs/download", require_auth, RunLogsDownloadController.process);
 
 issues_router.patch("/bulk", require_auth, IssueBulkUpdateController.process);
 issues_router.post("/bulk/delete", require_auth, IssueBulkDeleteController.process);

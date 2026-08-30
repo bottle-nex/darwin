@@ -122,6 +122,8 @@
         "bullmq": "^5.81.0",
         "chalk": "^5.6.2",
         "dotenv": "^17.4.2",
+        "ioredis": "^5.4.1",
+        "minio": "^8.0.7",
         "zod": "^4.4.3",
       },
       "devDependencies": {
@@ -216,6 +218,7 @@
         "chalk": "^5.6.2",
         "dotenv": "^17.4.2",
         "e2b": "^2.36.0",
+        "ioredis": "^5.4.1",
         "jsonwebtoken": "^9.0.3",
         "minio": "^8.0.7",
         "zod": "^4.4.3",
@@ -426,6 +429,7 @@
       "dependencies": {
         "@modelcontextprotocol/sdk": "^1.0.0",
         "@trymatcha/database": "*",
+        "@trymatcha/types": "*",
         "@types/node": "^25.9.3",
         "zod": "^4.4.3",
       },

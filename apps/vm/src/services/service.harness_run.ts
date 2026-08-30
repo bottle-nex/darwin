@@ -58,15 +58,12 @@ export default class HarnessRun {
             })
             .join(" ");
 
+        // stdout is the harness's event stream, not a feed for a person: it is read for the
+        // run's outcome only, and what the agent did reaches the log from the agent itself.
+        const observe = (line: string) => parser.observe_line(line);
         const trace = (line: string) => log.stream(chalk.dim(truncate(line, MAX_TEXT)));
         const stdout = SandboxStream.lines();
         const stderr = SandboxStream.lines();
-
-        const render = (line: string) => {
-            for (const rendered of parser.render_line(line)) {
-                log.stream(rendered);
-            }
-        };
 
         // Wall-clock, not any harness's self-reported duration — Claude's result event
         // supplies its own, but Codex/OpenCode's completion event is unverified and may not
@@ -78,12 +75,12 @@ export default class HarnessRun {
                 cwd: REPO_DIR,
                 envs: options.envs,
                 timeoutMs: options.timeout_ms,
-                onStdout: (chunk) => stdout.push(chunk).forEach(render),
+                onStdout: (chunk) => stdout.push(chunk).forEach(observe),
                 onStderr: (chunk) => stderr.push(chunk).forEach(trace),
             });
             stderr_tail = result.stderr;
         } finally {
-            stdout.flush().forEach(render);
+            stdout.flush().forEach(observe);
             stderr.flush().forEach(trace);
         }
 

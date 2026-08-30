@@ -204,6 +204,11 @@ export interface AgentSession {
     traceUrl: string | null;
     error: string | null;
 
+    logsKey: string | null;
+    logsLineCount: number;
+    logsDroppedLines: number;
+    logsSizeBytes: number;
+
     startedAt: Date;
     endedAt: Date | null;
 }

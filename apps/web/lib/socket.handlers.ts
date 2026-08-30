@@ -26,6 +26,7 @@ import { mark_team_chat_deleted, upsert_team_chat } from "@/hooks/chats/useTeamC
 import { updateBoardIssue, upsertBoardIssue } from "@/hooks/issues/useBoard";
 import { upsert_notification } from "@/hooks/notifications/notificationCache";
 import { PROJECT_QUERY_KEY } from "@/hooks/project/useGetProject";
+import { append_run_log_events, seal_run_log } from "@/hooks/runLogs/useRunLogs";
 import { TEAM_MEMBERS_QUERY_KEY } from "@/hooks/team/useGetTeamMembers";
 import { should_float_notification } from "@/lib/notifications/floatSuppression";
 import SessionServices from "@/lib/session";
@@ -172,5 +173,20 @@ export class SocketHandlers {
     static handle_agent_session_updated(queryClient: QueryClient, message: OutboundSocketMessage) {
         if (message.type !== OutboundSocketMessageType.AGENT_SESSION_UPDATED) return;
         update_agent_session(queryClient, message.payload);
+    }
+
+    static handle_run_log_appended(queryClient: QueryClient, message: OutboundSocketMessage) {
+        if (message.type !== OutboundSocketMessageType.RUN_LOG_APPENDED) return;
+        append_run_log_events(
+            queryClient,
+            message.runId,
+            message.payload.events,
+            message.payload.cursor,
+        );
+    }
+
+    static handle_run_log_sealed(queryClient: QueryClient, message: OutboundSocketMessage) {
+        if (message.type !== OutboundSocketMessageType.RUN_LOG_SEALED) return;
+        seal_run_log(queryClient, message.runId, message.payload.droppedEvents);
     }
 }
