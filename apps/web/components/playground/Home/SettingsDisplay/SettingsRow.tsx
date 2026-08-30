@@ -18,8 +18,8 @@ export default function SettingsRow({
     return (
         <div
             className={cn(
-                "flex gap-6 px-5 py-4",
-                stack ? "flex-col items-stretch" : "items-center justify-between",
+                "flex px-5 py-4",
+                stack ? "flex-col items-stretch gap-3" : "items-center justify-between gap-6",
                 className,
             )}
         >
