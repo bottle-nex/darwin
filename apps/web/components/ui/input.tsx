@@ -10,6 +10,7 @@ const inputVariants = cva(
             variant: {
                 default: "",
                 ghost: "border-none shadow-none",
+                outline: "rounded-[8px] border border-snow/5 bg-snow/6 hover:bg-snow/8",
             },
         },
         defaultVariants: {
