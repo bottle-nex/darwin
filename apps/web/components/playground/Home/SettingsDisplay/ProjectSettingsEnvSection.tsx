@@ -18,10 +18,8 @@ import parse_env from "@/lib/env_parser";
 import { formatRelativeTime } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
+import SettingsRow from "./SettingsRow";
 import SettingsUtilityCard from "./SettingsUtilityCard";
-
-const FIELD =
-    "border-white/10 bg-white/5 text-neutral-200 placeholder:text-neutral-500 focus-visible:border-matcha focus-visible:ring-matcha/30";
 
 const KEY_PATTERN = /^[A-Za-z_][A-Za-z0-9_]*$/;
 
@@ -80,13 +78,12 @@ export default function ProjectSettingsEnvSection({
     return (
         <SettingsUtilityCard
             title="Environment variables"
-            description="Encrypted at rest and write-only, you can add, overwrite, or delete them, but they're never shown again."
             headerAction={
                 <>
                     <Button
                         type="button"
                         size="sm"
-                        variant="tertiary"
+                        variant="flat"
                         loading={setSecrets.isPending}
                         disabled={!projectId}
                         onClick={() => fileRef.current?.click()}
@@ -106,63 +103,72 @@ export default function ProjectSettingsEnvSection({
                     />
                 </>
             }
+            rows
         >
-            {/* Add / overwrite */}
-            <div className="rounded-lg bg-white/5 p-3 shadow-[inset_0_1px_0_0_var(--color-edge)]">
-                <div className="flex items-end gap-2">
-                    <div className="flex-1">
-                        <label className="text-[11px] text-neutral-500">Key</label>
+            <SettingsRow
+                label="Add variable"
+                description={
+                    newKey.length > 0 && !keyValid ? (
+                        <span className="text-red-400">
+                            Keys must start with a letter or underscore and contain only letters,
+                            numbers, and underscores.
+                        </span>
+                    ) : (
+                        "Encrypted at rest and write-only — adding an existing key overwrites its value, and values are never shown again."
+                    )
+                }
+                stack
+            >
+                <div className="flex items-center gap-2">
+                    <Input
+                        variant="outline"
+                        value={newKey}
+                        onChange={(e) => setNewKey(e.target.value.replace(/\s/g, ""))}
+                        placeholder="DATABASE_URL"
+                        autoComplete="off"
+                        data-1p-ignore
+                        data-lpignore="true"
+                        spellCheck={false}
+                        className="h-8 flex-1 font-mono text-[13px]"
+                    />
+                    <div className="relative flex-1">
                         <Input
-                            value={newKey}
-                            onChange={(e) => setNewKey(e.target.value.replace(/\s/g, ""))}
-                            placeholder="DATABASE_URL"
+                            variant="outline"
+                            value={newValue}
+                            onChange={(e) => setNewValue(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.key === "Enter" && canAdd) addSecret();
+                            }}
+                            type="text"
+                            placeholder="value"
                             autoComplete="off"
                             data-1p-ignore
                             data-lpignore="true"
                             spellCheck={false}
-                            className={cn(FIELD, "mt-1 h-9 font-mono text-[13px]")}
+                            className={cn(
+                                "h-8 pr-8 font-mono text-[13px]",
+                                !reveal && "[-webkit-text-security:disc]",
+                            )}
                         />
-                    </div>
-                    <div className="flex-1">
-                        <label className="text-[11px] text-neutral-500">Value</label>
-                        <div className="relative mt-1">
-                            <Input
-                                value={newValue}
-                                onChange={(e) => setNewValue(e.target.value)}
-                                onKeyDown={(e) => {
-                                    if (e.key === "Enter" && canAdd) addSecret();
-                                }}
-                                type="text"
-                                placeholder="value"
-                                autoComplete="off"
-                                data-1p-ignore
-                                data-lpignore="true"
-                                spellCheck={false}
-                                className={cn(
-                                    FIELD,
-                                    "h-9 pr-9 font-mono text-[13px]",
-                                    !reveal && "[-webkit-text-security:disc]",
-                                )}
-                            />
-                            <Button
-                                variant="unstyled"
-                                type="button"
-                                onClick={() => setReveal((v) => !v)}
-                                aria-label={reveal ? "Hide value" : "Show value"}
-                                className="absolute top-1/2 right-2 -translate-y-1/2 cursor-pointer text-neutral-500 hover:text-neutral-300"
-                            >
-                                {reveal ? (
-                                    <HideSecretIcon className="size-3" aria-hidden />
-                                ) : (
-                                    <RevealSecretIcon className="size-3" aria-hidden />
-                                )}
-                            </Button>
-                        </div>
+                        <Button
+                            variant="unstyled"
+                            type="button"
+                            onClick={() => setReveal((v) => !v)}
+                            aria-label={reveal ? "Hide value" : "Show value"}
+                            className="absolute top-1/2 right-2 -translate-y-1/2 cursor-pointer text-neutral-500 hover:text-neutral-300"
+                        >
+                            {reveal ? (
+                                <HideSecretIcon className="size-3" aria-hidden />
+                            ) : (
+                                <RevealSecretIcon className="size-3" aria-hidden />
+                            )}
+                        </Button>
                     </div>
                     <Button
                         type="button"
+                        variant="flat-primary"
                         size="sm"
-                        className="h-9"
+                        className="h-8 shrink-0"
                         loading={setSecrets.isPending}
                         disabled={!canAdd}
                         onClick={addSecret}
@@ -171,74 +177,57 @@ export default function ProjectSettingsEnvSection({
                         Add
                     </Button>
                 </div>
-                {newKey.length > 0 && !keyValid && (
-                    <p className="mt-2 text-[11px] text-red-400">
-                        Keys must start with a letter or underscore and contain only letters,
-                        numbers, and underscores.
-                    </p>
-                )}
-            </div>
+            </SettingsRow>
 
-            {/* Existing keys */}
-            <div>
-                <h3 className="mb-2 text-[11px] font-medium tracking-wide text-neutral-500 uppercase">
-                    {list.length} variable{list.length === 1 ? "" : "s"}
-                </h3>
-                {secrets.isLoading ? (
-                    <p className="px-1 py-3 text-[13px] text-neutral-500">Loading…</p>
-                ) : list.length === 0 ? (
-                    <p className="rounded-lg bg-white/5 px-3 py-6 text-center text-[13px] text-neutral-500 shadow-[inset_0_1px_0_0_var(--color-edge)]">
-                        No environment variables yet.
-                    </p>
-                ) : (
-                    <div className="flex flex-col gap-1.5">
-                        {list.map((s) => {
-                            const deleting =
-                                deleteSecret.isPending && deleteSecret.variables?.key === s.key;
-                            return (
-                                <div
-                                    key={s.key}
-                                    className="group flex items-center justify-between gap-3 rounded-lg bg-white/5 px-3 py-2 shadow-[inset_0_1px_0_0_var(--color-edge)]"
-                                >
-                                    <section>
-                                        <div className="flex items-center justify-center gap-x-3">
-                                            <EnvSecretIcon
-                                                className="size-3 shrink-0 text-neutral-500"
-                                                aria-hidden
-                                            />
-                                            <span className="min-w-0 flex-1 truncate font-mono text-[12px] text-neutral-200">
-                                                {s.key}
-                                            </span>
-                                        </div>
-                                        <div className="mt-1 truncate pl-6 font-mono text-[12px] leading-none text-neutral-600">
-                                            {maskDots(s.key)}
-                                        </div>
-                                    </section>
-                                    <section className="flex items-center justify-center gap-x-3">
-                                        <span className="shrink-0 text-[10px] text-neutral-600">
-                                            Updated {formatRelativeTime(s.updatedAt)}
-                                        </span>
-                                        <Button
-                                            variant="unstyled"
-                                            type="button"
-                                            aria-label={`Delete ${s.key}`}
-                                            loading={deleting}
-                                            iconOnly
-                                            onClick={() =>
-                                                projectId &&
-                                                deleteSecret.mutate({ projectId, key: s.key })
-                                            }
-                                            className="flex size-6 shrink-0 cursor-pointer items-center justify-center rounded text-neutral-400 hover:bg-neutral-700/50 hover:text-red-500 disabled:opacity-40 [&_svg]:size-3"
-                                        >
-                                            <DeleteIcon className="size-3" aria-hidden />
-                                        </Button>
-                                    </section>
+            {secrets.isLoading ? (
+                <div className="px-5 py-4 text-[13px] text-neutral-500">Loading…</div>
+            ) : list.length === 0 ? (
+                <div className="px-5 py-4 text-[13px] text-neutral-500">
+                    No environment variables yet.
+                </div>
+            ) : (
+                <>
+                    {list.map((s) => {
+                        const deleting =
+                            deleteSecret.isPending && deleteSecret.variables?.key === s.key;
+                        return (
+                            <SettingsRow
+                                key={s.key}
+                                label={
+                                    <span className="flex items-center gap-2">
+                                        <EnvSecretIcon
+                                            className="size-3.5 shrink-0 text-neutral-500"
+                                            aria-hidden
+                                        />
+                                        <span className="truncate font-mono">{s.key}</span>
+                                    </span>
+                                }
+                                description={<span className="font-mono">{maskDots(s.key)}</span>}
+                            >
+                                <div className="flex items-center gap-3">
+                                    <span className="shrink-0 text-[11px] text-neutral-500">
+                                        Updated {formatRelativeTime(s.updatedAt)}
+                                    </span>
+                                    <Button
+                                        variant="unstyled"
+                                        type="button"
+                                        aria-label={`Delete ${s.key}`}
+                                        loading={deleting}
+                                        iconOnly
+                                        onClick={() =>
+                                            projectId &&
+                                            deleteSecret.mutate({ projectId, key: s.key })
+                                        }
+                                        className="flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-[8px] bg-snow/8 text-neutral-400 transition-colors hover:bg-red-500/12 hover:text-red-300 disabled:opacity-40 [&_svg]:size-3.5"
+                                    >
+                                        <DeleteIcon className="size-3.5" aria-hidden />
+                                    </Button>
                                 </div>
-                            );
-                        })}
-                    </div>
-                )}
-            </div>
+                            </SettingsRow>
+                        );
+                    })}
+                </>
+            )}
         </SettingsUtilityCard>
     );
 }

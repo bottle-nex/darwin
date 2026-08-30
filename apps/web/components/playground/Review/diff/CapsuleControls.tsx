@@ -2,13 +2,7 @@
 import type { CapsuleControl } from "@trymatcha/types";
 
 import { Input } from "@/components/ui/input";
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
+import SelectField from "@/components/ui/SelectField";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 
@@ -46,18 +40,18 @@ function Field({
 }) {
     if (control.kind === "enum") {
         return (
-            <Select value={value} onValueChange={onChange}>
-                <SelectTrigger size="sm" className="w-full text-[13px]">
-                    <SelectValue placeholder={control.name} />
-                </SelectTrigger>
-                <SelectContent>
-                    {(control.options ?? []).map((option) => (
-                        <SelectItem key={option} value={option}>
-                            {option}
-                        </SelectItem>
-                    ))}
-                </SelectContent>
-            </Select>
+            <SelectField
+                size="sm"
+                className="w-full"
+                aria-label={control.name}
+                value={value}
+                onChange={onChange}
+                placeholder={control.name}
+                options={(control.options ?? []).map((option) => ({
+                    value: option,
+                    label: option,
+                }))}
+            />
         );
     }
 

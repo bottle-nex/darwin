@@ -2,39 +2,45 @@ import { cn } from "@/lib/utils";
 
 export default function SettingsUtilityCard({
     title,
-    description,
     headerAction,
     footer,
     children,
     className,
+    rows = false,
 }: {
     title: string;
-    description?: React.ReactNode;
     headerAction?: React.ReactNode;
     footer?: React.ReactNode;
     children: React.ReactNode;
     className?: string;
+    rows?: boolean;
 }) {
     return (
-        <div
-            className={cn(
-                "overflow-hidden rounded-xl border border-border bg-snow/3 flex flex-col py-4",
-                className,
-            )}
-        >
-            <div className="w-full flex items-start justify-between gap-3 px-4">
-                <div className="flex flex-col gap-0.5 items-start">
-                    <span className="text-sm font-medium text-snow">{title}</span>
-                    <span className="text-[13px] text-snow/60">{description}</span>
-                </div>
+        <div className={cn("flex flex-col gap-3", className)}>
+            <div className="mx-2 flex items-center justify-between gap-3">
+                <span className="text-[15px] leading-tight font-medium text-snow">{title}</span>
                 {headerAction && (
                     <div className="flex shrink-0 items-center gap-2">{headerAction}</div>
                 )}
             </div>
 
-            <div className="rounded-lg flex flex-col py-3 px-5 gap-5">{children}</div>
+            <div className="overflow-hidden rounded-xl border border-border bg-snow/3">
+                <div
+                    className={
+                        rows
+                            ? "flex flex-col divide-y divide-border"
+                            : "flex flex-col gap-5 px-5 py-6"
+                    }
+                >
+                    {children}
+                </div>
 
-            {footer && <div className="py-3 px-3 w-full flex justify-end">{footer}</div>}
+                {footer && (
+                    <div className="flex w-full justify-end border-t border-border px-4 py-3">
+                        {footer}
+                    </div>
+                )}
+            </div>
         </div>
     );
 }
