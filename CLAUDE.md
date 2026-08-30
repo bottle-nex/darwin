@@ -28,7 +28,7 @@ Bun-managed Turborepo monorepo. `bun@1.3.2` is pinned via `packageManager`; use 
 
 Local infra is `docker-compose up -d`: Postgres 16 on `:4403`, Redis 7 with `notify-keyspace-events Ex` on `:4404` (the Redis flag is required — OTP/expiry logic relies on it), and MinIO on `:4405` (API) / `:4406` (console).
 
-Local infra sits in one block: web `4400`, admin `4401`, Postgres `4403`, Redis `4404`, MinIO `4405`/`4406`. The API server is the exception — it listens on `8080`.
+Every port sits in one block: web `4400`, admin `4401`, server `4402`, Postgres `4403`, Redis `4404`, MinIO `4405`/`4406`.
 
 ## Environment
 
