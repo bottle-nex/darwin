@@ -59,7 +59,7 @@ export default function ResourcePickerDialog({
                                 value={`${resource.label} ${resource.id}`}
                                 onSelect={() => onPick(resource.id)}
                                 className={cn(
-                                    "px-2.5 py-2 hover:bg-white/5 data-[selected=true]:not-hover:bg-transparent",
+                                    "px-2.5 py-2 hover:bg-white/5",
                                     destructive && "text-rose-300/90",
                                 )}
                             >

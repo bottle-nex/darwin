@@ -8,6 +8,7 @@ import PlaygroundAvatar from "@/components/playground/Core/components/Playground
 import { CapsuleTrigger } from "@/components/playground/Issue/Capsule";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import DialogSubmitButton, { handleDialogSubmitKey } from "@/components/ui/DialogSubmitButton";
 import { GHOST_FIELD } from "@/components/ui/fieldStyles";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Textarea } from "@/components/ui/textarea";
@@ -92,7 +93,7 @@ export default function InviteToTeamDialog({
                 }}
                 className={cn(
                     "flex flex-col max-h-[80vh] min-h-[40vh] w-150 max-w-none sm:max-w-none p-0 gap-0 overflow-hidden",
-                    "bg-charcoal rounded-3xl",
+                    "rounded-3xl",
                 )}
             >
                 <DialogTitle className="sr-only">Invite members</DialogTitle>
@@ -217,7 +218,10 @@ function InviteForm({
     const senderLetter = (sender.name || sender.email || "?").trim().charAt(0).toUpperCase();
 
     return (
-        <main className="flex min-h-0 min-w-0 flex-1 flex-col justify-between *:px-6">
+        <main
+            className="flex min-h-0 min-w-0 flex-1 flex-col justify-between *:px-6"
+            onKeyDown={(event) => handleDialogSubmitKey(event, handleSubmit)}
+        >
             <section className="flex flex-col items-start gap-y-3 pt-4 pb-2">
                 <div className="flex w-full items-center justify-between gap-x-4">
                     <div className="flex items-center justify-start gap-x-1 text-snow text-xs">
@@ -317,7 +321,7 @@ function InviteForm({
                     onChange={(e) => setMessage(e.target.value)}
                     maxLength={500}
                     placeholder="Add a short note to the invite…"
-                    className={cn(GHOST_FIELD, "w-full text-[13px] leading-6 text-neutral-300")}
+                    className={cn(GHOST_FIELD, "w-full text-base leading-[1.65] text-neutral-200")}
                 />
             </section>
 
@@ -361,17 +365,12 @@ function InviteForm({
                 </div>
 
                 <div className="flex h-fit items-center justify-end gap-x-2">
-                    <Button
-                        type="button"
-                        variant="tertiary"
-                        size="xs"
-                        className="text-ink!"
+                    <DialogSubmitButton
+                        label={submitLabel}
                         onClick={handleSubmit}
                         loading={isPending}
                         disabled={!canSubmit}
-                    >
-                        {submitLabel}
-                    </Button>
+                    />
                 </div>
             </section>
         </main>

@@ -91,7 +91,7 @@ function CommandItem({ className, ...props }: React.ComponentProps<typeof Comman
     return (
         <CommandPrimitive.Item
             data-slot="command-item"
-            className={cn(MENU_ITEM, className)}
+            className={cn(MENU_ITEM, "rounded-lg", className)}
             {...props}
         />
     );

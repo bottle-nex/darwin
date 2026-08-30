@@ -9,6 +9,7 @@ import PlaygroundAvatar, {
 import { Button } from "@/components/ui/button";
 import { ColorPicker } from "@/components/ui/color-picker";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import DialogSubmitButton, { handleDialogSubmitKey } from "@/components/ui/DialogSubmitButton";
 import { DIALOG_TITLE_FIELD, GHOST_FIELD } from "@/components/ui/fieldStyles";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Textarea } from "@/components/ui/textarea";
@@ -57,7 +58,7 @@ export default function CreateTagDialog({
                 }}
                 className={cn(
                     "flex flex-col max-h-[80vh] min-h-[40vh] w-130 max-w-none sm:max-w-none p-0 gap-0 overflow-hidden",
-                    "bg-charcoal rounded-3xl",
+                    "rounded-3xl",
                 )}
             >
                 <DialogTitle className="sr-only">{tag ? "Edit tag" : "New tag"}</DialogTitle>
@@ -122,7 +123,10 @@ function TagForm({ projectId, tag, onDone }: { projectId: string; tag?: Tag; onD
     }
 
     return (
-        <main className="flex min-h-0 min-w-0 flex-1 flex-col justify-between *:px-6">
+        <main
+            className="flex min-h-0 min-w-0 flex-1 flex-col justify-between *:px-6"
+            onKeyDown={(event) => handleDialogSubmitKey(event, submit)}
+        >
             <section className="flex flex-col items-start gap-y-3 pt-4 pb-2">
                 <div className="flex items-center justify-start gap-x-1 text-snow text-xs">
                     <PlaygroundAvatar
@@ -213,17 +217,12 @@ function TagForm({ projectId, tag, onDone }: { projectId: string; tag?: Tag; onD
             </section>
 
             <section className="flex h-fit items-center justify-end gap-x-2 pb-4">
-                <Button
-                    type="button"
-                    variant="tertiary"
-                    size="xs"
-                    className="text-ink!"
+                <DialogSubmitButton
+                    label={tag ? "Save" : "Create Tag"}
                     onClick={submit}
                     loading={pending}
                     disabled={!ready}
-                >
-                    {tag ? "Save" : "Create Tag"}
-                </Button>
+                />
             </section>
         </main>
     );
