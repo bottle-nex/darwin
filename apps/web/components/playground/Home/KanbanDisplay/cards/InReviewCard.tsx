@@ -3,8 +3,9 @@ import { PullRequestOpenIcon } from "@trymatcha/ui/icons";
 
 import { reviewSlugFor } from "@/components/playground/Review/reviewSlug";
 import IconWrapper from "@/components/ui/IconWrapper";
+import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
 import { usePaneRouteStore } from "@/store/playground/usePaneRouteStore";
-import type { Issue } from "@/types/kanban";
+import { type Issue, KanbanStatus } from "@/types/kanban";
 
 import AgentChip from "./AgentChip";
 import BaseCard from "./BaseCard";
@@ -13,6 +14,7 @@ import BaseCard from "./BaseCard";
 export default function InReviewCard({ issue }: { issue: Issue }) {
     const openReview = usePaneRouteStore((s) => s.openReview);
     const pullNumber = issue.boardIssue?.prNumber ?? null;
+    const { titleBox } = KanbanBoard.glyphFor(KanbanStatus.InReview);
 
     return (
         <BaseCard issue={issue}>
@@ -35,8 +37,7 @@ export default function InReviewCard({ issue }: { issue: Issue }) {
                         <IconWrapper
                             icon={PullRequestOpenIcon}
                             variant="ring"
-                            hoverGroup="card"
-                            iconClassName="text-green-500"
+                            iconClassName={titleBox}
                             title={pullNumber === null ? undefined : "Open the review"}
                         >
                             <span className="text-[12px] text-snow">{issue.pr?.number}</span>

@@ -16,7 +16,9 @@ import PriorityChipMenu from "./PriorityChipMenu";
 
 const MAX_AVATARS = 3;
 
-const MAX_TAGS = 5;
+export function shortDate(iso: string): string {
+    return new Date(iso).toLocaleDateString([], { month: "short", day: "numeric" });
+}
 
 export function issueIdentifier(projectName: string | undefined, number: number | string): string {
     const key = (projectName ?? "ISS").slice(0, 3).toUpperCase();
@@ -129,7 +131,7 @@ export default function IssueCardFace({
             </div>
 
             {priorityChip || targetDate || tags.length ? (
-                <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
+                <div className="mt-2.5 flex items-center gap-1.5 overflow-hidden">
                     {priorityChip && issueId ? (
                         <PriorityChipMenu issueId={issueId} issue={boardIssue}>
                             {priorityChip}
@@ -137,7 +139,7 @@ export default function IssueCardFace({
                     ) : (
                         priorityChip
                     )}
-                    <IssueTags tags={tags} max={MAX_TAGS} className="contents" />
+                    <IssueTags tags={tags} className="contents" />
                     {targetDate && (
                         <IconWrapper
                             variant="outline"
