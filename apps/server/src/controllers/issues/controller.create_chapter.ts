@@ -5,6 +5,7 @@ import z from "zod";
 
 import Access from "../../access-control/access";
 import ResponseWriter from "../../services/service.response";
+import { icon_schema } from "../project/icon.schema";
 
 export default class ChapterCreateController {
     static body_schema = z.object({
@@ -15,6 +16,7 @@ export default class ChapterCreateController {
             .min(1)
             .max(50)
             .regex(/^[a-z0-9-]+$/, "Slug must be lowercase letters, numbers, and hyphens only"),
+        icon: icon_schema.nullish(),
     });
 
     static async process(req: Request, res: Response) {
@@ -53,8 +55,9 @@ export default class ChapterCreateController {
                         name: data.name,
                         slug: data.slug,
                         order: (last_chapter?.order ?? 0) + 1,
+                        icon: data.icon ?? undefined,
                     },
-                    select: { id: true, name: true, slug: true, order: true },
+                    select: { id: true, name: true, slug: true, order: true, icon: true },
                 });
             });
 

@@ -26,7 +26,7 @@ const envSchema = z.object({
     SERVER_EMAIL_FROM: z.string().min(1).default("matcha <noreply@highgarden.app>"),
     SERVER_WEB_URL: z.url({ protocol: /^https?$/ }),
     SERVER_PUBLIC_API_URL: z.url({ protocol: /^https?$/ }),
-    SERVER_ADMIN_URL: z.url({ protocol: /^https?$/ }).default("http://localhost:5174"),
+    SERVER_ADMIN_URL: z.url({ protocol: /^https?$/ }).default("http://localhost:4401"),
     SERVER_ADMIN_EMAILS: z
         .string()
         .default("")
@@ -55,7 +55,7 @@ const envSchema = z.object({
     SERVER_GITHUB_APP_PRIVATE_KEY: z
         .string()
         .min(1, "GitHub App private key (base64-encoded PEM) is required"),
-    SERVER_GITHUB_APP_WEBHOOK_SECRET: z.string().optional(),
+    SERVER_GITHUB_APP_WEBHOOK_SECRET: z.string().min(1, "GitHub App webhook secret is required"),
     OPENROUTER_API_KEY: z.string().min(1, "Open router API key is required"),
 });
 

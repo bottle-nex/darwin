@@ -58,6 +58,7 @@ export const REVIEW_CLOSE_URL = (project_id: string, pull_number: number) =>
     `${REVIEW_URL(project_id, pull_number)}/close`;
 
 export const LIST_TAGS_URL = (project_id: string) => `${PROJECT_URL}/${project_id}/tags`;
+export const ISSUE_IMPORT_URL = (project_id: string) => `${PROJECT_URL}/${project_id}/issue-import`;
 export const CREATE_TAG_URL = (project_id: string) => `${PROJECT_URL}/${project_id}/tags`;
 export const UPDATE_TAG_URL = (project_id: string, tagId: string) =>
     `${PROJECT_URL}/${project_id}/tags/${tagId}`;

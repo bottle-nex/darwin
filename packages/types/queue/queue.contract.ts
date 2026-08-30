@@ -7,6 +7,7 @@ export const QueueName = {
     ProductDiff: "product.diff",
     IssueOutcome: "issue.outcome",
     Notification: "notification.dispatch",
+    GithubImport: "github.import",
 } as const;
 export type QueueName = (typeof QueueName)[keyof typeof QueueName];
 
@@ -24,6 +25,20 @@ export interface OnboardJobData {
     repo_url: string;
     branch: string;
     installation_id: number;
+}
+
+export type GithubImportJobData =
+    | { kind: "issue_opened"; repoId: string; payload: GithubIssuePayload }
+    | { kind: "backfill"; projectId: string; page: number };
+
+export interface GithubIssuePayload {
+    githubIssueId: string;
+    number: number;
+    title: string;
+    body: string;
+    url: string;
+    authorLogin: string;
+    authorAvatar: string | null;
 }
 
 export interface ProductDiffJobData {

@@ -10,6 +10,7 @@ import delete_review_comment_controller from "../../controllers/project/controll
 import delete_secret_controller from "../../controllers/project/controller.delete_secret";
 import delete_tag_controller from "../../controllers/project/controller.delete_tag";
 import delete_template_controller from "../../controllers/project/controller.delete_template";
+import get_issue_import_controller from "../../controllers/project/controller.get_issue_import";
 import get_product_diff_controller from "../../controllers/project/controller.get_product_diff";
 import get_project_controller from "../../controllers/project/controller.get_project";
 import get_project_config_controller from "../../controllers/project/controller.get_project_config";
@@ -27,6 +28,7 @@ import merge_review_controller from "../../controllers/project/controller.merge_
 import product_diff_artifact_urls_controller from "../../controllers/project/controller.product_diff_artifact_urls";
 import regenerate_product_diff_controller from "../../controllers/project/controller.regenerate_product_diff";
 import set_secrets_controller from "../../controllers/project/controller.set_secrets";
+import update_issue_import_controller from "../../controllers/project/controller.update_issue_import";
 import update_project_controller from "../../controllers/project/controller.update_project";
 import update_project_config_controller from "../../controllers/project/controller.update_project_config";
 import update_review_comment_controller from "../../controllers/project/controller.update_review_comment";
@@ -107,6 +109,8 @@ project_router.get("/:project_id/secrets", require_auth, list_secrets_controller
 project_router.post("/:project_id/secrets", require_auth, set_secrets_controller);
 project_router.delete("/:project_id/secrets/:key", require_auth, delete_secret_controller);
 project_router.get("/:project_id/tags", require_auth, list_tags_controller);
+project_router.get("/:project_id/issue-import", require_auth, get_issue_import_controller);
+project_router.patch("/:project_id/issue-import", require_auth, update_issue_import_controller);
 project_router.post("/:project_id/tags", require_auth, create_tag_controller);
 project_router.patch("/:project_id/tags/:tag_id", require_auth, update_tag_controller);
 project_router.delete("/:project_id/tags/:tag_id", require_auth, delete_tag_controller);

@@ -15,6 +15,7 @@ import type { ReactNode } from "react";
 import { formatRelativeTime } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
+import GithubActorName from "../GithubActorName";
 import ReviewActorAvatar from "../ReviewActorAvatar";
 
 const TITLE = "text-[20px] leading-[1.3] font-medium tracking-[-0.011em] text-neutral-100";
@@ -52,7 +53,7 @@ export default function ReviewSummary({ review }: { review: ReviewHeader }) {
                     <>
                         <span className="flex items-center gap-1.5 text-neutral-300">
                             <ReviewActorAvatar actor={review.author} className="size-4" />
-                            {review.author.login}
+                            <GithubActorName login={review.author.login} />
                         </span>
                         <Dot />
                     </>

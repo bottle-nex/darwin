@@ -183,7 +183,7 @@ bun run dev
 
 </details>
 
-Your app will be running at `http://localhost:3000`. Open it in your browser to see it in action!
+Your app will be running at `http://localhost:4400`. Open it in your browser to see it in action!
 
 You can also read the official [detailed step-by-step guide from Prisma ORM](https://pris.ly/guide/turborepo?utm_campaign=turborepo-example) to build a project from scratch using Turborepo and Prisma ORM.
 

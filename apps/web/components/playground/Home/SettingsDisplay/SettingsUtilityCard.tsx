@@ -1,5 +1,7 @@
 import { cn } from "@/lib/utils";
 
+export const SETTINGS_CARD_SHELL = "rounded-xl border border-border bg-snow/3";
+
 export default function SettingsUtilityCard({
     title,
     headerAction,
@@ -24,7 +26,7 @@ export default function SettingsUtilityCard({
                 )}
             </div>
 
-            <div className="overflow-hidden rounded-xl border border-border bg-snow/3">
+            <div className={cn(SETTINGS_CARD_SHELL, "overflow-hidden")}>
                 <div
                     className={
                         rows

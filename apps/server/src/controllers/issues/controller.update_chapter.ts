@@ -5,6 +5,7 @@ import z from "zod";
 
 import Access from "../../access-control/access";
 import ResponseWriter from "../../services/service.response";
+import { icon_schema } from "../project/icon.schema";
 
 export default class ChapterUpdateController {
     static params_schema = z.object({ id: z.string().min(1) });
@@ -17,6 +18,7 @@ export default class ChapterUpdateController {
             .max(50)
             .regex(/^[a-z0-9-]+$/, "Slug must be lowercase letters, numbers, and hyphens only")
             .optional(),
+        icon: icon_schema.nullish(),
         order: z.number().int().optional(),
     });
 
@@ -55,8 +57,16 @@ export default class ChapterUpdateController {
 
             const updated = await prisma.chapter.update({
                 where: { id: params_data.id },
-                data: { name: body_data.name, slug: body_data.slug, order: body_data.order },
-                select: { id: true, name: true, slug: true, order: true },
+                data: {
+                    name: body_data.name,
+                    slug: body_data.slug,
+                    order: body_data.order,
+                    icon:
+                        body_data.icon === undefined
+                            ? undefined
+                            : (body_data.icon ?? Prisma.DbNull),
+                },
+                select: { id: true, name: true, slug: true, order: true, icon: true },
             });
 
             ResponseWriter.success(res, { chapter: updated }, "Chapter updated");

@@ -1,10 +1,12 @@
 "use client";
-import { CheckIcon } from "@trymatcha/ui/icons";
+import { CheckIcon, KanbanBoardLayoutIcon } from "@trymatcha/ui/icons";
 
+import HeroBuddy from "@/components/landing/v2/HeroBuddy";
 import { PRIORITY_TO_NUMBER } from "@/components/playground/Home/KanbanDisplay/customkanban/data";
 import { PRIORITY_OPTIONS } from "@/components/playground/Issue/issueHelpers";
 import MemberAvatar from "@/components/playground/Issue/MemberAvatar";
 import { CommandEmpty, CommandGroup, CommandItem, CommandList } from "@/components/ui/command";
+import { IconPickGlyph } from "@/components/ui/IconPicker";
 import { COPY_FIELDS, DATE_PRESETS, type IssueActions } from "@/hooks/issues/useIssueActions";
 import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
 import { cn } from "@/lib/utils";
@@ -172,30 +174,49 @@ export default function CommandIssuePage({
                 <CommandGroup>
                     {actions.sharedColumnId && (
                         <CommandItem
-                            value="Back to board"
+                            value="Agent board"
                             disabled={!editable}
                             onSelect={() => pick(() => actions.moveToColumn(null))}
                             className="px-2.5 py-2"
                         >
-                            Back to board
+                            <HeroBuddy move={false} className="size-3.5" />
+                            Agent board
                         </CommandItem>
                     )}
-                    {actions.columns
-                        .filter((column) => column.id !== actions.sharedColumnId)
-                        .map((column) => (
-                            <CommandItem
-                                key={column.id}
-                                value={column.title}
-                                disabled={!editable}
-                                onSelect={() => pick(() => actions.moveToColumn(column.id))}
-                                className="px-2.5 py-2"
-                            >
-                                <span className="truncate">{column.title}</span>
-                            </CommandItem>
-                        ))}
-                    {actions.columns.length === 0 && !actions.sharedColumnId && (
-                        <CommandItem disabled>No columns</CommandItem>
+                    {actions.chapterBoards.map((chapter) =>
+                        chapter.columns.length ? (
+                            <CommandGroup key={chapter.id} heading={chapter.name}>
+                                {chapter.columns
+                                    .filter((column) => column.id !== actions.sharedColumnId)
+                                    .map((column) => (
+                                        <CommandItem
+                                            key={column.id}
+                                            value={`${chapter.name} ${column.label}`}
+                                            disabled={!editable}
+                                            onSelect={() =>
+                                                pick(() => actions.moveToColumn(column.id))
+                                            }
+                                            className="px-2.5 py-2"
+                                        >
+                                            {chapter.icon ? (
+                                                <IconPickGlyph
+                                                    pick={chapter.icon}
+                                                    className="size-3.5"
+                                                />
+                                            ) : (
+                                                <KanbanBoardLayoutIcon
+                                                    className="size-3.5"
+                                                    aria-hidden
+                                                />
+                                            )}
+                                            <span className="truncate">{column.label}</span>
+                                        </CommandItem>
+                                    ))}
+                            </CommandGroup>
+                        ) : null,
                     )}
+                    {actions.chapterBoards.every((chapter) => chapter.columns.length === 0) &&
+                        !actions.sharedColumnId && <CommandItem disabled>No columns</CommandItem>}
                 </CommandGroup>
             )}
 

@@ -26,8 +26,9 @@ export type Assignee = {
 
 export type PullRequest = {
     number: string;
-    added: number;
-    removed: number;
+    /** Diff counts come from the agent run, not the board payload, so a card may not have them. */
+    added?: number;
+    removed?: number;
 };
 
 export type Issue = {

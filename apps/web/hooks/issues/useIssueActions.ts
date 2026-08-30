@@ -12,7 +12,7 @@ import { isAxiosError } from "axios";
 import { PRIORITY_TO_NUMBER } from "@/components/playground/Home/KanbanDisplay/customkanban/data";
 import { isEditable } from "@/components/playground/Issue/issueHelpers";
 import { useAssignIssue, useUnassignIssue } from "@/hooks/issues/useAssignIssue";
-import { useBoardColumns } from "@/hooks/issues/useBoardColumns";
+import { useChapterBoards } from "@/hooks/issues/useBoardColumns";
 import { useBulkUpdateIssues } from "@/hooks/issues/useBulkUpdateIssues";
 import { type CreateIssueInput, useCreateIssue } from "@/hooks/issues/useCreateIssue";
 import { useIssues } from "@/hooks/issues/useIssue";
@@ -100,12 +100,7 @@ export function useIssueActions(target: IssueActionTarget) {
     const isComplete = suppliedIssues.length > 0 || issueQuery.isComplete;
     const issue = issues.length === 1 ? issues[0] : undefined;
 
-    const { data: metadata } = useBoardColumns(projectId);
-    const columns = (metadata?.columns ?? []).map((column) => ({
-        id: column.id,
-        title: column.label,
-        cards: [],
-    }));
+    const chapterBoards = useChapterBoards(projectId);
     const { data: members } = useProjectMembers(projectId);
     const { data: tags } = useListTags(projectId);
 
@@ -165,7 +160,7 @@ export function useIssueActions(target: IssueActionTarget) {
         sharedPriority: shared(issues, (row) => row.priority),
         sharedColumnId: shared(issues, (row) => row.customColumnId),
         projectId,
-        columns,
+        chapterBoards,
         members: members ?? [],
         tags: tags ?? [],
         editable,

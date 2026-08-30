@@ -21,6 +21,13 @@ export type CreateIssueInput = {
     assignee_ids?: string[];
     tag_ids?: string[];
     created_by: { id: string; name: string };
+    github_link?: {
+        githubIssueId: string;
+        number: number;
+        url: string;
+        authorLogin: string;
+        authorAvatar: string | null;
+    };
 };
 
 export const BULK_ISSUE_LIMIT = 100;
@@ -59,6 +66,15 @@ export type IssueRow = Prisma.IssueGetPayload<{ include: typeof ISSUE_ROW_INCLUD
 export type UpdateIssueResult = { ok: true; issue: IssueRow } | IssueMutationFailure;
 
 export type DeleteIssueResult = { ok: true } | IssueMutationFailure;
+
+function is_issue_number_collision(error: unknown): boolean {
+    if (!(error instanceof Prisma.PrismaClientKnownRequestError) || error.code !== "P2002") {
+        return false;
+    }
+    const target = error.meta?.target;
+    const fields = Array.isArray(target) ? target : [target];
+    return fields.includes("number") || fields.includes("Issue_projectId_number_key");
+}
 
 function update_issue_row(
     tx: Prisma.TransactionClient,
@@ -102,6 +118,20 @@ export default class IssueService {
                         select: { id: true, status: true },
                     });
 
+                    if (input.github_link) {
+                        await tx.githubIssueLink.create({
+                            data: {
+                                issueId: created.id,
+                                projectId: input.project_id,
+                                githubIssueId: BigInt(input.github_link.githubIssueId),
+                                number: input.github_link.number,
+                                url: input.github_link.url,
+                                authorLogin: input.github_link.authorLogin,
+                                authorAvatar: input.github_link.authorAvatar,
+                            },
+                        });
+                    }
+
                     await ActivityService.emit(tx, {
                         issueId: created.id,
                         actor: {
@@ -116,10 +146,7 @@ export default class IssueService {
                 });
                 break;
             } catch (error) {
-                if (
-                    error instanceof Prisma.PrismaClientKnownRequestError &&
-                    error.code === "P2002"
-                ) {
+                if (is_issue_number_collision(error)) {
                     continue;
                 }
                 throw error;

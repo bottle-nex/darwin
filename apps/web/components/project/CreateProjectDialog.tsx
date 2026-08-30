@@ -1,5 +1,5 @@
 "use client";
-import { BreadcrumbSeparatorIcon, ProjectAvatarPickerIcon } from "@trymatcha/ui/icons";
+import { BreadcrumbSeparatorIcon } from "@trymatcha/ui/icons";
 import { useParams } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { useState } from "react";
@@ -9,7 +9,7 @@ import CreateProjectDialogDetailsStep from "@/components/project/CreateProjectDi
 import ProjectEnvStep, { type EnvRow } from "@/components/project/ProjectEnvStep";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import IconPicker, { type IconPick, IconPickGlyph } from "@/components/ui/IconPicker";
+import { type IconPick, IconPickButton } from "@/components/ui/IconPicker";
 import { useGetDashboard } from "@/hooks/dashboard/useGetDashboard";
 import { useFetchOrganizations } from "@/hooks/playground/useFetchOrganizations";
 import { useSetProjectSecrets } from "@/hooks/project/useSetProjectSecrets";
@@ -101,33 +101,14 @@ export default function CreateProjectDialog() {
                         <BreadcrumbSeparatorIcon />
                     </span>
                     {!createdProjectId && (
-                        <IconPicker open={iconOpen} onOpenChange={setIconOpen} onSelect={setIcon}>
-                            <Button
-                                variant="unstyled"
-                                type="button"
-                                aria-label="Pick project icon"
-                                style={
-                                    icon?.kind === "icon"
-                                        ? { backgroundColor: `${icon.color}33` }
-                                        : undefined
-                                }
-                                className={cn(
-                                    "flex size-5.5 shrink-0 cursor-pointer items-center justify-center rounded-[7px] transition-colors",
-                                    icon?.kind === "icon"
-                                        ? "hover:brightness-125"
-                                        : "bg-white/5 hover:bg-white/10",
-                                )}
-                            >
-                                {icon ? (
-                                    <IconPickGlyph pick={icon} className="size-3.5 text-sm" />
-                                ) : (
-                                    <ProjectAvatarPickerIcon
-                                        className="size-3.5 text-white/60"
-                                        aria-hidden
-                                    />
-                                )}
-                            </Button>
-                        </IconPicker>
+                        <IconPickButton
+                            pick={icon}
+                            onSelect={setIcon}
+                            open={iconOpen}
+                            onOpenChange={setIconOpen}
+                            label="Pick project icon"
+                            size="sm"
+                        />
                     )}
                     <span>
                         <BreadcrumbSeparatorIcon />

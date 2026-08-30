@@ -1,5 +1,5 @@
 "use client";
-import { DeleteIcon, ProjectAvatarPickerIcon } from "@trymatcha/ui/icons";
+import { DeleteIcon } from "@trymatcha/ui/icons";
 import { isAxiosError } from "axios";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -13,7 +13,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog";
-import IconPicker, { type IconPick, IconPickGlyph } from "@/components/ui/IconPicker";
+import { type IconPick, IconPickButton } from "@/components/ui/IconPicker";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
@@ -92,33 +92,13 @@ export default function ProjectSettingsGeneralSection({
         <div className="flex flex-col gap-12">
             <SettingsUtilityCard title="Project" rows>
                 <SettingsRow label="Icon" description="Shown next to the project everywhere.">
-                    <IconPicker open={iconOpen} onOpenChange={setIconOpen} onSelect={setIcon}>
-                        <Button
-                            variant="unstyled"
-                            type="button"
-                            aria-label="Pick project icon"
-                            style={
-                                icon?.kind === "icon"
-                                    ? { backgroundColor: `${icon.color}33` }
-                                    : undefined
-                            }
-                            className={cn(
-                                "flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-[8px] transition-colors",
-                                icon?.kind === "icon"
-                                    ? "hover:brightness-125"
-                                    : "bg-snow/6 hover:bg-snow/10",
-                            )}
-                        >
-                            {icon ? (
-                                <IconPickGlyph pick={icon} className="size-4 text-base" />
-                            ) : (
-                                <ProjectAvatarPickerIcon
-                                    className="size-4 text-white/60"
-                                    aria-hidden
-                                />
-                            )}
-                        </Button>
-                    </IconPicker>
+                    <IconPickButton
+                        pick={icon}
+                        onSelect={setIcon}
+                        open={iconOpen}
+                        onOpenChange={setIconOpen}
+                        label="Pick project icon"
+                    />
                 </SettingsRow>
 
                 <SettingsRow label="Name">

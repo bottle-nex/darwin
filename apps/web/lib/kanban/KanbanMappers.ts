@@ -53,13 +53,14 @@ export class KanbanMappers {
             status,
             createdAt: issue.createdAt,
             targetDate: issue.targetDate,
+            pr: issue.prNumber === null ? undefined : { number: `#${issue.prNumber}` },
         };
     }
 
     /**
      * Build the LLM board's status lanes from the server payload. Only issues NOT
      * parked in a custom column (`customColumnId === null`) belong here — they're
-     * grouped by their status. Agent-only fields (queue position, runner, PR, …)
+     * grouped by their status. Agent-only fields (queue position, runner, diff counts)
      * aren't in the board payload, so cards render without them for now.
      */
     static boardIssuesToLlmBoard(board: BoardResponse, projectName: string): BoardState {

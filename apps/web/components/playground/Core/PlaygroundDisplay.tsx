@@ -83,6 +83,8 @@ function SettingsPane({ tab }: { tab: string }) {
             return <SettingsDisplay section="env" />;
         case PlaygroundTab.SettingsHarness:
             return <SettingsDisplay section="harness" />;
+        case PlaygroundTab.SettingsIntegrations:
+            return <SettingsDisplay section="integrations" />;
         default:
             return null;
     }

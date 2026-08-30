@@ -106,14 +106,12 @@ function SelectItem({
     return (
         <SelectPrimitive.Item
             data-slot="select-item"
-            className={cn(
-                MENU_ITEM,
-                "w-full leading-5 *:[span]:last:flex *:[span]:last:items-center *:[span]:last:gap-2",
-                className,
-            )}
+            className={cn(MENU_ITEM, "w-full leading-5", className)}
             {...props}
         >
-            <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
+            <SelectPrimitive.ItemText>
+                <span className="flex min-w-0 items-center gap-2">{children}</span>
+            </SelectPrimitive.ItemText>
             <SelectPrimitive.ItemIndicator className="ml-auto">
                 <CheckIcon className="size-4 text-neutral-400" />
             </SelectPrimitive.ItemIndicator>

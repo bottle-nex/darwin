@@ -5,6 +5,7 @@ import LogoLoader from "@/components/app/LogoLoader";
 import Markdown from "@/components/utility/Markdown";
 import { useReviewComments } from "@/hooks/review/useReviewComments";
 
+import GithubActorName from "../GithubActorName";
 import ReviewActorAvatar from "../ReviewActorAvatar";
 import ReviewCommentCard from "./ReviewCommentCard";
 import ReviewComposer from "./ReviewComposer";
@@ -30,7 +31,7 @@ export default function PullRequestReviewDisplay({
                         <ReviewActorAvatar actor={review.author} className="mt-0.5 size-6" />
                         <div className="min-w-0 flex-1">
                             <p className="text-[14.5px] font-medium text-neutral-200">
-                                {review.author?.login ?? "Unknown"}
+                                <GithubActorName login={review.author?.login} />
                                 <span className="ml-2 font-normal text-neutral-600">
                                     opened this pull request
                                 </span>

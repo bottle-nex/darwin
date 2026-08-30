@@ -3,6 +3,7 @@ export * from "./prisma/schemas.prisma";
 export * from "./socket/socket.types";
 export * from "./socket/socket.codes";
 export * from "./queue/queue.contract";
+export * from "./github/import.contract";
 export * from "./mentions/token";
 export * from "./pagination/page.type";
 export * from "./product-diff/capsule.contract";

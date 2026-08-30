@@ -1,9 +1,9 @@
 "use client";
-import { BeforeAfterFrameIcon, HelpIcon } from "@trymatcha/ui/icons";
+import { BeforeAfterFrameIcon } from "@trymatcha/ui/icons";
 import type { ReactNode } from "react";
 
 import { MICRO_LABEL } from "@/components/playground/Core/components/paneBar";
-import { TooltipComponent } from "@/components/ui/tooltip-component";
+import HelpHint from "@/components/ui/HelpHint";
 import { cn } from "@/lib/utils";
 
 const APPROXIMATION_HINT =
@@ -36,15 +36,13 @@ export default function DiffFrame({
                 />
                 <span className={MICRO_LABEL}>{label}</span>
 
-                <TooltipComponent content={APPROXIMATION_HINT} className="max-w-56">
-                    <span
-                        tabIndex={0}
-                        aria-label={APPROXIMATION_HINT}
-                        className="ml-auto flex size-5 shrink-0 cursor-help items-center justify-center rounded-md text-neutral-600 transition-colors outline-none hover:bg-white/5 hover:text-neutral-300 focus-visible:text-neutral-300"
-                    >
-                        <HelpIcon className="size-3.5" />
-                    </span>
-                </TooltipComponent>
+                <HelpHint
+                    content={APPROXIMATION_HINT}
+                    label={APPROXIMATION_HINT}
+                    side="top"
+                    contentClassName="max-w-56"
+                    className="ml-auto size-5 hover:bg-white/5"
+                />
             </header>
             <div className="overflow-hidden rounded-md" style={{ width, height }}>
                 {children}

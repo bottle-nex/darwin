@@ -1,6 +1,7 @@
 import type { IconType } from "@trymatcha/ui/icons";
 import {
     EnvSecretIcon,
+    GithubLogoIcon,
     HarnessIcon,
     SettingsApiKeysIcon,
     SettingsAppearanceIcon,
@@ -22,6 +23,7 @@ const PROJECT_SETTINGS: SettingsItem[] = [
     { tab: PlaygroundTab.SettingsTemplates, label: "Issue templates", icon: SettingsTemplatesIcon },
     { tab: PlaygroundTab.SettingsEnv, label: "Environment variables", icon: EnvSecretIcon },
     { tab: PlaygroundTab.SettingsHarness, label: "AI Harness", icon: HarnessIcon },
+    { tab: PlaygroundTab.SettingsIntegrations, label: "Integrations", icon: GithubLogoIcon },
 ];
 
 export function filterSettingsItems(query: string, hasProject: boolean) {

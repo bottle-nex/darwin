@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
+import type { IconPick } from "@/components/ui/IconPicker";
 import { boardColumnsKey } from "@/hooks/issues/boardCache";
 import { apiClient } from "@/lib/axios";
 import { CREATE_CHAPTER_URL } from "@/routes/api_routes";
@@ -10,6 +11,7 @@ export interface CreateChapterInput {
     project_id: string;
     name: string;
     slug: string;
+    icon?: IconPick | null;
 }
 
 export function useCreateChapter() {

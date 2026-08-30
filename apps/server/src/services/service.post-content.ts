@@ -1,35 +1,19 @@
 import sanitizeHtml from "sanitize-html";
 
+import {
+    BASE_ALLOWED_TAGS,
+    SAFE_LINK_ATTRS,
+    SAFE_LINK_TRANSFORM,
+    TABLE_SPAN_ATTRS,
+} from "./service.html-sanitize";
+
 const WORDS_PER_MINUTE = 220;
 
 const ALLOWED_TAGS = [
-    "p",
-    "br",
-    "strong",
-    "em",
-    "s",
+    ...BASE_ALLOWED_TAGS,
     "u",
-    "code",
-    "pre",
-    "blockquote",
-    "hr",
-    "h1",
-    "h2",
-    "h3",
-    "h4",
-    "ul",
-    "ol",
-    "li",
-    "a",
-    "img",
     "figure",
     "figcaption",
-    "table",
-    "thead",
-    "tbody",
-    "tr",
-    "th",
-    "td",
     "label",
     "input",
     "div",
@@ -41,7 +25,9 @@ export default class PostContentService {
         return sanitizeHtml(html, {
             allowedTags: ALLOWED_TAGS,
             allowedAttributes: {
-                a: ["href", "target", "rel"],
+                a: SAFE_LINK_ATTRS,
+                td: TABLE_SPAN_ATTRS,
+                th: TABLE_SPAN_ATTRS,
                 img: ["src", "alt", "title", "width", "height"],
                 code: ["class"],
                 pre: ["class"],
@@ -53,10 +39,7 @@ export default class PostContentService {
             },
             allowedSchemesByTag: { img: ["http", "https"] },
             transformTags: {
-                a: sanitizeHtml.simpleTransform("a", {
-                    rel: "noopener noreferrer",
-                    target: "_blank",
-                }),
+                a: SAFE_LINK_TRANSFORM,
                 input: sanitizeHtml.simpleTransform("input", { disabled: "disabled" }),
             },
         });

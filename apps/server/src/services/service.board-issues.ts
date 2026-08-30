@@ -202,7 +202,7 @@ export default class BoardIssueService {
             prisma.chapter.findMany({
                 where: { projectId: project_id },
                 orderBy: { order: "asc" },
-                select: { id: true, name: true, slug: true, order: true },
+                select: { id: true, name: true, slug: true, order: true, icon: true },
             }),
             prisma.customColumn.findMany({
                 where: { chapter: { projectId: project_id } },

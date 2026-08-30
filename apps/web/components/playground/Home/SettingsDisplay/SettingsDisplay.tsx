@@ -8,12 +8,13 @@ import { useGetDashboard } from "@/hooks/dashboard/useGetDashboard";
 import { useGetProject } from "@/hooks/project/useGetProject";
 
 import AIHarnessSettingsSection from "./AIHarnessSettingsSection";
+import IntegrationsDisplay from "./integrations/IntegrationsDisplay";
 import ProjectSettingsEnvSection from "./ProjectSettingsEnvSection";
 import ProjectSettingsGeneralSection from "./ProjectSettingsGeneralSection";
 import SettingsPaneShell from "./SettingsPaneShell";
 import IssueTemplatesDisplay from "./templates/IssueTemplatesDisplay";
 
-export type ProjectSettingsSection = "project" | "env" | "templates" | "harness";
+export type ProjectSettingsSection = "project" | "env" | "templates" | "harness" | "integrations";
 
 function RestrictedNotice() {
     return (
@@ -83,8 +84,14 @@ export default function SettingsDisplay({ section }: { section: ProjectSettingsS
                 );
             case "harness":
                 return <AIHarnessSettingsSection projectId={currentProject.id} isAdmin={isAdmin} />;
+            case "integrations":
+                return <IntegrationsDisplay project={currentProject} />;
         }
     }
 
-    return <SettingsPaneShell sectionKey={section}>{getSection()}</SettingsPaneShell>;
+    return (
+        <SettingsPaneShell sectionKey={section} wide={section === "integrations"}>
+            {getSection()}
+        </SettingsPaneShell>
+    );
 }
