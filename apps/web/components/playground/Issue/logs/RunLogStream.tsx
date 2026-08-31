@@ -1,8 +1,8 @@
 "use client";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { type RunLogEvent, RunLogEventKind, RunLogState } from "@trymatcha/types";
-import { DownloadIcon, LoadingSpinnerIcon } from "@trymatcha/ui/icons";
-import { useEffect, useRef, useState } from "react";
+import { DownloadIcon, DropdownCaretIcon, LoadingSpinnerIcon } from "@trymatcha/ui/icons";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { useRunLogs } from "@/hooks/runLogs/useRunLogs";
 import { useSocketConnection } from "@/hooks/socket/useSocketConnection";
@@ -10,35 +10,47 @@ import { apiClient } from "@/lib/axios";
 import { cn } from "@/lib/utils";
 import { RUN_LOGS_DOWNLOAD_URL } from "@/routes/api_routes";
 
-import { EVENT_COLOR, EVENT_GLYPH, PHASE_COLOR, PHASE_LABEL } from "./runLog.registry";
+import { EVENT_COLOR, EVENT_GLYPH, GROUP_LABEL } from "./runLog.registry";
+import { groupRunLogEvents, type RunLogRow, toRunLogRows } from "./runLogGroups";
 
-const ROW_ESTIMATE = 18;
+const ROW_ESTIMATE = 20;
 const TAIL_THRESHOLD_PX = 48;
-
-function stampOf(event: RunLogEvent) {
-    return new Date(event.ts).toTimeString().slice(0, 8);
-}
 
 function describe(event: RunLogEvent): string {
     switch (event.kind) {
         case RunLogEventKind.Phase:
-            return PHASE_LABEL[event.phase];
+            return event.phase;
         case RunLogEventKind.Thought:
             return event.durationMs < 1000
-                ? "thought for <1s"
-                : `thought for ${Math.round(event.durationMs / 1000)}s`;
+                ? "Thought for less than a second"
+                : `Thought for ${Math.round(event.durationMs / 1000)}s`;
         case RunLogEventKind.FileRead:
-            return `read ${event.path}`;
+            return `Read ${event.path}`;
         case RunLogEventKind.FileWrite:
-            return `${event.mode === "edit" ? "edited" : "created"} ${event.path}`;
+            return `${event.mode === "edit" ? "Edited" : "Created"} ${event.path}`;
         case RunLogEventKind.Search:
-            return `search "${event.pattern}"`;
+            return `Searched for "${event.pattern}"`;
         case RunLogEventKind.Command:
         case RunLogEventKind.CommandFailed:
             return event.command;
         case RunLogEventKind.Notice:
         case RunLogEventKind.Failure:
             return event.text;
+    }
+}
+
+function detail(event: RunLogEvent): string {
+    switch (event.kind) {
+        case RunLogEventKind.FileRead:
+        case RunLogEventKind.FileWrite:
+            return event.path;
+        case RunLogEventKind.Search:
+            return event.pattern;
+        case RunLogEventKind.Command:
+        case RunLogEventKind.CommandFailed:
+            return event.command;
+        default:
+            return describe(event);
     }
 }
 
@@ -61,25 +73,39 @@ export default function RunLogStream({
     const isConnected = useSocketConnection(projectId);
     const { data, isLoading } = useRunLogs(runId, isConnected);
     const [scrollElement, setScrollElement] = useState<HTMLDivElement | null>(null);
+    const [collapsed, setCollapsed] = useState<ReadonlySet<string>>(() => new Set());
     const followTail = useRef(true);
 
     const events = data?.events ?? [];
+    const rows = useMemo(
+        () => toRunLogRows(groupRunLogEvents(events), collapsed),
+        [events, collapsed],
+    );
 
     const virtualizer = useVirtualizer({
-        count: events.length,
+        count: rows.length,
         getScrollElement: () => scrollElement,
         estimateSize: () => ROW_ESTIMATE,
         overscan: 24,
     });
 
     useEffect(() => {
-        if (!followTail.current || !events.length) return;
-        virtualizer.scrollToIndex(events.length - 1, { align: "end" });
-    }, [events.length, virtualizer]);
+        if (!followTail.current || !rows.length) return;
+        virtualizer.scrollToIndex(rows.length - 1, { align: "end" });
+    }, [rows.length, virtualizer]);
 
     function trackTail(event: React.UIEvent<HTMLDivElement>) {
         const { scrollTop, scrollHeight, clientHeight } = event.currentTarget;
         followTail.current = scrollHeight - scrollTop - clientHeight < TAIL_THRESHOLD_PX;
+    }
+
+    function toggleGroup(key: string) {
+        setCollapsed((previous) => {
+            const next = new Set(previous);
+            if (next.has(key)) next.delete(key);
+            else next.add(key);
+            return next;
+        });
     }
 
     if (isLoading) {
@@ -90,11 +116,11 @@ export default function RunLogStream({
         );
     }
 
-    if (!events.length) {
+    if (!rows.length) {
         return (
             <p className="px-3 py-6 text-center text-[12px] text-snow/35">
                 {data?.state === RunLogState.Live
-                    ? "Waiting for the sandbox to report..."
+                    ? "Waiting for the agent to report..."
                     : "No logs were captured for this run."}
             </p>
         );
@@ -122,54 +148,83 @@ export default function RunLogStream({
                 ref={setScrollElement}
                 onScroll={trackTail}
                 data-lenis-prevent
-                className="no-scrollbar max-h-[420px] overflow-y-auto bg-ink/40 py-1"
+                className="no-scrollbar max-h-[420px] overflow-y-auto py-1.5"
             >
                 <div className="relative w-full" style={{ height: virtualizer.getTotalSize() }}>
-                    {virtualizer.getVirtualItems().map((item) => {
-                        const event = events[item.index];
-                        return (
-                            <div
-                                key={event.seq}
-                                ref={virtualizer.measureElement}
-                                data-index={item.index}
-                                className="absolute top-0 left-0 flex w-full gap-2 px-3 font-mono text-[11.5px] leading-[18px]"
-                                style={{ transform: `translateY(${item.start}px)` }}
-                            >
-                                <span className="shrink-0 text-snow/25 tabular-nums">
-                                    {stampOf(event)}
-                                </span>
-                                <span
-                                    className={cn(
-                                        "w-12 shrink-0 truncate",
-                                        PHASE_COLOR[event.phase],
-                                    )}
-                                >
-                                    {PHASE_LABEL[event.phase]}
-                                </span>
-                                <span className="min-w-0 flex-1">
-                                    <span
-                                        className={cn(
-                                            "break-all whitespace-pre-wrap",
-                                            EVENT_COLOR[event.kind],
-                                        )}
-                                    >
-                                        <span className="mr-1.5 opacity-60">
-                                            {EVENT_GLYPH[event.kind]}
-                                        </span>
-                                        {describe(event)}
-                                    </span>
-                                    {event.kind === RunLogEventKind.CommandFailed &&
-                                        event.output && (
-                                            <span className="mt-0.5 block border-l border-rose-300/25 pl-2 text-[11px] break-all whitespace-pre-wrap text-snow/45">
-                                                {event.output}
-                                            </span>
-                                        )}
-                                </span>
-                            </div>
-                        );
-                    })}
+                    {virtualizer.getVirtualItems().map((item) => (
+                        <div
+                            key={rows[item.index]!.key}
+                            ref={virtualizer.measureElement}
+                            data-index={item.index}
+                            className="absolute top-0 left-0 w-full px-3"
+                            style={{ transform: `translateY(${item.start}px)` }}
+                        >
+                            <RunLogRowView row={rows[item.index]!} onToggle={toggleGroup} />
+                        </div>
+                    ))}
                 </div>
             </div>
+        </div>
+    );
+}
+
+function RunLogRowView({ row, onToggle }: { row: RunLogRow; onToggle: (key: string) => void }) {
+    if (row.type === "header") {
+        const label = GROUP_LABEL[row.group.kind]?.(row.group.events.length);
+        return (
+            <button
+                type="button"
+                onClick={() => onToggle(row.key)}
+                aria-expanded={row.expanded}
+                className="flex w-full items-center gap-1.5 py-[3px] text-left text-[12.5px] text-snow/70 transition-colors hover:text-snow"
+            >
+                <DropdownCaretIcon
+                    className={cn(
+                        "size-2.5 shrink-0 text-neutral-500 transition-transform",
+                        !row.expanded && "-rotate-90",
+                    )}
+                    aria-hidden
+                />
+                <span className="truncate">{label}</span>
+            </button>
+        );
+    }
+
+    if (row.type === "child") {
+        return (
+            <div className="flex items-start gap-2 py-[2px] pl-[13px]">
+                <span aria-hidden className="w-px shrink-0 self-stretch bg-snow/12" />
+                <span className="min-w-0 flex-1 truncate pl-2 font-mono text-[11.5px] leading-[18px] text-snow/45">
+                    {detail(row.event)}
+                </span>
+            </div>
+        );
+    }
+
+    return (
+        <div className="flex items-start gap-1.5 py-[3px]">
+            <span
+                aria-hidden
+                className={cn(
+                    "w-3 shrink-0 text-center text-[11px] leading-[19px]",
+                    EVENT_COLOR[row.event.kind],
+                )}
+            >
+                {EVENT_GLYPH[row.event.kind]}
+            </span>
+            <span
+                className={cn(
+                    "min-w-0 flex-1 text-[12.5px] leading-[19px] break-words",
+                    EVENT_COLOR[row.event.kind],
+                )}
+            >
+                {describe(row.event)}
+                {row.event.kind === RunLogEventKind.CommandFailed && row.event.output && (
+                    <span className="mt-1 block border-l border-rose-300/25 pl-2 font-mono text-[11px] break-all whitespace-pre-wrap text-snow/45">
+                        {row.event.output}
+                    </span>
+                )}
+            </span>
         </div>
     );
 }

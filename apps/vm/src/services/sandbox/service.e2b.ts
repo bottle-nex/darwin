@@ -341,9 +341,28 @@ export default class E2B {
                     const existing_mcp_config = await sandbox.files
                         .read(mcp_config_path)
                         .catch(() => null);
+                    /**
+                     * The run's identity and log endpoint belong on the MCP server's own env,
+                     * not the harness process's: the agent spawns this server as a child with a
+                     * restricted environment plus whatever this block names, so anything set
+                     * only on the harness never reaches the tool that has to report.
+                     *
+                     * Rebuilt per issue because run_id changes on every pass of this loop while
+                     * the sandbox is reused across all of them.
+                     */
+                    const run_mcp_server: McpServerSpec = {
+                        ...mcp_server,
+                        env: {
+                            ...mcp_server.env,
+                            MATCHA_RUN_ID: run_id,
+                            ...(ENV.SERVER_VM_PUBLIC_URL
+                                ? { MATCHA_VM_URL: ENV.SERVER_VM_PUBLIC_URL }
+                                : {}),
+                        },
+                    };
                     await sandbox.files.write(
                         mcp_config_path,
-                        agent.buildMcpConfig(mcp_server, existing_mcp_config),
+                        agent.buildMcpConfig(run_mcp_server, existing_mcp_config),
                     );
 
                     log.step(`issue #${issue.number} pushed into sandbox`, { title: issue.title });
@@ -385,10 +404,6 @@ export default class E2B {
                             envs: {
                                 ...(await resolve_harness_env(harness, project.id)),
                                 GH_TOKEN: gh_token,
-                                MATCHA_RUN_ID: run_id,
-                                ...(ENV.SERVER_VM_PUBLIC_URL
-                                    ? { MATCHA_VM_URL: ENV.SERVER_VM_PUBLIC_URL }
-                                    : {}),
                                 ...(graph_state === "ready" ? { GRAPHIFY_OUT } : {}),
                             },
                             timeout_ms: ISSUE_SOLVE_TIMEOUT_MS,

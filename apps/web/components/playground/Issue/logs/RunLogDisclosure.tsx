@@ -1,55 +1,41 @@
 "use client";
 import { type AgentSession, AgentSessionStatus } from "@trymatcha/types";
 import { DropdownCaretIcon } from "@trymatcha/ui/icons";
-import { useMemo, useState } from "react";
 
-import { flattenActivityPages } from "@/hooks/activity/activityCache";
-import { useActivity } from "@/hooks/activity/useActivity";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { cn } from "@/lib/utils";
+import { useRunLogDisclosureStore } from "@/store/playground/useRunLogDisclosureStore";
 
 import RunLogStream from "./RunLogStream";
 
-function latestSession(sessions: (AgentSession | null | undefined)[]): AgentSession | null {
-    let latest: AgentSession | null = null;
-    for (const session of sessions) {
-        if (!session) continue;
-        if (!latest || session.attemptNumber >= latest.attemptNumber) latest = session;
-    }
-    return latest;
-}
-
-export default function RunLogPanel({ issueId }: { issueId: string }) {
+/**
+ * The run's log, attached to the activity row that started it.
+ *
+ * Opens itself while the run is live and stays shut once it has ended: a run in progress is the
+ * one a reader came to watch, and an old one is a detail they can ask for.
+ */
+export default function RunLogDisclosure({ session }: { session: AgentSession }) {
     const project = useActiveProject();
-    const { data } = useActivity(issueId);
-    const [openedRunId, setOpenedRunId] = useState<string | null>(null);
-    const [expanded, setExpanded] = useState(false);
-
-    const session = useMemo(() => {
-        if (!data) return null;
-        return latestSession(flattenActivityPages(data.pages).map((entry) => entry.session));
-    }, [data]);
-
-    if (session && session.id !== openedRunId) {
-        setOpenedRunId(session.id);
-        setExpanded(session.status === AgentSessionStatus.Running);
-    }
-
-    if (!session || !project) return null;
+    const expanded = useRunLogDisclosureStore((state) => state.expanded[session.id]);
+    const setExpanded = useRunLogDisclosureStore((state) => state.setExpanded);
 
     const running = session.status === AgentSessionStatus.Running;
+    const isOpen = expanded ?? running;
+
+    if (!project) return null;
 
     return (
-        <section className="overflow-hidden rounded-md border border-edge bg-charcoal">
+        <section className="mt-1.5 overflow-hidden rounded-md border border-edge bg-charcoal">
             <button
                 type="button"
-                onClick={() => setExpanded(!expanded)}
+                onClick={() => setExpanded(session.id, !isOpen)}
+                aria-expanded={isOpen}
                 className="flex w-full items-center gap-2 px-3 py-2 text-left transition-colors hover:bg-snow/4"
             >
                 <DropdownCaretIcon
                     className={cn(
                         "size-3 shrink-0 text-neutral-500 transition-transform",
-                        !expanded && "-rotate-90",
+                        !isOpen && "-rotate-90",
                     )}
                     aria-hidden
                 />
@@ -65,7 +51,7 @@ export default function RunLogPanel({ issueId }: { issueId: string }) {
                 )}
             </button>
 
-            {expanded && (
+            {isOpen && (
                 <RunLogStream
                     runId={session.id}
                     projectId={project.id}

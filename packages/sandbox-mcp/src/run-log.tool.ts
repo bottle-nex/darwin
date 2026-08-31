@@ -13,6 +13,8 @@ export const REPORT_PROGRESS_DESCRIPTION = [
     "Call this immediately after each meaningful action: reading a file, editing or creating a file,",
     "searching, or running a command. Report the action itself, never its contents or output —",
     "the file diff and the command results are shown separately.",
+    "One action per call. If you read three files, call this three times with one path each;",
+    "never combine several paths or commands into a single report.",
 ].join(" ");
 
 export const report_progress_schema = {
@@ -42,7 +44,12 @@ export type ReportProgressArgs = {
     text?: string;
 };
 
+const REPO_DIR = "/home/user/repo";
+
 const head = (value: string | undefined, limit: number) => (value ?? "").trim().slice(0, limit);
+
+const repo_relative = (path: string) =>
+    path.startsWith(`${REPO_DIR}/`) ? path.slice(REPO_DIR.length + 1) : path;
 
 /**
  * A failure is described by its last lines, not its first: the command is already named on the
@@ -65,11 +72,11 @@ const tail = (value: string | undefined, limit: number) => {
 export function to_run_log_event(args: ReportProgressArgs): RunLogEventBody | null {
     switch (args.kind) {
         case RunLogEventKind.FileRead: {
-            const path = head(args.path, RUN_LOG_MAX_PATH_LENGTH);
+            const path = repo_relative(head(args.path, RUN_LOG_MAX_PATH_LENGTH));
             return path ? { kind: RunLogEventKind.FileRead, path } : null;
         }
         case RunLogEventKind.FileWrite: {
-            const path = head(args.path, RUN_LOG_MAX_PATH_LENGTH);
+            const path = repo_relative(head(args.path, RUN_LOG_MAX_PATH_LENGTH));
             return path
                 ? { kind: RunLogEventKind.FileWrite, path, mode: args.mode ?? "edit" }
                 : null;
@@ -101,6 +108,13 @@ export function to_run_log_event(args: ReportProgressArgs): RunLogEventBody | nu
 
 const DELIVERY_ATTEMPTS = 3;
 const DELIVERY_BACKOFF_MS = 200;
+
+/**
+ * A deadline per attempt, because the failure this guards against is a worker that accepts the
+ * connection and never answers. A crash is reported back as an error and retried; a wedged
+ * process is silent, and without a bound here the agent waits on it forever.
+ */
+const DELIVERY_TIMEOUT_MS = 3_000;
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -134,6 +148,7 @@ export async function deliver_run_log(
                     "content-type": "application/json",
                 },
                 body: JSON.stringify(delivery),
+                signal: AbortSignal.timeout(DELIVERY_TIMEOUT_MS),
             });
             if (response.ok) return true;
             if (response.status < 500) return false;

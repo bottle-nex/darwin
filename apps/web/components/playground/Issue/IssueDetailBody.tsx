@@ -6,7 +6,6 @@ import { cn } from "@/lib/utils";
 import ActivityFeed from "./activity/ActivityFeed";
 import IssueBody from "./IssueBody";
 import IssueTitleField from "./IssueTitleField";
-import RunLogPanel from "./logs/RunLogPanel";
 import type { IssueFormState } from "./useIssueForm";
 
 export default function IssueDetailBody({
@@ -36,7 +35,6 @@ export default function IssueDetailBody({
                 <div onContextMenu={(event) => event.stopPropagation()}>
                     <IssueBody form={form} />
                 </div>
-                <RunLogPanel issueId={issueId} />
                 <div className="h-px w-full bg-snow/7" />
                 <ActivityFeed issueId={issueId} scrollElement={scrollElement} />
             </div>

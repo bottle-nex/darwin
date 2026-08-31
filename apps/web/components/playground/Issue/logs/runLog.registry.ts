@@ -1,22 +1,4 @@
-import { RunLogEventKind, RunLogPhase } from "@trymatcha/types";
-
-export const PHASE_LABEL: Record<RunLogPhase, string> = {
-    [RunLogPhase.Boot]: "boot",
-    [RunLogPhase.Clone]: "clone",
-    [RunLogPhase.Install]: "install",
-    [RunLogPhase.Agent]: "agent",
-    [RunLogPhase.Test]: "test",
-    [RunLogPhase.Push]: "push",
-};
-
-export const PHASE_COLOR: Record<RunLogPhase, string> = {
-    [RunLogPhase.Boot]: "text-snow/35",
-    [RunLogPhase.Clone]: "text-sky-300/60",
-    [RunLogPhase.Install]: "text-amber-300/60",
-    [RunLogPhase.Agent]: "text-primary/70",
-    [RunLogPhase.Test]: "text-matcha/70",
-    [RunLogPhase.Push]: "text-emerald-300/60",
-};
+import { RunLogEventKind } from "@trymatcha/types";
 
 export const EVENT_GLYPH: Record<RunLogEventKind, string> = {
     [RunLogEventKind.Phase]: "──",
@@ -40,4 +22,11 @@ export const EVENT_COLOR: Record<RunLogEventKind, string> = {
     [RunLogEventKind.CommandFailed]: "text-rose-300/85",
     [RunLogEventKind.Notice]: "text-snow/55",
     [RunLogEventKind.Failure]: "text-rose-300/85",
+};
+
+export const GROUP_LABEL: Partial<Record<RunLogEventKind, (count: number) => string>> = {
+    [RunLogEventKind.FileRead]: (count) => `Read ${count} files`,
+    [RunLogEventKind.FileWrite]: (count) => `Changed ${count} files`,
+    [RunLogEventKind.Search]: (count) => `Ran ${count} searches`,
+    [RunLogEventKind.Command]: (count) => `Ran ${count} commands`,
 };
