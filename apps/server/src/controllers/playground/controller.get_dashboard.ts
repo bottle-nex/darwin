@@ -1,6 +1,6 @@
 import { Action, Permissions } from "@trymatcha/access-control";
 import { prisma } from "@trymatcha/database";
-import { BackgroundLightingColor, DefaultHomeView } from "@trymatcha/types";
+import { BackgroundLightingColor, CodeTheme, DefaultHomeView } from "@trymatcha/types";
 import type { Request, Response } from "express";
 import z from "zod";
 
@@ -10,10 +10,13 @@ const params_schema = z.object({
     org_slug: z.string().min(1),
 });
 
+// Served to users who have no UserConfig row yet. Every field here must stay in step
+// with the select below, or those users get an incomplete config on the client.
 const DEFAULT_USER_CONFIG = {
     backgroundLightingEnabled: true,
     backgroundLightingColor: BackgroundLightingColor.Violet,
     defaultHomeView: DefaultHomeView.Kanban,
+    codeTheme: CodeTheme.Matcha,
 };
 
 export default class GetDashboardController {
@@ -76,6 +79,7 @@ export default class GetDashboardController {
                     backgroundLightingEnabled: true,
                     backgroundLightingColor: true,
                     defaultHomeView: true,
+                    codeTheme: true,
                 },
             });
 

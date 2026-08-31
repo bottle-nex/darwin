@@ -206,6 +206,19 @@ export const BackgroundLightingColor = {
 export type BackgroundLightingColor =
     (typeof BackgroundLightingColor)[keyof typeof BackgroundLightingColor];
 
+export const CodeTheme = {
+    Matcha: "Matcha",
+    NightOwl: "NightOwl",
+    OneDark: "OneDark",
+    Dracula: "Dracula",
+    Nord: "Nord",
+    MaterialOceanic: "MaterialOceanic",
+    GruvboxDark: "GruvboxDark",
+    VscDarkPlus: "VscDarkPlus",
+    A11yDark: "A11yDark",
+} as const;
+export type CodeTheme = (typeof CodeTheme)[keyof typeof CodeTheme];
+
 export const DefaultHomeView = {
     Inbox: "Inbox",
     Chats: "Chats",

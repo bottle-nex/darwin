@@ -1,5 +1,5 @@
 "use client";
-import type { BackgroundLightingColor } from "@trymatcha/types";
+import type { BackgroundLightingColor, CodeTheme } from "@trymatcha/types";
 import { useParams } from "next/navigation";
 import { Slider } from "radix-ui";
 
@@ -18,6 +18,13 @@ import {
     BACKGROUND_LIGHTING_PRESETS,
     DEFAULT_USER_CONFIG,
 } from "@/lib/backgroundLighting";
+import {
+    CODE_THEME_PRESETS,
+    CODE_THEMES,
+    type CodeThemePreset,
+    type CodeTokenRole,
+    codeThemePreset,
+} from "@/lib/codeThemes";
 import { cn } from "@/lib/utils";
 import { useBackgroundLightingStore } from "@/store/playground/useBackgroundLightingStore";
 
@@ -38,6 +45,108 @@ function ColorOption({ label, rgb }: { label: string; rgb: string }) {
             </span>
             {label}
         </span>
+    );
+}
+
+// A hand-tokenized snippet, so the preview does not have to pull Prism into the
+// settings bundle. Each pair is the theme role that colours the text next to it.
+const PREVIEW_LINES: Array<Array<[CodeTokenRole, string]>> = [
+    // The "//" below is sample text, not a real comment. It is what shows the reader
+    // the comment colour, which is one of the biggest differences between themes.
+    [
+        ["keyword", "export async function "],
+        ["function", "claimIssue"],
+        ["punctuation", "("],
+        ["variable", "boardId"],
+        ["punctuation", ": "],
+        ["className", "string"],
+        ["punctuation", ") {"],
+    ],
+    [
+        ["punctuation", "    "],
+        ["keyword", "const "],
+        ["variable", "issue"],
+        ["operator", " = "],
+        ["keyword", "await "],
+        ["variable", "board"],
+        ["punctuation", "."],
+        ["property", "queue"],
+        ["punctuation", "."],
+        ["function", "take"],
+        ["punctuation", "({ "],
+        ["property", "limit"],
+        ["punctuation", ": "],
+        ["number", "1"],
+        ["punctuation", " });"],
+    ],
+    [
+        ["punctuation", "    "],
+        ["keyword", "return "],
+        ["variable", "issue"],
+        ["punctuation", "."],
+        ["property", "status"],
+        ["operator", " === "],
+        ["string", '"open"'],
+        ["punctuation", ";"],
+    ],
+    [["punctuation", "}"]],
+];
+
+// The compact swatch shown inside the dropdown. It stays small on purpose: the select
+// trigger is one line tall and clips whatever the selected option renders, so the full
+// snippet lives in its own row below instead.
+function ThemeOption({ label, colors }: CodeThemePreset) {
+    return (
+        <span className="flex items-center gap-2.5">
+            <span className="flex h-6 w-10 shrink-0 flex-col justify-center gap-[3px] overflow-hidden rounded-[5px] bg-charcoal px-1.5 ring-1 ring-snow/10 ring-inset">
+                <span className="flex gap-[3px]">
+                    <span
+                        className="block h-[3px] w-2 rounded-full"
+                        style={{ background: colors.keyword }}
+                    />
+                    <span
+                        className="block h-[3px] w-3 rounded-full"
+                        style={{ background: colors.function }}
+                    />
+                </span>
+                <span className="flex gap-[3px]">
+                    <span
+                        className="block h-[3px] w-1.5 rounded-full"
+                        style={{ background: colors.property }}
+                    />
+                    <span
+                        className="block h-[3px] w-3.5 rounded-full"
+                        style={{ background: colors.string }}
+                    />
+                </span>
+            </span>
+            {label}
+        </span>
+    );
+}
+
+// Same surface, font and line height as the real diff, so what you see here is what
+// the Changes tab will look like.
+function CodeThemePreview({ theme }: { theme: CodeTheme }) {
+    const { colors } = codeThemePreset(theme);
+    return (
+        <pre
+            className="overflow-x-auto text-[12.5px] leading-[1.7]"
+            style={{
+                color: colors.plain,
+                fontFamily: "var(--font-jetbrains-mono), ui-monospace, monospace",
+            }}
+        >
+            {PREVIEW_LINES.map((line) => (
+                <div key={line.map(([, text]) => text).join("")}>
+                    {line.map(([role, text]) => (
+                        <span key={role + text} style={{ color: colors[role] }}>
+                            {text}
+                        </span>
+                    ))}
+                </div>
+            ))}
+        </pre>
     );
 }
 
@@ -135,6 +244,29 @@ export default function AppearanceSettingsSection() {
                         />
                     </Slider.Root>
                 </SettingsRow>
+            </SettingsUtilityCard>
+
+            <SettingsUtilityCard title="Code" rows>
+                <SettingsRow
+                    label="Code theme"
+                    description="Syntax colors in the Changes tab of a review."
+                >
+                    <SelectField
+                        aria-label="Code theme"
+                        className="w-48 pl-1"
+                        itemClassName="pl-1"
+                        value={config.codeTheme}
+                        onChange={(theme) => updateConfig.mutate({ codeTheme: theme as CodeTheme })}
+                        options={CODE_THEMES.map((theme) => ({
+                            value: theme,
+                            label: <ThemeOption {...CODE_THEME_PRESETS[theme]} />,
+                        }))}
+                    />
+                </SettingsRow>
+
+                <div className="px-5 py-4">
+                    <CodeThemePreview theme={config.codeTheme} />
+                </div>
             </SettingsUtilityCard>
         </div>
     );

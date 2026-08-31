@@ -2,7 +2,7 @@
 import Image from "next/image";
 import { useState } from "react";
 
-import { type IconPick, IconPickGlyph, iconPickSurface } from "@/components/ui/IconPicker";
+import { type IconPick, IconPickGlyph } from "@/components/ui/IconPicker";
 import { cn } from "@/lib/utils";
 
 const AVATAR_TONE = {
@@ -48,9 +48,9 @@ export type AvatarSize = keyof typeof AVATAR_SIZE;
 const BASE =
     "relative inline-flex shrink-0 items-center justify-center overflow-hidden font-semibold leading-none ring-1 ring-inset";
 
-/** The gradient tile suits a letter; a picked icon needs the quieter ring the picker uses. */
 const LETTER_RING = "ring-white/15";
-const ICON_RING = "ring-white/8";
+const PICKED_ICON_SURFACE = "bg-graphite/70 ring-[0.5px] ring-white/8";
+const PICKED_EMOJI_SURFACE = "bg-transparent ring-0";
 
 // top sheen — bright highlight fading to nothing, like the logo's radial sheen
 const SHEEN =
@@ -96,16 +96,17 @@ export default function PlaygroundAvatar({
     const { bg, glow } = AVATAR_TONE[tone];
     const [failedSrc, setFailedSrc] = useState<string | null>(null);
     const photoSrc = src && src !== failedSrc ? src : null;
-    const picked = !photoSrc && icon ? iconPickSurface(icon) : null;
+    const picked = photoSrc ? null : icon;
 
     return (
         <span
-            style={picked?.style}
             className={cn(
                 BASE,
                 AVATAR_SIZE[size],
                 picked
-                    ? [ICON_RING, picked.className]
+                    ? picked.kind === "emoji"
+                        ? PICKED_EMOJI_SURFACE
+                        : PICKED_ICON_SURFACE
                     : [LETTER_RING, bg, !photoSrc && [SHEEN, glow]],
                 className,
             )}
@@ -120,14 +121,8 @@ export default function PlaygroundAvatar({
                     onError={() => setFailedSrc(photoSrc)}
                     className="object-cover"
                 />
-            ) : icon ? (
-                <IconPickGlyph
-                    pick={icon}
-                    className={cn(
-                        "relative drop-shadow-[0_1px_1px_rgba(0,0,0,0.25)]",
-                        AVATAR_ICON_SIZE[size],
-                    )}
-                />
+            ) : picked ? (
+                <IconPickGlyph pick={picked} className={cn("relative", AVATAR_ICON_SIZE[size])} />
             ) : (
                 <span className="relative drop-shadow-[0_1px_1px_rgba(0,0,0,0.25)]">{letter}</span>
             )}

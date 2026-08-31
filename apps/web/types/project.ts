@@ -1,5 +1,6 @@
 import type {
     BackgroundLightingColor,
+    CodeTheme,
     DefaultHomeView,
     ProjectRole,
     TeamRole,
@@ -27,6 +28,7 @@ export interface UserConfig {
     backgroundLightingEnabled: boolean;
     backgroundLightingColor: BackgroundLightingColor;
     defaultHomeView: DefaultHomeView;
+    codeTheme: CodeTheme;
 }
 
 export interface DashboardData {

@@ -18,6 +18,8 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { useReviewFileSource } from "@/hooks/review/useReviewFileSource";
+import { useUserConfig } from "@/hooks/user/useUserConfig";
+import { codeThemeVars } from "@/lib/codeThemes";
 import { cn } from "@/lib/utils";
 
 import { languageFor, refractor } from "./diffLanguage";
@@ -35,6 +37,7 @@ export default function ReviewFileDiff({
     pullNumber: number;
 }) {
     const { name, directory } = splitPath(file.filename);
+    const { codeTheme } = useUserConfig();
     const [wholeFile, setWholeFile] = useState(false);
     const [ranges, setRanges] = useState<Array<[number, number]>>([]);
     const wantsSource = wholeFile || ranges.length > 0;
@@ -76,10 +79,18 @@ export default function ReviewFileDiff({
         } catch {
             return null;
         }
+        // Deliberately not keyed on the theme: tokenize only produces class names, and
+        // colour is applied in CSS. Adding it here would re-run Prism over the whole
+        // file on every theme change.
     }, [renderedHunks, file.filename]);
 
     return (
-        <section className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-lg border border-border bg-white/2">
+        // The theme variables go here rather than on <Diff> because react-diff-view
+        // only reads a fixed list of props and drops a style prop entirely.
+        <section
+            style={codeThemeVars(codeTheme)}
+            className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-lg border border-border bg-white/2"
+        >
             <header className="flex shrink-0 items-center gap-2 px-3 py-2.5">
                 <DiffFileRowIcon className="size-3.5 shrink-0 text-neutral-500" />
                 <span className="shrink-0 font-headline text-[14px] font-medium text-neutral-100">

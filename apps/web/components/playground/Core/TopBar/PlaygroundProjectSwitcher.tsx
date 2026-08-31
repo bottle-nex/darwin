@@ -44,7 +44,7 @@ export default function PlaygroundProjectSwitcher() {
                 <Button
                     variant="unstyled"
                     type="button"
-                    className="flex h-7 min-w-0 cursor-pointer items-center gap-1.5 rounded-sm px-1 text-[13px] font-semibold text-neutral-100 transition-colors hover:bg-white/8 data-[state=open]:bg-white/8"
+                    className="flex h-7 min-w-0 cursor-pointer items-center gap-1.5 px-0.5 text-[13px] font-semibold text-neutral-100 transition-colors hover:bg-white/8 data-[state=open]:bg-white/8 rounded-[8px]!"
                 >
                     <PlaygroundAvatar
                         tone={active ? toneFor(active.id) : "indigo"}

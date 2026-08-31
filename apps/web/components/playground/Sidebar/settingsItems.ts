@@ -23,9 +23,16 @@ export const ACCOUNT_SETTINGS: SettingsItem[] = [
     {
         tab: PlaygroundTab.SettingsAppearance,
         label: "Appearance",
-        description: "Lighting, accent, and home view.",
+        description: "Lighting, code theme, and home view.",
         icon: SettingsAppearanceIcon,
-        facets: ["Default home view", "Background lighting", "Glow color", "Direction"],
+        facets: [
+            "Default home view",
+            "Background lighting",
+            "Glow color",
+            "Direction",
+            "Code theme",
+            "Syntax highlighting",
+        ],
     },
     {
         tab: PlaygroundTab.SettingsApiKeys,

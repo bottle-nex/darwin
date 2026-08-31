@@ -3,8 +3,6 @@
 /* All design tokens (colors, radii, fonts) live in the shared theme package,
    imported by both apps/web and apps/admin so they cannot drift. */
 @import "../../../packages/theme/theme.css";
-/*@import "../../../node_modules/react-diff-view/style/index.css";*/
-@import "prism-themes/themes/prism-z-touch.css";
 @import "react-diff-view/style/index.css";
 
 @source "../**/*.{ts,tsx}";
@@ -574,7 +572,10 @@
     --diff-bar-width: 4px;
 
     --diff-background-color: transparent;
-    --diff-text-color: #e6e6e6;
+    /* Goes through --code-plain so the theme owns the base text colour too. It has to
+       be declared here rather than overridden from a parent: a variable set on an
+       element always wins over one inherited from an ancestor. */
+    --diff-text-color: var(--code-plain, #e6e6e6);
     --diff-font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
     --diff-selection-background-color: color-mix(in oklab, var(--color-sky-400) 24%, transparent);
 
@@ -651,4 +652,84 @@
 
 .review-diff .diff-decoration-content {
     padding: 0;
+}
+
+/* Maps Prism's token classes onto the 11 theme roles in lib/codeThemes.ts. The colours
+   are never written here — codeThemes.ts sets the variables on the diff's root element.
+   Add a theme by adding a row to that table, not by adding rules here. */
+.review-diff .token.comment,
+.review-diff .token.prolog,
+.review-diff .token.cdata,
+.review-diff .token.doctype {
+    color: var(--code-comment);
+    font-style: italic;
+}
+
+.review-diff .token.punctuation,
+.review-diff .token.entity,
+.review-diff .token.namespace {
+    color: var(--code-punctuation);
+}
+
+.review-diff .token.operator {
+    color: var(--code-operator);
+}
+
+.review-diff .token.keyword,
+.review-diff .token.selector,
+.review-diff .token.important {
+    color: var(--code-keyword);
+}
+
+.review-diff .token.string,
+.review-diff .token.char,
+.review-diff .token.url,
+.review-diff .token.attr-value,
+.review-diff .token.inserted {
+    color: var(--code-string);
+}
+
+.review-diff .token.number,
+.review-diff .token.boolean,
+.review-diff .token.constant,
+.review-diff .token.unit {
+    color: var(--code-number);
+}
+
+.review-diff .token.function,
+.review-diff .token.builtin,
+.review-diff .token.method {
+    color: var(--code-function);
+}
+
+.review-diff .token.class-name,
+.review-diff .token.maybe-class-name,
+.review-diff .token.atrule,
+.review-diff .token.annotation,
+.review-diff .token.decorator {
+    color: var(--code-class-name);
+}
+
+.review-diff .token.property,
+.review-diff .token.symbol,
+.review-diff .token.tag,
+.review-diff .token.attr-name,
+.review-diff .token.deleted {
+    color: var(--code-property);
+}
+
+/* Last so that a regex nested inside another group still takes the variable colour. */
+.review-diff .token.variable,
+.review-diff .token.parameter,
+.review-diff .token.regex,
+.review-diff .token.interpolation {
+    color: var(--code-variable);
+}
+
+.review-diff .token.bold {
+    font-weight: 600;
+}
+
+.review-diff .token.italic {
+    font-style: italic;
 }
