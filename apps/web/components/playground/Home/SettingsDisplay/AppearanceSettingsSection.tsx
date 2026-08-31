@@ -22,8 +22,8 @@ import {
     CODE_THEME_PRESETS,
     CODE_THEMES,
     type CodeThemePreset,
-    type CodeTokenRole,
     codeThemePreset,
+    type CodeTokenRole,
 } from "@/lib/codeThemes";
 import { cn } from "@/lib/utils";
 import { useBackgroundLightingStore } from "@/store/playground/useBackgroundLightingStore";

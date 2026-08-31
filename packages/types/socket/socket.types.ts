@@ -218,3 +218,7 @@ export type OutboundSocketMessage =
           runId: string;
           payload: { eventCount: number; droppedEvents: number };
       };
+
+export function project_channel_name(project_id: string): string {
+    return `project:${project_id}`;
+}
