@@ -1,33 +1,23 @@
 "use client";
 
 import { MyIssuesIcon } from "@trymatcha/ui/icons";
-import { type ReactNode, useMemo, useState } from "react";
+import { type ReactNode, useMemo } from "react";
 
 import LogoLoader from "@/components/app/LogoLoader";
 import PaneEmptyState from "@/components/playground/Core/components/PaneEmptyState";
-import IssueListGroupHeader from "@/components/playground/Home/KanbanDisplay/IssueListGroupHeader";
 import IssueListRow from "@/components/playground/Home/KanbanDisplay/IssueListRow";
-import { flattenGroupedIssueRows } from "@/components/playground/Home/KanbanDisplay/virtualizedIssueRows";
 import { VirtualizedRows } from "@/components/playground/Home/KanbanDisplay/VirtualizedRows";
 import { Button } from "@/components/ui/button";
 import { IssueSelectionOrderProvider } from "@/hooks/issues/useIssueSelection";
 import { KanbanMappers } from "@/lib/kanban/KanbanMappers";
 import { useIssueSelectionStore } from "@/store/issues/useIssueSelectionStore";
-import type {
-    MyIssuesGroup,
-    MyIssuesOrder,
-    MyIssuesView,
-} from "@/store/issues/useMyIssuesOptionsStore";
+import type { MyIssuesView } from "@/store/issues/useMyIssuesOptionsStore";
 import type { BoardIssue } from "@/types/board";
-
-import { groupIssues } from "./myIssues";
 
 type MyIssuesListProps = {
     issues: BoardIssue[];
     total: number;
     view: MyIssuesView;
-    groupBy: MyIssuesGroup;
-    orderBy: MyIssuesOrder;
     loading: boolean;
     error: boolean;
     pageError: boolean;
@@ -43,8 +33,6 @@ export default function MyIssuesList({
     issues,
     total,
     view,
-    groupBy,
-    orderBy,
     loading,
     error,
     pageError,
@@ -55,37 +43,26 @@ export default function MyIssuesList({
     fetchingNextPage,
     onLoadMore,
 }: MyIssuesListProps) {
-    const [collapsedGroupKeys, setCollapsedGroupKeys] = useState<Set<string>>(() => new Set());
-    const groups = useMemo(() => groupIssues(issues, groupBy, orderBy), [issues, groupBy, orderBy]);
+    // One flat list — filters do the narrowing. Grouping belongs to the Agent
+    // board's list view, where lanes are the point. The `issue:` key scheme is kept
+    // so the virtualizer's item identity survives.
     const rows = useMemo(
-        () => flattenGroupedIssueRows(groups, (issue) => issue.id, false, collapsedGroupKeys),
-        [collapsedGroupKeys, groups],
+        () => issues.map((issue) => ({ key: `issue:${issue.id}`, issue })),
+        [issues],
     );
     const loadedIssueIds = useMemo(() => issues.map((issue) => issue.id), [issues]);
     const selectedIds = useIssueSelectionStore((s) => s.ids);
-    // A group header between two issues is not a selected row, so a run of selected
-    // rows never joins across one.
     const selectedAt = (index: number) => {
         const row = rows[index];
-        return row?.kind === "issue" && selectedIds.includes(row.issue.id);
+        return row !== undefined && selectedIds.includes(row.issue.id);
     };
     const issuePositions = useMemo(
         () => new Map(loadedIssueIds.map((issueId, index) => [issueId, index + 1])),
         [loadedIssueIds],
     );
-    const issueRows = useMemo(() => {
-        const indexes = new Map<string, number>();
-        rows.forEach((row, index) => {
-            if (row.kind === "issue") indexes.set(row.issue.id, index);
-        });
-        return indexes;
-    }, [rows]);
-    const stickyGroupRows = useMemo(
-        () =>
-            groupBy === "none"
-                ? []
-                : rows.flatMap((row, index) => (row.kind === "group" ? [index] : [])),
-        [groupBy, rows],
+    const issueRows = useMemo(
+        () => new Map(rows.map((row, index) => [row.issue.id, index])),
+        [rows],
     );
     const emptyState = resolveEmptyState({
         loading,
@@ -96,15 +73,6 @@ export default function MyIssuesList({
         onRetry,
     });
 
-    function toggleGroup(groupKey: string) {
-        setCollapsedGroupKeys((current) => {
-            const next = new Set(current);
-            if (next.has(groupKey)) next.delete(groupKey);
-            else next.add(groupKey);
-            return next;
-        });
-    }
-
     return (
         <IssueSelectionOrderProvider issueIds={loadedIssueIds}>
             <VirtualizedRows
@@ -114,7 +82,6 @@ export default function MyIssuesList({
                 className="mt-2 min-h-0 flex-1 px-3 pb-2"
                 contentRole="list"
                 findIssueRow={(issueId) => issueRows.get(issueId) ?? -1}
-                stickyRowIndexes={stickyGroupRows}
                 emptyState={emptyState}
                 status={{
                     label: loading
@@ -128,7 +95,7 @@ export default function MyIssuesList({
                             : `${issues.length} of ${total} issues loaded`,
                 }}
                 autoFill={{
-                    key: `${view}:${groupBy}:${orderBy}:${filtersActive}`,
+                    key: `${view}:${filtersActive}`,
                     hasNextPage,
                     fetchingNextPage,
                     pageError,
@@ -136,22 +103,6 @@ export default function MyIssuesList({
                     onLoadMore,
                 }}
                 renderRow={(row, index) => {
-                    if (row.kind === "group") {
-                        if (groupBy === "none") return <div aria-hidden />;
-                        return (
-                            <div className="pb-1">
-                                <IssueListGroupHeader
-                                    title={row.group.label}
-                                    icon={row.group.icon}
-                                    iconClassName={row.group.iconClassName}
-                                    count={row.group.issues.length}
-                                    collapsed={collapsedGroupKeys.has(row.group.key)}
-                                    onToggle={() => toggleGroup(row.group.key)}
-                                />
-                            </div>
-                        );
-                    }
-                    if (row.kind === "group-end") return null;
                     return (
                         <div
                             role="listitem"
@@ -161,7 +112,7 @@ export default function MyIssuesList({
                         >
                             <IssueListRow
                                 issueId={row.issue.id}
-                                number={`#${row.issue.number}`}
+                                number={row.issue.number}
                                 title={row.issue.title}
                                 status={row.issue.status}
                                 tags={row.issue.tags}

@@ -12,6 +12,7 @@ import StarterKit from "@tiptap/starter-kit";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { createReferenceMention } from "@/components/playground/Home/chat/referenceMention";
+import { useActiveProject } from "@/hooks/useActiveProject";
 import { cn } from "@/lib/utils";
 
 import ImageNodeView from "./ImageNodeView";
@@ -75,6 +76,7 @@ export default function IssueDescriptionEditor({
     onReady,
 }: IssueDescriptionEditorProps) {
     const queryClient = useQueryClient();
+    const projectName = useActiveProject()?.name;
     const [linkRequest, setLinkRequest] = useState<LinkPromptRequest | null>(null);
     const requestLink = useCallback((request: LinkPromptRequest) => setLinkRequest(request), []);
     const onChangeRef = useRef(onChange);
@@ -126,12 +128,13 @@ export default function IssueDescriptionEditor({
                       createReferenceMention({
                           queryClient,
                           projectId: mentionProjectId,
+                          projectName,
                           triggers: ["member", "issue"],
                       }),
                   ]
                 : []),
         ],
-        [authoring, placeholder, mentionProjectId, queryClient, requestLink],
+        [authoring, placeholder, mentionProjectId, projectName, queryClient, requestLink],
     );
 
     const editorProps = useMemo(

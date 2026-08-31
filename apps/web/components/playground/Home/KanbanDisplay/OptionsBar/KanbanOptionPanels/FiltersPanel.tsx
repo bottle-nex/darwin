@@ -40,16 +40,24 @@ function FacetRow({ facetKey, count }: { facetKey: FacetKey; count?: number }) {
     );
 }
 
-export function FiltersPanelItems() {
+/**
+ * `crossBoard` offers the Board facet. A column board is already scoped to one
+ * board, so filtering to another there would return rows no lane can hold and
+ * render empty — only flat lists get it.
+ */
+export function FiltersPanelItems({ crossBoard = false }: { crossBoard?: boolean }) {
     const filters = useKanbanFilterStore((s) => s.filters);
     const clearAll = useKanbanFilterStore((s) => s.clearAll);
     const active = activeFacetKeys(filters);
+    const listFacets = crossBoard
+        ? LIST_FACET_KEYS
+        : LIST_FACET_KEYS.filter((key) => key !== "spaceIds");
 
     return (
         <>
             <DropdownMenuLabel>Filter issues</DropdownMenuLabel>
 
-            {LIST_FACET_KEYS.map((key) => (
+            {listFacets.map((key) => (
                 <EagerSubmenu
                     key={key}
                     className={`${FACET_MENU_CONTENT} [direction:ltr]`}
@@ -91,7 +99,7 @@ export function FiltersPanelItems() {
     );
 }
 
-export default function FiltersPanel() {
+export default function FiltersPanel({ crossBoard = false }: { crossBoard?: boolean }) {
     const filters = useKanbanFilterStore((s) => s.filters);
 
     return (
@@ -106,7 +114,7 @@ export default function FiltersPanel() {
                 </DropdownMenuTrigger>
             </TooltipComponent>
             <DropdownMenuContent align="end" className={`${FILTERS_PANEL_WIDTH} [direction:ltr]`}>
-                <FiltersPanelItems />
+                <FiltersPanelItems crossBoard={crossBoard} />
             </DropdownMenuContent>
         </DropdownMenu>
     );

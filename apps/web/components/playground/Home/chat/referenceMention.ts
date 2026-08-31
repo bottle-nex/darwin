@@ -7,6 +7,7 @@ import { parse_reference_token, reference_key } from "@trymatcha/types";
 
 import { displayNameOf } from "@/components/playground/Core/components/PlaygroundAvatar";
 import type { ProjectMember } from "@/hooks/project/useProjectMembers";
+import { issueIdentifier } from "@/lib/format";
 import { type IssueSuggestion, search_issues, search_members } from "@/lib/referenceSearch";
 
 import ReferenceChip from "./ReferenceChip";
@@ -143,12 +144,15 @@ function to_member_item(member: ProjectMember): ReferenceSuggestion {
 export function createReferenceMention({
     queryClient,
     projectId,
+    projectName,
     container,
     triggers = ["member", "issue"],
     memberUserIds,
 }: {
     queryClient: QueryClient;
     projectId: string;
+    /** Names the issues a mention suggests. The label is stored in the message. */
+    projectName?: string;
     container?: string;
     triggers?: ReferenceTrigger[];
     memberUserIds?: readonly string[];
@@ -190,7 +194,7 @@ export function createReferenceMention({
             return issues.map((issue) => ({
                 kind: "issue" as const,
                 id: issue.id,
-                label: `${issue.number} ${issue.title}`,
+                label: `${issueIdentifier(projectName, issue.number)} ${issue.title}`,
                 issue,
             }));
         },

@@ -9,6 +9,7 @@ import type { IconPick } from "@/components/ui/IconPicker";
 import IconWrapper from "@/components/ui/IconWrapper";
 import { useBoardColumns } from "@/hooks/issues/useBoardColumns";
 import { useActiveProject } from "@/hooks/useActiveProject";
+import { issueIdentifier } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { NO_FOCUS, useKanbanOptionsStore } from "@/store/kanban/useKanbanOptionsStore";
 import { usePaneRouteStore } from "@/store/playground/usePaneRouteStore";
@@ -138,9 +139,7 @@ export default function PlaygroundBreadcrumb({
         (column) => column.id === issue?.customColumnId,
     )?.spaceId;
     const issueSpace = metadata?.spaces.find((space) => space.id === issueSpaceId);
-    const issueIdentifier = issue
-        ? `${(project?.name ?? "ISS").slice(0, 3).toUpperCase()}-${issue.number}`
-        : undefined;
+    const identifier = issue ? issueIdentifier(project?.name, issue.number) : undefined;
     const issueTrail: PlaygroundBreadcrumbSegment[] = issue
         ? [
               ...(issueSpace ? [{ label: "Spaces", target: SPACES_BREADCRUMB_TARGET }] : []),
@@ -151,10 +150,10 @@ export default function PlaygroundBreadcrumb({
               },
               trailing
                   ? {
-                        label: `${issueIdentifier} ${issue.title}`,
+                        label: `${identifier} ${issue.title}`,
                         onClick: () => openIssue(issue.id),
                     }
-                  : `${issueIdentifier} ${issue.title}`,
+                  : `${identifier} ${issue.title}`,
               ...(trailing ? [trailing] : []),
           ]
         : [];

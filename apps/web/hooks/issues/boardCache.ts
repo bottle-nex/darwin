@@ -42,6 +42,7 @@ export function normalizeBoardFilters(filters: BoardFilters): BoardFilters {
         assigneeIds: uniqueSorted(filters.assigneeIds),
         creatorIds: uniqueSorted(filters.creatorIds),
         tagIds: uniqueSorted(filters.tagIds),
+        spaceIds: uniqueSorted(filters.spaceIds),
         createdAt: normalizeDateRange(filters.createdAt),
         startDate: normalizeDateRange(filters.startDate),
         targetDate: normalizeDateRange(filters.targetDate),
@@ -133,8 +134,15 @@ export function boardIssueBelongsToLane(issue: BoardIssue, selector: BoardLaneSe
         : issue.customColumnId === null && issue.status === selector.status;
 }
 
-export function boardIssueMatchesFilters(issue: BoardIssue, filters: BoardFilters) {
-    return issueMatchesFilters(issue, filters, { skipStatus: issue.customColumnId !== null });
+export function boardIssueMatchesFilters(
+    issue: BoardIssue,
+    filters: BoardFilters,
+    spaceOfColumn?: (columnId: string) => string | undefined,
+) {
+    return issueMatchesFilters(issue, filters, {
+        skipStatus: issue.customColumnId !== null,
+        spaceOfColumn,
+    });
 }
 
 export function mergeBoardLaneRows(
@@ -166,10 +174,11 @@ export function resolveBoardFilterFallback(
     loadedRows: readonly BoardIssue[],
     filters: BoardFilters,
     baseSettled: boolean,
+    spaceOfColumn?: (columnId: string) => string | undefined,
 ) {
     const filtersActive = hasActiveFilters(filters);
     const localRows = filtersActive
-        ? loadedRows.filter((row) => boardIssueMatchesFilters(row, filters))
+        ? loadedRows.filter((row) => boardIssueMatchesFilters(row, filters, spaceOfColumn))
         : [...loadedRows];
     return {
         filtersActive,

@@ -64,7 +64,7 @@ function SpaceForm({ space, projectSlug }: { space: BoardSpace | null; projectSl
 
     return (
         <main
-            className="flex min-w-0 flex-col *:px-6"
+            className="flex min-h-0 min-w-0 flex-1 flex-col justify-between *:px-6"
             onKeyDown={(event) => handleDialogSubmitKey(event, submit)}
         >
             <section className="flex flex-col items-start gap-y-3 pt-4 pb-2">
@@ -105,15 +105,24 @@ function SpaceForm({ space, projectSlug }: { space: BoardSpace | null; projectSl
                         className={cn(GHOST_FIELD, DIALOG_TITLE_FIELD)}
                     />
                 </div>
+            </section>
+
+            <section
+                data-lenis-prevent
+                className="no-scrollbar flex min-h-0 flex-1 flex-col items-start gap-y-3 overflow-y-auto pb-4"
+            >
                 <Textarea
-                    rows={2}
+                    rows={3}
                     placeholder="Describe what this space is for"
                     maxLength={280}
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    className={cn(GHOST_FIELD, "text-[13px] text-neutral-400")}
+                    className={cn(GHOST_FIELD, "w-full text-[13px] leading-6 text-neutral-300")}
                 />
-                <div className="flex items-center gap-2">
+            </section>
+
+            <section className="flex flex-col gap-y-4 pb-4">
+                <div className="flex items-center gap-x-2.5">
                     <Capsule
                         type="calendar"
                         placeholder="Start date"
@@ -133,15 +142,15 @@ function SpaceForm({ space, projectSlug }: { space: BoardSpace | null; projectSl
                         earliest={startDate}
                     />
                 </div>
-            </section>
 
-            <section className="flex h-fit items-center justify-end pb-4">
-                <DialogSubmitButton
-                    label={space ? "Save changes" : "Add space"}
-                    onClick={submit}
-                    loading={saving}
-                    disabled={!ready}
-                />
+                <div className="flex items-center justify-end">
+                    <DialogSubmitButton
+                        label={space ? "Save changes" : "Add space"}
+                        onClick={submit}
+                        loading={saving}
+                        disabled={!ready}
+                    />
+                </div>
             </section>
         </main>
     );
@@ -163,8 +172,8 @@ export default function SpaceFormDialog({ projectSlug }: { projectSlug: string }
                     (event.currentTarget as HTMLElement).focus();
                 }}
                 className={cn(
-                    "flex w-110 max-w-none flex-col gap-0 overflow-hidden p-0 sm:max-w-none",
-                    "rounded-3xl",
+                    "flex max-h-[80vh] min-h-[40vh] w-187.5 max-w-none flex-col gap-0 overflow-hidden p-0 sm:max-w-none",
+                    "rounded-3xl bg-charcoal",
                 )}
             >
                 <DialogTitle className="sr-only">

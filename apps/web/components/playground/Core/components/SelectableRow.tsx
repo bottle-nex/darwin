@@ -38,6 +38,9 @@ export default function SelectableRow({
             {...props}
             onClickCapture={(event) => {
                 if (!selectionActive) return;
+                // This runs before the click reaches a descendant, so an inline field
+                // editor would never see it. Marked elements opt out.
+                if ((event.target as HTMLElement).closest("[data-row-editor]")) return;
                 event.preventDefault();
                 event.stopPropagation();
                 onToggleSelection();

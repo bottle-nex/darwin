@@ -97,7 +97,7 @@ export default function KanbanOptionsBarGroupedKeys() {
                                         </>
                                     }
                                 >
-                                    <FiltersPanelItems />
+                                    <FiltersPanelItems crossBoard={kanbanView === "list"} />
                                 </EagerSubmenu>
 
                                 <EagerSubmenu

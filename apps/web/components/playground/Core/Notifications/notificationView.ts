@@ -19,6 +19,8 @@ import {
     WarningTriangleIcon,
 } from "@trymatcha/ui/icons";
 import { format, formatDistanceToNowStrict, isToday, isYesterday } from "date-fns";
+
+import { issueIdentifier } from "@/lib/format";
 export type NotificationView = {
     actorId: string;
     actorName: string;
@@ -72,7 +74,11 @@ export function theme_of(notification: Notification): NotificationTheme {
 export function notification_view(notification: Notification): NotificationView {
     const payload = notification.payload as Record<string, string | number>;
     const projectSlug = payload.projectSlug ? String(payload.projectSlug) : null;
-    const issueRef = payload.issueNumber ? `#${payload.issueNumber}` : null;
+    // The payload has no project name, only its slug — which is generated from the
+    // name, so it keys to the same three letters.
+    const issueRef = payload.issueNumber
+        ? issueIdentifier(projectSlug ?? undefined, payload.issueNumber)
+        : null;
 
     switch (notification.type) {
         case NotificationType.IssueAssigned:

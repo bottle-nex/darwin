@@ -1,5 +1,6 @@
 import { ClockIcon, CommentCountIcon, PausedStateIcon } from "@trymatcha/ui/icons";
 
+import { useIssueIdentifier } from "@/hooks/issues/useIssueIdentifier";
 import { GanttTimeline } from "@/lib/gantt/GanttTimeline";
 import { cn } from "@/lib/utils";
 import type { GanttIssue } from "@/types/gantt";
@@ -7,6 +8,7 @@ import type { GanttIssue } from "@/types/gantt";
 import { BLURRED_BG_TWO } from "../KanbanDisplay/cardStyles";
 
 export default function GanttIssueCard({ issue, now }: { issue: GanttIssue; now: number }) {
+    const identifier = useIssueIdentifier();
     const { left, width } = GanttTimeline.barGeometry(issue, now);
     const isSolving = issue.status === "solving";
     const isQueued = issue.status === "queued";
@@ -40,7 +42,7 @@ export default function GanttIssueCard({ issue, now }: { issue: GanttIssue; now:
                     left,
                     width,
                 }}
-                title={`${issue.number} · ${issue.title}`}
+                title={`${identifier(issue.number)} · ${issue.title}`}
             >
                 <div className="flex h-full flex-col py-2.5 pl-3 pr-2.5">
                     <div className="flex items-center justify-between gap-2">
@@ -59,7 +61,7 @@ export default function GanttIssueCard({ issue, now }: { issue: GanttIssue; now:
                             )}
                         </div>
                         <span className="shrink-0 font-mono text-[11px] text-neutral-500">
-                            {issue.number}
+                            {identifier(issue.number)}
                         </span>
                     </div>
 

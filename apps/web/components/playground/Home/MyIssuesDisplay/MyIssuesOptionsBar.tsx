@@ -20,7 +20,7 @@ export default function MyIssuesOptionsBar({ count }: { count: number }) {
 export function MyIssuesControls() {
     return (
         <div className="flex shrink-0 items-center gap-1.5">
-            <FiltersPanel />
+            <FiltersPanel crossBoard />
         </div>
     );
 }

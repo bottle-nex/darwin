@@ -9,6 +9,7 @@ import {
     reference_split_pattern,
 } from "@trymatcha/types";
 
+import { useIssueIdentifier } from "@/hooks/issues/useIssueIdentifier";
 import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
 import { urlSplitPattern, withProtocol } from "@/lib/urls";
 import { cn } from "@/lib/utils";
@@ -51,6 +52,7 @@ export default function MessageBody({
     isMine: boolean;
 }) {
     const openIssue = usePaneRouteStore((s) => s.openIssue);
+    const identifier = useIssueIdentifier();
     const labels = reference_labels(references);
     const issues = reference_issues(references);
     return (
@@ -102,7 +104,7 @@ export default function MessageBody({
                         {StatusIcon && (
                             <StatusIcon className={cn("size-3", status.titleBox)} aria-hidden />
                         )}
-                        {issue ? `#${issue.number}` : label}
+                        {issue ? identifier(issue.number) : label}
                     </button>
                 );
             })}

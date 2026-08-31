@@ -10,7 +10,7 @@ type IssueTagsProps = {
     className?: string;
 };
 
-export default function IssueTags({ tags, max = 2, size = "sm", className }: IssueTagsProps) {
+export default function IssueTags({ tags, max = 2, size = "md", className }: IssueTagsProps) {
     if (!tags.length) return null;
 
     const shown = tags.slice(0, max);

@@ -4,8 +4,6 @@ import type { SpaceCommandActions } from "@/hooks/spaces/useSpaceActions";
 import { DATE_SHORTCUTS_WITH_CLEAR } from "@/lib/dateShortcuts";
 import type { SpaceCommandPage } from "@/types/command.type";
 
-const LIST = "no-scrollbar max-h-[min(60vh,26rem)] p-2";
-
 export const SPACE_PAGE_TITLE: Record<SpaceCommandPage, string> = {
     "space-dates": "Set dates",
 };
@@ -28,7 +26,7 @@ export default function CommandSpacePage({
     }
 
     return (
-        <CommandList data-lenis-prevent className={LIST}>
+        <CommandList data-lenis-prevent>
             <CommandEmpty>No matches.</CommandEmpty>
 
             {page === "space-dates" && (
@@ -42,7 +40,7 @@ export default function CommandSpacePage({
                                 onSelect={() =>
                                     pick(() => actions.setStartDate(shortcut.resolve()))
                                 }
-                                className="justify-between px-2.5 py-2"
+                                className="justify-between"
                             >
                                 {shortcut.label}
                             </CommandItem>
@@ -57,7 +55,7 @@ export default function CommandSpacePage({
                                 onSelect={() =>
                                     pick(() => actions.setTargetDate(shortcut.resolve()))
                                 }
-                                className="justify-between px-2.5 py-2"
+                                className="justify-between"
                             >
                                 {shortcut.label}
                             </CommandItem>

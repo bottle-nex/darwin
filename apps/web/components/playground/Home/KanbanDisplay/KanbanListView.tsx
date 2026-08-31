@@ -53,7 +53,7 @@ export default function KanbanListView({ board }: KanbanListViewProps) {
             issues: column.cards.map<Issue>((card) => ({
                 id: card.id,
                 boardIssue: card.boardIssue,
-                number: card.number ? `#${card.number}` : "#—",
+                number: card.number === undefined ? "" : String(card.number),
                 title: card.title,
                 project: project?.name ?? "",
                 tags: card.tags,

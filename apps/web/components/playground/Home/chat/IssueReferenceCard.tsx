@@ -4,6 +4,7 @@ import type { ReferencedIssueLabel } from "@trymatcha/types";
 import { UnknownStatusIcon } from "@trymatcha/ui/icons";
 
 import { Button } from "@/components/ui/button";
+import { useIssueIdentifier } from "@/hooks/issues/useIssueIdentifier";
 import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
 import { cn } from "@/lib/utils";
 import { usePaneRouteStore } from "@/store/playground/usePaneRouteStore";
@@ -13,6 +14,7 @@ const STATUS_STYLE = new Map(
 );
 
 export default function IssueReferenceCard({ issue }: { issue: ReferencedIssueLabel }) {
+    const identifier = useIssueIdentifier();
     const openIssue = usePaneRouteStore((s) => s.openIssue);
     const status = issue.status ? STATUS_STYLE.get(issue.status) : undefined;
     const StatusIcon = status?.icon ?? UnknownStatusIcon;
@@ -36,7 +38,7 @@ export default function IssueReferenceCard({ issue }: { issue: ReferencedIssueLa
             </span>
             <span className="flex min-w-0 flex-1 flex-col items-start justify-between gap-0.5 rounded-[5px] bg-charcoal/70 px-2 py-1.5 backdrop-blur-xs">
                 <span className="shrink-0 text-[11.5px] leading-3.5 text-neutral-500">
-                    #{issue.number}
+                    {identifier(issue.number)}
                     {status && ` · ${status.title}`}
                 </span>
                 <div className="w-full min-w-0 overflow-hidden">

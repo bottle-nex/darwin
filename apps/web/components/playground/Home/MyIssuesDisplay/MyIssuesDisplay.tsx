@@ -18,10 +18,8 @@ export default function MyIssuesDisplay() {
     const filters = useKanbanFilterStore((state) => state.filters);
     const clearAll = useKanbanFilterStore((state) => state.clearAll);
     const view = useMyIssuesOptionsStore((state) => state.view);
-    const groupBy = useMyIssuesOptionsStore((state) => state.groupBy);
-    const orderBy = useMyIssuesOptionsStore((state) => state.orderBy);
     const setView = useMyIssuesOptionsStore((state) => state.setView);
-    const myIssues = useMyIssues(project?.id, userId ?? undefined, view, groupBy, orderBy, filters);
+    const myIssues = useMyIssues(project?.id, userId ?? undefined, view, filters);
 
     useKanbanFilterUrlSync(project?.id);
 
@@ -33,8 +31,6 @@ export default function MyIssuesDisplay() {
                 issues={myIssues.issues}
                 total={myIssues.total}
                 view={view}
-                groupBy={groupBy}
-                orderBy={orderBy}
                 loading={myIssues.isPending || !userId}
                 error={myIssues.isError}
                 pageError={myIssues.isFetchNextPageError}

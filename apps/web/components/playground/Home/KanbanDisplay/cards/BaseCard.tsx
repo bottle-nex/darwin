@@ -1,10 +1,11 @@
 import type { ReactNode } from "react";
 
+import { issueIdentifier } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import type { Issue } from "@/types/kanban";
 
 import { CARD_SHELL } from "../cardStyles";
-import IssueCardFace, { issueIdentifier } from "./IssueCardFace";
+import IssueCardFace from "./IssueCardFace";
 
 type BaseCardProps = {
     issue: Issue;

@@ -1,5 +1,6 @@
 import type { BoardIssue } from "@/types/board";
 import {
+    AGENT_BOARD,
     type BoardFilters,
     type DateRangeFilter,
     EMPTY_FILTERS,
@@ -46,13 +47,36 @@ function matchesQuery(issue: BoardIssue, query: string): boolean {
     const needle = query.trim().toLowerCase();
     if (needle.length === 0) return true;
     if (issue.title.toLowerCase().includes(needle)) return true;
-    return `#${issue.number}`.includes(needle);
+    // Rows read `TRY-42`, so drop a leading project key or `#` and match the number
+    // itself — "42", "#42" and "try-42" all find the same issue.
+    const numberNeedle = needle.replace(/^#/, "").replace(/^[a-z]+-/, "");
+    return numberNeedle.length > 0 && String(issue.number).includes(numberNeedle);
+}
+
+/**
+ * An issue reaches a board only through its column, so the caller supplies the
+ * column-to-space lookup. Without one the board facet cannot be judged locally
+ * and is left to the server.
+ */
+function matchesBoards(
+    issue: BoardIssue,
+    spaceIds: string[],
+    spaceOfColumn?: (columnId: string) => string | undefined,
+): boolean {
+    if (spaceIds.length === 0) return true;
+    if (issue.customColumnId === null) return spaceIds.includes(AGENT_BOARD);
+    if (!spaceOfColumn) return true;
+    const spaceId = spaceOfColumn(issue.customColumnId);
+    return spaceId !== undefined && spaceIds.includes(spaceId);
 }
 
 export function issueMatchesFilters(
     issue: BoardIssue,
     filters: BoardFilters,
-    { skipStatus = false }: { skipStatus?: boolean } = {},
+    {
+        skipStatus = false,
+        spaceOfColumn,
+    }: { skipStatus?: boolean; spaceOfColumn?: (columnId: string) => string | undefined } = {},
 ): boolean {
     if (!skipStatus && filters.statuses.length > 0 && !filters.statuses.includes(issue.status)) {
         return false;
@@ -65,6 +89,7 @@ export function issueMatchesFilters(
     if (filters.tagIds.length > 0 && !issue.tags.some((tag) => filters.tagIds.includes(tag.id))) {
         return false;
     }
+    if (!matchesBoards(issue, filters.spaceIds, spaceOfColumn)) return false;
     if (!withinRange(issue.createdAt, filters.createdAt)) return false;
     if (!withinRange(issue.startDate, filters.startDate)) return false;
     if (!withinRange(issue.targetDate, filters.targetDate)) return false;

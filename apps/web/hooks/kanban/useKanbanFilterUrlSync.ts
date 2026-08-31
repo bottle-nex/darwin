@@ -21,6 +21,7 @@ const LIST_PARAM: Record<ListFacetKey, string> = {
     assigneeIds: "assignee",
     creatorIds: "creator",
     tagIds: "tag",
+    spaceIds: "space",
 };
 
 const DATE_PARAM: Record<DateFacetKey, string> = {
@@ -61,6 +62,7 @@ function readFilters(params: URLSearchParams): BoardFilters {
         assigneeIds: parseList(params.get(LIST_PARAM.assigneeIds)),
         creatorIds: parseList(params.get(LIST_PARAM.creatorIds)),
         tagIds: parseList(params.get(LIST_PARAM.tagIds)),
+        spaceIds: parseList(params.get(LIST_PARAM.spaceIds)),
         createdAt: parseRange(params.get(DATE_PARAM.createdAt)),
         startDate: parseRange(params.get(DATE_PARAM.startDate)),
         targetDate: parseRange(params.get(DATE_PARAM.targetDate)),

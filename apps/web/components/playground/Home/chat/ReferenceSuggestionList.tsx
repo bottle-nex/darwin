@@ -7,6 +7,7 @@ import PlaygroundAvatar, {
     toneFor,
 } from "@/components/playground/Core/components/PlaygroundAvatar";
 import { Button } from "@/components/ui/button";
+import { useIssueIdentifier } from "@/hooks/issues/useIssueIdentifier";
 import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
 import { cn } from "@/lib/utils";
 
@@ -26,11 +27,14 @@ interface ReferenceSuggestionListProps {
 }
 
 function IssueRow({ item }: { item: Extract<ReferenceSuggestion, { kind: "issue" }> }) {
+    const identifier = useIssueIdentifier();
     const { icon: Icon, titleBox } = KanbanBoard.glyphFor(item.issue.status);
     return (
         <>
             <Icon className={cn("size-3.5 shrink-0", titleBox)} />
-            <span className="shrink-0 font-medium text-neutral-400">#{item.issue.number}</span>
+            <span className="shrink-0 font-medium text-neutral-400">
+                {identifier(item.issue.number)}
+            </span>
             <span className="truncate">{item.issue.title}</span>
         </>
     );

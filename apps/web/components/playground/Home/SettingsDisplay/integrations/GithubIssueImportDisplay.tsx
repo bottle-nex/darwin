@@ -1,7 +1,6 @@
 "use client";
 import { GithubImportTarget, IMPORTED_TAG_NAME } from "@trymatcha/types";
 import { BackChevronIcon, CheckIcon, GithubLogoIcon } from "@trymatcha/ui/icons";
-import { useMemo } from "react";
 
 import TagDisplay from "@/components/playground/Home/TagsDisplay/TagDisplay";
 import { Button } from "@/components/ui/button";
@@ -20,7 +19,7 @@ import {
 } from "@/components/ui/select";
 import { useIssueImportConfig } from "@/hooks/github/useIssueImportConfig";
 import { useUpdateIssueImportConfig } from "@/hooks/github/useUpdateIssueImportConfig";
-import { useBoardColumns } from "@/hooks/issues/useBoardColumns";
+import { useBoardDestinations } from "@/hooks/issues/useBoardDestinations";
 import { useEscapeExit } from "@/hooks/shortcuts/useEscapeExit";
 import { useListTags } from "@/hooks/tags/useListTags";
 import { formatRelativeTime } from "@/lib/format";
@@ -71,7 +70,6 @@ export default function GithubIssueImportDisplay({
     onBack: () => void;
 }) {
     const { data: config, isLoading } = useIssueImportConfig(project.id);
-    const { data: board } = useBoardColumns(project.id);
     const { data: tags } = useListTags(project.id);
     const update = useUpdateIssueImportConfig();
 
@@ -79,14 +77,9 @@ export default function GithubIssueImportDisplay({
 
     const agentLaneTitle = KanbanBoard.columnFor(KanbanStatus.Todo)?.title ?? "To Do";
 
-    const spaces = useMemo(
-        () =>
-            (board?.spaces ?? []).map((space) => ({
-                ...space,
-                columns: (board?.columns ?? []).filter((column) => column.spaceId === space.id),
-            })),
-        [board],
-    );
+    // A config picker must be able to show and re-select its current value, so
+    // nothing is filtered out.
+    const destinations = useBoardDestinations(undefined);
 
     const repo = project.githubRepoFullName;
     const enabled = config?.enabled ?? false;
@@ -239,21 +232,16 @@ export default function GithubIssueImportDisplay({
                                         <SelectItem value={AGENT_BOARD_VALUE}>
                                             Agent board · {agentLaneTitle}
                                         </SelectItem>
-                                        {spaces.map((space) =>
-                                            space.columns.length ? (
-                                                <SelectGroup key={space.id}>
-                                                    <SelectLabel>{space.name}</SelectLabel>
-                                                    {space.columns.map((column) => (
-                                                        <SelectItem
-                                                            key={column.id}
-                                                            value={column.id}
-                                                        >
-                                                            {space.name} › {column.label}
-                                                        </SelectItem>
-                                                    ))}
-                                                </SelectGroup>
-                                            ) : null,
-                                        )}
+                                        {destinations.spaces.map((space) => (
+                                            <SelectGroup key={space.id}>
+                                                <SelectLabel>{space.name}</SelectLabel>
+                                                {space.columns.map((column) => (
+                                                    <SelectItem key={column.id} value={column.id}>
+                                                        {column.label}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectGroup>
+                                        ))}
                                     </SelectContent>
                                 </Select>
                             </LabeledField>

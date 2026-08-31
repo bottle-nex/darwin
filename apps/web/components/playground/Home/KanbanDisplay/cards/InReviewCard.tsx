@@ -23,7 +23,7 @@ export default function InReviewCard({ issue }: { issue: Issue }) {
                     <button
                         type="button"
                         disabled={pullNumber === null}
-                        aria-label={`Review pull request #${issue.pr?.number}`}
+                        aria-label={`Review pull request ${issue.pr?.number}`}
                         onClick={(event) => {
                             event.stopPropagation();
                             if (pullNumber === null || !issue.boardIssue) return;

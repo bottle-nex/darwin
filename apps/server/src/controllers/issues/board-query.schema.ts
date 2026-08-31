@@ -69,6 +69,7 @@ export const board_filters_schema = z
         assigneeIds: identifier_list_schema.default([]),
         creatorIds: identifier_list_schema.default([]),
         tagIds: identifier_list_schema.default([]),
+        spaceIds: identifier_list_schema.default([]),
         createdAt: date_range_schema.nullable().default(null),
         startDate: date_range_schema.nullable().default(null),
         targetDate: date_range_schema.nullable().default(null),

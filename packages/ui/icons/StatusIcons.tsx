@@ -15,7 +15,8 @@ import {
     HiOutlineQuestionMarkCircle,
     HiXCircle,
 } from "react-icons/hi2";
-import { LuEllipsis, LuInfo } from "react-icons/lu";
+import { LuChartNoAxesColumnIncreasing, LuCircleDashed, LuInfo } from "react-icons/lu";
+import { PiExclamationMarkBold } from "react-icons/pi";
 
 export const CancelledStatusIcon = createIcon(CancelledGlyph);
 
@@ -35,11 +36,13 @@ export const InlineHintIcon = createIcon(LuInfo);
 
 export const MergeToneWarningIcon = createIcon(HiExclamationTriangle);
 
-export const NoPriorityIcon = createIcon(LuEllipsis);
+export const NoPriorityIcon = createIcon(PiExclamationMarkBold);
 
 export const NotificationsBellIcon = createIcon(HiOutlineBell);
 
 export const OffBoardStatusIcon = createIcon(OffBoardGlyph);
+
+export const PriorityFieldIcon = createIcon(LuChartNoAxesColumnIncreasing);
 
 export function HighPriorityIcon({ className }: IconBaseProps) {
     return (
@@ -230,6 +233,8 @@ export function OffBoardGlyph(props: IconBaseProps) {
         </StatusGlyph>
     );
 }
+
+export const StatusFieldIcon = createIcon(LuCircleDashed);
 
 export const StatusInfoIcon = createIcon(HiInformationCircle);
 

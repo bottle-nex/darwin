@@ -4,17 +4,23 @@ import {
     AssigneeGroupIcon,
     CalendarIcon,
     CreatorIcon,
+    PriorityFieldIcon,
     SearchIcon,
+    SpaceEntityIcon,
+    StatusFieldIcon,
     TagIcon,
 } from "@trymatcha/ui/icons";
 import { useMemo } from "react";
 
 import { DATE_ICON_COLOR, PRIORITY_OPTIONS } from "@/components/playground/Issue/issueHelpers";
+import type { IconPick } from "@/components/ui/IconPicker";
+import { useSpaces } from "@/hooks/issues/useBoardColumns";
 import { useProjectMembers } from "@/hooks/project/useProjectMembers";
 import { useListTags } from "@/hooks/tags/useListTags";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
 import {
+    AGENT_BOARD,
     type BoardFilters,
     type FacetKey,
     type ListFacetKey,
@@ -31,11 +37,12 @@ export type FacetMeta = {
 };
 
 export const FACET_META: Record<FacetKey, FacetMeta> = {
-    statuses: { label: "Status", plural: "statuses", icon: KanbanBoard.COLUMNS[0].icon },
-    priorities: { label: "Priority", plural: "priorities", icon: PRIORITY_OPTIONS[0].icon },
+    statuses: { label: "Status", plural: "statuses", icon: StatusFieldIcon },
+    priorities: { label: "Priority", plural: "priorities", icon: PriorityFieldIcon },
     assigneeIds: { label: "Assignee", plural: "assignees", icon: AssigneeGroupIcon },
     creatorIds: { label: "Creator", plural: "creators", icon: CreatorIcon },
     tagIds: { label: "Tag", plural: "tags", icon: TagIcon },
+    spaceIds: { label: "Board", plural: "boards", icon: SpaceEntityIcon },
     createdAt: { label: "Created", plural: "dates", icon: CalendarIcon },
     startDate: {
         label: "Start date",
@@ -57,11 +64,13 @@ export type FacetOption = {
     label: string;
     icon?: IconType;
     iconClassName?: string;
+    /** A user-picked glyph, e.g. a space's own icon. Takes precedence over `icon`. */
+    iconPick?: IconPick | null;
     dotColor?: string;
     avatarSrc?: string | null;
 };
 
-const SEARCHABLE_FACETS: ListFacetKey[] = ["assigneeIds", "creatorIds", "tagIds"];
+const SEARCHABLE_FACETS: ListFacetKey[] = ["assigneeIds", "creatorIds", "tagIds", "spaceIds"];
 
 export function isSearchableFacet(key: ListFacetKey): boolean {
     return SEARCHABLE_FACETS.includes(key);
@@ -75,6 +84,7 @@ export function useFacetOptions(key: ListFacetKey): FacetOption[] {
     const projectId = useActiveProject()?.id;
     const { data: members } = useProjectMembers(projectId);
     const { data: tags } = useListTags(projectId);
+    const spaces = useSpaces(projectId);
 
     return useMemo(() => {
         const people = (members ?? []).map((member) => ({
@@ -102,6 +112,18 @@ export function useFacetOptions(key: ListFacetKey): FacetOption[] {
                 return [{ value: UNASSIGNED, label: "Unassigned" }, ...people];
             case "creatorIds":
                 return people;
+            case "spaceIds":
+                return [
+                    { value: AGENT_BOARD, label: "Agent board", icon: SpaceEntityIcon },
+                    // A space draws with its own picked glyph, falling back to the
+                    // shared one so every row keeps its icon column.
+                    ...spaces.map((space) => ({
+                        value: space.id,
+                        label: space.name,
+                        icon: SpaceEntityIcon,
+                        iconPick: space.icon,
+                    })),
+                ];
             case "tagIds":
                 return (tags ?? []).map((tag) => ({
                     value: tag.id,
@@ -109,7 +131,7 @@ export function useFacetOptions(key: ListFacetKey): FacetOption[] {
                     dotColor: tag.color,
                 }));
         }
-    }, [key, members, tags]);
+    }, [key, members, tags, spaces]);
 }
 
 export function facetSummary(options: FacetOption[], values: string[], plural: string): string {

@@ -11,6 +11,7 @@ import {
     DropdownMenuContent,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { IconPickGlyph } from "@/components/ui/IconPicker";
 import { cn } from "@/lib/utils";
 import { useKanbanFilterStore } from "@/store/kanban/useKanbanFilterStore";
 import type { ListFacetKey } from "@/types/boardFilter";
@@ -128,14 +129,21 @@ export function FilterFacetItems({ facetKey }: { facetKey: ListFacetKey }) {
                                             />
                                         ) : (
                                             <>
-                                                {option.icon && (
-                                                    <option.icon
-                                                        className={cn(
-                                                            "size-3.5 text-neutral-400",
-                                                            option.iconClassName,
-                                                        )}
-                                                        aria-hidden
+                                                {option.iconPick ? (
+                                                    <IconPickGlyph
+                                                        pick={option.iconPick}
+                                                        className="size-3.5 shrink-0"
                                                     />
+                                                ) : (
+                                                    option.icon && (
+                                                        <option.icon
+                                                            className={cn(
+                                                                "size-3.5 shrink-0 text-neutral-400",
+                                                                option.iconClassName,
+                                                            )}
+                                                            aria-hidden
+                                                        />
+                                                    )
                                                 )}
                                                 <span className="flex-1 truncate text-[13px] text-neutral-200">
                                                     {option.label}

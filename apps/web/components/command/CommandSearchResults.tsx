@@ -8,6 +8,7 @@ import { ChatsNavIcon } from "@trymatcha/ui/icons";
 
 import { PlaygroundTab } from "@/components/playground/playgroundTabs";
 import { CommandGroup, CommandItem } from "@/components/ui/command";
+import { useIssueIdentifier } from "@/hooks/issues/useIssueIdentifier";
 import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
 import { cn } from "@/lib/utils";
 import { useChatThreadStore } from "@/store/playground/useChatThreadStore";
@@ -29,6 +30,7 @@ export default function CommandSearchResults({
 }) {
     const openIssue = usePaneRouteStore((s) => s.openIssue);
     const openThread = useOpenSearchThread(openIssue);
+    const identifier = useIssueIdentifier();
 
     if (isError) {
         return (
@@ -69,7 +71,7 @@ export default function CommandSearchResults({
                                 <span className="flex min-w-0 flex-col">
                                     <span className="flex min-w-0 items-center gap-1.5">
                                         <span className="shrink-0 text-neutral-500">
-                                            #{hit.number}
+                                            {identifier(hit.number)}
                                         </span>
                                         <span className="truncate">{hit.title}</span>
                                     </span>
@@ -104,7 +106,7 @@ export default function CommandSearchResults({
                             <span className="flex min-w-0 flex-col">
                                 <span className="truncate">{hit.snippet}</span>
                                 <span className="truncate text-[11.5px] text-neutral-500">
-                                    {messageContext(hit)}
+                                    {messageContext(hit, identifier)}
                                 </span>
                             </span>
                         </CommandItem>
@@ -119,13 +121,21 @@ function SearchNotice({ children }: { children: React.ReactNode }) {
     return <div className="px-2.5 py-2 text-[12.5px] text-neutral-500">{children}</div>;
 }
 
-function messageContext(hit: GlobalSearchMessageHit) {
-    const where = threadLabel(hit.thread);
+function messageContext(
+    hit: GlobalSearchMessageHit,
+    identifier: (number: number | string) => string,
+) {
+    const where = threadLabel(hit.thread, identifier);
     return hit.senderName ? `${hit.senderName} · ${where}` : where;
 }
 
-function threadLabel(thread: GlobalSearchMessageThread) {
-    if (thread.kind === "issue-comment") return `#${thread.issueNumber} ${thread.issueTitle}`;
+function threadLabel(
+    thread: GlobalSearchMessageThread,
+    identifier: (number: number | string) => string,
+) {
+    if (thread.kind === "issue-comment") {
+        return `${identifier(thread.issueNumber)} ${thread.issueTitle}`;
+    }
     if (thread.kind === "team-chat") return thread.teamName;
     return "Project chat";
 }

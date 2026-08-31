@@ -1,19 +1,18 @@
 "use client";
-import { CheckIcon, SpaceEntityIcon } from "@trymatcha/ui/icons";
+import { CheckIcon } from "@trymatcha/ui/icons";
 
-import HeroBuddy from "@/components/landing/v2/HeroBuddy";
 import { PRIORITY_TO_NUMBER } from "@/components/playground/Home/KanbanDisplay/customkanban/data";
+import { boardDestinationRows } from "@/components/playground/Issue/boardDestinationRows";
 import { PRIORITY_OPTIONS } from "@/components/playground/Issue/issueHelpers";
 import MemberAvatar from "@/components/playground/Issue/MemberAvatar";
 import { CommandEmpty, CommandGroup, CommandItem, CommandList } from "@/components/ui/command";
-import { IconPickGlyph } from "@/components/ui/IconPicker";
+import { useBoardDestinations } from "@/hooks/issues/useBoardDestinations";
 import { COPY_FIELDS, type IssueActions } from "@/hooks/issues/useIssueActions";
+import { useActiveProject } from "@/hooks/useActiveProject";
 import { DATE_SHORTCUTS_WITH_CLEAR } from "@/lib/dateShortcuts";
 import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
 import { cn } from "@/lib/utils";
-import type { CommandPage, IssueCommandPage } from "@/types/command.type";
-
-const LIST = "no-scrollbar max-h-[min(60vh,26rem)] p-2";
+import type { IssueCommandPage } from "@/types/command.type";
 
 export const ISSUE_PAGE_TITLE: Record<IssueCommandPage, string> = {
     status: "Change status",
@@ -30,11 +29,15 @@ export default function CommandIssuePage({
     actions,
     onDone,
 }: {
-    page: CommandPage;
+    page: IssueCommandPage;
     actions: IssueActions;
     onDone: () => void;
 }) {
-    const { issue, editable, count } = actions;
+    const { issue, count } = actions;
+    // Each page is one field, so its rows share one rule.
+    const editable = actions.canEdit(page);
+    const destinations = useBoardDestinations(actions.sharedColumnId);
+    const projectName = useActiveProject()?.name;
     if (!count) return null;
 
     function pick(run: () => void, closes = true) {
@@ -43,7 +46,7 @@ export default function CommandIssuePage({
     }
 
     return (
-        <CommandList data-lenis-prevent className={LIST}>
+        <CommandList data-lenis-prevent>
             <CommandEmpty>No matches.</CommandEmpty>
 
             {page === "status" && (
@@ -54,7 +57,7 @@ export default function CommandIssuePage({
                             value={column.title}
                             disabled={!editable}
                             onSelect={() => pick(() => actions.setStatus(column.status))}
-                            className="justify-between px-2.5 py-2"
+                            className="justify-between"
                         >
                             <span className="flex items-center gap-2.5">
                                 <column.icon
@@ -77,7 +80,7 @@ export default function CommandIssuePage({
                             value={option.label}
                             disabled={!editable}
                             onSelect={() => pick(() => actions.setPriority(option.value))}
-                            className="justify-between px-2.5 py-2"
+                            className="justify-between"
                         >
                             <span className="flex items-center gap-2.5">
                                 <option.icon
@@ -102,7 +105,7 @@ export default function CommandIssuePage({
                             value={member.name ?? member.email}
                             disabled={!editable}
                             onSelect={() => pick(() => actions.toggleAssignee(member.id), false)}
-                            className="justify-between px-2.5 py-2"
+                            className="justify-between"
                         >
                             <span className="flex min-w-0 items-center gap-2.5">
                                 <MemberAvatar member={member} className="size-5" />
@@ -123,7 +126,7 @@ export default function CommandIssuePage({
                             value={tag.name}
                             disabled={!editable}
                             onSelect={() => pick(() => actions.toggleTag(tag.id), false)}
-                            className="justify-between px-2.5 py-2"
+                            className="justify-between"
                         >
                             <span className="flex min-w-0 items-center gap-2.5">
                                 <span
@@ -151,7 +154,6 @@ export default function CommandIssuePage({
                                 onSelect={() =>
                                     pick(() => actions.setStartDate(shortcut.resolve()))
                                 }
-                                className="px-2.5 py-2"
                             >
                                 {shortcut.label}
                             </CommandItem>
@@ -166,7 +168,6 @@ export default function CommandIssuePage({
                                 onSelect={() =>
                                     pick(() => actions.setTargetDate(shortcut.resolve()))
                                 }
-                                className="px-2.5 py-2"
                             >
                                 {shortcut.label}
                             </CommandItem>
@@ -175,52 +176,29 @@ export default function CommandIssuePage({
                 </>
             )}
 
-            {page === "move" && (
-                <CommandGroup>
-                    {actions.sharedColumnId && (
-                        <CommandItem
-                            value="Agent board"
-                            disabled={!editable}
-                            onSelect={() => pick(() => actions.moveToColumn(null))}
-                            className="px-2.5 py-2"
-                        >
-                            <HeroBuddy move={false} className="size-3.5" />
-                            Agent board
+            {page === "move" &&
+                boardDestinationRows({
+                    destinations,
+                    disabled: !editable,
+                    onPick: (columnId) => pick(() => actions.moveToColumn(columnId)),
+                    Item: ({ disabled, onSelect, className, children }) => (
+                        <CommandItem disabled={disabled} onSelect={onSelect} className={className}>
+                            {children}
                         </CommandItem>
-                    )}
-                    {actions.spaceBoards.map((space) =>
-                        space.columns.length ? (
-                            <CommandGroup key={space.id} heading={space.name}>
-                                {space.columns
-                                    .filter((column) => column.id !== actions.sharedColumnId)
-                                    .map((column) => (
-                                        <CommandItem
-                                            key={column.id}
-                                            value={`${space.name} ${column.label}`}
-                                            disabled={!editable}
-                                            onSelect={() =>
-                                                pick(() => actions.moveToColumn(column.id))
-                                            }
-                                            className="px-2.5 py-2"
-                                        >
-                                            {space.icon ? (
-                                                <IconPickGlyph
-                                                    pick={space.icon}
-                                                    className="size-3.5"
-                                                />
-                                            ) : (
-                                                <SpaceEntityIcon className="size-3.5" aria-hidden />
-                                            )}
-                                            <span className="truncate">{column.label}</span>
-                                        </CommandItem>
-                                    ))}
-                            </CommandGroup>
-                        ) : null,
-                    )}
-                    {actions.spaceBoards.every((space) => space.columns.length === 0) &&
-                        !actions.sharedColumnId && <CommandItem disabled>No columns</CommandItem>}
-                </CommandGroup>
-            )}
+                    ),
+                    Heading: ({ icon, name, children }) => (
+                        <CommandGroup
+                            heading={
+                                <span className="flex items-center gap-1.5">
+                                    {icon}
+                                    <span className="truncate">{name}</span>
+                                </span>
+                            }
+                        >
+                            {children}
+                        </CommandGroup>
+                    ),
+                })}
 
             {page === "copy" && issue && (
                 <CommandGroup>
@@ -232,21 +210,16 @@ export default function CommandIssuePage({
                                 pick(() =>
                                     actions.copyField(
                                         field.label,
-                                        field.value(issue, actions.issueHref()),
+                                        field.value(issue, actions.issueHref(), projectName),
                                     ),
                                 )
                             }
-                            className="px-2.5 py-2"
                         >
                             <field.icon className="size-4 text-neutral-400" aria-hidden />
                             Copy {field.label}
                         </CommandItem>
                     ))}
-                    <CommandItem
-                        value="Duplicate issue"
-                        onSelect={() => pick(actions.duplicate)}
-                        className="px-2.5 py-2"
-                    >
+                    <CommandItem value="Duplicate issue" onSelect={() => pick(actions.duplicate)}>
                         Duplicate issue
                     </CommandItem>
                 </CommandGroup>

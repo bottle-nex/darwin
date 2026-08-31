@@ -7,12 +7,10 @@ import {
     useSensor,
     useSensors,
 } from "@dnd-kit/core";
-import { useQueryClient } from "@tanstack/react-query";
 import { useRef } from "react";
 
-import { moveBoardIssueCaches, reconcileBoardProject } from "@/hooks/issues/boardCache";
+import { useMoveIssue } from "@/hooks/issues/useMoveIssue";
 import { useReorderColumns } from "@/hooks/issues/useReorderColumns";
-import { useUpdateIssue } from "@/hooks/issues/useUpdateIssue";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
 import { toast } from "@/lib/toast";
@@ -32,9 +30,8 @@ export function useCustomKanbanDnd(
     scope: BoardScope,
 ) {
     const projectId = useActiveProject()?.id;
-    const updateIssue = useUpdateIssue();
+    const moveIssue = useMoveIssue();
     const reorderColumns = useReorderColumns();
-    const queryClient = useQueryClient();
 
     const dragOriginColumn = useRef<string | null>(null);
 
@@ -156,15 +153,9 @@ export function useCustomKanbanDnd(
         clearDrag();
     }
 
+    // The same move the menus perform, so a drag and a menu pick behave alike.
     function persistMove(cardId: string, columnId: string | null) {
-        if (!projectId) return;
-        moveBoardIssueCaches(queryClient, projectId, cardId, columnId);
-        updateIssue
-            .mutateAsync({ id: cardId, project_id: projectId, custom_column_id: columnId })
-            .catch(() => {
-                reconcileBoardProject(queryClient, projectId);
-                toast.error("Couldn't move the issue.");
-            });
+        moveIssue([cardId], columnId);
     }
 
     function persistColumnOrder() {

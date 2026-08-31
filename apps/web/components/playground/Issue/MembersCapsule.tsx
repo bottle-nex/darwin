@@ -60,7 +60,7 @@ export default function MembersCapsule({
     const selectedMembers = (members ?? []).filter((member) => selected.includes(member.id));
     const trigger = (
         <CapsuleTrigger disabled={disabled} className={className}>
-            <AssigneeGroupIcon className="size-3.5 text-white/60" />
+            <AssigneeGroupIcon className="size-3.5! text-snow" />
             {selectedMembers.length === 0
                 ? placeholder
                 : selectedMembers.length === 1

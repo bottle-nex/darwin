@@ -11,6 +11,7 @@ import {
 } from "@/components/playground/Core/components/PlaygroundPaneSlots";
 import IssueDropdown from "@/components/playground/Home/KanbanDisplay/IssueDropdown";
 import ConfirmDialog from "@/components/utility/ConfirmDialog";
+import { useIssueIdentifier } from "@/hooks/issues/useIssueIdentifier";
 import { useEscapeExit } from "@/hooks/shortcuts/useEscapeExit";
 import { usePaneRouteStore } from "@/store/playground/usePaneRouteStore";
 import type { BoardColumn, BoardIssue } from "@/types/board";
@@ -33,6 +34,7 @@ export default function IssueDisplayPane({
     onDismiss?: () => void;
 }) {
     const openBoard = usePaneRouteStore((s) => s.openBoard);
+    const identifier = useIssueIdentifier();
     const close = onDismiss ?? openBoard;
     const [confirmingClose, setConfirmingClose] = useState(false);
 
@@ -66,7 +68,7 @@ export default function IssueDisplayPane({
                         className="flex shrink-0 items-center justify-between gap-2 border-b border-border px-3"
                     >
                         <span className="text-[12.5px] font-medium text-neutral-400 tabular-nums">
-                            #{issue.number}
+                            {identifier(issue.number)}
                         </span>
                         <IssueSubmitAction form={form} warningPlacement="below" />
                     </div>

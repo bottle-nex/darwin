@@ -12,6 +12,9 @@ import type {
 import { BOARD_SYSTEM_STATUSES } from "../controllers/issues/board-query.schema";
 import PaginationService from "./service.pagination";
 
+/** The board facet's sentinel for "not on any space", matching the client. */
+const AGENT_BOARD = "agent";
+
 export const BOARD_ISSUE_SELECT = {
     id: true,
     number: true,
@@ -621,6 +624,23 @@ export default class BoardIssueService {
                 WHERE "tag"."A" = "i"."id"
                 AND "tag"."B" IN (${Prisma.join(filters.tagIds)})
             )`);
+        }
+        if (filters.spaceIds.length) {
+            // An issue reaches a board through its column; the agent board is the
+            // absence of one. Mirrors how the assignee facet handles "unassigned".
+            const space_ids = filters.spaceIds.filter((id) => id !== AGENT_BOARD);
+            const choices: Prisma.Sql[] = [];
+            if (filters.spaceIds.includes(AGENT_BOARD)) {
+                choices.push(Prisma.sql`"i"."customColumnId" IS NULL`);
+            }
+            if (space_ids.length) {
+                choices.push(Prisma.sql`EXISTS (
+                    SELECT 1 FROM "CustomColumn" AS "board_column"
+                    WHERE "board_column"."id" = "i"."customColumnId"
+                    AND "board_column"."spaceId" IN (${Prisma.join(space_ids)})
+                )`);
+            }
+            predicates.push(Prisma.sql`(${Prisma.join(choices, " OR ")})`);
         }
         BoardIssueService.add_date_predicates(predicates, "createdAt", filters.createdAt);
         BoardIssueService.add_date_predicates(predicates, "startDate", filters.startDate);

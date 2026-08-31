@@ -33,7 +33,7 @@ export default function KanbanOptionsBarFlatKeys() {
 
             <PaneActionsSlot>
                 <div className="flex shrink-0 items-center gap-0.75">
-                    <FiltersPanel />
+                    <FiltersPanel crossBoard={kanbanView === "list"} />
                     <FocusPanel value={focus} onChange={setFocus} customColumns={customColumns} />
                     <KanbanViewPanel value={kanbanView} onChange={setKanbanView} />
                     <div className="mx-1 h-4 w-px bg-white/8" />

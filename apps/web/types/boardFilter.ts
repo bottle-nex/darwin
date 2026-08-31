@@ -2,6 +2,9 @@ import type { ServerIssueStatus } from "@/types/board";
 
 export const UNASSIGNED = "unassigned";
 
+/** The Agent board, as a value in the board facet. Spaces use their own ids. */
+export const AGENT_BOARD = "agent";
+
 export type DateRangeFilter = { from: string | null; to: string | null };
 
 export type BoardFilters = {
@@ -10,6 +13,7 @@ export type BoardFilters = {
     assigneeIds: string[];
     creatorIds: string[];
     tagIds: string[];
+    spaceIds: string[];
     createdAt: DateRangeFilter | null;
     startDate: DateRangeFilter | null;
     targetDate: DateRangeFilter | null;
@@ -22,6 +26,7 @@ export const LIST_FACET_KEYS = [
     "assigneeIds",
     "creatorIds",
     "tagIds",
+    "spaceIds",
 ] as const;
 
 export const DATE_FACET_KEYS = ["createdAt", "startDate", "targetDate"] as const;
@@ -38,6 +43,7 @@ export const EMPTY_FILTERS: BoardFilters = {
     assigneeIds: [],
     creatorIds: [],
     tagIds: [],
+    spaceIds: [],
     createdAt: null,
     startDate: null,
     targetDate: null,

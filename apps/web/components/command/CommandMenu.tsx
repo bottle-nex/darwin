@@ -12,6 +12,7 @@ import {
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import KeyCombo from "@/components/ui/KeyCombo";
 import { useIssueActions } from "@/hooks/issues/useIssueActions";
+import { useIssueIdentifier } from "@/hooks/issues/useIssueIdentifier";
 import { isSearchableQuery, useGlobalSearch } from "@/hooks/search/useGlobalSearch";
 import {
     comboToKeys,
@@ -75,6 +76,7 @@ function CommandMenuBody({ onDone }: { onDone: () => void }) {
     const setPage = useCommandMenuStore((s) => s.setPage);
     const [query, setQuery] = useState("");
 
+    const identifier = useIssueIdentifier();
     const selectedIds = useIssueSelectionStore((s) => s.ids);
     const actions = useIssueActions(selectedIds.length ? selectedIds : issueId);
 
@@ -187,7 +189,7 @@ function CommandMenuBody({ onDone }: { onDone: () => void }) {
                     count={actions.count}
                     noun="issue"
                     title={actions.issue?.title}
-                    lead={actions.issue ? `#${actions.issue.number}` : undefined}
+                    lead={actions.issue ? identifier(actions.issue.number) : undefined}
                 />
             )}
 

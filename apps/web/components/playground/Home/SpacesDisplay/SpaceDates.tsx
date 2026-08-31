@@ -9,6 +9,8 @@ import { useSpaceActions } from "@/hooks/kanban/useSpaceActions";
 import { shortDate } from "@/lib/format";
 import type { BoardSpace } from "@/types/board";
 
+import { cn } from "../../../../../../packages/editorial/lib/cn";
+
 type SpaceDateButtonProps = {
     date: string | null;
     label: string;
@@ -28,7 +30,6 @@ type SpaceDateButtonProps = {
 function SpaceDateButton({
     date,
     label,
-    iconClassName,
     canEdit,
     range,
     earliest,
@@ -42,13 +43,14 @@ function SpaceDateButton({
             variant="unstyled"
             type="button"
             aria-label={label}
+            data-row-editor
             disabled={!canEdit}
-            className={canEdit ? "w-fit cursor-pointer" : "w-fit"}
+            className={cn(canEdit ? "w-fit cursor-pointer" : "w-fit", "group")}
         >
             <IconWrapper
                 variant="ghost"
                 icon={CalendarIcon}
-                iconClassName={iconClassName + " size-4.5"}
+                iconClassName={"size-4.25 group-hover:text-snow"}
                 className="text-[12px] flex items-center h-6.5"
             >
                 <span className="text-snow/90 font-medium">{shortDate(date)}</span>
@@ -59,9 +61,14 @@ function SpaceDateButton({
             variant="unstyled"
             type="button"
             aria-label={label}
+            data-row-editor
             className="w-fit cursor-pointer ml-1"
         >
-            <IconWrapper variant="ghost" icon={CalendarIcon} iconClassName={"size-4.5"} />
+            <IconWrapper
+                variant="ghost"
+                icon={CalendarIcon}
+                iconClassName={"size-4.25 hover:text-snow"}
+            />
         </Button>
     );
 

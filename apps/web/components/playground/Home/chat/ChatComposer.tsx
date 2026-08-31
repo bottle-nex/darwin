@@ -12,6 +12,7 @@ import { forwardRef, useEffect, useId, useImperativeHandle, useMemo, useRef } fr
 import { Button } from "@/components/ui/button";
 import EmojiPicker from "@/components/ui/EmojiPicker";
 import IconWrapper from "@/components/ui/IconWrapper";
+import { useActiveProject } from "@/hooks/useActiveProject";
 import { cn } from "@/lib/utils";
 
 import { createReferenceMention, ISSUE_TRIGGER, SUGGESTION_KEYS } from "./referenceMention";
@@ -80,6 +81,7 @@ const ChatComposer = forwardRef<ChatComposerHandle, ChatComposerProps>(function 
     ref,
 ) {
     const queryClient = useQueryClient();
+    const projectName = useActiveProject()?.name;
     const portalSlot = `reference-portal-${useId()}`;
     const onSendRef = useRef(onSend);
     const disabledRef = useRef(disabled);
@@ -114,6 +116,7 @@ const ChatComposer = forwardRef<ChatComposerHandle, ChatComposerProps>(function 
                       createReferenceMention({
                           queryClient,
                           projectId,
+                          projectName,
                           container: `[data-slot="${portalSlot}"]`,
                           memberUserIds,
                       }),
@@ -135,7 +138,7 @@ const ChatComposer = forwardRef<ChatComposerHandle, ChatComposerProps>(function 
                 },
             }),
         ],
-        [projectId, placeholder, portalSlot, queryClient, memberUserIds],
+        [projectId, projectName, placeholder, portalSlot, queryClient, memberUserIds],
     );
 
     const editor = useEditor(

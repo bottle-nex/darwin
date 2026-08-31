@@ -8,27 +8,28 @@ import {
     DuplicateIcon,
     ExternalLinkIcon,
     KanbanColumnsIcon,
-    SpaceEntityIcon,
     SubmenuDisclosureIcon,
     TagIcon,
 } from "@trymatcha/ui/icons";
 import { type ReactNode, useState } from "react";
 
-import HeroBuddy from "@/components/landing/v2/HeroBuddy";
 import MemberOptionRow from "@/components/playground/Core/components/MemberOptionRow";
+import { boardDestinationRows } from "@/components/playground/Issue/boardDestinationRows";
 import { PRIORITY_OPTIONS } from "@/components/playground/Issue/issueHelpers";
 import {
     ContextMenu,
     ContextMenuContent,
     ContextMenuItem,
+    ContextMenuLabel,
     ContextMenuSeparator,
     ContextMenuSub,
     ContextMenuSubContent,
     ContextMenuSubTrigger,
     ContextMenuTrigger,
 } from "@/components/ui/context-menu";
-import { IconPickGlyph } from "@/components/ui/IconPicker";
+import { useBoardDestinations } from "@/hooks/issues/useBoardDestinations";
 import { COPY_FIELDS, useIssueActions } from "@/hooks/issues/useIssueActions";
+import { useActiveProject } from "@/hooks/useActiveProject";
 import { DATE_SHORTCUTS_WITH_CLEAR } from "@/lib/dateShortcuts";
 import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
 import { cn } from "@/lib/utils";
@@ -81,6 +82,8 @@ export default function IssueDropdown({
     children: ReactNode;
 }) {
     const actions = useIssueActions(boardIssue ?? issueId);
+    const projectName = useActiveProject()?.name;
+    const destinations = useBoardDestinations(actions.sharedColumnId);
     const { issue, editable } = actions;
 
     if (!issue) return <>{children}</>;
@@ -271,7 +274,7 @@ export default function IssueDropdown({
                 <ContextMenuSeparator />
 
                 <Submenu
-                    disabled={!editable}
+                    disabled={!actions.canEdit("move")}
                     className="w-52"
                     trigger={
                         <>
@@ -280,42 +283,29 @@ export default function IssueDropdown({
                         </>
                     }
                 >
-                    {issue.customColumnId && (
-                        <ContextMenuItem onSelect={() => actions.moveToColumn(null)}>
-                            <HeroBuddy move={false} className="size-3.5" />
-                            <span className="flex-1">Agent board</span>
-                        </ContextMenuItem>
-                    )}
-                    {actions.spaceBoards.map((space) => (
-                        <Submenu
-                            key={space.id}
-                            className="w-52"
-                            disabled={space.columns.length === 0}
-                            trigger={
-                                <>
-                                    {space.icon ? (
-                                        <IconPickGlyph pick={space.icon} className={ICON} />
-                                    ) : (
-                                        <SpaceEntityIcon className={ICON} aria-hidden />
-                                    )}
-                                    <span className="flex-1 truncate">{space.name}</span>
-                                </>
-                            }
-                        >
-                            {space.columns.map((column) => (
-                                <ContextMenuItem
-                                    key={column.id}
-                                    disabled={column.id === issue.customColumnId}
-                                    onSelect={() => actions.moveToColumn(column.id)}
-                                >
-                                    <span className="flex-1 truncate">{column.label}</span>
-                                </ContextMenuItem>
-                            ))}
-                        </Submenu>
-                    ))}
-                    {actions.spaceBoards.length === 0 && !issue.customColumnId && (
-                        <ContextMenuItem disabled>No boards</ContextMenuItem>
-                    )}
+                    {boardDestinationRows({
+                        destinations,
+                        disabled: !actions.canEdit("move"),
+                        onPick: (columnId) => actions.moveToColumn(columnId),
+                        Item: ({ disabled, onSelect, className, children }) => (
+                            <ContextMenuItem
+                                disabled={disabled}
+                                onSelect={onSelect}
+                                className={className}
+                            >
+                                {children}
+                            </ContextMenuItem>
+                        ),
+                        Heading: ({ icon, name, children }) => (
+                            <>
+                                <ContextMenuLabel className="flex items-center gap-1.5">
+                                    {icon}
+                                    <span className="truncate">{name}</span>
+                                </ContextMenuLabel>
+                                {children}
+                            </>
+                        ),
+                    })}
                 </Submenu>
 
                 <Submenu
@@ -333,7 +323,7 @@ export default function IssueDropdown({
                             onSelect={() =>
                                 actions.copyField(
                                     field.label,
-                                    field.value(issue, actions.issueHref()),
+                                    field.value(issue, actions.issueHref(), projectName),
                                 )
                             }
                         >

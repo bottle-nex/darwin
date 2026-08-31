@@ -58,7 +58,7 @@ export default function PlaygroundSidebarRow({
             </span>
 
             <span className="flex min-w-0 flex-1 items-baseline gap-1.5">
-                <span className="truncate text-[13.5px]">{label}</span>
+                <span className="truncate text-[12.5px]">{label}</span>
                 {suffix && (
                     <span className="truncate text-[10px] text-neutral-500">- {suffix}</span>
                 )}

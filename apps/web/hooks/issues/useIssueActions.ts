@@ -10,30 +10,37 @@ import {
 import { isAxiosError } from "axios";
 
 import { PRIORITY_TO_NUMBER } from "@/components/playground/Home/KanbanDisplay/customkanban/data";
-import { isEditable } from "@/components/playground/Issue/issueHelpers";
+import { isEditable, isFieldEditable } from "@/components/playground/Issue/issueHelpers";
 import { useAssignIssue, useUnassignIssue } from "@/hooks/issues/useAssignIssue";
 import { useSpaceBoards } from "@/hooks/issues/useBoardColumns";
 import { useBulkUpdateIssues } from "@/hooks/issues/useBulkUpdateIssues";
 import { type CreateIssueInput, useCreateIssue } from "@/hooks/issues/useCreateIssue";
 import { useIssues } from "@/hooks/issues/useIssue";
+import { useMoveIssue } from "@/hooks/issues/useMoveIssue";
 import { type UpdateIssueInput, useUpdateIssue } from "@/hooks/issues/useUpdateIssue";
 import { useProjectMembers } from "@/hooks/project/useProjectMembers";
 import { useListTags } from "@/hooks/tags/useListTags";
 import { useActiveProject } from "@/hooks/useActiveProject";
+import { issueIdentifier } from "@/lib/format";
 import { htmlToMarkdown } from "@/lib/markdown";
 import { toast } from "@/lib/toast";
 import { useDeleteIssueStore } from "@/store/issues/useDeleteIssueStore";
 import type { BoardIssue, ServerIssueStatus } from "@/types/board";
+import type { IssueCommandPage } from "@/types/command.type";
 import type { Priority } from "@/types/kanban";
 
 export const COPY_FIELDS: {
     label: string;
     icon: IconType;
-    value: (issue: BoardIssue, url: string) => string;
+    value: (issue: BoardIssue, url: string, projectName: string | undefined) => string;
 }[] = [
     { label: "URL", icon: CopyFieldUrlIcon, value: (_issue, url) => url },
     { label: "title", icon: CopyFieldTitleIcon, value: (issue) => issue.title },
-    { label: "issue number", icon: CopyFieldNumberIcon, value: (issue) => `#${issue.number}` },
+    {
+        label: "issue number",
+        icon: CopyFieldNumberIcon,
+        value: (issue, _url, projectName) => issueIdentifier(projectName, issue.number),
+    },
     { label: "issue ID", icon: CopyFieldIdIcon, value: (issue) => issue.id },
     {
         label: "description as markdown",
@@ -79,6 +86,7 @@ function sharedMembership(issues: BoardIssue[], read: (issue: BoardIssue) => { i
  */
 export function useIssueActions(target: IssueActionTarget) {
     const projectId = useActiveProject()?.id;
+    const moveIssue = useMoveIssue();
     const { issueIds, suppliedIssues } = resolveIssueActionTarget(target);
     const issueQuery = useIssues(projectId, suppliedIssues.length ? [] : issueIds);
     const issues = suppliedIssues.length ? suppliedIssues : issueQuery.issues;
@@ -98,6 +106,7 @@ export function useIssueActions(target: IssueActionTarget) {
 
     const ready = Boolean(isComplete && issues.length && projectId);
     const editable = ready && issues.every(isEditable);
+    const canEdit = (field: IssueCommandPage) => ready && isFieldEditable(issues, field);
     const assigneeIds = sharedMembership(issues, (row) => row.assignees);
     const tagIds = sharedMembership(issues, (row) => row.tags);
 
@@ -106,16 +115,17 @@ export function useIssueActions(target: IssueActionTarget) {
 
     function patch(input: Omit<UpdateIssueInput, "id" | "project_id">) {
         if (!ready) return;
+        const handleError = () => toast.error(failureNote);
         if (issues.length > 1) {
             bulkUpdateIssues.mutate(
                 { issue_ids: issues.map((row) => row.id), project_id: projectId!, ...input },
-                { onError: () => toast.error(failureNote) },
+                { onError: handleError },
             );
             return;
         }
         updateIssue.mutate(
             { id: issues[0].id, project_id: projectId!, ...input },
-            { onError: () => toast.error(failureNote) },
+            { onError: handleError },
         );
     }
 
@@ -149,6 +159,7 @@ export function useIssueActions(target: IssueActionTarget) {
         members: members ?? [],
         tags: tags ?? [],
         editable,
+        canEdit,
         assigneeIds,
         tagIds,
         issueHref,
@@ -157,7 +168,12 @@ export function useIssueActions(target: IssueActionTarget) {
         setPriority: (priority: Priority) => patch({ priority: PRIORITY_TO_NUMBER[priority] }),
         setStartDate: (iso: string | null) => patch({ start_date: iso }),
         setTargetDate: (iso: string | null) => patch({ target_date: iso }),
-        moveToColumn: (columnId: string | null) => patch({ custom_column_id: columnId }),
+        moveToColumn: (columnId: string | null) =>
+            ready &&
+            moveIssue(
+                issues.map((row) => row.id),
+                columnId,
+            ),
 
         toggleTag: (tagId: string) => {
             if (issues.length > 1) {

@@ -43,7 +43,7 @@ export class KanbanMappers {
         return {
             id: issue.id,
             boardIssue: issue,
-            number: `#${issue.number}`,
+            number: String(issue.number),
             title: issue.title,
             project: projectName,
             tags: issue.tags,

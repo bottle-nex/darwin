@@ -3,6 +3,7 @@ import { CalendarIcon, UnknownStatusIcon } from "@trymatcha/ui/icons";
 import type { ReactNode } from "react";
 
 import PlaygroundAvatar from "@/components/playground/Core/components/PlaygroundAvatar";
+import IssueFieldChip from "@/components/playground/Issue/IssueFieldChip";
 import { DATE_ICON_COLOR, PRIORITY_OPTIONS } from "@/components/playground/Issue/issueHelpers";
 import IconWrapper from "@/components/ui/IconWrapper";
 import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
@@ -11,7 +12,6 @@ import type { BoardIssue, BoardTag } from "@/types/board";
 import type { Assignee, Priority } from "@/types/kanban";
 
 import IssueTags from "../IssueTags";
-import PriorityChipMenu from "./PriorityChipMenu";
 
 const MAX_AVATARS = 3;
 
@@ -19,12 +19,7 @@ export function shortDate(iso: string): string {
     return new Date(iso).toLocaleDateString([], { month: "short", day: "numeric" });
 }
 
-export function issueIdentifier(projectName: string | undefined, number: number | string): string {
-    const key = (projectName ?? "ISS").slice(0, 3).toUpperCase();
-    return `${key}-${String(number).replace(/^#/, "")}`;
-}
-
-function AssigneeStack({ assignees, onClick }: { assignees: Assignee[]; onClick?: () => void }) {
+function AssigneeStack({ assignees }: { assignees: Assignee[] }) {
     const shown = assignees.slice(0, MAX_AVATARS);
     const overflow = assignees.length - shown.length;
     const avatars = (
@@ -46,22 +41,7 @@ function AssigneeStack({ assignees, onClick }: { assignees: Assignee[]; onClick?
         </>
     );
 
-    if (!onClick) return <span className="flex shrink-0 items-center -space-x-1">{avatars}</span>;
-
-    return (
-        <button
-            type="button"
-            aria-label="Assignees"
-            onClick={(event) => {
-                event.preventDefault();
-                event.stopPropagation();
-                onClick();
-            }}
-            className="flex shrink-0 cursor-pointer items-center -space-x-1"
-        >
-            {avatars}
-        </button>
-    );
+    return <span className="flex shrink-0 items-center -space-x-1">{avatars}</span>;
 }
 
 export default function IssueCardFace({
@@ -75,7 +55,6 @@ export default function IssueCardFace({
     targetDate,
     createdAt,
     assignees,
-    onAssigneesClick,
     children,
 }: {
     identifier: string;
@@ -88,7 +67,6 @@ export default function IssueCardFace({
     targetDate?: string | null;
     createdAt?: string;
     assignees: Assignee[];
-    onAssigneesClick?: () => void;
     children?: ReactNode;
 }) {
     const column = KanbanBoard.COLUMNS.find((c) => c.status === status);
@@ -107,23 +85,55 @@ export default function IssueCardFace({
             />
         ) : null;
 
+    const targetDateChip = targetDate ? (
+        <IconWrapper
+            variant="outline"
+            hoverGroup="card"
+            icon={CalendarIcon}
+            iconClassName={DATE_ICON_COLOR.target}
+            className="px-2.5 text-neutral-300"
+        >
+            {shortDate(targetDate)}
+        </IconWrapper>
+    ) : null;
+
     return (
         <>
             <div className="flex items-center justify-between gap-2">
                 <span className="font-mono text-[11px] tracking-[0.04em] text-neutral-500">
                     {identifier}
                 </span>
-                <AssigneeStack assignees={assignees} onClick={onAssigneesClick} />
+                {issueId ? (
+                    <IssueFieldChip issueId={issueId} issue={boardIssue} field="assignees">
+                        <AssigneeStack assignees={assignees} />
+                    </IssueFieldChip>
+                ) : (
+                    <AssigneeStack assignees={assignees} />
+                )}
             </div>
 
             <div className="mt-2 flex items-start gap-1.5">
-                <StatusIcon
-                    className={cn(
-                        "mt-px size-4.25 shrink-0",
-                        column?.titleBox ?? "text-neutral-500",
-                    )}
-                    aria-label={column?.title ?? "No status"}
-                />
+                {issueId ? (
+                    <IssueFieldChip
+                        issueId={issueId}
+                        issue={boardIssue}
+                        field="status"
+                        className="mt-px shrink-0 cursor-pointer disabled:cursor-default"
+                    >
+                        <StatusIcon
+                            className={cn("size-4.25", column?.titleBox ?? "text-neutral-500")}
+                            aria-label={column?.title ?? "No status"}
+                        />
+                    </IssueFieldChip>
+                ) : (
+                    <StatusIcon
+                        className={cn(
+                            "mt-px size-4.25 shrink-0",
+                            column?.titleBox ?? "text-neutral-500",
+                        )}
+                        aria-label={column?.title ?? "No status"}
+                    />
+                )}
                 <p className="line-clamp-2 text-[14px] leading-snug font-medium text-neutral-50">
                     {title}
                 </p>
@@ -132,24 +142,29 @@ export default function IssueCardFace({
             {priorityChip || targetDate || tags.length ? (
                 <div className="mt-2.5 flex items-center gap-1.5 overflow-hidden">
                     {priorityChip && issueId ? (
-                        <PriorityChipMenu issueId={issueId} issue={boardIssue}>
+                        <IssueFieldChip issueId={issueId} issue={boardIssue} field="priority">
                             {priorityChip}
-                        </PriorityChipMenu>
+                        </IssueFieldChip>
                     ) : (
                         priorityChip
                     )}
-                    <IssueTags tags={tags} className="contents" />
-                    {targetDate && (
-                        <IconWrapper
-                            variant="outline"
-                            hoverGroup="card"
-                            icon={CalendarIcon}
-                            iconClassName={DATE_ICON_COLOR.target}
-                            className="px-2.5 text-neutral-300"
-                        >
-                            {shortDate(targetDate)}
-                        </IconWrapper>
+                    {tags.length > 0 && issueId ? (
+                        <IssueFieldChip issueId={issueId} issue={boardIssue} field="tags">
+                            <span className="flex flex-wrap items-center gap-1.5">
+                                <IssueTags tags={tags} />
+                            </span>
+                        </IssueFieldChip>
+                    ) : (
+                        <IssueTags tags={tags} className="contents" />
                     )}
+                    {targetDate &&
+                        (issueId ? (
+                            <IssueFieldChip issueId={issueId} issue={boardIssue} field="dates">
+                                {targetDateChip}
+                            </IssueFieldChip>
+                        ) : (
+                            targetDateChip
+                        ))}
                 </div>
             ) : null}
 

@@ -5,6 +5,7 @@ import { displayNameOf } from "@/components/playground/Core/components/Playgroun
 import { useIssue } from "@/hooks/issues/useIssue";
 import { useProjectMembers } from "@/hooks/project/useProjectMembers";
 import { useActiveProject } from "@/hooks/useActiveProject";
+import { issueIdentifier } from "@/lib/format";
 
 import { ISSUE_TRIGGER, kindFor, MEMBER_TRIGGER } from "./referenceTriggers";
 
@@ -13,7 +14,9 @@ import { ISSUE_TRIGGER, kindFor, MEMBER_TRIGGER } from "./referenceTriggers";
  * retitle is reflected everywhere the reference appears.
  */
 export default function ReferenceChip({ node }: NodeViewProps) {
-    const projectId = useActiveProject()?.id;
+    const project = useActiveProject();
+    const projectId = project?.id;
+    const projectName = project?.name;
     const char = (node.attrs.mentionSuggestionChar as string) ?? MEMBER_TRIGGER;
     const isIssue = char === ISSUE_TRIGGER;
     const id = node.attrs.id as string | null;
@@ -27,7 +30,7 @@ export default function ReferenceChip({ node }: NodeViewProps) {
     const member = isIssue ? undefined : members?.find((row) => row.memberId === id);
 
     const resolved = issue
-        ? `${issue.number} ${issue.title}`
+        ? `${issueIdentifier(projectName, issue.number)} ${issue.title}`
         : member
           ? displayNameOf(member.name, member.email)
           : null;

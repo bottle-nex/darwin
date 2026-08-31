@@ -46,6 +46,22 @@ export function shortDate(date: string | Date): string {
     return `${value.toLocaleDateString([], { month: "short" })} ${day}${ordinalSuffix(day)}`;
 }
 
+/**
+ * How an issue is named everywhere it is shown: the project's first three letters,
+ * uppercased, then the number — "trymatcha" issue 42 reads `TRY-42`.
+ *
+ * Punctuation and spaces are stripped before slicing, so "My App" keys as `MYA`
+ * rather than `MY ` with a trailing space. Some callers hand this an already
+ * `#`-prefixed number, so that prefix is dropped rather than doubled.
+ */
+export function issueIdentifier(projectName: string | undefined, number: number | string): string {
+    const key = (projectName ?? "")
+        .replace(/[^a-z0-9]/gi, "")
+        .slice(0, 3)
+        .toUpperCase();
+    return `${key || "ISS"}-${String(number).replace(/^#/, "")}`;
+}
+
 /** Turn an organization name into a url-safe slug, e.g. "Acme Labs" -> "acme-labs". */
 export function slugify(name: string): string {
     return name
