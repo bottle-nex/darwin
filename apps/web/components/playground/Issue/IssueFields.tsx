@@ -15,7 +15,7 @@ export default function IssueFields({
     form: IssueFormState;
     layout: "row" | "stacked" | "tags";
 }) {
-    const { fields, projectId, readOnly } = form;
+    const { fields, projectId } = form;
     const inSidebar = layout !== "row";
     const capsuleClass = inSidebar ? STACKED_CAPSULE : undefined;
 
@@ -43,7 +43,6 @@ export default function IssueFields({
             projectId={projectId}
             value={fields.memberIds}
             onChange={fields.setMemberIds}
-            disabled={readOnly}
             open={fields.membersOpen}
             onOpenChange={fields.setMembersOpen}
             className={capsuleClass}

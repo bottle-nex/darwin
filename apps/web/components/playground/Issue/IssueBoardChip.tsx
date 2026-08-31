@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import type { BoardIssue } from "@/types/board";
 
 import IssueFieldChip from "./IssueFieldChip";
+import { ROW_GLYPH_CELL } from "./issueHelpers";
 
 /**
  * Where an issue lives, as one glyph you can act on.
@@ -45,6 +46,7 @@ export default function IssueBoardChip({
                 issue={issue}
                 field="move"
                 contentClassName={contentClassName}
+                className={cn(ROW_GLYPH_CELL, "cursor-pointer")}
             >
                 {space?.icon ? (
                     <IconPickGlyph pick={space.icon} className="size-4 shrink-0 text-base" />
@@ -64,6 +66,7 @@ export default function IssueBoardChip({
             issue={issue}
             field="status"
             contentClassName={contentClassName}
+            className={cn(ROW_GLYPH_CELL, "cursor-pointer")}
         >
             <StatusIcon className={cn("size-4 shrink-0", glyph.titleBox)} aria-hidden />
         </IssueFieldChip>

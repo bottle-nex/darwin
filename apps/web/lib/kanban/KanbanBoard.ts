@@ -68,7 +68,7 @@ export class KanbanBoard {
             status: KanbanStatus.Failed,
             title: "Failed",
             icon: FailedStatusIcon,
-            titleBox: "text-[#E88795]",
+            titleBox: "text-rose-400",
         },
         {
             status: KanbanStatus.Cancelled,

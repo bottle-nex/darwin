@@ -1,9 +1,9 @@
 import { createIcon } from "./createIcon";
-import { HiOutlineInbox, HiOutlineTag, HiOutlineUserGroup } from "react-icons/hi2";
-import { LuUser, LuUsers } from "react-icons/lu";
+import { HiOutlineInbox, HiOutlineTag, HiOutlineUserGroup, HiUsers } from "react-icons/hi2";
+import { LuUser } from "react-icons/lu";
 import { MdMyLocation } from "react-icons/md";
 
-export const AssigneeGroupIcon = createIcon(LuUsers);
+export const AssigneeGroupIcon = createIcon(HiUsers);
 
 export const CreatorIcon = createIcon(LuUser);
 

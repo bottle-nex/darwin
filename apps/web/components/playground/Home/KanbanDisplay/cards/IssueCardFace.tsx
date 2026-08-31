@@ -140,7 +140,7 @@ export default function IssueCardFace({
             </div>
 
             {priorityChip || targetDate || tags.length ? (
-                <div className="mt-2.5 flex items-center gap-1.5 overflow-hidden">
+                <div className="mt-2.5 flex items-center gap-1.5 overflow-hidden p-0.25">
                     {priorityChip && issueId ? (
                         <IssueFieldChip issueId={issueId} issue={boardIssue} field="priority">
                             {priorityChip}

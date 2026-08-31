@@ -120,7 +120,7 @@ export default function ActivityRow({
     const predicate = render(activity.payload);
 
     return (
-        <div className="relative flex items-start gap-x-2.5 pt-1.5 pb-1">
+        <div className="relative flex items-start gap-x-2.5 pt-1.25 pb-1">
             {rail.above && <span aria-hidden className={cn(RAIL_CLASS, "top-0 h-1.5")} />}
             {rail.below && <span aria-hidden className={cn(RAIL_CLASS, "top-7 bottom-0")} />}
             <span

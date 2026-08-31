@@ -48,7 +48,9 @@ export default function SelectableRow({
             className={cn(
                 "group/selectable flex items-center gap-3 rounded-md transition-colors",
                 selectionActive && "cursor-pointer select-none",
-                selected ? "bg-active" : "hover:bg-hover",
+                selected ? SELECTED_TINT : "hover:bg-hover",
+                selected && joinedAbove && "rounded-t-none",
+                selected && joinedBelow && "rounded-b-none",
                 className,
             )}
         >

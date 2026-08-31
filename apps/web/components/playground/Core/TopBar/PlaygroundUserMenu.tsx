@@ -14,6 +14,7 @@ import { signOut } from "next-auth/react";
 import PlaygroundAvatar from "@/components/playground/Core/components/PlaygroundAvatar";
 import { PlaygroundTab } from "@/components/playground/playgroundTabs";
 import { SIDEBAR_ICON_BUTTON_CLASS } from "@/components/playground/Sidebar/shared";
+import SidebarNotificationsButton from "@/components/playground/Sidebar/SidebarNotificationsButton";
 import { Button } from "@/components/ui/button";
 import {
     DropdownMenu,
@@ -164,6 +165,8 @@ export default function PlaygroundUserMenu() {
             </DropdownMenu>
 
             <div className="ml-auto flex shrink-0 items-center gap-0.5">
+                <SidebarNotificationsButton />
+
                 <TooltipComponent content="Settings" side="top" delayDuration={500}>
                     <Button
                         variant="unstyled"

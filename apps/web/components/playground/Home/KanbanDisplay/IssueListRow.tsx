@@ -4,7 +4,7 @@ import PlaygroundAvatar from "@/components/playground/Core/components/Playground
 import SelectableRow from "@/components/playground/Core/components/SelectableRow";
 import IssueBoardChip from "@/components/playground/Issue/IssueBoardChip";
 import IssueFieldChip from "@/components/playground/Issue/IssueFieldChip";
-import { PRIORITY_OPTIONS } from "@/components/playground/Issue/issueHelpers";
+import { PRIORITY_OPTIONS, ROW_GLYPH_CELL } from "@/components/playground/Issue/issueHelpers";
 import { useIssueIdentifier } from "@/hooks/issues/useIssueIdentifier";
 import { useIssueSelection } from "@/hooks/issues/useIssueSelection";
 import { shortDate } from "@/lib/format";
@@ -75,12 +75,13 @@ export default function IssueListRow({
             onToggleSelection={() => toggleSelection(issueId)}
             className="min-h-11 w-full px-3 text-left"
         >
-            {PriorityIcon && (
+            {PriorityIcon ? (
                 <IssueFieldChip
                     contentClassName="w-46"
                     issueId={issueId}
                     issue={boardIssue}
                     field="priority"
+                    className={cn(ROW_GLYPH_CELL, "cursor-pointer")}
                 >
                     <PriorityIcon
                         className={cn(
@@ -90,13 +91,9 @@ export default function IssueListRow({
                         aria-hidden
                     />
                 </IssueFieldChip>
+            ) : (
+                <span className={ROW_GLYPH_CELL} />
             )}
-            <IssueBoardChip
-                issueId={issueId}
-                issue={boardIssue}
-                status={status}
-                contentClassName="w-48"
-            />
 
             <button
                 type="button"
@@ -104,12 +101,18 @@ export default function IssueListRow({
                     if (handleSelectClick(event, issueId)) return;
                     openIssue(issueId);
                 }}
-                className="flex min-w-0 flex-1 cursor-pointer items-center gap-2.5 text-left focus-visible:outline-none"
+                className="flex min-w-0 flex-1 cursor-pointer items-center text-left focus-visible:outline-none"
             >
                 <span className="w-14 shrink-0 font-mono text-[12px] text-snow/70">
                     {identifier}
                 </span>
-                <span className="min-w-0 flex-1 truncate text-[13px] font-medium text-neutral-100">
+                <IssueBoardChip
+                    issueId={issueId}
+                    issue={boardIssue}
+                    status={status}
+                    contentClassName="w-48"
+                />
+                <span className="min-w-0 flex-1 truncate text-[13px] font-medium text-neutral-100 pl-2">
                     {title}
                 </span>
             </button>

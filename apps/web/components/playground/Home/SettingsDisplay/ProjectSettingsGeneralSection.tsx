@@ -136,8 +136,9 @@ export default function ProjectSettingsGeneralSection({
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}
                         maxLength={150}
+                        placeholder="Add description for your project"
                         rows={4}
-                        className="max-h-40 w-full resize-none overflow-y-auto rounded-[8px] border border-snow/5 bg-snow/6 px-2.5 py-2 text-[13px] hover:bg-snow/8"
+                        className="max-h-40 w-full resize-none overflow-y-auto px-0! py-2 text-[13px] bg-transparent!"
                     />
                 </SettingsRow>
             </SettingsUtilityCard>

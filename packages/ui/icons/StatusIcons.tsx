@@ -3,7 +3,8 @@ import clsx from "clsx";
 import { useId } from "react";
 import type { ReactNode } from "react";
 import type { IconBaseProps } from "react-icons";
-import { BsExclamationSquareFill } from "react-icons/bs";
+import { CgBolt } from "react-icons/cg";
+import { FaClock, FaRegClock, FaTowerBroadcast } from "react-icons/fa6";
 import { GoCheck, GoComment, GoXCircle } from "react-icons/go";
 import {
     HiBell,
@@ -17,6 +18,8 @@ import {
 } from "react-icons/hi2";
 import { LuChartNoAxesColumnIncreasing, LuCircleDashed, LuInfo } from "react-icons/lu";
 import { PiExclamationMarkBold } from "react-icons/pi";
+import { RxBorderDashed } from "react-icons/rx";
+import { TbLineDashed } from "react-icons/tb";
 
 export const CancelledStatusIcon = createIcon(CancelledGlyph);
 
@@ -36,7 +39,7 @@ export const InlineHintIcon = createIcon(LuInfo);
 
 export const MergeToneWarningIcon = createIcon(HiExclamationTriangle);
 
-export const NoPriorityIcon = createIcon(PiExclamationMarkBold);
+export const NoPriorityIcon = createIcon(TbLineDashed);
 
 export const NotificationsBellIcon = createIcon(HiOutlineBell);
 
@@ -248,6 +251,6 @@ export const TodoStatusIcon = createIcon(TodoGlyph);
 
 export const UnknownStatusIcon = createIcon(QueuedGlyph);
 
-export const UrgentPriorityIcon = createIcon(BsExclamationSquareFill);
+export const UrgentPriorityIcon = createIcon(FaTowerBroadcast);
 
 export const WarningTriangleIcon = createIcon(HiOutlineExclamationTriangle);
