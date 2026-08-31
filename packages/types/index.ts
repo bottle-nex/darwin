@@ -16,3 +16,4 @@ export * from "./chat/reaction";
 export * from "./chat/conversation-preview";
 export * from "./activity/payload";
 export * from "./review/review.contract";
+export * from "./logs/run-log.contract";

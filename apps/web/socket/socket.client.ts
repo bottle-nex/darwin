@@ -20,7 +20,7 @@ export default class WebSocketClient {
     private message_queue: InboundSocketMessage[] = [];
     private handlers: Map<OutboundSocketMessageType, MessageHandler[]> = new Map();
     private is_manually_closed: boolean = false;
-    private connection_state_handler?: (connected: boolean) => void;
+    private connection_state_handlers: Set<(connected: boolean) => void> = new Set();
 
     constructor(url: string) {
         this.url = url;
@@ -37,7 +37,7 @@ export default class WebSocketClient {
             this.is_connected = true;
             this.reconnect_attempts = 0;
             this.reconnect_delay = 1000;
-            this.connection_state_handler?.(true);
+            this.notify_connection_state(true);
             this.flush_message_queue();
         };
 
@@ -52,7 +52,7 @@ export default class WebSocketClient {
 
         this.ws.onclose = (event: CloseEvent) => {
             this.is_connected = false;
-            this.connection_state_handler?.(false);
+            this.notify_connection_state(false);
 
             if (this.reconnect_timeout) {
                 clearTimeout(this.reconnect_timeout);
@@ -154,6 +154,7 @@ export default class WebSocketClient {
 
         this.is_connected = false;
         this.handlers.clear();
+        this.connection_state_handlers.clear();
         this.message_queue = [];
     }
 
@@ -166,7 +167,15 @@ export default class WebSocketClient {
         };
     }
 
-    public set_connection_state_handler(cb: (connected: boolean) => void) {
-        this.connection_state_handler = cb;
+    public add_connection_state_handler(cb: (connected: boolean) => void) {
+        this.connection_state_handlers.add(cb);
+    }
+
+    public remove_connection_state_handler(cb: (connected: boolean) => void) {
+        this.connection_state_handlers.delete(cb);
+    }
+
+    private notify_connection_state(connected: boolean) {
+        for (const handler of this.connection_state_handlers) handler(connected);
     }
 }

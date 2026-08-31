@@ -104,6 +104,8 @@ export const SEARCH_ISSUES_URL = (project_id: string, query: string) =>
 export const ISSUE_CONFIG_URL = (id: string) => `${ISSUES_URL}/${id}/config`;
 export const ISSUE_REFERENCES_URL = (id: string) => `${ISSUES_URL}/${id}/references`;
 export const ISSUE_ACTIVITY_URL = (id: string) => `${ISSUES_URL}/${id}/activity`;
+export const RUN_LOGS_URL = (runId: string) => `${ISSUES_URL}/runs/${runId}/logs`;
+export const RUN_LOGS_DOWNLOAD_URL = (runId: string) => `${RUN_LOGS_URL(runId)}/download`;
 export const COLUMN_URL = (id: string) => `${ISSUES_URL}/columns/${id}`;
 export const REORDER_COLUMNS_URL = ISSUES_URL + "/columns/reorder";
 export const CREATE_SPACE_URL = ISSUES_URL + "/spaces";

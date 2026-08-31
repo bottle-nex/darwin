@@ -7,6 +7,7 @@ import { ENV } from "../configs/env";
 
 const SIGNED_URL_TTL_MS = 5 * 60 * 1000;
 const ARTIFACT_URL_TTL_MS = 15 * 60 * 1000;
+const RUN_LOG_ARCHIVE_MAX_BYTES = 64 * 1024 * 1024;
 const SAFE_PRODUCT_DIFF_CONTENT_TYPE =
     /^(application\/(javascript|json|manifest\+json|octet-stream|wasm)|font\/(otf|ttf|woff|woff2)|image\/(avif|gif|jpeg|png|svg\+xml|webp|x-icon)|text\/(css|html|plain))$/;
 
@@ -29,6 +30,15 @@ export default class StorageService {
             ENV.SERVER_GCS_CLIENT_EMAIL &&
             ENV.SERVER_GCS_PRIVATE_KEY &&
             ENV.SERVER_GCS_PUBLIC_URL,
+        );
+    }
+
+    static is_run_logs_configured(): boolean {
+        return Boolean(
+            ENV.SERVER_MINIO_URL &&
+            ENV.SERVER_MINIO_ACCESS_KEY &&
+            ENV.SERVER_MINIO_SECRET_KEY &&
+            ENV.SERVER_RUN_LOGS_BUCKET,
         );
     }
 
@@ -61,13 +71,8 @@ export default class StorageService {
     }
 
     static minio(): MinioClient {
-        if (
-            !ENV.SERVER_MINIO_URL ||
-            !ENV.SERVER_MINIO_ACCESS_KEY ||
-            !ENV.SERVER_MINIO_SECRET_KEY ||
-            !ENV.SERVER_PRODUCT_DIFF_BUCKET
-        ) {
-            throw new Error("MinIO Product Diff storage is not configured");
+        if (!ENV.SERVER_MINIO_URL || !ENV.SERVER_MINIO_ACCESS_KEY || !ENV.SERVER_MINIO_SECRET_KEY) {
+            throw new Error("MinIO storage is not configured");
         }
         if (!this.minioClient) {
             const endpoint = new URL(ENV.SERVER_MINIO_URL);
@@ -103,6 +108,61 @@ export default class StorageService {
             uploadUrl,
             publicUrl: `${ENV.SERVER_GCS_PUBLIC_URL!.replace(/\/+$/, "")}/${key}`,
         };
+    }
+
+    static async list_run_log_segments(prefix: string): Promise<string[]> {
+        const keys: string[] = [];
+        const stream = this.minio().listObjectsV2(ENV.SERVER_RUN_LOGS_BUCKET!, prefix, true);
+        for await (const item of stream) {
+            if (item.name) keys.push(item.name);
+        }
+        return keys.sort();
+    }
+
+    /**
+     * Concatenates a run's segments into one body.
+     *
+     * Safe to join without re-compressing: gzip is defined over concatenated members, so the
+     * joined bytes stay a valid archive that any reader — the browser's download, or gunzip on
+     * the read path — decodes as the whole run in sequence order.
+     */
+    static async read_run_log_archive(prefix: string): Promise<Buffer> {
+        const keys = await this.list_run_log_segments(prefix);
+        const segments: Buffer[] = [];
+        let bytes = 0;
+
+        for (const key of keys) {
+            const segment = await this.read_run_log(key);
+            bytes += segment.length;
+            if (bytes > RUN_LOG_ARCHIVE_MAX_BYTES) {
+                throw new Error("Run log archive exceeds the read limit");
+            }
+            segments.push(segment);
+        }
+
+        return Buffer.concat(segments, bytes);
+    }
+
+    static async read_run_log(key: string): Promise<Buffer> {
+        const bucket = ENV.SERVER_RUN_LOGS_BUCKET!;
+        const stat = await this.minio().statObject(bucket, key);
+        if (stat.size > RUN_LOG_ARCHIVE_MAX_BYTES) {
+            throw new Error("Run log archive exceeds the read limit");
+        }
+
+        const chunks: Buffer[] = [];
+        for await (const chunk of await this.minio().getObject(bucket, key)) {
+            chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
+        }
+        return Buffer.concat(chunks);
+    }
+
+    static async signed_run_log_url(key: string): Promise<string> {
+        return this.minio().presignedGetObject(
+            ENV.SERVER_RUN_LOGS_BUCKET!,
+            key,
+            ARTIFACT_URL_TTL_MS / 1000,
+        );
     }
 
     static async signed_product_diff_url(key: string): Promise<string> {

@@ -14,6 +14,7 @@ import PresenceService from "../services/service.presence";
 import type { AuthUser } from "../types/express.d";
 import ChatSocketHandler from "./chat.handler";
 import ProjectChatSocketHandler from "./project-chat.handler";
+import RunLogSocketHandler from "./run-log.handler";
 import SubscriberSystem from "./subscriber.system";
 import TeamChatSocketHandler from "./team-chat.handler";
 
@@ -24,6 +25,8 @@ export default class SocketServer {
     private project_connections: Map<string, Set<WebSocket>> = new Map();
     private user_connections: Map<string, Set<WebSocket>> = new Map();
     private connection_users: Map<WebSocket, AuthUser> = new Map();
+    private run_connections: Map<string, Set<WebSocket>> = new Map();
+    private connection_runs: Map<WebSocket, Set<string>> = new Map();
     private subscriber_system: SubscriberSystem;
 
     constructor(server: Server) {
@@ -45,8 +48,11 @@ export default class SocketServer {
 
     private start_listening() {
         this.subscriber_system.on_message((channel, message) => {
-            if (channel.scope === "project") this.broadcast_message(channel.id, message);
-            else this.send_to_user(channel.id, message);
+            if (channel.scope !== "project") return this.send_to_user(channel.id, message);
+
+            const run_id = RunLogSocketHandler.target_run(message);
+            if (run_id) return this.send_to_run(run_id, message);
+            this.broadcast_message(channel.id, message);
         });
     }
 
@@ -147,9 +153,56 @@ export default class SocketServer {
                 case InboundSocketMessageType.TEAM_CHAT_REACTION_TOGGLE:
                     await this.toggle_team_chat_reaction(ws, project_id, message);
                     return;
+                case InboundSocketMessageType.RUN_LOG_SUBSCRIBE:
+                    await this.subscribe_run_logs(ws, project_id, message.payload.runId);
+                    return;
+                case InboundSocketMessageType.RUN_LOG_UNSUBSCRIBE:
+                    this.unsubscribe_run_logs(ws, message.payload.runId);
+                    return;
             }
         } catch (error) {
             console.error("Socket message handler error:", error);
+        }
+    }
+
+    private async subscribe_run_logs(ws: WebSocket, project_id: string, run_id: string) {
+        if (this.connection_runs.get(ws)?.has(run_id)) return;
+        if (!(await RunLogSocketHandler.belongs_to_project(run_id, project_id))) return;
+        if (ws.readyState !== WebSocket.OPEN) return;
+
+        let subscribers = this.run_connections.get(run_id);
+        if (!subscribers) {
+            subscribers = new Set();
+            this.run_connections.set(run_id, subscribers);
+        }
+        subscribers.add(ws);
+
+        let runs = this.connection_runs.get(ws);
+        if (!runs) {
+            runs = new Set();
+            this.connection_runs.set(ws, runs);
+        }
+        runs.add(run_id);
+    }
+
+    private unsubscribe_run_logs(ws: WebSocket, run_id: string) {
+        const subscribers = this.run_connections.get(run_id);
+        if (subscribers) {
+            subscribers.delete(ws);
+            if (subscribers.size === 0) this.run_connections.delete(run_id);
+        }
+
+        const runs = this.connection_runs.get(ws);
+        if (!runs) return;
+        runs.delete(run_id);
+        if (runs.size === 0) this.connection_runs.delete(ws);
+    }
+
+    private send_to_run(run_id: string, message: string) {
+        const subscribers = this.run_connections.get(run_id);
+        if (!subscribers) return;
+        for (const ws of subscribers) {
+            if (ws.readyState === WebSocket.OPEN) ws.send(message);
         }
     }
 
@@ -284,6 +337,13 @@ export default class SocketServer {
     private remove_connection(ws: WebSocket, project_id: string) {
         const user = this.connection_users.get(ws);
         this.connection_users.delete(ws);
+
+        for (const run_id of this.connection_runs.get(ws) ?? []) {
+            const subscribers = this.run_connections.get(run_id);
+            subscribers?.delete(ws);
+            if (subscribers && subscribers.size === 0) this.run_connections.delete(run_id);
+        }
+        this.connection_runs.delete(ws);
 
         const connections = this.project_connections.get(project_id);
         if (connections) {

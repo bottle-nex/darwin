@@ -67,6 +67,10 @@ export function useSubscribeEventHandlers(project_id: string | undefined) {
                 SocketHandlers.handle_activity_created(queryClient, message),
             [OutboundSocketMessageType.AGENT_SESSION_UPDATED]: (message) =>
                 SocketHandlers.handle_agent_session_updated(queryClient, message),
+            [OutboundSocketMessageType.RUN_LOG_APPENDED]: (message) =>
+                SocketHandlers.handle_run_log_appended(queryClient, message),
+            [OutboundSocketMessageType.RUN_LOG_SEALED]: (message) =>
+                SocketHandlers.handle_run_log_sealed(queryClient, message),
         };
 
         Object.entries(handlers_map).forEach(([type, handler]) => {

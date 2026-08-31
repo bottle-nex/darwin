@@ -44,6 +44,7 @@ const envSchema = z.object({
     SERVER_GCS_PRIVATE_KEY: z.string().optional(),
     SERVER_GCS_PUBLIC_URL: z.string().optional(),
     SERVER_PRODUCT_DIFF_BUCKET: z.string().optional(),
+    SERVER_RUN_LOGS_BUCKET: z.string().optional(),
     SERVER_MINIO_URL: z.url({ protocol: /^https?$/ }).optional(),
     SERVER_MINIO_ACCESS_KEY: z.string().optional(),
     SERVER_MINIO_SECRET_KEY: z.string().optional(),

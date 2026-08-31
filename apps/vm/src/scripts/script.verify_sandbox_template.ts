@@ -34,9 +34,17 @@ const REQUIREMENTS: Requirement[] = [
     { name: "git", command: "git --version", needed_for: "cloning and branching" },
     { name: "node", command: "node --version", needed_for: "running sandbox-mcp" },
     {
+        /**
+         * Started, not just located. A bundle with an import the sandbox cannot resolve is still
+         * a file on disk, and a stdio MCP server that dies on startup is invisible — the agent
+         * simply runs without the tools and nothing anywhere says why.
+         *
+         * Reading from /dev/null closes the transport immediately, so the server prints its
+         * startup line and exits instead of waiting for a client that will never speak.
+         */
         name: "sandbox-mcp",
-        command: `test -f ${SANDBOX_MCP_ENTRY} && echo present`,
-        needed_for: "report_status, the worker's Busy/Idle signal",
+        command: `MATCHA_SESSION_KIND=worker node ${SANDBOX_MCP_ENTRY} < /dev/null 2>&1 | head -1`,
+        needed_for: "report_progress and report_status, the agent's only way to report",
     },
     {
         name: "graphify",

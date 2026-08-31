@@ -1,5 +1,5 @@
 "use client";
-import { ActorType, type IssueActivity } from "@trymatcha/types";
+import { ActivityType, ActorType, type IssueActivity } from "@trymatcha/types";
 
 import HeroBuddy from "@/components/landing/v2/HeroBuddy";
 import PlaygroundAvatar, {
@@ -11,6 +11,7 @@ import InfoTooltip from "@/components/ui/InfoTooltip";
 import { formatRelativeTime } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
+import RunLogDisclosure from "../logs/RunLogDisclosure";
 import { activity_entry } from "./activity.registry";
 
 export type ActivityActorView = {
@@ -128,30 +129,35 @@ export default function ActivityRow({
             >
                 <Icon className={cn("size-3.5", iconClassName)} />
             </span>
-            <p className="min-w-0 flex-1 text-[12.5px] leading-[22px] wrap-anywhere text-neutral-500">
-                <ActorName actor={actor} />{" "}
-                {detail ? (
-                    <HoverCard openDelay={120} closeDelay={80}>
-                        <HoverCardTrigger asChild>
-                            <span className="cursor-default underline decoration-edge decoration-dotted underline-offset-4 hover:decoration-neutral-500">
-                                {predicate}
-                            </span>
-                        </HoverCardTrigger>
-                        <HoverCardContent side="top" align="start" className="p-2">
-                            {detail(activity.payload)}
-                        </HoverCardContent>
-                    </HoverCard>
-                ) : (
-                    predicate
+            <div className="min-w-0 flex-1">
+                <p className="text-[12.5px] leading-[22px] wrap-anywhere text-neutral-500">
+                    <ActorName actor={actor} />{" "}
+                    {detail ? (
+                        <HoverCard openDelay={120} closeDelay={80}>
+                            <HoverCardTrigger asChild>
+                                <span className="cursor-default underline decoration-edge decoration-dotted underline-offset-4 hover:decoration-neutral-500">
+                                    {predicate}
+                                </span>
+                            </HoverCardTrigger>
+                            <HoverCardContent side="top" align="start" className="p-2">
+                                {detail(activity.payload)}
+                            </HoverCardContent>
+                        </HoverCard>
+                    ) : (
+                        predicate
+                    )}
+                    <time
+                        dateTime={at.toISOString()}
+                        title={at.toLocaleString()}
+                        className="ml-2 text-[11px] whitespace-nowrap text-snow/80"
+                    >
+                        {formatRelativeTime(at)}
+                    </time>
+                </p>
+                {activity.type === ActivityType.RunStarted && activity.session && (
+                    <RunLogDisclosure session={activity.session} />
                 )}
-                <time
-                    dateTime={at.toISOString()}
-                    title={at.toLocaleString()}
-                    className="ml-2 text-[11px] whitespace-nowrap text-snow/80"
-                >
-                    {formatRelativeTime(at)}
-                </time>
-            </p>
+            </div>
         </div>
     );
 }

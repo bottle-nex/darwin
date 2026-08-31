@@ -47,10 +47,12 @@ services:
       MINIO_ROOT_USER: ${SERVER_MINIO_ACCESS_KEY:-trymatcha-local}
       MINIO_ROOT_PASSWORD: ${SERVER_MINIO_SECRET_KEY:-trymatcha-local-dev-only}
       SERVER_PRODUCT_DIFF_BUCKET: ${SERVER_PRODUCT_DIFF_BUCKET:-product-diffs}
+      SERVER_RUN_LOGS_BUCKET: ${SERVER_RUN_LOGS_BUCKET:-run-logs}
     entrypoint: >
       /bin/sh -c "
       mc alias set local http://minio:9000 $${MINIO_ROOT_USER} $${MINIO_ROOT_PASSWORD} &&
-      mc mb --ignore-existing local/$${SERVER_PRODUCT_DIFF_BUCKET}
+      mc mb --ignore-existing local/$${SERVER_PRODUCT_DIFF_BUCKET} &&
+      mc mb --ignore-existing local/$${SERVER_RUN_LOGS_BUCKET}
       "
 
 volumes:

@@ -1,3 +1,4 @@
+import type { RunLogEvent } from "../logs/run-log.contract";
 import type {
     AgentSession,
     Chat,
@@ -19,6 +20,8 @@ export enum InboundSocketMessageType {
     TEAM_CHAT_CREATE = "TEAM_CHAT_CREATE",
     TEAM_CHAT_DELETE = "TEAM_CHAT_DELETE",
     TEAM_CHAT_REACTION_TOGGLE = "TEAM_CHAT_REACTION_TOGGLE",
+    RUN_LOG_SUBSCRIBE = "RUN_LOG_SUBSCRIBE",
+    RUN_LOG_UNSUBSCRIBE = "RUN_LOG_UNSUBSCRIBE",
 }
 
 export type InboundSocketMessage =
@@ -75,6 +78,14 @@ export type InboundSocketMessage =
     | {
           type: InboundSocketMessageType.TEAM_CHAT_REACTION_TOGGLE;
           payload: { chatId: string; emoji: string; operationId: string };
+      }
+    | {
+          type: InboundSocketMessageType.RUN_LOG_SUBSCRIBE;
+          payload: { runId: string };
+      }
+    | {
+          type: InboundSocketMessageType.RUN_LOG_UNSUBSCRIBE;
+          payload: { runId: string };
       };
 
 export enum OutboundSocketMessageType {
@@ -93,6 +104,8 @@ export enum OutboundSocketMessageType {
     NOTIFICATION_CREATED = "NOTIFICATION_CREATED",
     ACTIVITY_CREATED = "ACTIVITY_CREATED",
     AGENT_SESSION_UPDATED = "AGENT_SESSION_UPDATED",
+    RUN_LOG_APPENDED = "RUN_LOG_APPENDED",
+    RUN_LOG_SEALED = "RUN_LOG_SEALED",
 }
 
 export type OutboundSocketMessage =
@@ -192,4 +205,16 @@ export type OutboundSocketMessage =
           type: OutboundSocketMessageType.AGENT_SESSION_UPDATED;
           projectId: string;
           payload: AgentSession;
+      }
+    | {
+          type: OutboundSocketMessageType.RUN_LOG_APPENDED;
+          projectId: string;
+          runId: string;
+          payload: { events: RunLogEvent[]; cursor: number };
+      }
+    | {
+          type: OutboundSocketMessageType.RUN_LOG_SEALED;
+          projectId: string;
+          runId: string;
+          payload: { eventCount: number; droppedEvents: number };
       };

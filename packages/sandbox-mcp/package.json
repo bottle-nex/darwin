@@ -5,12 +5,13 @@
     "type": "module",
     "main": "dist/index.js",
     "scripts": {
-        "build": "tsup src/index.ts --platform=node --format=esm",
+        "build": "tsup",
         "typecheck": "tsc --noEmit"
     },
     "dependencies": {
         "@modelcontextprotocol/sdk": "^1.0.0",
         "@trymatcha/database": "*",
+        "@trymatcha/types": "*",
         "@types/node": "^25.9.3",
         "zod": "^4.4.3"
     },

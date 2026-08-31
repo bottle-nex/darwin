@@ -108,6 +108,7 @@ export default class ReportRunFailed {
             );
 
             const project_id = existing.issue.projectId;
+
             await server_services.publisher.publish_message(
                 server_services.publisher.get_channel_name(project_id),
                 JSON.stringify({

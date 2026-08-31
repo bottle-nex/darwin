@@ -24,20 +24,18 @@ RUN curl -fsSL "https://github.com/cli/cli/releases/download/v${GH_CLI_VERSION}/
 # (packages/harness's AgentHarness classes). Pinned the same way gh/graphify/bun are: a
 # version that moves under us changes agent behavior without changing this repo.
 #
-# CODEX_CLI_VERSION and OPENCODE_CLI_VERSION are placeholders — the package names below
-# (`@openai/codex`, `opencode-ai`) are best-effort guesses, unverified against each
-# project's actual npm distribution. Confirm both (name and latest version) before
-# building this template for real; if either isn't actually npm-distributed, this whole
-# RUN needs a different install method (matching the gh-style static-binary pattern above).
-ENV CLAUDE_CODE_CLI_VERSION=<confirm-on-npm>
+# All three package names are confirmed against npm. Claude Code is pinned to npm's
+# `stable` dist-tag; codex and opencode publish no stable channel, so both are pinned to
+# the `latest` they resolved to when this was set. Bump by checking npm for each.
+ENV CLAUDE_CODE_CLI_VERSION=2.1.236
 RUN npm install -g "@anthropic-ai/claude-code@${CLAUDE_CODE_CLI_VERSION}" \
     && claude --version
 
-ENV CODEX_CLI_VERSION=<confirm-on-npm>
+ENV CODEX_CLI_VERSION=0.151.0
 RUN npm install -g "@openai/codex@${CODEX_CLI_VERSION}" \
     && codex --version
 
-ENV OPENCODE_CLI_VERSION=<confirm-on-npm>
+ENV OPENCODE_CLI_VERSION=1.18.25
 RUN npm install -g "opencode-ai@${OPENCODE_CLI_VERSION}" \
     && opencode --version
 

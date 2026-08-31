@@ -1,0 +1,5 @@
+-- AlterTable
+ALTER TABLE "AgentSession" ADD COLUMN     "logsDroppedLines" INTEGER NOT NULL DEFAULT 0,
+ADD COLUMN     "logsKey" TEXT,
+ADD COLUMN     "logsLineCount" INTEGER NOT NULL DEFAULT 0,
+ADD COLUMN     "logsSizeBytes" INTEGER NOT NULL DEFAULT 0;
