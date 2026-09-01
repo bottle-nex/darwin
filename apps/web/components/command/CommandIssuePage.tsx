@@ -102,7 +102,7 @@ export default function CommandIssuePage({
                     {actions.members.map((member) => (
                         <CommandItem
                             key={member.id}
-                            value={member.name ?? member.email}
+                            value={`${member.name ?? ""} ${member.email}`}
                             disabled={!editable}
                             onSelect={() => pick(() => actions.toggleAssignee(member.id), false)}
                             className="justify-between"

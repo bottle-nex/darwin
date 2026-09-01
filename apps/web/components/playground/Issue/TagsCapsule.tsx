@@ -75,7 +75,7 @@ export default function TagsCapsule({
     const selectedTags = allTags.filter((tag) => selected.includes(tag.id));
 
     return (
-        <Popover open={open} onOpenChange={setOpen}>
+        <Popover modal open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
                 <CapsuleTrigger disabled={disabled} className={className}>
                     {selectedTags.length === 0 ? (

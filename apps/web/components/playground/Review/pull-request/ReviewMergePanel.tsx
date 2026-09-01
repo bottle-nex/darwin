@@ -21,6 +21,7 @@ import { useGetProject } from "@/hooks/project/useGetProject";
 import { useCloseReview } from "@/hooks/review/useCloseReview";
 import { useMergeReview } from "@/hooks/review/useMergeReview";
 import { GITHUB_NOT_LINKED } from "@/hooks/review/usePostReviewComment";
+import { toast } from "@/lib/toast";
 import { cn } from "@/lib/utils";
 
 type MergeTone = "clean" | "dirty" | "attention" | "checking";
@@ -221,7 +222,16 @@ export default function ReviewMergePanel({
                     variant: "default",
                     onClick: () =>
                         mergeReview.mutate(undefined, {
-                            onSuccess: () => setConfirming(null),
+                            onSuccess: () => {
+                                setConfirming(null);
+                                toast.success("Pull request merged.", {
+                                    description: `#${review.pullNumber} into ${review.baseBranch}`,
+                                    action: {
+                                        label: "View on GitHub",
+                                        onClick: () => window.open(review.htmlUrl, "_blank"),
+                                    },
+                                });
+                            },
                             onError: handleError,
                         }),
                 }}
@@ -244,7 +254,16 @@ export default function ReviewMergePanel({
                     variant: "destructive",
                     onClick: () =>
                         closeReview.mutate(undefined, {
-                            onSuccess: () => setConfirming(null),
+                            onSuccess: () => {
+                                setConfirming(null);
+                                toast.success("Pull request closed.", {
+                                    description: `#${review.pullNumber} can be reopened on GitHub.`,
+                                    action: {
+                                        label: "View on GitHub",
+                                        onClick: () => window.open(review.htmlUrl, "_blank"),
+                                    },
+                                });
+                            },
                             onError: handleError,
                         }),
                 }}

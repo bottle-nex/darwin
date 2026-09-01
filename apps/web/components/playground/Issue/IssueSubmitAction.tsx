@@ -13,10 +13,12 @@ export default function IssueSubmitAction({
     form,
     className,
     warningPlacement = "above",
+    showWarning = true,
 }: {
     form: IssueFormState;
     className?: string;
     warningPlacement?: "above" | "below";
+    showWarning?: boolean;
 }) {
     const { body, submit, pending, warning, shakeControls, isEdit, isCustom, isMac, readOnly } =
         form;
@@ -43,7 +45,9 @@ export default function IssueSubmitAction({
                     </span>
                 )}
                 <div className="relative isolate">
-                    <SubmitWarningToast warning={warning} placement={warningPlacement} />
+                    {showWarning && (
+                        <SubmitWarningToast warning={warning} placement={warningPlacement} />
+                    )}
                     <motion.div animate={shakeControls} className="relative z-10">
                         <Button variant="flat-primary" size="sm" onClick={submit} loading={pending}>
                             {isEdit ? "Save" : "Create Issue"}
