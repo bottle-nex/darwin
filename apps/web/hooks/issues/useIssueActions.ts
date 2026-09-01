@@ -9,8 +9,11 @@ import {
 } from "@trymatcha/ui/icons";
 import { isAxiosError } from "axios";
 
-import { PRIORITY_TO_NUMBER } from "@/components/playground/Home/KanbanDisplay/customkanban/data";
-import { isEditable, isFieldEditable } from "@/components/playground/Issue/issueHelpers";
+import {
+    isEditable,
+    isFieldEditable,
+    PRIORITY_TO_NUMBER,
+} from "@/components/playground/Issue/issueHelpers";
 import { useAssignIssue, useUnassignIssue } from "@/hooks/issues/useAssignIssue";
 import { useSpaceBoards } from "@/hooks/issues/useBoardColumns";
 import { useBulkUpdateIssues } from "@/hooks/issues/useBulkUpdateIssues";

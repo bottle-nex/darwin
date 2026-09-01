@@ -29,19 +29,20 @@ model Project {
   createdAt            DateTime            @default(now())
   updatedAt            DateTime            @updatedAt
 
-  routingClaimedAt DateTime?
-  issues           Issue[]
-  projectChats     ProjectChat[]
-  spaces           Space[]
-  setupSessions    SetupSession[]
-  secrets          ProjectSecret[]
-  tags             Tag[]
-  issueTemplates   IssueTemplate[]
-  notifications    Notification[]
-  planMd           String?         @db.Text
-  planStatus       PlanStatus      @default(Pending)
-  planCommitSha    String?
-  planGeneratedAt  DateTime?
+  routingClaimedAt     DateTime?
+  issues               Issue[]
+  issueViewPreferences IssueViewPreference[]
+  projectChats         ProjectChat[]
+  spaces               Space[]
+  setupSessions        SetupSession[]
+  secrets              ProjectSecret[]
+  tags                 Tag[]
+  issueTemplates       IssueTemplate[]
+  notifications        Notification[]
+  planMd               String?               @db.Text
+  planStatus           PlanStatus            @default(Pending)
+  planCommitSha        String?
+  planGeneratedAt      DateTime?
 
   workers    Worker[]
   maxWorkers Int      @default(1)

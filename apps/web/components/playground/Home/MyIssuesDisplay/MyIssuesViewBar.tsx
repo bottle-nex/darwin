@@ -1,7 +1,6 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import IconWrapper from "@/components/ui/IconWrapper";
 import type { MyIssuesView } from "@/store/issues/useMyIssuesOptionsStore";
 
 import { MyIssuesControls } from "./MyIssuesOptionsBar";
@@ -22,22 +21,18 @@ export default function MyIssuesViewBar({
         <div className="flex shrink-0 items-center justify-between gap-3 px-4 py-3">
             <div role="tablist" aria-label="My issues views" className="flex items-center gap-1.5">
                 {VIEWS.map((option) => (
-                    <Button
+                    <button
                         key={option.value}
-                        variant="unstyled"
                         type="button"
                         role="tab"
                         aria-selected={view === option.value}
                         onClick={() => onViewChange(option.value)}
-                        className={cn(
-                            "cursor-pointer rounded-full px-3 py-1 text-[11px] font-medium ring-1 ring-inset transition-colors",
-                            view === option.value
-                                ? "bg-active text-neutral-100 ring-white/5"
-                                : "bg-white/[0.025] text-neutral-500 ring-white/7 hover:bg-hover hover:text-neutral-300",
-                        )}
+                        className="cursor-pointer"
                     >
-                        {option.label}
-                    </Button>
+                        <IconWrapper size="big" variant="ring" active={view === option.value}>
+                            {option.label}
+                        </IconWrapper>
+                    </button>
                 ))}
             </div>
             <MyIssuesControls />

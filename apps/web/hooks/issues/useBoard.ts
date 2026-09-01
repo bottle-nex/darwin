@@ -94,7 +94,7 @@ export function useBoardLane(projectId: string | undefined, selector: BoardLaneS
  * fan-out below opens one infinite query per lane — so an unscoped list would
  * load every column of every space on mount.
  */
-function laneSelectorsFor(
+export function laneSelectorsFor(
     scope: BoardScope,
     columns: { id: string; spaceId: string }[] | undefined,
 ): BoardLaneSelector[] {

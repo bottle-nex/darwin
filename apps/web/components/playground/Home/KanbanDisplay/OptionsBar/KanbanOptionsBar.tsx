@@ -6,6 +6,7 @@ import {
 } from "@/components/playground/Core/components/PlaygroundPaneSlots";
 import { useGetProjectConfig } from "@/hooks/project/useGetProjectConfig";
 import { useActiveProject } from "@/hooks/useActiveProject";
+import type { BoardScope } from "@/types/board";
 
 import KanbanOptionsBarFlatKeys from "./KanbanOptionsBarFlatKeys";
 import KanbanOptionsBarGroupedKeys from "./KanbanOptionsBarGroupedKeys";
@@ -28,15 +29,15 @@ function KanbanOptionsBarSkeleton() {
     );
 }
 
-export default function KanbanOptionsBar() {
+export default function KanbanOptionsBar({ scope }: { scope: BoardScope }) {
     const projectId = useActiveProject()?.id;
     const { data: projectConfig, isLoading } = useGetProjectConfig(projectId);
 
     if (isLoading) return <KanbanOptionsBarSkeleton />;
     switch (projectConfig?.kanbanOptionView) {
         case "GROUPED":
-            return <KanbanOptionsBarGroupedKeys />;
+            return <KanbanOptionsBarGroupedKeys scope={scope} />;
         default:
-            return <KanbanOptionsBarFlatKeys />;
+            return <KanbanOptionsBarFlatKeys scope={scope} />;
     }
 }

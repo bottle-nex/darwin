@@ -1,5 +1,5 @@
 "use client";
-import { ActivityType, ActorType, type IssueActivity } from "@trymatcha/types";
+import { ActivityType, ActorType, AgentSessionStatus, type IssueActivity } from "@trymatcha/types";
 
 import HeroBuddy from "@/components/landing/v2/HeroBuddy";
 import PlaygroundAvatar, {
@@ -11,8 +11,9 @@ import InfoTooltip from "@/components/ui/InfoTooltip";
 import { formatRelativeTime } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
-import RunLogDisclosure from "../logs/RunLogDisclosure";
+import AgentLogsActivity from "../logs/AgentLogsActivity";
 import { activity_entry } from "./activity.registry";
+import RunPulseIcon from "./RunPulseIcon";
 
 export type ActivityActorView = {
     id: string;
@@ -118,46 +119,56 @@ export default function ActivityRow({
     const actor = actor_of(activity);
     const at = new Date(activity.createdAt);
     const predicate = render(activity.payload);
+    const runSession = activity.type === ActivityType.RunStarted ? activity.session : null;
+    const isLiveRun = runSession?.status === AgentSessionStatus.Running;
 
     return (
-        <div className="relative flex items-start gap-x-2.5 pt-1.25 pb-1">
-            {rail.above && <span aria-hidden className={cn(RAIL_CLASS, "top-0 h-1.5")} />}
-            {rail.below && <span aria-hidden className={cn(RAIL_CLASS, "top-7 bottom-0")} />}
-            <span
-                aria-hidden
-                className="relative z-10 flex size-[22px] shrink-0 items-center justify-center rounded-full"
-            >
-                <Icon className={cn("size-3.5", iconClassName)} />
-            </span>
-            <div className="min-w-0 flex-1">
-                <p className="text-[12.5px] leading-[22px] wrap-anywhere text-neutral-500">
-                    <ActorName actor={actor} />{" "}
-                    {detail ? (
-                        <HoverCard openDelay={120} closeDelay={80}>
-                            <HoverCardTrigger asChild>
-                                <span className="cursor-default underline decoration-edge decoration-dotted underline-offset-4 hover:decoration-neutral-500">
-                                    {predicate}
-                                </span>
-                            </HoverCardTrigger>
-                            <HoverCardContent side="top" align="start" className="p-2">
-                                {detail(activity.payload)}
-                            </HoverCardContent>
-                        </HoverCard>
-                    ) : (
-                        predicate
-                    )}
-                    <time
-                        dateTime={at.toISOString()}
-                        title={at.toLocaleString()}
-                        className="ml-2 text-[11px] whitespace-nowrap text-snow/80"
-                    >
-                        {formatRelativeTime(at)}
-                    </time>
-                </p>
-                {activity.type === ActivityType.RunStarted && activity.session && (
-                    <RunLogDisclosure session={activity.session} />
+        <div>
+            <div className="relative flex items-start gap-x-2.5 pt-1.25 pb-1">
+                {!runSession && rail.above && (
+                    <span aria-hidden className={cn(RAIL_CLASS, "top-0 h-1.5")} />
                 )}
+                {!runSession && rail.below && (
+                    <span aria-hidden className={cn(RAIL_CLASS, "top-7 bottom-0")} />
+                )}
+                <span
+                    aria-hidden
+                    className="relative z-10 flex size-[22px] shrink-0 items-center justify-center rounded-full"
+                >
+                    {isLiveRun ? (
+                        <RunPulseIcon className="size-3.5 text-matcha" />
+                    ) : (
+                        <Icon className={cn("size-3.5", iconClassName)} />
+                    )}
+                </span>
+                <div className="min-w-0 flex-1">
+                    <p className="text-[12.5px] leading-[22px] wrap-anywhere text-neutral-500">
+                        <ActorName actor={actor} />{" "}
+                        {detail ? (
+                            <HoverCard openDelay={120} closeDelay={80}>
+                                <HoverCardTrigger asChild>
+                                    <span className="cursor-default underline decoration-edge decoration-dotted underline-offset-4 hover:decoration-neutral-500">
+                                        {predicate}
+                                    </span>
+                                </HoverCardTrigger>
+                                <HoverCardContent side="top" align="start" className="p-2">
+                                    {detail(activity.payload)}
+                                </HoverCardContent>
+                            </HoverCard>
+                        ) : (
+                            predicate
+                        )}
+                        <time
+                            dateTime={at.toISOString()}
+                            title={at.toLocaleString()}
+                            className="ml-2 text-[11px] whitespace-nowrap text-snow/80"
+                        >
+                            {formatRelativeTime(at)}
+                        </time>
+                    </p>
+                </div>
             </div>
+            {runSession && <AgentLogsActivity session={runSession} />}
         </div>
     );
 }

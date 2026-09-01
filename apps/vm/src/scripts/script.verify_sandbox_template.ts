@@ -20,6 +20,47 @@ const TEMPLATE_NAME = "node-py-claude-template";
 const TEMPLATE_TAG = "stable";
 const SANDBOX_MCP_ENTRY = "/opt/matcha/sandbox-mcp/index.js";
 const CAPSULE_CHECK_ENTRY = "/opt/matcha/capsule-check/index.js";
+const SANDBOX_MCP_TOOLS = ["report_status", "report_progress"];
+
+/**
+ * Asks the MCP server which tools it serves, over its own stdio protocol.
+ *
+ * A bundle built before a tool existed still starts and still prints its startup line, so
+ * booting it proves nothing about what the agent can actually call. The handshake is the only
+ * thing that separates a current bundle from a stale one. Closing stdin after the last message
+ * ends the server the same way reading from /dev/null did.
+ *
+ * Written as one pipeline with no shell variable in it: this string is quoted twice on its way
+ * into the sandbox, and anything the outer shell could expand or unquote is a false MISSING
+ * that reads exactly like a genuinely broken bundle.
+ */
+const mcp_tools_probe = () => {
+    const handshake = [
+        {
+            jsonrpc: "2.0",
+            id: 1,
+            method: "initialize",
+            params: {
+                protocolVersion: "2024-11-05",
+                capabilities: {},
+                clientInfo: { name: "template-verify", version: "0" },
+            },
+        },
+        { jsonrpc: "2.0", method: "notifications/initialized" },
+        { jsonrpc: "2.0", id: 2, method: "tools/list" },
+    ]
+        .map((message) => `'${JSON.stringify(message)}'`)
+        .join(" ");
+
+    const served = SANDBOX_MCP_TOOLS.map((tool) => `"name":"${tool}"`).join("|");
+
+    return [
+        `printf '%s\n' ${handshake}`,
+        `| MATCHA_SESSION_KIND=worker node ${SANDBOX_MCP_ENTRY} 2>/dev/null`,
+        `| grep -oE '${served}' | sort -u`,
+        `| awk 'END { if (NR == ${SANDBOX_MCP_TOOLS.length}) print "${SANDBOX_MCP_TOOLS.join(", ")}"; else exit 1 }'`,
+    ].join(" ");
+};
 
 interface Requirement {
     name: string;
@@ -35,16 +76,15 @@ const REQUIREMENTS: Requirement[] = [
     { name: "node", command: "node --version", needed_for: "running sandbox-mcp" },
     {
         /**
-         * Started, not just located. A bundle with an import the sandbox cannot resolve is still
-         * a file on disk, and a stdio MCP server that dies on startup is invisible — the agent
-         * simply runs without the tools and nothing anywhere says why.
-         *
-         * Reading from /dev/null closes the transport immediately, so the server prints its
-         * startup line and exits instead of waiting for a client that will never speak.
+         * Serving the tools, not just located and not just started. A bundle with an import the
+         * sandbox cannot resolve is still a file on disk, and a stdio MCP server that dies on
+         * startup is invisible — the agent simply runs without the tools and nothing anywhere
+         * says why. A bundle that starts but predates a tool fails the same way, which is what
+         * the handshake below catches and booting it did not.
          */
         name: "sandbox-mcp",
-        command: `MATCHA_SESSION_KIND=worker node ${SANDBOX_MCP_ENTRY} < /dev/null 2>&1 | head -1`,
-        needed_for: "report_progress and report_status, the agent's only way to report",
+        command: mcp_tools_probe(),
+        needed_for: "report_progress and report_status, the agent's own way to report",
     },
     {
         name: "graphify",

@@ -9,13 +9,7 @@ import {
     TodoStatusIcon,
 } from "@trymatcha/ui/icons";
 
-import {
-    type BoardState,
-    type Issue,
-    type KanbanColumnDef,
-    KanbanStatus,
-    type Priority,
-} from "@/types/kanban";
+import { type KanbanColumnDef, KanbanStatus, type Priority } from "@/types/kanban";
 
 export type StatusGlyph = Pick<KanbanColumnDef, "icon" | "titleBox">;
 
@@ -115,38 +109,5 @@ export class KanbanBoard {
 
     static isBridgeStatus(status: string): status is KanbanStatus {
         return (KanbanBoard.BRIDGE_STATUSES as string[]).includes(status);
-    }
-
-    /** An empty board with one (empty) lane per status — keyed off `STATUSES` so it
-     *  always matches `KanbanStatus` and can never drift out of sync with it. */
-    static emptyBoard(): BoardState {
-        return Object.fromEntries(
-            KanbanBoard.STATUSES.map((s) => [s, [] as Issue[]]),
-        ) as BoardState;
-    }
-
-    static filterBoard(board: BoardState, matches: (issueId: string) => boolean): BoardState {
-        return Object.fromEntries(
-            KanbanBoard.STATUSES.map((s) => [s, board[s].filter((issue) => matches(issue.id))]),
-        ) as BoardState;
-    }
-
-    /**
-     * Splits `COLUMNS` into what the board row should render vs. what collapses into the
-     * hidden-columns list: a column stays visible if it has issues, or if it's a bridge status
-     * (e.g. Todo) that must stay a droppable target even while empty.
-     */
-    static partitionColumns(board: BoardState): {
-        visible: KanbanColumnDef[];
-        hidden: KanbanColumnDef[];
-    } {
-        const visible: KanbanColumnDef[] = [];
-        const hidden: KanbanColumnDef[] = [];
-        for (const column of KanbanBoard.COLUMNS) {
-            const keepVisible =
-                board[column.status].length > 0 || KanbanBoard.isBridgeStatus(column.status);
-            (keepVisible ? visible : hidden).push(column);
-        }
-        return { visible, hidden };
     }
 }

@@ -1,6 +1,6 @@
 "use client";
 import { defaultRangeExtractor, type Range, useVirtualizer } from "@tanstack/react-virtual";
-import { type Chat, to_plain_text } from "@trymatcha/types";
+import { ActivityType, type Chat, to_plain_text } from "@trymatcha/types";
 import {
     type FocusEvent,
     useCallback,
@@ -41,8 +41,16 @@ function excerpt(comment: Chat) {
     return text.length > EXCERPT_LIMIT ? `${text.slice(0, EXCERPT_LIMIT).trimEnd()}...` : text;
 }
 
+/**
+ * A row that carries its own agent-log box breaks the run the same way a comment does: the box
+ * is full-width chrome sitting between two rows, so a connector reaching it would point at a
+ * card rather than joining one activity to the next.
+ */
 function isRailed(entry: ActivityFeedEntry | undefined) {
-    return entry?.kind === "activity";
+    if (entry?.kind !== "activity") return false;
+    const carriesLogs =
+        entry.activity.type === ActivityType.RunStarted && Boolean(entry.activity.session);
+    return !carriesLogs;
 }
 
 export default function ActivityFeed({

@@ -3,8 +3,10 @@ import {
     RUN_LOG_MAX_FAILURE_OUTPUT_LENGTH,
     RUN_LOG_MAX_NOTICE_LENGTH,
     RUN_LOG_MAX_PATH_LENGTH,
+    RUN_LOG_MAX_STEP_LENGTH,
     type RunLogEventBody,
     RunLogEventKind,
+    RunLogLevel,
 } from "@trymatcha/types";
 import { z } from "zod";
 
@@ -15,6 +17,13 @@ export const REPORT_PROGRESS_DESCRIPTION = [
     "the file diff and the command results are shown separately.",
     "One action per call. If you read three files, call this three times with one path each;",
     "never combine several paths or commands into a single report.",
+    "A notice takes a level: use warn when something did not go to plan but the run continues,",
+    "and error when it leaves the run unable to finish. Anything else is info.",
+    "Use kind 'step' when you turn to a new part of the work, before you start it. Say the goal in",
+    "one short plain sentence — 'Finding where the navbar tiles are defined', not 'Calling Grep'.",
+    "The person reading has not seen your reasoning, so a step is the only place they learn what you",
+    "are trying to do and why the actions that follow make sense. Expect roughly five to ten steps",
+    "across a whole run: a step marks a change of intent, never a single file or command.",
 ].join(" ");
 
 export const report_progress_schema = {
@@ -22,16 +31,18 @@ export const report_progress_schema = {
         RunLogEventKind.FileRead,
         RunLogEventKind.FileWrite,
         RunLogEventKind.Search,
-        RunLogEventKind.Command,
         RunLogEventKind.CommandFailed,
         RunLogEventKind.Notice,
+        RunLogEventKind.Step,
     ]),
     path: z.string().optional(),
     mode: z.enum(["edit", "create"]).optional(),
     pattern: z.string().optional(),
     command: z.string().optional(),
     output: z.string().optional(),
+    exitCode: z.number().int().optional(),
     text: z.string().optional(),
+    level: z.enum([RunLogLevel.Info, RunLogLevel.Warn, RunLogLevel.Error]).optional(),
 };
 
 export type ReportProgressArgs = {
@@ -41,15 +52,21 @@ export type ReportProgressArgs = {
     pattern?: string;
     command?: string;
     output?: string;
+    exitCode?: number;
     text?: string;
+    level?: RunLogLevel;
 };
 
 const REPO_DIR = "/home/user/repo";
 
 const head = (value: string | undefined, limit: number) => (value ?? "").trim().slice(0, limit);
 
-const repo_relative = (path: string) =>
-    path.startsWith(`${REPO_DIR}/`) ? path.slice(REPO_DIR.length + 1) : path;
+/**
+ * A path inside the repo, or null for anything else. The sandbox holds our own scaffolding beside
+ * the clone, and a write there is not a change to the reader's code.
+ */
+const repo_relative = (path: string): string | null =>
+    path.startsWith(`${REPO_DIR}/`) ? path.slice(REPO_DIR.length + 1) : null;
 
 /**
  * A failure is described by its last lines, not its first: the command is already named on the
@@ -85,10 +102,6 @@ export function to_run_log_event(args: ReportProgressArgs): RunLogEventBody | nu
             const pattern = head(args.pattern, RUN_LOG_MAX_COMMAND_LENGTH);
             return pattern ? { kind: RunLogEventKind.Search, pattern } : null;
         }
-        case RunLogEventKind.Command: {
-            const command = head(args.command, RUN_LOG_MAX_COMMAND_LENGTH);
-            return command ? { kind: RunLogEventKind.Command, command } : null;
-        }
         case RunLogEventKind.CommandFailed: {
             const command = head(args.command, RUN_LOG_MAX_COMMAND_LENGTH);
             return command
@@ -96,12 +109,18 @@ export function to_run_log_event(args: ReportProgressArgs): RunLogEventBody | nu
                       kind: RunLogEventKind.CommandFailed,
                       command,
                       output: tail(args.output, RUN_LOG_MAX_FAILURE_OUTPUT_LENGTH),
+                      exitCode: args.exitCode,
                   }
                 : null;
         }
+        case RunLogEventKind.Step: {
+            const text = head(args.text, RUN_LOG_MAX_STEP_LENGTH);
+            return text ? { kind: RunLogEventKind.Step, text } : null;
+        }
         default: {
             const text = head(args.text, RUN_LOG_MAX_NOTICE_LENGTH);
-            return text ? { kind: RunLogEventKind.Notice, text } : null;
+            if (!text) return null;
+            return { kind: RunLogEventKind.Notice, text, level: args.level ?? RunLogLevel.Info };
         }
     }
 }

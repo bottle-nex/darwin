@@ -80,13 +80,14 @@ export function facetValues(filters: BoardFilters, key: ListFacetKey): string[] 
     return filters[key].map(String);
 }
 
-export function useFacetOptions(key: ListFacetKey): FacetOption[] {
+export function useFacetOptions(key: ListFacetKey | undefined): FacetOption[] {
     const projectId = useActiveProject()?.id;
     const { data: members } = useProjectMembers(projectId);
     const { data: tags } = useListTags(projectId);
     const spaces = useSpaces(projectId);
 
     return useMemo(() => {
+        if (!key) return [];
         const people = (members ?? []).map((member) => ({
             value: member.id,
             label: member.name ?? member.email,

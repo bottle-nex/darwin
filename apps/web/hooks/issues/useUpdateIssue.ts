@@ -24,6 +24,8 @@ export interface UpdateIssueInput {
     /** ISO string to set, `null` to clear, omitted to leave untouched. */
     start_date?: string | null;
     target_date?: string | null;
+    /** New manual position — the midpoint between the cards a drop landed between. */
+    sort_order?: number;
 }
 
 export function useUpdateIssue() {
@@ -41,6 +43,7 @@ export function useUpdateIssue() {
                 assignee_ids: input.assignee_ids,
                 start_date: input.start_date,
                 target_date: input.target_date,
+                sort_order: input.sort_order,
             });
             return res.data.data.issue;
         },

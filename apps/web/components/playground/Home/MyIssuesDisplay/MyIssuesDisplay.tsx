@@ -1,5 +1,6 @@
 "use client";
 
+import { useIssueView } from "@/hooks/issues/useIssueView";
 import { useMyIssues } from "@/hooks/issues/useMyIssues";
 import { useKanbanFilterUrlSync } from "@/hooks/kanban/useKanbanFilterUrlSync";
 import { useActiveProject } from "@/hooks/useActiveProject";
@@ -19,6 +20,7 @@ export default function MyIssuesDisplay() {
     const clearAll = useKanbanFilterStore((state) => state.clearAll);
     const view = useMyIssuesOptionsStore((state) => state.view);
     const setView = useMyIssuesOptionsStore((state) => state.setView);
+    const { layout, groupBy } = useIssueView("my-issues");
     const myIssues = useMyIssues(project?.id, userId ?? undefined, view, filters);
 
     useKanbanFilterUrlSync(project?.id);
@@ -31,6 +33,8 @@ export default function MyIssuesDisplay() {
                 issues={myIssues.issues}
                 total={myIssues.total}
                 view={view}
+                layout={layout}
+                groupBy={groupBy}
                 loading={myIssues.isPending || !userId}
                 error={myIssues.isError}
                 pageError={myIssues.isFetchNextPageError}

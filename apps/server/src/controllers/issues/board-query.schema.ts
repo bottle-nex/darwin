@@ -121,7 +121,7 @@ export const board_search_query_schema = page_query_schema.extend({
 export const my_issues_query_schema = page_query_schema.extend({
     view: z.enum(["assigned", "created"]),
     group: z.enum(["status", "priority", "none"]),
-    order: z.enum(["newest", "oldest", "priority", "number"]),
+    order: z.enum(["manual", "newest", "oldest", "priority", "number"]),
     filters: filters_query_schema,
 });
 

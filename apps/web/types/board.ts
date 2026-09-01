@@ -36,6 +36,8 @@ export type BoardIssue = {
     priority: number;
     status: ServerIssueStatus;
     customColumnId: string | null;
+    /** Manual board/list position. Higher sorts first; drops write the midpoint of their neighbours. */
+    sortOrder: number;
     createdAt: string;
     startDate: string | null;
     targetDate: string | null;

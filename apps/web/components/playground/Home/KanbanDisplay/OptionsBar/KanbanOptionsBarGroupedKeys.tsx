@@ -22,20 +22,19 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useIssueView } from "@/hooks/issues/useIssueView";
 import { useFilteredCustomColumns } from "@/hooks/kanban/useFilteredCustomColumns";
 import { activeFacetKeys } from "@/lib/kanban/boardFilter";
 import { useKanbanFilterStore } from "@/store/kanban/useKanbanFilterStore";
 import { useKanbanOptionsStore } from "@/store/kanban/useKanbanOptionsStore";
+import type { BoardScope } from "@/types/board";
 
 import AddTaskButton from "./KanbanOptionPanels/AddTaskButton";
+import { DISPLAY_PANEL_WIDTH, DisplayPanelItems } from "./KanbanOptionPanels/DisplayPanel";
 import EagerSubmenu from "./KanbanOptionPanels/EagerSubmenu";
 import FilterChipsBar from "./KanbanOptionPanels/FilterChipsBar";
 import { FILTERS_PANEL_WIDTH, FiltersPanelItems } from "./KanbanOptionPanels/FiltersPanel";
 import { FOCUS_PANEL_WIDTH, FocusPanelItems } from "./KanbanOptionPanels/FocusPanel";
-import {
-    KANBAN_VIEW_PANEL_WIDTH,
-    KanbanViewPanelItems,
-} from "./KanbanOptionPanels/KanbanViewPanel";
 
 /**
  * Every toolbar option collapsed behind one "Options" menu. The panels that have
@@ -45,11 +44,10 @@ import {
  * standalone FocusPanel — see its comment for why the content is forced back to
  * `[direction:ltr]`.
  */
-export default function KanbanOptionsBarGroupedKeys() {
+export default function KanbanOptionsBarGroupedKeys({ scope }: { scope: BoardScope }) {
     const focus = useKanbanOptionsStore((s) => s.focus);
     const setFocus = useKanbanOptionsStore((s) => s.setFocus);
-    const kanbanView = useKanbanOptionsStore((s) => s.kanbanView);
-    const setKanbanView = useKanbanOptionsStore((s) => s.setKanbanView);
+    const view = useIssueView(scope);
     const filters = useKanbanFilterStore((s) => s.filters);
     const customColumns = useFilteredCustomColumns();
     const activeCount = activeFacetKeys(filters).length;
@@ -74,7 +72,7 @@ export default function KanbanOptionsBarGroupedKeys() {
                                 aria-label="Options"
                                 className="flex h-7 cursor-pointer items-center gap-1 rounded-md px-2 text-[12px] font-medium text-neutral-400 transition-colors hover:bg-white/5 hover:text-neutral-200"
                             >
-                                <OptionsMenuIcon className="size-3.5" aria-hidden />
+                                <OptionsMenuIcon className="size-4" aria-hidden />
                                 Options
                             </Button>
                         </DropdownMenuTrigger>
@@ -97,7 +95,7 @@ export default function KanbanOptionsBarGroupedKeys() {
                                         </>
                                     }
                                 >
-                                    <FiltersPanelItems crossBoard={kanbanView === "list"} />
+                                    <FiltersPanelItems crossBoard={view.layout === "list"} />
                                 </EagerSubmenu>
 
                                 <EagerSubmenu
@@ -120,20 +118,23 @@ export default function KanbanOptionsBarGroupedKeys() {
                                 </EagerSubmenu>
 
                                 <EagerSubmenu
-                                    className={`${KANBAN_VIEW_PANEL_WIDTH} [direction:ltr]`}
+                                    className={`${DISPLAY_PANEL_WIDTH} [direction:ltr]`}
                                     trigger={
                                         <>
                                             <BoardViewIcon
                                                 className="size-3.5 text-neutral-400"
                                                 aria-hidden
                                             />
-                                            <span className="flex-1">Layout</span>
+                                            <span className="flex-1">Display</span>
                                         </>
                                     }
                                 >
-                                    <KanbanViewPanelItems
-                                        value={kanbanView}
-                                        onChange={setKanbanView}
+                                    <DisplayPanelItems
+                                        layout={view.layout}
+                                        groupBy={view.groupBy}
+                                        groupings={view.groupings}
+                                        onLayoutChange={view.setLayout}
+                                        onGroupByChange={view.setGroupBy}
                                     />
                                 </EagerSubmenu>
                             </>

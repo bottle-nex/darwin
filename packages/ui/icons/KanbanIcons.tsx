@@ -1,16 +1,11 @@
 import { createIcon } from "./createIcon";
-import {
-    LuArrowUpDown,
-    LuColumns3,
-    LuEye,
-    LuListFilter,
-    LuShare2,
-    LuSlidersHorizontal,
-} from "react-icons/lu";
+import { LuArrowUpDown, LuColumns3, LuEye, LuListFilter, LuShare2 } from "react-icons/lu";
+import { HiViewGridAdd } from "react-icons/hi";
 import {
     MdAccessTimeFilled,
     MdAutoAwesome,
     MdList,
+    MdOutlineKeyboardOptionKey,
     MdSortByAlpha,
     MdVerticalSplit,
     MdViewKanban,
@@ -35,7 +30,7 @@ export const KanbanColumnsIcon = createIcon(LuColumns3);
 
 export const KanbanListViewIcon = createIcon(MdList);
 
-export const OptionsMenuIcon = createIcon(LuSlidersHorizontal);
+export const OptionsMenuIcon = createIcon(HiViewGridAdd);
 
 export const ShareIcon = createIcon(LuShare2);
 

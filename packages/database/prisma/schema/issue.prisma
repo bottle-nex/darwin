@@ -29,6 +29,7 @@ model Issue {
   assignedWorker   Worker? @relation(fields: [assignerWorkerId], references: [id], onDelete: Cascade)
 
   queuePosition  Int?
+  sortOrder      Float     @default(0)
   specialization String?
   prUrl          String?
   prNumber       Int?
@@ -47,8 +48,8 @@ model Issue {
   @@unique([projectId, number])
   @@index([projectId, status])
   @@index([projectId, customColumnId])
-  @@index([projectId, status, createdAt, id])
-  @@index([projectId, customColumnId, createdAt, id])
+  @@index([projectId, status, sortOrder, id])
+  @@index([projectId, customColumnId, sortOrder, id])
   @@index([status, createdAt])
   @@index([assignerWorkerId, status, queuePosition])
   @@index([title(ops: raw("gin_trgm_ops"))], map: "Issue_title_trgm_idx", type: Gin)
@@ -106,7 +107,7 @@ model IssueTemplate {
 }
 
 model Space {
-  id          String  @id @default(cuid())
+  id          String    @id @default(cuid())
   projectId   String
   name        String
   slug        String
@@ -115,7 +116,7 @@ model Space {
   targetDate  DateTime?
   order       Int
   /// An `IconPick`: a named icon with a colour, or an emoji. Null falls back to the board glyph.
-  icon      Json?
+  icon        Json?
 
   project    Project             @relation(fields: [projectId], references: [id], onDelete: Cascade)
   columns    CustomColumn[]
@@ -143,6 +144,28 @@ model CustomColumn {
   updatedAt DateTime @updatedAt
 
   @@index([spaceId])
+}
+
+/// One user's saved layout and grouping for a place that lists issues. `viewKey` is
+/// the pane it belongs to — "agent", "my-issues" or "space:<spaceId>" — kept as one
+/// string so the unique index holds (a nullable spaceId would not, since Postgres
+/// treats NULLs as distinct).
+model IssueViewPreference {
+  id        String @id @default(cuid())
+  userId    String
+  projectId String
+  viewKey   String
+  layout    String
+  groupBy   String
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, projectId, viewKey])
+  @@index([userId, projectId])
 }
 
 /// A user's personal position for a custom column within a space. Only

@@ -2,7 +2,7 @@
 import type { Editor } from "@tiptap/react";
 import { useEffect, useRef, useState } from "react";
 
-import { PRIORITY_TO_NUMBER } from "@/components/playground/Home/KanbanDisplay/customkanban/data";
+import { PRIORITY_TO_NUMBER } from "@/components/playground/Issue/issueHelpers";
 import { useCreateIssue } from "@/hooks/issues/useCreateIssue";
 import { useGetIssueConfig, useSetIssueConfig } from "@/hooks/issues/useIssueConfig";
 import { useUpdateIssue } from "@/hooks/issues/useUpdateIssue";

@@ -10,7 +10,6 @@ import type {
     MyIssuesQuery,
 } from "../controllers/issues/board-query.schema";
 import { BOARD_SYSTEM_STATUSES } from "../controllers/issues/board-query.schema";
-import PaginationService from "./service.pagination";
 
 /** The board facet's sentinel for "not on any space", matching the client. */
 const AGENT_BOARD = "agent";
@@ -24,6 +23,7 @@ export const BOARD_ISSUE_SELECT = {
     status: true,
     customColumnId: true,
     createdAt: true,
+    sortOrder: true,
     startDate: true,
     targetDate: true,
     prUrl: true,
@@ -68,9 +68,20 @@ const created_cursor_schema = z
     })
     .strict();
 
+const sort_cursor_schema = z
+    .object({
+        v: z.literal(1),
+        scope: z.string().length(64),
+        kind: z.literal("sort"),
+        sortOrder: z.number(),
+        id: z.string().min(1).max(191),
+    })
+    .strict();
+
 const my_issue_cursor_schema = z.discriminatedUnion("kind", [
     created_cursor_schema.extend({ kind: z.literal("newest") }),
     created_cursor_schema.extend({ kind: z.literal("oldest") }),
+    sort_cursor_schema.extend({ kind: z.literal("manual") }),
     z
         .object({
             v: z.literal(1),
@@ -93,7 +104,8 @@ const my_issue_cursor_schema = z.discriminatedUnion("kind", [
 ]);
 
 type CreatedRow = { id: string; createdAt: Date };
-type MyIssueRow = CreatedRow & { number: number; priority: number };
+type SortRow = { id: string; sortOrder: number };
+type MyIssueRow = CreatedRow & SortRow & { number: number; priority: number };
 type FilterableIssue = MyIssueRow & {
     title: string;
     status: IssueStatus;
@@ -306,22 +318,31 @@ export default class BoardIssueService {
             : ({ type: "system", status: issue.status } as const);
     }
 
-    static encode_created_cursor(scope: ScopeInput, row: CreatedRow) {
+    static encode_sort_cursor(scope: ScopeInput, row: SortRow) {
         return encode_payload({
             v: 1,
             scope: scope_digest(scope),
-            kind: "created",
-            createdAt: row.createdAt.toISOString(),
+            kind: "sort",
+            sortOrder: row.sortOrder,
             id: row.id,
         });
     }
 
-    static decode_created_cursor(cursor: string, scope: ScopeInput) {
-        const parsed = created_cursor_schema.safeParse(decode_payload(cursor));
+    static decode_sort_cursor(cursor: string, scope: ScopeInput) {
+        const parsed = sort_cursor_schema.safeParse(decode_payload(cursor));
         if (!parsed.success || parsed.data.scope !== scope_digest(scope)) {
             throw new InvalidBoardCursorError();
         }
-        return { createdAt: new Date(parsed.data.createdAt), id: parsed.data.id };
+        return { sortOrder: parsed.data.sortOrder, id: parsed.data.id };
+    }
+
+    static after_sort_cursor(cursor: SortRow) {
+        return {
+            OR: [
+                { sortOrder: { lt: cursor.sortOrder } },
+                { sortOrder: cursor.sortOrder, id: { lt: cursor.id } },
+            ],
+        };
     }
 
     static matches_filters(
@@ -368,14 +389,13 @@ export default class BoardIssueService {
         return issue.title.toLowerCase().includes(query) || `#${issue.number}`.includes(query);
     }
 
-    static created_page<T extends CreatedRow>(rows: T[], limit: number, scope: ScopeInput) {
+    static sorted_page<T extends SortRow>(rows: T[], limit: number, scope: ScopeInput) {
         const has_more = rows.length > limit;
         const items = has_more ? rows.slice(0, limit) : rows;
         const last = items.at(-1);
         return {
             items,
-            nextCursor:
-                has_more && last ? BoardIssueService.encode_created_cursor(scope, last) : null,
+            nextCursor: has_more && last ? BoardIssueService.encode_sort_cursor(scope, last) : null,
             hasMore: has_more,
         };
     }
@@ -387,21 +407,21 @@ export default class BoardIssueService {
         limit: number,
     ) {
         const scope = BoardIssueService.lane_scope(project_id, selector);
-        const decoded = cursor ? BoardIssueService.decode_created_cursor(cursor, scope) : undefined;
+        const decoded = cursor ? BoardIssueService.decode_sort_cursor(cursor, scope) : undefined;
         const where = BoardIssueService.lane_where(project_id, selector);
         const [rows, total] = await Promise.all([
             prisma.issue.findMany({
                 where: decoded
-                    ? { AND: [where, PaginationService.older_than_cursor(decoded)] }
+                    ? { AND: [where, BoardIssueService.after_sort_cursor(decoded)] }
                     : where,
-                orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+                orderBy: [{ sortOrder: "desc" }, { id: "desc" }],
                 take: limit + 1,
                 select: BOARD_ISSUE_SELECT,
             }),
             decoded ? Promise.resolve(undefined) : prisma.issue.count({ where }),
         ]);
         return {
-            ...BoardIssueService.created_page(rows, limit, scope),
+            ...BoardIssueService.sorted_page(rows, limit, scope),
             ...(total === undefined ? {} : { total }),
         };
     }
@@ -417,15 +437,15 @@ export default class BoardIssueService {
         limit: number,
     ) {
         const scope = BoardIssueService.search_scope(project_id, filters);
-        const decoded = cursor ? BoardIssueService.decode_created_cursor(cursor, scope) : undefined;
+        const decoded = cursor ? BoardIssueService.decode_sort_cursor(cursor, scope) : undefined;
         const base_predicates = BoardIssueService.filter_predicates(project_id, filters, {
             customColumnsIgnoreStatus: true,
         });
         const predicates = [...base_predicates];
         if (decoded) {
             predicates.push(Prisma.sql`(
-                "i"."createdAt" < ${decoded.createdAt}
-                OR ("i"."createdAt" = ${decoded.createdAt} AND "i"."id" < ${decoded.id})
+                "i"."sortOrder" < ${decoded.sortOrder}
+                OR ("i"."sortOrder" = ${decoded.sortOrder} AND "i"."id" < ${decoded.id})
             )`);
         }
 
@@ -434,10 +454,10 @@ export default class BoardIssueService {
             async (transaction) => {
                 const [page_rows, count_rows] = await Promise.all([
                     transaction.$queryRaw<MyIssueRow[]>`
-                        SELECT "i"."id", "i"."createdAt", "i"."number", "i"."priority"
+                        SELECT "i"."id", "i"."createdAt", "i"."sortOrder", "i"."number", "i"."priority"
                         FROM "Issue" AS "i"
                         ${where}
-                        ORDER BY "i"."createdAt" DESC, "i"."id" DESC
+                        ORDER BY "i"."sortOrder" DESC, "i"."id" DESC
                         LIMIT ${limit + 1}
                     `,
                     decoded
@@ -459,9 +479,7 @@ export default class BoardIssueService {
                 return {
                     items: full_rows,
                     nextCursor:
-                        has_more && last
-                            ? BoardIssueService.encode_created_cursor(scope, last)
-                            : null,
+                        has_more && last ? BoardIssueService.encode_sort_cursor(scope, last) : null,
                     hasMore: has_more,
                     ...(count_rows ? { total: Number(count_rows[0]?.total ?? 0) } : {}),
                 };
@@ -507,7 +525,7 @@ export default class BoardIssueService {
             async (transaction) => {
                 const [rows, count_rows] = await Promise.all([
                     transaction.$queryRaw<MyIssueRow[]>(Prisma.sql`
-                        SELECT "i"."id", "i"."createdAt", "i"."number", "i"."priority"
+                        SELECT "i"."id", "i"."createdAt", "i"."sortOrder", "i"."number", "i"."priority"
                         FROM "Issue" AS "i"
                         WHERE ${Prisma.join(page_predicates, " AND ")}
                         ORDER BY ${order}
@@ -544,6 +562,9 @@ export default class BoardIssueService {
 
     static sort_my_issue_rows<T extends MyIssueRow>(rows: T[], order: MyIssuesOrder) {
         return [...rows].sort((left, right) => {
+            if (order === "manual") {
+                return right.sortOrder - left.sortOrder || right.id.localeCompare(left.id);
+            }
             if (order === "newest" || order === "oldest") {
                 const difference = left.createdAt.getTime() - right.createdAt.getTime();
                 const directed = order === "newest" ? -difference : difference;
@@ -672,6 +693,7 @@ export default class BoardIssueService {
 
     static encode_my_issue_cursor(scope: ScopeInput, order: MyIssuesOrder, row: MyIssueRow) {
         const common = { v: 1, scope: scope_digest(scope), kind: order, id: row.id };
+        if (order === "manual") return encode_payload({ ...common, sortOrder: row.sortOrder });
         if (order === "newest" || order === "oldest") {
             return encode_payload({ ...common, createdAt: row.createdAt.toISOString() });
         }
@@ -696,6 +718,12 @@ export default class BoardIssueService {
     }
 
     private static my_cursor_predicate(cursor: z.infer<typeof my_issue_cursor_schema>): Prisma.Sql {
+        if (cursor.kind === "manual") {
+            return Prisma.sql`(
+                "i"."sortOrder" < ${cursor.sortOrder}
+                OR ("i"."sortOrder" = ${cursor.sortOrder} AND "i"."id" < ${cursor.id})
+            )`;
+        }
         if (cursor.kind === "newest") {
             const created_at = new Date(cursor.createdAt);
             return Prisma.sql`(
@@ -730,6 +758,7 @@ export default class BoardIssueService {
     }
 
     private static my_order_sql(order: MyIssuesOrder) {
+        if (order === "manual") return Prisma.sql`"i"."sortOrder" DESC, "i"."id" DESC`;
         if (order === "newest") return Prisma.sql`"i"."createdAt" DESC, "i"."id" DESC`;
         if (order === "oldest") return Prisma.sql`"i"."createdAt" ASC, "i"."id" ASC`;
         if (order === "number") return Prisma.sql`"i"."number" DESC, "i"."id" DESC`;

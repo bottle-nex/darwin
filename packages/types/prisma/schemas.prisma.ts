@@ -132,6 +132,7 @@ export interface Issue {
     status: IssueStatus;
     priority: number;
     customColumnId: string | null;
+    sortOrder: number;
     startDate: Date | null;
     targetDate: Date | null;
     prUrl: string | null;

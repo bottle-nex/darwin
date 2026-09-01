@@ -17,7 +17,7 @@ import { appendToRunLogPage, mergeRunLogPage, sealRunLogPage } from "./runLogCac
 
 export const RUN_LOGS_QUERY_KEY = ["run-logs"] as const;
 
-function queryKeyFor(runId: string) {
+export function queryKeyFor(runId: string) {
     return [...RUN_LOGS_QUERY_KEY, runId] as const;
 }
 

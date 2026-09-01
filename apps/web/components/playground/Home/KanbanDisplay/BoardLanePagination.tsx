@@ -4,17 +4,12 @@ import { useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { useBoardLaneModel } from "@/hooks/issues/useBoard";
 import { useActiveProject } from "@/hooks/useActiveProject";
-import { useCustomKanbanStore } from "@/store/kanban/useCustomKanbanStore";
-import { useKanbanBoardStore } from "@/store/kanban/useKanbanBoardStore";
 import type { BoardLaneSelector } from "@/types/board";
 
 export default function BoardLanePagination({ selector }: { selector: BoardLaneSelector }) {
     const projectId = useActiveProject()?.id;
     const lane = useBoardLaneModel(projectId, selector);
     const paginationTargetRef = useRef<HTMLDivElement | null>(null);
-    const boardDragActive = useKanbanBoardStore((state) => state.overlayActive);
-    const customDragActive = useCustomKanbanStore((state) => state.overlayActive);
-    const dragActive = boardDragActive || customDragActive;
     const fallbackPagination = lane.source === "fallback";
     const hasNextPage = Boolean(
         fallbackPagination ? lane.hasNextFallbackPage : lane.hasNextBasePage,
@@ -30,9 +25,10 @@ export default function BoardLanePagination({ selector }: { selector: BoardLaneS
 
     useEffect(() => {
         const target = paginationTargetRef.current;
-        if (!target || !hasNextPage || fetchingNextPage || pageError || dragActive) return;
+        if (!target || !hasNextPage || fetchingNextPage || pageError) return;
+        // Inside a list the pane's own scroller is the root; on a board the loaders
+        // sit under the columns, where the viewport is what tells us they are reached.
         const root = target.closest<HTMLElement>("[data-lenis-prevent]");
-        if (!root) return;
         const observer = new IntersectionObserver(
             ([entry]) => {
                 if (entry.isIntersecting) void fetchNextPage();
@@ -41,7 +37,7 @@ export default function BoardLanePagination({ selector }: { selector: BoardLaneS
         );
         observer.observe(target);
         return () => observer.disconnect();
-    }, [dragActive, fetchNextPage, fetchingNextPage, hasNextPage, pageError]);
+    }, [fetchNextPage, fetchingNextPage, hasNextPage, pageError]);
 
     return (
         <div
@@ -53,12 +49,7 @@ export default function BoardLanePagination({ selector }: { selector: BoardLaneS
             }
         >
             {pageError && (
-                <Button
-                    size="xs"
-                    variant="tertiary"
-                    disabled={dragActive}
-                    onClick={() => retryPage()}
-                >
+                <Button size="xs" variant="tertiary" onClick={() => retryPage()}>
                     {fallbackPagination ? "Retry search" : "Retry lane"}
                 </Button>
             )}

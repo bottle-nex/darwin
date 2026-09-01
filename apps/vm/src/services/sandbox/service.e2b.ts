@@ -3,7 +3,7 @@ import { randomUUID } from "node:crypto";
 import { Harness, Prisma, prisma, WorkerStatus } from "@trymatcha/database";
 import { type McpServerSpec, Registry } from "@trymatcha/harness";
 import Logger, { format_duration } from "@trymatcha/logger";
-import { RunLogPhase } from "@trymatcha/types";
+import { RunLogEventKind, type RunLogMilestoneBody, RunLogPhase } from "@trymatcha/types";
 import type { CommandResult, SnapshotInfo } from "e2b";
 import { Sandbox } from "e2b";
 
@@ -37,6 +37,8 @@ const SANDBOX_TIMEOUT_MS = 15 * 60_000;
 const WORKER_SANDBOX_TIMEOUT_MS = 55 * 60_000;
 const CLONE_TIMEOUT_MS = 10 * 60_000;
 const ISSUE_PROMPT_PATH = "/home/user/issue_prompt.txt";
+
+type ChangesSummary = Extract<RunLogMilestoneBody, { kind: typeof RunLogEventKind.ChangesSummary }>;
 const PR_BODY_PATH = "/home/user/pr_body.md";
 const SANDBOX_MCP_ENTRY = "/opt/matcha/sandbox-mcp/index.js";
 const ISSUE_SOLVE_TIMEOUT_MS = 30 * 60_000;
@@ -294,10 +296,25 @@ export default class E2B {
 
                 console.log("already_pushed", already_pushed);
 
+                const base_commit = await E2B.head_of(sandbox);
+
                 // Minted after the claim lands, and used as the AgentSession id so a
                 // retried report is an upsert rather than a second attempt row. A resumed
                 // issue whose PR already exists never runs claude, so it has no run.
                 let run_id: string | undefined;
+
+                // The milestones are written through whichever writer the run opened, so they
+                // are silently dropped for a resumed issue that never opens one. Fire-and-forget
+                // for the same reason the observed trace is: a milestone that fails to store is
+                // not worth holding the run for.
+                let run_writer: RunLogWriter | null = null;
+                const milestone = (phase: RunLogPhase, event: RunLogMilestoneBody) => {
+                    void run_writer
+                        ?.write_observed(phase, event)
+                        .catch((error: unknown) =>
+                            log.warn("run log milestone not stored", { error: String(error) }),
+                        );
+                };
 
                 let agent_done = issue.agentDoneAt !== null;
 
@@ -382,6 +399,7 @@ export default class E2B {
                         log,
                     );
                     RunLogRegistry.register(run_id, writer, run_worker_token);
+                    run_writer = writer;
 
                     let report;
                     try {
@@ -420,6 +438,12 @@ export default class E2B {
                             },
                         });
                     } catch (error) {
+                        milestone(RunLogPhase.Agent, {
+                            kind: RunLogEventKind.RunFailed,
+                            reason: failure_sentence(
+                                describe_failure("solve issue", error, secrets()),
+                            ),
+                        });
                         RunLogRegistry.release(run_id);
                         await RunReporter.failed(
                             run_worker_token,
@@ -431,8 +455,23 @@ export default class E2B {
                         throw error;
                     }
 
+                    milestone(RunLogPhase.Agent, {
+                        kind: RunLogEventKind.AgentFinished,
+                        durationMs: report.duration_ms,
+                    });
+
+                    const changes = await E2B.changes_since(sandbox, base_commit);
+                    if (changes) milestone(RunLogPhase.Publish, changes);
+
                     RunLogRegistry.release(run_id);
-                    await RunReporter.completed(run_worker_token, run_id, issue.id, report, log);
+                    await RunReporter.completed(
+                        run_worker_token,
+                        run_id,
+                        issue.id,
+                        report,
+                        changes?.files,
+                        log,
+                    );
 
                     log.success(`issue #${issue.number} run finished`, {
                         turns: report.num_turns ?? "unknown",
@@ -633,7 +672,11 @@ export default class E2B {
 
             ## Reporting your progress
 
-            Someone is watching this run and sees only what you report. Call report_progress immediately after each action you take — every file you read, every file you edit or create, every search, and every command you run. Report the action, not its contents: the file changes and command output are shown separately, so send the path or the command and nothing more. A step you do not report did not happen as far as the person watching is concerned.
+            Someone is watching this run and sees only what you report. Call report_progress immediately after each action you take — every file you read, every file you edit or create, every search, and every command you run. Report the action, not its contents: the file changes and command output are shown separately, so send the path or the command and nothing more. An action you do not report did not happen as far as the person watching is concerned.
+
+            Use kind "notice" to record a decision the reader could not guess: a file you deliberately left alone and why, something you ruled out, a constraint you found in their code. Not a running commentary — a note is for a conclusion that would otherwise be invisible to someone who only sees the files you changed.
+
+            Before you turn to a new part of the work, report it with kind "step" and say the goal in one short plain sentence — "Finding where the navbar tiles are defined", not "Calling Grep". The person reading never sees your reasoning, so a step is the only place they learn what you are trying to do, and it is what makes the actions underneath it make sense. Expect roughly five to ten steps across this whole run: a step marks a change of intent, never a single file or command.
 
             Never start a long-running command in the background and end your turn waiting on it. This is a single non-interactive run: there is no later turn to come back to, so anything left running when you stop is lost and the issue goes unsolved. Run it in the foreground and wait for it to finish.`;
 
@@ -736,6 +779,44 @@ export default class E2B {
             if (existing) return existing;
             throw error;
         }
+    }
+
+    public static async head_of(sandbox: Sandbox): Promise<string> {
+        const result = await sandbox.commands
+            .run("git rev-parse HEAD", { cwd: REPO_DIR })
+            .catch(() => null);
+        return result?.stdout.trim() ?? "";
+    }
+
+    /**
+     * What the run changed, measured from the commit it started on.
+     *
+     * The agent commits its own work, so this is read after it finishes rather than tracked as
+     * it goes — and it is read against a remembered commit rather than the base branch, which a
+     * shallow clone does not have locally to compare with.
+     */
+    public static async changes_since(
+        sandbox: Sandbox,
+        base_commit: string,
+    ): Promise<ChangesSummary | null> {
+        if (!base_commit) return null;
+        const result = await sandbox.commands
+            .run(`git diff --shortstat ${base_commit}..HEAD`, { cwd: REPO_DIR })
+            .catch(() => null);
+
+        const summary = result?.stdout.trim();
+        if (!summary) return null;
+
+        const count = (pattern: RegExp) => Number(pattern.exec(summary)?.[1] ?? 0);
+        const files = count(/(\d+) files? changed/);
+        if (!files) return null;
+
+        return {
+            kind: RunLogEventKind.ChangesSummary,
+            files,
+            insertions: count(/(\d+) insertions?\(\+\)/),
+            deletions: count(/(\d+) deletions?\(-\)/),
+        };
     }
 
     public static async head_commit(sandbox_id: string): Promise<string> {

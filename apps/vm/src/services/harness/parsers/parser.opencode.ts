@@ -8,7 +8,6 @@ const ANSI_ESCAPE = /\[[0-9;]*[A-Za-z]/g;
 const READ = /^→ Read (.+)$/;
 const SKILL = /^→ Skill "(.+)"$/;
 const WRITE = /^[←→] Write (.+)$/;
-const COMMAND = /^\$ (.+)$/;
 const SEARCH = /^✱ (?:Grep|Glob) "(.+)" \d+ match(?:es)?$/;
 
 /**
@@ -43,9 +42,6 @@ export function parse_opencode_trace(raw: string): RunLogEventBody | null {
     const search = SEARCH.exec(line);
     if (search?.[1]) return { kind: RunLogEventKind.Search, pattern: search[1] };
 
-    const command = COMMAND.exec(line);
-    if (command?.[1]) return { kind: RunLogEventKind.Command, command: command[1] };
-
     const skill = SKILL.exec(line);
     if (skill?.[1]) return { kind: RunLogEventKind.Notice, text: `skill: ${skill[1]}` };
 
@@ -60,7 +56,7 @@ export function parse_opencode_trace(raw: string): RunLogEventBody | null {
 export default class OpenCodeEventParser implements HarnessEventParser {
     private last_text: string | undefined;
 
-    observe_line(line: string): void {
+    observe_line(line: string): RunLogEventBody | null {
         try {
             const event = JSON.parse(line);
             const text =
@@ -70,13 +66,14 @@ export default class OpenCodeEventParser implements HarnessEventParser {
                     : undefined;
             if (typeof text === "string" && text.trim()) {
                 this.last_text = text;
-                return;
+                return null;
             }
         } catch {
             // not JSON — fall through to plain text
         }
 
         if (line.trim()) this.last_text = line;
+        return null;
     }
 
     observe_trace_line(line: string): RunLogEventBody | null {

@@ -15,10 +15,10 @@ import { myIssuesKey, normalizeBoardFilters } from "./boardCache";
 
 const PAGE_LIMIT = 50;
 
-// My Issues is one flat, newest-first list. The server still requires both params
-// and folds them into the cursor's scope digest, so they are sent as constants.
+// Grouping happens on the loaded rows, so the server only needs the sort key. It
+// folds both params into the cursor's scope digest, so they are sent as constants.
 const GROUP = "none";
-const ORDER = "newest";
+const ORDER = "manual";
 
 export function useMyIssues(
     projectId: string | undefined,

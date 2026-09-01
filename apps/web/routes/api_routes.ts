@@ -97,6 +97,7 @@ export const BOARD_COLUMNS_URL = (project_id: string) => `${BOARD_URL(project_id
 export const BOARD_SEARCH_URL = (project_id: string) => `${BOARD_URL(project_id)}/search`;
 export const MY_ISSUES_URL = (project_id: string) => `${BOARD_URL(project_id)}/my`;
 export const ISSUE_URL = (id: string) => `${ISSUES_URL}/${id}`;
+export const ISSUE_VIEWS_URL = (project_id: string) => `${ISSUES_URL}/views/${project_id}`;
 export const BULK_UPDATE_ISSUES_URL = ISSUES_URL + "/bulk";
 export const BULK_DELETE_ISSUES_URL = ISSUES_URL + "/bulk/delete";
 export const SEARCH_ISSUES_URL = (project_id: string, query: string) =>

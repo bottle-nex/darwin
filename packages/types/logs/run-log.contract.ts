@@ -1,24 +1,29 @@
 export const RunLogEventKind = {
-    Phase: "phase",
-    Thought: "thought",
+    AgentFinished: "agent_finished",
+    ChangesSummary: "changes_summary",
+    RunFailed: "run_failed",
+    Step: "step",
     FileRead: "file_read",
     FileWrite: "file_write",
     Search: "search",
-    Command: "command",
     CommandFailed: "command_failed",
     Notice: "notice",
-    Failure: "failure",
 } as const;
 export type RunLogEventKind = (typeof RunLogEventKind)[keyof typeof RunLogEventKind];
 
 export const RunLogPhase = {
     Setup: "setup",
-    Plan: "plan",
     Agent: "agent",
-    Verify: "verify",
     Publish: "publish",
 } as const;
 export type RunLogPhase = (typeof RunLogPhase)[keyof typeof RunLogPhase];
+
+export const RunLogLevel = {
+    Info: "info",
+    Warn: "warn",
+    Error: "error",
+} as const;
+export type RunLogLevel = (typeof RunLogLevel)[keyof typeof RunLogLevel];
 
 export const RunLogState = {
     Live: "live",
@@ -27,16 +32,43 @@ export const RunLogState = {
 } as const;
 export type RunLogState = (typeof RunLogState)[keyof typeof RunLogState];
 
-export type RunLogEventBody =
-    | { kind: typeof RunLogEventKind.Phase }
-    | { kind: typeof RunLogEventKind.Thought; durationMs: number }
+export type RunLogMilestoneBody =
+    | { kind: typeof RunLogEventKind.AgentFinished; durationMs: number }
+    | {
+          kind: typeof RunLogEventKind.ChangesSummary;
+          files: number;
+          insertions: number;
+          deletions: number;
+      }
+    | { kind: typeof RunLogEventKind.RunFailed; reason: string };
+
+export type RunLogActionBody =
+    | { kind: typeof RunLogEventKind.Step; text: string }
     | { kind: typeof RunLogEventKind.FileRead; path: string }
     | { kind: typeof RunLogEventKind.FileWrite; path: string; mode: "edit" | "create" }
     | { kind: typeof RunLogEventKind.Search; pattern: string }
-    | { kind: typeof RunLogEventKind.Command; command: string }
-    | { kind: typeof RunLogEventKind.CommandFailed; command: string; output: string }
-    | { kind: typeof RunLogEventKind.Notice; text: string }
-    | { kind: typeof RunLogEventKind.Failure; text: string };
+    | {
+          kind: typeof RunLogEventKind.CommandFailed;
+          command: string;
+          output: string;
+          exitCode?: number;
+      }
+    | { kind: typeof RunLogEventKind.Notice; text: string; level?: RunLogLevel };
+
+export type RunLogEventBody = RunLogMilestoneBody | RunLogActionBody;
+
+export function run_log_level(event: RunLogEventBody): RunLogLevel {
+    switch (event.kind) {
+        case RunLogEventKind.Notice:
+            return event.level ?? RunLogLevel.Info;
+        case RunLogEventKind.CommandFailed:
+            return RunLogLevel.Warn;
+        case RunLogEventKind.RunFailed:
+            return RunLogLevel.Error;
+        default:
+            return RunLogLevel.Info;
+    }
+}
 
 export type RunLogEvent = RunLogEventBody & {
     seq: number;
@@ -60,8 +92,9 @@ export const RUN_LOG_HOT_TTL_SECONDS = 6 * 60 * 60;
 export const RUN_LOG_MAX_BYTES = 8 * 1024 * 1024;
 
 export const RUN_LOG_MAX_PATH_LENGTH = 256;
-export const RUN_LOG_MAX_COMMAND_LENGTH = 512;
-export const RUN_LOG_MAX_NOTICE_LENGTH = 500;
+export const RUN_LOG_MAX_COMMAND_LENGTH = 160;
+export const RUN_LOG_MAX_NOTICE_LENGTH = 160;
+export const RUN_LOG_MAX_STEP_LENGTH = 100;
 export const RUN_LOG_MAX_FAILURE_OUTPUT_LENGTH = 2_000;
 
 export const RUN_LOG_CACHE_INDEX_KEY = "run-logs:index";

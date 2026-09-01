@@ -16,12 +16,14 @@ import IssueGetConfigController from "../../controllers/issues/controller.get_is
 import IssueReferencesGetController from "../../controllers/issues/controller.get_issue_references";
 import IssueGetController from "../../controllers/issues/controller.get_issues";
 import RunLogsGetController from "../../controllers/issues/controller.get_run_logs";
+import ViewPreferencesGetController from "../../controllers/issues/controller.get_view_preferences";
 import IssueActivityListController from "../../controllers/issues/controller.list_activity";
 import MyIssuesListController from "../../controllers/issues/controller.list_my_issues";
 import ColumnReorderController from "../../controllers/issues/controller.reorder_columns";
 import BoardIssuesSearchController from "../../controllers/issues/controller.search_board_issues";
 import IssueSearchController from "../../controllers/issues/controller.search_issues";
 import IssueSetConfigController from "../../controllers/issues/controller.set_issue_config";
+import ViewPreferenceSetController from "../../controllers/issues/controller.set_view_preference";
 import IssueUnassignController from "../../controllers/issues/controller.unassign_issue";
 import ColumnUpdateController from "../../controllers/issues/controller.update_column";
 import IssueUpdateController from "../../controllers/issues/controller.update_issue";
@@ -36,6 +38,9 @@ issues_router.get("/board/:project_id/search", require_auth, BoardIssuesSearchCo
 issues_router.get("/board/:project_id/my", require_auth, MyIssuesListController.process);
 issues_router.get("/board/:project_id", require_auth, IssueGetController.process);
 issues_router.get("/search/:project_id", require_auth, IssueSearchController.process);
+
+issues_router.get("/views/:project_id", require_auth, ViewPreferencesGetController.process);
+issues_router.patch("/views/:project_id", require_auth, ViewPreferenceSetController.process);
 
 issues_router.post("/spaces", require_auth, SpaceCreateController.process);
 issues_router.patch("/spaces/:id", require_auth, SpaceUpdateController.process);

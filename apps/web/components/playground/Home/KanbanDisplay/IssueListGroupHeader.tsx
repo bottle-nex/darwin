@@ -1,15 +1,14 @@
 "use client";
 
-import type { IconType } from "@trymatcha/ui/icons";
 import { AddIcon, DropdownCaretIcon } from "@trymatcha/ui/icons";
+import type { ReactNode } from "react";
 
 import IconWrapper from "@/components/ui/IconWrapper";
 import { cn } from "@/lib/utils";
 
 type IssueListGroupHeaderProps = {
     title: string;
-    icon: IconType;
-    iconClassName?: string;
+    glyph: ReactNode;
     count: number;
     total?: number;
     collapsed: boolean;
@@ -19,8 +18,7 @@ type IssueListGroupHeaderProps = {
 
 export default function IssueListGroupHeader({
     title,
-    icon: GroupIcon,
-    iconClassName,
+    glyph,
     count,
     total,
     collapsed,
@@ -45,10 +43,7 @@ export default function IssueListGroupHeader({
                     aria-hidden
                 />
                 <div className="flex min-w-0 flex-1 items-center gap-2">
-                    <GroupIcon
-                        className={cn("size-3.5 shrink-0", iconClassName ?? "text-violet-300")}
-                        aria-hidden
-                    />
+                    {glyph}
                     <span className="truncate text-[13px] font-semibold text-neutral-200">
                         {title}
                     </span>

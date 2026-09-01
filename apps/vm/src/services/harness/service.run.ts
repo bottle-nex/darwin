@@ -66,16 +66,18 @@ export default class HarnessRun {
             })
             .join(" ");
 
-        // stdout is the harness's event stream and is read for the run's outcome only. The
-        // trace on stderr is the rendering meant for a person, and it is the only place a
-        // harness describes every action it took: the agent's own reports reach the log
-        // through the sandbox MCP tool, but only for the actions it chooses to report.
-        const observe = (line: string) => parser.observe_line(line);
+        // Both streams can describe an action. stdout is the harness's event stream, which for
+        // a harness that names its tool calls there is the complete record of the run; stderr is
+        // the rendering meant for a person, which is where a harness with no event stream says
+        // what it did. Whichever a harness has, its parser reads — the agent's own reports
+        // through the sandbox MCP tool cover only the actions it chooses to report.
+        const emit = (event: RunLogEventBody | null) => {
+            if (event && options.on_observed) options.on_observed(event);
+        };
+        const observe = (line: string) => emit(parser.observe_line(line));
         const trace = (line: string) => {
             log.stream(chalk.dim(truncate(line, MAX_TEXT)));
-            if (!options.on_observed || !parser.observe_trace_line) return;
-            const event = parser.observe_trace_line(line);
-            if (event) options.on_observed(event);
+            if (parser.observe_trace_line) emit(parser.observe_trace_line(line));
         };
         const stdout = SandboxStream.lines();
         const stderr = SandboxStream.lines();

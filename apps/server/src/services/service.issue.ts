@@ -42,6 +42,7 @@ export const ISSUE_PATCH_SCHEMA = z.object({
     assignee_ids: z.array(z.string()).max(20).optional(),
     start_date: z.union([z.null(), z.coerce.date()]).optional(),
     target_date: z.union([z.null(), z.coerce.date()]).optional(),
+    sort_order: z.number().finite().optional(),
 });
 
 export type IssuePatch = z.infer<typeof ISSUE_PATCH_SCHEMA>;
@@ -106,6 +107,7 @@ export default class IssueService {
                             projectId: input.project_id,
                             createdById: input.created_by.id,
                             customColumnId: input.custom_column_id,
+                            sortOrder: Date.now() / 1000,
                             status: input.custom_column_id ? IssueStatus.Parked : IssueStatus.Todo,
                             number: (last_issue?.number ?? 0) + 1,
                             assignees: input.assignee_ids?.length
@@ -285,6 +287,7 @@ export default class IssueService {
                 title: patch.title,
                 description: references ? references.message : undefined,
                 priority: patch.priority,
+                sortOrder: patch.sort_order,
                 status: next_status,
                 customColumn:
                     next_column_id === null

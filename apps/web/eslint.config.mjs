@@ -37,7 +37,7 @@ const eslintConfig = defineConfig([
             "components/playground/Home/KanbanDisplay/VirtualizedRows.tsx",
             "components/playground/Home/chat/ProjectChatThread.tsx",
             "components/playground/Issue/activity/ActivityFeed.tsx",
-            "components/playground/Issue/logs/RunLogStream.tsx",
+            "components/playground/Issue/logs/AgentLogList.tsx",
         ],
         rules: { "react-hooks/incompatible-library": "off" },
     },

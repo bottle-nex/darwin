@@ -15,7 +15,7 @@ import { type ReactNode, useState } from "react";
 
 import MemberOptionRow from "@/components/playground/Core/components/MemberOptionRow";
 import { boardDestinationRows } from "@/components/playground/Issue/boardDestinationRows";
-import { PRIORITY_OPTIONS } from "@/components/playground/Issue/issueHelpers";
+import { PRIORITY_OPTIONS, PRIORITY_TO_NUMBER } from "@/components/playground/Issue/issueHelpers";
 import {
     ContextMenu,
     ContextMenuContent,
@@ -34,8 +34,6 @@ import { DATE_SHORTCUTS_WITH_CLEAR } from "@/lib/dateShortcuts";
 import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
 import { cn } from "@/lib/utils";
 import type { BoardIssue } from "@/types/board";
-
-import { PRIORITY_TO_NUMBER } from "./customkanban/data";
 
 const ICON = "size-3.5 text-snow/50!";
 

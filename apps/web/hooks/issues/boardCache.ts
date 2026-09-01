@@ -235,6 +235,7 @@ export function toBoardIssue(issue: Issue | BoardIssue): BoardIssue {
         priority: issue.priority,
         status: issue.status,
         customColumnId: issue.customColumnId,
+        sortOrder: issue.sortOrder,
         createdAt: new Date(issue.createdAt).toISOString(),
         startDate: issue.startDate ? new Date(issue.startDate).toISOString() : null,
         targetDate: issue.targetDate ? new Date(issue.targetDate).toISOString() : null,

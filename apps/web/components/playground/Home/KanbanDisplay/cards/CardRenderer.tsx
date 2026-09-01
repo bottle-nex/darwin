@@ -1,5 +1,6 @@
 "use client";
 import { useIssueSelection } from "@/hooks/issues/useIssueSelection";
+import type { IssueSelectionScope } from "@/store/issues/useIssueSelectionStore";
 import { usePaneRouteStore } from "@/store/playground/usePaneRouteStore";
 import { type Issue, KanbanStatus } from "@/types/kanban";
 
@@ -15,8 +16,6 @@ import TodoCard from "./TodoCard";
 /** Picks the card component for an issue based on its column. */
 function statusCard(issue: Issue) {
     switch (issue.status) {
-        case KanbanStatus.Todo:
-            return <TodoCard issue={issue} />;
         case KanbanStatus.Queued:
             return <QueuedCard issue={issue} />;
         case KanbanStatus.InProgress:
@@ -29,6 +28,9 @@ function statusCard(issue: Issue) {
             return <FailedCard issue={issue} />;
         case KanbanStatus.Cancelled:
             return <CancelledCard issue={issue} />;
+        // To Do and issues parked in a space column both draw the plain face.
+        default:
+            return <TodoCard issue={issue} />;
     }
 }
 
@@ -40,13 +42,15 @@ function statusCard(issue: Issue) {
  */
 export default function CardRenderer({
     issue,
+    selectionScope = "kanban",
     preview = false,
 }: {
     issue: Issue;
+    selectionScope?: IssueSelectionScope;
     preview?: boolean;
 }) {
     const openIssue = usePaneRouteStore((s) => s.openIssue);
-    const { isSelected, handleSelectClick } = useIssueSelection("kanban");
+    const { isSelected, handleSelectClick } = useIssueSelection(selectionScope);
     const selected = isSelected(issue.id);
 
     const open = () => openIssue(issue.id);
@@ -56,7 +60,7 @@ export default function CardRenderer({
             role="button"
             tabIndex={0}
             data-issue-id={issue.id}
-            data-selection-scope="kanban"
+            data-selection-scope={selectionScope}
             data-selected={selected}
             className="group/card cursor-pointer rounded-md"
             onClick={(event) => {

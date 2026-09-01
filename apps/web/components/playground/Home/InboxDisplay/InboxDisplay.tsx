@@ -12,6 +12,7 @@ import { type InboxFilter, useInboxStore } from "@/store/playground/useInboxStor
 
 import InboxDetail from "./InboxDetail";
 import { useInboxNotifications } from "./useInboxNotifications";
+import IconWrapper from "@/components/ui/IconWrapper";
 
 const FILTERS: { value: InboxFilter; label: string }[] = [
     { value: "all", label: "Inbox" },
@@ -46,14 +47,11 @@ export default function InboxDisplay() {
                             key={option.value}
                             type="button"
                             onClick={() => setFilter(option.value)}
-                            className={cn(
-                                "cursor-pointer rounded-md px-2 py-1 text-[12px] font-medium transition-colors",
-                                filter === option.value
-                                    ? "bg-white/7 text-neutral-100"
-                                    : "text-neutral-500 hover:bg-white/4 hover:text-neutral-200",
-                            )}
+                            className="cursor-pointer"
                         >
-                            {option.label}
+                            <IconWrapper variant="ring" size="big" active={filter === option.value}>
+                                {option.label}
+                            </IconWrapper>
                         </button>
                     ))}
                     {unreadCount > 0 && projectId && (

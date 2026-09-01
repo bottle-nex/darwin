@@ -31,6 +31,15 @@ export type PriorityOption = {
     iconClassName?: string;
 };
 
+/** A card's `Priority` as the server's 0–4 priority scale. */
+export const PRIORITY_TO_NUMBER: Record<Priority, 0 | 1 | 2 | 3 | 4> = {
+    none: 0,
+    urgent: 1,
+    high: 2,
+    medium: 3,
+    low: 4,
+};
+
 export const PRIORITY_OPTIONS: PriorityOption[] = [
     { value: "none", label: "No priority", icon: NoPriorityIcon, rank: 0 },
     {

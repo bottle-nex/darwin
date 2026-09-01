@@ -1,16 +1,15 @@
 "use client";
 
 import { MyIssuesIcon } from "@trymatcha/ui/icons";
-import { type ReactNode, useMemo } from "react";
+import type { ReactNode } from "react";
 
 import LogoLoader from "@/components/app/LogoLoader";
 import PaneEmptyState from "@/components/playground/Core/components/PaneEmptyState";
-import IssueListRow from "@/components/playground/Home/KanbanDisplay/IssueListRow";
-import { VirtualizedRows } from "@/components/playground/Home/KanbanDisplay/VirtualizedRows";
+import GroupedIssueBoard from "@/components/playground/Home/KanbanDisplay/GroupedIssueBoard";
+import GroupedIssueList from "@/components/playground/Home/KanbanDisplay/GroupedIssueList";
 import { Button } from "@/components/ui/button";
-import { IssueSelectionOrderProvider } from "@/hooks/issues/useIssueSelection";
-import { KanbanMappers } from "@/lib/kanban/KanbanMappers";
-import { useIssueSelectionStore } from "@/store/issues/useIssueSelectionStore";
+import type { IssueLayout } from "@/hooks/issues/useIssueView";
+import { type IssueGroupBy, NO_GROUPING } from "@/lib/kanban/issueGrouping";
 import type { MyIssuesView } from "@/store/issues/useMyIssuesOptionsStore";
 import type { BoardIssue } from "@/types/board";
 
@@ -18,6 +17,8 @@ type MyIssuesListProps = {
     issues: BoardIssue[];
     total: number;
     view: MyIssuesView;
+    layout: IssueLayout;
+    groupBy: IssueGroupBy;
     loading: boolean;
     error: boolean;
     pageError: boolean;
@@ -33,6 +34,8 @@ export default function MyIssuesList({
     issues,
     total,
     view,
+    layout,
+    groupBy,
     loading,
     error,
     pageError,
@@ -43,27 +46,6 @@ export default function MyIssuesList({
     fetchingNextPage,
     onLoadMore,
 }: MyIssuesListProps) {
-    // One flat list — filters do the narrowing. Grouping belongs to the Agent
-    // board's list view, where lanes are the point. The `issue:` key scheme is kept
-    // so the virtualizer's item identity survives.
-    const rows = useMemo(
-        () => issues.map((issue) => ({ key: `issue:${issue.id}`, issue })),
-        [issues],
-    );
-    const loadedIssueIds = useMemo(() => issues.map((issue) => issue.id), [issues]);
-    const selectedIds = useIssueSelectionStore((s) => s.ids);
-    const selectedAt = (index: number) => {
-        const row = rows[index];
-        return row !== undefined && selectedIds.includes(row.issue.id);
-    };
-    const issuePositions = useMemo(
-        () => new Map(loadedIssueIds.map((issueId, index) => [issueId, index + 1])),
-        [loadedIssueIds],
-    );
-    const issueRows = useMemo(
-        () => new Map(rows.map((row, index) => [row.issue.id, index])),
-        [rows],
-    );
     const emptyState = resolveEmptyState({
         loading,
         error,
@@ -73,61 +55,46 @@ export default function MyIssuesList({
         onRetry,
     });
 
-    return (
-        <IssueSelectionOrderProvider issueIds={loadedIssueIds}>
-            <VirtualizedRows
-                rows={rows}
-                getRowKey={(row) => row.key}
-                estimateSize={44}
-                className="mt-2 min-h-0 flex-1 px-3 pb-2"
-                contentRole="list"
-                findIssueRow={(issueId) => issueRows.get(issueId) ?? -1}
-                emptyState={emptyState}
-                status={{
-                    label: loading
-                        ? "Loading your issues"
-                        : error || pageError
-                          ? "Your issues could not be loaded. Retry is available."
-                          : issues.length === 0
-                            ? filtersActive
-                                ? "No loaded issues match your filters"
-                                : "No issues to show"
-                            : `${issues.length} of ${total} issues loaded`,
-                }}
-                autoFill={{
-                    key: `${view}:${filtersActive}`,
-                    hasNextPage,
-                    fetchingNextPage,
-                    pageError,
-                    paused: false,
-                    onLoadMore,
-                }}
-                renderRow={(row, index) => {
-                    return (
-                        <div
-                            role="listitem"
-                            aria-posinset={issuePositions.get(row.issue.id)}
-                            aria-setsize={total}
-                            className="overflow-hidden"
-                        >
-                            <IssueListRow
-                                issueId={row.issue.id}
-                                number={row.issue.number}
-                                title={row.issue.title}
-                                status={row.issue.status}
-                                tags={row.issue.tags}
-                                assignees={row.issue.assignees.map(KanbanMappers.toAssignee)}
-                                createdAt={row.issue.createdAt}
-                                boardIssue={row.issue}
-                                selectionScope="my-issues"
-                                joinedAbove={selectedAt(index - 1)}
-                                joinedBelow={selectedAt(index + 1)}
-                            />
-                        </div>
-                    );
-                }}
+    const autoFill = {
+        key: `${view}:${filtersActive}`,
+        hasNextPage,
+        fetchingNextPage,
+        pageError,
+        paused: false,
+        onLoadMore,
+    };
+
+    if (layout === "board") {
+        return (
+            <GroupedIssueBoard
+                issues={issues}
+                groupBy={groupBy === NO_GROUPING ? "statuses" : groupBy}
+                selectionScope="my-issues"
+                columnAutoFill={autoFill}
             />
-        </IssueSelectionOrderProvider>
+        );
+    }
+
+    return (
+        <GroupedIssueList
+            issues={issues}
+            groupBy={groupBy}
+            selectionScope="my-issues"
+            total={total}
+            emptyState={emptyState}
+            status={{
+                label: loading
+                    ? "Loading your issues"
+                    : error || pageError
+                      ? "Your issues could not be loaded. Retry is available."
+                      : issues.length === 0
+                        ? filtersActive
+                            ? "No loaded issues match your filters"
+                            : "No issues to show"
+                        : `${issues.length} of ${total} issues loaded`,
+            }}
+            autoFill={autoFill}
+        />
     );
 }
 

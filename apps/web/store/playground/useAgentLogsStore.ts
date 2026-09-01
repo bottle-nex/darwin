@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-interface RunLogDisclosureState {
+interface AgentLogsState {
     expanded: Record<string, boolean>;
     setExpanded: (runId: string, value: boolean) => void;
 }
@@ -11,7 +11,7 @@ interface RunLogDisclosureState {
  * A row that scrolls out of view unmounts, so anything held in the row's own state resets the
  * moment it comes back — a log the reader opened would close itself behind them.
  */
-export const useRunLogDisclosureStore = create<RunLogDisclosureState>((set) => ({
+export const useAgentLogsStore = create<AgentLogsState>((set) => ({
     expanded: {},
     setExpanded: (runId, value) =>
         set((state) => ({ expanded: { ...state.expanded, [runId]: value } })),

@@ -77,12 +77,13 @@ model User {
   projectChatReactions ProjectChatReaction[]
   teamChatReactions    TeamChatReaction[]
 
-  customColumnOrders  CustomColumnOrder[]
-  notifications       Notification[]
-  issueActivities     IssueActivity[]     @relation(name: "ActivityActor")
-  apiKeys             ApiKey[]
-  config              UserConfig?
-  githubImportConfigs GithubIssueImport[] @relation(name: "GithubImportConfigurer")
+  customColumnOrders   CustomColumnOrder[]
+  issueViewPreferences IssueViewPreference[]
+  notifications        Notification[]
+  issueActivities      IssueActivity[]       @relation(name: "ActivityActor")
+  apiKeys              ApiKey[]
+  config               UserConfig?
+  githubImportConfigs  GithubIssueImport[]   @relation(name: "GithubImportConfigurer")
 }
 
 model UserConfig {

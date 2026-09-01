@@ -4,8 +4,10 @@ import {
     RUN_LOG_MAX_FAILURE_OUTPUT_LENGTH,
     RUN_LOG_MAX_NOTICE_LENGTH,
     RUN_LOG_MAX_PATH_LENGTH,
+    RUN_LOG_MAX_STEP_LENGTH,
     type RunLogEventBody,
     RunLogEventKind,
+    RunLogLevel,
     type RunLogPhase,
 } from "@trymatcha/types";
 import { z } from "zod";
@@ -22,10 +24,12 @@ export type RunLogWriteResult = "stored" | "duplicate" | "refused" | "ignored" |
 /**
  * The events a sandbox is allowed to report about itself.
  *
- * Narrower than the full set on purpose: phase changes and run failures are what this worker
- * observed, so an agent cannot claim a phase it never reached or a failure that did not happen.
+ * Narrower than the full set on purpose: the milestones are what this worker observed, so an
+ * agent cannot claim it pushed a branch or finished a run that never happened. A step is the one
+ * addition, because the agent is the only thing that knows its own intent.
  */
 const reported_event_schema = z.discriminatedUnion("kind", [
+    z.object({ kind: z.literal(RunLogEventKind.Step), text: z.string() }),
     z.object({ kind: z.literal(RunLogEventKind.FileRead), path: z.string() }),
     z.object({
         kind: z.literal(RunLogEventKind.FileWrite),
@@ -33,16 +37,38 @@ const reported_event_schema = z.discriminatedUnion("kind", [
         mode: z.enum(["edit", "create"]).default("edit"),
     }),
     z.object({ kind: z.literal(RunLogEventKind.Search), pattern: z.string() }),
-    z.object({ kind: z.literal(RunLogEventKind.Command), command: z.string() }),
     z.object({
         kind: z.literal(RunLogEventKind.CommandFailed),
         command: z.string(),
         output: z.string().default(""),
+        exitCode: z.number().int().optional(),
     }),
-    z.object({ kind: z.literal(RunLogEventKind.Notice), text: z.string() }),
+    z.object({
+        kind: z.literal(RunLogEventKind.Notice),
+        text: z.string(),
+        level: z.enum([RunLogLevel.Info, RunLogLevel.Warn, RunLogLevel.Error]).optional(),
+    }),
 ]);
 
-type ReportedEvent = z.infer<typeof reported_event_schema>;
+/**
+ * Everything the worker itself can record — the sandbox's vocabulary plus the milestones only
+ * this process can vouch for, because it is the one that performed them.
+ */
+const observed_event_schema = z.union([
+    reported_event_schema,
+    z.discriminatedUnion("kind", [
+        z.object({ kind: z.literal(RunLogEventKind.AgentFinished), durationMs: z.number() }),
+        z.object({
+            kind: z.literal(RunLogEventKind.ChangesSummary),
+            files: z.number().int(),
+            insertions: z.number().int(),
+            deletions: z.number().int(),
+        }),
+        z.object({ kind: z.literal(RunLogEventKind.RunFailed), reason: z.string() }),
+    ]),
+]);
+
+type ReportedEvent = z.infer<typeof observed_event_schema>;
 
 /**
  * Writes one action into the cache, from either of the two things that can describe a run.
@@ -91,11 +117,15 @@ export default class RunLogWriter {
      * and a line that fails to store is gone rather than resent.
      */
     async write_observed(phase: RunLogPhase, event: unknown): Promise<RunLogWriteResult> {
-        return this.store(phase, event);
+        return this.store(phase, event, observed_event_schema);
     }
 
-    private async store(phase: RunLogPhase, event: unknown): Promise<RunLogWriteResult> {
-        const parsed = reported_event_schema.safeParse(event);
+    private async store(
+        phase: RunLogPhase,
+        event: unknown,
+        schema: z.ZodType<ReportedEvent> = reported_event_schema,
+    ): Promise<RunLogWriteResult> {
+        const parsed = schema.safeParse(event);
         if (!parsed.success) return "unsupported";
 
         const body = this.sanitize(parsed.data);
@@ -129,7 +159,6 @@ export default class RunLogWriter {
                 return `${body.kind}:${body.path}`;
             case RunLogEventKind.Search:
                 return `${body.kind}:${body.pattern}`;
-            case RunLogEventKind.Command:
             case RunLogEventKind.CommandFailed:
                 return `${body.kind}:${body.command}`;
             default:
@@ -138,7 +167,10 @@ export default class RunLogWriter {
     }
 
     private clean(text: string, limit: number): string {
-        return redact(text.replace(ANSI_ESCAPE, ""), this.secrets).trim().slice(0, limit);
+        return redact(text.replace(ANSI_ESCAPE, ""), this.secrets)
+            .replace(/\s+/g, " ")
+            .trim()
+            .slice(0, limit);
     }
 
     /**
@@ -152,10 +184,7 @@ export default class RunLogWriter {
 
     private sanitize(event: ReportedEvent): RunLogEventBody | null {
         switch (event.kind) {
-            case RunLogEventKind.FileRead: {
-                const path = this.clean(event.path, RUN_LOG_MAX_PATH_LENGTH);
-                return path ? { ...event, path } : null;
-            }
+            case RunLogEventKind.FileRead:
             case RunLogEventKind.FileWrite: {
                 const path = this.clean(event.path, RUN_LOG_MAX_PATH_LENGTH);
                 return path ? { ...event, path } : null;
@@ -163,10 +192,6 @@ export default class RunLogWriter {
             case RunLogEventKind.Search: {
                 const pattern = this.clean(event.pattern, RUN_LOG_MAX_COMMAND_LENGTH);
                 return pattern ? { ...event, pattern } : null;
-            }
-            case RunLogEventKind.Command: {
-                const command = this.clean(event.command, RUN_LOG_MAX_COMMAND_LENGTH);
-                return command ? { ...event, command } : null;
             }
             case RunLogEventKind.CommandFailed: {
                 const command = this.clean(event.command, RUN_LOG_MAX_COMMAND_LENGTH);
@@ -177,10 +202,16 @@ export default class RunLogWriter {
                     output: this.tail(event.output, RUN_LOG_MAX_FAILURE_OUTPUT_LENGTH),
                 };
             }
-            default: {
+            case RunLogEventKind.Step: {
+                const text = this.clean(event.text, RUN_LOG_MAX_STEP_LENGTH);
+                return text ? { ...event, text } : null;
+            }
+            case RunLogEventKind.Notice: {
                 const text = this.clean(event.text, RUN_LOG_MAX_NOTICE_LENGTH);
                 return text ? { ...event, text } : null;
             }
+            default:
+                return event;
         }
     }
 }

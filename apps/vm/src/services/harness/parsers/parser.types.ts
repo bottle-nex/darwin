@@ -10,7 +10,7 @@ export interface AgentReport {
 }
 
 export interface HarnessEventParser {
-    observe_line: (line: string) => void;
+    observe_line: (line: string) => RunLogEventBody | null;
     extract_report: (stderr_tail: string, duration_ms: number) => AgentReport;
 
     /**

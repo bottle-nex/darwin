@@ -4,7 +4,6 @@ import { useDeleteColumn } from "@/hooks/issues/useDeleteColumn";
 import { useUpdateColumn } from "@/hooks/issues/useUpdateColumn";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { toast } from "@/lib/toast";
-import { useCustomKanbanStore } from "@/store/kanban/useCustomKanbanStore";
 
 export function useCustomColumnActions() {
     const projectId = useActiveProject()?.id;
@@ -16,14 +15,11 @@ export function useCustomColumnActions() {
         const name = title.trim();
         if (!name || !projectId) return false;
         try {
-            const column = await createColumn.mutateAsync({
+            await createColumn.mutateAsync({
                 project_id: projectId,
                 space_id: spaceId,
                 label: name,
             });
-            useCustomKanbanStore
-                .getState()
-                .addColumnLocal({ id: column.id, title: column.label, cards: [] });
             return true;
         } catch {
             toast.error("Couldn't create the list.");
@@ -33,7 +29,6 @@ export function useCustomColumnActions() {
 
     const removeColumn = async (columnId: string) => {
         if (!projectId) return;
-        useCustomKanbanStore.getState().removeColumnLocal(columnId);
         try {
             await deleteColumn.mutateAsync({ id: columnId, project_id: projectId });
         } catch {
@@ -44,7 +39,6 @@ export function useCustomColumnActions() {
     const renameColumn = async (columnId: string, label: string) => {
         const name = label.trim();
         if (!name || !projectId) return;
-        useCustomKanbanStore.getState().renameColumnLocal(columnId, name);
         try {
             await updateColumn.mutateAsync({ id: columnId, project_id: projectId, label: name });
         } catch {

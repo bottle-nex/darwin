@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-import type { KanbanStatus, KanbanView } from "@/types/kanban";
+import type { KanbanStatus } from "@/types/kanban";
 
 /**
  * The Focus selection: the normal multi-column board, or a single focused
@@ -16,22 +16,16 @@ export const NO_FOCUS: FocusValue = { kind: "default" };
 
 interface KanbanOptionsState {
     focus: FocusValue;
-    /** Whether the board renders as a column grid or a flat list. */
-    kanbanView: KanbanView;
     setFocus: (focus: FocusValue) => void;
-    setKanbanView: (view: KanbanView) => void;
 }
 
 /**
- * Board toolbar view state: which column is focused full-width, and the
- * board/list layout toggle. Which board a pane shows is navigation state now —
+ * Which column a pane is focused on, full width. Layout and grouping are saved
+ * per user — see `useIssueView`. Which board a pane shows is navigation state —
  * see `usePlaygroundNavStore`. Issue-narrowing filters live in
  * `useKanbanFilterStore`.
  */
 export const useKanbanOptionsStore = create<KanbanOptionsState>((set) => ({
     focus: NO_FOCUS,
-    kanbanView: "board",
-
     setFocus: (focus) => set({ focus }),
-    setKanbanView: (kanbanView) => set({ kanbanView }),
 }));
