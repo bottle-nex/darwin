@@ -45,14 +45,25 @@ const reported_event_schema = z.discriminatedUnion("kind", [
 type ReportedEvent = z.infer<typeof reported_event_schema>;
 
 /**
- * Writes one reported action straight through to the cache.
+ * Writes one action into the cache, from either of the two things that can describe a run.
  *
  * Deliberately holds nothing: the caller answers the sandbox with the outcome of this write, so
  * anything buffered here would be acknowledged before it was stored, and a restart would lose
- * events the sandbox had already been told to forget. Sequence numbers come from the sandbox for
- * the same reason — a retry has to carry the identity of the event it is replacing.
+ * events the sandbox had already been told to forget.
+ *
+ * A run is described from two sides — the agent reporting itself through the MCP tool, and this
+ * worker watching the harness's trace — so the ordering they share cannot come from either one.
+ * This writer owns it. The number the sandbox sends is kept as the identity of its report, which
+ * is what still makes a retry safe, but it names the report rather than its position.
  */
 export default class RunLogWriter {
+    private next_seq = 0;
+
+    /** Sandbox report number → the sequence it was stored under, so a retry is recognised. */
+    private readonly reported = new Map<number, number>();
+
+    private last_identity: string | null = null;
+
     private constructor(
         private readonly run_id: string,
         private readonly owner: RunLogOwner,
@@ -64,22 +75,66 @@ export default class RunLogWriter {
         return new RunLogWriter(run_id, owner, secrets, log);
     }
 
+    /** Records an action the agent reported about itself, identified by the sandbox's number. */
     async write(phase: RunLogPhase, seq: number, event: unknown): Promise<RunLogWriteResult> {
+        if (this.reported.has(seq)) return "duplicate";
+
+        const result = await this.store(phase, event);
+        if (result === "stored") this.reported.set(seq, this.next_seq);
+        return result;
+    }
+
+    /**
+     * Records an action this worker watched the harness take.
+     *
+     * Carries no report number because nothing retries it: the trace is read once as it streams,
+     * and a line that fails to store is gone rather than resent.
+     */
+    async write_observed(phase: RunLogPhase, event: unknown): Promise<RunLogWriteResult> {
+        return this.store(phase, event);
+    }
+
+    private async store(phase: RunLogPhase, event: unknown): Promise<RunLogWriteResult> {
         const parsed = reported_event_schema.safeParse(event);
         if (!parsed.success) return "unsupported";
 
         const body = this.sanitize(parsed.data);
         if (!body) return "ignored";
 
+        // Both sides describe the same run, so the same action can arrive twice — the agent
+        // reports a write, and the trace shows the harness performing it a moment later. Only
+        // an immediate repeat is dropped: the same file read twice in a row is worth seeing.
+        const identity = RunLogWriter.identity(body);
+        if (identity === this.last_identity) return "ignored";
+
+        this.next_seq += 1;
         const result = await RunLogCache.append(this.run_id, this.owner, {
             ...body,
-            seq,
+            seq: this.next_seq,
             ts: new Date().toISOString(),
             phase,
         });
 
-        if (result === "stored") this.log.stream(render_event(body, phase));
+        if (result === "stored") {
+            this.last_identity = identity;
+            this.log.stream(render_event(body, phase));
+        }
         return result;
+    }
+
+    private static identity(body: RunLogEventBody): string {
+        switch (body.kind) {
+            case RunLogEventKind.FileRead:
+            case RunLogEventKind.FileWrite:
+                return `${body.kind}:${body.path}`;
+            case RunLogEventKind.Search:
+                return `${body.kind}:${body.pattern}`;
+            case RunLogEventKind.Command:
+            case RunLogEventKind.CommandFailed:
+                return `${body.kind}:${body.command}`;
+            default:
+                return `${body.kind}:${"text" in body ? body.text : ""}`;
+        }
     }
 
     private clean(text: string, limit: number): string {

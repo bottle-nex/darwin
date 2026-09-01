@@ -11,7 +11,7 @@ const body_schema = z.object({
     issue_id: z.string().min(1),
     harness: z.enum(Harness),
     model: z.string().min(1),
-    effort: z.enum(Effort).optional(),
+    effort: z.enum(Effort).nullable().optional(),
     harness_version: z.string().min(1).optional(),
 });
 

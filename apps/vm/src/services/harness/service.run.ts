@@ -1,6 +1,7 @@
 import { Effort, type Harness } from "@trymatcha/database";
 import { Registry } from "@trymatcha/harness";
 import type Logger from "@trymatcha/logger";
+import type { RunLogEventBody } from "@trymatcha/types";
 import chalk from "chalk";
 import type { Sandbox } from "e2b";
 
@@ -36,6 +37,13 @@ export interface HarnessRunOptions {
     extra_flags?: string[];
     /** Names the run in the error thrown when it produces no result event. */
     label: string;
+    /**
+     * Receives what the harness was seen doing, for harnesses whose parser can read their trace.
+     *
+     * Runs that have no log to write into leave this out, and a harness with no trace parser
+     * never calls it — in both cases the run behaves exactly as it did before.
+     */
+    on_observed?: (event: RunLogEventBody) => void;
 }
 
 export type { AgentReport };
@@ -58,10 +66,17 @@ export default class HarnessRun {
             })
             .join(" ");
 
-        // stdout is the harness's event stream, not a feed for a person: it is read for the
-        // run's outcome only, and what the agent did reaches the log from the agent itself.
+        // stdout is the harness's event stream and is read for the run's outcome only. The
+        // trace on stderr is the rendering meant for a person, and it is the only place a
+        // harness describes every action it took: the agent's own reports reach the log
+        // through the sandbox MCP tool, but only for the actions it chooses to report.
         const observe = (line: string) => parser.observe_line(line);
-        const trace = (line: string) => log.stream(chalk.dim(truncate(line, MAX_TEXT)));
+        const trace = (line: string) => {
+            log.stream(chalk.dim(truncate(line, MAX_TEXT)));
+            if (!options.on_observed || !parser.observe_trace_line) return;
+            const event = parser.observe_trace_line(line);
+            if (event) options.on_observed(event);
+        };
         const stdout = SandboxStream.lines();
         const stderr = SandboxStream.lines();
 

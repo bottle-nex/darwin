@@ -23,15 +23,16 @@ class OpenCodeHarness extends AgentHarness {
     readonly binary = "opencode";
     readonly pinnedVersion = "";
     readonly models = [
-        "google/gemini-3-pro",
-        "minimax/minimax-m2.1",
-        "xai/grok-4.6",
-        "xai/grok-4.5",
-        "deepseek/deepseek-v4-flash",
-        "xiaomi/mimo-v2.5",
+        "opencode/gemini-3.1-pro",
+        "opencode/minimax-m3",
+        "opencode/grok-4.6",
+        "opencode/grok-4.5",
+        "opencode/deepseek-v4-flash",
+        "opencode/mimo-v2.5-free",
+        "opencode/kimi-k3",
     ];
-    readonly credentialEnvVar = "OPENCODE_PROVIDER_KEY";
-    readonly credentialSource = CredentialSource.ProjectSecret;
+    readonly credentialEnvVar = "OPENCODE_API_KEY";
+    readonly credentialSource = CredentialSource.PlatformKey;
     readonly supportsEffort = false;
 
     buildBypassFlags(): string[] {

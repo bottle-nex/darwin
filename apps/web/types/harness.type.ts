@@ -22,12 +22,13 @@ export const HARNESS_MODELS: Record<Harness, string[]> = {
     Claude: ["claude-fable-5", "claude-opus-5", "claude-sonnet-5", "claude-haiku-4-5"],
     Codex: ["gpt-5.6-luna", "gpt-5.6-terra", "gpt-5.6-sol", "gpt-5.6-sol-pro", "gpt-5.6-sol-ultra"],
     OpenCode: [
-        "google/gemini-3-pro",
-        "minimax/minimax-m2.1",
-        "xai/grok-4.6",
-        "xai/grok-4.5",
-        "deepseek/deepseek-v4-flash",
-        "xiaomi/mimo-v2.5",
+        "opencode/gemini-3.1-pro",
+        "opencode/minimax-m3",
+        "opencode/grok-4.6",
+        "opencode/grok-4.5",
+        "opencode/deepseek-v4-flash",
+        "opencode/mimo-v2.5-free",
+        "opencode/kimi-k3",
     ],
 };
 
