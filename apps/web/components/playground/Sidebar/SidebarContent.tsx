@@ -1,6 +1,6 @@
 "use client";
 import { motion } from "motion/react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 import { PANE_TOP_BAR_HEIGHT } from "@/components/playground/Core/components/PlaygroundPaneFrame";
 import PlaygroundLeadBar from "@/components/playground/Core/TopBar/PlaygroundLeadBar";
@@ -9,7 +9,7 @@ import { useActiveProject } from "@/hooks/useActiveProject";
 import { cn } from "@/lib/utils";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
 
-import { isSettingsTab } from "../playgroundTabs";
+import { isSettingsTab, PlaygroundTab } from "../playgroundTabs";
 import BoardSection from "./BoardSection";
 import ForYouSection from "./ForYouSection";
 import { filterSettingsItems } from "./settingsItems";
@@ -20,6 +20,9 @@ import TeamsSection from "./TeamsSection";
 
 const PANEL_TRANSITION = { duration: 0.26, ease: [0.32, 0.72, 0, 1] } as const;
 const PANEL_SLIDE = 28;
+const SWIPE_TRIGGER_DISTANCE = 50;
+const SWIPE_SETTLE_MS = 200;
+const SWIPE_COMMIT_MS = 300;
 
 const PANE = "absolute inset-0 flex flex-col gap-3 overflow-x-hidden overflow-y-auto px-2";
 
@@ -30,7 +33,8 @@ export default function SidebarContent() {
     const activeProject = useActiveProject();
     const [settingsQuery, setSettingsQuery] = useState("");
 
-    const inSettings = isSettingsTab(selectedRowId);
+    const [paneOverride, setPaneOverride] = useState<"workspace" | "settings" | null>(null);
+    const inSettings = paneOverride ? paneOverride === "settings" : isSettingsTab(selectedRowId);
     const section = {
         selectedRowId,
         onSelect: (id: string) => setTab(id),
@@ -46,6 +50,51 @@ export default function SidebarContent() {
     function leaveSettings() {
         setSettingsQuery("");
         returnFromSettings();
+    }
+
+    const swipe = useRef({
+        distance: 0,
+        fired: false,
+        firedDirection: 0,
+        settleTimer: 0,
+        commitTimer: 0,
+    });
+
+    function swipeTo(view: "workspace" | "settings") {
+        const gesture = swipe.current;
+        setPaneOverride(view);
+        window.clearTimeout(gesture.commitTimer);
+        gesture.commitTimer = window.setTimeout(() => {
+            if (view === "settings") setTab(PlaygroundTab.SettingsOverview);
+            else leaveSettings();
+            setPaneOverride(null);
+        }, SWIPE_COMMIT_MS);
+    }
+
+    function handlePaneSwipe(event: React.WheelEvent) {
+        if (Math.abs(event.deltaX) <= Math.abs(event.deltaY)) return;
+        const gesture = swipe.current;
+        window.clearTimeout(gesture.settleTimer);
+        gesture.settleTimer = window.setTimeout(() => {
+            gesture.distance = 0;
+            gesture.fired = false;
+        }, SWIPE_SETTLE_MS);
+        const direction = Math.sign(event.deltaX);
+        if (gesture.fired) {
+            if (direction === 0 || direction === gesture.firedDirection) return;
+            gesture.fired = false;
+            gesture.distance = 0;
+        }
+        gesture.distance += event.deltaX;
+        if (gesture.distance > SWIPE_TRIGGER_DISTANCE && !inSettings) {
+            gesture.fired = true;
+            gesture.firedDirection = 1;
+            swipeTo("settings");
+        } else if (gesture.distance < -SWIPE_TRIGGER_DISTANCE && inSettings) {
+            gesture.fired = true;
+            gesture.firedDirection = -1;
+            swipeTo("workspace");
+        }
     }
 
     return (
@@ -71,7 +120,7 @@ export default function SidebarContent() {
                 )}
             </div>
 
-            <div className="relative min-h-0 flex-1">
+            <div className="relative min-h-0 flex-1" onWheel={handlePaneSwipe}>
                 <motion.div
                     initial={false}
                     animate={{ opacity: inSettings ? 0 : 1, x: inSettings ? -PANEL_SLIDE : 0 }}
