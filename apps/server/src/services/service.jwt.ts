@@ -6,10 +6,10 @@ import type { AuthUser } from "../types/express";
 /**
  * Sign a session JWT for an authenticated user.
  *
- * Uses HS256 with `SERVER_JWT_SECRET` and expires after `SERVER_JWT_TOKEN_TTL`.
+ * Uses HS256 with `JWT_SECRET` and expires after `SERVER_JWT_TOKEN_TTL`.
  */
 export function signSessionJwt(claims: AuthUser): string {
-    return jwt.sign(claims, ENV.SERVER_JWT_SECRET, {
+    return jwt.sign(claims, ENV.JWT_SECRET, {
         algorithm: "HS256",
         expiresIn: ENV.SERVER_JWT_TOKEN_TTL as SignOptions["expiresIn"],
     });
@@ -18,12 +18,12 @@ export function signSessionJwt(claims: AuthUser): string {
 /**
  * Verify and decode a session JWT.
  *
- * Validates the HS256 signature and expiry against `SERVER_JWT_SECRET`, then asserts
+ * Validates the HS256 signature and expiry against `JWT_SECRET`, then asserts
  * the payload shape so callers receive a fully-typed {@link AuthUser}. Throws if the
  * signature/expiry is invalid or the payload is missing its `id`/`email` claims.
  */
 export function verifySessionJwt(token: string): AuthUser {
-    const payload = jwt.verify(token, ENV.SERVER_JWT_SECRET, {
+    const payload = jwt.verify(token, ENV.JWT_SECRET, {
         algorithms: ["HS256"],
     });
 
@@ -45,14 +45,14 @@ export interface AdminClaims {
 }
 
 export function signAdminJwt(email: string): string {
-    return jwt.sign({ email, scope: "admin" } satisfies AdminClaims, ENV.SERVER_JWT_SECRET, {
+    return jwt.sign({ email, scope: "admin" } satisfies AdminClaims, ENV.JWT_SECRET, {
         algorithm: "HS256",
         expiresIn: ENV.SERVER_ADMIN_JWT_TTL as SignOptions["expiresIn"],
     });
 }
 
 export function verifyAdminJwt(token: string): AdminClaims {
-    const payload = jwt.verify(token, ENV.SERVER_JWT_SECRET, {
+    const payload = jwt.verify(token, ENV.JWT_SECRET, {
         algorithms: ["HS256"],
     });
 
@@ -77,14 +77,14 @@ export interface SandboxClaims {
  * MATCHA_SANDBOX_TOKEN so sandbox-mcp can call back in without a user session.
  */
 export function signSandboxJwt(session_id: string): string {
-    return jwt.sign({ session_id } satisfies SandboxClaims, ENV.SERVER_JWT_SECRET, {
+    return jwt.sign({ session_id } satisfies SandboxClaims, ENV.JWT_SECRET, {
         algorithm: "HS256",
         expiresIn: ENV.SERVER_SANDBOX_JWT_TTL as SignOptions["expiresIn"],
     });
 }
 
 export function verifySandboxJwt(token: string): SandboxClaims {
-    const payload = jwt.verify(token, ENV.SERVER_JWT_SECRET, {
+    const payload = jwt.verify(token, ENV.JWT_SECRET, {
         algorithms: ["HS256"],
     });
 
@@ -109,14 +109,14 @@ export interface WorkerClaims {
  * MATCHA_SANDBOX_TOKEN so sandbox-mcp can report status/PR outcome without a user session.
  */
 export function signWorkerJwt(worker_id: string): string {
-    return jwt.sign({ worker_id } satisfies WorkerClaims, ENV.SERVER_JWT_SECRET, {
+    return jwt.sign({ worker_id } satisfies WorkerClaims, ENV.JWT_SECRET, {
         algorithm: "HS256",
-        expiresIn: ENV.SERVER_WORKER_JWT_TTL as SignOptions["expiresIn"],
+        expiresIn: ENV.WORKER_JWT_TTL as SignOptions["expiresIn"],
     });
 }
 
 export function verifyWorkerJwt(token: string): WorkerClaims {
-    const payload = jwt.verify(token, ENV.SERVER_JWT_SECRET, {
+    const payload = jwt.verify(token, ENV.JWT_SECRET, {
         algorithms: ["HS256"],
     });
 

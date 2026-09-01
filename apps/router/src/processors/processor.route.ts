@@ -344,7 +344,7 @@ export default class RouterProcessor {
         needs_model_pick_ids: string[];
     }): Promise<Assignment[]> {
         const model = new ChatAnthropic({
-            apiKey: ENV.SERVER_ANTHROPIC_API_KEY,
+            apiKey: ENV.ROUTER_ANTHROPIC_API_KEY,
             model: "claude-haiku-4-5-20251001",
         });
 

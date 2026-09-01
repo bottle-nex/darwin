@@ -10,7 +10,7 @@ start_run_log_server();
 
 Logger.banner("matcha vm", {
     listening: "onboard + dispatch",
-    dispatch_concurrency: ENV.SERVER_VM_DISPATCH_CONCURRENCY,
+    dispatch_concurrency: ENV.VM_DISPATCH_CONCURRENCY,
     onboard_concurrency: 1,
-    run_log_port: ENV.SERVER_VM_HTTP_PORT,
+    run_log_port: ENV.VM_HTTP_PORT,
 });

@@ -54,7 +54,7 @@ export default class GithubUserService {
 
     static buildAuthorizeUrl(state: string): string {
         const params = new URLSearchParams({
-            client_id: ENV.SERVER_GITHUB_APP_CLIENT_ID,
+            client_id: ENV.GITHUB_APP_CLIENT_ID,
             state,
         });
         return `https://github.com/login/oauth/authorize?${params}`;
@@ -128,8 +128,8 @@ export default class GithubUserService {
             method: "POST",
             headers: { "Content-Type": "application/json", Accept: "application/json" },
             body: JSON.stringify({
-                client_id: ENV.SERVER_GITHUB_APP_CLIENT_ID,
-                client_secret: ENV.SERVER_GITHUB_APP_CLIENT_SECRET,
+                client_id: ENV.GITHUB_APP_CLIENT_ID,
+                client_secret: ENV.GITHUB_APP_CLIENT_SECRET,
                 ...("code" in grant ? grant : { grant_type: "refresh_token", ...grant }),
             }),
         });

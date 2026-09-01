@@ -59,7 +59,7 @@ import re, sys
 path, vm_url, api_url = sys.argv[1], sys.argv[2], sys.argv[3]
 with open(path) as handle:
     text = handle.read()
-for key, value in (("SERVER_VM_PUBLIC_URL", vm_url), ("SERVER_PUBLIC_API_URL", api_url)):
+for key, value in (("VM_PUBLIC_URL", vm_url), ("PUBLIC_API_URL", api_url)):
     pattern = re.compile(rf"^{key}=.*$", re.M)
     if pattern.search(text):
         text = pattern.sub(f"{key}={value}", text, count=1)
@@ -70,8 +70,8 @@ with open(path, "w") as handle:
 PY
 
 echo ""
-echo "  SERVER_VM_PUBLIC_URL=$NGROK_URL"
-echo "  SERVER_PUBLIC_API_URL=$CF_URL"
+echo "  VM_PUBLIC_URL=$NGROK_URL"
+echo "  PUBLIC_API_URL=$CF_URL"
 echo ""
 echo "written to .env — restart the vm worker AND the server so they read it."
 echo "ctrl-c here stops both tunnels."

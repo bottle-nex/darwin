@@ -63,7 +63,7 @@ export default class RunReporter {
 
     private static async post(path: string, token: string, body: unknown, log: Logger) {
         try {
-            const response = await fetch(`${ENV.SERVER_PUBLIC_API_URL}/api/v1/worker${path}`, {
+            const response = await fetch(`${ENV.PUBLIC_API_URL}/api/v1/worker${path}`, {
                 method: "POST",
                 headers: {
                     authorization: `Bearer ${token}`,

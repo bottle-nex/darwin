@@ -35,19 +35,16 @@ export default class StorageService {
 
     static is_run_logs_configured(): boolean {
         return Boolean(
-            ENV.SERVER_MINIO_URL &&
-            ENV.SERVER_MINIO_ACCESS_KEY &&
-            ENV.SERVER_MINIO_SECRET_KEY &&
-            ENV.SERVER_RUN_LOGS_BUCKET,
+            ENV.MINIO_URL && ENV.MINIO_ACCESS_KEY && ENV.MINIO_SECRET_KEY && ENV.RUN_LOGS_BUCKET,
         );
     }
 
     static is_product_diff_configured(): boolean {
         return Boolean(
-            ENV.SERVER_MINIO_URL &&
-            ENV.SERVER_MINIO_ACCESS_KEY &&
-            ENV.SERVER_MINIO_SECRET_KEY &&
-            ENV.SERVER_PRODUCT_DIFF_BUCKET,
+            ENV.MINIO_URL &&
+            ENV.MINIO_ACCESS_KEY &&
+            ENV.MINIO_SECRET_KEY &&
+            ENV.PRODUCT_DIFF_BUCKET,
         );
     }
 
@@ -71,17 +68,17 @@ export default class StorageService {
     }
 
     static minio(): MinioClient {
-        if (!ENV.SERVER_MINIO_URL || !ENV.SERVER_MINIO_ACCESS_KEY || !ENV.SERVER_MINIO_SECRET_KEY) {
+        if (!ENV.MINIO_URL || !ENV.MINIO_ACCESS_KEY || !ENV.MINIO_SECRET_KEY) {
             throw new Error("MinIO storage is not configured");
         }
         if (!this.minioClient) {
-            const endpoint = new URL(ENV.SERVER_MINIO_URL);
+            const endpoint = new URL(ENV.MINIO_URL);
             this.minioClient = new MinioClient({
                 endPoint: endpoint.hostname,
                 port: Number(endpoint.port || (endpoint.protocol === "https:" ? 443 : 80)),
                 useSSL: endpoint.protocol === "https:",
-                accessKey: ENV.SERVER_MINIO_ACCESS_KEY,
-                secretKey: ENV.SERVER_MINIO_SECRET_KEY,
+                accessKey: ENV.MINIO_ACCESS_KEY,
+                secretKey: ENV.MINIO_SECRET_KEY,
             });
         }
         return this.minioClient;
@@ -112,7 +109,7 @@ export default class StorageService {
 
     static async list_run_log_segments(prefix: string): Promise<string[]> {
         const keys: string[] = [];
-        const stream = this.minio().listObjectsV2(ENV.SERVER_RUN_LOGS_BUCKET!, prefix, true);
+        const stream = this.minio().listObjectsV2(ENV.RUN_LOGS_BUCKET!, prefix, true);
         for await (const item of stream) {
             if (item.name) keys.push(item.name);
         }
@@ -144,7 +141,7 @@ export default class StorageService {
     }
 
     static async read_run_log(key: string): Promise<Buffer> {
-        const bucket = ENV.SERVER_RUN_LOGS_BUCKET!;
+        const bucket = ENV.RUN_LOGS_BUCKET!;
         const stat = await this.minio().statObject(bucket, key);
         if (stat.size > RUN_LOG_ARCHIVE_MAX_BYTES) {
             throw new Error("Run log archive exceeds the read limit");
@@ -159,7 +156,7 @@ export default class StorageService {
 
     static async signed_run_log_url(key: string): Promise<string> {
         return this.minio().presignedGetObject(
-            ENV.SERVER_RUN_LOGS_BUCKET!,
+            ENV.RUN_LOGS_BUCKET!,
             key,
             ARTIFACT_URL_TTL_MS / 1000,
         );
@@ -167,7 +164,7 @@ export default class StorageService {
 
     static async signed_product_diff_url(key: string): Promise<string> {
         return this.minio().presignedGetObject(
-            ENV.SERVER_PRODUCT_DIFF_BUCKET!,
+            ENV.PRODUCT_DIFF_BUCKET!,
             key,
             SIGNED_URL_TTL_MS / 1000,
         );
@@ -191,7 +188,7 @@ export default class StorageService {
             keys.map(async (key) => [
                 key,
                 await client.presignedGetObject(
-                    ENV.SERVER_PRODUCT_DIFF_BUCKET!,
+                    ENV.PRODUCT_DIFF_BUCKET!,
                     key,
                     ARTIFACT_URL_TTL_MS / 1000,
                 ),
@@ -226,7 +223,7 @@ export default class StorageService {
 
     static async stream_product_diff_object(key: string) {
         const client = this.minio();
-        const bucket = ENV.SERVER_PRODUCT_DIFF_BUCKET!;
+        const bucket = ENV.PRODUCT_DIFF_BUCKET!;
         const stat = await client.statObject(bucket, key);
         const metadata = Object.fromEntries(
             Object.entries(stat.metaData).map(([name, value]) => [

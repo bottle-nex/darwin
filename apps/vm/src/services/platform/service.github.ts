@@ -15,12 +15,10 @@ export default class GithubService {
     private static appAuth() {
         if (!this._appAuth) {
             this._appAuth = createAppAuth({
-                appId: ENV.SERVER_GITHUB_APP_ID,
-                privateKey: Buffer.from(ENV.SERVER_GITHUB_APP_PRIVATE_KEY, "base64").toString(
-                    "utf8",
-                ),
-                clientId: ENV.SERVER_GITHUB_APP_CLIENT_ID,
-                clientSecret: ENV.SERVER_GITHUB_APP_CLIENT_SECRET,
+                appId: ENV.GITHUB_APP_ID,
+                privateKey: Buffer.from(ENV.GITHUB_APP_PRIVATE_KEY, "base64").toString("utf8"),
+                clientId: ENV.GITHUB_APP_CLIENT_ID,
+                clientSecret: ENV.GITHUB_APP_CLIENT_SECRET,
             });
         }
         return this._appAuth;

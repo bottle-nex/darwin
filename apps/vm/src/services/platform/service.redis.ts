@@ -12,7 +12,7 @@ let client: Redis | null = null;
 
 export function redis(): Redis {
     if (!client) {
-        client = new Redis(ENV.SERVER_REDIS_URL, {
+        client = new Redis(ENV.REDIS_URL, {
             maxRetriesPerRequest: 2,
             commandTimeout: REDIS_COMMAND_TIMEOUT_MS,
         });

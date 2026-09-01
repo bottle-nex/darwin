@@ -93,7 +93,7 @@ async function main() {
         data: {
             issueId: created_issue.id,
             harness: Harness.Claude,
-            model: ENV.SERVER_SOLVE_MODEL,
+            model: ENV.VM_SOLVE_MODEL,
         },
     });
 

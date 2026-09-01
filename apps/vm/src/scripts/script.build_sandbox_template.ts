@@ -67,7 +67,7 @@ async function main() {
     }).fromDockerfile(dockerfile);
 
     await Template.build(template, TEMPLATE_NAME, {
-        apiKey: ENV.SERVER_E2B_API_KEY,
+        apiKey: ENV.VM_E2B_API_KEY,
         tags: [TEMPLATE_TAG],
         memoryMB: SANDBOX_MEMORY_MB,
         cpuCount: SANDBOX_CPU_COUNT,
