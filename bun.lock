@@ -141,6 +141,7 @@
         "@trymatcha/database": "*",
         "@trymatcha/harness": "*",
         "@trymatcha/logger": "*",
+        "@trymatcha/services": "*",
         "@trymatcha/types": "*",
         "bullmq": "^5.79.1",
         "chalk": "^5.6.2",
@@ -166,6 +167,7 @@
         "@trymatcha/access-control": "*",
         "@trymatcha/database": "*",
         "@trymatcha/harness": "*",
+        "@trymatcha/services": "*",
         "@trymatcha/types": "*",
         "@types/cors": "^2.8.19",
         "@types/dotenv": "^8.2.3",
@@ -436,6 +438,20 @@
       "devDependencies": {
         "@trymatcha/typescript-config": "*",
         "tsup": "^8.0.0",
+        "typescript": "^5",
+      },
+    },
+    "packages/services": {
+      "name": "@trymatcha/services",
+      "dependencies": {
+        "@trymatcha/database": "*",
+        "@trymatcha/types": "*",
+        "ioredis": "^5.11.0",
+      },
+      "devDependencies": {
+        "@types/bun": "latest",
+      },
+      "peerDependencies": {
         "typescript": "^5",
       },
     },
@@ -1177,6 +1193,8 @@
     "@trymatcha/sandbox-mcp": ["@trymatcha/sandbox-mcp@workspace:packages/sandbox-mcp"],
 
     "@trymatcha/server": ["@trymatcha/server@workspace:apps/server"],
+
+    "@trymatcha/services": ["@trymatcha/services@workspace:packages/services"],
 
     "@trymatcha/types": ["@trymatcha/types@workspace:packages/types"],
 

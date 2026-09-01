@@ -1,8 +1,8 @@
 import { ActivityType, ActorType, AgentSessionStatus, prisma } from "@trymatcha/database";
+import { ActivityService } from "@trymatcha/services";
 import type { Request, Response } from "express";
 import z from "zod";
 
-import ActivityService from "../../services/service.activity";
 import AgentSessionService, {
     run_cost_schema,
     run_stats_schema,

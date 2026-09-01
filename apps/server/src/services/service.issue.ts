@@ -1,12 +1,12 @@
 import { Action, Permissions } from "@trymatcha/access-control";
 import { ActivityType, ActorType, IssueStatus, Prisma, prisma } from "@trymatcha/database";
+import { ActivityService } from "@trymatcha/services";
 import { OutboundSocketMessageType } from "@trymatcha/types";
 import z from "zod";
 
 import { server_services } from "..";
 import Access from "../access-control/access";
 import { issue_recipients } from "../notifications/recipients";
-import ActivityService from "./service.activity";
 import { diff_issue } from "./service.activity-diff";
 import DescriptionReferenceService from "./service.description-references";
 

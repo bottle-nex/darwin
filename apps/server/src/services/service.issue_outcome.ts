@@ -1,8 +1,8 @@
 import { ActivityType, ActorType, IssueStatus, prisma } from "@trymatcha/database";
+import { type ActivityEvent, ActivityService } from "@trymatcha/services";
 import { type IssueOutcomeJobData, OutboundSocketMessageType } from "@trymatcha/types";
 
 import { server_services } from "..";
-import ActivityService, { type ActivityEvent } from "./service.activity";
 import { location_of } from "./service.activity-diff";
 import AgentSessionService from "./service.agent-session";
 import GithubPullsService from "./service.github_pulls";

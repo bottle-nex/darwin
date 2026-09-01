@@ -1,11 +1,14 @@
 import Logger from "@trymatcha/logger";
 import {
+    ActivityType,
+    ActorType,
     Effort,
     Harness,
     IssueStatus,
     prisma,
     WorkerStatus,
     type Issue,
+    type Prisma,
     type Worker,
 } from "@trymatcha/database";
 import type QueueService from "../services/services.queue";
@@ -15,6 +18,8 @@ import z from "zod";
 import { RunnableSequence } from "@langchain/core/runnables";
 import { routerPrompt } from "../prompts/prompt.router";
 import { Registry } from "@trymatcha/harness";
+import { ActivityService, publisher } from "@trymatcha/services";
+import { OutboundSocketMessageType } from "@trymatcha/types";
 
 const log = Logger.scope("route");
 
@@ -24,6 +29,15 @@ interface Assignment {
     specialization: string;
     model?: string;
     effort?: Effort;
+}
+
+type QueuedIssue = Prisma.IssueGetPayload<{
+    include: { creator: true; assignees: true; tags: true };
+}>;
+
+interface QueuedRow {
+    issue: QueuedIssue;
+    activities: { seq: bigint }[];
 }
 
 interface ResolvedConfig {
@@ -216,22 +230,43 @@ export default class RouterProcessor {
             resolved_configs.set(issue.id, { harness: effective_harness, model, effort });
         }
 
-        await prisma.$transaction(async (tx) => {
+        const routed = await prisma.$transaction(async (tx) => {
+            const rows: QueuedRow[] = [];
+
             for (const a of assignments) {
                 const w = await tx.worker.update({
                     where: { id: a.workerId },
                     data: { nextQueuePos: { increment: 1 } },
                     select: { nextQueuePos: true },
                 });
-                await tx.issue.update({
+                const queue_position = w.nextQueuePos - 1;
+                const issue = await tx.issue.update({
                     where: { id: a.issueId },
                     data: {
                         assignerWorkerId: a.workerId,
-                        queuePosition: w.nextQueuePos - 1,
+                        queuePosition: queue_position,
                         specialization: a.specialization,
                         status: IssueStatus.Queued,
                     },
+                    include: { creator: true, assignees: true, tags: true },
                 });
+
+                const activities = await ActivityService.emit(tx, {
+                    issueId: a.issueId,
+                    actor: { type: ActorType.Agent, workerId: a.workerId },
+                    events: [
+                        {
+                            type: ActivityType.StatusChanged,
+                            payload: {
+                                from: { kind: "status", status: IssueStatus.Todo },
+                                to: { kind: "status", status: IssueStatus.Queued },
+                            },
+                            dedupeKey: `queued:${a.workerId}:${queue_position}`,
+                        },
+                    ],
+                });
+
+                rows.push({ issue, activities });
 
                 const resolved = resolved_configs.get(a.issueId);
                 if (resolved) {
@@ -244,7 +279,11 @@ export default class RouterProcessor {
                     });
                 }
             }
+
+            return rows;
         });
+
+        await RouterProcessor.broadcast_queued(projectId, routed);
 
         const worker_ids = [...new Set(assignments.map((a) => a.workerId))];
         await Promise.all(worker_ids.map((id) => queue.enqueue_dispatch(id)));
@@ -253,6 +292,23 @@ export default class RouterProcessor {
             queued: assignments.length,
             workers: worker_ids.length,
         });
+    }
+
+    static async broadcast_queued(projectId: string, routed: QueuedRow[]) {
+        const channel = publisher().get_channel_name(projectId);
+
+        for (const { issue, activities } of routed) {
+            await publisher().publish_message(
+                channel,
+                JSON.stringify({
+                    type: OutboundSocketMessageType.ISSUE_UPDATED,
+                    projectId,
+                    payload: issue,
+                    previous: { status: IssueStatus.Todo, customColumnId: null },
+                }),
+            );
+            await ActivityService.publish(projectId, issue.id, activities);
+        }
     }
 
     static async spin_up_workers(

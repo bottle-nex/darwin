@@ -1,4 +1,4 @@
-import PubSubSystem, { type ParsedChannel } from "./pubsub.server";
+import PubSubSystem, { type ParsedChannel } from "./service.pubsub";
 
 export default class SubscriberSystem extends PubSubSystem {
     public subscribe_project(project_id: string) {

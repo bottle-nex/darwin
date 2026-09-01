@@ -19,6 +19,7 @@
         "@trymatcha/access-control": "*",
         "@trymatcha/database": "*",
         "@trymatcha/harness": "*",
+        "@trymatcha/services": "*",
         "@trymatcha/types": "*",
         "@types/cors": "^2.8.19",
         "@types/dotenv": "^8.2.3",

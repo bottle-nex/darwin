@@ -39,6 +39,7 @@ import TextDiff from "./TextDiff";
 
 /** Every other status already reads as a word. */
 const STATUS_LABEL: Record<string, string> = {
+    Todo: "To Do",
     InProgress: "In Progress",
     InReview: "In Review",
 };

@@ -1,4 +1,5 @@
 import { Action, Permissions } from "@trymatcha/access-control";
+import { SubscriberSystem } from "@trymatcha/services";
 import {
     AppSocketCloseCode,
     type InboundSocketMessage,
@@ -15,7 +16,6 @@ import type { AuthUser } from "../types/express.d";
 import ChatSocketHandler from "./chat.handler";
 import ProjectChatSocketHandler from "./project-chat.handler";
 import RunLogSocketHandler from "./run-log.handler";
-import SubscriberSystem from "./subscriber.system";
 import TeamChatSocketHandler from "./team-chat.handler";
 
 const PRESENCE_HEARTBEAT_MS = 30_000;

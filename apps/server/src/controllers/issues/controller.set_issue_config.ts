@@ -1,11 +1,11 @@
 import { Action, Permissions } from "@trymatcha/access-control";
 import { ActivityType, ActorType, Effort, Harness, IssueStatus, prisma } from "@trymatcha/database";
 import { Registry } from "@trymatcha/harness";
+import { ActivityService } from "@trymatcha/services";
 import type { Request, Response } from "express";
 import z from "zod";
 
 import Access from "../../access-control/access";
-import ActivityService from "../../services/service.activity";
 import ResponseWriter from "../../services/service.response";
 
 // An issue whose sandbox already started can't have its harness swapped under it —

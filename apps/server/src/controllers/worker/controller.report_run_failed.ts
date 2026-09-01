@@ -5,12 +5,12 @@ import {
     IssueStatus,
     prisma,
 } from "@trymatcha/database";
+import { ActivityService } from "@trymatcha/services";
 import { OutboundSocketMessageType } from "@trymatcha/types";
 import type { Request, Response } from "express";
 import z from "zod";
 
 import { server_services } from "../..";
-import ActivityService from "../../services/service.activity";
 import { location_of } from "../../services/service.activity-diff";
 import AgentSessionService, {
     run_cost_schema,

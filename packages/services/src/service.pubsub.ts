@@ -1,7 +1,5 @@
 import { Redis } from "ioredis";
 
-import { ENV } from "../configs/env";
-
 export type ChannelScope = "project" | "user";
 
 export type ParsedChannel = { scope: ChannelScope; id: string };
@@ -12,7 +10,11 @@ export default abstract class PubSubSystem {
     private static readonly USER_CHANNEL_PREFIX = "user:";
 
     constructor() {
-        this.redis = new Redis(ENV.SERVER_REDIS_URL);
+        const url = process.env.SERVER_REDIS_URL;
+        if (!url) {
+            throw new Error("SERVER_REDIS_URL is not set — cannot reach the realtime bus");
+        }
+        this.redis = new Redis(url);
     }
 
     public get_channel_name(project_id: string) {

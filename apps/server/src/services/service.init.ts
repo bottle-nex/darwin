@@ -1,5 +1,6 @@
+import { publisher, type PublisherSystem } from "@trymatcha/services";
+
 import NotificationQueueService from "../notifications/service.notification-queue";
-import PublisherSystem from "../real-time/publisher.system";
 import GithubImportQueueService from "./service.github_import_queue";
 import IssueOutcomeQueueService from "./service.issue_outcome_queue";
 import ProductDiffService from "./service.product_diff";
@@ -16,7 +17,7 @@ export default class InitService {
     private product_diff_sweep: ReturnType<typeof setInterval>;
 
     constructor() {
-        this.publisher = new PublisherSystem();
+        this.publisher = publisher();
         this.queue = new QueueService();
         this.notifications = new NotificationQueueService();
         this.issue_outcomes = new IssueOutcomeQueueService();

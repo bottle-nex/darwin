@@ -1,8 +1,7 @@
 import type { IssueStatus } from "@trymatcha/database";
 import { ActivitySurface, ActivityType } from "@trymatcha/database";
+import type { ActivityEvent } from "@trymatcha/services";
 import type { ActivityLocationRef } from "@trymatcha/types";
-
-import type { ActivityEvent } from "./service.activity";
 
 /**
  * Collapses the (status, customColumn) pair into the one thing it represents.

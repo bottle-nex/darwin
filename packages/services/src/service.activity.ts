@@ -2,7 +2,7 @@ import type { ActivityType, ActorType, AgentSession, Prisma } from "@trymatcha/d
 import { ActivitySurface } from "@trymatcha/database";
 import { type ActivityPayloadMap, OutboundSocketMessageType } from "@trymatcha/types";
 
-import { server_services } from "../index";
+import { publisher } from "./service.publisher";
 
 type EventFor<T extends ActivityType> = {
     type: T;
@@ -70,8 +70,8 @@ export default class ActivityService {
     static async publish(project_id: string, issue_id: string, rows: ActivityRow[]) {
         if (!rows.length) return;
 
-        await server_services.publisher.publish_message(
-            server_services.publisher.get_channel_name(project_id),
+        await publisher().publish_message(
+            publisher().get_channel_name(project_id),
             JSON.stringify({
                 type: OutboundSocketMessageType.ACTIVITY_CREATED,
                 projectId: project_id,
@@ -82,8 +82,8 @@ export default class ActivityService {
 
     // used to emit agent session..
     static async publish_session(project_id: string, session: AgentSession) {
-        await server_services.publisher.publish_message(
-            server_services.publisher.get_channel_name(project_id),
+        await publisher().publish_message(
+            publisher().get_channel_name(project_id),
             JSON.stringify({
                 type: OutboundSocketMessageType.AGENT_SESSION_UPDATED,
                 projectId: project_id,

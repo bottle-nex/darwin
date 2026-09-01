@@ -1,8 +1,8 @@
 import { ActivityType, ActorType, Effort, Harness, IssueStatus, prisma } from "@trymatcha/database";
+import { ActivityService } from "@trymatcha/services";
 import type { Request, Response } from "express";
 import z from "zod";
 
-import ActivityService from "../../services/service.activity";
 import ResponseWriter from "../../services/service.response";
 
 const body_schema = z.object({
