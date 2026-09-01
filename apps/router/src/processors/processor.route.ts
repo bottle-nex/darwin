@@ -193,28 +193,26 @@ export default class RouterProcessor {
         const assignments: Assignment[] = await this.route_issues(assignment_data);
         log.info("model returned assignments", { count: assignments.length });
 
-        // Resolved once per issue that needs materializing — a straight snapshot when the
-        // project already has a default, otherwise the LLM's pick, validated against the real
-        // harness manifest and never trusted blindly (models get hallucinated).
+        // Resolved once per issue that needs materializing — the project's stored default when
+        // it has one, otherwise the LLM's pick — but either way validated against the real
+        // harness manifest and never trusted blindly (a stored default can go stale after a
+        // harness's model list changes; a picked model can be hallucinated).
+        const harness_supports_effort = Registry.supportsEffort(effective_harness);
+        const fallback_model = Registry.get(effective_harness).models[0] ?? null;
         const resolved_configs = new Map<string, ResolvedConfig>();
         for (const issue of unconfigured) {
-            if (default_model) {
-                resolved_configs.set(issue.id, {
-                    harness: effective_harness,
-                    model: default_model,
-                    effort: default_effort,
-                });
-                continue;
-            }
-
-            const picked = assignments.find((a) => a.issueId === issue.id);
+            const picked = default_model
+                ? undefined
+                : assignments.find((a) => a.issueId === issue.id);
+            const candidate_model = default_model ?? picked?.model;
             const model =
-                picked?.model && Registry.supportsModel(effective_harness, picked.model)
-                    ? picked.model
-                    : (Registry.get(effective_harness).models[0] ?? null);
+                candidate_model && Registry.supportsModel(effective_harness, candidate_model)
+                    ? candidate_model
+                    : fallback_model;
             if (!model) continue; // harness has no models configured at all — nothing to snapshot
 
-            const effort = supports_effort && picked?.effort ? picked.effort : null;
+            const candidate_effort = default_model ? default_effort : picked?.effort;
+            const effort = harness_supports_effort && candidate_effort ? candidate_effort : null;
             resolved_configs.set(issue.id, { harness: effective_harness, model, effort });
         }
 

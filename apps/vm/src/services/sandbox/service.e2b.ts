@@ -3,6 +3,7 @@ import { randomUUID } from "node:crypto";
 import { Harness, Prisma, prisma, WorkerStatus } from "@trymatcha/database";
 import { type McpServerSpec, Registry } from "@trymatcha/harness";
 import Logger, { format_duration } from "@trymatcha/logger";
+import { RunLogPhase } from "@trymatcha/types";
 import type { CommandResult, SnapshotInfo } from "e2b";
 import { Sandbox } from "e2b";
 
@@ -243,12 +244,8 @@ export default class E2B {
 
             const sandbox = await Sandbox.connect(sandbox_id, { apiKey: ENV.SERVER_E2B_API_KEY });
 
-            const [installation_token, worker_token] = await Promise.all([
-                GithubService.getInstallationToken(installation_id),
-                Promise.resolve(sign_worker_jwt(worker_id)),
-            ]);
-            gh_token = installation_token;
-            log.info("minted github + worker tokens for the sandbox");
+            gh_token = await GithubService.getInstallationToken(installation_id);
+            log.info("minted github token for the sandbox");
 
             await E2B.refresh_origin(sandbox, repo_url, gh_token);
 
@@ -258,7 +255,6 @@ export default class E2B {
                 args: [SANDBOX_MCP_ENTRY],
                 env: {
                     MATCHA_SERVER_URL: ENV.SERVER_PUBLIC_API_URL,
-                    MATCHA_SANDBOX_TOKEN: worker_token,
                     MATCHA_SESSION_KIND: "worker",
                 },
             };
@@ -319,13 +315,14 @@ export default class E2B {
                     const agent = Registry.get(harness);
 
                     run_id = randomUUID();
+                    const run_worker_token = sign_worker_jwt(worker_id);
                     const version_result = await sandbox.commands
                         .run(`${agent.binary} --version`)
                         .catch(() => null);
                     const harness_version = version_result?.stdout?.trim() || undefined;
 
                     await RunReporter.started(
-                        worker_token,
+                        run_worker_token,
                         { run_id, issue_id: issue.id, harness, model, effort, harness_version },
                         log,
                     );
@@ -354,6 +351,7 @@ export default class E2B {
                         ...mcp_server,
                         env: {
                             ...mcp_server.env,
+                            MATCHA_SANDBOX_TOKEN: run_worker_token,
                             MATCHA_RUN_ID: run_id,
                             ...(ENV.SERVER_VM_PUBLIC_URL
                                 ? { MATCHA_VM_URL: ENV.SERVER_VM_PUBLIC_URL }
@@ -383,7 +381,7 @@ export default class E2B {
                         secrets(),
                         log,
                     );
-                    RunLogRegistry.register(run_id, writer, worker_token);
+                    RunLogRegistry.register(run_id, writer, run_worker_token);
 
                     let report;
                     try {
@@ -408,11 +406,23 @@ export default class E2B {
                             },
                             timeout_ms: ISSUE_SOLVE_TIMEOUT_MS,
                             label: `solving agent for issue #${issue.number}`,
+                            // Fire-and-forget: the trace arrives as the harness streams it, and
+                            // holding that stream to await a cache write would slow the run down
+                            // to the speed of its own logging.
+                            on_observed: (event) => {
+                                void writer
+                                    .write_observed(RunLogPhase.Agent, event)
+                                    .catch((error: unknown) =>
+                                        log.warn("observed run log event not stored", {
+                                            error: String(error),
+                                        }),
+                                    );
+                            },
                         });
                     } catch (error) {
                         RunLogRegistry.release(run_id);
                         await RunReporter.failed(
-                            worker_token,
+                            run_worker_token,
                             run_id,
                             issue.id,
                             failure_sentence(describe_failure("solve issue", error, secrets())),
@@ -422,7 +432,7 @@ export default class E2B {
                     }
 
                     RunLogRegistry.release(run_id);
-                    await RunReporter.completed(worker_token, run_id, issue.id, report, log);
+                    await RunReporter.completed(run_worker_token, run_id, issue.id, report, log);
 
                     log.success(`issue #${issue.number} run finished`, {
                         turns: report.num_turns ?? "unknown",
