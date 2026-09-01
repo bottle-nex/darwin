@@ -8,6 +8,7 @@ import { useGetDashboard } from "@/hooks/dashboard/useGetDashboard";
 import { useGetProject } from "@/hooks/project/useGetProject";
 
 import AIHarnessSettingsSection from "./AIHarnessSettingsSection";
+import IntegrationsSettingsHeroCard from "./hero/IntegrationsSettingsHeroCard";
 import IntegrationsDisplay from "./integrations/IntegrationsDisplay";
 import ProjectSettingsEnvSection from "./ProjectSettingsEnvSection";
 import ProjectSettingsGeneralSection from "./ProjectSettingsGeneralSection";
@@ -90,8 +91,11 @@ export default function SettingsDisplay({ section }: { section: ProjectSettingsS
     }
 
     return (
-        <SettingsPaneShell sectionKey={section} wide={section === "integrations"}>
-            {getSection()}
+        <SettingsPaneShell sectionKey={section}>
+            <div className="flex min-h-0 flex-1 flex-col gap-8">
+                {section === "integrations" && <IntegrationsSettingsHeroCard />}
+                {getSection()}
+            </div>
         </SettingsPaneShell>
     );
 }

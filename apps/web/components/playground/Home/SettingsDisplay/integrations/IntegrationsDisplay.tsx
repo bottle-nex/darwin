@@ -33,16 +33,14 @@ export default function IntegrationsDisplay({ project }: { project: ProjectDetai
                 <h2 className="text-sm font-medium text-snow">Integrations</h2>
             </header>
 
-            <ul className="grid list-none grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
+            <ul className="flex w-full max-w-90 list-none flex-col gap-3">
                 <li>
                     <IntegrationCard
                         icon={GithubLogoIcon}
                         name="GitHub"
-                        description="Mirror newly opened GitHub issues onto this project's board, tagged so you can tell them apart."
+                        description="Mirror new GitHub issues onto this project's board."
                         status={status}
-                        note={repo ?? "Connect a repository to this project first"}
                         onSelect={() => setView({ kind: "github" })}
-                        className="h-full w-full"
                     />
                 </li>
             </ul>
