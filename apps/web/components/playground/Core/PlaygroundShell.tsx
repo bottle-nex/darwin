@@ -14,6 +14,7 @@ import PlaygroundCollapsedLead from "@/components/playground/Core/TopBar/Playgro
 import SpacesSelectionBar from "@/components/playground/Home/SpacesDisplay/SpacesSelectionBar";
 import CreateIssueDialog from "@/components/playground/Issue/CreateIssueDialog";
 import IssueDisplay from "@/components/playground/Issue/IssueDisplay";
+import SolveReportSheet from "@/components/playground/Issue/SolveReportSheet";
 import {
     defaultHomeViewToTab,
     isSettingsTab,
@@ -133,6 +134,7 @@ export default function PlaygroundShell() {
                 <SpacesSelectionBar />
             </section>
             <PlaygroundSheetSidebar />
+            <SolveReportSheet />
             <CreateProjectDialog />
             <CreateTeamDialog />
             <DeleteTeamDialog />

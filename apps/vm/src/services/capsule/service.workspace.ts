@@ -39,16 +39,58 @@ export function pick_package_manager(root_entries: string[]): PackageManager {
     return "npm";
 }
 
-export function install_command(manager: PackageManager): string {
+/**
+ * Whether this repository is a JavaScript project at all.
+ *
+ * `pick_package_manager` falls back to npm when it recognises no lockfile, which is the right
+ * answer for a JS repo that ships none and the wrong one for a Python, Go or Rust repo — those
+ * have no manifest to install and must be left alone.
+ */
+export function has_node_project(root_entries: string[]): boolean {
+    return root_entries.includes("package.json");
+}
+
+/**
+ * `strict` pins to the lockfile and fails when the two have drifted. The capsule wants that: a
+ * preview has to be reproducible. The solve sandbox does not — a lockfile a few commits stale is
+ * common in real repositories, and refusing to install over it would block the whole run.
+ */
+export function install_command(manager: PackageManager, strict = true): string {
     switch (manager) {
         case "bun":
-            return "bun install --frozen-lockfile";
+            return strict ? "bun install --frozen-lockfile" : "bun install";
         case "pnpm":
-            return "pnpm install --frozen-lockfile";
+            return strict ? "pnpm install --frozen-lockfile" : "pnpm install --no-frozen-lockfile";
         case "yarn":
-            return "yarn install --immutable";
+            return strict ? "yarn install --immutable" : "yarn install";
         case "npm":
-            return "npm ci";
+            return strict ? "npm ci" : "npm install";
+    }
+}
+
+/**
+ * Installs the whole repository, never a subset.
+ *
+ * A partial install is worse than none: running the package manager fires the repo's
+ * `prepare` script, which is what arms husky's git hooks — so a half-installed tree ends up
+ * with a live pre-push hook it cannot satisfy, and every push is rejected.
+ */
+export async function install_dependencies(
+    sandbox: Sandbox,
+    manager: PackageManager,
+    log: Logger,
+    strict = true,
+): Promise<void> {
+    const command = install_command(manager, strict);
+    log.step("installing repository dependencies", { command });
+
+    try {
+        await sandbox.commands.run(command, { cwd: REPO_DIR, timeoutMs: INSTALL_TIMEOUT_MS });
+    } catch (error) {
+        const failure = describe_failure("install dependencies", error, []);
+        throw new InstallFailedError(
+            `${command} failed: ${failure.message.slice(-MAX_INSTALL_ERROR_CHARS)}`,
+        );
     }
 }
 
@@ -117,7 +159,7 @@ export default class CapsuleWorkspace {
             globalCss: profile.globalCssPath ?? "none",
         });
 
-        await this.install(sandbox, profile, log);
+        await install_dependencies(sandbox, profile.packageManager, log);
         return { profile, changedFiles: changed_files };
     }
 
@@ -187,27 +229,6 @@ export default class CapsuleWorkspace {
             .filter(Boolean);
 
         return matches.sort((left, right) => left.length - right.length)[0] ?? null;
-    }
-
-    private static async install(
-        sandbox: Sandbox,
-        profile: AppProfile,
-        log: Logger,
-    ): Promise<void> {
-        const command = install_command(profile.packageManager);
-        log.step("installing repository dependencies", { command });
-
-        try {
-            await sandbox.commands.run(command, {
-                cwd: REPO_DIR,
-                timeoutMs: INSTALL_TIMEOUT_MS,
-            });
-        } catch (error) {
-            const failure = describe_failure("install dependencies", error, []);
-            throw new InstallFailedError(
-                `${command} failed: ${failure.message.slice(-MAX_INSTALL_ERROR_CHARS)}`,
-            );
-        }
     }
 
     private static async list_dir(sandbox: Sandbox, dir: string): Promise<string[]> {

@@ -13,6 +13,7 @@ const body_schema = z.object({
     run_id: z.string().min(1),
     issue_id: z.string().min(1),
     summary: z.string().max(500).optional(),
+    report: z.string().max(16_000).optional(),
     stats: run_stats_schema,
     cost: run_cost_schema,
 });
@@ -48,6 +49,7 @@ export default class ReportRunCompleted {
                     data: {
                         status: AgentSessionStatus.Succeeded,
                         summary: data.summary,
+                        report: data.report,
                         stats: AgentSessionService.to_stats(data.stats),
                         cost: AgentSessionService.to_cost(data.cost),
                         endedAt: new Date(),

@@ -8,6 +8,11 @@ import type { CommandResult, SnapshotInfo } from "e2b";
 import { Sandbox } from "e2b";
 
 import { ENV } from "../../conf/config.env";
+import {
+    has_node_project,
+    install_dependencies,
+    pick_package_manager,
+} from "../capsule/service.workspace";
 import GraphService, {
     GRAPHIFY_INTEGRATION,
     GRAPHIFY_OUT,
@@ -45,6 +50,8 @@ type Committed = Extract<RunLogMilestoneBody, { kind: typeof RunLogEventKind.Com
 // commit message contains newlines and anything friendlier would be ambiguous.
 const COMMIT_FORMAT = "%H%x1f%s%x1f%b%x1e";
 const PR_BODY_PATH = "/home/user/pr_body.md";
+const SOLVE_REPORT_PATH = "/home/user/solve_report.md";
+const SOLVE_REPORT_MAX_CHARS = 16_000;
 const SANDBOX_MCP_ENTRY = "/opt/matcha/sandbox-mcp/index.js";
 const ISSUE_SOLVE_TIMEOUT_MS = 30 * 60_000;
 const ISSUE_PUSH_TIMEOUT_MS = 10 * 60_000;
@@ -64,6 +71,19 @@ function previous_push_attempts(worker: { contextSummary: unknown }): number {
     const summary = worker.contextSummary as { pushAttempts?: unknown } | null;
     const attempts = Number(summary?.pushAttempts);
     return Number.isInteger(attempts) && attempts > 0 ? attempts : 0;
+}
+
+/**
+ * The issue whose commit is sitting unpushed in this worker's retained sandbox.
+ *
+ * A push retry must not reset the branch or re-run the agent: the work only exists locally,
+ * so resetting destroys it and re-running spends a whole run rediscovering a fix that is
+ * already committed one line above.
+ */
+function pending_push_issue_id(worker: { contextSummary: unknown }): string | undefined {
+    if (previous_push_attempts(worker) === 0) return undefined;
+    const summary = worker.contextSummary as { issueId?: unknown } | null;
+    return typeof summary?.issueId === "string" ? summary.issueId : undefined;
 }
 
 export default class E2B {
@@ -211,6 +231,8 @@ export default class E2B {
         let retain_sandbox = false;
         let gh_token = "";
         let current_issue: ClaimedIssue | null = null;
+        let current_run_id: string | undefined;
+        const push_retry_issue_id = pending_push_issue_id(worker);
 
         const secrets = () => [gh_token, ENV.SERVER_CLAUDE_CODE_OAUTH_TOKEN];
         const failure_fields = () => ({
@@ -293,10 +315,12 @@ export default class E2B {
                 );
 
                 console.log("existing_pull", existing_pull);
+                const resuming_push = push_retry_issue_id === issue.id;
                 const already_pushed = await E2B.prepare_issue_branch(
                     sandbox,
                     issue.prBranch,
                     branch,
+                    resuming_push,
                 );
 
                 console.log("already_pushed", already_pushed);
@@ -306,6 +330,10 @@ export default class E2B {
                 // Minted after the claim lands, and used as the AgentSession id so a
                 // retried report is an upsert rather than a second attempt row. A resumed
                 // issue whose PR already exists never runs claude, so it has no run.
+                //
+                // Mirrored onto current_run_id so a failure thrown past this scope — a rejected
+                // push is the common one — still names the run it belongs to. Without it the
+                // give-up report writes a bare status change and the reason is lost.
                 let run_id: string | undefined;
 
                 // The milestones are written through whichever writer the run opened, so they
@@ -332,11 +360,16 @@ export default class E2B {
                     log.info(`branch already pushed for issue #${issue.number}`, {
                         branch: issue.prBranch,
                     });
+                } else if (resuming_push) {
+                    log.info(`retrying the push for issue #${issue.number}`, {
+                        branch: issue.prBranch,
+                    });
                 } else {
                     const { harness, model, effort } = issue;
                     const agent = Registry.get(harness);
 
                     run_id = randomUUID();
+                    current_run_id = run_id;
                     const run_worker_token = sign_worker_jwt(worker_id);
                     const version_result = await sandbox.commands
                         .run(`${agent.binary} --version`)
@@ -388,7 +421,12 @@ export default class E2B {
                     log.step(`issue #${issue.number} pushed into sandbox`, { title: issue.title });
                     await sandbox.files.write(
                         ISSUE_PROMPT_PATH,
-                        E2B.build_issue_prompt(issue, branch, project.planMd),
+                        E2B.build_issue_prompt(
+                            issue,
+                            branch,
+                            project.planMd,
+                            await E2B.dependencies_installed(sandbox),
+                        ),
                     );
 
                     log.info(`invoking ${harness} for issue #${issue.number}`, {
@@ -479,6 +517,7 @@ export default class E2B {
                         issue.id,
                         report,
                         changes?.files,
+                        await E2B.read_solve_report(sandbox),
                         log,
                     );
 
@@ -618,6 +657,7 @@ export default class E2B {
                     issueId: current_issue.id,
                     workerId: worker_id,
                     reason: failure_sentence(failure),
+                    runId: current_run_id,
                 }).catch((e) =>
                     log.error("could not report the failed issue", e, failure_fields()),
                 );
@@ -651,10 +691,22 @@ export default class E2B {
         }
     }
 
+    /**
+     * Checked here rather than remembered from the clone, because a reused sandbox never runs the
+     * clone again and a repository we could not install must not be told that it was.
+     */
+    private static async dependencies_installed(sandbox: Sandbox): Promise<boolean> {
+        const result = await sandbox.commands
+            .run(`test -d ${REPO_DIR}/node_modules`, { cwd: REPO_DIR })
+            .catch(() => null);
+        return result !== null;
+    }
+
     private static build_issue_prompt(
         issue: ClaimedIssue,
         base_branch: string,
         plan_md: string | null,
+        dependencies_installed: boolean,
     ): string {
         const intro = `You are an autonomous coding agent working inside a fresh clone of this repository at ${REPO_DIR}, currently on branch "${issue.prBranch}".`;
 
@@ -674,16 +726,55 @@ export default class E2B {
             `Investigate the issue and read every relevant file before changing it.`,
             `Stay on the existing branch "${issue.prBranch}". Never switch branches or commit directly to "${base_branch}".`,
             `Implement the fix using your normal tools.`,
+            ...(dependencies_installed
+                ? [
+                      `Run this repository's own lint and type-check scripts and fix what your change broke. They are the same checks its pre-push hook runs, and the push is rejected if they fail.`,
+                  ]
+                : []),
             `Commit your changes with a clear commit message.`,
             `Do not push the branch or open a pull request — that is handled for you once you finish.`,
             `Write a short markdown summary of your change to ${PR_BODY_PATH}. It becomes the pull request description.`,
+            `Write your solve report to ${SOLVE_REPORT_PATH}, following the template below exactly.`,
         ];
+
+        const report = `## Your solve report
+
+            ${SOLVE_REPORT_PATH} is the only place your reasoning survives. The person reading it later sees the files you changed and every command you ran, but never why — so write down what they cannot reconstruct.
+
+            Use these five headings, exactly as written, in this order, and nothing else:
+
+            ## The cause
+            What was actually wrong. Two sentences at most.
+
+            ## Where
+            The files you touched, with line numbers.
+
+            ## The fix, and why this one
+            What you changed, and the other approach you considered and rejected. Say why you rejected it.
+
+            ## Ruled out
+            The dead ends. Files you read and left alone, causes you suspected and disproved, approaches that would not work in this codebase. This is the most valuable section: it is what stops the next person repeating your work. If you truly ruled nothing out, say so.
+
+            ## How it was checked
+            The commands you ran to verify the fix and what they returned. If you did not verify it, write "Not verified" and say what would need running. Never imply you checked something you did not.
+
+            Every claim you make must name a real file, command, or commit from this run. A reader can compare your report against what you actually did, so a file you never opened or a command you never ran makes the whole report untrustworthy.
+
+            This is not the pull request description. ${PR_BODY_PATH} tells a reviewer what changed; this tells a maintainer how you got there. Write both.`;
 
         const steps = `## What to do, in this exact order
 
             ${actions.map((action, index) => `${index + 1}. ${action}`).join("\n")}
 
             Do all of this yourself with your Bash tool — you have full permissions in this sandbox.
+
+            ${
+                dependencies_installed
+                    ? "This repository's dependencies are already installed, so its own scripts will run."
+                    : "This repository's dependencies are not installed, and installing them here is not possible. Verify your change by reading the code rather than by running the project's tooling, and say plainly in your report that you could not run it."
+            }
+
+            Never run a package install of your own, whatever the reason. A partial install leaves some packages without their dependencies while still arming the repository's git hooks, and every push after that is rejected. If a tool you want is missing, say so in your report instead.
 
             ## Reporting your progress
 
@@ -697,13 +788,14 @@ export default class E2B {
 
             Never start a long-running command in the background and end your turn waiting on it. This is a single non-interactive run: there is no later turn to come back to, so anything left running when you stop is lost and the issue goes unsolved. Run it in the foreground and wait for it to finish.`;
 
-        return [intro, brief, issue_section, steps].filter(Boolean).join("\n\n");
+        return [intro, brief, issue_section, steps, report].filter(Boolean).join("\n\n");
     }
 
     private static async prepare_issue_branch(
         sandbox: Sandbox,
         issue_branch: string,
         base_branch: string,
+        keep_local_work: boolean,
     ): Promise<boolean> {
         this.validate_branch(issue_branch);
         this.validate_branch(base_branch);
@@ -714,20 +806,34 @@ export default class E2B {
         );
         const already_pushed = Boolean(remote_branch.stdout.trim());
 
-        const current_branch = await sandbox.commands.run("git branch --show-current", {
+        // A push retry is the one case where the sandbox holds work worth keeping: the commit
+        // exists only here, so resetting would destroy the very thing we came back to push.
+        if (keep_local_work) return already_pushed;
+
+        // Otherwise reset unconditionally, even when the branch is already checked out. A
+        // retained sandbox comes back sitting on this branch with the last attempt's commit still
+        // on it, and skipping the reset hands the next agent that work — which it then correctly
+        // reports as "already done", burning a whole run.
+        const source_branch = already_pushed ? issue_branch : base_branch;
+        await sandbox.commands.run(`git fetch --depth 1 origin ${source_branch}`, {
             cwd: REPO_DIR,
         });
-        if (current_branch.stdout.trim() !== issue_branch) {
-            const source_branch = already_pushed ? issue_branch : base_branch;
-            await sandbox.commands.run(`git fetch --depth 1 origin ${source_branch}`, {
-                cwd: REPO_DIR,
-            });
-            await sandbox.commands.run(`git switch --force-create ${issue_branch} FETCH_HEAD`, {
-                cwd: REPO_DIR,
-            });
-        }
+        await sandbox.commands.run(`git switch --force-create ${issue_branch} FETCH_HEAD`, {
+            cwd: REPO_DIR,
+        });
+        await sandbox.commands.run("git reset --hard FETCH_HEAD", { cwd: REPO_DIR });
 
         return already_pushed;
+    }
+
+    /**
+     * Only ever called on a run where the agent actually worked. A resumed issue skips the
+     * agent entirely, and reporting an empty section for it would blank the account an
+     * earlier run already wrote.
+     */
+    private static async read_solve_report(sandbox: Sandbox): Promise<string | undefined> {
+        const text = (await sandbox.files.read(SOLVE_REPORT_PATH).catch(() => "")).trim();
+        return text ? text.slice(0, SOLVE_REPORT_MAX_CHARS) : undefined;
     }
 
     private static async find_pull_request(
@@ -977,6 +1083,41 @@ export default class E2B {
             .map(([key, value]) => `${key}=${value}`)
             .join("\n");
         await sandbox.files.write(`${REPO_DIR}/.env`, env_file);
+
+        await E2B.install_repo_dependencies(sandbox, log);
+    }
+
+    /**
+     * Best-effort, and deliberately so.
+     *
+     * Repositories we cannot install — anything that is not a JavaScript project, or a JS one
+     * whose install simply fails here — still solve fine without their dependencies; that is how
+     * every issue was solved before this step existed. Failing the clone over it would turn a
+     * missing convenience into a dead run.
+     *
+     * The one thing a failure must not leave behind is a half-installed tree. Running a package
+     * manager fires the repository's `prepare` script, which is what arms hook managers like
+     * husky, so an install that dies partway can leave a live pre-push hook that nothing in the
+     * tree can satisfy — the exact state that made every push fail. Undo that arming rather than
+     * hand the next step a repository that cannot push.
+     */
+    private static async install_repo_dependencies(sandbox: Sandbox, log: Logger): Promise<void> {
+        const root_entries = (await sandbox.files.list(REPO_DIR)).map((entry) => entry.name);
+        if (!has_node_project(root_entries)) {
+            log.info("no package.json at the repository root — skipping dependency install");
+            return;
+        }
+
+        try {
+            await install_dependencies(sandbox, pick_package_manager(root_entries), log, false);
+        } catch (error) {
+            log.warn("dependency install failed — continuing without it", {
+                error: String(error),
+            });
+            await sandbox.commands
+                .run("git config --unset-all core.hooksPath", { cwd: REPO_DIR })
+                .catch(() => null);
+        }
     }
 
     public static validate_branch(branch: string): void {

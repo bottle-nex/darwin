@@ -24,6 +24,7 @@ export default class RunReporter {
         issue_id: string,
         report: AgentReport,
         files_changed: number | undefined,
+        solve_report: string | undefined,
         log: Logger,
     ) {
         await RunReporter.post(
@@ -33,6 +34,7 @@ export default class RunReporter {
                 run_id,
                 issue_id,
                 summary: report.result?.slice(0, 500),
+                report: solve_report,
                 stats: {
                     num_turns: report.num_turns,
                     duration_ms: report.duration_ms,

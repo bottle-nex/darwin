@@ -19,6 +19,7 @@ import RunLogsGetController from "../../controllers/issues/controller.get_run_lo
 import ViewPreferencesGetController from "../../controllers/issues/controller.get_view_preferences";
 import IssueActivityListController from "../../controllers/issues/controller.list_activity";
 import MyIssuesListController from "../../controllers/issues/controller.list_my_issues";
+import SolveReportListController from "../../controllers/issues/controller.list_solve_reports";
 import ColumnReorderController from "../../controllers/issues/controller.reorder_columns";
 import BoardIssuesSearchController from "../../controllers/issues/controller.search_board_issues";
 import IssueSearchController from "../../controllers/issues/controller.search_issues";
@@ -67,6 +68,7 @@ issues_router.put("/:id/config", require_auth, IssueSetConfigController.process)
 
 issues_router.get("/:id/references", require_auth, IssueReferencesGetController.process);
 issues_router.get("/:id/activity", require_auth, IssueActivityListController.process);
+issues_router.get("/:id/solve-reports", require_auth, SolveReportListController.process);
 
 issues_router.post("/:id/assignees", require_auth, IssueAssignController.process);
 issues_router.delete("/:id/assignees/:user_id", require_auth, IssueUnassignController.process);

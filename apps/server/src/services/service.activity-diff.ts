@@ -21,7 +21,7 @@ export function location_of(
  * have to collide on `@@unique([issueId, dedupeKey])` instead of writing two rows.
  */
 export function pull_request_activity_key(
-    type: ActivityType.PrMerged | ActivityType.PrClosed,
+    type: typeof ActivityType.PrMerged | typeof ActivityType.PrClosed,
     url: string,
 ): string {
     return `${type}:${url}`;

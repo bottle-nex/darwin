@@ -24,6 +24,7 @@ import {
 import { mark_project_chat_deleted, upsert_project_chat } from "@/hooks/chats/useProjectChat";
 import { mark_team_chat_deleted, upsert_team_chat } from "@/hooks/chats/useTeamChat";
 import { updateBoardIssue, upsertBoardIssue } from "@/hooks/issues/useBoard";
+import { solveReportsKey } from "@/hooks/issues/useSolveReports";
 import { upsert_notification } from "@/hooks/notifications/notificationCache";
 import { PROJECT_QUERY_KEY } from "@/hooks/project/useGetProject";
 import { append_run_log_events, seal_run_log } from "@/hooks/runLogs/useRunLogs";
@@ -173,6 +174,7 @@ export class SocketHandlers {
     static handle_agent_session_updated(queryClient: QueryClient, message: OutboundSocketMessage) {
         if (message.type !== OutboundSocketMessageType.AGENT_SESSION_UPDATED) return;
         update_agent_session(queryClient, message.payload);
+        queryClient.invalidateQueries({ queryKey: solveReportsKey(message.payload.issueId) });
     }
 
     static handle_run_log_appended(queryClient: QueryClient, message: OutboundSocketMessage) {

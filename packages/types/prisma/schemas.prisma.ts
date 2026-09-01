@@ -200,6 +200,7 @@ export interface AgentSession {
     status: AgentSessionStatus;
 
     summary: string | null;
+    report: string | null;
     stats: AgentSessionStats | null;
     cost: AgentSessionCost | null;
     traceUrl: string | null;
