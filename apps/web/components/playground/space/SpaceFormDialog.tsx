@@ -173,7 +173,7 @@ export default function SpaceFormDialog({ projectSlug }: { projectSlug: string }
                 }}
                 className={cn(
                     "flex max-h-[80vh] min-h-[40vh] w-187.5 max-w-none flex-col gap-0 overflow-hidden p-0 sm:max-w-none",
-                    "rounded-3xl bg-charcoal",
+                    "rounded-3xl bg-graphite",
                 )}
             >
                 <DialogTitle className="sr-only">
