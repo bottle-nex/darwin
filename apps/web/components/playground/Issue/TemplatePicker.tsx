@@ -58,7 +58,7 @@ export default function TemplatePicker({ projectId, onPick }: TemplatePickerProp
     }
 
     return (
-        <Popover open={open} onOpenChange={setOpen}>
+        <Popover modal open={open} onOpenChange={setOpen}>
             <TooltipComponent side="bottom" content="Start from a template">
                 <PopoverTrigger asChild>
                     <CapsuleTrigger

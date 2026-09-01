@@ -70,12 +70,9 @@ export default function MembersCapsule({
     );
 
     return (
-        <Popover open={open} onOpenChange={setOpen}>
+        <Popover modal open={open} onOpenChange={setOpen}>
             {tooltip ? (
-                <TooltipComponent
-                    className="w-60"
-                    content="Assigning a member is compulsory, our agent may ask them questions about this issue."
-                >
+                <TooltipComponent content="Assigning a member is compulsory, our agent may ask them questions about this issue.">
                     <PopoverTrigger asChild>{trigger}</PopoverTrigger>
                 </TooltipComponent>
             ) : (
@@ -96,7 +93,7 @@ export default function MembersCapsule({
                                 return (
                                     <CommandItem
                                         key={member.id}
-                                        value={member.name ?? member.email}
+                                        value={`${member.name ?? ""} ${member.email}`}
                                         onSelect={() => toggle(member.id)}
                                     >
                                         <MemberOptionRow

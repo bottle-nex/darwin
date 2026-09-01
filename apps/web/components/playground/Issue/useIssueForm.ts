@@ -10,6 +10,7 @@ import { useActiveProject } from "@/hooks/useActiveProject";
 import { KanbanMappers } from "@/lib/kanban/KanbanMappers";
 import { toast } from "@/lib/toast";
 import type { IssueTarget } from "@/store/issues/useCreateIssueStore";
+import { usePaneRouteStore } from "@/store/playground/usePaneRouteStore";
 import type { BoardIssue } from "@/types/board";
 import type { Effort, Harness } from "@/types/harness.type";
 import { HARNESS_MODELS, HARNESS_SUPPORTS_EFFORT } from "@/types/harness.type";
@@ -234,7 +235,7 @@ export function useIssueForm({
                 ]);
                 setHarnessDraft(null);
             } else {
-                await createIssue.mutateAsync({
+                const created = await createIssue.mutateAsync({
                     project_id: projectId,
                     title: title.trim(),
                     description: body.toHtml(),
@@ -244,6 +245,13 @@ export function useIssueForm({
                     tag_ids: tagIds,
                     start_date: startDate?.toISOString(),
                     target_date: targetDate?.toISOString(),
+                });
+                toast.success("Issue created.", {
+                    description: created.issue.title,
+                    action: {
+                        label: "View issue",
+                        onClick: () => usePaneRouteStore.getState().openIssue(created.issue.id),
+                    },
                 });
             }
             onSubmitted?.();

@@ -25,6 +25,7 @@ import { issueIdentifier } from "@/lib/format";
 import { htmlToMarkdown } from "@/lib/markdown";
 import { toast } from "@/lib/toast";
 import { useDeleteIssueStore } from "@/store/issues/useDeleteIssueStore";
+import { usePaneRouteStore } from "@/store/playground/usePaneRouteStore";
 import type { BoardIssue, ServerIssueStatus } from "@/types/board";
 import type { IssueCommandPage } from "@/types/command.type";
 import type { Priority } from "@/types/kanban";
@@ -244,7 +245,15 @@ export function useIssueActions(target: IssueActionTarget) {
                     tag_ids: issue!.tags.map((tag) => tag.id),
                 },
                 {
-                    onSuccess: () => toast.success("Duplicated issue."),
+                    onSuccess: (data) =>
+                        toast.success("Duplicated issue.", {
+                            description: data.issue.title,
+                            action: {
+                                label: "View issue",
+                                onClick: () =>
+                                    usePaneRouteStore.getState().openIssue(data.issue.id),
+                            },
+                        }),
                     onError: () => toast.error("Couldn't duplicate the issue."),
                 },
             );

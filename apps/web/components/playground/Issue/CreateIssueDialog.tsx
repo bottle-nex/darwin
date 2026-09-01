@@ -17,7 +17,7 @@ export default function CreateIssueDialog() {
                     event.preventDefault();
                     (event.currentTarget as HTMLElement).focus();
                 }}
-                className="flex flex-col max-h-[80vh] min-h-[40vh] w-187.5 max-w-none sm:max-w-none p-0 gap-0 overflow-hidden rounded-3xl"
+                className="flex flex-col max-h-[80vh] min-h-[40vh] w-187.5 max-w-none sm:max-w-none p-0 gap-0 rounded-3xl bg-transparent"
             >
                 <CreateIssueForm target={target} onCreated={close} />
             </DialogContent>
