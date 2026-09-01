@@ -1,8 +1,16 @@
 "use client";
-import { BackChevronIcon, SearchIcon } from "@trymatcha/ui/icons";
+import { BackChevronIcon, CloseIcon, SearchIcon } from "@trymatcha/ui/icons";
+import { useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
+import IconWrapper from "@/components/ui/IconWrapper";
 import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
+
+// Both states are always mounted and cross-fade in place: the left and right
+// 28px slots never move, so nothing reflows when the row turns into a search bar.
+const SLOT = "flex size-7 shrink-0 items-center justify-center rounded-[6px]";
+const FADE = "transition-opacity duration-200 ease-out";
 
 export default function SettingsSearchRow({
     value,
@@ -15,31 +23,85 @@ export default function SettingsSearchRow({
     onBack: () => void;
     onSubmit: () => void;
 }) {
-    return (
-        <div className="flex h-7 w-full items-center gap-1">
-            <Button
-                variant="unstyled"
-                type="button"
-                onClick={onBack}
-                aria-label="Back"
-                className="flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-[6px] bg-snow/5 text-neutral-400 transition-colors hover:bg-snow/8 hover:text-neutral-100"
-            >
-                <BackChevronIcon className="size-4" aria-hidden />
-            </Button>
+    const [searching, setSearching] = useState(false);
+    const inputRef = useRef<HTMLInputElement>(null);
 
-            <div className="relative min-w-0 flex-1">
+    function openSearch() {
+        setSearching(true);
+        requestAnimationFrame(() => inputRef.current?.focus());
+    }
+
+    function closeSearch() {
+        onChange("");
+        setSearching(false);
+    }
+
+    return (
+        <div className="relative h-7 w-full">
+            {/* Browse state */}
+            <div
+                aria-hidden={searching}
+                className={cn(
+                    "absolute inset-0 flex items-center justify-between gap-1",
+                    FADE,
+                    searching && "pointer-events-none opacity-0",
+                )}
+            >
+                <Button
+                    variant="unstyled"
+                    type="button"
+                    onClick={onBack}
+                    tabIndex={searching ? -1 : 0}
+                    className="flex h-7 cursor-pointer items-center gap-0.5 rounded-full pl-1.75 pr-3.25 text-[12.5px] text-snow/80 transition-colors hover:bg-active hover:text-snow/90"
+                >
+                    <BackChevronIcon className="size-4 shrink-0" aria-hidden />
+                    Back
+                </Button>
+
+                <Button
+                    variant="unstyled"
+                    type="button"
+                    onClick={openSearch}
+                    aria-label="Search settings"
+                    tabIndex={searching ? -1 : 0}
+                    className={cn(SLOT, "cursor-pointer")}
+                >
+                    <IconWrapper
+                        icon={SearchIcon}
+                        variant="ghost"
+                        className="size-7 rounded-[6px]"
+                        iconClassName="size-4"
+                    />
+                </Button>
+            </div>
+
+            {/* Search state */}
+            <div
+                aria-hidden={!searching}
+                className={cn(
+                    "absolute inset-0",
+                    FADE,
+                    !searching && "pointer-events-none opacity-0",
+                )}
+            >
                 <SearchIcon
-                    className="pointer-events-none absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-neutral-400"
+                    className="pointer-events-none absolute top-1/2 left-1.5 size-4 -translate-y-1/2 text-neutral-400"
                     aria-hidden
                 />
                 <Input
+                    ref={inputRef}
                     variant="ghost"
                     value={value}
+                    tabIndex={searching ? 0 : -1}
                     onChange={(event) => onChange(event.target.value)}
                     onKeyDown={(event) => {
                         if (event.key === "Escape") {
                             event.preventDefault();
-                            onChange("");
+                            if (value) {
+                                onChange("");
+                                return;
+                            }
+                            closeSearch();
                             return;
                         }
                         if (event.key === "Enter") {
@@ -48,8 +110,21 @@ export default function SettingsSearchRow({
                         }
                     }}
                     placeholder="Search settings..."
-                    className="h-7 rounded-[6px] bg-snow/5 pl-8 text-[12.5px] hover:bg-snow/7"
+                    className="h-7 rounded-[6px] bg-snow/5 pr-8 pl-7 text-[12.5px] hover:bg-snow/7"
                 />
+                <Button
+                    variant="unstyled"
+                    type="button"
+                    onClick={closeSearch}
+                    aria-label="Close search"
+                    tabIndex={searching ? 0 : -1}
+                    className={cn(
+                        SLOT,
+                        "absolute top-0 right-0 cursor-pointer text-neutral-400 transition-colors hover:text-neutral-100",
+                    )}
+                >
+                    <CloseIcon className="size-4" aria-hidden />
+                </Button>
             </div>
         </div>
     );
