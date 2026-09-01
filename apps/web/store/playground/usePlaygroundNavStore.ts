@@ -37,6 +37,7 @@ interface PlaygroundNavState {
     /** Slug of the project the selected space belongs to — guards stale detail. */
     selectedSpaceProjectSlug: string | null;
     setTab: (tabId: string) => void;
+    hydrateTab: (tabId: string) => void;
     returnFromSettings: () => void;
     openTeam: (team: ProjectTeam, projectSlug: string) => void;
     clearTeam: () => void;
@@ -63,6 +64,11 @@ export const usePlaygroundNavStore = create<PlaygroundNavState>((set) => ({
             lastWorkspaceTab: isSettingsTab(tabId) ? state.lastWorkspaceTab : tabId,
         }));
     },
+    hydrateTab: (tabId) =>
+        set((state) => ({
+            tab: tabId,
+            lastWorkspaceTab: isSettingsTab(tabId) ? state.lastWorkspaceTab : tabId,
+        })),
     returnFromSettings: () => {
         leave_pane();
         set((state) => ({ tab: state.lastWorkspaceTab }));

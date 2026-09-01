@@ -1,7 +1,8 @@
 "use client";
 import type { IconType } from "@trymatcha/ui/icons";
+import { ExternalLinkIcon } from "@trymatcha/ui/icons";
 
-import IconWrapper from "@/components/ui/IconWrapper";
+import { Button } from "@/components/ui/button";
 import Pill, { type PillTone } from "@/components/ui/Pill";
 import { cn } from "@/lib/utils";
 
@@ -32,7 +33,6 @@ export default function IntegrationCard({
     name,
     description,
     status,
-    note,
     onSelect,
     disabled,
     className,
@@ -41,42 +41,42 @@ export default function IntegrationCard({
     name: string;
     description: string;
     status: IntegrationStatus;
-    note?: string;
     onSelect: () => void;
     disabled?: boolean;
     className?: string;
 }) {
     return (
-        <button
-            type="button"
-            onClick={onSelect}
-            disabled={disabled}
-            aria-label={`${name} — ${STATUS_LABEL[status]}`}
+        <div
             className={cn(
                 SETTINGS_CARD_SHELL,
-                "group flex cursor-pointer flex-col gap-3.5 p-4 text-left outline-none transition-colors hover:bg-snow/6 focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-60",
+                "flex items-start gap-3 px-4 py-3.5",
+                disabled && "opacity-60",
                 className,
             )}
         >
-            <div className="flex items-start justify-between gap-3">
-                <IconWrapper
-                    icon={Icon}
-                    className="size-10 shrink-0 rounded-lg bg-graphite/40"
-                    iconClassName="size-5 text-snow"
-                />
-                <Pill tone={STATUS_TONE[status]} dotColor={STATUS_DOT[status]}>
-                    {STATUS_LABEL[status]}
-                </Pill>
+            <Icon className="mt-0.5 size-8 shrink-0 text-snow" aria-hidden />
+
+            <div className="flex min-w-0 flex-1 flex-col gap-1">
+                <div className="flex items-center gap-2.5">
+                    <span className="shrink-0 text-[14px] font-semibold text-snow">{name}</span>
+                    <Pill size="sm" tone={STATUS_TONE[status]} dotColor={STATUS_DOT[status]}>
+                        {STATUS_LABEL[status]}
+                    </Pill>
+                </div>
+                <span className="text-[12.5px] leading-[1.5] text-snow/55">{description}</span>
             </div>
 
-            <div className="flex min-w-0 flex-col gap-1">
-                <span className="truncate text-sm font-medium text-snow">{name}</span>
-                <span className="line-clamp-2 text-[13px] leading-[1.45] text-snow/60">
-                    {description}
-                </span>
-            </div>
-
-            {note && <span className="truncate text-[11px] text-snow/40">{note}</span>}
-        </button>
+            <Button
+                type="button"
+                variant="flat"
+                size="sm"
+                onClick={onSelect}
+                disabled={disabled}
+                className="shrink-0"
+            >
+                <ExternalLinkIcon className="size-3.5" aria-hidden />
+                {status === "connected" ? "Open" : "Connect"}
+            </Button>
+        </div>
     );
 }

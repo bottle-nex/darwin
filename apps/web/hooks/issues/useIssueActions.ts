@@ -221,7 +221,13 @@ export function useIssueActions(target: IssueActionTarget) {
             toast.success(`Copied ${label}.`);
         },
 
-        openInNewTab: () => window.open(issueHref(), "_blank"),
+        openInNewTab: () => {
+            const anchor = document.createElement("a");
+            anchor.href = issueHref();
+            anchor.target = "_blank";
+            anchor.rel = "noopener";
+            anchor.click();
+        },
 
         duplicate: () => {
             if (!issue || !projectId) return;
