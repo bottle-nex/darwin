@@ -47,7 +47,7 @@ export function usePlaygroundUrlSync(
     const tab = usePlaygroundNavStore((s) => s.tab);
     const selectedTeam = usePlaygroundNavStore((s) => s.selectedTeam);
     const selectedSpace = usePlaygroundNavStore((s) => s.selectedSpace);
-    const setTab = usePlaygroundNavStore((s) => s.setTab);
+    const hydrateTab = usePlaygroundNavStore((s) => s.hydrateTab);
     const openTeam = usePlaygroundNavStore((s) => s.openTeam);
     const openSpace = usePlaygroundNavStore((s) => s.openSpace);
 
@@ -71,9 +71,9 @@ export function usePlaygroundUrlSync(
             space: params.get("space"), // space slug, when the tab is space
         };
         const { tab: tabParam } = initialRef.current;
-        if (tabParam) setTab(isPlaygroundTab(tabParam) ? tabParam : PLAYGROUND_DEFAULT_TAB);
+        if (tabParam) hydrateTab(isPlaygroundTab(tabParam) ? tabParam : PLAYGROUND_DEFAULT_TAB);
         hydratedRef.current = true;
-    }, [setTab]);
+    }, [hydrateTab]);
 
     // Once, if no ?tab= was present, apply the user's default-home-view
     // preference as soon as it loads. Never fires again after that.
@@ -84,9 +84,9 @@ export function usePlaygroundUrlSync(
             return;
         }
         if (defaultHomeView === undefined) return;
-        setTab(defaultHomeView);
+        hydrateTab(defaultHomeView);
         preferenceAppliedRef.current = true;
-    }, [defaultHomeView, setTab]);
+    }, [defaultHomeView, hydrateTab]);
 
     // Resolve the team-detail target from its slug once the teams have loaded.
     // Runs after the hydrate effect, so `initialRef` is already populated.
@@ -116,9 +116,9 @@ export function usePlaygroundUrlSync(
         if (!spaces) return; // wait for the board metadata to load
         const space = spaces.find((c) => c.slug === spaceParam);
         if (space) openSpace(space, projectSlug ?? "");
-        else setTab(PLAYGROUND_DEFAULT_TAB);
+        else hydrateTab(PLAYGROUND_DEFAULT_TAB);
         spaceHydratedRef.current = true;
-    }, [spaces, openSpace, setTab, projectSlug]);
+    }, [spaces, openSpace, hydrateTab, projectSlug]);
 
     // Mirror nav state back into the URL. Gated on hydration completing so the
     // initial params survive until they've been consumed.
