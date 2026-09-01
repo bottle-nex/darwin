@@ -11,7 +11,6 @@ import {
     HiCheckCircle,
     HiExclamationTriangle,
     HiInformationCircle,
-    HiOutlineBell,
     HiOutlineExclamationTriangle,
     HiOutlineQuestionMarkCircle,
     HiXCircle,
@@ -41,7 +40,7 @@ export const MergeToneWarningIcon = createIcon(HiExclamationTriangle);
 
 export const NoPriorityIcon = createIcon(TbLineDashed);
 
-export const NotificationsBellIcon = createIcon(HiOutlineBell);
+export const NotificationsBellIcon = createIcon(HiBell);
 
 export const OffBoardStatusIcon = createIcon(OffBoardGlyph);
 

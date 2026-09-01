@@ -1,14 +1,12 @@
+import { IoMdChatbubbles } from "react-icons/io";
 import { createIcon } from "./createIcon";
-import {
-    HiOutlineAtSymbol,
-    HiOutlineChatBubbleLeftRight,
-    HiOutlineFaceSmile,
-} from "react-icons/hi2";
+import { HiOutlineAtSymbol, HiChatBubbleLeftRight, HiOutlineFaceSmile } from "react-icons/hi2";
 import { MdChat } from "react-icons/md";
-import { PiSmileyFill } from "react-icons/pi";
+import { PiChatCenteredDuotone, PiSmileyFill } from "react-icons/pi";
 import { RiSendPlane2Fill } from "react-icons/ri";
+import { BiSolidChat } from "react-icons/bi";
 
-export const ChatsNavIcon = createIcon(HiOutlineChatBubbleLeftRight);
+export const ChatsNavIcon = createIcon(BiSolidChat);
 
 export const CommentCountIcon = createIcon(MdChat);
 

@@ -65,17 +65,17 @@ export default class ReportRunStarted {
                     sessionId: session.id,
                     events: [
                         {
-                            type: ActivityType.RunStarted,
-                            payload: { attemptNumber: session.attemptNumber },
-                            dedupeKey: `run:${session.id}:started`,
-                        },
-                        {
                             type: ActivityType.StatusChanged,
                             payload: {
                                 from: { kind: "status", status: IssueStatus.Queued },
                                 to: { kind: "status", status: IssueStatus.InProgress },
                             },
                             dedupeKey: `run:${session.id}:claimed`,
+                        },
+                        {
+                            type: ActivityType.RunStarted,
+                            payload: { attemptNumber: session.attemptNumber },
+                            dedupeKey: `run:${session.id}:started`,
                         },
                     ],
                 });

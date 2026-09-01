@@ -1,7 +1,6 @@
 import { Action, Permissions } from "@trymatcha/access-control";
 import { ActivityType, ActorType, IssueStatus, Prisma, prisma } from "@trymatcha/database";
-import { ActivityService } from "@trymatcha/services";
-import { OutboundSocketMessageType } from "@trymatcha/types";
+import { ActivityService, IssueBroadcastService } from "@trymatcha/services";
 import z from "zod";
 
 import { server_services } from "..";
@@ -164,15 +163,7 @@ export default class IssueService {
             include: { creator: true, assignees: true, tags: true },
         });
 
-        const channel_name = server_services.publisher.get_channel_name(input.project_id);
-        await server_services.publisher.publish_message(
-            channel_name,
-            JSON.stringify({
-                type: OutboundSocketMessageType.ISSUE_CREATED,
-                projectId: input.project_id,
-                payload: full_issue,
-            }),
-        );
+        await IssueBroadcastService.issue_created(input.project_id, full_issue);
 
         if (!input.custom_column_id || issue.status === IssueStatus.Todo) {
             await server_services.queue.enqueue_project(input.project_id);
@@ -314,19 +305,7 @@ export default class IssueService {
 
         if (references) await DescriptionReferenceService.write(id, references);
 
-        const channel_name = server_services.publisher.get_channel_name(issue.projectId);
-        await server_services.publisher.publish_message(
-            channel_name,
-            JSON.stringify({
-                type: OutboundSocketMessageType.ISSUE_UPDATED,
-                projectId: issue.projectId,
-                payload: updated,
-                previous: {
-                    status: issue.status,
-                    customColumnId: issue.customColumnId,
-                },
-            }),
-        );
+        await IssueBroadcastService.issue_updated(issue.projectId, updated, issue);
         await ActivityService.publish(issue.projectId, id, activities);
         await IssueService.notify_update(actor.id, issue, updated, next_status, next_column_id);
 

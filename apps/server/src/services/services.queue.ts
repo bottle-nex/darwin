@@ -1,6 +1,7 @@
 import {
     type GithubImportJobData,
     type GithubIssuePayload,
+    type IssueOutcomeJobData,
     type OnboardJobData,
     type ProductDiffJobData,
     QueueName,
@@ -15,12 +16,14 @@ export default class QueueService {
     private onboard_queue: Queue<OnboardJobData>;
     private product_diff_queue: Queue<ProductDiffJobData>;
     private github_import_queue: Queue<GithubImportJobData>;
+    private issue_outcome_queue: Queue<IssueOutcomeJobData>;
 
     constructor() {
         this.queue = new Queue(QueueName.IssueRouter, queue_config);
         this.onboard_queue = new Queue(QueueName.ProjectOnboard, queue_config);
         this.product_diff_queue = new Queue(QueueName.ProductDiff, queue_config);
         this.github_import_queue = new Queue(QueueName.GithubImport, queue_config);
+        this.issue_outcome_queue = new Queue(QueueName.IssueOutcome, queue_config);
     }
     async enqueue_project(project_id: string) {
         console.log(`[queue] enqueueing project ${project_id} for routing`);
@@ -66,6 +69,16 @@ export default class QueueService {
             },
         );
         console.log(`[queue] GitHub issue ${payload.githubIssueId} enqueued`);
+    }
+
+    async enqueue_pr_merged(data: Extract<IssueOutcomeJobData, { kind: "pr_merged" }>) {
+        console.log(`[queue] enqueueing merged PR ${data.prUrl} (issue ${data.issueId})`);
+        await this.issue_outcome_queue.add("pr_merged", data, {
+            jobId: `pr-merged-${data.issueId}-${data.prNumber}`,
+            removeOnComplete: true,
+            removeOnFail: true,
+        });
+        console.log(`[queue] merged PR ${data.prUrl} enqueued`);
     }
 
     async enqueue_github_backfill(project_id: string, page: number) {

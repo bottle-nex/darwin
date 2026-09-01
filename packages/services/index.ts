@@ -5,6 +5,11 @@ export {
     default as ActivityService,
 } from "./src/service.activity";
 export {
+    type BroadcastableIssue,
+    default as IssueBroadcastService,
+    type IssueLocation,
+} from "./src/service.issue-broadcast";
+export {
     type ChannelScope,
     type ParsedChannel,
     default as PubSubSystem,

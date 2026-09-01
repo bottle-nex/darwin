@@ -336,11 +336,7 @@ export default function IssueDropdown({
                     </ContextMenuItem>
                 </Submenu>
 
-                <ContextMenuItem
-                    variant="destructive"
-                    disabled={!editable}
-                    onSelect={actions.requestDelete}
-                >
+                <ContextMenuItem variant="destructive" onSelect={actions.requestDelete}>
                     <DeleteIcon className="size-3.5" aria-hidden />
                     <span className="flex-1">Delete</span>
                 </ContextMenuItem>

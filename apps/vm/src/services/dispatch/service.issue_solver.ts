@@ -1,6 +1,7 @@
 import type { Effort } from "@trymatcha/database";
 import { Harness, IssueStatus, prisma } from "@trymatcha/database";
 import type Logger from "@trymatcha/logger";
+import { IssueBroadcastService } from "@trymatcha/services";
 
 import { ENV } from "../../conf/config.env";
 
@@ -94,8 +95,29 @@ export default class IssueSolver {
         }
 
         log.step(`claimed issue #${issue.number}`, { title: issue.title });
+        await this.announce_claim(issue.id, log);
         const { issueConfig: claimed_config, ...claimed_rest } = issue;
         return { ...claimed_rest, prBranch: pr_branch, ...resolve_config(claimed_config) };
+    }
+
+    /**
+     * The claim above is the only place Queued → InProgress is written, so it is the only
+     * place that can announce it. Best-effort: a realtime bus that is down must not cost us
+     * an issue that is already claimed and ready to solve.
+     */
+    private static async announce_claim(issue_id: string, log: Logger) {
+        try {
+            const claimed = await prisma.issue.findUniqueOrThrow({
+                where: { id: issue_id },
+                include: { creator: true, assignees: true, tags: true },
+            });
+            await IssueBroadcastService.issue_updated(claimed.projectId, claimed, {
+                status: IssueStatus.Queued,
+                customColumnId: claimed.customColumnId,
+            });
+        } catch (error) {
+            log.warn("claim not broadcast", { issue: issue_id, error: String(error) });
+        }
     }
 
     private static pr_branch(issue_id: string): string {

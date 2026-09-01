@@ -5,12 +5,10 @@ import {
     IssueStatus,
     prisma,
 } from "@trymatcha/database";
-import { ActivityService } from "@trymatcha/services";
-import { OutboundSocketMessageType } from "@trymatcha/types";
+import { ActivityService, IssueBroadcastService } from "@trymatcha/services";
 import type { Request, Response } from "express";
 import z from "zod";
 
-import { server_services } from "../..";
 import { location_of } from "../../services/service.activity-diff";
 import AgentSessionService, {
     run_cost_schema,
@@ -109,18 +107,7 @@ export default class ReportRunFailed {
 
             const project_id = existing.issue.projectId;
 
-            await server_services.publisher.publish_message(
-                server_services.publisher.get_channel_name(project_id),
-                JSON.stringify({
-                    type: OutboundSocketMessageType.ISSUE_UPDATED,
-                    projectId: project_id,
-                    payload: updated_issue,
-                    previous: {
-                        status: before.status,
-                        customColumnId: before.customColumnId,
-                    },
-                }),
-            );
+            await IssueBroadcastService.issue_updated(project_id, updated_issue, before);
             await ActivityService.publish(project_id, data.issue_id, activities);
             await ActivityService.publish_session(project_id, session);
 

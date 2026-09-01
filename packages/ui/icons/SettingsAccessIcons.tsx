@@ -1,6 +1,4 @@
 import { createIcon } from "./createIcon";
-import { BsBoxes } from "react-icons/bs";
-import { GoHubot } from "react-icons/go";
 import {
     HiOutlineArrowLeft,
     HiOutlineArrowsRightLeft,
@@ -8,27 +6,36 @@ import {
     HiOutlineCheckBadge,
     HiOutlineCog6Tooth,
     HiOutlineCommandLine,
-    HiOutlineDocumentText,
+    HiDocumentText,
     HiOutlineFolder,
     HiOutlineHashtag,
     HiOutlineKey,
-    HiOutlineLockClosed,
+    HiLockClosed,
     HiOutlineNoSymbol,
-    HiOutlinePaintBrush,
     HiOutlineRectangleGroup,
     HiOutlineRectangleStack,
-    HiOutlineSquare3Stack3D,
-    HiOutlineSquares2X2,
+    HiSquare3Stack3D,
+    HiPuzzlePiece,
+    HiRectangleStack,
+    HiSquares2X2,
     HiOutlineUserMinus,
     HiOutlineUserPlus,
 } from "react-icons/hi2";
-import { MdKey, MdPersonOff, MdRemove, MdVerifiedUser, MdVpnKey } from "react-icons/md";
-import { RiConnectorLine } from "react-icons/ri";
+import { RiPaintBrushFill } from "react-icons/ri";
+import { IoIosSettings, IoMdSettings } from "react-icons/io";
+import {
+    MdKey,
+    MdOutlineSupportAgent,
+    MdPersonOff,
+    MdRemove,
+    MdVerifiedUser,
+    MdVpnKey,
+} from "react-icons/md";
 import { TbLayoutSidebarFilled } from "react-icons/tb";
 
 export const AccessChangedIcon = createIcon(HiOutlineKey);
 
-export const AccessRestrictedIcon = createIcon(HiOutlineLockClosed);
+export const AccessRestrictedIcon = createIcon(HiLockClosed);
 
 export const ApiKeyIcon = createIcon(MdKey);
 
@@ -38,7 +45,7 @@ export const CommandMenuIcon = createIcon(HiOutlineCommandLine);
 
 export const EnvSecretIcon = createIcon(MdVpnKey);
 
-export const HarnessIcon = createIcon(GoHubot);
+export const HarnessIcon = createIcon(MdOutlineSupportAgent);
 
 export const InviteAcceptedIcon = createIcon(HiOutlineCheckBadge);
 
@@ -60,24 +67,24 @@ export const ProjectEntityIcon = createIcon(HiOutlineFolder);
 
 export const ProjectReferenceIcon = createIcon(HiOutlineRectangleGroup);
 
-export const SpaceEntityIcon = createIcon(BsBoxes);
+export const SpaceEntityIcon = createIcon(HiRectangleStack);
 
 export const RemoveMemberIcon = createIcon(MdPersonOff);
 
 export const RemovedFromOrgIcon = createIcon(HiOutlineNoSymbol);
 
-export const SettingsApiKeysIcon = createIcon(HiOutlineSquare3Stack3D);
+export const SettingsApiKeysIcon = createIcon(HiSquare3Stack3D);
 
-export const SettingsAppearanceIcon = createIcon(HiOutlinePaintBrush);
+export const SettingsAppearanceIcon = createIcon(RiPaintBrushFill);
 
 export const SettingsBackIcon = createIcon(HiOutlineArrowLeft);
 
-export const SettingsIcon = createIcon(HiOutlineCog6Tooth);
+export const SettingsIcon = createIcon(IoMdSettings);
 
-export const SettingsIntegrationsIcon = createIcon(RiConnectorLine);
+export const SettingsIntegrationsIcon = createIcon(HiPuzzlePiece);
 
-export const SettingsOverviewIcon = createIcon(HiOutlineSquares2X2);
+export const SettingsOverviewIcon = createIcon(HiSquares2X2);
 
-export const SettingsTemplatesIcon = createIcon(HiOutlineDocumentText);
+export const SettingsTemplatesIcon = createIcon(HiDocumentText);
 
 export const SidebarToggleIcon = createIcon(TbLayoutSidebarFilled);

@@ -33,6 +33,10 @@ export default class IssueOutcomeQueueService {
                 await IssueOutcomeService.reconcile(data.issueId);
                 return;
             }
+            if (data.kind === "pr_merged") {
+                await IssueOutcomeService.pr_merged(data);
+                return;
+            }
             await IssueOutcomeService.failed(data);
         } catch (error) {
             if (error instanceof IssueOutcomeConflict) {

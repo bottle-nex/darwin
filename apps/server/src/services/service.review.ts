@@ -2,6 +2,7 @@ import { ActivityType, ActorType, prisma } from "@trymatcha/database";
 import { ActivityService } from "@trymatcha/services";
 import { type ReviewHeader, ReviewState } from "@trymatcha/types";
 
+import { pull_request_activity_key } from "./service.activity-diff";
 import GithubPullsService, { type PullRequestRef } from "./service.github_pulls";
 
 export interface ResolvedReview {
@@ -112,7 +113,13 @@ export default class ReviewService {
             const activities = await ActivityService.emit(prisma, {
                 issueId: resolved.issue.id,
                 actor: { type: ActorType.User, userId: actor.id, name: actor.name },
-                events: [{ type, payload: { url: header.htmlUrl } }],
+                events: [
+                    {
+                        type,
+                        payload: { url: header.htmlUrl },
+                        dedupeKey: pull_request_activity_key(type, header.htmlUrl),
+                    },
+                ],
             });
             await ActivityService.publish(resolved.projectId, resolved.issue.id, activities);
         }

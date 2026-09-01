@@ -54,6 +54,10 @@ model AgentSession {
 
   // a basic summary of what changed
   summary  String?
+  /// This run's section of the issue's solve report — the agent's own account of what was
+  /// wrong, what it changed, and what it ruled out. One per run and never rewritten, so a
+  /// reopened issue keeps every earlier attempt's reasoning; the pane joins them in order.
+  report   String? @db.Text
   /// { numTurns, durationMs, commits?, filesChanged? }
   stats    Json?
   /// { totalCostUsd, sandboxSeconds? }

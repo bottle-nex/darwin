@@ -2,6 +2,7 @@ import type { Request, Response } from "express";
 
 import { server_services } from "../..";
 import GithubWebhookService from "../../services/service.github_webhook";
+import IssueOutcomeService from "../../services/service.issue_outcome";
 import ResponseWriter from "../../services/service.response";
 
 export default class GithubWebhookController {
@@ -24,25 +25,55 @@ export default class GithubWebhookController {
                 ResponseWriter.success(res, { ok: true }, "pong");
                 return;
             }
-            if (event !== "issues") {
-                ResponseWriter.success(res, { ignored: true }, "Event ignored");
+            if (event === "issues") {
+                await GithubWebhookController.issue_opened(res, JSON.parse(raw.toString()));
+                return;
+            }
+            if (event === "pull_request") {
+                await GithubWebhookController.pull_request_merged(res, JSON.parse(raw.toString()));
                 return;
             }
 
-            const importable = GithubWebhookService.issue_to_import(JSON.parse(raw.toString()));
-            if (!importable) {
-                ResponseWriter.success(res, { ignored: true }, "Event ignored");
-                return;
-            }
-
-            await server_services.queue.enqueue_github_issue(
-                importable.repo_id,
-                importable.payload,
-            );
-            ResponseWriter.success(res, { queued: true }, "Issue queued for import");
+            ResponseWriter.success(res, { ignored: true }, "Event ignored");
         } catch (error) {
             console.error("GithubWebhookController error: ", error);
             ResponseWriter.system_error(res);
         }
+    }
+
+    private static async issue_opened(res: Response, body: unknown) {
+        const importable = GithubWebhookService.issue_to_import(body);
+        if (!importable) {
+            ResponseWriter.success(res, { ignored: true }, "Event ignored");
+            return;
+        }
+
+        await server_services.queue.enqueue_github_issue(importable.repo_id, importable.payload);
+        ResponseWriter.success(res, { queued: true }, "Issue queued for import");
+    }
+
+    private static async pull_request_merged(res: Response, body: unknown) {
+        const merged = GithubWebhookService.merged_pull_request(body);
+        if (!merged) {
+            ResponseWriter.success(res, { ignored: true }, "Event ignored");
+            return;
+        }
+
+        const issue = await IssueOutcomeService.issue_for_merged_pr(merged.repo_id, merged.pr_url);
+        if (!issue) {
+            ResponseWriter.success(res, { ignored: true }, "No issue tracks this pull request");
+            return;
+        }
+
+        await server_services.queue.enqueue_pr_merged({
+            kind: "pr_merged",
+            issueId: issue.id,
+            prUrl: merged.pr_url,
+            prNumber: merged.pr_number,
+            prTitle: merged.pr_title,
+            mergedAt: merged.merged_at,
+            mergedByLogin: merged.merged_by_login,
+        });
+        ResponseWriter.success(res, { queued: true }, "Merge queued");
     }
 }

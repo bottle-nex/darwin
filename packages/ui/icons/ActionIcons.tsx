@@ -1,7 +1,7 @@
 import { createIcon } from "./createIcon";
 import { BsReply } from "react-icons/bs";
 import { GrReturn } from "react-icons/gr";
-import { HiOutlinePencilSquare } from "react-icons/hi2";
+import { HiPencilSquare } from "react-icons/hi2";
 import { IoPencilSharp } from "react-icons/io5";
 import { LuCopyPlus, LuExternalLink, LuUserPlus } from "react-icons/lu";
 import {
@@ -76,4 +76,4 @@ export const RevokeInviteIcon = createIcon(MdPersonRemove);
 
 export const RunnerIcon = createIcon(MdStorage);
 
-export const SettingsGeneralIcon = createIcon(HiOutlinePencilSquare);
+export const SettingsGeneralIcon = createIcon(HiPencilSquare);

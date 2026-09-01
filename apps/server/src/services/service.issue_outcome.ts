@@ -1,15 +1,23 @@
 import { ActivityType, ActorType, IssueStatus, prisma } from "@trymatcha/database";
-import { type ActivityEvent, ActivityService } from "@trymatcha/services";
-import { type IssueOutcomeJobData, OutboundSocketMessageType } from "@trymatcha/types";
+import {
+    type ActivityActor,
+    type ActivityEvent,
+    ActivityService,
+    type BroadcastableIssue,
+    IssueBroadcastService,
+    type IssueLocation,
+} from "@trymatcha/services";
+import type { IssueOutcomeJobData } from "@trymatcha/types";
 
 import { server_services } from "..";
-import { location_of } from "./service.activity-diff";
+import { location_of, pull_request_activity_key } from "./service.activity-diff";
 import AgentSessionService from "./service.agent-session";
 import GithubPullsService from "./service.github_pulls";
 import ProductDiffService from "./service.product_diff";
 
 type PrOpened = Extract<IssueOutcomeJobData, { kind: "pr_opened" }>;
 type Failed = Extract<IssueOutcomeJobData, { kind: "failed" }>;
+type PrMerged = Extract<IssueOutcomeJobData, { kind: "pr_merged" }>;
 
 export const GIVE_UP_AFTER_MS = 15 * 60_000;
 
@@ -52,7 +60,7 @@ export default class IssueOutcomeService {
 
             return this.finish(transaction, {
                 issueId: data.issueId,
-                workerId: data.workerId,
+                actor: { type: ActorType.Agent, workerId: data.workerId },
                 sessionId: session?.id,
                 transitioned: update.count === 1,
                 events: [
@@ -109,7 +117,7 @@ export default class IssueOutcomeService {
 
             return this.finish(transaction, {
                 issueId: data.issueId,
-                workerId: data.workerId,
+                actor: { type: ActorType.Agent, workerId: data.workerId },
                 sessionId: session?.id,
                 transitioned: update.count === 1,
                 events: [
@@ -119,6 +127,59 @@ export default class IssueOutcomeService {
                         payload: {
                             from: location_of(issue.status, issue.customColumn),
                             to: { kind: "status", status: IssueStatus.Failed },
+                        },
+                    },
+                ],
+            });
+        });
+
+        await this.broadcast(completion, issue);
+    }
+
+    static issue_for_merged_pr(repo_id: string, pr_url: string) {
+        return prisma.issue.findFirst({
+            where: { prUrl: pr_url, project: { githubRepoId: BigInt(repo_id) } },
+            select: { id: true },
+        });
+    }
+
+    static async pr_merged(data: PrMerged): Promise<void> {
+        const issue = await prisma.issue.findUnique({
+            where: { id: data.issueId },
+            select: {
+                status: true,
+                customColumnId: true,
+                customColumn: { select: { id: true, label: true } },
+            },
+        });
+        if (!issue) return;
+
+        const completion = await prisma.$transaction(async (transaction) => {
+            const update = await transaction.issue.updateMany({
+                where: { id: data.issueId, status: IssueStatus.InReview },
+                data: {
+                    status: IssueStatus.Done,
+                    resolvedAt: new Date(data.mergedAt),
+                    prNumber: data.prNumber,
+                    prTitle: data.prTitle,
+                },
+            });
+
+            return this.finish(transaction, {
+                issueId: data.issueId,
+                actor: { type: ActorType.Github, name: data.mergedByLogin },
+                transitioned: update.count === 1,
+                events: [
+                    {
+                        type: ActivityType.PrMerged,
+                        payload: { url: data.prUrl },
+                        dedupeKey: pull_request_activity_key(ActivityType.PrMerged, data.prUrl),
+                    },
+                    {
+                        type: ActivityType.StatusChanged,
+                        payload: {
+                            from: location_of(issue.status, issue.customColumn),
+                            to: { kind: "status", status: IssueStatus.Done },
                         },
                     },
                 ],
@@ -232,7 +293,7 @@ export default class IssueOutcomeService {
         transaction: Parameters<Parameters<typeof prisma.$transaction>[0]>[0],
         input: {
             issueId: string;
-            workerId: string;
+            actor: ActivityActor;
             sessionId?: string;
             transitioned: boolean;
             events: ActivityEvent[];
@@ -246,7 +307,7 @@ export default class IssueOutcomeService {
 
         const activities = await ActivityService.emit(transaction, {
             issueId: input.issueId,
-            actor: { type: ActorType.Agent, workerId: input.workerId },
+            actor: input.actor,
             sessionId: input.sessionId,
             events: input.events,
         });
@@ -256,24 +317,16 @@ export default class IssueOutcomeService {
 
     private static async broadcast(
         completion: {
-            issue: { projectId: string; id: string };
+            issue: BroadcastableIssue;
             transitioned: boolean;
             activities: { seq: bigint }[];
         },
-        previous: { status: IssueStatus; customColumnId: string | null },
+        previous: IssueLocation,
     ) {
         if (!completion.transitioned) return;
 
         const project_id = completion.issue.projectId;
-        await server_services.publisher.publish_message(
-            server_services.publisher.get_channel_name(project_id),
-            JSON.stringify({
-                type: OutboundSocketMessageType.ISSUE_UPDATED,
-                projectId: project_id,
-                payload: completion.issue,
-                previous,
-            }),
-        );
+        await IssueBroadcastService.issue_updated(project_id, completion.issue, previous);
         await ActivityService.publish(project_id, completion.issue.id, completion.activities);
     }
 }

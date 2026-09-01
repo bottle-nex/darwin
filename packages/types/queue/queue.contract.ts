@@ -56,7 +56,16 @@ export type IssueOutcomeJobData =
           runId?: string;
       }
     | { kind: "failed"; issueId: string; workerId: string; reason: string; runId?: string }
-    | { kind: "reconcile"; issueId: string };
+    | { kind: "reconcile"; issueId: string }
+    | {
+          kind: "pr_merged";
+          issueId: string;
+          prUrl: string;
+          prNumber: number;
+          prTitle: string;
+          mergedAt: string;
+          mergedByLogin: string | null;
+      };
 
 export type NotificationJobData =
     | { action: "issue.assigned"; issueId: string; assigneeId: string; actorId: string }

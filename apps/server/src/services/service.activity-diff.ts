@@ -15,6 +15,18 @@ export function location_of(
     return { kind: "status", status };
 }
 
+/**
+ * The one key both merge paths must agree on. A merge started inside matcha and the
+ * `pull_request` webhook GitHub sends back for that same merge are one event, so they
+ * have to collide on `@@unique([issueId, dedupeKey])` instead of writing two rows.
+ */
+export function pull_request_activity_key(
+    type: ActivityType.PrMerged | ActivityType.PrClosed,
+    url: string,
+): string {
+    return `${type}:${url}`;
+}
+
 function same_location(a: ActivityLocationRef, b: ActivityLocationRef): boolean {
     if (a.kind === "column" || b.kind === "column") {
         return a.kind === "column" && b.kind === "column" && a.id === b.id;

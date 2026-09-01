@@ -18,8 +18,7 @@ import z from "zod";
 import { RunnableSequence } from "@langchain/core/runnables";
 import { routerPrompt } from "../prompts/prompt.router";
 import { Registry } from "@trymatcha/harness";
-import { ActivityService, publisher } from "@trymatcha/services";
-import { OutboundSocketMessageType } from "@trymatcha/types";
+import { ActivityService, IssueBroadcastService } from "@trymatcha/services";
 
 const log = Logger.scope("route");
 
@@ -295,18 +294,11 @@ export default class RouterProcessor {
     }
 
     static async broadcast_queued(projectId: string, routed: QueuedRow[]) {
-        const channel = publisher().get_channel_name(projectId);
-
         for (const { issue, activities } of routed) {
-            await publisher().publish_message(
-                channel,
-                JSON.stringify({
-                    type: OutboundSocketMessageType.ISSUE_UPDATED,
-                    projectId,
-                    payload: issue,
-                    previous: { status: IssueStatus.Todo, customColumnId: null },
-                }),
-            );
+            await IssueBroadcastService.issue_updated(projectId, issue, {
+                status: IssueStatus.Todo,
+                customColumnId: null,
+            });
             await ActivityService.publish(projectId, issue.id, activities);
         }
     }
