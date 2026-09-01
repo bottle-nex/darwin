@@ -657,79 +657,79 @@
 /* Maps Prism's token classes onto the 11 theme roles in lib/codeThemes.ts. The colours
    are never written here — codeThemes.ts sets the variables on the diff's root element.
    Add a theme by adding a row to that table, not by adding rules here. */
-.review-diff .token.comment,
-.review-diff .token.prolog,
-.review-diff .token.cdata,
-.review-diff .token.doctype {
+:is(.review-diff, .agent-log) .token.comment,
+:is(.review-diff, .agent-log) .token.prolog,
+:is(.review-diff, .agent-log) .token.cdata,
+:is(.review-diff, .agent-log) .token.doctype {
     color: var(--code-comment);
     font-style: italic;
 }
 
-.review-diff .token.punctuation,
-.review-diff .token.entity,
-.review-diff .token.namespace {
+:is(.review-diff, .agent-log) .token.punctuation,
+:is(.review-diff, .agent-log) .token.entity,
+:is(.review-diff, .agent-log) .token.namespace {
     color: var(--code-punctuation);
 }
 
-.review-diff .token.operator {
+:is(.review-diff, .agent-log) .token.operator {
     color: var(--code-operator);
 }
 
-.review-diff .token.keyword,
-.review-diff .token.selector,
-.review-diff .token.important {
+:is(.review-diff, .agent-log) .token.keyword,
+:is(.review-diff, .agent-log) .token.selector,
+:is(.review-diff, .agent-log) .token.important {
     color: var(--code-keyword);
 }
 
-.review-diff .token.string,
-.review-diff .token.char,
-.review-diff .token.url,
-.review-diff .token.attr-value,
-.review-diff .token.inserted {
+:is(.review-diff, .agent-log) .token.string,
+:is(.review-diff, .agent-log) .token.char,
+:is(.review-diff, .agent-log) .token.url,
+:is(.review-diff, .agent-log) .token.attr-value,
+:is(.review-diff, .agent-log) .token.inserted {
     color: var(--code-string);
 }
 
-.review-diff .token.number,
-.review-diff .token.boolean,
-.review-diff .token.constant,
-.review-diff .token.unit {
+:is(.review-diff, .agent-log) .token.number,
+:is(.review-diff, .agent-log) .token.boolean,
+:is(.review-diff, .agent-log) .token.constant,
+:is(.review-diff, .agent-log) .token.unit {
     color: var(--code-number);
 }
 
-.review-diff .token.function,
-.review-diff .token.builtin,
-.review-diff .token.method {
+:is(.review-diff, .agent-log) .token.function,
+:is(.review-diff, .agent-log) .token.builtin,
+:is(.review-diff, .agent-log) .token.method {
     color: var(--code-function);
 }
 
-.review-diff .token.class-name,
-.review-diff .token.maybe-class-name,
-.review-diff .token.atrule,
-.review-diff .token.annotation,
-.review-diff .token.decorator {
+:is(.review-diff, .agent-log) .token.class-name,
+:is(.review-diff, .agent-log) .token.maybe-class-name,
+:is(.review-diff, .agent-log) .token.atrule,
+:is(.review-diff, .agent-log) .token.annotation,
+:is(.review-diff, .agent-log) .token.decorator {
     color: var(--code-class-name);
 }
 
-.review-diff .token.property,
-.review-diff .token.symbol,
-.review-diff .token.tag,
-.review-diff .token.attr-name,
-.review-diff .token.deleted {
+:is(.review-diff, .agent-log) .token.property,
+:is(.review-diff, .agent-log) .token.symbol,
+:is(.review-diff, .agent-log) .token.tag,
+:is(.review-diff, .agent-log) .token.attr-name,
+:is(.review-diff, .agent-log) .token.deleted {
     color: var(--code-property);
 }
 
 /* Last so that a regex nested inside another group still takes the variable colour. */
-.review-diff .token.variable,
-.review-diff .token.parameter,
-.review-diff .token.regex,
-.review-diff .token.interpolation {
+:is(.review-diff, .agent-log) .token.variable,
+:is(.review-diff, .agent-log) .token.parameter,
+:is(.review-diff, .agent-log) .token.regex,
+:is(.review-diff, .agent-log) .token.interpolation {
     color: var(--code-variable);
 }
 
-.review-diff .token.bold {
+:is(.review-diff, .agent-log) .token.bold {
     font-weight: 600;
 }
 
-.review-diff .token.italic {
+:is(.review-diff, .agent-log) .token.italic {
     font-style: italic;
 }

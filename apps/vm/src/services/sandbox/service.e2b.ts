@@ -39,6 +39,11 @@ const CLONE_TIMEOUT_MS = 10 * 60_000;
 const ISSUE_PROMPT_PATH = "/home/user/issue_prompt.txt";
 
 type ChangesSummary = Extract<RunLogMilestoneBody, { kind: typeof RunLogEventKind.ChangesSummary }>;
+type Committed = Extract<RunLogMilestoneBody, { kind: typeof RunLogEventKind.Committed }>;
+
+// A unit separator between a commit's fields and a record separator between commits, because a
+// commit message contains newlines and anything friendlier would be ambiguous.
+const COMMIT_FORMAT = "%H%x1f%s%x1f%b%x1e";
 const PR_BODY_PATH = "/home/user/pr_body.md";
 const SANDBOX_MCP_ENTRY = "/opt/matcha/sandbox-mcp/index.js";
 const ISSUE_SOLVE_TIMEOUT_MS = 30 * 60_000;
@@ -460,6 +465,10 @@ export default class E2B {
                         durationMs: report.duration_ms,
                     });
 
+                    for (const commit of await E2B.commits_since(sandbox, base_commit)) {
+                        milestone(RunLogPhase.Publish, commit);
+                    }
+
                     const changes = await E2B.changes_since(sandbox, base_commit);
                     if (changes) milestone(RunLogPhase.Publish, changes);
 
@@ -530,6 +539,12 @@ export default class E2B {
                 });
 
                 console.log("issueWithPr", issueWithPr);
+
+                milestone(RunLogPhase.Publish, {
+                    kind: RunLogEventKind.PullRequestOpened,
+                    number: pull_request.number,
+                    url: pull_request.htmlUrl,
+                });
 
                 log.info(`PR ready for issue #${issue.number}`, { pull: pull_request.number });
                 await OutcomeReporter.publish({
@@ -674,6 +689,8 @@ export default class E2B {
 
             Someone is watching this run and sees only what you report. Call report_progress immediately after each action you take — every file you read, every file you edit or create, every search, and every command you run. Report the action, not its contents: the file changes and command output are shown separately, so send the path or the command and nothing more. An action you do not report did not happen as far as the person watching is concerned.
 
+            When you report a command, give it a title: a short plain sentence naming what you were trying to achieve, never what you typed — "Retry GitHub API for profile", not "run curl". Send the command and the output you got back with it. The person watching sees only that title until they open it, so a title that just repeats the command tells them nothing.
+
             Use kind "notice" to record a decision the reader could not guess: a file you deliberately left alone and why, something you ruled out, a constraint you found in their code. Not a running commentary — a note is for a conclusion that would otherwise be invisible to someone who only sees the files you changed.
 
             Before you turn to a new part of the work, report it with kind "step" and say the goal in one short plain sentence — "Finding where the navbar tiles are defined", not "Calling Grep". The person reading never sees your reasoning, so a step is the only place they learn what you are trying to do, and it is what makes the actions underneath it make sense. Expect roughly five to ten steps across this whole run: a step marks a change of intent, never a single file or command.
@@ -817,6 +834,37 @@ export default class E2B {
             insertions: count(/(\d+) insertions?\(\+\)/),
             deletions: count(/(\d+) deletions?\(-\)/),
         };
+    }
+
+    /**
+     * The commits the run produced, oldest first.
+     *
+     * Read from git rather than from what the agent said it did: the agent commits its own work,
+     * and this is the only account of it that cannot be wrong.
+     */
+    public static async commits_since(sandbox: Sandbox, base_commit: string): Promise<Committed[]> {
+        if (!base_commit) return [];
+        const result = await sandbox.commands
+            .run(`git log --reverse --format=${COMMIT_FORMAT} ${base_commit}..HEAD`, {
+                cwd: REPO_DIR,
+            })
+            .catch(() => null);
+
+        return (result?.stdout ?? "")
+            .split("\x1e")
+            .map((entry) => entry.trim().split("\x1f"))
+            .flatMap<Committed>(([sha, subject, body]) =>
+                sha && subject
+                    ? [
+                          {
+                              kind: RunLogEventKind.Committed,
+                              sha,
+                              subject,
+                              body: body?.trim() || undefined,
+                          },
+                      ]
+                    : [],
+            );
     }
 
     public static async head_commit(sandbox_id: string): Promise<string> {

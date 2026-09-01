@@ -1,9 +1,10 @@
 import {
     RUN_LOG_MAX_COMMAND_LENGTH,
-    RUN_LOG_MAX_FAILURE_OUTPUT_LENGTH,
     RUN_LOG_MAX_NOTICE_LENGTH,
+    RUN_LOG_MAX_OUTPUT_LENGTH,
     RUN_LOG_MAX_PATH_LENGTH,
     RUN_LOG_MAX_STEP_LENGTH,
+    RUN_LOG_MAX_TITLE_LENGTH,
     type RunLogEventBody,
     RunLogEventKind,
     RunLogLevel,
@@ -19,6 +20,10 @@ export const REPORT_PROGRESS_DESCRIPTION = [
     "never combine several paths or commands into a single report.",
     "A notice takes a level: use warn when something did not go to plan but the run continues,",
     "and error when it leaves the run unable to finish. Anything else is info.",
+    "When you report a command, give it a title: a short plain sentence naming what you were",
+    "trying to achieve, not what you typed — 'Retry GitHub API for profile', never 'run curl'.",
+    "Send the command you ran and the output you got back; the person reading sees both folded",
+    "behind that title, and the title is all they see until they open it.",
     "Use kind 'step' when you turn to a new part of the work, before you start it. Say the goal in",
     "one short plain sentence — 'Finding where the navbar tiles are defined', not 'Calling Grep'.",
     "The person reading has not seen your reasoning, so a step is the only place they learn what you",
@@ -31,10 +36,11 @@ export const report_progress_schema = {
         RunLogEventKind.FileRead,
         RunLogEventKind.FileWrite,
         RunLogEventKind.Search,
-        RunLogEventKind.CommandFailed,
+        RunLogEventKind.Command,
         RunLogEventKind.Notice,
         RunLogEventKind.Step,
     ]),
+    title: z.string().optional(),
     path: z.string().optional(),
     mode: z.enum(["edit", "create"]).optional(),
     pattern: z.string().optional(),
@@ -47,6 +53,7 @@ export const report_progress_schema = {
 
 export type ReportProgressArgs = {
     kind: RunLogEventKind;
+    title?: string;
     path?: string;
     mode?: "edit" | "create";
     pattern?: string;
@@ -102,16 +109,16 @@ export function to_run_log_event(args: ReportProgressArgs): RunLogEventBody | nu
             const pattern = head(args.pattern, RUN_LOG_MAX_COMMAND_LENGTH);
             return pattern ? { kind: RunLogEventKind.Search, pattern } : null;
         }
-        case RunLogEventKind.CommandFailed: {
+        case RunLogEventKind.Command: {
             const command = head(args.command, RUN_LOG_MAX_COMMAND_LENGTH);
-            return command
-                ? {
-                      kind: RunLogEventKind.CommandFailed,
-                      command,
-                      output: tail(args.output, RUN_LOG_MAX_FAILURE_OUTPUT_LENGTH),
-                      exitCode: args.exitCode,
-                  }
-                : null;
+            if (!command) return null;
+            return {
+                kind: RunLogEventKind.Command,
+                command,
+                title: head(args.title, RUN_LOG_MAX_TITLE_LENGTH) || undefined,
+                output: tail(args.output, RUN_LOG_MAX_OUTPUT_LENGTH) || undefined,
+                exitCode: args.exitCode,
+            };
         }
         case RunLogEventKind.Step: {
             const text = head(args.text, RUN_LOG_MAX_STEP_LENGTH);

@@ -40,7 +40,7 @@ export default function CopyLogButton({
             aria-label={label}
             onClick={copy}
             className={cn(
-                "shrink-0 cursor-pointer rounded-[4px] p-1 text-neutral-500 transition-colors hover:bg-snow/6 hover:text-snow",
+                "flex size-[18px] shrink-0 cursor-pointer items-center justify-center rounded-[4px] text-neutral-500 transition-colors hover:bg-snow/6 hover:text-snow",
                 className,
             )}
         >

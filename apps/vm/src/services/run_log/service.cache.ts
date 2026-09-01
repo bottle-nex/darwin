@@ -81,4 +81,34 @@ export default class RunLogCache {
 
         return "stored";
     }
+
+    /**
+     * Rewrites an event already stored under `seq`, and announces it again.
+     *
+     * Both sides describe the same command — the worker sees the harness run it, and the agent
+     * reports it afterwards with a title a person can read. The trace always lands first, so the
+     * richer report has to be able to overwrite it rather than be dropped as a repeat. Readers
+     * key events by sequence, so re-publishing the same number replaces rather than appends.
+     */
+    static async replace(run_id: string, owner: RunLogOwner, event: RunLogEvent): Promise<void> {
+        const client = redis();
+        const cache_key = run_log_cache_key(run_id);
+
+        await client
+            .multi()
+            .zremrangebyscore(cache_key, event.seq, event.seq)
+            .zadd(cache_key, event.seq, JSON.stringify(event))
+            .hincrby(run_log_meta_key(run_id), "bytes", run_log_event_bytes(event))
+            .exec();
+
+        await client.publish(
+            project_channel_name(owner.projectId),
+            JSON.stringify({
+                type: OutboundSocketMessageType.RUN_LOG_APPENDED,
+                projectId: owner.projectId,
+                runId: run_id,
+                payload: { events: [event], cursor: event.seq },
+            }),
+        );
+    }
 }

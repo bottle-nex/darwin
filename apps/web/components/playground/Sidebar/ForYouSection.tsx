@@ -1,5 +1,5 @@
 "use client";
-import { ChatsNavIcon, InboxIcon, MyIssuesIcon, SettingsIcon } from "@trymatcha/ui/icons";
+import { ChatsNavIcon, InboxIcon, MyIssuesIcon } from "@trymatcha/ui/icons";
 
 import { useNotificationBadges } from "@/hooks/notifications/useNotificationBadges";
 
@@ -16,7 +16,6 @@ const FOR_YOU_ROWS: { id: string; label: string; icon: React.ComponentType }[] =
         icon: MyIssuesIcon,
     },
     { id: PlaygroundTab.Chats, label: "Chats", icon: ChatsNavIcon },
-    { id: PlaygroundTab.SettingsOverview, label: "Settings", icon: SettingsIcon },
 ];
 
 export default function PlaygroundSidebarForYouSection({

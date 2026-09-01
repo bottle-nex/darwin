@@ -1,5 +1,5 @@
 "use client";
-import { CommandKeyIcon, EnterKeyIcon, InlineHintIcon } from "@trymatcha/ui/icons";
+import { CommandKeyIcon, EnterKeyIcon } from "@trymatcha/ui/icons";
 import { motion } from "motion/react";
 import type { ReactNode } from "react";
 
@@ -23,18 +23,7 @@ export default function IssueSubmitAction({
     const { body, submit, pending, warning, shakeControls, isEdit, isCustom, isMac, readOnly } =
         form;
 
-    if (readOnly) {
-        return (
-            <section className={cn("h-fit flex items-center", className)}>
-                <div className="flex items-center gap-x-1 text-xs text-white/70">
-                    <InlineHintIcon size={10} />
-                    <span>
-                        The agent has picked this issue up. It can&apos;t be edited while it runs.
-                    </span>
-                </div>
-            </section>
-        );
-    }
+    if (readOnly) return null;
 
     return (
         <section className={cn("h-fit flex items-center justify-end", className)}>

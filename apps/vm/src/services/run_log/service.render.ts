@@ -39,8 +39,14 @@ export function render_event(event: RunLogEventBody, phase: RunLogPhase): string
             return `${chalk.cyan("⟩")} ${chalk.cyan(`${event.mode} ${event.path}`)}`;
         case RunLogEventKind.Search:
             return `${chalk.cyan("⟩")} ${chalk.cyan(`search "${event.pattern}"`)}`;
-        case RunLogEventKind.CommandFailed:
-            return `${chalk.yellowBright("✗")} ${chalk.yellowBright(`$ ${event.command}`)}`;
+        case RunLogEventKind.Command: {
+            const tone = event.exitCode ? chalk.yellowBright : chalk.cyan;
+            return `${tone(event.exitCode ? "✗" : "⟩")} ${tone(`$ ${truncate(event.command, MAX_TEXT)}`)}`;
+        }
+        case RunLogEventKind.Committed:
+            return chalk.blue(`▪ commit ${event.sha.slice(0, 7)} — ${event.subject}`);
+        case RunLogEventKind.PullRequestOpened:
+            return chalk.blue(`▪ opened pull request #${event.number}`);
         case RunLogEventKind.Notice:
             return NOTICE_TONE[run_log_level(event)](truncate(event.text, MAX_TEXT));
     }

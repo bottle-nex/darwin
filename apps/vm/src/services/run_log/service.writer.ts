@@ -1,10 +1,12 @@
 import type Logger from "@trymatcha/logger";
 import {
     RUN_LOG_MAX_COMMAND_LENGTH,
-    RUN_LOG_MAX_FAILURE_OUTPUT_LENGTH,
+    RUN_LOG_MAX_COMMIT_BODY_LENGTH,
     RUN_LOG_MAX_NOTICE_LENGTH,
+    RUN_LOG_MAX_OUTPUT_LENGTH,
     RUN_LOG_MAX_PATH_LENGTH,
     RUN_LOG_MAX_STEP_LENGTH,
+    RUN_LOG_MAX_TITLE_LENGTH,
     type RunLogEventBody,
     RunLogEventKind,
     RunLogLevel,
@@ -38,9 +40,10 @@ const reported_event_schema = z.discriminatedUnion("kind", [
     }),
     z.object({ kind: z.literal(RunLogEventKind.Search), pattern: z.string() }),
     z.object({
-        kind: z.literal(RunLogEventKind.CommandFailed),
+        kind: z.literal(RunLogEventKind.Command),
         command: z.string(),
-        output: z.string().default(""),
+        title: z.string().optional(),
+        output: z.string().optional(),
         exitCode: z.number().int().optional(),
     }),
     z.object({
@@ -65,6 +68,17 @@ const observed_event_schema = z.union([
             deletions: z.number().int(),
         }),
         z.object({ kind: z.literal(RunLogEventKind.RunFailed), reason: z.string() }),
+        z.object({
+            kind: z.literal(RunLogEventKind.Committed),
+            sha: z.string(),
+            subject: z.string(),
+            body: z.string().optional(),
+        }),
+        z.object({
+            kind: z.literal(RunLogEventKind.PullRequestOpened),
+            number: z.number().int(),
+            url: z.string(),
+        }),
     ]),
 ]);
 
@@ -88,7 +102,7 @@ export default class RunLogWriter {
     /** Sandbox report number → the sequence it was stored under, so a retry is recognised. */
     private readonly reported = new Map<number, number>();
 
-    private last_identity: string | null = null;
+    private last_stored: { identity: string; seq: number; titled: boolean } | null = null;
 
     private constructor(
         private readonly run_id: string,
@@ -135,7 +149,24 @@ export default class RunLogWriter {
         // reports a write, and the trace shows the harness performing it a moment later. Only
         // an immediate repeat is dropped: the same file read twice in a row is worth seeing.
         const identity = RunLogWriter.identity(body);
-        if (identity === this.last_identity) return "ignored";
+        const titled = RunLogWriter.titled(body);
+        const open = this.last_stored;
+
+        if (open?.identity === identity) {
+            // The trace always reaches this writer before the agent's own report of the same
+            // command, so the version carrying a readable title arrives second and would
+            // otherwise be thrown away as a repeat.
+            if (!titled || open.titled) return "ignored";
+
+            await RunLogCache.replace(this.run_id, this.owner, {
+                ...body,
+                seq: open.seq,
+                ts: new Date().toISOString(),
+                phase,
+            });
+            this.last_stored = { identity, seq: open.seq, titled };
+            return "stored";
+        }
 
         this.next_seq += 1;
         const result = await RunLogCache.append(this.run_id, this.owner, {
@@ -146,10 +177,15 @@ export default class RunLogWriter {
         });
 
         if (result === "stored") {
-            this.last_identity = identity;
+            this.last_stored = { identity, seq: this.next_seq, titled };
             this.log.stream(render_event(body, phase));
         }
         return result;
+    }
+
+    /** Whether this event carries a human title, which is what lets it replace a bare duplicate. */
+    private static titled(body: RunLogEventBody): boolean {
+        return body.kind === RunLogEventKind.Command && Boolean(body.title);
     }
 
     private static identity(body: RunLogEventBody): string {
@@ -159,7 +195,7 @@ export default class RunLogWriter {
                 return `${body.kind}:${body.path}`;
             case RunLogEventKind.Search:
                 return `${body.kind}:${body.pattern}`;
-            case RunLogEventKind.CommandFailed:
+            case RunLogEventKind.Command:
                 return `${body.kind}:${body.command}`;
             default:
                 return `${body.kind}:${"text" in body ? body.text : ""}`;
@@ -193,13 +229,29 @@ export default class RunLogWriter {
                 const pattern = this.clean(event.pattern, RUN_LOG_MAX_COMMAND_LENGTH);
                 return pattern ? { ...event, pattern } : null;
             }
-            case RunLogEventKind.CommandFailed: {
+            case RunLogEventKind.Command: {
                 const command = this.clean(event.command, RUN_LOG_MAX_COMMAND_LENGTH);
                 if (!command) return null;
                 return {
                     ...event,
                     command,
-                    output: this.tail(event.output, RUN_LOG_MAX_FAILURE_OUTPUT_LENGTH),
+                    title: event.title
+                        ? this.clean(event.title, RUN_LOG_MAX_TITLE_LENGTH)
+                        : undefined,
+                    output: event.output
+                        ? this.tail(event.output, RUN_LOG_MAX_OUTPUT_LENGTH)
+                        : undefined,
+                };
+            }
+            case RunLogEventKind.Committed: {
+                const subject = this.clean(event.subject, RUN_LOG_MAX_TITLE_LENGTH);
+                if (!subject) return null;
+                return {
+                    ...event,
+                    subject,
+                    body: event.body
+                        ? this.tail(event.body, RUN_LOG_MAX_COMMIT_BODY_LENGTH)
+                        : undefined,
                 };
             }
             case RunLogEventKind.Step: {

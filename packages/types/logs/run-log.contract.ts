@@ -6,7 +6,9 @@ export const RunLogEventKind = {
     FileRead: "file_read",
     FileWrite: "file_write",
     Search: "search",
-    CommandFailed: "command_failed",
+    Command: "command",
+    Committed: "committed",
+    PullRequestOpened: "pull_request_opened",
     Notice: "notice",
 } as const;
 export type RunLogEventKind = (typeof RunLogEventKind)[keyof typeof RunLogEventKind];
@@ -40,7 +42,14 @@ export type RunLogMilestoneBody =
           insertions: number;
           deletions: number;
       }
-    | { kind: typeof RunLogEventKind.RunFailed; reason: string };
+    | { kind: typeof RunLogEventKind.RunFailed; reason: string }
+    | {
+          kind: typeof RunLogEventKind.Committed;
+          sha: string;
+          subject: string;
+          body?: string;
+      }
+    | { kind: typeof RunLogEventKind.PullRequestOpened; number: number; url: string };
 
 export type RunLogActionBody =
     | { kind: typeof RunLogEventKind.Step; text: string }
@@ -48,9 +57,10 @@ export type RunLogActionBody =
     | { kind: typeof RunLogEventKind.FileWrite; path: string; mode: "edit" | "create" }
     | { kind: typeof RunLogEventKind.Search; pattern: string }
     | {
-          kind: typeof RunLogEventKind.CommandFailed;
+          kind: typeof RunLogEventKind.Command;
           command: string;
-          output: string;
+          title?: string;
+          output?: string;
           exitCode?: number;
       }
     | { kind: typeof RunLogEventKind.Notice; text: string; level?: RunLogLevel };
@@ -61,8 +71,8 @@ export function run_log_level(event: RunLogEventBody): RunLogLevel {
     switch (event.kind) {
         case RunLogEventKind.Notice:
             return event.level ?? RunLogLevel.Info;
-        case RunLogEventKind.CommandFailed:
-            return RunLogLevel.Warn;
+        case RunLogEventKind.Command:
+            return event.exitCode ? RunLogLevel.Warn : RunLogLevel.Info;
         case RunLogEventKind.RunFailed:
             return RunLogLevel.Error;
         default:
@@ -92,10 +102,12 @@ export const RUN_LOG_HOT_TTL_SECONDS = 6 * 60 * 60;
 export const RUN_LOG_MAX_BYTES = 8 * 1024 * 1024;
 
 export const RUN_LOG_MAX_PATH_LENGTH = 256;
-export const RUN_LOG_MAX_COMMAND_LENGTH = 160;
+export const RUN_LOG_MAX_COMMAND_LENGTH = 1_000;
 export const RUN_LOG_MAX_NOTICE_LENGTH = 160;
 export const RUN_LOG_MAX_STEP_LENGTH = 100;
-export const RUN_LOG_MAX_FAILURE_OUTPUT_LENGTH = 2_000;
+export const RUN_LOG_MAX_TITLE_LENGTH = 80;
+export const RUN_LOG_MAX_OUTPUT_LENGTH = 4_096;
+export const RUN_LOG_MAX_COMMIT_BODY_LENGTH = 2_000;
 
 export const RUN_LOG_CACHE_INDEX_KEY = "run-logs:index";
 

@@ -1,52 +1,34 @@
 import { type RunLogEvent, RunLogEventKind } from "@trymatcha/types";
 
-export type AgentLogRow = {
-    key: string;
-    event: RunLogEvent;
-    count: number;
-};
-
-const REPEATABLE_KINDS = new Set<RunLogEventKind>([
-    RunLogEventKind.FileRead,
-    RunLogEventKind.FileWrite,
-    RunLogEventKind.Search,
-]);
-
 /**
- * One failure, reported from both sides, is one failure.
+ * One command, reported from both sides, is one row.
  *
- * The worker watches the harness run `git add … && git commit -m …` and the agent reports the
- * same break as `git commit`, so the two arrive back to back naming the same thing at different
- * lengths. The shorter one is the one a person can read.
+ * The worker watches the harness run a command and the agent reports the same one afterwards
+ * with a title. The writer already collapses the pair when the two spell the command
+ * identically; this catches the case where they do not — the agent sends `git commit` for what
+ * the trace saw as `git add … && git commit -m …`. The titled one is the one worth keeping.
  */
-function duplicateFailure(event: RunLogEvent, next: RunLogEvent | undefined): boolean {
-    return (
-        event.kind === RunLogEventKind.CommandFailed &&
-        next?.kind === RunLogEventKind.CommandFailed &&
-        (event.command.includes(next.command) || next.command.includes(event.command)) &&
-        event.command.length >= next.command.length
-    );
+function supersededBy(event: RunLogEvent, next: RunLogEvent | undefined): boolean {
+    if (event.kind !== RunLogEventKind.Command || next?.kind !== RunLogEventKind.Command) {
+        return false;
+    }
+    const related = event.command.includes(next.command) || next.command.includes(event.command);
+    return related && !event.title && Boolean(next.title);
 }
 
+const KNOWN_KINDS = new Set<string>(Object.values(RunLogEventKind));
+
 /**
- * One row per line on screen, with runs of the same action counted rather than listed.
- *
- * A count is the whole row, not a fold over hidden ones: nothing here can be opened, so a long
- * run stays short without putting anything out of reach that the row does not already say.
+ * A run stored before the vocabulary last changed still holds kinds nothing renders any more.
+ * They are dropped here rather than guarded at every lookup, so the rest of the log can take a
+ * known kind for granted instead of every map needing a fallback.
  */
-export function toAgentLogRows(events: readonly RunLogEvent[]): AgentLogRow[] {
-    const rows: AgentLogRow[] = [];
+function renderable(event: RunLogEvent): boolean {
+    return KNOWN_KINDS.has(event.kind);
+}
 
-    for (const [index, event] of events.entries()) {
-        if (duplicateFailure(event, events[index + 1])) continue;
-
-        const open = rows[rows.length - 1];
-        if (open && open.event.kind === event.kind && REPEATABLE_KINDS.has(event.kind)) {
-            open.count += 1;
-            continue;
-        }
-        rows.push({ key: `run-log-${event.seq}`, event, count: 1 });
-    }
-
-    return rows;
+export function toAgentLogRows(events: readonly RunLogEvent[]): RunLogEvent[] {
+    return events.filter(
+        (event, index) => renderable(event) && !supersededBy(event, events[index + 1]),
+    );
 }

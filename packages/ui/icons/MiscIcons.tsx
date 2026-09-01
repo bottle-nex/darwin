@@ -1,16 +1,23 @@
 import { createIcon } from "./createIcon";
 import { FiDownload, FiRefreshCw } from "react-icons/fi";
 import { HiBars3CenterLeft, HiCalendar, HiOutlineArrowPath } from "react-icons/hi2";
+import { LuFileText, LuSparkles, LuSquareTerminal } from "react-icons/lu";
 import { MdAutorenew, MdEditCalendar, MdMoreHoriz, MdStar } from "react-icons/md";
 import { PiDotsThreeOutlineVerticalLight } from "react-icons/pi";
 import { RiLoader4Line } from "react-icons/ri";
 
+export const AgentStepIcon = createIcon(LuSparkles);
+
 export const CalendarIcon = createIcon(HiCalendar);
+
+export const CommandIcon = createIcon(LuSquareTerminal);
 
 export const DownloadIcon = createIcon(FiDownload);
 
 /** Setting a date, as opposed to `CalendarIcon`, which shows one. */
 export const EditCalendarIcon = createIcon(MdEditCalendar);
+
+export const FileIcon = createIcon(LuFileText);
 
 export const GanttNavIcon = createIcon(HiBars3CenterLeft);
 

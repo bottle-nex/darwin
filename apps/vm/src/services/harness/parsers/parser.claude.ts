@@ -106,8 +106,8 @@ export default class ClaudeEventParser implements HarnessEventParser {
             case "MultiEdit":
             case "NotebookEdit":
                 return written_file(block, "edit");
-            // Remembered rather than reported: a command that worked says nothing the file
-            // changes do not, but a failure has to be able to name the command that failed.
+            // Held until its result arrives: the row carries the command and what it printed,
+            // and only the result knows the second half.
             case "Bash": {
                 const command = string_input(block, "command");
                 if (command && block.id) this.commands_by_tool_use.set(block.id, command);
@@ -137,11 +137,11 @@ export default class ClaudeEventParser implements HarnessEventParser {
         if (!command) return null;
         this.commands_by_tool_use.delete(id);
 
-        if (!block.is_error) return null;
         return {
-            kind: RunLogEventKind.CommandFailed,
+            kind: RunLogEventKind.Command,
             command,
             output: result_text(block.content),
+            exitCode: block.is_error ? 1 : 0,
         };
     }
 

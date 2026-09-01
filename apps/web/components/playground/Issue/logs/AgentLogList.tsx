@@ -1,23 +1,24 @@
 "use client";
 import { useVirtualizer } from "@tanstack/react-virtual";
-import { run_log_level, RunLogState } from "@trymatcha/types";
-import { DownloadIcon, LoadingSpinnerIcon } from "@trymatcha/ui/icons";
+import { run_log_level, type RunLogEvent, RunLogState } from "@trymatcha/types";
+import { DownloadIcon, DropdownCaretIcon, LoadingSpinnerIcon } from "@trymatcha/ui/icons";
+import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useMemo, useRef, useState } from "react";
 
-import InfoTooltip from "@/components/ui/InfoTooltip";
 import { useRunLogs } from "@/hooks/runLogs/useRunLogs";
 import { useSocketConnection } from "@/hooks/socket/useSocketConnection";
 import { apiClient } from "@/lib/axios";
 import { cn } from "@/lib/utils";
 import { RUN_LOGS_DOWNLOAD_URL } from "@/routes/api_routes";
 
-import { LEVEL_MESSAGE, pillFor, rowText } from "./agentLog.registry";
-import { type AgentLogRow, toAgentLogRows } from "./agentLogRows";
+import { detailOf, ICON, LEVEL_MESSAGE, titleOf } from "./agentLog.registry";
+import AgentLogDetail from "./AgentLogDetail";
+import { toAgentLogRows } from "./agentLogRows";
 import CopyLogButton from "./CopyLogButton";
 
-const ROW_ESTIMATE = 25;
+const ROW_ESTIMATE = 30;
 const TAIL_THRESHOLD_PX = 48;
-const TOOLTIP_DELAY_MS = 2000;
+const DETAIL_SPRING = { type: "spring", stiffness: 520, damping: 40, mass: 0.5 } as const;
 
 async function openArchive(runId: string) {
     const res = await apiClient.get<{ url: string }>(RUN_LOGS_DOWNLOAD_URL(runId));
@@ -38,6 +39,7 @@ export default function AgentLogList({
     const isConnected = useSocketConnection(projectId);
     const { data, isLoading } = useRunLogs(runId, isConnected);
     const [scrollElement, setScrollElement] = useState<HTMLDivElement | null>(null);
+    const [opened, setOpened] = useState<ReadonlySet<number>>(() => new Set());
     const followTail = useRef(true);
 
     const events = useMemo(() => data?.events ?? [], [data]);
@@ -46,10 +48,10 @@ export default function AgentLogList({
     const virtualizer = useVirtualizer({
         count: rows.length,
         getScrollElement: () => scrollElement,
-        getItemKey: (index) => rows[index]?.key ?? index,
+        getItemKey: (index) => rows[index]?.seq ?? index,
         estimateSize: () => ROW_ESTIMATE,
         measureElement: (element) => element.getBoundingClientRect().height,
-        overscan: 24,
+        overscan: 12,
     });
 
     useEffect(() => {
@@ -60,6 +62,15 @@ export default function AgentLogList({
     function trackTail(event: React.UIEvent<HTMLDivElement>) {
         const { scrollTop, scrollHeight, clientHeight } = event.currentTarget;
         followTail.current = scrollHeight - scrollTop - clientHeight < TAIL_THRESHOLD_PX;
+    }
+
+    function toggle(seq: number) {
+        setOpened((previous) => {
+            const next = new Set(previous);
+            if (next.has(seq)) next.delete(seq);
+            else next.add(seq);
+            return next;
+        });
     }
 
     if (isLoading) {
@@ -102,18 +113,23 @@ export default function AgentLogList({
                 ref={setScrollElement}
                 onScroll={trackTail}
                 data-lenis-prevent
-                className="no-scrollbar max-h-105 overflow-y-auto px-3 py-2"
+                className="no-scrollbar max-h-[560px] overflow-y-auto px-3 py-1.5"
             >
                 <div className="relative w-full" style={{ height: virtualizer.getTotalSize() }}>
                     {virtualizer.getVirtualItems().map((item) => (
                         <div
-                            key={rows[item.index]!.key}
+                            key={rows[item.index]!.seq}
                             ref={virtualizer.measureElement}
                             data-index={item.index}
                             className="absolute top-0 left-0 w-full"
                             style={{ transform: `translateY(${item.start}px)` }}
                         >
-                            <LogRow row={rows[item.index]!} />
+                            <LogRow
+                                event={rows[item.index]!}
+                                open={opened.has(rows[item.index]!.seq)}
+                                onToggle={toggle}
+                                railed={item.index < rows.length - 1}
+                            />
                         </div>
                     ))}
                 </div>
@@ -122,41 +138,92 @@ export default function AgentLogList({
     );
 }
 
-function LogRow({ row }: { row: AgentLogRow }) {
-    const level = run_log_level(row.event);
-    const pill = pillFor(row.event);
-    const text = rowText(row.event, row.count);
+function LogRow({
+    event,
+    open,
+    onToggle,
+    railed,
+}: {
+    event: RunLogEvent;
+    open: boolean;
+    onToggle: (seq: number) => void;
+    railed: boolean;
+}) {
+    const Icon = ICON[event.kind];
+    const title = titleOf(event);
+    const detail = detailOf(event);
+    const tone = LEVEL_MESSAGE[run_log_level(event)] ?? "text-snow/60";
 
     return (
-        <div className="group/row flex items-center gap-2.5 py-1">
-            <span
-                className={cn(
-                    "w-[52px] shrink-0 rounded-[4px] py-1.25 text-center text-[11px] leading-[15px] font-medium",
-                    pill.className,
-                )}
-            >
-                {pill.label}
-            </span>
-            <div className="flex min-w-0 flex-1 items-center gap-2 rounded-[5px] py-1 pr-2 pl-2.5 transition-colors group-hover/row:bg-snow/3">
-                <InfoTooltip
-                    content={text}
-                    openDelay={TOOLTIP_DELAY_MS}
-                    className="max-w-md text-[12px] leading-[18px] wrap-anywhere text-snow/70"
-                >
-                    <span
-                        className={cn(
-                            "min-w-0 flex-1 truncate text-[12.5px] leading-[19px]",
-                            LEVEL_MESSAGE[level] ?? "text-snow/65",
-                        )}
-                    >
-                        {text}
-                    </span>
-                </InfoTooltip>
-                <CopyLogButton
-                    label="Copy log line"
-                    text={() => text}
-                    className="opacity-0 transition-opacity group-hover/row:opacity-100 focus-visible:opacity-100"
+        <div className="group/row relative flex items-start gap-x-2.5 pb-2">
+            {railed && (
+                <span
+                    aria-hidden
+                    className="absolute top-[22px] bottom-0 left-[11px] w-px bg-snow/10"
                 />
+            )}
+            <span
+                aria-hidden
+                className="relative z-10 flex size-[22px] shrink-0 items-center justify-center"
+            >
+                <Icon className="size-3.5 text-snow/45" />
+            </span>
+
+            <div className="min-w-0 flex-1">
+                <div className="flex h-[22px] items-center gap-1.5">
+                    {detail ? (
+                        <button
+                            type="button"
+                            onClick={() => onToggle(event.seq)}
+                            aria-expanded={open}
+                            className="flex min-w-0 cursor-pointer items-center gap-1.5 text-left"
+                        >
+                            <span
+                                className={cn(
+                                    "truncate text-[13px] leading-[22px] hover:text-snow/80 transition-colors duration-200",
+                                    tone,
+                                )}
+                            >
+                                {title}
+                            </span>
+                            <DropdownCaretIcon
+                                className={cn(
+                                    "size-3.5 shrink-0 text-snow/30 transition-transform",
+                                    !open && "-rotate-90",
+                                )}
+                                aria-hidden
+                            />
+                        </button>
+                    ) : (
+                        <span
+                            className={cn(
+                                "min-w-0 truncate text-[13px] leading-[22px] transition-colors duration-300",
+                                tone,
+                            )}
+                        >
+                            {title}
+                        </span>
+                    )}
+                    <CopyLogButton
+                        label="Copy log line"
+                        text={() => title}
+                        className="opacity-0 transition-opacity group-hover/row:opacity-100 focus-visible:opacity-100"
+                    />
+                </div>
+                <AnimatePresence initial={false}>
+                    {detail && open && (
+                        <motion.div
+                            key="detail"
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: "auto", opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            transition={DETAIL_SPRING}
+                            className="overflow-hidden"
+                        >
+                            <AgentLogDetail detail={detail} />
+                        </motion.div>
+                    )}
+                </AnimatePresence>
             </div>
         </div>
     );

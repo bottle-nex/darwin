@@ -1,6 +1,6 @@
 "use client";
 import { useQueryClient } from "@tanstack/react-query";
-import { type AgentSession, AgentSessionStatus, type RunLogPage } from "@trymatcha/types";
+import { type AgentSession, type RunLogPage } from "@trymatcha/types";
 import { DropdownCaretIcon } from "@trymatcha/ui/icons";
 import { AnimatePresence, motion } from "motion/react";
 
@@ -10,7 +10,7 @@ import { useActiveProject } from "@/hooks/useActiveProject";
 import { cn } from "@/lib/utils";
 import { useAgentLogsStore } from "@/store/playground/useAgentLogsStore";
 
-import { rowText } from "./agentLog.registry";
+import { titleOf } from "./agentLog.registry";
 import AgentLogList from "./AgentLogList";
 import { toAgentLogRows } from "./agentLogRows";
 import CopyLogButton from "./CopyLogButton";
@@ -20,8 +20,8 @@ const PANEL_SPRING = { type: "spring", stiffness: 300, damping: 34, mass: 0.9 } 
 /**
  * The run's log, attached to the activity row that started it.
  *
- * Opens itself while the run is live and stays shut once it has ended: a run in progress is the
- * one a reader came to watch, and an old one is a detail they can ask for.
+ * Open until a reader closes it: the log is the account of what the agent did to their code, and
+ * it is worth more on the page than the row that would replace it.
  */
 export default function AgentLogsActivity({ session }: { session: AgentSession }) {
     const project = useActiveProject();
@@ -30,15 +30,14 @@ export default function AgentLogsActivity({ session }: { session: AgentSession }
 
     const queryClient = useQueryClient();
 
-    const running = session.status === AgentSessionStatus.Running;
-    const isOpen = expanded ?? running;
+    const isOpen = expanded ?? true;
 
     // Read at click time rather than through the hook: subscribing here too would send a second
     // socket subscribe for the same run, and unmounting either side would unsubscribe both.
     function wholeLog() {
         const page = queryClient.getQueryData<RunLogPage>(queryKeyFor(session.id));
         return toAgentLogRows(page?.events ?? [])
-            .map((row) => rowText(row.event, row.count))
+            .map((event) => titleOf(event))
             .join("\n");
     }
 
@@ -54,7 +53,7 @@ export default function AgentLogsActivity({ session }: { session: AgentSession }
                     className="group flex w-full cursor-pointer items-center gap-2 px-3 py-2.5 text-left"
                 >
                     <HeroBuddy move={false} className="size-4 shrink-0" />
-                    <span className="text-[13px] font-medium text-snow/50 transition-colors group-hover:text-snow/70">
+                    <span className="text-[12px] font-medium text-snow/50 transition-colors group-hover:text-snow/70">
                         Agent logs
                     </span>
                     <DropdownCaretIcon
