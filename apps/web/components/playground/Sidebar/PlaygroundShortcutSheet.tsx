@@ -22,9 +22,10 @@ export default function PlaygroundShortcutSheet() {
     const projectId = useCommandContextStore((s) => s.projectId);
     const issueId = useCommandContextStore((s) => s.issueId);
     const spaceId = useCommandContextStore((s) => s.spaceId);
+    const teamId = useCommandContextStore((s) => s.teamId);
     const [query, setQuery] = useState("");
 
-    const context = { orgSlug, projectId, issueId, spaceId };
+    const context = { orgSlug, projectId, issueId, spaceId, teamId };
     const normalized = query.trim().toLowerCase();
 
     const groups = COMMAND_KIND_ORDER.map((kind) => ({

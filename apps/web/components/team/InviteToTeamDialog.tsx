@@ -1,7 +1,7 @@
 "use client";
 
 import { ProjectRole } from "@trymatcha/types";
-import { BreadcrumbSeparatorIcon, CloseIcon } from "@trymatcha/ui/icons";
+import { BreadcrumbSeparatorIcon } from "@trymatcha/ui/icons";
 import * as React from "react";
 
 import PlaygroundAvatar from "@/components/playground/Core/components/PlaygroundAvatar";
@@ -14,7 +14,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 
-import ProjectTeamMemberPicker from "./ProjectTeamMemberPicker";
+import InviteRecipientField, { type InviteRecipients } from "./InviteRecipientField";
 
 const PROJECT_ROLES = Object.values(ProjectRole);
 
@@ -43,21 +43,11 @@ function useDebouncedValue<T>(value: T, delayMs: number) {
     return debounced;
 }
 
-type Sender = {
-    name?: string | null;
-    email?: string | null;
-    image?: string | null;
-};
-
 type InviteToTeamDialogProps = {
     open: boolean;
     onOpenChange: (open: boolean) => void;
-    /** Who the invite is from — pull from the session in the parent. */
-    sender: Sender;
-    /** Context shown to the inviter so they know what they're inviting into. */
     orgName: string;
     projectId: string;
-    projectName: string;
     teamName: string;
     teamMemberIds: string[];
     /** You own this — wire it to your invite mutation. */
@@ -73,10 +63,8 @@ type InviteToTeamDialogProps = {
 export default function InviteToTeamDialog({
     open,
     onOpenChange,
-    sender,
     orgName,
     projectId,
-    projectName,
     teamName,
     teamMemberIds,
     onSubmit,
@@ -91,17 +79,12 @@ export default function InviteToTeamDialog({
                     event.preventDefault();
                     (event.currentTarget as HTMLElement).focus();
                 }}
-                className={cn(
-                    "flex flex-col max-h-[80vh] min-h-[40vh] w-150 max-w-none sm:max-w-none p-0 gap-0 overflow-hidden",
-                    "rounded-3xl",
-                )}
+                className="flex flex-col max-h-[80vh] min-h-[40vh] w-150 max-w-none sm:max-w-none p-0 gap-0 overflow-hidden rounded-3xl"
             >
                 <DialogTitle className="sr-only">Invite members</DialogTitle>
                 <InviteForm
-                    sender={sender}
                     orgName={orgName}
                     projectId={projectId}
-                    projectName={projectName}
                     teamName={teamName}
                     teamMemberIds={teamMemberIds}
                     onSubmit={onSubmit}
@@ -113,109 +96,76 @@ export default function InviteToTeamDialog({
 }
 
 function InviteForm({
-    sender,
     orgName,
     projectId,
-    projectName,
     teamName,
     teamMemberIds,
     onSubmit,
     isPending,
 }: Omit<InviteToTeamDialogProps, "open" | "onOpenChange"> & { isPending: boolean }) {
-    const [emails, setEmails] = React.useState<string[]>([]);
-    const [selectedUserIds, setSelectedUserIds] = React.useState<string[]>([]);
+    const [recipients, setRecipients] = React.useState<InviteRecipients>({
+        emails: [],
+        userIds: [],
+    });
     const [draft, setDraft] = React.useState("");
     const [message, setMessage] = React.useState("");
     const [role, setRole] = React.useState<ProjectRole>(ProjectRole.Write);
     const [roleOpen, setRoleOpen] = React.useState(false);
 
     const debouncedDraft = useDebouncedValue(draft, 300);
-    const draftLooksInvalid = debouncedDraft.trim().length > 0 && !isValidEmail(debouncedDraft);
-    const recipientCount = emails.length + selectedUserIds.length;
+    const draftLooksInvalid =
+        debouncedDraft.includes("@") && !isValidEmail(debouncedDraft) && draft.includes("@");
+    const recipientCount = recipients.emails.length + recipients.userIds.length;
     const atLimit = recipientCount >= MAX_RECIPIENTS;
-    const maxProjectSelections = MAX_RECIPIENTS - emails.length;
-
-    const addEmails = React.useCallback(
-        (raw: string) => {
-            const candidates = raw
-                .split(/[\s,;]+/)
-                .map((e) => e.trim().toLowerCase())
-                .filter(Boolean);
-
-            setEmails((prev) => {
-                const seen = new Set(prev);
-                const next = [...prev];
-                for (const email of candidates) {
-                    if (next.length + selectedUserIds.length >= MAX_RECIPIENTS) break;
-                    if (isValidEmail(email) && !seen.has(email)) {
-                        seen.add(email);
-                        next.push(email);
-                    }
-                }
-                return next;
-            });
-        },
-        [selectedUserIds.length],
-    );
 
     const commitDraft = React.useCallback(() => {
-        if (!draft.trim()) return;
-        if (isValidEmail(draft)) {
-            addEmails(draft);
-            setDraft("");
-        }
-    }, [draft, addEmails]);
+        const candidates = draft
+            .split(/[\s,;]+/)
+            .map((entry) => entry.trim().toLowerCase())
+            .filter(Boolean);
+        if (!candidates.length) return;
 
-    const removeEmail = React.useCallback((email: string) => {
-        setEmails((prev) => prev.filter((e) => e !== email));
-    }, []);
-
-    function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
-        if (e.key === "Enter" || e.key === "," || e.key === ";" || e.key === "Tab") {
-            if (draft.trim()) {
-                e.preventDefault();
-                commitDraft();
+        setRecipients((prev) => {
+            const seen = new Set(prev.emails);
+            const next = [...prev.emails];
+            for (const email of candidates) {
+                if (next.length + prev.userIds.length >= MAX_RECIPIENTS) break;
+                if (isValidEmail(email) && !seen.has(email)) {
+                    seen.add(email);
+                    next.push(email);
+                }
             }
-        } else if (e.key === "Backspace" && !draft && emails.length > 0) {
-            removeEmail(emails[emails.length - 1]);
-        }
-    }
+            return next.length === prev.emails.length ? prev : { ...prev, emails: next };
+        });
 
-    function handlePaste(e: React.ClipboardEvent<HTMLInputElement>) {
-        const text = e.clipboardData.getData("text");
-        if (/[\s,;]/.test(text)) {
-            e.preventDefault();
-            addEmails(text);
-            setDraft("");
-        }
-    }
+        if (candidates.every(isValidEmail)) setDraft("");
+    }, [draft]);
 
     function handleSubmit() {
         // Fold a still-typed valid email into the batch before sending.
-        const canAddDraft = isValidEmail(draft) && recipientCount < MAX_RECIPIENTS;
+        const canAddDraft = isValidEmail(draft) && !atLimit;
         const pending = canAddDraft ? [draft.trim().toLowerCase()] : [];
-        const finalEmails = [...new Set([...emails, ...pending])].slice(
+        const finalEmails = [...new Set([...recipients.emails, ...pending])].slice(
             0,
-            MAX_RECIPIENTS - selectedUserIds.length,
+            MAX_RECIPIENTS - recipients.userIds.length,
         );
-        if (finalEmails.length === 0 && selectedUserIds.length === 0) return;
+        if (!finalEmails.length && !recipients.userIds.length) return;
         onSubmit({
             emails: finalEmails,
-            userIds: selectedUserIds,
+            userIds: recipients.userIds,
             role,
             message: message.trim() || undefined,
         });
     }
 
-    const hasEmailRecipients = emails.length > 0 || (isValidEmail(draft) && !atLimit);
-    const canSubmit = !isPending && (selectedUserIds.length > 0 || hasEmailRecipients);
+    const hasEmailRecipients = recipients.emails.length > 0 || (isValidEmail(draft) && !atLimit);
+    const canSubmit = !isPending && (recipients.userIds.length > 0 || hasEmailRecipients);
     const submitLabel =
-        selectedUserIds.length > 0 && hasEmailRecipients
+        recipients.userIds.length > 0 && hasEmailRecipients
             ? "Add and invite"
-            : selectedUserIds.length > 0
+            : recipients.userIds.length > 0
               ? "Add members"
               : "Send invites";
-    const senderLetter = (sender.name || sender.email || "?").trim().charAt(0).toUpperCase();
 
     return (
         <main
@@ -223,92 +173,36 @@ function InviteForm({
             onKeyDown={(event) => handleDialogSubmitKey(event, handleSubmit)}
         >
             <section className="flex flex-col items-start gap-y-3 pt-4 pb-2">
-                <div className="flex w-full items-center justify-between gap-x-4">
-                    <div className="flex items-center justify-start gap-x-1 text-snow text-xs">
-                        <PlaygroundAvatar
-                            letter={orgName.slice(0, 2)}
-                            tone="emerald"
-                            className="uppercase"
-                        />
-                        <span>
-                            <BreadcrumbSeparatorIcon />
-                        </span>
-                        <span className="text-sm">Invite Members</span>
-                    </div>
-                    <div className="flex min-w-0 items-center gap-x-2">
-                        <PlaygroundAvatar
-                            letter={senderLetter}
-                            tone="indigo"
-                            src={sender.image ?? undefined}
-                        />
-                        <span className="min-w-0 truncate text-[12px] text-white/45">
-                            {sender.email}
-                        </span>
-                    </div>
+                <div className="flex items-center justify-start gap-x-1 text-snow text-xs">
+                    <PlaygroundAvatar
+                        letter={orgName.slice(0, 2)}
+                        tone="emerald"
+                        className="uppercase"
+                    />
+                    <span>
+                        <BreadcrumbSeparatorIcon />
+                    </span>
+                    <span className="text-sm">Invite to {teamName}</span>
                 </div>
-                <p className="min-h-3.5 text-[11px]">
-                    {atLimit ? (
-                        <span className="text-amber-400">
-                            Maximum of {MAX_RECIPIENTS} recipients reached.
-                        </span>
-                    ) : draftLooksInvalid ? (
-                        <span className="text-rose-400">
-                            That doesn&apos;t look like a valid email.
-                        </span>
-                    ) : (
-                        <span className="text-neutral-500">
-                            Select project members or invite by email.
-                        </span>
-                    )}
-                </p>
-                <ProjectTeamMemberPicker
+
+                <InviteRecipientField
                     projectId={projectId}
                     excludedUserIds={teamMemberIds}
-                    selectedUserIds={selectedUserIds}
-                    onChange={setSelectedUserIds}
-                    maxSelections={maxProjectSelections}
+                    value={recipients}
+                    onChange={setRecipients}
+                    draft={draft}
+                    onDraftChange={setDraft}
+                    onCommitDraft={commitDraft}
+                    atLimit={atLimit}
                 />
-                <div className="flex w-full items-center gap-3 py-1">
-                    <span className="h-px flex-1 bg-white/5" />
-                    <span className="text-[10px] font-medium tracking-wide text-neutral-600 uppercase">
-                        Or invite by email
-                    </span>
-                    <span className="h-px flex-1 bg-white/5" />
-                </div>
-                <div className="flex w-full flex-wrap items-center gap-1.5">
-                    {emails.map((email) => (
-                        <span
-                            key={email}
-                            className="flex items-center gap-1 rounded-full bg-white/5 py-1 pr-1 pl-2.5 text-[12px] text-neutral-200 ring ring-white/10"
-                        >
-                            {email}
-                            <Button
-                                variant="unstyled"
-                                type="button"
-                                onClick={() => removeEmail(email)}
-                                aria-label={`Remove ${email}`}
-                                className="flex size-4 cursor-pointer items-center justify-center rounded-full text-neutral-400 hover:bg-white/10 hover:text-neutral-100"
-                            >
-                                <CloseIcon className="size-3" />
-                            </Button>
-                        </span>
-                    ))}
-                    <input
-                        type="email"
-                        autoFocus
-                        value={draft}
-                        onChange={(e) => setDraft(e.target.value)}
-                        onKeyDown={handleKeyDown}
-                        onPaste={handlePaste}
-                        onBlur={commitDraft}
-                        disabled={atLimit}
-                        placeholder={emails.length === 0 ? "name@company.com" : ""}
-                        className={cn(
-                            GHOST_FIELD,
-                            "h-8 min-w-48 flex-1 text-xl font-medium text-neutral-100 placeholder:text-neutral-600 disabled:cursor-not-allowed",
-                        )}
-                    />
-                </div>
+
+                {(atLimit || draftLooksInvalid) && (
+                    <p className="text-[11px] text-amber-400">
+                        {atLimit
+                            ? `Maximum of ${MAX_RECIPIENTS} recipients reached.`
+                            : "That doesn't look like a valid email."}
+                    </p>
+                )}
             </section>
 
             <section
@@ -325,53 +219,43 @@ function InviteForm({
                 />
             </section>
 
-            <section className="flex flex-col gap-y-4 pb-4">
-                <div className="flex flex-wrap items-center gap-2.5">
-                    <Popover open={roleOpen} onOpenChange={setRoleOpen}>
-                        <PopoverTrigger asChild>
-                            <CapsuleTrigger>{role}</CapsuleTrigger>
-                        </PopoverTrigger>
-                        <PopoverContent align="start" className="w-64 p-1">
-                            <div className="flex flex-col gap-0.5">
-                                {PROJECT_ROLES.map((option) => (
-                                    <Button
-                                        variant="unstyled"
-                                        key={option}
-                                        type="button"
-                                        onClick={() => {
-                                            setRole(option);
-                                            setRoleOpen(false);
-                                        }}
-                                        className={cn(
-                                            "flex cursor-pointer flex-col items-start gap-0.5 rounded-md px-2 py-1.5 text-left transition-colors",
-                                            option === role ? "bg-white/8" : "hover:bg-white/5",
-                                        )}
-                                    >
-                                        <span className="text-[13px] text-neutral-200">
-                                            {option}
-                                        </span>
-                                        <span className="text-[11px] text-neutral-500">
-                                            {ROLE_HINTS[option]}
-                                        </span>
-                                    </Button>
-                                ))}
-                            </div>
-                        </PopoverContent>
-                    </Popover>
+            <section className="flex items-center justify-between gap-x-3 pb-4">
+                <Popover open={roleOpen} onOpenChange={setRoleOpen}>
+                    <PopoverTrigger asChild>
+                        <CapsuleTrigger>{role}</CapsuleTrigger>
+                    </PopoverTrigger>
+                    <PopoverContent align="start" className="w-64 p-1">
+                        <div className="flex flex-col gap-0.5">
+                            {PROJECT_ROLES.map((option) => (
+                                <Button
+                                    variant="unstyled"
+                                    key={option}
+                                    type="button"
+                                    onClick={() => {
+                                        setRole(option);
+                                        setRoleOpen(false);
+                                    }}
+                                    className={cn(
+                                        "flex cursor-pointer flex-col items-start gap-0.5 rounded-md px-2 py-1.5 text-left transition-colors",
+                                        option === role ? "bg-white/8" : "hover:bg-white/5",
+                                    )}
+                                >
+                                    <span className="text-[13px] text-neutral-200">{option}</span>
+                                    <span className="text-[11px] text-neutral-500">
+                                        {ROLE_HINTS[option]}
+                                    </span>
+                                </Button>
+                            ))}
+                        </div>
+                    </PopoverContent>
+                </Popover>
 
-                    <CapsuleTrigger disabled>{orgName}</CapsuleTrigger>
-                    <CapsuleTrigger disabled>{projectName}</CapsuleTrigger>
-                    <CapsuleTrigger disabled>{teamName}</CapsuleTrigger>
-                </div>
-
-                <div className="flex h-fit items-center justify-end gap-x-2">
-                    <DialogSubmitButton
-                        label={submitLabel}
-                        onClick={handleSubmit}
-                        loading={isPending}
-                        disabled={!canSubmit}
-                    />
-                </div>
+                <DialogSubmitButton
+                    label={submitLabel}
+                    onClick={handleSubmit}
+                    loading={isPending}
+                    disabled={!canSubmit}
+                />
             </section>
         </main>
     );

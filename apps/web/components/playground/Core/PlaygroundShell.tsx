@@ -14,7 +14,7 @@ import PlaygroundCollapsedLead from "@/components/playground/Core/TopBar/Playgro
 import SpacesSelectionBar from "@/components/playground/Home/SpacesDisplay/SpacesSelectionBar";
 import CreateIssueDialog from "@/components/playground/Issue/CreateIssueDialog";
 import IssueDisplay from "@/components/playground/Issue/IssueDisplay";
-import SolveReportSheet from "@/components/playground/Issue/SolveReportSheet";
+import SolveReportDisplay from "@/components/playground/Issue/SolveReportDisplay";
 import {
     defaultHomeViewToTab,
     isSettingsTab,
@@ -68,6 +68,7 @@ export default function PlaygroundShell() {
 
     const activeTab = usePlaygroundNavStore((s) => s.tab);
     const selectedSpace = usePlaygroundNavStore((s) => s.selectedSpace);
+    const selectedTeam = usePlaygroundNavStore((s) => s.selectedTeam);
     const clearSpace = usePlaygroundNavStore((s) => s.clearSpace);
     const spaces = useSpaces(activeProject?.id);
     // The URL sync needs to tell "still loading" from "no spaces", so it gets the
@@ -99,8 +100,17 @@ export default function PlaygroundShell() {
             // Only while that space's board is on screen — the nav store keeps the
             // selection around after you leave, and space commands shouldn't follow.
             spaceId: activeTab === PlaygroundTab.Space ? (selectedSpace?.id ?? null) : null,
+            teamId: activeTab === PlaygroundTab.TeamDetail ? (selectedTeam?.id ?? null) : null,
         });
-    }, [orgSlug, activeProject?.id, openIssueId, activeTab, selectedSpace?.id, setCommandContext]);
+    }, [
+        orgSlug,
+        activeProject?.id,
+        openIssueId,
+        activeTab,
+        selectedSpace?.id,
+        selectedTeam?.id,
+        setCommandContext,
+    ]);
     useLayoutEffect(() => {
         useSidebarWidthStore.persist.rehydrate();
         useBackgroundLightingStore.persist.rehydrate();
@@ -123,6 +133,8 @@ export default function PlaygroundShell() {
                         </div>
                     ) : paneRoute.kind === "review" ? (
                         <ReviewDisplay route={paneRoute} />
+                    ) : paneRoute.kind === "solve-report" ? (
+                        <SolveReportDisplay route={paneRoute} />
                     ) : openIssueId ? (
                         <IssueDisplay issueId={openIssueId} />
                     ) : (
@@ -134,7 +146,6 @@ export default function PlaygroundShell() {
                 <SpacesSelectionBar />
             </section>
             <PlaygroundSheetSidebar />
-            <SolveReportSheet />
             <CreateProjectDialog />
             <CreateTeamDialog />
             <DeleteTeamDialog />

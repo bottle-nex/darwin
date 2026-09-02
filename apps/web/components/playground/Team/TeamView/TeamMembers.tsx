@@ -1,7 +1,12 @@
 "use client";
+import { useMemo } from "react";
+
 import LogoLoader from "@/components/app/LogoLoader";
 import { useGetTeamMembers } from "@/hooks/team/useGetTeamMembers";
+import { MemberSelectionOrderProvider } from "@/hooks/team/useMemberSelection";
+import { useMemberSelectionStore } from "@/store/team/useMemberSelectionStore";
 import type { TeamMembersData } from "@/types/team";
+import { inviteSelectionKey, memberSelectionKey } from "@/types/team";
 
 import PlaygroundTeamMemberRow from "./TeamMemberRow";
 
@@ -15,14 +20,15 @@ export default function PlaygroundTeamMembers({ teamId }: { teamId: string }) {
             className="flex min-h-0 flex-1 flex-col overflow-y-auto px-3 py-2"
         >
             {/* Table header */}
-            <div className="grid shrink-0 grid-cols-[1fr_120px_140px] items-center gap-4 px-2.5 pb-2 text-[11px] font-medium tracking-wide text-neutral-500 uppercase">
+            <div className="grid shrink-0 grid-cols-[1fr_120px_120px_140px] items-center gap-4 px-2.5 pb-2 pl-9 text-[11px] font-medium tracking-wide text-neutral-500 uppercase">
                 <span>Name</span>
-                <span className="ml-1">Role</span>
+                <span>Team</span>
+                <span>Project</span>
                 <span>Joined</span>
             </div>
 
             {/* Table body */}
-            <div className="flex flex-col gap-0.5 pt-1.5">
+            <div className="flex flex-col pt-1.5">
                 {isLoading ? (
                     <LogoLoader size={32} className="py-16" />
                 ) : isError ? (
@@ -46,15 +52,44 @@ function RenderMembers({
     membersData: NoInfer<TeamMembersData> | undefined;
     teamId: string;
 }) {
+    const selectedIds = useMemberSelectionStore((s) => s.ids);
+
+    const orderedKeys = useMemo(
+        () => [
+            ...(membersData?.members ?? []).map((member) => memberSelectionKey(member.user.id)),
+            ...(membersData?.pendingInvites ?? []).map((invite) => inviteSelectionKey(invite.id)),
+        ],
+        [membersData],
+    );
+
+    const selectedAt = (index: number) => {
+        const key = orderedKeys[index];
+        return Boolean(key) && selectedIds.includes(key);
+    };
+
+    const memberCount = membersData?.members.length ?? 0;
+
     return (
-        <>
-            {membersData?.members.map((member) => (
-                <PlaygroundTeamMemberRow teamMember={member} teamId={teamId} key={member.id} />
+        <MemberSelectionOrderProvider memberKeys={orderedKeys}>
+            {membersData?.members.map((member, index) => (
+                <PlaygroundTeamMemberRow
+                    teamMember={member}
+                    teamId={teamId}
+                    key={member.id}
+                    joinedAbove={selectedAt(index - 1)}
+                    joinedBelow={selectedAt(index + 1)}
+                />
             ))}
 
-            {membersData?.pendingInvites.map((invite) => (
-                <PlaygroundTeamMemberRow pendingMember={invite} teamId={teamId} key={invite.id} />
+            {membersData?.pendingInvites.map((invite, index) => (
+                <PlaygroundTeamMemberRow
+                    pendingMember={invite}
+                    teamId={teamId}
+                    key={invite.id}
+                    joinedAbove={selectedAt(memberCount + index - 1)}
+                    joinedBelow={selectedAt(memberCount + index + 1)}
+                />
             ))}
-        </>
+        </MemberSelectionOrderProvider>
     );
 }

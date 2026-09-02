@@ -47,7 +47,7 @@ export default function PlaygroundSidebarRow({
                     : "text-snow/65 hover:bg-hover hover:text-neutral-100",
                 className,
             )}
-            style={{ paddingLeft: 8 + indent * 16 }}
+            style={{ paddingLeft: 8 + indent }}
         >
             <span className="flex size-5 shrink-0 items-center justify-center">
                 {Icon ? (

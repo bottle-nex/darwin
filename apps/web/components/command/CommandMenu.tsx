@@ -20,30 +20,37 @@ import {
     isCommandAvailable,
 } from "@/hooks/shortcuts/usePlaygroundShortcuts";
 import { useSpaceCommandActions } from "@/hooks/spaces/useSpaceActions";
+import { useMemberCommandActions } from "@/hooks/team/useMemberCommandActions";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import { cn } from "@/lib/utils";
 import { useCommandContextStore } from "@/store/command/useCommandContextStore";
 import { useCommandMenuStore } from "@/store/command/useCommandMenuStore";
 import { useIssueSelectionStore } from "@/store/issues/useIssueSelectionStore";
 import { useSpaceSelectionStore } from "@/store/space/useSpaceSelectionStore";
+import { useMemberSelectionStore } from "@/store/team/useMemberSelectionStore";
 import {
     COMMAND_KIND_ORDER,
     type CommandEntry,
     CommandKind,
     type CommandPage,
+    isMemberCommandPage,
     isSpaceCommandPage,
 } from "@/types/command.type";
 
 import { commandEntryValue, filterCommandGroups } from "./commandFilter";
 import CommandIssuePage, { ISSUE_PAGE_TITLE } from "./CommandIssuePage";
+import CommandMemberPage, { MEMBER_PAGE_TITLE } from "./CommandMemberPage";
 import { commandMenuView } from "./commandMenuView";
 import CommandSearchResults from "./CommandSearchResults";
 import CommandSpacePage, { SPACE_PAGE_TITLE } from "./CommandSpacePage";
 
 const SEARCH_DEBOUNCE_MS = 200;
+const EMPTY_SELECTION: string[] = [];
 
 function pageTitle(page: CommandPage) {
-    return isSpaceCommandPage(page) ? SPACE_PAGE_TITLE[page] : ISSUE_PAGE_TITLE[page];
+    if (isSpaceCommandPage(page)) return SPACE_PAGE_TITLE[page];
+    if (isMemberCommandPage(page)) return MEMBER_PAGE_TITLE[page];
+    return ISSUE_PAGE_TITLE[page];
 }
 
 export default function CommandMenu() {
@@ -72,6 +79,7 @@ function CommandMenuBody({ onDone }: { onDone: () => void }) {
     const projectId = useCommandContextStore((s) => s.projectId);
     const issueId = useCommandContextStore((s) => s.issueId);
     const spaceId = useCommandContextStore((s) => s.spaceId);
+    const teamId = useCommandContextStore((s) => s.teamId);
     const page = useCommandMenuStore((s) => s.page);
     const setPage = useCommandMenuStore((s) => s.setPage);
     const [query, setQuery] = useState("");
@@ -87,9 +95,18 @@ function CommandMenuBody({ onDone }: { onDone: () => void }) {
     );
     const spaceActions = useSpaceCommandActions(spaceTargets);
 
+    const memberSelectionIds = useMemberSelectionStore((s) => s.ids);
+    // Member commands only mean anything on the team pane, so off it the selection reads empty.
+    const selectedMemberKeys = teamId ? memberSelectionIds : EMPTY_SELECTION;
+    const memberActions = useMemberCommandActions({
+        selectedKeys: selectedMemberKeys,
+        teamId,
+        projectId: projectId ?? undefined,
+    });
+
     const context = useMemo(
-        () => ({ orgSlug, projectId, issueId, spaceId }),
-        [orgSlug, projectId, issueId, spaceId],
+        () => ({ orgSlug, projectId, issueId, spaceId, teamId }),
+        [orgSlug, projectId, issueId, spaceId, teamId],
     );
 
     const availableGroups = useMemo(
@@ -103,10 +120,11 @@ function CommandMenuBody({ onDone }: { onDone: () => void }) {
                         (kind !== CommandKind.Issue ||
                             Boolean(issueId) ||
                             selectedIds.length > 0) &&
-                        (kind !== CommandKind.Space || spaceTargets.length > 0),
+                        (kind !== CommandKind.Space || spaceTargets.length > 0) &&
+                        (kind !== CommandKind.Member || selectedMemberKeys.length > 0),
                 ),
             })).filter((group) => group.entries.length > 0),
-        [issueId, selectedIds.length, spaceTargets.length],
+        [issueId, selectedIds.length, spaceTargets.length, selectedMemberKeys.length],
     );
 
     const groups = useMemo(
@@ -178,7 +196,13 @@ function CommandMenuBody({ onDone }: { onDone: () => void }) {
                 />
             </div>
 
-            {spaceTargets.length ? (
+            {selectedMemberKeys.length ? (
+                <CommandTargetHeader
+                    count={memberActions.count}
+                    noun={memberActions.onlyInvites ? "invite" : "member"}
+                    title={memberActions.soleTarget}
+                />
+            ) : spaceTargets.length ? (
                 <CommandTargetHeader
                     count={spaceActions.count}
                     noun="space"
@@ -196,6 +220,8 @@ function CommandMenuBody({ onDone }: { onDone: () => void }) {
             {page ? (
                 isSpaceCommandPage(page) ? (
                     <CommandSpacePage page={page} actions={spaceActions} onDone={onDone} />
+                ) : isMemberCommandPage(page) ? (
+                    <CommandMemberPage page={page} actions={memberActions} onDone={onDone} />
                 ) : (
                     <CommandIssuePage page={page} actions={actions} onDone={onDone} />
                 )

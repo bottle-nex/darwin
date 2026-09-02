@@ -1,5 +1,6 @@
 import { Router } from "express";
 
+import change_project_role_controller from "../../controllers/project/controller.change_project_role";
 import close_review_controller from "../../controllers/project/controller.close_review";
 import create_project_controller from "../../controllers/project/controller.create_project";
 import create_review_comment_controller from "../../controllers/project/controller.create_review_comment";
@@ -44,6 +45,7 @@ project_router.patch("/update", require_auth, update_project_controller);
 project_router.delete("/delete", require_auth, delete_project_controller);
 project_router.get("/:project_id", require_auth, get_project_controller);
 project_router.get("/:project_id/members", require_auth, list_members_controller);
+project_router.patch("/:project_id/members/role", require_auth, change_project_role_controller);
 project_router.get("/:project_id/presence", require_auth, list_presence_controller);
 project_router.post("/:project_id/setup", require_auth, start_setup);
 project_router.get("/:project_id/config", require_auth, get_project_config_controller);

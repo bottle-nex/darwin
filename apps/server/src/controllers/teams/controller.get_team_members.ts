@@ -31,7 +31,10 @@ export default class GetTeamMembersController {
                 return;
             }
 
-            const role = await Access.project(userId, team.projectId);
+            const [role, viewerTeamRole] = await Promise.all([
+                Access.project(userId, team.projectId),
+                Access.team(userId, teamId),
+            ]);
             if (!role || !Permissions.project(role, Action.project.read)) {
                 ResponseWriter.not_authorized(res, "You don't have access to this team");
                 return;
@@ -112,6 +115,7 @@ export default class GetTeamMembersController {
                 members: membersWithProjectRole,
                 pendingInvites: updatedPendingInvites,
                 viewerRole: role,
+                viewerTeamRole,
             });
         } catch (error) {
             console.error("error in get_team_members controller:", error);

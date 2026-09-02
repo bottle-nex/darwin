@@ -1,6 +1,7 @@
 import {
     AgentIcon,
     AssigneeGroupIcon,
+    ChangeRoleIcon,
     ChatsNavIcon,
     CommandMenuIcon,
     CopyIcon,
@@ -14,6 +15,9 @@ import {
     NotificationsBellIcon,
     OrganizationEntityIcon,
     ProjectEntityIcon,
+    RemovedFromOrgIcon,
+    RemoveMemberIcon,
+    RevokeInviteIcon,
     SettingsIcon,
     SidebarToggleIcon,
     SpaceEntityIcon,
@@ -39,7 +43,10 @@ import { useNewProjectStore } from "@/store/project/useNewProjectStore";
 import { useDeleteSpaceStore } from "@/store/space/useDeleteSpaceStore";
 import { useSpaceFormStore } from "@/store/space/useSpaceFormStore";
 import { useSpaceSelectionStore } from "@/store/space/useSpaceSelectionStore";
+import { useMemberSelectionStore } from "@/store/team/useMemberSelectionStore";
 import { useNewTeamStore } from "@/store/team/useNewTeamStore";
+import { useRemoveMembersStore } from "@/store/team/useRemoveMembersStore";
+import { useRevokeInvitesStore } from "@/store/team/useRevokeInvitesStore";
 import {
     type CommandAction,
     type CommandContext,
@@ -47,6 +54,7 @@ import {
     CommandKind,
     type CommandPage,
 } from "@/types/command.type";
+import { splitMemberSelection } from "@/types/team";
 
 function openTab(tab: PlaygroundTab) {
     usePlaygroundNavStore.getState().setTab(tab);
@@ -74,6 +82,22 @@ function onSpace(context: CommandContext): boolean {
 
 function onOneSpace(context: CommandContext): boolean {
     return spaceTargets(context).length === 1;
+}
+
+function memberSelection(): { memberUserIds: string[]; invitationIds: string[] } {
+    return splitMemberSelection(useMemberSelectionStore.getState().ids);
+}
+
+function onMembers(context: CommandContext): boolean {
+    if (!context.teamId) return false;
+    const { memberUserIds, invitationIds } = memberSelection();
+    return memberUserIds.length > 0 && invitationIds.length === 0;
+}
+
+function onInvites(context: CommandContext): boolean {
+    if (!context.teamId) return false;
+    const { memberUserIds, invitationIds } = memberSelection();
+    return invitationIds.length > 0 && memberUserIds.length === 0;
 }
 
 function openMenuPage(page: CommandPage) {
@@ -169,6 +193,22 @@ export const COMBINATIONS: Record<string, CommandAction> = {
             const [spaceId] = spaceTargets(commandContext());
             if (spaceId) useSpaceFormStore.getState().openEdit(spaceId);
         },
+    },
+    "m r": {
+        kind: CommandKind.Member,
+        label: "Set team role",
+        icon: ChangeRoleIcon,
+        isAvailable: onMembers,
+        opensPage: true,
+        run: openMenuPage("member-team-role"),
+    },
+    "m p": {
+        kind: CommandKind.Member,
+        label: "Set project role",
+        icon: ChangeRoleIcon,
+        isAvailable: onMembers,
+        opensPage: true,
+        run: openMenuPage("member-project-role"),
     },
     "o k": {
         kind: CommandKind.Open,
@@ -317,6 +357,46 @@ export const COMBINATIONS: Record<string, CommandAction> = {
             const targets = spaceTargets(commandContext());
             if (targets.length) useDeleteSpaceStore.getState().requestDelete(...targets);
         },
+    },
+    "d u": {
+        kind: CommandKind.Delete,
+        label: "Remove from team",
+        icon: RemoveMemberIcon,
+        destructive: true,
+        isAvailable: onMembers,
+        run: () => {
+            const { memberUserIds } = memberSelection();
+            if (memberUserIds.length) {
+                useRemoveMembersStore.getState().requestRemove({
+                    userIds: memberUserIds,
+                    scope: "team",
+                });
+            }
+        },
+    },
+    "d o": {
+        kind: CommandKind.Delete,
+        label: "Remove from organization",
+        icon: RemovedFromOrgIcon,
+        destructive: true,
+        isAvailable: onMembers,
+        run: () => {
+            const { memberUserIds } = memberSelection();
+            if (memberUserIds.length) {
+                useRemoveMembersStore.getState().requestRemove({
+                    userIds: memberUserIds,
+                    scope: "org",
+                });
+            }
+        },
+    },
+    "d v": {
+        kind: CommandKind.Delete,
+        label: "Revoke invite",
+        icon: RevokeInviteIcon,
+        destructive: true,
+        isAvailable: onInvites,
+        run: () => useRevokeInvitesStore.getState().requestRevoke(memberSelection().invitationIds),
     },
     "d p": {
         kind: CommandKind.Delete,

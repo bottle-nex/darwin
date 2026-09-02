@@ -4,6 +4,7 @@ import { create } from "zustand";
 export type PaneRoute =
     | { kind: "board" }
     | { kind: "issue"; issueId: string }
+    | { kind: "solve-report"; issueId: string }
     | { kind: "review"; pullNumber: number; slug: string; tab: ReviewTab };
 
 const BOARD: PaneRoute = { kind: "board" };
@@ -11,6 +12,7 @@ const BOARD: PaneRoute = { kind: "board" };
 const DEFAULT_REVIEW_TAB = ReviewTab.PullRequest;
 
 const ISSUE_SEGMENT = /\/issue\/([^/]+)\/?$/;
+const SOLVE_REPORT_SEGMENT = /\/issue\/([^/]+)\/report\/?$/;
 const REVIEW_SEGMENT = new RegExp(
     `/review/([^/]*?)-(\\d+)(?:/(${Object.values(ReviewTab).join("|")}))?/?$`,
 );
@@ -26,6 +28,11 @@ export function paneRouteFromPath(pathname: string): PaneRoute {
         };
     }
 
+    // Checked before the issue segment: both start `/issue/<id>`, and the issue pattern is
+    // anchored to the end, so only the more specific one can match a report URL.
+    const report = pathname.match(SOLVE_REPORT_SEGMENT);
+    if (report) return { kind: "solve-report", issueId: report[1] };
+
     const issue = pathname.match(ISSUE_SEGMENT);
     if (issue) return { kind: "issue", issueId: issue[1] };
 
@@ -33,11 +40,15 @@ export function paneRouteFromPath(pathname: string): PaneRoute {
 }
 
 function basePath(pathname: string): string {
-    return pathname.replace(REVIEW_SEGMENT, "").replace(ISSUE_SEGMENT, "");
+    return pathname
+        .replace(REVIEW_SEGMENT, "")
+        .replace(SOLVE_REPORT_SEGMENT, "")
+        .replace(ISSUE_SEGMENT, "");
 }
 
 function segmentFor(route: PaneRoute): string {
     if (route.kind === "issue") return `/issue/${route.issueId}`;
+    if (route.kind === "solve-report") return `/issue/${route.issueId}/report`;
     if (route.kind === "review") {
         const tab = route.tab === DEFAULT_REVIEW_TAB ? "" : `/${route.tab}`;
         return `/review/${route.slug}-${route.pullNumber}${tab}`;
@@ -52,6 +63,7 @@ export function panePath(route: PaneRoute): string {
 interface PaneRouteState {
     route: PaneRoute;
     openIssue: (issueId: string) => void;
+    openSolveReport: (issueId: string) => void;
     openReview: (target: { pullNumber: number; slug: string; tab?: ReviewTab }) => void;
     setReviewTab: (tab: ReviewTab) => void;
     openBoard: () => void;
@@ -70,6 +82,11 @@ export const usePaneRouteStore = create<PaneRouteState>((set, get) => {
             const route = get().route;
             if (route.kind === "issue" && route.issueId === issueId) return;
             go({ kind: "issue", issueId });
+        },
+        openSolveReport: (issueId) => {
+            const route = get().route;
+            if (route.kind === "solve-report" && route.issueId === issueId) return;
+            go({ kind: "solve-report", issueId });
         },
         openReview: ({ pullNumber, slug, tab = DEFAULT_REVIEW_TAB }) => {
             const route = get().route;

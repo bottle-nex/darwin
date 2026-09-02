@@ -3,6 +3,7 @@ import type { IconType } from "@trymatcha/ui/icons";
 export enum CommandKind {
     Issue = "Issue",
     Space = "Space",
+    Member = "Member",
     Workspace = "Workspace",
     Open = "Open",
     New = "New",
@@ -13,6 +14,7 @@ export enum CommandKind {
 export const COMMAND_KIND_ORDER: CommandKind[] = [
     CommandKind.Issue,
     CommandKind.Space,
+    CommandKind.Member,
     CommandKind.Open,
     CommandKind.New,
     CommandKind.Switch,
@@ -25,6 +27,7 @@ export interface CommandContext {
     projectId: string | null;
     issueId: string | null;
     spaceId: string | null;
+    teamId: string | null;
 }
 
 export type IssueCommandPage =
@@ -33,10 +36,16 @@ export type IssueCommandPage =
 /** Prefixed so the menu can tell whose page it is without a second lookup. */
 export type SpaceCommandPage = "space-dates";
 
-export type CommandPage = IssueCommandPage | SpaceCommandPage;
+export type MemberCommandPage = "member-team-role" | "member-project-role";
+
+export type CommandPage = IssueCommandPage | SpaceCommandPage | MemberCommandPage;
 
 export function isSpaceCommandPage(page: CommandPage): page is SpaceCommandPage {
     return page.startsWith("space-");
+}
+
+export function isMemberCommandPage(page: CommandPage): page is MemberCommandPage {
+    return page.startsWith("member-");
 }
 
 export interface CommandAction {

@@ -37,6 +37,7 @@ const PROJECT_PERMISSIONS: Record<ProjectRole, Set<ProjectAction>> = {
         Action.project.delete,
         Action.project.create_team,
         Action.project.manage_team,
+        Action.project.change_member_role,
         Action.project.create_issue,
         Action.project.triage_issue,
         Action.project.close_issue,
