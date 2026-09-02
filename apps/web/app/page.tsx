@@ -1,9 +1,10 @@
 import LandingBentoCards from "@/components/landing/LandingBentoCards";
 import LandingFeatureShowcase from "@/components/landing/LandingFeatureShowcase";
 import LandingFooter from "@/components/landing/LandingFooter";
-import LandingHero from "@/components/landing/LandingHero";
 import LandingIssueTracker from "@/components/landing/LandingIssueTracker";
 import LandingPlatformStack from "@/components/landing/LandingPlatformStack";
+// import LandingHero from "@/components/landing/LandingHero";
+import LandingHero from "@/components/new/LandingHero";
 import { LandingNavbar } from "@/components/new/LandingNavbar";
 
 export default function Home() {

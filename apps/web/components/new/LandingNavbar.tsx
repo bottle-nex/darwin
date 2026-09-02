@@ -192,7 +192,11 @@ export function LandingNavbar() {
                         )}
                     </nav>
 
-                    <Button variant={"tertiary"} onClick={session ? handleRedirect : handleSignin}>
+                    <Button
+                        className="pl-3!"
+                        variant={"tertiary"}
+                        onClick={session ? handleRedirect : handleSignin}
+                    >
                         Get Started
                         <CtaArrowIcon className="text-ink!" />
                     </Button>
