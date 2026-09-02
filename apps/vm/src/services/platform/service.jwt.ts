@@ -9,8 +9,8 @@ import { ENV } from "../../conf/config.env";
  * needs the token before the sandbox can make its first call back.
  */
 export function sign_worker_jwt(worker_id: string): string {
-    return jwt.sign({ worker_id }, ENV.SERVER_JWT_SECRET, {
+    return jwt.sign({ worker_id }, ENV.JWT_SECRET, {
         algorithm: "HS256",
-        expiresIn: ENV.SERVER_WORKER_JWT_TTL as SignOptions["expiresIn"],
+        expiresIn: ENV.WORKER_JWT_TTL as SignOptions["expiresIn"],
     });
 }

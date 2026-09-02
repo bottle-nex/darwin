@@ -28,16 +28,16 @@ export default class GithubAppService {
     private static _appOctokit: Octokit | null = null;
 
     private static privateKey(): string {
-        return Buffer.from(ENV.SERVER_GITHUB_APP_PRIVATE_KEY, "base64").toString("utf8");
+        return Buffer.from(ENV.GITHUB_APP_PRIVATE_KEY, "base64").toString("utf8");
     }
 
     private static appAuth() {
         if (!this._appAuth) {
             this._appAuth = createAppAuth({
-                appId: ENV.SERVER_GITHUB_APP_ID,
+                appId: ENV.GITHUB_APP_ID,
                 privateKey: this.privateKey(),
-                clientId: ENV.SERVER_GITHUB_APP_CLIENT_ID,
-                clientSecret: ENV.SERVER_GITHUB_APP_CLIENT_SECRET,
+                clientId: ENV.GITHUB_APP_CLIENT_ID,
+                clientSecret: ENV.GITHUB_APP_CLIENT_SECRET,
             });
         }
         return this._appAuth;
@@ -48,7 +48,7 @@ export default class GithubAppService {
             this._appOctokit = new Octokit({
                 authStrategy: createAppAuth,
                 auth: {
-                    appId: ENV.SERVER_GITHUB_APP_ID,
+                    appId: ENV.GITHUB_APP_ID,
                     privateKey: this.privateKey(),
                 },
             });

@@ -12,7 +12,7 @@ model SetupSession {
   startedAt  DateTime?
   finishedAt DateTime?
 
-  questions SetupQuestion[]
+  questions AgentQuestion[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -20,26 +20,32 @@ model SetupSession {
   @@index([projectId])
 }
 
-model SetupQuestion {
-  id        String       @id @default(cuid())
-  sessionId String
-  session   SetupSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+model AgentQuestion {
+  id             String        @id @default(cuid())
+  setupSessionId String?
+  setupSession   SetupSession? @relation(fields: [setupSessionId], references: [id], onDelete: Cascade)
+  agentSessionId String?
+  agentSession   AgentSession? @relation(fields: [agentSessionId], references: [id], onDelete: Cascade)
 
-  type    SetupQuestionType
+  type    AgentQuestionType
   key     String // "NPM_TOKEN", "START_COMMAND", ...
   prompt  String              @db.Text
   options String[] // for NeedChoice / Confirm
-  status  SetupQuestionStatus @default(Waiting)
+  status  AgentQuestionStatus @default(Waiting)
 
   // answer handling — NEVER store a secret value here
   answerValue String?        @db.Text // non-secret answers
   secretId    String? // pointer to the vault row for secret answers
   secret      ProjectSecret? @relation(fields: [secretId], references: [id], onDelete: SetNull)
 
+  deliveries QuestionDelivery[]
+
   askedAt    DateTime  @default(now())
+  expiresAt  DateTime?
   answeredAt DateTime?
 
-  @@index([sessionId, status])
+  @@index([setupSessionId, status])
+  @@index([agentSessionId, status])
 }
 
 model ProjectSecret {
@@ -52,7 +58,7 @@ model ProjectSecret {
   iv         String // GCM nonce
   authTag    String // GCM auth tag
 
-  questions SetupQuestion[]
+  questions AgentQuestion[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -74,7 +80,7 @@ enum SetupStatus {
   Failed
 }
 
-enum SetupQuestionType {
+enum AgentQuestionType {
   NeedSecret
   NeedValue
   NeedChoice
@@ -86,7 +92,7 @@ enum SetupQuestionType {
   ApproveCost
 }
 
-enum SetupQuestionStatus {
+enum AgentQuestionStatus {
   Waiting
   Answered
   Cancelled

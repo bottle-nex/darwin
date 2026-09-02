@@ -217,9 +217,9 @@ export default class CapsuleAuthor {
         await HarnessRun.execute(sandbox, log, {
             harness: Harness.Claude,
             prompt_path: AUTHOR_PROMPT_PATH,
-            model: ENV.SERVER_PREVIEW_MODEL,
-            effort: effort_from_env(ENV.SERVER_PREVIEW_EFFORT),
-            envs: { CLAUDE_CODE_OAUTH_TOKEN: ENV.SERVER_CLAUDE_CODE_OAUTH_TOKEN },
+            model: ENV.VM_PREVIEW_MODEL,
+            effort: effort_from_env(ENV.VM_PREVIEW_EFFORT),
+            envs: { CLAUDE_CODE_OAUTH_TOKEN: ENV.VM_CLAUDE_CODE_OAUTH_TOKEN },
             timeout_ms: AUTHOR_TIMEOUT_MS,
             label: "capsule authoring agent",
         });
@@ -246,9 +246,9 @@ export default class CapsuleAuthor {
         await HarnessRun.execute(sandbox, log, {
             harness: Harness.Claude,
             prompt_path: REPAIR_PROMPT_PATH,
-            model: ENV.SERVER_PREVIEW_MODEL,
-            effort: effort_from_env(ENV.SERVER_PREVIEW_EFFORT),
-            envs: { CLAUDE_CODE_OAUTH_TOKEN: ENV.SERVER_CLAUDE_CODE_OAUTH_TOKEN },
+            model: ENV.VM_PREVIEW_MODEL,
+            effort: effort_from_env(ENV.VM_PREVIEW_EFFORT),
+            envs: { CLAUDE_CODE_OAUTH_TOKEN: ENV.VM_CLAUDE_CODE_OAUTH_TOKEN },
             timeout_ms: REPAIR_TIMEOUT_MS,
             label: "capsule repair agent",
         });

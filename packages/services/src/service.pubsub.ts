@@ -10,7 +10,7 @@ export default abstract class PubSubSystem {
     private static readonly USER_CHANNEL_PREFIX = "user:";
 
     constructor() {
-        const url = process.env.SERVER_REDIS_URL;
+        const url = process.env.REDIS_URL;
         if (!url) {
             throw new Error("SERVER_REDIS_URL is not set — cannot reach the realtime bus");
         }

@@ -23,7 +23,7 @@ enum SetupStatus {
     FAILED = "Failed",
 }
 
-enum SetupQuestionType {
+enum AgentQuestionType {
     NEED_SECRET = "NeedSecret",
     NEED_VALUE = "NeedValue",
     NEED_CHOICE = "NeedChoice",
@@ -36,7 +36,7 @@ enum SetupQuestionType {
 }
 
 type AskArgs = {
-    type: SetupQuestionType;
+    type: AgentQuestionType;
     key: string;
     prompt: string;
     options?: string[];
@@ -69,7 +69,7 @@ export class McpServerService {
             "ask_user",
             "Ask the user for input you cannot derive (secret, choice, confirm). Blocks until answered.",
             {
-                type: z.enum(SetupQuestionType),
+                type: z.enum(AgentQuestionType),
                 key: z.string(),
                 prompt: z.string(),
                 options: z.array(z.string()).optional(),
@@ -107,11 +107,19 @@ export class McpServerService {
         for (;;) {
             const res = await this.api(`/sandbox/answer?key=${encodeURIComponent(args.key)}`);
             if (res.status === 200) {
-                const { data } = (await res.json()) as {
+                const body = (await res.json()) as {
+                    error?: { code?: string };
                     data?: { value?: string; provided?: boolean };
                 };
+
+                if (body.error?.code === "QUESTION_CANCELLED") {
+                    return this.text("nobody answered in time; proceed with your best judgement");
+                }
+
                 return this.text(
-                    data?.provided ? "provided (set as env var, retry now)" : String(data?.value),
+                    body.data?.provided
+                        ? "provided (set as env var, retry now)"
+                        : String(body.data?.value),
                 );
             }
             await this.sleep(McpServerService.POLL_INTERVAL_MS);
@@ -159,6 +167,7 @@ export class WorkerMcpServerService {
 
     private static readonly SERVER = process.env.MATCHA_SERVER_URL!;
     private static readonly TOKEN = process.env.MATCHA_SANDBOX_TOKEN!; // per-worker token
+    private static readonly POLL_INTERVAL_MS = 1000;
 
     private run_log_seq = 0;
 
@@ -171,6 +180,18 @@ export class WorkerMcpServerService {
     }
 
     public register_tools() {
+        this.mcp_server.tool(
+            "ask_user",
+            "Ask the person who filed this issue for input you cannot derive (choice, confirm, clarification). Blocks until answered or until nobody answers in time.",
+            {
+                type: z.enum(AgentQuestionType),
+                key: z.string(),
+                prompt: z.string(),
+                options: z.array(z.string()).optional(),
+            },
+            this.ask_user.bind(this),
+        );
+
         this.mcp_server.tool(
             "report_status",
             "Report whether this worker is Busy (actively solving an issue) or Idle (nothing left to work on). Call this before opening a PR once there is no more queued work.",
@@ -186,16 +207,43 @@ export class WorkerMcpServerService {
         );
     }
 
-    /**
-     * Reports one action to the vm worker, which is the only process that writes the run's log.
-     *
-     * The sequence number is assigned here rather than on the receiving side because this is
-     * where a retry originates: the worker acknowledges a sequence only once the cache holds it,
-     * so an unacknowledged event can be sent again under the same number and land exactly once.
-     *
-     * Gives up rather than failing the run. Logging is not the work, and an agent that cannot
-     * report should still solve its issue.
-     */
+    private async ask_user(args: AskArgs) {
+        const asked = await this.api("/ask", {
+            method: "POST",
+            body: JSON.stringify(args),
+        });
+
+        if (!asked.ok)
+            return this.text("could not reach the user; proceed with your best judgement");
+
+        for (;;) {
+            const res = await this.api(`/answer?key=${encodeURIComponent(args.key)}`);
+
+            if (res.status === 200) {
+                const body = (await res.json()) as {
+                    error?: { code?: string };
+                    data?: { value?: string; provided?: boolean };
+                };
+
+                if (body.error?.code === "QUESTION_CANCELLED") {
+                    return this.text("nobody answered in time; proceed with your best judgement");
+                }
+
+                return this.text(
+                    body.data?.provided
+                        ? "provided (set as env var, retry now)"
+                        : String(body.data?.value),
+                );
+            }
+
+            await this.sleep(WorkerMcpServerService.POLL_INTERVAL_MS);
+        }
+    }
+
+    private sleep(ms: number) {
+        return new Promise((resolve) => setTimeout(resolve, ms));
+    }
+
     private async report_progress(args: ReportProgressArgs) {
         const event = to_run_log_event(args);
         if (!event) return this.text("ignored");

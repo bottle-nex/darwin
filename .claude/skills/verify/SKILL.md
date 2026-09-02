@@ -19,7 +19,7 @@ description: How to run and drive trymatcha locally to verify changes (server, s
 ## Driving the WebSocket surface
 
 - Connect to `ws://localhost:8080?projectId=<id>&token=<jwt>`.
-- Mint session JWTs with `jsonwebtoken` (HS256, `SERVER_JWT_SECRET` from root `.env`), payload `{ id, name, email }` matching a real `"User"` row. Run the script with cwd `apps/server` so `jsonwebtoken` resolves.
+- Mint session JWTs with `jsonwebtoken` (HS256, `JWT_SECRET` from root `.env`), payload `{ id, name, email }` matching a real `"User"` row. Run the script with cwd `apps/server` so `jsonwebtoken` resolves.
 - Access rules: connection is rejected (close 4001) unless the user is a ProjectMember, the project owner, or an org member with access; bad JWT closes 4000. Inbound messages: `{ type: "CHAT_CREATE", payload: { issueId, message } }`; expect `CHAT_CREATED` broadcast / `CHAT_ERROR` to sender.
 - Useful fixtures (dev DB): project `cmqcsff8w0001v0vhk7jomvhi` with issues; user `cmpzs4vr90000fsvhqo8t0eit` (owner), `cmq43yigf0001w1vh0niony6t` (member), `cmreye7vz0000xxvhq4y3g9o8` (no access).
 - Clean up any rows you insert (`Chat`, `Issue`) after probing — this is the user's live dev DB.

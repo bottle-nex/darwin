@@ -18,6 +18,7 @@ export enum PlaygroundTab {
     SettingsOverview = "settings-overview",
     SettingsAppearance = "settings-appearance",
     SettingsApiKeys = "settings-api-keys",
+    SettingsConnectors = "settings-connectors",
     SettingsProject = "settings-project",
     SettingsTemplates = "settings-templates",
     SettingsEnv = "settings-env",
@@ -28,6 +29,7 @@ export enum PlaygroundTab {
 export const ACCOUNT_SETTINGS_TABS: PlaygroundTab[] = [
     PlaygroundTab.SettingsAppearance,
     PlaygroundTab.SettingsApiKeys,
+    PlaygroundTab.SettingsConnectors,
 ];
 
 export const PROJECT_SETTINGS_TABS: PlaygroundTab[] = [

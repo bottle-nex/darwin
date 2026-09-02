@@ -50,7 +50,7 @@ async function handle_run_log(request: Request): Promise<Response> {
 
 export function start_run_log_server() {
     const server = Bun.serve({
-        port: ENV.SERVER_VM_HTTP_PORT,
+        port: ENV.VM_HTTP_PORT,
         async fetch(request) {
             const { pathname } = new URL(request.url);
             if (pathname === "/health") return Response.json({ ok: true });

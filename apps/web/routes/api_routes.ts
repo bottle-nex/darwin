@@ -159,3 +159,10 @@ export const API_KEYS_URL = API_URL + "/claude-mcp/api-keys";
 export const REVOKE_API_KEY_URL = (id: string) => `${API_KEYS_URL}/${id}`;
 export const CLAUDE_MCP_URL = API_URL + "/claude-mcp/mcp";
 export const CLAUDE_MCP_CONNECTOR_URL = (key: string) => `${CLAUDE_MCP_URL}/${key}`;
+
+export const CONNECTORS_URL = API_URL + "/connectors";
+export const CONNECTOR_LINK_URL = (provider: string) => `${CONNECTORS_URL}/${provider}/link`;
+export const CONNECTOR_URL = (provider: string) => `${CONNECTORS_URL}/${provider}`;
+
+export const QUESTION_URL = (questionId: string) => `${API_URL}/questions/${questionId}`;
+export const QUESTION_SECRET_URL = (questionId: string) => `${QUESTION_URL(questionId)}/secret`;

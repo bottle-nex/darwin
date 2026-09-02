@@ -234,7 +234,7 @@ export default class E2B {
         let current_run_id: string | undefined;
         const push_retry_issue_id = pending_push_issue_id(worker);
 
-        const secrets = () => [gh_token, ENV.SERVER_CLAUDE_CODE_OAUTH_TOKEN];
+        const secrets = () => [gh_token, ENV.VM_CLAUDE_CODE_OAUTH_TOKEN];
         const failure_fields = () => ({
             worker: worker_id,
             project: project.id,
@@ -271,7 +271,7 @@ export default class E2B {
                 log.info("reusing live sandbox", { sandbox: sandbox_id });
             }
 
-            const sandbox = await Sandbox.connect(sandbox_id, { apiKey: ENV.SERVER_E2B_API_KEY });
+            const sandbox = await Sandbox.connect(sandbox_id, { apiKey: ENV.VM_E2B_API_KEY });
 
             gh_token = await GithubService.getInstallationToken(installation_id);
             log.info("minted github token for the sandbox");
@@ -283,7 +283,7 @@ export default class E2B {
                 command: "node",
                 args: [SANDBOX_MCP_ENTRY],
                 env: {
-                    MATCHA_SERVER_URL: ENV.SERVER_PUBLIC_API_URL,
+                    MATCHA_SERVER_URL: ENV.PUBLIC_API_URL,
                     MATCHA_SESSION_KIND: "worker",
                 },
             };
@@ -408,9 +408,7 @@ export default class E2B {
                             ...mcp_server.env,
                             MATCHA_SANDBOX_TOKEN: run_worker_token,
                             MATCHA_RUN_ID: run_id,
-                            ...(ENV.SERVER_VM_PUBLIC_URL
-                                ? { MATCHA_VM_URL: ENV.SERVER_VM_PUBLIC_URL }
-                                : {}),
+                            ...(ENV.VM_PUBLIC_URL ? { MATCHA_VM_URL: ENV.VM_PUBLIC_URL } : {}),
                         },
                     };
                     await sandbox.files.write(
@@ -974,45 +972,45 @@ export default class E2B {
     }
 
     public static async head_commit(sandbox_id: string): Promise<string> {
-        const sandbox = await Sandbox.connect(sandbox_id, { apiKey: ENV.SERVER_E2B_API_KEY });
+        const sandbox = await Sandbox.connect(sandbox_id, { apiKey: ENV.VM_E2B_API_KEY });
         const result = await sandbox.commands.run("git rev-parse HEAD", { cwd: REPO_DIR });
         return result.stdout.trim();
     }
 
     public static async create(timeout_ms: number = SANDBOX_TIMEOUT_MS): Promise<string> {
-        const sandbox = await Sandbox.create(ENV.SERVER_SANDBOX_TEMPLATE, {
-            apiKey: ENV.SERVER_E2B_API_KEY,
+        const sandbox = await Sandbox.create(ENV.VM_SANDBOX_TEMPLATE, {
+            apiKey: ENV.VM_E2B_API_KEY,
             timeoutMs: timeout_ms,
         });
         return sandbox.sandboxId;
     }
 
     public static async exec_command(sandbox_id: string, command: string): Promise<CommandResult> {
-        const sandbox = await Sandbox.connect(sandbox_id, { apiKey: ENV.SERVER_E2B_API_KEY });
+        const sandbox = await Sandbox.connect(sandbox_id, { apiKey: ENV.VM_E2B_API_KEY });
         const result = await sandbox.commands.run(command);
         return result;
     }
 
     public static async exec_js_code(sandbox_id: string, code: string): Promise<string> {
-        const sandbox = await Sandbox.connect(sandbox_id, { apiKey: ENV.SERVER_E2B_API_KEY });
+        const sandbox = await Sandbox.connect(sandbox_id, { apiKey: ENV.VM_E2B_API_KEY });
         const result = await sandbox.commands.run(`node -e '${code}'`);
         return result.stdout;
     }
 
     public static async take_snapshot(sandbox_id: string): Promise<SnapshotInfo> {
         const snapshot = await Sandbox.createSnapshot(sandbox_id, {
-            apiKey: ENV.SERVER_E2B_API_KEY,
+            apiKey: ENV.VM_E2B_API_KEY,
         });
         return snapshot;
     }
 
     public static async pause(sandbox_id: string): Promise<boolean> {
-        const status = await Sandbox.pause(sandbox_id, { apiKey: ENV.SERVER_E2B_API_KEY });
+        const status = await Sandbox.pause(sandbox_id, { apiKey: ENV.VM_E2B_API_KEY });
         return status;
     }
 
     public static async destroy(sandbox_id: string): Promise<void> {
-        const sandbox = await Sandbox.connect(sandbox_id, { apiKey: ENV.SERVER_E2B_API_KEY });
+        const sandbox = await Sandbox.connect(sandbox_id, { apiKey: ENV.VM_E2B_API_KEY });
         await sandbox.kill();
     }
 
@@ -1053,7 +1051,7 @@ export default class E2B {
             SecretService.get_all_secrets(project_id),
         ]);
 
-        const sandbox = await Sandbox.connect(sandbox_id, { apiKey: ENV.SERVER_E2B_API_KEY });
+        const sandbox = await Sandbox.connect(sandbox_id, { apiKey: ENV.VM_E2B_API_KEY });
         const clone_url = repo_url.replace("https://", `https://x-access-token:${token}@`);
 
         // `--progress` because git only reports progress when stderr is a terminal, and here it

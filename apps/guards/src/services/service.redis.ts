@@ -9,7 +9,7 @@ let client: Redis | null = null;
 
 export function redis(): Redis {
     if (!client) {
-        client = new Redis(ENV.SERVER_REDIS_URL, { maxRetriesPerRequest: 2 });
+        client = new Redis(ENV.REDIS_URL, { maxRetriesPerRequest: 2 });
         client.on("error", (error) => log.error("client error", error));
     }
     return client;

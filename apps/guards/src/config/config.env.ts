@@ -7,11 +7,11 @@ dotenv.config({ path: path.resolve(process.cwd(), "../../.env") });
 
 const envSchema = z.object({
     DATABASE_URL: z.url(),
-    SERVER_REDIS_URL: z.url(),
-    SERVER_MINIO_URL: z.url({ protocol: /^https?$/ }).optional(),
-    SERVER_MINIO_ACCESS_KEY: z.string().optional(),
-    SERVER_MINIO_SECRET_KEY: z.string().optional(),
-    SERVER_RUN_LOGS_BUCKET: z.string().optional(),
+    REDIS_URL: z.url(),
+    MINIO_URL: z.url({ protocol: /^https?$/ }).optional(),
+    MINIO_ACCESS_KEY: z.string().optional(),
+    MINIO_SECRET_KEY: z.string().optional(),
+    RUN_LOGS_BUCKET: z.string().optional(),
 });
 
 function parseEnv() {

@@ -5,7 +5,7 @@ import { prisma } from "@trymatcha/database";
 import { ENV } from "../../conf/config.env";
 
 const ALGORITHM = "aes-256-gcm";
-const KEY = Buffer.from(ENV.SERVER_SECRET_ENCRYPTION_KEY, "hex");
+const KEY = Buffer.from(ENV.SECRET_ENCRYPTION_KEY, "hex");
 
 type EncryptedPayload = {
     ciphertext: string;

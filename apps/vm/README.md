@@ -23,7 +23,7 @@ claude setup-token
 Store the token in the root `.env`:
 
 ```dotenv
-SERVER_CLAUDE_CODE_OAUTH_TOKEN=your-token
+VM_CLAUDE_CODE_OAUTH_TOKEN=your-token
 ```
 
 The token is injected only into each Claude command and is never baked into the image.

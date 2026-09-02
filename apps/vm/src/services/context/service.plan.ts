@@ -42,11 +42,11 @@ export interface BriefRun {
 
 export default class PlanService {
     static async generate_plan(sandbox_id: string): Promise<BriefRun> {
-        const sandbox = await Sandbox.connect(sandbox_id, { apiKey: ENV.SERVER_E2B_API_KEY });
+        const sandbox = await Sandbox.connect(sandbox_id, { apiKey: ENV.VM_E2B_API_KEY });
         await sandbox.files.write(PROMPT_PATH, BRIEF_PROMPT);
 
-        const model = ENV.SERVER_BRIEF_MODEL;
-        const effort = ENV.SERVER_BRIEF_EFFORT;
+        const model = ENV.VM_BRIEF_MODEL;
+        const effort = ENV.VM_BRIEF_EFFORT;
         log.step("generating project brief", { model, effort });
         const report = await HarnessRun.execute(sandbox, log, {
             harness: Harness.Claude,
@@ -54,7 +54,7 @@ export default class PlanService {
             model,
             effort: effort_from_env(effort),
             extra_flags: [`--tools "Read,Glob,Grep,Bash"`],
-            envs: { CLAUDE_CODE_OAUTH_TOKEN: ENV.SERVER_CLAUDE_CODE_OAUTH_TOKEN },
+            envs: { CLAUDE_CODE_OAUTH_TOKEN: ENV.VM_CLAUDE_CODE_OAUTH_TOKEN },
             timeout_ms: AGENT_TIMEOUT_MS,
             label: "onboarding agent",
         });

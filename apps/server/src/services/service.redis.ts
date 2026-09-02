@@ -21,7 +21,7 @@ export default class RedisService {
      * false`), so requests error out instead of hanging during an outage.
      */
     static async connect(): Promise<void> {
-        redis = new Redis(ENV.SERVER_REDIS_URL, {
+        redis = new Redis(ENV.REDIS_URL, {
             lazyConnect: true,
             maxRetriesPerRequest: 2,
             enableOfflineQueue: false,

@@ -221,24 +221,24 @@ export default class CapsuleUpload {
 
     private static storage(): { client: MinioClient; bucket: string } {
         if (
-            !ENV.SERVER_MINIO_URL ||
-            !ENV.SERVER_MINIO_ACCESS_KEY ||
-            !ENV.SERVER_MINIO_SECRET_KEY ||
-            !ENV.SERVER_PRODUCT_DIFF_BUCKET
+            !ENV.MINIO_URL ||
+            !ENV.MINIO_ACCESS_KEY ||
+            !ENV.MINIO_SECRET_KEY ||
+            !ENV.PRODUCT_DIFF_BUCKET
         ) {
             throw new Error("MinIO Product Diff storage is not configured");
         }
 
-        const endpoint = new URL(ENV.SERVER_MINIO_URL);
+        const endpoint = new URL(ENV.MINIO_URL);
         return {
             client: new MinioClient({
                 endPoint: endpoint.hostname,
                 port: Number(endpoint.port || (endpoint.protocol === "https:" ? 443 : 80)),
                 useSSL: endpoint.protocol === "https:",
-                accessKey: ENV.SERVER_MINIO_ACCESS_KEY,
-                secretKey: ENV.SERVER_MINIO_SECRET_KEY,
+                accessKey: ENV.MINIO_ACCESS_KEY,
+                secretKey: ENV.MINIO_SECRET_KEY,
             }),
-            bucket: ENV.SERVER_PRODUCT_DIFF_BUCKET,
+            bucket: ENV.PRODUCT_DIFF_BUCKET,
         };
     }
 }

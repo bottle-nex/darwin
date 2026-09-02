@@ -4,6 +4,7 @@ import {
     HarnessIcon,
     SettingsApiKeysIcon,
     SettingsAppearanceIcon,
+    SettingsConnectorsIcon,
     SettingsGeneralIcon,
     SettingsIntegrationsIcon,
     SettingsTemplatesIcon,
@@ -40,6 +41,13 @@ export const ACCOUNT_SETTINGS: SettingsItem[] = [
         description: "Let Claude file issues over MCP.",
         icon: SettingsApiKeysIcon,
         facets: ["MCP server URL", "New key", "Revoke keys"],
+    },
+    {
+        tab: PlaygroundTab.SettingsConnectors,
+        label: "Connectors",
+        description: "Where agent questions reach you.",
+        icon: SettingsConnectorsIcon,
+        facets: ["Slack", "Telegram", "Connect", "Disconnect"],
     },
 ];
 

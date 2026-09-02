@@ -144,13 +144,13 @@ export default class ProductDiffRunner {
                 log,
             );
 
-            const sandbox = await Sandbox.connect(sandbox_id, { apiKey: ENV.SERVER_E2B_API_KEY });
+            const sandbox = await Sandbox.connect(sandbox_id, { apiKey: ENV.VM_E2B_API_KEY });
             const status = await this.generate(sandbox, product_diff_id, row.baseSha, row.headSha);
             return status;
         } catch (error) {
             const failure = describe_failure("generate capsule diff", error, [
                 token,
-                ENV.SERVER_CLAUDE_CODE_OAUTH_TOKEN,
+                ENV.VM_CLAUDE_CODE_OAUTH_TOKEN,
             ]);
             log.error("capsule diff run failed", new Error(failure.message), {
                 productDiff: product_diff_id,

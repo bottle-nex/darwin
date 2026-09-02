@@ -24,7 +24,7 @@ function resolve_config(
     model: string;
     effort: Effort | null;
 } {
-    return config ?? { harness: Harness.Claude, model: ENV.SERVER_SOLVE_MODEL, effort: null };
+    return config ?? { harness: Harness.Claude, model: ENV.VM_SOLVE_MODEL, effort: null };
 }
 
 export default class IssueSolver {

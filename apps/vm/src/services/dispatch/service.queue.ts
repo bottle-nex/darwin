@@ -75,7 +75,7 @@ export default class QueueService {
                 // each job now drives a whole sandbox run (possibly many issues), not a
                 // quick db update — concurrency:1 would serialize every worker in the
                 // fleet through a single job at a time.
-                concurrency: ENV.SERVER_VM_DISPATCH_CONCURRENCY,
+                concurrency: ENV.VM_DISPATCH_CONCURRENCY,
             },
         );
 
@@ -94,7 +94,7 @@ export default class QueueService {
             run_product_diff_job,
             {
                 connection: queue_config.connection!,
-                concurrency: ENV.SERVER_PRODUCT_DIFF_CONCURRENCY,
+                concurrency: ENV.VM_PRODUCT_DIFF_CONCURRENCY,
                 lockDuration: PRODUCT_DIFF_LOCK_MS,
                 stalledInterval: PRODUCT_DIFF_STALL_CHECK_MS,
                 maxStalledCount: 0,

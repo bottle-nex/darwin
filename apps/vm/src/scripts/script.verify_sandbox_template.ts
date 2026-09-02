@@ -116,7 +116,7 @@ async function main() {
         template: `${TEMPLATE_NAME}:${TEMPLATE_TAG}`,
     });
     const sandbox = await Sandbox.create(`${TEMPLATE_NAME}:${TEMPLATE_TAG}`, {
-        apiKey: ENV.SERVER_E2B_API_KEY,
+        apiKey: ENV.VM_E2B_API_KEY,
         timeoutMs: 5 * 60_000,
     });
 
