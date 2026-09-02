@@ -13,6 +13,7 @@ import MyIssuesDisplay from "@/components/playground/Home/MyIssuesDisplay/MyIssu
 import ChatsDisplay from "@/components/playground/Home/panes/ChatsDisplay";
 import ApiKeysSettingsSection from "@/components/playground/Home/SettingsDisplay/ApiKeysSettingsSection";
 import AppearanceSettingsSection from "@/components/playground/Home/SettingsDisplay/AppearanceSettingsSection";
+import ConnectorsSettingsSection from "@/components/playground/Home/SettingsDisplay/ConnectorsSettingsSection";
 import SettingsOverviewDisplay from "@/components/playground/Home/SettingsDisplay/overview/SettingsOverviewDisplay";
 import SettingsBreadcrumb from "@/components/playground/Home/SettingsDisplay/SettingsBreadcrumb";
 import SettingsDisplay from "@/components/playground/Home/SettingsDisplay/SettingsDisplay";
@@ -84,6 +85,12 @@ function SettingsPane({ tab }: { tab: string }) {
             return (
                 <SettingsPaneShell sectionKey={tab}>
                     <ApiKeysSettingsSection />
+                </SettingsPaneShell>
+            );
+        case PlaygroundTab.SettingsConnectors:
+            return (
+                <SettingsPaneShell sectionKey={tab}>
+                    <ConnectorsSettingsSection />
                 </SettingsPaneShell>
             );
         case PlaygroundTab.SettingsProject:

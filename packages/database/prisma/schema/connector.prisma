@@ -1,0 +1,68 @@
+model Connector {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  provider Provider
+  status   ConnectorStatus @default(Active)
+
+  externalUserId String
+  externalChatId String
+
+  ciphertext String? @db.Text
+  iv         String?
+  authTag    String?
+
+  deliveries QuestionDelivery[]
+
+  connectedAt DateTime  @default(now())
+  revokedAt   DateTime?
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([userId, provider])
+  @@unique([provider, externalUserId])
+  @@index([userId, status])
+}
+
+model ConnectorLinkToken {
+  id     String @id @default(cuid())
+  token  String @unique
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  provider Provider
+
+  expiresAt  DateTime
+  consumedAt DateTime?
+
+  createdAt DateTime @default(now())
+
+  @@index([userId, provider])
+}
+
+model QuestionDelivery {
+  id          String        @id @default(cuid())
+  questionId  String
+  question    AgentQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  connectorId String
+  connector   Connector     @relation(fields: [connectorId], references: [id], onDelete: Cascade)
+
+  externalMessageId String
+  externalChatId    String
+
+  deliveredAt  DateTime  @default(now())
+  supersededAt DateTime?
+
+  @@unique([connectorId, externalMessageId])
+  @@index([questionId])
+}
+
+enum Provider {
+  Slack
+  Telegram
+}
+
+enum ConnectorStatus {
+  Active
+  Revoked
+}

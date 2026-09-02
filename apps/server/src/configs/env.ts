@@ -58,6 +58,14 @@ const envSchema = z.object({
         .min(1, "GitHub App private key (base64-encoded PEM) is required"),
     SERVER_GITHUB_APP_WEBHOOK_SECRET: z.string().min(1, "GitHub App webhook secret is required"),
     SERVER_OPENROUTER_API_KEY: z.string().min(1, "Open router API key is required"),
+    SLACK_CLIENT_ID: z.string().optional(),
+    SLACK_CLIENT_SECRET: z.string().optional(),
+    SLACK_SIGNING_SECRET: z.string().optional(),
+    TELEGRAM_BOT_TOKEN: z.string().optional(),
+    TELEGRAM_BOT_USERNAME: z.string().optional(),
+    TELEGRAM_WEBHOOK_SECRET: z.string().optional(),
+    SERVER_AGENT_QUESTION_TTL_SECONDS: z.coerce.number().default(86400),
+    SERVER_CONNECTOR_LINK_TTL_SECONDS: z.coerce.number().default(600),
 });
 
 function parseEnv() {

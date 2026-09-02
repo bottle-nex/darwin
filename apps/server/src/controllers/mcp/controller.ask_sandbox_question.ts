@@ -1,11 +1,13 @@
-import { prisma, SetupQuestionType, SetupStatus } from "@trymatcha/database";
+import { AgentQuestionType, prisma, SetupStatus } from "@trymatcha/database";
 import type { Request, Response } from "express";
 import { z } from "zod";
 
+import { ENV } from "../../configs/env";
+import ConnectorService from "../../services/connectors/service.connector";
 import ResponseWriter from "../../services/service.response";
 
 const body_schema = z.object({
-    type: z.enum(SetupQuestionType),
+    type: z.enum(AgentQuestionType),
     key: z.string().min(1),
     prompt: z.string().min(1),
     options: z.array(z.string()).optional(),
@@ -26,14 +28,17 @@ export default class AskSandboxQuestion {
                 return;
             }
 
+            const expires_at = new Date(Date.now() + ENV.SERVER_AGENT_QUESTION_TTL_SECONDS * 1000);
+
             const [question] = await Promise.all([
-                prisma.setupQuestion.create({
+                prisma.agentQuestion.create({
                     data: {
-                        sessionId: session_id,
+                        setupSessionId: session_id,
                         type: data.type,
                         key: data.key,
                         prompt: data.prompt,
                         options: data.options ?? [],
+                        expiresAt: expires_at,
                     },
                 }),
                 prisma.setupSession.update({
@@ -42,10 +47,14 @@ export default class AskSandboxQuestion {
                 }),
             ]);
 
-            // TODO: notify the project owner/team a setup question is waiting (email/push/socket)
-            console.log(`[setup] session ${session_id} asked "${data.key}": ${data.prompt}`);
+            const delivered = await ConnectorService.deliver(question);
+            if (delivered === 0) {
+                console.warn(
+                    `[setup] session ${session_id} asked "${data.key}" with no reachable connector`,
+                );
+            }
 
-            ResponseWriter.created(res, { question_id: question.id });
+            ResponseWriter.created(res, { question_id: question.id, delivered });
         } catch (error) {
             console.error("error in asking sandbox question: ", error);
             ResponseWriter.system_error(res);

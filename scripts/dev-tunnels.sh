@@ -73,6 +73,8 @@ echo ""
 echo "  VM_PUBLIC_URL=$NGROK_URL"
 echo "  PUBLIC_API_URL=$CF_URL"
 echo ""
+"$ROOT/scripts/register-connectors.sh" || echo "connector registration failed — run scripts/register-connectors.sh by hand"
+
 echo "written to .env — restart the vm worker AND the server so they read it."
 echo "ctrl-c here stops both tunnels."
 echo ""

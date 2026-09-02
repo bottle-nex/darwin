@@ -2,6 +2,7 @@ import { createIcon } from "./createIcon";
 import {
     HiOutlineArrowLeft,
     HiOutlineArrowsRightLeft,
+    HiOutlineBellAlert,
     HiOutlineBriefcase,
     HiOutlineCheckBadge,
     HiOutlineCog6Tooth,
@@ -82,6 +83,8 @@ export const SettingsBackIcon = createIcon(HiOutlineArrowLeft);
 export const SettingsIcon = createIcon(IoMdSettings);
 
 export const SettingsIntegrationsIcon = createIcon(HiPuzzlePiece);
+
+export const SettingsConnectorsIcon = createIcon(HiOutlineBellAlert);
 
 export const SettingsOverviewIcon = createIcon(HiSquares2X2);
 

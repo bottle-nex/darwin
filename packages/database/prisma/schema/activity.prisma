@@ -72,6 +72,7 @@ model AgentSession {
   logsSizeBytes    Int     @default(0)
 
   activities IssueActivity[]
+  questions  AgentQuestion[]
 
   startedAt DateTime  @default(now())
   endedAt   DateTime?

@@ -84,6 +84,8 @@ model User {
   apiKeys              ApiKey[]
   config               UserConfig?
   githubImportConfigs  GithubIssueImport[]   @relation(name: "GithubImportConfigurer")
+  connectors           Connector[]
+  connectorLinkTokens  ConnectorLinkToken[]
 }
 
 model UserConfig {

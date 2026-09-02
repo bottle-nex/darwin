@@ -1,4 +1,4 @@
-import { prisma, SetupQuestionStatus } from "@trymatcha/database";
+import { AgentQuestionStatus, prisma } from "@trymatcha/database";
 import type { Request, Response } from "express";
 import { z } from "zod";
 
@@ -23,12 +23,23 @@ export default class GetSandboxAnswer {
                 return;
             }
 
-            const question = await prisma.setupQuestion.findFirst({
-                where: { sessionId: session_id, key: data.key },
+            const question = await prisma.agentQuestion.findFirst({
+                where: { setupSessionId: session_id, key: data.key },
                 orderBy: { askedAt: "desc" },
             });
 
-            if (!question || question.status !== SetupQuestionStatus.Answered) {
+            if (question?.status === AgentQuestionStatus.Cancelled) {
+                ResponseWriter.custom(
+                    res,
+                    true,
+                    "QUESTION_CANCELLED",
+                    "nobody answered in time — proceed with your best judgement",
+                    200,
+                );
+                return;
+            }
+
+            if (!question || question.status !== AgentQuestionStatus.Answered) {
                 ResponseWriter.custom(res, true, "WAITING_FOR_ANSWER", "waiting for answer", 202);
                 return;
             }

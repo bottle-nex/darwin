@@ -14,7 +14,7 @@ import {
     LuSquareKanban,
     LuSquareTerminal,
 } from "react-icons/lu";
-import { RiRocketFill, RiSlackFill, RiTeamFill } from "react-icons/ri";
+import { RiRocketFill, RiSlackFill, RiTeamFill, RiTelegram2Fill } from "react-icons/ri";
 import { SiJira, SiLinear, SiNotion } from "react-icons/si";
 
 export const AttachmentCountIcon = createIcon(LuPaperclip);
@@ -62,5 +62,7 @@ export const ShowcaseSubtaskCountIcon = createIcon(BsArrowReturnRight);
 export const ShowcaseTimelineViewIcon = createIcon(BsBarChartSteps);
 
 export const SlackLogoIcon = createIcon(RiSlackFill);
+
+export const TelegramLogoIcon = createIcon(RiTelegram2Fill);
 
 export const XLogoIcon = createIcon(FaXTwitter);

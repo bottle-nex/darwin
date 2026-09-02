@@ -88,6 +88,10 @@ const TAB_TRAILS: Partial<Record<PlaygroundTab, PlaygroundBreadcrumbSegment[]>> 
         { label: "Settings", target: SETTINGS_BREADCRUMB_TARGET },
         "API keys",
     ],
+    [PlaygroundTab.SettingsConnectors]: [
+        { label: "Settings", target: SETTINGS_BREADCRUMB_TARGET },
+        "Connectors",
+    ],
     [PlaygroundTab.SettingsProject]: [
         { label: "Settings", target: SETTINGS_BREADCRUMB_TARGET },
         "General",

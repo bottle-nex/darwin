@@ -21,6 +21,11 @@ app.use(
     }),
 );
 app.use("/api/v1/github/webhook", express.raw({ type: "application/json", limit: "5mb" }));
+app.use("/api/v1/connectors/slack/events", express.raw({ type: "application/json", limit: "1mb" }));
+app.use(
+    "/api/v1/connectors/slack/interactions",
+    express.raw({ type: "application/x-www-form-urlencoded", limit: "1mb" }),
+);
 app.use(express.json());
 app.use("/api/v1", v1_router);
 
