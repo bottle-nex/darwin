@@ -9,6 +9,7 @@ import PlaygroundAvatar, {
     initialOf,
     toneFor,
 } from "@/components/playground/Core/components/PlaygroundAvatar";
+import SelectableRow from "@/components/playground/Core/components/SelectableRow";
 import { Button } from "@/components/ui/button";
 import {
     DropdownMenu,
@@ -17,13 +18,20 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import useRevokeInvite from "@/hooks/invitations/useRevokeInvite";
+import { useMemberSelection } from "@/hooks/team/useMemberSelection";
 import { formatDate } from "@/lib/format";
 import type { PendingInviteDetail, TeamMemberDetail } from "@/types/team";
+import { inviteSelectionKey, memberSelectionKey } from "@/types/team";
 import { INVITATION_STATUS } from "@/types/types.invitation";
 
 import ProjectRoleTicker from "./ProjectRoleTicker";
+import TeamRoleTicker from "./TeamRoleTicker";
 
-type MemberDetailProps = { teamId: string } & (
+type MemberDetailProps = {
+    teamId: string;
+    joinedAbove?: boolean;
+    joinedBelow?: boolean;
+} & (
     | {
           teamMember: TeamMemberDetail;
           pendingMember?: never;
@@ -38,8 +46,16 @@ export default function PlaygroundTeamMemberRow({
     teamMember,
     pendingMember,
     teamId,
+    joinedAbove,
+    joinedBelow,
 }: MemberDetailProps) {
     const isMember = !!teamMember;
+    const { selectedIds, isSelected, toggleSelection } = useMemberSelection();
+
+    const selectionKey = isMember
+        ? memberSelectionKey(teamMember.user.id)
+        : inviteSelectionKey(pendingMember.id);
+    const selected = isSelected(selectionKey);
 
     const user = isMember
         ? teamMember.user
@@ -55,47 +71,64 @@ export default function PlaygroundTeamMemberRow({
     const joined = isMember ? teamMember.createdAt : pendingMember.sentAt;
 
     return (
-        <div className="grid grid-cols-[1fr_120px_140px] items-center gap-4 rounded-md px-2.5 py-2 hover:bg-neutral-800/50 cursor-pointer">
-            <div className="flex min-w-0 items-center gap-3">
-                <PlaygroundAvatar
-                    size="lg"
-                    className="rounded-full"
-                    src={user.image}
-                    letter={initialOf(user.name, user.email)}
-                    tone={toneFor(toneKey)}
-                />
-                <div className="min-w-0">
-                    <p className="truncate text-[13px] leading-3 font-medium text-neutral-100">
-                        {name}
-                    </p>
-                    <p className="truncate text-[12px] text-neutral-400 font-medium">{secondary}</p>
+        <SelectableRow
+            data-member-id={selectionKey}
+            selected={selected}
+            selectionActive={selectedIds.length > 0}
+            joinedAbove={joinedAbove}
+            joinedBelow={joinedBelow}
+            selectionLabel={selected ? `Deselect ${name}` : `Select ${name}`}
+            onToggleSelection={() => toggleSelection(selectionKey)}
+            className="cursor-pointer px-2.5 py-2"
+        >
+            <div className="grid min-w-0 flex-1 grid-cols-[1fr_120px_120px_140px] items-center gap-4">
+                <div className="flex min-w-0 items-center gap-3">
+                    <PlaygroundAvatar
+                        size="lg"
+                        className="rounded-full"
+                        src={user.image}
+                        letter={initialOf(user.name, user.email)}
+                        tone={toneFor(toneKey)}
+                    />
+                    <div className="min-w-0">
+                        <p className="truncate text-[13px] leading-3 font-medium text-neutral-100">
+                            {name}
+                        </p>
+                        <p className="truncate text-[12px] font-medium text-neutral-400">
+                            {secondary}
+                        </p>
+                    </div>
                 </div>
-            </div>
 
-            <div className="min-w-0">
-                {isMember ? (
-                    teamMember.projectRole ? (
+                <div className="min-w-0">
+                    {isMember ? (
+                        <TeamRoleTicker role={teamMember.role} />
+                    ) : (
+                        <span className="inline-flex max-w-full items-center gap-x-1.25 truncate rounded-[4px] bg-pink-400/10 px-2 py-0.5 text-[11px] font-medium text-pink-300">
+                            {pendingMember.status}
+                            <InvitationPendingIcon size={14} />
+                        </span>
+                    )}
+                </div>
+
+                <div className="min-w-0">
+                    {isMember && teamMember.projectRole ? (
                         <ProjectRoleTicker role={teamMember.projectRole} />
                     ) : (
                         <span className="inline-flex items-center rounded-full bg-white/5 px-2 py-0.5 text-[11px] font-medium text-neutral-500">
                             —
                         </span>
-                    )
-                ) : (
-                    <span className="inline-flex gap-x-1.25 max-w-full items-center truncate rounded-[4px] bg-pink-400/10 px-2 py-0.5 text-[11px] font-medium text-pink-300">
-                        {pendingMember.status}
-                        <InvitationPendingIcon size={14} />
-                    </span>
-                )}
-            </div>
+                    )}
+                </div>
 
-            <div className="flex items-center justify-between text-[12px] text-neutral-400">
-                <span>{formatDate(joined)}</span>
-                {!isMember && pendingMember.status === INVITATION_STATUS.PENDING && (
-                    <RevokeInviteMenu invitationId={pendingMember.id} teamId={teamId} />
-                )}
+                <div className="flex items-center justify-between text-[12px] text-neutral-400">
+                    <span>{formatDate(joined)}</span>
+                    {!isMember && pendingMember.status === INVITATION_STATUS.PENDING && (
+                        <RevokeInviteMenu invitationId={pendingMember.id} teamId={teamId} />
+                    )}
+                </div>
             </div>
-        </div>
+        </SelectableRow>
     );
 }
 
@@ -109,6 +142,9 @@ function RevokeInviteMenu({ invitationId, teamId }: { invitationId: string; team
                     variant="unstyled"
                     loading={isPending}
                     iconOnly
+                    data-row-editor
+                    onPointerDown={(event) => event.stopPropagation()}
+                    onClick={(event) => event.stopPropagation()}
                     className="rounded-sm p-0.5 text-neutral-500 outline-none hover:text-neutral-200 disabled:opacity-50 [&_svg]:size-4"
                     aria-label="Invite actions"
                 >

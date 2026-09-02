@@ -19,7 +19,7 @@ export function SelectionBarButton({
             variant="unstyled"
             type="button"
             className={cn(
-                "flex cursor-pointer items-center gap-1.25 rounded-lg border border-snow/5 bg-snow/4 py-1.25 pr-3.5 pl-3 text-[11px] text-snow shadow-sm shadow-black/7 transition-colors hover:bg-snow/6",
+                "flex cursor-pointer items-center gap-1.25 rounded-full border border-snow/5 bg-snow/4 py-1.25 pr-3.5 pl-3 text-[11px] text-snow shadow-sm shadow-black/7 transition-colors hover:bg-snow/6",
                 className,
             )}
             {...props}
@@ -62,7 +62,7 @@ export default function SelectionBar({
                     }}
                     className="pointer-events-none absolute inset-x-0 bottom-6 z-40 flex justify-center"
                 >
-                    <div className="pointer-events-auto flex items-center gap-1 rounded-lg bg-cement py-1.75 pr-2 pl-5 shadow-xl shadow-black/20">
+                    <div className="pointer-events-auto flex items-center gap-1 rounded-full bg-cement py-1.75 pr-2 pl-5 shadow-lg shadow-black/30">
                         <span className="text-[13px] text-snow/90">{count} selected</span>
                         {hint && (
                             <span className="hidden text-[12px] text-neutral-500 sm:inline">

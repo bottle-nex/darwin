@@ -1,6 +1,12 @@
 "use client";
 
-import { AddIcon, ChatsNavIcon, DeleteIcon, OverflowMenuIcon } from "@trymatcha/ui/icons";
+import {
+    AddIcon,
+    ChatsNavIcon,
+    DeleteIcon,
+    OverflowMenuIcon,
+    TeamEntityIcon,
+} from "@trymatcha/ui/icons";
 import { useParams } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
@@ -58,7 +64,7 @@ export default function PlaygroundSidebarTeamsSection() {
     }
 
     return (
-        <Section title="Teams">
+        <Section title="Teams" variant="tree" icon={TeamEntityIcon}>
             {teams.map((t) => {
                 const isActive = selectedTeam?.id === t.id;
                 return (
@@ -75,6 +81,7 @@ export default function PlaygroundSidebarTeamsSection() {
                                 tone: "indigo",
                             })}
                             active={isActive}
+                            indent={12}
                             onClick={() => openTeam(t, projectSlug ?? "")}
                         />
                         {(t.viewerRole || isAdmin) && (
@@ -120,6 +127,7 @@ export default function PlaygroundSidebarTeamsSection() {
                 <Row
                     label="Add team"
                     leading={{ kind: "icon", icon: AddIcon }}
+                    indent={12}
                     onClick={openCreateTeam}
                 />
             )}

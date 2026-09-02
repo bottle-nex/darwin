@@ -5,8 +5,10 @@ import { MergeIcon } from "@trymatcha/ui/icons";
 import LogoLoader from "@/components/app/LogoLoader";
 import { PLAYGROUND_PANE_SHELL } from "@/components/playground/Core/components/paneBar";
 import PaneColumns from "@/components/playground/Core/components/PaneColumns";
+import PaneFallback from "@/components/playground/Core/components/PaneFallback";
 import PlaygroundBreadcrumb from "@/components/playground/Core/components/PlaygroundBreadcrumb";
 import { PaneLeadSlot } from "@/components/playground/Core/components/PlaygroundPaneSlots";
+import ReadOnlyIssueProperties from "@/components/playground/Issue/ReadOnlyIssueProperties";
 import { Button } from "@/components/ui/button";
 import { useReview } from "@/hooks/review/useReview";
 import { useEscapeExit } from "@/hooks/shortcuts/useEscapeExit";
@@ -17,7 +19,6 @@ import ChangesReviewDisplay from "./changes/ChangesReviewDisplay";
 import DiffReviewDisplay from "./diff/DiffReviewDisplay";
 import PullRequestReviewDisplay from "./pull-request/PullRequestReviewDisplay";
 import ReviewHeader from "./ReviewHeader";
-import ReviewIssueProperties from "./ReviewIssueProperties";
 
 type ReviewRoute = Extract<PaneRoute, { kind: "review" }>;
 
@@ -29,18 +30,18 @@ export default function ReviewDisplay({ route }: { route: ReviewRoute }) {
 
     useEscapeExit({ onExit: () => (review ? openIssue(review.issueId) : openBoard()) });
 
-    if (isPending) return <ReviewFallback>{null}</ReviewFallback>;
+    if (isPending) return <PaneFallback />;
 
     if (!review) {
         return (
-            <ReviewFallback>
+            <PaneFallback>
                 <p className="text-[14.5px] text-neutral-500">
                     This pull request is no longer available.
                 </p>
                 <Button size="xs" variant="tertiary" onClick={openBoard}>
                     Back to board
                 </Button>
-            </ReviewFallback>
+            </PaneFallback>
         );
     }
 
@@ -84,26 +85,9 @@ function ReviewTabPanels({
 
         case ReviewTab.PullRequest:
             return (
-                <PaneColumns aside={<ReviewIssueProperties issueId={review.issueId} />}>
+                <PaneColumns aside={<ReadOnlyIssueProperties issueId={review.issueId} />}>
                     <PullRequestReviewDisplay projectId={projectId} review={review} />
                 </PaneColumns>
             );
     }
-}
-
-function ReviewFallback({ children }: { children: React.ReactNode }) {
-    return (
-        <main className={PLAYGROUND_PANE_SHELL}>
-            <PaneLeadSlot>
-                <PlaygroundBreadcrumb />
-            </PaneLeadSlot>
-            {children ? (
-                <div className="flex flex-1 flex-col items-center justify-center gap-y-3">
-                    {children}
-                </div>
-            ) : (
-                <LogoLoader className="h-full w-full text-snow" />
-            )}
-        </main>
-    );
 }

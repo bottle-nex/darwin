@@ -1,7 +1,8 @@
+import { BiSolidCopy } from "react-icons/bi";
 import { createIcon } from "./createIcon";
 import { BsReply } from "react-icons/bs";
 import { GrReturn } from "react-icons/gr";
-import { HiPencilSquare } from "react-icons/hi2";
+import { HiPencilSquare, HiUserPlus } from "react-icons/hi2";
 import { IoPencilSharp } from "react-icons/io5";
 import { LuCopyPlus, LuExternalLink, LuUserPlus } from "react-icons/lu";
 import {
@@ -10,7 +11,6 @@ import {
     MdChecklist,
     MdClose,
     MdColorize,
-    MdContentCopy,
     MdDelete,
     MdDragIndicator,
     MdEdit,
@@ -42,7 +42,7 @@ export const CommandKeyIcon = createIcon(MdOutlineKeyboardCommandKey);
 
 export const ComposeIssueIcon = createIcon(IoPencilSharp);
 
-export const CopyIcon = createIcon(MdContentCopy);
+export const CopyIcon = createIcon(BiSolidCopy);
 
 export const DeleteIcon = createIcon(MdDelete);
 
@@ -64,7 +64,7 @@ export const ImportUploadIcon = createIcon(MdUpload);
 
 export const InvitationPendingIcon = createIcon(MdJoinLeft);
 
-export const InviteMemberIcon = createIcon(LuUserPlus);
+export const InviteMemberIcon = createIcon(HiUserPlus);
 
 export const LogoutIcon = createIcon(MdLogout);
 

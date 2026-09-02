@@ -1,11 +1,13 @@
 "use client";
 
-import { DropdownCaretIcon } from "@trymatcha/ui/icons";
+import { DropdownCaretIcon, type IconType } from "@trymatcha/ui/icons";
 import { motion, type Variants } from "motion/react";
 import { Children, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+
+import TreeBranch from "./SidebarTreeBranch";
 
 const HEIGHT_SPRING = { type: "spring", stiffness: 800, damping: 48, mass: 0.6 } as const;
 
@@ -27,20 +29,24 @@ const ROW_VARIANTS: Variants = {
 
 type SectionProps = {
     title: string;
+    icon?: IconType;
     action?: React.ReactNode;
     defaultOpen?: boolean;
-    variant?: "header" | "inline";
+    variant?: "header" | "inline" | "tree";
     children: React.ReactNode;
 };
 
 export default function PlaygroundSidebarSection({
     title,
+    icon: Icon,
     action,
     defaultOpen = true,
     variant = "header",
     children,
 }: SectionProps) {
     const [open, setOpen] = useState(defaultOpen);
+    const isTree = variant === "tree";
+    const rows = Children.toArray(children) as React.ReactElement[];
 
     return (
         <section className="flex flex-col">
@@ -50,16 +56,24 @@ export default function PlaygroundSidebarSection({
                     type="button"
                     onClick={() => setOpen((v) => !v)}
                     className={cn(
-                        "group flex flex-1 cursor-pointer items-center gap-x-2 rounded-md py-1.5 text-left ring-inset focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-hidden",
-                        variant === "header"
-                            ? "px-2 text-[12px] font-medium text-neutral-500 capitalize"
-                            : "px-2 text-[12px] font-medium text-neutral-400",
+                        "group flex flex-1 cursor-pointer items-center rounded-md text-left ring-inset focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-hidden",
+                        variant === "header" &&
+                            "gap-x-2 px-2 py-1.5 text-[12px] font-medium text-neutral-500 capitalize",
+                        variant === "inline" &&
+                            "gap-x-2 px-2 py-1.5 text-[12px] font-medium text-neutral-400",
+                        isTree &&
+                            "gap-1 rounded-[5px] px-2 py-1 text-[12.5px] font-medium tracking-wider text-snow/65 hover:bg-hover hover:text-neutral-100",
                     )}
                 >
-                    <span>{title}</span>
+                    {isTree && (
+                        <span className="flex size-5 shrink-0 items-center justify-center">
+                            {Icon && <Icon className="size-4" aria-hidden />}
+                        </span>
+                    )}
+                    <span className={cn("truncate", isTree && "min-w-0 flex-1")}>{title}</span>
                     <DropdownCaretIcon
                         className={cn(
-                            "size-3 text-neutral-500 transition-transform",
+                            "size-3 shrink-0 text-neutral-500 transition-transform",
                             !open && "-rotate-90",
                         )}
                         aria-hidden
@@ -72,11 +86,18 @@ export default function PlaygroundSidebarSection({
                 initial={false}
                 animate={open ? "open" : "closed"}
                 variants={CONTAINER_VARIANTS}
-                className="flex flex-col gap-0.5 overflow-hidden"
+                className={cn("flex flex-col overflow-hidden", isTree ? "pl-2.5" : "gap-0.5")}
                 aria-hidden={!open}
             >
-                {Children.map(children, (child) => (
-                    <motion.div variants={ROW_VARIANTS}>{child}</motion.div>
+                {rows.map((child, index) => (
+                    <motion.div
+                        key={child.key}
+                        variants={ROW_VARIANTS}
+                        className={cn(isTree && "relative")}
+                    >
+                        {child}
+                        {isTree && <TreeBranch last={index === rows.length - 1} />}
+                    </motion.div>
                 ))}
             </motion.div>
         </section>

@@ -18,6 +18,7 @@ const Action = {
         delete: "delete",
         create_team: "create_team",
         manage_team: "manage_team",
+        change_member_role: "change_member_role",
         create_issue: "create_issue",
         triage_issue: "triage_issue",
         close_issue: "close_issue",

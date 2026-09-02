@@ -1,13 +1,21 @@
 "use client";
-import { targetForIssue } from "@/components/playground/Issue/issueHelpers";
-import IssueProperties from "@/components/playground/Issue/IssueProperties";
-import { useIssueForm } from "@/components/playground/Issue/useIssueForm";
 import { useBoardColumns } from "@/hooks/issues/useBoardColumns";
 import { useIssue } from "@/hooks/issues/useIssue";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import type { BoardColumn, BoardIssue } from "@/types/board";
 
-export default function ReviewIssueProperties({ issueId }: { issueId: string }) {
+import { targetForIssue } from "./issueHelpers";
+import IssueProperties from "./IssueProperties";
+import { useIssueForm } from "./useIssueForm";
+
+/**
+ * The issue's properties column, fetched by id and not editable.
+ *
+ * What a pane that is showing something belonging to an issue — a pull request, a solve
+ * report — puts beside it, so the issue's own state stays on screen without that pane having
+ * to own an issue form of its own.
+ */
+export default function ReadOnlyIssueProperties({ issueId }: { issueId: string }) {
     const projectId = useActiveProject()?.id;
     const { data: issue } = useIssue(projectId, issueId);
     const { data: metadata } = useBoardColumns(projectId);

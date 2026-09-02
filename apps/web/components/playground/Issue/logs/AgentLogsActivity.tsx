@@ -68,7 +68,7 @@ export default function AgentLogsActivity({ session }: { session: AgentSession }
                     <CopyLogButton
                         label="Copy the whole log"
                         text={wholeLog}
-                        className="absolute top-1/2 right-9 -translate-y-1/2"
+                        className="absolute top-1/2 right-9 -translate-y-1/2 active:scale-[0.98]"
                     />
                 )}
             </div>

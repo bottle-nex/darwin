@@ -11,10 +11,11 @@ export const useCommandContextStore = create<CommandContextState>((set) => ({
     projectId: null,
     issueId: null,
     spaceId: null,
+    teamId: null,
     setContext: (context) => set(context),
 }));
 
 export function commandContext(): CommandContext {
-    const { orgSlug, projectId, issueId, spaceId } = useCommandContextStore.getState();
-    return { orgSlug, projectId, issueId, spaceId };
+    const { orgSlug, projectId, issueId, spaceId, teamId } = useCommandContextStore.getState();
+    return { orgSlug, projectId, issueId, spaceId, teamId };
 }

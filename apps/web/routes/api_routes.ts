@@ -77,6 +77,8 @@ export const GET_TEAM_MEMBERS = (teamId: string) => `${API_URL}/teams/${teamId}/
 export const DELETE_TEAM = (teamId: string) => `${API_URL}/teams/${teamId}`;
 export const CHANGE_MEMBER_AUTHORITY = API_URL + "/teams/change-authority";
 export const REMOVE_MEMBERS = API_URL + "/teams/remove-members";
+export const CHANGE_PROJECT_ROLE = (project_id: string) =>
+    `${PROJECT_URL}/${project_id}/members/role`;
 
 export const GITHUB_URL = API_URL + "/github";
 export const GITHUB_CONNECT_START = GITHUB_URL + "/connect/start";

@@ -16,10 +16,12 @@ import useInviteTeamMember from "@/hooks/invitations/useInviteTeamMember";
 import { useGetTeamMembers } from "@/hooks/team/useGetTeamMembers";
 import { toast } from "@/lib/toast";
 import { useDeleteTeamStore } from "@/store/team/useDeleteTeamStore";
-import { useUserSessionStore } from "@/store/user/useUserSessionStore";
 import type { ProjectTeam } from "@/types/project";
 
 import OptionButton from "../../Home/KanbanDisplay/OptionsBar/KanbanOptionPanels/OptionButton";
+import MembersSelectionBar from "./MembersSelectionBar";
+import RemoveMembersDialog from "./RemoveMembersDialog";
+import RevokeInvitesDialog from "./RevokeInvitesDialog";
 import PlaygroundTeamMembers from "./TeamMembers";
 
 type PlaygroundTeamViewProps = {
@@ -32,7 +34,6 @@ export default function PlaygroundTeamViewMain({ team }: PlaygroundTeamViewProps
     const { orgSlug, projectSlug } = useParams<{ orgSlug: string; projectSlug?: string }>();
     const { data: dashboard } = useGetDashboard(orgSlug);
     const activeProject = dashboard?.projects.find((p) => p.slug === projectSlug);
-    const user = useUserSessionStore((s) => s.session?.user);
 
     const { data: teamData } = useGetTeamMembers(team.id);
     const isAdmin = teamData?.viewerRole === "Admin";
@@ -41,7 +42,7 @@ export default function PlaygroundTeamViewMain({ team }: PlaygroundTeamViewProps
     const invite = useInviteTeamMember();
 
     return (
-        <div className="flex min-h-0 flex-1 flex-col">
+        <div className="relative flex min-h-0 flex-1 flex-col">
             <PaneLeadSlot>
                 <PlaygroundBreadcrumb trail={[team.name]} />
             </PaneLeadSlot>
@@ -72,13 +73,21 @@ export default function PlaygroundTeamViewMain({ team }: PlaygroundTeamViewProps
 
             <PlaygroundTeamMembers teamId={team.id} />
 
+            <MembersSelectionBar teamId={team.id} />
+
+            <RemoveMembersDialog
+                teamId={team.id}
+                teamName={team.name}
+                orgId={dashboard?.org.id}
+                orgName={dashboard?.org.name ?? "this organization"}
+            />
+            <RevokeInvitesDialog teamId={team.id} />
+
             <InviteToTeamDialog
                 open={inviteOpen}
                 onOpenChange={setInviteOpen}
-                sender={{ name: user?.name, email: user?.email, image: user?.image }}
                 orgName={dashboard?.org.name ?? ""}
                 projectId={activeProject?.id ?? ""}
-                projectName={activeProject?.name ?? ""}
                 teamName={team.name}
                 teamMemberIds={teamData?.members.map((member) => member.user.id) ?? []}
                 onSubmit={({ emails, userIds, role, message }) => {

@@ -5,7 +5,6 @@ import { FileIcon, MergeIcon, PullRequestOpenIcon } from "@trymatcha/ui/icons";
 import { reviewSlugFor } from "@/components/playground/Review/reviewSlug";
 import { useSolveReports } from "@/hooks/issues/useSolveReports";
 import { usePaneRouteStore } from "@/store/playground/usePaneRouteStore";
-import { useSolveReportStore } from "@/store/playground/useSolveReportStore";
 import type { BoardIssue } from "@/types/board";
 
 import { CapsuleTrigger } from "./Capsule";
@@ -14,7 +13,7 @@ import PropertyGroup from "./PropertyGroup";
 
 export default function IssueAttachments({ issue }: { issue: BoardIssue }) {
     const openReview = usePaneRouteStore((s) => s.openReview);
-    const openSolveReport = useSolveReportStore((s) => s.open);
+    const openSolveReport = usePaneRouteStore((s) => s.openSolveReport);
     const { data: reports } = useSolveReports(issue.id);
     const pullNumber = issue.prNumber;
 
@@ -49,7 +48,7 @@ export default function IssueAttachments({ issue }: { issue: BoardIssue }) {
                     onClick={() => openSolveReport(issue.id)}
                 >
                     <FileIcon className="size-3.75! text-neutral-400" />
-                    How this was solved
+                    Solve Report
                 </CapsuleTrigger>
             )}
         </PropertyGroup>
