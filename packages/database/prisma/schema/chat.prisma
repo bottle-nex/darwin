@@ -116,7 +116,7 @@ model TeamChatReaction {
 }
 
 /// An entity tagged inside a message body. The body stores an opaque
-/// `@[member:<id>]` / `#[issue:<id>]` token, so this row carries no offset —
+/// `@[member:<id>]` / `@[team:<id>]` / `#[issue:<id>]` token, so this row carries no offset —
 /// it exists to make the reverse lookup ("where is this issue discussed?")
 /// indexable and to drive notification fan-out. Exactly one source column and
 /// exactly one target column are set, enforced by CHECK constraints that
@@ -128,12 +128,14 @@ model MessageReference {
   teamChatId    String?
   memberId      String?
   issueId       String?
+  teamId        String?
 
   chat        Chat?          @relation(fields: [chatId], references: [id], onDelete: Cascade)
   projectChat ProjectChat?   @relation(fields: [projectChatId], references: [id], onDelete: Cascade)
   teamChat    TeamChat?      @relation(fields: [teamChatId], references: [id], onDelete: Cascade)
   member      ProjectMember? @relation(fields: [memberId], references: [id], onDelete: Cascade)
   issue       Issue?         @relation(fields: [issueId], references: [id], onDelete: Cascade)
+  team        Team?          @relation(fields: [teamId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
 
@@ -142,4 +144,5 @@ model MessageReference {
   @@index([teamChatId])
   @@index([memberId])
   @@index([issueId])
+  @@index([teamId])
 }

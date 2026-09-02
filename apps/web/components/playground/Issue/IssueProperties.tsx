@@ -6,6 +6,7 @@ import HarnessCapsules from "./HarnessCapsule";
 import IssueAttachments from "./IssueAttachments";
 import IssueFieldChip from "./IssueFieldChip";
 import IssueFields from "./IssueFields";
+import IssuePullRequestTree from "./IssuePullRequestTree";
 import PropertyGroup from "./PropertyGroup";
 import type { IssueFormState } from "./useIssueForm";
 
@@ -43,6 +44,7 @@ export default function IssueProperties({
                 <HarnessCapsules harnessConfig={form.harnessConfig} />
             </PropertyGroup>
             <IssueAttachments issue={issue} />
+            <IssuePullRequestTree issue={issue} />
         </aside>
     );
 }

@@ -47,6 +47,7 @@ export interface ProjectTeam {
     id: string;
     name: string;
     slug: string;
+    icon: IconPick | null;
     viewerRole: TeamRole | null;
 }
 

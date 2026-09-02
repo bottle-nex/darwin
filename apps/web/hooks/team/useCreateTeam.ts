@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
+import { type IconPick, randomIconPick } from "@/components/ui/IconPicker";
 import { PROJECT_QUERY_KEY } from "@/hooks/project/useGetProject";
 import { apiClient } from "@/lib/axios";
 import { CREATE_TEAM } from "@/routes/api_routes";
@@ -10,6 +11,7 @@ export interface CreateTeamInput {
     name: string;
     slug: string;
     description?: string;
+    icon?: IconPick;
 }
 
 interface CreatedTeam {
@@ -20,7 +22,10 @@ export function useCreateTeam() {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: async (input: CreateTeamInput) => {
-            const res = await apiClient.post<ApiResponse<CreatedTeam>>(CREATE_TEAM, input);
+            const res = await apiClient.post<ApiResponse<CreatedTeam>>(CREATE_TEAM, {
+                ...input,
+                icon: input.icon ?? randomIconPick(),
+            });
             return res.data.data;
         },
         onSuccess: (_data, variables) => {

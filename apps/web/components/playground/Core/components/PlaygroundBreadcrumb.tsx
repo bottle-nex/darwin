@@ -46,6 +46,7 @@ export type PlaygroundBreadcrumbTarget = {
 
 export type PlaygroundBreadcrumbSegment =
     | string
+    | { label: string; icon?: IconPick | null }
     | { label: string; icon?: IconPick | null; onClick: () => void }
     | { label: string; icon?: IconPick | null; target: PlaygroundBreadcrumbTarget };
 
@@ -207,7 +208,9 @@ export default function PlaygroundBreadcrumb({
                         ? undefined
                         : "onClick" in segment
                           ? segment.onClick
-                          : () => navigate(segment.target);
+                          : "target" in segment
+                            ? () => navigate(segment.target)
+                            : undefined;
                 const current = index === segments.length - 1;
 
                 return (

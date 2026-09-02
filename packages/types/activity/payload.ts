@@ -31,6 +31,11 @@ interface WrittenActivityPayloads {
     LabelAdded: ActivityPayloadBase & { label: ActivityLabelRef };
     LabelRemoved: ActivityPayloadBase & { label: ActivityLabelRef };
     DatesChanged: ActivityPayloadBase & { from: DateRange; to: DateRange };
+    IssueReopened: ActivityPayloadBase & {
+        note: string;
+        from: ActivityLocationRef;
+        attemptNumber: number;
+    };
     RunStarted: ActivityPayloadBase & { attemptNumber: number };
     RunCompleted: ActivityPayloadBase & { attemptNumber: number; summary?: string };
     AttemptFailed: ActivityPayloadBase & { attemptNumber: number; reason: string };

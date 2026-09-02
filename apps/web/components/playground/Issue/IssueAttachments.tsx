@@ -1,9 +1,7 @@
 "use client";
-import { IssueStatus } from "@trymatcha/types";
-import { FileIcon, MergeIcon, PullRequestOpenIcon } from "@trymatcha/ui/icons";
+import { FileIcon } from "@trymatcha/ui/icons";
 
-import { reviewSlugFor } from "@/components/playground/Review/reviewSlug";
-import { useSolveReports } from "@/hooks/issues/useSolveReports";
+import { useIssueAttempts } from "@/hooks/issues/useIssueAttempts";
 import { usePaneRouteStore } from "@/store/playground/usePaneRouteStore";
 import type { BoardIssue } from "@/types/board";
 
@@ -12,45 +10,18 @@ import { STACKED_CAPSULE } from "./issueHelpers";
 import PropertyGroup from "./PropertyGroup";
 
 export default function IssueAttachments({ issue }: { issue: BoardIssue }) {
-    const openReview = usePaneRouteStore((s) => s.openReview);
     const openSolveReport = usePaneRouteStore((s) => s.openSolveReport);
-    const { data: reports } = useSolveReports(issue.id);
-    const pullNumber = issue.prNumber;
+    const { data } = useIssueAttempts(issue.id);
 
-    const hasPullRequest = Boolean(issue.prUrl) && pullNumber !== null;
-    const hasReport = Boolean(reports?.length);
-
-    if (!hasPullRequest && !hasReport) return null;
-
-    const merged = issue.status === IssueStatus.Done;
-    const PullRequestIcon = merged ? MergeIcon : PullRequestOpenIcon;
+    const hasReport = data?.attempts.some((attempt) => attempt.report) ?? false;
+    if (!hasReport) return null;
 
     return (
         <PropertyGroup title="Attachments">
-            {hasPullRequest && (
-                <CapsuleTrigger
-                    className={STACKED_CAPSULE}
-                    onClick={() =>
-                        openReview({ pullNumber: pullNumber!, slug: reviewSlugFor(issue) })
-                    }
-                >
-                    <PullRequestIcon
-                        className={
-                            merged ? "size-3.75! text-violet-400" : "size-3.75! text-green-500"
-                        }
-                    />
-                    Pull request
-                </CapsuleTrigger>
-            )}
-            {hasReport && (
-                <CapsuleTrigger
-                    className={STACKED_CAPSULE}
-                    onClick={() => openSolveReport(issue.id)}
-                >
-                    <FileIcon className="size-3.75! text-neutral-400" />
-                    Solve Report
-                </CapsuleTrigger>
-            )}
+            <CapsuleTrigger className={STACKED_CAPSULE} onClick={() => openSolveReport(issue.id)}>
+                <FileIcon className="size-3.75! text-neutral-400" />
+                Solve Report
+            </CapsuleTrigger>
         </PropertyGroup>
     );
 }

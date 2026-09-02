@@ -44,7 +44,7 @@ export default function PlaygroundTeamViewMain({ team }: PlaygroundTeamViewProps
     return (
         <div className="relative flex min-h-0 flex-1 flex-col">
             <PaneLeadSlot>
-                <PlaygroundBreadcrumb trail={[team.name]} />
+                <PlaygroundBreadcrumb trail={[{ label: team.name, icon: team.icon }]} />
             </PaneLeadSlot>
 
             <PaneActionsSlot>

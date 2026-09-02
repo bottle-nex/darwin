@@ -15,12 +15,19 @@ export const MESSAGE_REFERENCE_INCLUDE = {
             description: true,
         },
     },
+    team: { select: { id: true, name: true, icon: true } },
 } as const;
+
+export type MentionTargets = {
+    memberIds: string[];
+    userIds: string[];
+};
 
 export type ResolvedReferences = {
     message: string;
     memberIds: string[];
     issueIds: string[];
+    teamIds: string[];
 };
 
 export default class MessageReferenceService {
@@ -31,8 +38,10 @@ export default class MessageReferenceService {
     ): Promise<ResolvedReferences> {
         const member_ids = reference_ids(message, "member");
         const issue_ids = reference_ids(message, "issue");
+        const team_ids = reference_ids(message, "team");
+        const reachable_team_ids = team_id ? team_ids.filter((id) => id === team_id) : team_ids;
 
-        const [members, issues] = await Promise.all([
+        const [members, issues, teams] = await Promise.all([
             member_ids.length
                 ? prisma.projectMember.findMany({
                       where: {
@@ -55,17 +64,25 @@ export default class MessageReferenceService {
                       select: { id: true },
                   })
                 : [],
+            reachable_team_ids.length
+                ? prisma.team.findMany({
+                      where: { id: { in: reachable_team_ids }, projectId: project_id },
+                      select: { id: true },
+                  })
+                : [],
         ]);
 
-        const valid_members = new Set(members.map((member) => member.id));
-        const valid_issues = new Set(issues.map((issue) => issue.id));
+        const valid = {
+            member: new Set(members.map((member) => member.id)),
+            issue: new Set(issues.map((issue) => issue.id)),
+            team: new Set(teams.map((team) => team.id)),
+        };
 
         return {
-            message: filter_reference_tokens(message, (kind, id) =>
-                kind === "member" ? valid_members.has(id) : valid_issues.has(id),
-            ),
-            memberIds: [...valid_members],
-            issueIds: [...valid_issues],
+            message: filter_reference_tokens(message, (kind, id) => valid[kind].has(id)),
+            memberIds: [...valid.member],
+            issueIds: [...valid.issue],
+            teamIds: [...valid.team],
         };
     }
 
@@ -73,7 +90,42 @@ export default class MessageReferenceService {
         return [
             ...resolved.memberIds.map((memberId) => ({ memberId })),
             ...resolved.issueIds.map((issueId) => ({ issueId })),
+            ...resolved.teamIds.map((teamId) => ({ teamId })),
         ];
+    }
+
+    static async mention_targets(input: {
+        memberIds: string[];
+        teamIds: string[];
+        projectId: string;
+        actorId: string;
+    }): Promise<MentionTargets> {
+        if (!input.memberIds.length && !input.teamIds.length) return { memberIds: [], userIds: [] };
+
+        const members = await prisma.projectMember.findMany({
+            where: {
+                projectId: input.projectId,
+                OR: [
+                    ...(input.memberIds.length ? [{ id: { in: input.memberIds } }] : []),
+                    ...(input.teamIds.length
+                        ? [
+                              {
+                                  user: {
+                                      teamMemberships: { some: { teamId: { in: input.teamIds } } },
+                                  },
+                              },
+                          ]
+                        : []),
+                ],
+            },
+            select: { id: true, userId: true },
+        });
+
+        const targets = members.filter((member) => member.userId !== input.actorId);
+        return {
+            memberIds: targets.map((member) => member.id),
+            userIds: targets.map((member) => member.userId),
+        };
     }
 
     static async referenced_issue_recipients(input: {

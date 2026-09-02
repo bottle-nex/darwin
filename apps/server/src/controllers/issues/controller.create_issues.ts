@@ -121,7 +121,12 @@ export default class IssueCreateController {
             });
 
             if (full_issue) {
-                await DescriptionReferenceService.write(full_issue.id, references);
+                await DescriptionReferenceService.write({
+                    issueId: full_issue.id,
+                    projectId: parsed_body.data.project_id,
+                    actorId: user.id,
+                    resolved: references,
+                });
             }
 
             if (!full_issue) {

@@ -10,7 +10,7 @@ const CORNER = 4;
 const ELBOW = `M${STEM_X} 0V${TICK_Y - CORNER}a${CORNER} ${CORNER} 0 0 0 ${CORNER} ${CORNER}H${TICK_END}`;
 const SPINE = `M${STEM_X} 0V${HEIGHT}`;
 
-export default function PlaygroundSidebarTreeBranch({ last }: { last: boolean }) {
+export default function TreeBranch({ last }: { last: boolean }) {
     return (
         <svg
             viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
@@ -18,7 +18,7 @@ export default function PlaygroundSidebarTreeBranch({ last }: { last: boolean })
             fill="none"
             aria-hidden
             style={{ width: WIDTH }}
-            className="pointer-events-none absolute inset-y-0 left-0 text-snow/20"
+            className="pointer-events-none absolute inset-y-0 left-2.5 text-snow/20"
         >
             <path
                 d={last ? ELBOW : `${ELBOW}${SPINE}`}

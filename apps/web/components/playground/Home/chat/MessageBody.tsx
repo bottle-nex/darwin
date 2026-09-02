@@ -1,21 +1,29 @@
 "use client";
 
 import {
+    as_icon_pick,
     type LabelledReference,
     parse_reference_token,
     reference_issues,
     reference_key,
     reference_labels,
     reference_split_pattern,
+    reference_teams,
 } from "@trymatcha/types";
+import { TeamEntityIcon } from "@trymatcha/ui/icons";
 
+import { IconPickGlyph } from "@/components/ui/IconPicker";
 import { useIssueIdentifier } from "@/hooks/issues/useIssueIdentifier";
 import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
 import { urlSplitPattern, withProtocol } from "@/lib/urls";
 import { cn } from "@/lib/utils";
 import { usePaneRouteStore } from "@/store/playground/usePaneRouteStore";
 
-const TOMBSTONE_LABEL = { member: "@unknown", issue: "#deleted issue" } as const;
+const TOMBSTONE_LABEL = {
+    member: "@unknown",
+    issue: "#deleted issue",
+    team: "@deleted team",
+} as const;
 
 function LinkedText({ text, isMine }: { text: string; isMine: boolean }) {
     return (
@@ -55,6 +63,7 @@ export default function MessageBody({
     const identifier = useIssueIdentifier();
     const labels = reference_labels(references);
     const issues = reference_issues(references);
+    const teams = reference_teams(references);
     return (
         <>
             {text.split(reference_split_pattern()).map((part, index) => {
@@ -81,6 +90,23 @@ export default function MessageBody({
                 if (token.kind === "member") {
                     return (
                         <span key={index} className="mx-px px-1 font-semibold text-white">
+                            {label}
+                        </span>
+                    );
+                }
+
+                if (token.kind === "team") {
+                    const icon = as_icon_pick(teams.get(token.id)?.icon);
+                    return (
+                        <span
+                            key={index}
+                            className="mx-px inline-flex items-center gap-1 px-1 align-middle font-semibold text-white"
+                        >
+                            {icon ? (
+                                <IconPickGlyph pick={icon} className="size-3 text-[11px]" />
+                            ) : (
+                                <TeamEntityIcon className="size-3" aria-hidden />
+                            )}
                             {label}
                         </span>
                     );

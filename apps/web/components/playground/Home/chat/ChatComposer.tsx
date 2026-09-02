@@ -5,7 +5,7 @@ import { type Editor, Extension } from "@tiptap/core";
 import Placeholder from "@tiptap/extension-placeholder";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import type { LabelledReference } from "@trymatcha/types";
+import { type LabelledReference, reference_token } from "@trymatcha/types";
 import { EmojiReactionIcon, SendIcon } from "@trymatcha/ui/icons";
 import { forwardRef, useEffect, useId, useImperativeHandle, useMemo, useRef } from "react";
 
@@ -15,7 +15,7 @@ import IconWrapper from "@/components/ui/IconWrapper";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { cn } from "@/lib/utils";
 
-import { createReferenceMention, ISSUE_TRIGGER, SUGGESTION_KEYS } from "./referenceMention";
+import { createReferenceMention, SUGGESTION_KEYS } from "./referenceMention";
 
 const MESSAGE_CHAR_LIMIT = 5000;
 
@@ -28,7 +28,7 @@ interface ChatComposerProps {
     placeholder: string;
     disabled?: boolean;
     className?: string;
-    memberUserIds?: readonly string[];
+    teamId?: string;
     onSend: (message: string, references: LabelledReference[]) => void;
     children?: React.ReactNode;
 }
@@ -38,10 +38,7 @@ function serialize(editor: Editor): string {
         .getText({
             blockSeparator: "\n",
             textSerializers: {
-                mention: ({ node }) =>
-                    node.attrs.mentionSuggestionChar === ISSUE_TRIGGER
-                        ? `#[issue:${node.attrs.id}]`
-                        : `@[member:${node.attrs.id}]`,
+                mention: ({ node }) => reference_token(node.attrs.kind, node.attrs.id),
             },
         })
         .trim();
@@ -54,21 +51,27 @@ function serialize(editor: Editor): string {
  */
 function draft_references(editor: Editor): LabelledReference[] {
     const references: LabelledReference[] = [];
+    const blank = { memberId: null, issueId: null, teamId: null };
     editor.state.doc.descendants((node) => {
         if (node.type.name !== "mention") return;
         const id = node.attrs.id as string;
         const label = (node.attrs.label as string) ?? "";
-        if (node.attrs.mentionSuggestionChar === ISSUE_TRIGGER) {
-            const [number, ...title] = label.split(" ");
+        if (node.attrs.kind === "issue") {
+            const [identifier, ...title] = label.split(" ");
             references.push({
-                memberId: null,
+                ...blank,
                 issueId: id,
-                issue: { number: Number(number), title: title.join(" ") },
+                issue: {
+                    number: Number(identifier?.split("-").pop()),
+                    title: title.join(" "),
+                },
             });
+        } else if (node.attrs.kind === "team") {
+            references.push({ ...blank, teamId: id, team: { name: label } });
         } else {
             references.push({
+                ...blank,
                 memberId: id,
-                issueId: null,
                 member: { user: { name: label, email: "" } },
             });
         }
@@ -77,7 +80,7 @@ function draft_references(editor: Editor): LabelledReference[] {
 }
 
 const ChatComposer = forwardRef<ChatComposerHandle, ChatComposerProps>(function ChatComposer(
-    { projectId, placeholder, disabled, className, memberUserIds, onSend, children },
+    { projectId, placeholder, disabled, className, teamId, onSend, children },
     ref,
 ) {
     const queryClient = useQueryClient();
@@ -118,7 +121,7 @@ const ChatComposer = forwardRef<ChatComposerHandle, ChatComposerProps>(function 
                           projectId,
                           projectName,
                           container: `[data-slot="${portalSlot}"]`,
-                          memberUserIds,
+                          teamId,
                       }),
                   ]
                 : []),
@@ -138,7 +141,7 @@ const ChatComposer = forwardRef<ChatComposerHandle, ChatComposerProps>(function 
                 },
             }),
         ],
-        [projectId, projectName, placeholder, portalSlot, queryClient, memberUserIds],
+        [projectId, projectName, placeholder, portalSlot, queryClient, teamId],
     );
 
     const editor = useEditor(

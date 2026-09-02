@@ -107,7 +107,6 @@ export default function ReviewComposer({
                     key={editorKey}
                     className="tiptap-compact"
                     placeholder="Leave a comment…"
-                    mentionProjectId={projectId}
                     onChange={(state) => {
                         setHtml(state.html);
                         setIsEmpty(state.isEmpty);

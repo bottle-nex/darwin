@@ -5,6 +5,7 @@ import queue_config from "../configs/config.queue";
 import AddedToProjectNotification from "./actions/action.added-to-project";
 import AddedToTeamNotification from "./actions/action.added-to-team";
 import ChatMentionNotification from "./actions/action.chat-mention";
+import DescriptionMentionNotification from "./actions/action.description-mention";
 import InviteAcceptedNotification from "./actions/action.invite-accepted";
 import IssueAssignedNotification from "./actions/action.issue-assigned";
 import IssueCommentedNotification from "./actions/action.issue-commented";
@@ -59,6 +60,8 @@ export default class NotificationQueueService {
                 return ProjectChatMentionNotification.handle(data);
             case "team_chat.mention":
                 return TeamChatMentionNotification.handle(data);
+            case "issue.description_mention":
+                return DescriptionMentionNotification.handle(data);
             case "issue.status_changed":
                 return IssueStatusChangedNotification.handle(data);
             case "issue.priority_changed":
@@ -111,6 +114,8 @@ export default class NotificationQueueService {
                 return `${data.action}:${data.projectChatId}:${data.memberId}`;
             case "team_chat.mention":
                 return `${data.action}:${data.teamChatId}:${data.memberId}`;
+            case "issue.description_mention":
+                return `${data.action}:${data.issueId}:${data.memberId}`;
             case "issue.status_changed":
                 return `${data.action}:${data.issueId}:${data.recipientId}~${data.toStatus}`;
             case "issue.priority_changed":

@@ -1,3 +1,4 @@
+import { ISSUE_LANE_NAME } from "@trymatcha/types";
 import {
     CancelledStatusIcon,
     DoneStatusIcon,
@@ -30,43 +31,43 @@ export class KanbanBoard {
     static readonly COLUMNS: KanbanColumnDef[] = [
         {
             status: KanbanStatus.Todo,
-            title: "To Do",
+            title: ISSUE_LANE_NAME[KanbanStatus.Todo],
             icon: TodoStatusIcon,
             titleBox: "text-neutral-100",
         },
         {
             status: KanbanStatus.Queued,
-            title: "Queued",
+            title: ISSUE_LANE_NAME[KanbanStatus.Queued],
             icon: QueuedStatusIcon,
             titleBox: "text-[#50B5E2]",
         },
         {
             status: KanbanStatus.InProgress,
-            title: "In Progress",
+            title: ISSUE_LANE_NAME[KanbanStatus.InProgress],
             icon: InProgressStatusIcon,
             titleBox: "text-[#D69E1F]",
         },
         {
             status: KanbanStatus.InReview,
-            title: "In Review",
+            title: ISSUE_LANE_NAME[KanbanStatus.InReview],
             icon: InReviewStatusIcon,
             titleBox: "text-[#8999FF]",
         },
         {
             status: KanbanStatus.Done,
-            title: "Done",
+            title: ISSUE_LANE_NAME[KanbanStatus.Done],
             icon: DoneStatusIcon,
             titleBox: "text-[#34C75C]",
         },
         {
             status: KanbanStatus.Failed,
-            title: "Failed",
+            title: ISSUE_LANE_NAME[KanbanStatus.Failed],
             icon: FailedStatusIcon,
             titleBox: "text-rose-400",
         },
         {
             status: KanbanStatus.Cancelled,
-            title: "Cancelled",
+            title: ISSUE_LANE_NAME[KanbanStatus.Cancelled],
             icon: CancelledStatusIcon,
             titleBox: "text-snow/60",
         },

@@ -15,14 +15,12 @@ import {
     EditIcon,
     ErrorCircleIcon,
     HarnessIcon,
-    MergeIcon,
     PriorityChangedActivityIcon,
-    PullRequestClosedIcon,
-    PullRequestOpenIcon,
     RunCompletedActivityIcon,
     RunStartedActivityIcon,
     StatusChangedActivityIcon,
     TagIcon,
+    TodoStatusIcon,
     UntrackedActivityIcon,
 } from "@trymatcha/ui/icons";
 import { type ComponentProps, forwardRef, type ReactNode } from "react";
@@ -31,8 +29,8 @@ import TagDisplay from "@/components/playground/Home/TagsDisplay/TagDisplay";
 import InfoTooltip from "@/components/ui/InfoTooltip";
 import { formatDate } from "@/lib/format";
 import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
+import { PULL_REQUEST_STATE } from "@/lib/review/pullRequestState";
 import { cn } from "@/lib/utils";
-import { KanbanStatus } from "@/types/kanban";
 
 import { DATE_ICON_COLOR, PRIORITY_OPTIONS } from "../issueHelpers";
 import TextDiff from "./TextDiff";
@@ -170,6 +168,16 @@ const REGISTRY: { [K in ActivityType]?: ActivityEntry<K> } = {
         iconClassName: "text-neutral-400",
         render: () => "created the issue",
         summary: "created the issue",
+    },
+    [ActivityType.IssueReopened]: {
+        icon: TodoStatusIcon,
+        iconClassName: "text-neutral-100",
+        render: (payload) => (
+            <>
+                reopened this issue for attempt {payload.attemptNumber} — {payload.note}
+            </>
+        ),
+        summary: "reopened the issue",
     },
     [ActivityType.StatusChanged]: {
         icon: StatusChangedActivityIcon,
@@ -311,8 +319,8 @@ const REGISTRY: { [K in ActivityType]?: ActivityEntry<K> } = {
         summary: "changed the agent config",
     },
     [ActivityType.PrOpened]: {
-        icon: PullRequestOpenIcon,
-        iconClassName: KanbanBoard.glyphFor(KanbanStatus.InReview).titleBox,
+        icon: PULL_REQUEST_STATE.open.icon,
+        iconClassName: PULL_REQUEST_STATE.open.text,
         render: (payload) => (
             <>
                 opened{" "}
@@ -329,8 +337,8 @@ const REGISTRY: { [K in ActivityType]?: ActivityEntry<K> } = {
         summary: "opened a pull request",
     },
     [ActivityType.PrMerged]: {
-        icon: MergeIcon,
-        iconClassName: KanbanBoard.glyphFor(KanbanStatus.Done).titleBox,
+        icon: PULL_REQUEST_STATE.merged.icon,
+        iconClassName: PULL_REQUEST_STATE.merged.text,
         render: (payload) => (
             <>
                 merged{" "}
@@ -347,8 +355,8 @@ const REGISTRY: { [K in ActivityType]?: ActivityEntry<K> } = {
         summary: "merged a pull request",
     },
     [ActivityType.PrClosed]: {
-        icon: PullRequestClosedIcon,
-        iconClassName: "text-rose-400",
+        icon: PULL_REQUEST_STATE.closed.icon,
+        iconClassName: PULL_REQUEST_STATE.closed.text,
         render: (payload) => (
             <>
                 closed{" "}

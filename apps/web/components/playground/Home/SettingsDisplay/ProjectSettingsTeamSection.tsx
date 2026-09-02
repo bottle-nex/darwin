@@ -1,11 +1,56 @@
 "use client";
-import { AddIcon, DeleteIcon } from "@trymatcha/ui/icons";
+import { AddIcon, DeleteIcon, TeamEntityIcon } from "@trymatcha/ui/icons";
+import { useState } from "react";
 
-import PlaygroundAvatar from "@/components/playground/Core/components/PlaygroundAvatar";
 import { Button } from "@/components/ui/button";
+import { IconPickButton } from "@/components/ui/IconPicker";
+import { useUpdateTeam } from "@/hooks/team/useUpdateTeam";
 import { useDeleteTeamStore } from "@/store/team/useDeleteTeamStore";
 import { useNewTeamStore } from "@/store/team/useNewTeamStore";
-import type { ProjectDetail } from "@/types/project";
+import type { ProjectDetail, ProjectTeam } from "@/types/project";
+
+function TeamRow({
+    team,
+    projectId,
+    canManage,
+    onDelete,
+}: {
+    team: ProjectTeam;
+    projectId: string;
+    canManage: boolean;
+    onDelete: () => void;
+}) {
+    const [open, setOpen] = useState(false);
+    const updateTeam = useUpdateTeam();
+
+    return (
+        <div className="group flex items-center gap-3 rounded-lg bg-white/5 px-3 py-2 shadow-[inset_0_1px_0_0_var(--color-edge)]">
+            <IconPickButton
+                pick={team.icon}
+                onSelect={(icon) => updateTeam.mutate({ teamId: team.id, projectId, icon })}
+                open={open}
+                onOpenChange={setOpen}
+                label={`Pick ${team.name} icon`}
+                size="sm"
+                fallbackIcon={TeamEntityIcon}
+            />
+            <span className="min-w-0 flex-1 truncate text-[12px] text-neutral-200">
+                {team.name}
+            </span>
+            {canManage && (
+                <Button
+                    variant="unstyled"
+                    type="button"
+                    aria-label={`Delete ${team.name}`}
+                    onClick={onDelete}
+                    className="flex size-6 shrink-0 cursor-pointer items-center justify-center rounded text-neutral-400 hover:bg-neutral-700/50 hover:text-red-500"
+                >
+                    <DeleteIcon className="size-3" aria-hidden />
+                </Button>
+            )}
+        </div>
+    );
+}
 
 export default function ProjectSettingsTeamSection({
     project,
@@ -51,29 +96,13 @@ export default function ProjectSettingsTeamSection({
             ) : (
                 <div className="flex flex-col gap-1.5">
                     {project.teams.map((t) => (
-                        <div
+                        <TeamRow
                             key={t.id}
-                            className="group flex items-center gap-3 rounded-lg bg-white/5 px-3 py-2 shadow-[inset_0_1px_0_0_var(--color-edge)]"
-                        >
-                            <PlaygroundAvatar
-                                letter={t.name.trim().charAt(0).toUpperCase()}
-                                tone="indigo"
-                            />
-                            <span className="min-w-0 flex-1 truncate text-[12px] text-neutral-200">
-                                {t.name}
-                            </span>
-                            {canManage && (
-                                <Button
-                                    variant="unstyled"
-                                    type="button"
-                                    aria-label={`Delete ${t.name}`}
-                                    onClick={() => requestDelete(t)}
-                                    className="flex size-6 shrink-0 cursor-pointer items-center justify-center rounded text-neutral-400 hover:bg-neutral-700/50 hover:text-red-500"
-                                >
-                                    <DeleteIcon className="size-3" aria-hidden />
-                                </Button>
-                            )}
-                        </div>
+                            team={t}
+                            projectId={project.id}
+                            canManage={canManage}
+                            onDelete={() => requestDelete(t)}
+                        />
                     ))}
                 </div>
             )}

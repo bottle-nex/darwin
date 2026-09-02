@@ -1,9 +1,8 @@
-import { Action, Permissions } from "@trymatcha/access-control";
 import { prisma } from "@trymatcha/database";
 import { to_plain_text } from "@trymatcha/types";
 import type { Request, Response } from "express";
 
-import Access from "../../access-control/access";
+import { readable_issue_project } from "../../access-control/issue-access";
 import { MESSAGE_REFERENCE_INCLUDE } from "../../services/service.message-references";
 import ResponseWriter from "../../services/service.response";
 
@@ -31,24 +30,12 @@ export default class IssueReferencesGetController {
             }
 
             const issue_id = req.params.id as string;
-            const issue = await prisma.issue.findUnique({
-                where: { id: issue_id },
-                select: { id: true, projectId: true },
-            });
-            if (!issue) {
-                ResponseWriter.not_found(res, "Issue not found");
-                return;
-            }
-
-            const role = await Access.project(user.id, issue.projectId);
-            if (!role || !Permissions.project(role, Action.project.read)) {
-                ResponseWriter.not_authorized(res, "You dont have access to this project");
-                return;
-            }
+            const project_id = await readable_issue_project(res, user.id, issue_id);
+            if (!project_id) return;
 
             const rows = await prisma.messageReference.findMany({
                 where: {
-                    issueId: issue.id,
+                    issueId: issue_id,
                     OR: [
                         { chat: { isDeleted: false } },
                         { projectChat: { isDeleted: false } },

@@ -129,7 +129,6 @@ export default function IssueDescriptionEditor({
                           queryClient,
                           projectId: mentionProjectId,
                           projectName,
-                          triggers: ["member", "issue"],
                       }),
                   ]
                 : []),

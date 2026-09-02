@@ -318,7 +318,7 @@
         margin-top: 0.25rem;
     }
 
-    /* @member / #issue chips, both in the composer and in sent messages. */
+    /* @member / @team / #issue chips, both in the composer and in sent messages. */
     .reference-chip {
         border-radius: 4px;
         padding: 0 0.25rem;
@@ -331,6 +331,11 @@
     .reference-chip[data-kind="member"] {
         background: rgba(99, 102, 241, 0.22);
         color: #c7d2fe;
+    }
+
+    .reference-chip[data-kind="team"] {
+        background: rgba(16, 185, 129, 0.2);
+        color: #a7f3d0;
     }
 
     .tiptap h1,

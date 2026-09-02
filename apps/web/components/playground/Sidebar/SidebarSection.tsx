@@ -7,7 +7,7 @@ import { Children, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-import TreeBranch from "./SidebarTreeBranch";
+import TreeBranch from "../Core/components/TreeBranch";
 
 const HEIGHT_SPRING = { type: "spring", stiffness: 800, damping: 48, mass: 0.6 } as const;
 
@@ -50,7 +50,7 @@ export default function PlaygroundSidebarSection({
 
     return (
         <section className="flex flex-col">
-            <div className="flex items-center justify-between gap-1 pr-1">
+            <div className={cn("flex items-center justify-between gap-1", action && "pr-1")}>
                 <Button
                     variant="unstyled"
                     type="button"
@@ -86,7 +86,7 @@ export default function PlaygroundSidebarSection({
                 initial={false}
                 animate={open ? "open" : "closed"}
                 variants={CONTAINER_VARIANTS}
-                className={cn("flex flex-col overflow-hidden", isTree ? "pl-2.5" : "gap-0.5")}
+                className={cn("flex flex-col overflow-hidden", !isTree && "gap-0.5")}
                 aria-hidden={!open}
             >
                 {rows.map((child, index) => (

@@ -2,7 +2,6 @@
 import { type ReviewHeader as ReviewHeaderData, ReviewTab } from "@trymatcha/types";
 import { MergeIcon } from "@trymatcha/ui/icons";
 
-import LogoLoader from "@/components/app/LogoLoader";
 import { PLAYGROUND_PANE_SHELL } from "@/components/playground/Core/components/paneBar";
 import PaneColumns from "@/components/playground/Core/components/PaneColumns";
 import PaneFallback from "@/components/playground/Core/components/PaneFallback";

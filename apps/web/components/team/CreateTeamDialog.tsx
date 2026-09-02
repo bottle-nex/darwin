@@ -10,6 +10,7 @@ import { CapsuleTrigger } from "@/components/playground/Issue/Capsule";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import DialogSubmitButton, { handleDialogSubmitKey } from "@/components/ui/DialogSubmitButton";
 import { DIALOG_TITLE_FIELD, GHOST_FIELD } from "@/components/ui/fieldStyles";
+import { type IconPick, IconPickButton, randomIconPick } from "@/components/ui/IconPicker";
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Textarea } from "@/components/ui/textarea";
@@ -56,6 +57,8 @@ function CreateTeamForm({ projectId, onClose }: { projectId: string | null; onCl
     const createTeam = useCreateTeam();
 
     const [name, setName] = useState("");
+    const [icon, setIcon] = useState<IconPick>(randomIconPick);
+    const [iconOpen, setIconOpen] = useState(false);
     const [slug, setSlug] = useState("");
     const [slugEdited, setSlugEdited] = useState(false);
     const [slugOpen, setSlugOpen] = useState(false);
@@ -80,6 +83,7 @@ function CreateTeamForm({ projectId, onClose }: { projectId: string | null; onCl
                 name: name.trim(),
                 slug: resolvedSlug,
                 description: description.trim() || undefined,
+                icon,
             },
             { onSuccess: onClose },
         );
@@ -96,6 +100,7 @@ function CreateTeamForm({ projectId, onClose }: { projectId: string | null; onCl
                         letter={project?.name.slice(0, 2) ?? ""}
                         tone={project ? toneFor(project.id) : "emerald"}
                         icon={project?.icon}
+                        size="xl"
                         className="uppercase"
                     />
                     <span>
@@ -103,19 +108,28 @@ function CreateTeamForm({ projectId, onClose }: { projectId: string | null; onCl
                     </span>
                     <span className="text-sm">New Team</span>
                 </div>
-                <Textarea
-                    rows={1}
-                    autoFocus
-                    placeholder="Team name"
-                    maxLength={80}
-                    value={name}
-                    onChange={(e) => {
-                        setName(e.target.value);
-                        if (!slugEdited) setSlug(slugify(e.target.value));
-                    }}
-                    onKeyDown={(e) => e.key === "Enter" && e.preventDefault()}
-                    className={cn(GHOST_FIELD, DIALOG_TITLE_FIELD)}
-                />
+                <div className="flex w-full items-start gap-x-2">
+                    <IconPickButton
+                        pick={icon}
+                        onSelect={setIcon}
+                        open={iconOpen}
+                        onOpenChange={setIconOpen}
+                        label="Pick team icon"
+                    />
+                    <Textarea
+                        rows={1}
+                        autoFocus
+                        placeholder="Team name"
+                        maxLength={80}
+                        value={name}
+                        onChange={(e) => {
+                            setName(e.target.value);
+                            if (!slugEdited) setSlug(slugify(e.target.value));
+                        }}
+                        onKeyDown={(e) => e.key === "Enter" && e.preventDefault()}
+                        className={cn(GHOST_FIELD, DIALOG_TITLE_FIELD)}
+                    />
+                </div>
             </section>
 
             <section

@@ -1,5 +1,6 @@
 "use client";
 
+import type { IconPick } from "@trymatcha/types";
 import { CheckIcon, ICONS, type IconType, ProjectAvatarPickerIcon } from "@trymatcha/ui/icons";
 import { useMemo, useState } from "react";
 
@@ -9,8 +10,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { EMOJI_GROUPS } from "@/data/emojis_bulk";
 import { cn } from "@/lib/utils";
 
-export type IconPick =
-    { kind: "icon"; name: string; color: string } | { kind: "emoji"; char: string };
+export type { IconPick };
 
 /**
  * The tile a picked icon sits on: washed with the pick's own colour, so the icon reads
@@ -51,6 +51,16 @@ const WHEEL =
 const RECENTS_CAP = 14;
 
 const ICON_LIST = Object.entries(ICONS);
+
+/** Drawn from the catalog itself, so the name always resolves and no pool can drift. */
+export function randomIconPick(): IconPick {
+    const [name] = ICON_LIST[Math.floor(Math.random() * ICON_LIST.length)];
+    return {
+        kind: "icon",
+        name,
+        color: SWATCHES[Math.floor(Math.random() * SWATCHES.length)],
+    };
+}
 const ALL_EMOJIS = EMOJI_GROUPS.flatMap((group) => group.emojis);
 const EMOJI_NAMES = new Map(ALL_EMOJIS.map((emoji) => [emoji.c, emoji.n]));
 

@@ -1,18 +1,16 @@
 "use client";
-import type { ReviewHeader, ReviewState } from "@trymatcha/types";
+import type { ReviewHeader } from "@trymatcha/types";
 import type { IconType } from "@trymatcha/ui/icons";
 import {
     BranchMergeDirectionIcon,
     ChangedFilesIcon,
     CommentCountIcon,
     CommitsIcon,
-    MergeIcon,
-    PullRequestClosedIcon,
-    PullRequestOpenIcon,
 } from "@trymatcha/ui/icons";
 import type { ReactNode } from "react";
 
 import { formatRelativeTime } from "@/lib/format";
+import { PULL_REQUEST_STATE } from "@/lib/review/pullRequestState";
 import { cn } from "@/lib/utils";
 
 import GithubActorName from "../GithubActorName";
@@ -23,14 +21,8 @@ const META = "text-[12.5px] leading-none text-neutral-400";
 const MONO = "font-mono text-[11.5px] leading-none tracking-tight text-neutral-500";
 const QUIET = "text-neutral-500";
 
-const STATE_STYLE: Record<ReviewState, { icon: IconType; label: string; tone: string }> = {
-    open: { icon: PullRequestOpenIcon, label: "Open", tone: "bg-green-500/12 text-green-400" },
-    merged: { icon: MergeIcon, label: "Merged", tone: "bg-violet-500/12 text-violet-400" },
-    closed: { icon: PullRequestClosedIcon, label: "Closed", tone: "bg-rose-500/12 text-rose-400" },
-};
-
 export default function ReviewSummary({ review }: { review: ReviewHeader }) {
-    const state = STATE_STYLE[review.state];
+    const state = PULL_REQUEST_STATE[review.state];
     const StateIcon = state.icon;
     const hasSidecar = review.labels.length > 0 || review.reviewers.length > 0;
 
@@ -42,7 +34,8 @@ export default function ReviewSummary({ review }: { review: ReviewHeader }) {
                 <span
                     className={cn(
                         "flex items-center gap-1.5 rounded-full px-2 py-1 text-[11.5px] font-medium",
-                        state.tone,
+                        state.surface,
+                        state.text,
                     )}
                 >
                     <StateIcon className="size-3.5" />

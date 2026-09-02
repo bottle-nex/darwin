@@ -9,6 +9,7 @@ import PlaygroundAvatar, {
 } from "@/components/playground/Core/components/PlaygroundAvatar";
 import { Button } from "@/components/ui/button";
 import ExpandableSearchBar from "@/components/ui/ExpandableSearchBar";
+import type { IconPick } from "@/components/ui/IconPicker";
 import { useChatConversationPreviews } from "@/hooks/chats/useChatConversationPreviews";
 import { cn } from "@/lib/utils";
 import { useNewTeamStore } from "@/store/team/useNewTeamStore";
@@ -16,6 +17,7 @@ import { useNewTeamStore } from "@/store/team/useNewTeamStore";
 type Conversation = {
     id: string;
     name: string;
+    icon?: IconPick | null;
 };
 
 type ProjectConversation = Conversation & {
@@ -59,6 +61,7 @@ function ConversationRow({
             <PlaygroundAvatar
                 letter={conversation.name.slice(0, 1).toUpperCase()}
                 tone={toneFor(conversation.id)}
+                icon={conversation.icon}
                 size="lg"
                 className="rounded-md"
             />

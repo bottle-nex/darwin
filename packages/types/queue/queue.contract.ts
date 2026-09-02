@@ -84,6 +84,12 @@ export type NotificationJobData =
           mentionedById: string;
       }
     | {
+          action: "issue.description_mention";
+          issueId: string;
+          memberId: string;
+          mentionedById: string;
+      }
+    | {
           action: "issue.status_changed";
           issueId: string;
           recipientId: string;

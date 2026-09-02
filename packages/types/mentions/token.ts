@@ -1,6 +1,12 @@
 import type { IssueStatus } from "../prisma/enums.prisma";
 
-export type ReferenceKind = "member" | "issue";
+export type ReferenceKind = "member" | "issue" | "team";
+
+export type ReferencedTeamLabel = {
+    id?: string;
+    name: string;
+    icon?: unknown;
+};
 
 export type ReferencedIssueLabel = {
     id?: string;
@@ -14,8 +20,10 @@ export type ReferencedIssueLabel = {
 export type LabelledReference = {
     memberId: string | null;
     issueId: string | null;
+    teamId?: string | null;
     member?: { user?: { name: string | null; email: string } | null } | null;
     issue?: ReferencedIssueLabel | null;
+    team?: ReferencedTeamLabel | null;
 };
 
 export type ParsedReference = {
@@ -25,18 +33,32 @@ export type ParsedReference = {
     end: number;
 };
 
-const TOKEN_SOURCE = String.raw`([@#])\[(member|issue):([A-Za-z0-9_-]+)\]`;
+const SIGIL: Record<ReferenceKind, string> = {
+    member: "@",
+    issue: "#",
+    team: "@",
+};
+
+const TOKEN_SOURCE = String.raw`([@#])\[(member|issue|team):([A-Za-z0-9_-]+)\]`;
+
+export function reference_sigil(kind: ReferenceKind): string {
+    return SIGIL[kind];
+}
 
 export function reference_token_pattern(): RegExp {
     return new RegExp(TOKEN_SOURCE, "g");
 }
 
 export function reference_split_pattern(): RegExp {
-    return new RegExp(String.raw`([@#]\[(?:member|issue):[A-Za-z0-9_-]+\])`, "g");
+    return new RegExp(String.raw`([@#]\[(?:member|issue|team):[A-Za-z0-9_-]+\])`, "g");
 }
 
 export function reference_key(kind: ReferenceKind, id: string): string {
     return `${kind}:${id}`;
+}
+
+export function reference_token(kind: ReferenceKind, id: string): string {
+    return `${SIGIL[kind]}[${reference_key(kind, id)}]`;
 }
 
 export function parse_reference_token(literal: string): { kind: ReferenceKind; id: string } | null {
@@ -99,6 +121,10 @@ export function issue_label(number: number, title: string): string {
     return `#${number} ${title}`;
 }
 
+export function team_label(name: string): string {
+    return `@${name}`;
+}
+
 export function reference_labels(references: LabelledReference[]): Map<string, string> {
     const labels = new Map<string, string>();
     for (const reference of references) {
@@ -114,6 +140,9 @@ export function reference_labels(references: LabelledReference[]): Map<string, s
                 issue_label(reference.issue.number, reference.issue.title),
             );
         }
+        if (reference.teamId && reference.team) {
+            labels.set(reference_key("team", reference.teamId), team_label(reference.team.name));
+        }
     }
     return labels;
 }
@@ -128,9 +157,18 @@ export function reference_issues(
     return issues;
 }
 
+export function reference_teams(references: LabelledReference[]): Map<string, ReferencedTeamLabel> {
+    const teams = new Map<string, ReferencedTeamLabel>();
+    for (const reference of references) {
+        if (reference.teamId && reference.team) teams.set(reference.teamId, reference.team);
+    }
+    return teams;
+}
+
 const TOMBSTONE: Record<ReferenceKind, string> = {
     member: "@Unknown",
     issue: "#deleted issue",
+    team: "@deleted team",
 };
 
 export function to_plain_text(text: string, references: LabelledReference[]): string {

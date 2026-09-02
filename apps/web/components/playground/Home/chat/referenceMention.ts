@@ -3,22 +3,35 @@ import Mention, { type MentionNodeAttrs } from "@tiptap/extension-mention";
 import { PluginKey } from "@tiptap/pm/state";
 import { ReactNodeViewRenderer, ReactRenderer } from "@tiptap/react";
 import type { SuggestionOptions } from "@tiptap/suggestion";
-import { parse_reference_token, reference_key } from "@trymatcha/types";
+import {
+    parse_reference_token,
+    reference_sigil,
+    reference_token,
+    type ReferenceKind,
+} from "@trymatcha/types";
 
 import { displayNameOf } from "@/components/playground/Core/components/PlaygroundAvatar";
 import type { ProjectMember } from "@/hooks/project/useProjectMembers";
 import { issueIdentifier } from "@/lib/format";
-import { type IssueSuggestion, search_issues, search_members } from "@/lib/referenceSearch";
+import {
+    type IssueSuggestion,
+    search_issues,
+    search_members,
+    search_teams,
+    team_member_user_ids,
+} from "@/lib/referenceSearch";
+import type { ProjectTeam } from "@/types/project";
 
 import ReferenceChip from "./ReferenceChip";
 import ReferenceSuggestionList, {
     type ReferenceSuggestionListHandle,
 } from "./ReferenceSuggestionList";
-import { ISSUE_TRIGGER, kindFor, MEMBER_TRIGGER } from "./referenceTriggers";
+import { ISSUE_TRIGGER, MEMBER_TRIGGER } from "./referenceTriggers";
 
 export type ReferenceSuggestion =
     | { kind: "member"; id: string; label: string; member: ProjectMember }
-    | { kind: "issue"; id: string; label: string; issue: IssueSuggestion };
+    | { kind: "issue"; id: string; label: string; issue: IssueSuggestion }
+    | { kind: "team"; id: string; label: string; team: ProjectTeam };
 
 type ReferenceSuggestionOptions = Omit<
     SuggestionOptions<ReferenceSuggestion, MentionNodeAttrs>,
@@ -27,7 +40,7 @@ type ReferenceSuggestionOptions = Omit<
 
 export { ISSUE_TRIGGER, MEMBER_TRIGGER } from "./referenceTriggers";
 
-export const SUGGESTION_KEYS = [new PluginKey("memberReference"), new PluginKey("issueReference")];
+export const SUGGESTION_KEYS = [new PluginKey("mentionReference"), new PluginKey("issueReference")];
 
 const render_suggestion: ReferenceSuggestionOptions["render"] = () => {
     let component: ReactRenderer<ReferenceSuggestionListHandle>;
@@ -38,6 +51,7 @@ const render_suggestion: ReferenceSuggestionOptions["render"] = () => {
             component = new ReactRenderer(ReferenceSuggestionList, {
                 props,
                 editor: props.editor,
+                className: "z-[100]",
             });
             unmount = props.mount(component.element as HTMLElement);
         },
@@ -69,7 +83,8 @@ const insert_reference: ReferenceSuggestionOptions["command"] = ({ editor, range
                 attrs: {
                     id: item.id,
                     label: item.label,
-                    mentionSuggestionChar: item.kind === "issue" ? ISSUE_TRIGGER : MEMBER_TRIGGER,
+                    kind: item.kind,
+                    mentionSuggestionChar: reference_sigil(item.kind),
                 },
             },
             { type: "text", text: " " },
@@ -77,8 +92,14 @@ const insert_reference: ReferenceSuggestionOptions["command"] = ({ editor, range
         .run();
 };
 
-function referenceToken(char: string, id: string): string {
-    return `${char}[${reference_key(kindFor(char), id)}]`;
+function node_kind(attrs: Record<string, unknown>): ReferenceKind {
+    return (attrs.kind as ReferenceKind | null) ?? "member";
+}
+
+function node_text(attrs: Record<string, unknown>): string {
+    const kind = node_kind(attrs);
+    const id = attrs.id as string | null;
+    return id ? reference_token(kind, id) : `${reference_sigil(kind)}${attrs.label ?? ""}`;
 }
 
 /**
@@ -105,6 +126,14 @@ const ReferenceMentionNode = Mention.extend({
                         ? null
                         : (element.textContent?.replace(/^[@#]/, "") ?? null)),
             },
+            kind: {
+                default: "member",
+                parseHTML: (element: HTMLElement) =>
+                    element.getAttribute("data-kind") ??
+                    parse_reference_token(element.textContent ?? "")?.kind ??
+                    (element.textContent?.startsWith(ISSUE_TRIGGER) ? "issue" : "member"),
+                renderHTML: () => ({}),
+            },
             mentionSuggestionChar: {
                 ...parent.mentionSuggestionChar,
                 parseHTML: (element: HTMLElement) =>
@@ -121,15 +150,12 @@ const ReferenceMentionNode = Mention.extend({
     },
 });
 
-export type ReferenceTrigger = "member" | "issue";
+function matches(text: string | null | undefined, needle: string): boolean {
+    return text?.toLowerCase().includes(needle) ?? false;
+}
 
-function member_matches(member: ProjectMember, query: string): boolean {
-    const needle = query.trim().toLowerCase();
-    if (!needle) return true;
-    return (
-        (member.name?.toLowerCase().includes(needle) ?? false) ||
-        member.email.toLowerCase().includes(needle)
-    );
+function member_matches(member: ProjectMember, needle: string): boolean {
+    return matches(member.name, needle) || matches(member.email, needle);
 }
 
 function to_member_item(member: ProjectMember): ReferenceSuggestion {
@@ -141,27 +167,24 @@ function to_member_item(member: ProjectMember): ReferenceSuggestion {
     };
 }
 
+function to_team_item(team: ProjectTeam): ReferenceSuggestion {
+    return { kind: "team", id: team.id, label: team.name, team };
+}
+
 export function createReferenceMention({
     queryClient,
     projectId,
     projectName,
     container,
-    triggers = ["member", "issue"],
-    memberUserIds,
+    teamId,
 }: {
     queryClient: QueryClient;
     projectId: string;
     /** Names the issues a mention suggests. The label is stored in the message. */
     projectName?: string;
     container?: string;
-    triggers?: ReferenceTrigger[];
-    memberUserIds?: readonly string[];
+    teamId?: string;
 }) {
-    const allowed_member_ids = memberUserIds ? new Set(memberUserIds) : null;
-    const allowed_members = (members: ProjectMember[]) =>
-        allowed_member_ids
-            ? members.filter((member) => allowed_member_ids.has(member.id))
-            : members;
     const shared = {
         ...(container ? { container } : { floatingUi: { strategy: "fixed" as const } }),
         allowSpaces: false,
@@ -169,19 +192,40 @@ export function createReferenceMention({
         render: render_suggestion,
     };
 
-    const member_suggestion = {
+    async function taggable_members(query: string): Promise<ProjectMember[]> {
+        const needle = query.trim().toLowerCase();
+        const allowed = teamId ? new Set(await team_member_user_ids(queryClient, teamId)) : null;
+        const narrow = (members: ProjectMember[]) =>
+            allowed ? members.filter((member) => allowed.has(member.id)) : members;
+
+        const roster = narrow(await search_members(queryClient, projectId, "")).filter((member) =>
+            needle ? member_matches(member, needle) : true,
+        );
+        if (roster.length || !needle) return roster;
+
+        return narrow(await search_members(queryClient, projectId, query));
+    }
+
+    async function taggable_teams(query: string): Promise<ProjectTeam[]> {
+        const needle = query.trim().toLowerCase();
+        const teams = await search_teams(queryClient, projectId);
+        return teams.filter(
+            (team) =>
+                (teamId ? team.id === teamId : true) &&
+                (needle ? matches(team.name, needle) : true),
+        );
+    }
+
+    const mention_suggestion = {
         ...shared,
         char: MEMBER_TRIGGER,
         pluginKey: SUGGESTION_KEYS[0],
         items: async ({ query }: { query: string }) => {
-            const roster = await search_members(queryClient, projectId, "");
-            const narrowed = allowed_members(roster).filter((member) =>
-                member_matches(member, query),
-            );
-            if (narrowed.length || !query.trim()) return narrowed.map(to_member_item);
-
-            const searched = await search_members(queryClient, projectId, query);
-            return allowed_members(searched).map(to_member_item);
+            const [teams, members] = await Promise.all([
+                taggable_teams(query),
+                taggable_members(query),
+            ]);
+            return [...teams.map(to_team_item), ...members.map(to_member_item)];
         },
     };
 
@@ -202,34 +246,26 @@ export function createReferenceMention({
 
     return ReferenceMentionNode.configure({
         HTMLAttributes: { class: "reference-chip" },
-        renderText: ({ node }) => {
-            const char = node.attrs.mentionSuggestionChar ?? MEMBER_TRIGGER;
-            return node.attrs.id
-                ? referenceToken(char, node.attrs.id)
-                : `${char}${node.attrs.label ?? ""}`;
-        },
+        renderText: ({ node }) => node_text(node.attrs),
         /**
          * The stored text is the shared reference token, so `reference_ids` and
          * `filter_reference_tokens` read an issue description exactly the way
          * they already read a chat message.
          */
         renderHTML: ({ node }) => {
-            const char = node.attrs.mentionSuggestionChar ?? MEMBER_TRIGGER;
             const id = node.attrs.id as string | null;
             return [
                 "span",
                 {
                     "data-type": "mention",
-                    "data-kind": kindFor(char),
+                    "data-kind": node_kind(node.attrs),
                     ...(id ? { "data-id": id } : {}),
-                    "data-mention-suggestion-char": char,
+                    "data-mention-suggestion-char": reference_sigil(node_kind(node.attrs)),
                     class: "reference-chip",
                 },
-                id ? referenceToken(char, id) : `${char}${node.attrs.label ?? ""}`,
+                node_text(node.attrs),
             ];
         },
-        suggestions: triggers.map((trigger) =>
-            trigger === "member" ? member_suggestion : issue_suggestion,
-        ),
+        suggestions: [mention_suggestion, issue_suggestion],
     });
 }

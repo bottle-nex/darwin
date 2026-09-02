@@ -41,6 +41,7 @@ const THEME: Record<NotificationType, NotificationTheme> = {
     [NotificationType.ChatMention]: { icon: MentionIcon, tint: "text-primary" },
     [NotificationType.ProjectChatMention]: { icon: MentionIcon, tint: "text-matcha" },
     [NotificationType.TeamChatMention]: { icon: MentionIcon, tint: "text-matcha" },
+    [NotificationType.DescriptionMention]: { icon: MentionIcon, tint: "text-primary" },
     [NotificationType.IssueStatusChanged]: { icon: StatusChangedIcon, tint: "text-matcha" },
     [NotificationType.IssuePriorityChanged]: {
         icon: WarningTriangleIcon,
@@ -133,6 +134,15 @@ export function notification_view(notification: Notification): NotificationView 
                 action: `mentioned you in ${String(payload.teamName)} chat`,
                 body: String(payload.message),
                 issueRef: null,
+                projectSlug,
+            };
+        case NotificationType.DescriptionMention:
+            return {
+                actorId: String(payload.senderId ?? ""),
+                actorName: String(payload.senderName),
+                action: "mentioned you in",
+                body: String(payload.issueTitle),
+                issueRef,
                 projectSlug,
             };
         case NotificationType.IssueStatusChanged:
