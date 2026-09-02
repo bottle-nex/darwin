@@ -583,7 +583,7 @@ export default function LandingHero() {
                 variants={CARD_STACK}
                 className="absolute top-[26%] right-[2.5%] z-30 flex w-100 flex-col gap-4"
             >
-                <div className="absolute -inset-12 -z-10 rounded-[48px] bg-black/40 blur-3xl" />
+                <div className="absolute -inset-12 -z-10 rounded-[48px] bg-black/20 blur-xl" />
                 <OverlayCard
                     icon={<MatchaLogo className="h-2.5 w-auto text-snow" />}
                     title="Morning recap"

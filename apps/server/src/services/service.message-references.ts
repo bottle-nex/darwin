@@ -1,4 +1,5 @@
 import { prisma } from "@trymatcha/database";
+import type { LabelledReference } from "@trymatcha/types";
 import { filter_reference_tokens, reference_ids } from "@trymatcha/types";
 
 import { issue_recipients } from "../notifications/recipients";
@@ -84,6 +85,50 @@ export default class MessageReferenceService {
             issueIds: [...valid.issue],
             teamIds: [...valid.team],
         };
+    }
+
+    static async labels_for(resolved: ResolvedReferences): Promise<LabelledReference[]> {
+        const [members, issues, teams] = await Promise.all([
+            resolved.memberIds.length
+                ? prisma.projectMember.findMany({
+                      where: { id: { in: resolved.memberIds } },
+                      select: { id: true, user: { select: { name: true, email: true } } },
+                  })
+                : [],
+            resolved.issueIds.length
+                ? prisma.issue.findMany({
+                      where: { id: { in: resolved.issueIds } },
+                      select: { id: true, number: true, title: true },
+                  })
+                : [],
+            resolved.teamIds.length
+                ? prisma.team.findMany({
+                      where: { id: { in: resolved.teamIds } },
+                      select: { id: true, name: true },
+                  })
+                : [],
+        ]);
+
+        return [
+            ...members.map((member) => ({
+                memberId: member.id,
+                issueId: null,
+                teamId: null,
+                member: { user: member.user },
+            })),
+            ...issues.map((issue) => ({
+                memberId: null,
+                issueId: issue.id,
+                teamId: null,
+                issue,
+            })),
+            ...teams.map((team) => ({
+                memberId: null,
+                issueId: null,
+                teamId: team.id,
+                team,
+            })),
+        ];
     }
 
     static to_rows(resolved: ResolvedReferences) {

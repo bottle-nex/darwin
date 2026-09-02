@@ -1,4 +1,4 @@
-import { BackgroundLightingColor, CodeTheme, DefaultHomeView } from "@trymatcha/types";
+import { BackgroundLightingColor, CodeTheme, DefaultHomeView, DiffView } from "@trymatcha/types";
 
 /**
  * `selectionAlpha` is how strongly a selected card or row is washed with the accent.
@@ -97,6 +97,7 @@ export const DEFAULT_USER_CONFIG = {
     backgroundLightingColor: BackgroundLightingColor.Violet,
     defaultHomeView: DefaultHomeView.Kanban,
     codeTheme: CodeTheme.Matcha,
+    diffView: DiffView.Unified,
 };
 
 export const GLOW_STORAGE_KEY = "playground-background-glow";

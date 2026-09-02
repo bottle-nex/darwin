@@ -21,6 +21,7 @@ import list_members_controller from "../../controllers/project/controller.list_m
 import list_presence_controller from "../../controllers/project/controller.list_presence";
 import list_product_diffs_controller from "../../controllers/project/controller.list_product_diffs";
 import list_review_comments_controller from "../../controllers/project/controller.list_review_comments";
+import list_review_commits_controller from "../../controllers/project/controller.list_review_commits";
 import list_review_files_controller from "../../controllers/project/controller.list_review_files";
 import list_secrets_controller from "../../controllers/project/controller.list_secrets";
 import list_tags_controller from "../../controllers/project/controller.list_tags";
@@ -76,6 +77,11 @@ project_router.get(
     "/:project_id/review/:pull_number/file",
     require_auth,
     get_review_file_controller,
+);
+project_router.get(
+    "/:project_id/review/:pull_number/commits",
+    require_auth,
+    list_review_commits_controller,
 );
 project_router.get(
     "/:project_id/review/:pull_number/comments",

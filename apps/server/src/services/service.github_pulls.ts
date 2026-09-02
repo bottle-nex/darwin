@@ -2,6 +2,7 @@ import { Octokit } from "@octokit/rest";
 import {
     type ReviewActor,
     type ReviewComment,
+    type ReviewCommit,
     type ReviewFile,
     type ReviewFileStatus,
     type ReviewLabel,
@@ -57,6 +58,28 @@ export class ReviewDeleteUnsupportedError extends Error {
         super("GitHub reviews cannot be deleted, only edited or dismissed.");
         this.name = "ReviewDeleteUnsupportedError";
     }
+}
+
+type GithubFile = {
+    filename: string;
+    previous_filename?: string;
+    status: string;
+    additions: number;
+    deletions: number;
+    blob_url?: string;
+    patch?: string;
+};
+
+function reviewFile(file: GithubFile): ReviewFile {
+    return {
+        filename: file.filename,
+        previousFilename: file.previous_filename ?? null,
+        status: file.status as ReviewFileStatus,
+        additions: file.additions,
+        deletions: file.deletions,
+        htmlUrl: file.blob_url ?? null,
+        patch: file.patch ?? null,
+    };
 }
 
 function parseCommentId(commentId: string): { kind: string; id: number } {
@@ -125,6 +148,23 @@ export default class GithubPullsService {
         return data[0] ? { url: data[0].html_url } : null;
     }
 
+    static async listPullRequestCommits(ref: PullRequestRef): Promise<ReviewCommit[]> {
+        const octokit = await GithubAppService.octokitFor(ref.installationId);
+        const commits = await octokit.paginate(octokit.rest.pulls.listCommits, {
+            owner: ref.owner,
+            repo: ref.repo,
+            pull_number: ref.pullNumber,
+            per_page: 100,
+        });
+        return commits.map((entry) => ({
+            sha: entry.sha,
+            subject: entry.commit.message.split("\n")[0] ?? "",
+            htmlUrl: entry.html_url,
+            author: actor(entry.author as GithubUser | null),
+            committedAt: entry.commit.committer?.date ?? entry.commit.author?.date ?? null,
+        }));
+    }
+
     static async listPullRequestFiles(ref: PullRequestRef): Promise<ReviewFile[]> {
         const octokit = await GithubAppService.octokitFor(ref.installationId);
         const files = await octokit.paginate(octokit.rest.pulls.listFiles, {
@@ -133,15 +173,24 @@ export default class GithubPullsService {
             pull_number: ref.pullNumber,
             per_page: 100,
         });
-        return files.map((file) => ({
-            filename: file.filename,
-            previousFilename: file.previous_filename ?? null,
-            status: file.status as ReviewFileStatus,
-            additions: file.additions,
-            deletions: file.deletions,
-            htmlUrl: file.blob_url ?? null,
-            patch: file.patch ?? null,
-        }));
+        return files.map(reviewFile);
+    }
+
+    static async listCommitFiles(ref: PullRequestRef, sha: string): Promise<ReviewFile[]> {
+        const octokit = await GithubAppService.octokitFor(ref.installationId);
+        try {
+            const { data } = await octokit.rest.repos.getCommit({
+                owner: ref.owner,
+                repo: ref.repo,
+                ref: sha,
+            });
+            return (data.files ?? []).map(reviewFile);
+        } catch (error) {
+            // A stale link naming a commit that was rebased away is a normal thing to hold, so it
+            // reads as a pull request with nothing in it rather than a broken pane.
+            if ((error as { status?: number }).status === 404) return [];
+            throw error;
+        }
     }
 
     static async getFileSource(

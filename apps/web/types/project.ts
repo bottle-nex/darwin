@@ -2,6 +2,7 @@ import type {
     BackgroundLightingColor,
     CodeTheme,
     DefaultHomeView,
+    DiffView,
     ProjectRole,
     TeamRole,
 } from "@trymatcha/types";
@@ -29,6 +30,7 @@ export interface UserConfig {
     backgroundLightingColor: BackgroundLightingColor;
     defaultHomeView: DefaultHomeView;
     codeTheme: CodeTheme;
+    diffView: DiffView;
 }
 
 export interface DashboardData {

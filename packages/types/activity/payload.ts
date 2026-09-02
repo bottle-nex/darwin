@@ -33,6 +33,7 @@ interface WrittenActivityPayloads {
     DatesChanged: ActivityPayloadBase & { from: DateRange; to: DateRange };
     IssueReopened: ActivityPayloadBase & {
         note: string;
+        noteText?: string;
         from: ActivityLocationRef;
         attemptNumber: number;
     };

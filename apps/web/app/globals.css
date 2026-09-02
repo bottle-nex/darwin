@@ -600,26 +600,35 @@
         transparent
     );
 
-    font-size: 14px;
+    font-size: 13px;
     letter-spacing: 0.01em;
 }
 
 .review-diff .diff-line {
-    line-height: 1.7;
+    line-height: 1.65;
 }
 
 .review-diff .diff-gutter-col {
     width: 3.5rem;
 }
 
-.review-diff .diff-gutter-col:first-of-type {
+/* Unified shows one gutter, so the old side's column is collapsed away. Split needs it: each
+   pane counts lines in its own file. */
+.review-diff.diff-unified .diff-gutter-col:first-of-type {
     width: 0;
 }
 
-.review-diff td.diff-gutter:first-of-type {
+.review-diff.diff-unified td.diff-gutter:first-of-type {
     width: 0;
     padding: 0;
     overflow: hidden;
+}
+
+/* The seam between the two panes. Spelled out rather than taken from a Tailwind token: these
+   rules are plain CSS, so an undefined var falls back to currentColor and the seam picks up each
+   row's gutter colour — red down a deletion, green down an insertion. */
+.review-diff.diff-split td.diff-gutter:nth-of-type(3) {
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .review-diff .diff-gutter {
@@ -629,30 +638,38 @@
     font-variant-numeric: tabular-nums;
 }
 
+/* The library breaks with `word-break: break-all`, which splits identifiers mid-token — a wrapped
+   import reads as `fra` / `mer-motion`. Breaking inside a word is the last resort instead, so a
+   line wraps at its spaces where it has any. Both sides of a row are cells of one table row, so
+   wrapping never costs the two panes their alignment. */
 .review-diff .diff-code {
     padding-left: 0.75rem;
     padding-right: 0.75rem;
+    word-break: normal;
+    overflow-wrap: break-word;
 }
 
+/* The bar down the gutter. Both sides share one stripe; only --diff-bar-color differs. */
 .review-diff .diff-gutter-insert,
 .review-diff .diff-gutter-delete {
     background-position: left top;
     background-repeat: no-repeat;
     background-size: var(--diff-bar-width) 100%;
+    background-image: repeating-linear-gradient(
+        to bottom,
+        var(--diff-bar-color) 0 1px,
+        color-mix(in oklab, var(--diff-bar-color) 25%, transparent) 1px 3px
+    );
 }
 
 .review-diff .diff-gutter-insert {
+    --diff-bar-color: var(--diff-add);
     color: var(--diff-gutter-insert-text-color);
-    background-image: linear-gradient(var(--diff-add), var(--diff-add));
 }
 
 .review-diff .diff-gutter-delete {
+    --diff-bar-color: var(--diff-remove);
     color: var(--diff-gutter-delete-text-color);
-    background-image: repeating-linear-gradient(
-        to bottom,
-        var(--diff-remove) 0 1px,
-        color-mix(in oklab, var(--diff-remove) 25%, transparent) 1px 3px
-    );
 }
 
 .review-diff .diff-decoration-content {

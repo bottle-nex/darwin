@@ -58,24 +58,32 @@ export default function ReviewDisplay({ route }: { route: ReviewRoute }) {
                     trailingIcon={MergeIcon}
                 />
             </PaneLeadSlot>
-            <ReviewHeader tab={route.tab} htmlUrl={review.htmlUrl} />
-            <ReviewTabPanels tab={route.tab} projectId={projectId} review={review} />
+            <ReviewHeader
+                tab={route.tab}
+                htmlUrl={review.htmlUrl}
+                projectId={projectId}
+                pullNumber={review.pullNumber}
+                commit={route.commit}
+            />
+            <ReviewTabPanels route={route} projectId={projectId} review={review} />
         </main>
     );
 }
 
 function ReviewTabPanels({
-    tab,
+    route,
     projectId,
     review,
 }: {
-    tab: ReviewTab;
+    route: ReviewRoute;
     projectId: string | undefined;
     review: ReviewHeaderData;
 }) {
-    switch (tab) {
+    switch (route.tab) {
         case ReviewTab.Changes:
-            return <ChangesReviewDisplay projectId={projectId} review={review} />;
+            return (
+                <ChangesReviewDisplay projectId={projectId} review={review} commit={route.commit} />
+            );
 
         case ReviewTab.VisualChanges:
             return (

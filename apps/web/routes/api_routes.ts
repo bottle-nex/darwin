@@ -44,6 +44,8 @@ export const PRODUCT_DIFF_ARTIFACT_URLS_URL = (project_id: string, product_diff_
 
 export const REVIEW_URL = (project_id: string, pull_number: number) =>
     `${PROJECT_URL}/${project_id}/review/${pull_number}`;
+export const REVIEW_COMMITS_URL = (project_id: string, pull_number: number) =>
+    `${REVIEW_URL(project_id, pull_number)}/commits`;
 export const REVIEW_FILES_URL = (project_id: string, pull_number: number) =>
     `${REVIEW_URL(project_id, pull_number)}/files`;
 export const REVIEW_COMMENTS_URL = (project_id: string, pull_number: number) =>

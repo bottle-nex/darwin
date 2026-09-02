@@ -39,7 +39,7 @@ export class KanbanBoard {
             status: KanbanStatus.Queued,
             title: ISSUE_LANE_NAME[KanbanStatus.Queued],
             icon: QueuedStatusIcon,
-            titleBox: "text-[#50B5E2]",
+            titleBox: "text-snow/70",
         },
         {
             status: KanbanStatus.InProgress,

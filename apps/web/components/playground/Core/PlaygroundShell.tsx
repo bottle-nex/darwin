@@ -121,7 +121,7 @@ export default function PlaygroundShell() {
     const showOnboarding = !loading && !!project && !project.tourCompleted && !inSettings;
 
     return (
-        <main className="relative flex h-screen flex-col overflow-hidden bg-ink text-neutral-100 tracking-wide">
+        <main className="relative flex h-screen flex-col overflow-hidden bg-ink text-neutral-100 tracking-wide select-none">
             <section className="relative flex flex-1 min-h-0 p-1.5">
                 <BackgroundLighting />
                 <PlaygroundSidebar />

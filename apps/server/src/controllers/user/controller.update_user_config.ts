@@ -1,5 +1,5 @@
 import { prisma } from "@trymatcha/database";
-import { BackgroundLightingColor, CodeTheme, DefaultHomeView } from "@trymatcha/types";
+import { BackgroundLightingColor, CodeTheme, DefaultHomeView, DiffView } from "@trymatcha/types";
 import type { Request, Response } from "express";
 import { z } from "zod";
 
@@ -19,6 +19,7 @@ const body_schema = z.object({
         .enum(Object.values(DefaultHomeView) as [DefaultHomeView, ...DefaultHomeView[]])
         .optional(),
     codeTheme: z.enum(Object.values(CodeTheme) as [CodeTheme, ...CodeTheme[]]).optional(),
+    diffView: z.enum(Object.values(DiffView) as [DiffView, ...DiffView[]]).optional(),
 });
 
 export default class UpdateUserConfigController {
@@ -40,6 +41,7 @@ export default class UpdateUserConfigController {
                     backgroundLightingColor: true,
                     defaultHomeView: true,
                     codeTheme: true,
+                    diffView: true,
                 },
             });
 

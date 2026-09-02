@@ -1,5 +1,5 @@
 "use client";
-import type { BackgroundLightingColor, CodeTheme } from "@trymatcha/types";
+import type { BackgroundLightingColor, CodeTheme, DiffView } from "@trymatcha/types";
 import { useParams } from "next/navigation";
 import { Slider } from "radix-ui";
 
@@ -25,6 +25,7 @@ import {
     codeThemePreset,
     type CodeTokenRole,
 } from "@/lib/codeThemes";
+import { DIFF_VIEWS } from "@/lib/review/diffView";
 import { cn } from "@/lib/utils";
 import { useBackgroundLightingStore } from "@/store/playground/useBackgroundLightingStore";
 
@@ -247,6 +248,28 @@ export default function AppearanceSettingsSection() {
             </SettingsUtilityCard>
 
             <SettingsUtilityCard title="Code" rows>
+                <SettingsRow
+                    label="Diff view"
+                    description="How a file's changes are laid out in the Changes tab."
+                >
+                    <SelectField
+                        aria-label="Diff view"
+                        className="w-48 pl-1"
+                        itemClassName="pl-1"
+                        value={config.diffView}
+                        onChange={(view) => updateConfig.mutate({ diffView: view as DiffView })}
+                        options={DIFF_VIEWS.map((view) => ({
+                            value: view.value,
+                            label: (
+                                <span className="flex items-center gap-2.5">
+                                    <view.icon className="size-3.5 text-neutral-400" aria-hidden />
+                                    {view.label}
+                                </span>
+                            ),
+                        }))}
+                    />
+                </SettingsRow>
+
                 <SettingsRow
                     label="Code theme"
                     description="Syntax colors in the Changes tab of a review."

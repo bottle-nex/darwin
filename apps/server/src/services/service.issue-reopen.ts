@@ -1,7 +1,7 @@
 import { Action, Permissions } from "@trymatcha/access-control";
 import { ActivityType, ActorType, IssueStatus, Prisma, prisma } from "@trymatcha/database";
 import { ActivityService, IssueBroadcastService } from "@trymatcha/services";
-import { isReopenable, ISSUE_LANE_NAME } from "@trymatcha/types";
+import { isReopenable, ISSUE_LANE_NAME, to_plain_text } from "@trymatcha/types";
 import z from "zod";
 
 import { server_services } from "..";
@@ -10,6 +10,7 @@ import { issue_recipients } from "../notifications/recipients";
 import { location_of } from "./service.activity-diff";
 import GithubPullsService from "./service.github_pulls";
 import { ISSUE_ROW_INCLUDE, type IssueActor, type IssueRow } from "./service.issue";
+import MessageReferenceService, { type ResolvedReferences } from "./service.message-references";
 
 export const REOPEN_SCHEMA = z.object({
     note: z.string().trim().min(1).max(2000),
@@ -93,6 +94,12 @@ export default class IssueReopenService {
             );
         }
 
+        const resolved = await MessageReferenceService.resolve(note, issue.projectId);
+        const note_text = to_plain_text(
+            resolved.message,
+            await MessageReferenceService.labels_for(resolved),
+        );
+
         const attempt_number = (await prisma.agentSession.count({ where: { issueId: id } })) + 1;
         const previous_location = location_of(issue.status, issue.customColumn);
 
@@ -115,7 +122,12 @@ export default class IssueReopenService {
                 events: [
                     {
                         type: ActivityType.IssueReopened,
-                        payload: { note, from: previous_location, attemptNumber: attempt_number },
+                        payload: {
+                            note: resolved.message,
+                            noteText: note_text,
+                            from: previous_location,
+                            attemptNumber: attempt_number,
+                        },
                         dedupeKey: `reopen:${attempt_number}`,
                     },
                     {
@@ -149,6 +161,7 @@ export default class IssueReopenService {
         await ActivityService.publish(issue.projectId, id, outcome.activities);
         await server_services.queue.enqueue_project(issue.projectId);
         await IssueReopenService.notify(actor.id, id, issue);
+        await IssueReopenService.notify_mentions(actor.id, id, issue.projectId, resolved);
 
         return { ok: true, issue: outcome.reopened };
     }
@@ -166,6 +179,29 @@ export default class IssueReopenService {
             where: { id: worker_id },
             data: { contextSummary: Prisma.DbNull },
         });
+    }
+
+    private static async notify_mentions(
+        actor_id: string,
+        issue_id: string,
+        project_id: string,
+        resolved: ResolvedReferences,
+    ) {
+        const targets = await MessageReferenceService.mention_targets({
+            memberIds: resolved.memberIds,
+            teamIds: resolved.teamIds,
+            projectId: project_id,
+            actorId: actor_id,
+        });
+
+        for (const member_id of targets.memberIds) {
+            await server_services.notifications.enqueue({
+                action: "issue.description_mention",
+                issueId: issue_id,
+                memberId: member_id,
+                mentionedById: actor_id,
+            });
+        }
     }
 
     private static async notify(

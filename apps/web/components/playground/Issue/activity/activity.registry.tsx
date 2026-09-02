@@ -174,7 +174,8 @@ const REGISTRY: { [K in ActivityType]?: ActivityEntry<K> } = {
         iconClassName: "text-neutral-100",
         render: (payload) => (
             <>
-                reopened this issue for attempt {payload.attemptNumber} — {payload.note}
+                reopened this issue for attempt {payload.attemptNumber} —{" "}
+                {payload.noteText ?? payload.note}
             </>
         ),
         summary: "reopened the issue",

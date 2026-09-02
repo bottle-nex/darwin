@@ -76,6 +76,14 @@ export interface ReviewHeader {
     productDiffId: string | null;
 }
 
+export interface ReviewCommit {
+    sha: string;
+    subject: string;
+    htmlUrl: string;
+    author: ReviewActor | null;
+    committedAt: string | null;
+}
+
 export interface ReviewFile {
     filename: string;
     previousFilename: string | null;

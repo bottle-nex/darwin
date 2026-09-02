@@ -1,25 +1,15 @@
 import { prisma } from "@trymatcha/database";
+import {
+    DESCRIPTION_REFERENCE_INCLUDE,
+    description_reference_labels,
+    type DescriptionReferenceRow,
+} from "@trymatcha/services";
 import type { LabelledReference } from "@trymatcha/types";
 
 import { server_services } from "..";
 import MessageReferenceService, { type ResolvedReferences } from "./service.message-references";
 
-export const DESCRIPTION_REFERENCE_INCLUDE = {
-    member: { include: { user: true } },
-    referencedIssue: {
-        select: { id: true, number: true, title: true, status: true, priority: true },
-    },
-    team: { select: { id: true, name: true, icon: true } },
-} as const;
-
-type DescriptionReferenceRow = {
-    memberId: string | null;
-    referencedIssueId: string | null;
-    teamId: string | null;
-    member?: { user?: { name: string | null; email: string } | null } | null;
-    referencedIssue?: { number: number; title: string } | null;
-    team?: { name: string } | null;
-};
+export { DESCRIPTION_REFERENCE_INCLUDE };
 
 type DescriptionWrite = {
     issueId: string;
@@ -40,14 +30,7 @@ export default class DescriptionReferenceService {
     }
 
     static to_labels(rows: DescriptionReferenceRow[]): LabelledReference[] {
-        return rows.map((row) => ({
-            memberId: row.memberId,
-            issueId: row.referencedIssueId,
-            teamId: row.teamId,
-            member: row.member,
-            issue: row.referencedIssue,
-            team: row.team,
-        }));
+        return description_reference_labels(rows);
     }
 
     /** Replaces the issue's reference rows with the ones its description now holds. */

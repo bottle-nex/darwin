@@ -448,9 +448,11 @@
         "@trymatcha/database": "*",
         "@trymatcha/types": "*",
         "ioredis": "^5.11.0",
+        "turndown": "^7.2.4",
       },
       "devDependencies": {
         "@types/bun": "latest",
+        "@types/turndown": "^5.0.6",
       },
       "peerDependencies": {
         "typescript": "^5",

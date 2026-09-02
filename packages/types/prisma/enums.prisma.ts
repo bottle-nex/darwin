@@ -220,6 +220,12 @@ export const CodeTheme = {
 } as const;
 export type CodeTheme = (typeof CodeTheme)[keyof typeof CodeTheme];
 
+export const DiffView = {
+    Unified: "Unified",
+    Split: "Split",
+} as const;
+export type DiffView = (typeof DiffView)[keyof typeof DiffView];
+
 export const DefaultHomeView = {
     Inbox: "Inbox",
     Chats: "Chats",

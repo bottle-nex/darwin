@@ -68,7 +68,7 @@ export default class IssueAttemptListController {
                     return [
                         payload.attemptNumber,
                         {
-                            note: payload.note,
+                            note: payload.noteText ?? payload.note,
                             actorName: payload.actor?.name ?? null,
                             at: row.createdAt,
                         },

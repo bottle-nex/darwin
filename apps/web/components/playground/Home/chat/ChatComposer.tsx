@@ -5,7 +5,7 @@ import { type Editor, Extension } from "@tiptap/core";
 import Placeholder from "@tiptap/extension-placeholder";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import { type LabelledReference, reference_token } from "@trymatcha/types";
+import type { LabelledReference } from "@trymatcha/types";
 import { EmojiReactionIcon, SendIcon } from "@trymatcha/ui/icons";
 import { forwardRef, useEffect, useId, useImperativeHandle, useMemo, useRef } from "react";
 
@@ -15,7 +15,7 @@ import IconWrapper from "@/components/ui/IconWrapper";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { cn } from "@/lib/utils";
 
-import { createReferenceMention, SUGGESTION_KEYS } from "./referenceMention";
+import { createReferenceMention, SUGGESTION_KEYS, toReferenceText } from "./referenceMention";
 
 const MESSAGE_CHAR_LIMIT = 5000;
 
@@ -31,17 +31,6 @@ interface ChatComposerProps {
     teamId?: string;
     onSend: (message: string, references: LabelledReference[]) => void;
     children?: React.ReactNode;
-}
-
-function serialize(editor: Editor): string {
-    return editor
-        .getText({
-            blockSeparator: "\n",
-            textSerializers: {
-                mention: ({ node }) => reference_token(node.attrs.kind, node.attrs.id),
-            },
-        })
-        .trim();
 }
 
 /**
@@ -96,7 +85,7 @@ const ChatComposer = forwardRef<ChatComposerHandle, ChatComposerProps>(function 
 
     function submit(instance: Editor | null) {
         if (!instance || disabledRef.current) return;
-        const message = serialize(instance);
+        const message = toReferenceText(instance);
         if (!message || message.length > MESSAGE_CHAR_LIMIT) return;
         onSendRef.current(message, draft_references(instance));
         instance.commands.clearContent(true);

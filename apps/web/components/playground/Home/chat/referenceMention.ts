@@ -1,6 +1,7 @@
 import type { QueryClient } from "@tanstack/react-query";
 import Mention, { type MentionNodeAttrs } from "@tiptap/extension-mention";
 import { PluginKey } from "@tiptap/pm/state";
+import type { Editor } from "@tiptap/react";
 import { ReactNodeViewRenderer, ReactRenderer } from "@tiptap/react";
 import type { SuggestionOptions } from "@tiptap/suggestion";
 import {
@@ -106,6 +107,17 @@ function node_text(attrs: Record<string, unknown>): string {
  * The id is the only thing stored. Labels are resolved live by the node view, so
  * a renamed member or retitled issue never leaves a stale chip behind.
  */
+export function toReferenceText(editor: Editor): string {
+    return editor
+        .getText({
+            blockSeparator: "\n",
+            textSerializers: {
+                mention: ({ node }) => reference_token(node.attrs.kind, node.attrs.id),
+            },
+        })
+        .trim();
+}
+
 const ReferenceMentionNode = Mention.extend({
     addAttributes() {
         const parent = (this.parent?.() ?? {}) as Record<string, Record<string, unknown>>;
