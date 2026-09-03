@@ -69,7 +69,7 @@ export default function SkyHero() {
         <section className="relative isolate min-h-svh w-full overflow-hidden bg-ink text-ink">
             <Sky />
             <Blueprint />
-            
+
             {/*<div className="absolute right-0 bottom-0 text-snow text-3xl font-semibold ">
                 The Product that build Products.
             </div>*/}
@@ -265,4 +265,3 @@ function CloudHaze() {
         </div>
     );
 }
-
