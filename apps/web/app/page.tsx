@@ -6,6 +6,7 @@ import LandingPlatformStack from "@/components/landing/LandingPlatformStack";
 // import LandingHero from "@/components/landing/LandingHero";
 import LandingHero from "@/components/new/LandingHero";
 import { LandingNavbar } from "@/components/new/LandingNavbar";
+import SkyHero from "@/components/new/SkyHero";
 
 export default function Home() {
     return (
@@ -14,6 +15,7 @@ export default function Home() {
             className="theme-landing relative min-h-screen w-screen flex flex-col pb-6"
         >
             <LandingNavbar />
+            <SkyHero />
             <LandingHero />
             <LandingBentoCards />
             <LandingFeatureShowcase />
