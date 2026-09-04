@@ -15,24 +15,32 @@ import type { BoardIssue } from "@/types/board";
 import type { Effort, Harness } from "@/types/harness.type";
 import { HARNESS_MODELS, HARNESS_SUPPORTS_EFFORT } from "@/types/harness.type";
 import type { Priority } from "@/types/kanban";
+import type { ExecutionMode } from "@/types/project";
 
 import { useSubmitWarning } from "./SubmitWarningToast";
 import { useIssueDescription } from "./useIssueDescription";
 
 const FROZEN_HARNESS_STATUSES = ["InProgress", "InReview", "Done", "Failed", "Cancelled"];
 
-type HarnessDraft = { harness: Harness; model: string | null; effort: Effort | null };
+type HarnessDraft = {
+    harness: Harness;
+    model: string | null;
+    effort: Effort | null;
+    executionMode: ExecutionMode;
+};
 
 export type HarnessConfigState = {
     harness: Harness;
     model: string | null;
     effort: Effort | null;
+    executionMode: ExecutionMode;
     modelOptions: string[];
     supportsEffort: boolean;
     frozen: boolean;
     setHarness: (value: Harness) => void;
     setModel: (value: string) => void;
     setEffort: (value: Effort) => void;
+    setExecutionMode: (value: ExecutionMode) => void;
 };
 
 type UseIssueFormArgs = {
@@ -125,18 +133,21 @@ export function useIssueForm({
     const savedHarness = issueConfigData?.config.harness ?? "Claude";
     const savedModel = issueConfigData?.config.model ?? null;
     const savedEffort = issueConfigData?.config.effort ?? null;
+    const savedExecutionMode = issueConfigData?.config.executionMode ?? "Autonomous";
 
     const [harnessDraft, setHarnessDraft] = useState<HarnessDraft | null>(null);
     const currentHarness = harnessDraft?.harness ?? savedHarness;
     const currentModel = harnessDraft ? harnessDraft.model : savedModel;
     const currentEffort = harnessDraft ? harnessDraft.effort : savedEffort;
+    const currentExecutionMode = harnessDraft ? harnessDraft.executionMode : savedExecutionMode;
     const harnessSupportsEffort = HARNESS_SUPPORTS_EFFORT[currentHarness];
 
     const harnessDirty =
         harnessDraft !== null &&
         (currentHarness !== savedHarness ||
             currentModel !== savedModel ||
-            currentEffort !== savedEffort);
+            currentEffort !== savedEffort ||
+            currentExecutionMode !== savedExecutionMode);
 
     function setHarness(next: Harness) {
         const nextModel = HARNESS_MODELS[next].includes(currentModel ?? "")
@@ -146,27 +157,49 @@ export function useIssueForm({
             harness: next,
             model: nextModel,
             effort: HARNESS_SUPPORTS_EFFORT[next] ? currentEffort : null,
+            executionMode: currentExecutionMode,
         });
     }
 
     function setModel(next: string) {
-        setHarnessDraft({ harness: currentHarness, model: next, effort: currentEffort });
+        setHarnessDraft({
+            harness: currentHarness,
+            model: next,
+            effort: currentEffort,
+            executionMode: currentExecutionMode,
+        });
     }
 
     function setEffort(next: Effort) {
-        setHarnessDraft({ harness: currentHarness, model: currentModel, effort: next });
+        setHarnessDraft({
+            harness: currentHarness,
+            model: currentModel,
+            effort: next,
+            executionMode: currentExecutionMode,
+        });
+    }
+
+    function setExecutionMode(next: ExecutionMode) {
+        setHarnessDraft({
+            harness: currentHarness,
+            model: currentModel,
+            effort: currentEffort,
+            executionMode: next,
+        });
     }
 
     const harnessConfig: HarnessConfigState = {
         harness: currentHarness,
         model: currentModel,
         effort: currentEffort,
+        executionMode: currentExecutionMode,
         modelOptions: HARNESS_MODELS[currentHarness],
         supportsEffort: harnessSupportsEffort,
         frozen: harnessFrozen,
         setHarness,
         setModel,
         setEffort,
+        setExecutionMode,
     };
 
     const titleRef = useRef<HTMLTextAreaElement>(null);
@@ -226,6 +259,7 @@ export function useIssueForm({
                                   issueId: issue.id,
                                   harness: currentHarness,
                                   model: currentModel,
+                                  execution_mode: currentExecutionMode,
                                   ...(harnessSupportsEffort && currentEffort
                                       ? { effort: currentEffort }
                                       : {}),

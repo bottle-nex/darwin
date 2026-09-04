@@ -15,6 +15,7 @@ import {
     HARNESS_OPTIONS,
     HARNESS_SUPPORTS_EFFORT,
 } from "@/types/harness.type";
+import { EXECUTION_MODE_OPTIONS, type ExecutionMode } from "@/types/project";
 
 import SettingsRow from "./SettingsRow";
 import SettingsTilePicker from "./SettingsTilePicker";
@@ -35,6 +36,7 @@ export default function AIHarnessSettingsSection({
     const [harnessDraft, setHarnessDraft] = useState<Harness | null>(null);
     const [modelDraft, setModelDraft] = useState<string | null>(null);
     const [effortDraft, setEffortDraft] = useState<Effort | null>(null);
+    const [modeDraft, setModeDraft] = useState<ExecutionMode | null>(null);
 
     if (!isAdmin) {
         return (
@@ -58,9 +60,13 @@ export default function AIHarnessSettingsSection({
     const savedEffort = config?.defaultEffort ?? null;
     const effort = effortDraft ?? (harnessDraft ? null : savedEffort);
 
+    const savedMode = config?.executionMode ?? "Autonomous";
+    const mode = modeDraft ?? savedMode;
+
     const dirty =
         harness !== savedHarness ||
         model !== savedModel ||
+        mode !== savedMode ||
         effort !== (supportsEffort ? savedEffort : null);
     const canSave = dirty && Boolean(model) && !update.isPending;
 
@@ -76,6 +82,7 @@ export default function AIHarnessSettingsSection({
             projectId,
             harness,
             default_model: model,
+            execution_mode: mode,
             ...(supportsEffort && effort ? { default_effort: effort } : {}),
         });
     }
@@ -102,6 +109,20 @@ export default function AIHarnessSettingsSection({
                 </>
             }
         >
+            <SettingsRow
+                label="Execution mode"
+                description="How much the agent decides on its own. An issue can override this."
+                stack
+            >
+                <SettingsTilePicker
+                    name="executionMode"
+                    columns={2}
+                    options={EXECUTION_MODE_OPTIONS}
+                    value={mode}
+                    onChange={setModeDraft}
+                />
+            </SettingsRow>
+
             <SettingsRow
                 label="Harness"
                 description="The agent CLI that runs issues in this project."

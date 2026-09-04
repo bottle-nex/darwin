@@ -69,6 +69,7 @@ model ProjectConfig {
   harness            Harness          @default(Claude)
   defaultModel       String?
   defaultEffort      Effort?
+  executionMode      ExecutionMode    @default(Autonomous)
 }
 
 model ProjectMember {

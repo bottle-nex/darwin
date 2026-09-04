@@ -25,6 +25,7 @@ export const IssueStatus = {
     Todo: "Todo",
     Queued: "Queued",
     InProgress: "InProgress",
+    AwaitingApproval: "AwaitingApproval",
     InReview: "InReview",
     Done: "Done",
     Failed: "Failed",
@@ -32,6 +33,12 @@ export const IssueStatus = {
     Parked: "Parked",
 } as const;
 export type IssueStatus = (typeof IssueStatus)[keyof typeof IssueStatus];
+
+export const ExecutionMode = {
+    Autonomous: "Autonomous",
+    Manual: "Manual",
+} as const;
+export type ExecutionMode = (typeof ExecutionMode)[keyof typeof ExecutionMode];
 
 export const GithubImportTarget = {
     AgentBoard: "AgentBoard",

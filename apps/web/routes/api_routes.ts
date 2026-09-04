@@ -177,3 +177,6 @@ export const DARWIN_CANCEL_RUN_URL = (run_id: string) => `${DARWIN_URL}/runs/${r
 export const DARWIN_THREADS_URL = (project_id: string) => `${DARWIN_URL}/threads/${project_id}`;
 export const DARWIN_THREAD_URL = (project_id: string, thread_id: string) =>
     `${DARWIN_THREADS_URL(project_id)}/${thread_id}`;
+
+export const ISSUE_QUESTIONS_URL = (issueId: string) => `${API_URL}/questions/issue/${issueId}`;
+export const QUESTION_ANSWER_URL = (questionId: string) => `${QUESTION_URL(questionId)}/answer`;

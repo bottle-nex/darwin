@@ -20,7 +20,7 @@ const TEMPLATE_NAME = "node-py-claude-template";
 const TEMPLATE_TAG = "stable";
 const SANDBOX_MCP_ENTRY = "/opt/darwin/sandbox-mcp/index.js";
 const CAPSULE_CHECK_ENTRY = "/opt/darwin/capsule-check/index.js";
-const SANDBOX_MCP_TOOLS = ["report_status", "report_progress"];
+const SANDBOX_MCP_TOOLS = ["report_status", "report_progress", "ask_user"];
 
 /**
  * Asks the MCP server which tools it serves, over its own stdio protocol.
@@ -84,7 +84,7 @@ const REQUIREMENTS: Requirement[] = [
          */
         name: "sandbox-mcp",
         command: mcp_tools_probe(),
-        needed_for: "report_progress and report_status, the agent's own way to report",
+        needed_for: "report_progress, report_status and ask_user — how the agent reports and asks",
     },
     {
         name: "graphify",

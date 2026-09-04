@@ -1,10 +1,14 @@
 "use client";
 import { useVirtualizer } from "@tanstack/react-virtual";
-import { run_log_level, type RunLogEvent, RunLogState } from "@trydarwin/types";
+import { run_log_level, type RunLogEvent, RunLogEventKind, RunLogState } from "@trydarwin/types";
 import { DownloadIcon, DropdownCaretIcon, LoadingSpinnerIcon } from "@trydarwin/ui/icons";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { toast } from "sonner";
 
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { useAnswerQuestion, useIssueQuestions } from "@/hooks/connectors/useIssueQuestions";
 import { useRunLogs } from "@/hooks/runLogs/useRunLogs";
 import { useSocketConnection } from "@/hooks/socket/useSocketConnection";
 import { apiClient } from "@/lib/axios";
@@ -28,10 +32,12 @@ async function openArchive(runId: string) {
 export default function AgentLogList({
     runId,
     projectId,
+    issueId,
     canDownload,
 }: {
     runId: string;
     projectId: string;
+    issueId?: string;
     canDownload: boolean;
 }) {
     "use no memo";
@@ -41,6 +47,16 @@ export default function AgentLogList({
     const [scrollElement, setScrollElement] = useState<HTMLDivElement | null>(null);
     const [opened, setOpened] = useState<ReadonlySet<number>>(() => new Set());
     const followTail = useRef(true);
+
+    const { data: pendingQuestions } = useIssueQuestions(issueId);
+    const answer = useAnswerQuestion(issueId ?? "");
+
+    // A question the agent is still blocked on is answerable right where it was asked; once it
+    // is answered the same row becomes plain history, and the answer arrives as its own event.
+    const waiting = useMemo(
+        () => new Set((pendingQuestions ?? []).map((question) => question.id)),
+        [pendingQuestions],
+    );
 
     const events = useMemo(() => data?.events ?? [], [data]);
     const rows = useMemo(() => toAgentLogRows(events), [events]);
@@ -129,6 +145,17 @@ export default function AgentLogList({
                                 open={opened.has(rows[item.index]!.seq)}
                                 onToggle={toggle}
                                 railed={item.index < rows.length - 1}
+                                waiting={waiting}
+                                busy={answer.isPending}
+                                onAnswer={(questionId, value) =>
+                                    answer.mutate(
+                                        { questionId, value },
+                                        {
+                                            onSuccess: () => toast.success("Sent to the agent"),
+                                            onError: () => toast.error("Could not send that"),
+                                        },
+                                    )
+                                }
                             />
                         </div>
                     ))}
@@ -143,11 +170,17 @@ function LogRow({
     open,
     onToggle,
     railed,
+    waiting,
+    busy,
+    onAnswer,
 }: {
     event: RunLogEvent;
     open: boolean;
     onToggle: (seq: number) => void;
     railed: boolean;
+    waiting: ReadonlySet<string>;
+    busy: boolean;
+    onAnswer: (questionId: string, value: string) => void;
 }) {
     const Icon = ICON[event.kind];
     const title = titleOf(event);
@@ -224,7 +257,75 @@ function LogRow({
                         </motion.div>
                     )}
                 </AnimatePresence>
+
+                {event.kind === RunLogEventKind.QuestionAsked && waiting.has(event.questionId) && (
+                    <QuestionReply
+                        options={event.options ?? []}
+                        busy={busy}
+                        onAnswer={(value) => onAnswer(event.questionId, value)}
+                    />
+                )}
             </div>
+        </div>
+    );
+}
+
+/**
+ * The answer control, rendered in the run's timeline at the point the question was asked, so the
+ * exchange reads in the order it happened rather than sitting in a panel away from its context.
+ */
+function QuestionReply({
+    options,
+    busy,
+    onAnswer,
+}: {
+    options: string[];
+    busy: boolean;
+    onAnswer: (value: string) => void;
+}) {
+    const [text, setText] = useState("");
+
+    return (
+        <div className="mt-1.5 mb-1 flex flex-col gap-2 rounded-lg border border-amber-500/20 bg-amber-500/5 p-2.5">
+            {options.length > 0 ? (
+                <div className="flex flex-wrap gap-1.5">
+                    {options.map((option) => (
+                        <Button
+                            key={option}
+                            type="button"
+                            variant="flat"
+                            size="xs"
+                            disabled={busy}
+                            onClick={() => onAnswer(option)}
+                        >
+                            {option}
+                        </Button>
+                    ))}
+                </div>
+            ) : (
+                <div className="flex items-center gap-1.5">
+                    <Input
+                        variant="outline"
+                        className="h-7 text-[12px]"
+                        placeholder="Answer the agent"
+                        value={text}
+                        onChange={(event) => setText(event.target.value)}
+                        onKeyDown={(event) => {
+                            if (event.key === "Enter" && text.trim()) onAnswer(text.trim());
+                        }}
+                    />
+                    <Button
+                        type="button"
+                        variant="flat-primary"
+                        size="xs"
+                        className="shrink-0"
+                        disabled={busy || !text.trim()}
+                        onClick={() => onAnswer(text.trim())}
+                    >
+                        Send
+                    </Button>
+                </div>
+            )}
         </div>
     );
 }

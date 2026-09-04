@@ -7,6 +7,7 @@ import type { Sandbox } from "e2b";
 
 import SandboxStream, { truncate } from "../sandbox/service.stream";
 import { type AgentReport, get_parser } from "./parsers/parser.index";
+import QuestionPause, { type QuestionPauseOptions } from "./service.question_pause";
 
 type EnvEffort = "low" | "medium" | "high" | "xhigh" | "max";
 
@@ -26,6 +27,8 @@ export function effort_from_env(value: EnvEffort): Effort {
 
 const REPO_DIR = "/home/user/repo";
 const MAX_TEXT = 160;
+const RESUME_POLL_MS = 2000;
+const MAX_STREAM_RECONNECTS = 5;
 
 export interface HarnessRunOptions {
     harness: Harness;
@@ -44,6 +47,11 @@ export interface HarnessRunOptions {
      * never calls it — in both cases the run behaves exactly as it did before.
      */
     on_observed?: (event: RunLogEventBody) => void;
+    /**
+     * Suspends the sandbox whenever the agent is blocked on a question. Only the issue-solving
+     * run passes this; brief, preview and product-diff runs never wait on a person.
+     */
+    pause_on_question?: Omit<QuestionPauseOptions, "detach" | "reattach" | "on_event">;
 }
 
 export type { AgentReport };
@@ -87,20 +95,121 @@ export default class HarnessRun {
         // exist, so this is the one thing reliably available across all three.
         const started_at = Date.now();
         let stderr_tail = "";
+
+        // Started detached rather than awaited, because a run that can be paused mid-flight
+        // cannot hold its output stream open: pausing drops the connection, and only a command
+        // we own by pid can be reattached to on the other side of the snapshot.
+        const sinks = {
+            onStdout: (chunk: string) => stdout.push(chunk).forEach(observe),
+            onStderr: (chunk: string) => stderr.push(chunk).forEach(trace),
+        };
+
+        let handle = await sandbox.commands.run(command, {
+            cwd: REPO_DIR,
+            envs: options.envs,
+            timeoutMs: options.timeout_ms,
+            background: true,
+            ...sinks,
+        });
+
+        const pid = handle.pid;
+        const pause = options.pause_on_question
+            ? new QuestionPause(
+                  {
+                      ...options.pause_on_question,
+                      detach: () => handle.disconnect(),
+                      reattach: async () => {
+                          handle = await sandbox.commands.connect(pid, {
+                              timeoutMs: options.timeout_ms,
+                              ...sinks,
+                          });
+                      },
+                      on_event: emit,
+                  },
+                  log,
+              )
+            : null;
+
+        if (pause) void pause.watch();
+
         try {
-            const result = await sandbox.commands.run(command, {
-                cwd: REPO_DIR,
-                envs: options.envs,
-                timeoutMs: options.timeout_ms,
-                onStdout: (chunk) => stdout.push(chunk).forEach(observe),
-                onStderr: (chunk) => stderr.push(chunk).forEach(trace),
-            });
+            const result = await HarnessRun.settle(
+                () => handle,
+                async () => {
+                    handle = await sandbox.commands.connect(pid, {
+                        timeoutMs: options.timeout_ms,
+                        ...sinks,
+                    });
+                },
+                pause,
+                log,
+            );
             stderr_tail = result.stderr;
         } finally {
+            pause?.stop();
             stdout.flush().forEach(observe);
             stderr.flush().forEach(trace);
         }
 
         return parser.extract_report(stderr_tail, Date.now() - started_at);
     }
+
+    /**
+     * Waits for the detached command, treating a lost connection as a pause rather than a
+     * failure. `wait()` rejects when the snapshot takes the stream down with it, so the handle is
+     * re-read after the supervisor has resumed and reattached, and the wait is retried on it.
+     */
+    /**
+     * Waits for the detached command, reconnecting rather than failing when the stream drops.
+     *
+     * The process lives in the sandbox, not in this connection, so a dropped stream says nothing
+     * about whether the run is still going — it is exactly what a pause does, and what a network
+     * blip looks like. Reattaching by pid is the whole reason the command is started detached;
+     * only a command that has genuinely gone away is a failure.
+     */
+    private static async settle(
+        current: () => CommandHandleLike,
+        reattach: () => Promise<void>,
+        pause: QuestionPause | null,
+        log: Logger,
+    ): Promise<{ stderr: string }> {
+        let reconnects = 0;
+
+        for (;;) {
+            try {
+                return await current().wait();
+            } catch (error) {
+                if (pause?.is_holding) {
+                    while (pause.is_holding) {
+                        await new Promise((resolve) => setTimeout(resolve, RESUME_POLL_MS));
+                    }
+
+                    log.info("sandbox resumed — waiting on the harness again");
+                    continue;
+                }
+
+                if (reconnects >= MAX_STREAM_RECONNECTS) throw error;
+                reconnects += 1;
+
+                log.warn("harness stream dropped — reattaching to the running command", {
+                    attempt: `${reconnects}/${MAX_STREAM_RECONNECTS}`,
+                    error: String(error),
+                });
+
+                await new Promise((resolve) => setTimeout(resolve, RESUME_POLL_MS));
+
+                try {
+                    await reattach();
+                } catch {
+                    // Nothing to reattach to means the command really is gone, and the original
+                    // stream error is the one that describes why.
+                    throw error;
+                }
+            }
+        }
+    }
+}
+
+interface CommandHandleLike {
+    wait(): Promise<{ stderr: string }>;
 }

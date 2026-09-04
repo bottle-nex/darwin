@@ -40,6 +40,8 @@ model AgentQuestion {
 
   deliveries QuestionDelivery[]
 
+  timeoutBehavior TimeoutBehavior @default(Proceed)
+
   askedAt    DateTime  @default(now())
   expiresAt  DateTime?
   answeredAt DateTime?
@@ -80,6 +82,11 @@ enum SetupStatus {
   Failed
 }
 
+enum TimeoutBehavior {
+  Proceed
+  Deny
+}
+
 enum AgentQuestionType {
   NeedSecret
   NeedValue
@@ -90,6 +97,7 @@ enum AgentQuestionType {
   DefineSuccess
   Clarify
   ApproveCost
+  ApprovePullRequest
 }
 
 enum AgentQuestionStatus {

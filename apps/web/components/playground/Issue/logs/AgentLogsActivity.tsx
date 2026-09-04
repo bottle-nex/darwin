@@ -19,7 +19,13 @@ import CopyLogButton from "./CopyLogButton";
  * Open until a reader closes it: the log is the account of what the agent did to their code, and
  * it is worth more on the page than the row that would replace it.
  */
-export default function AgentLogsActivity({ session }: { session: AgentSession }) {
+export default function AgentLogsActivity({
+    session,
+    issueId,
+}: {
+    session: AgentSession;
+    issueId?: string;
+}) {
     const project = useActiveProject();
     const expanded = useAgentLogsStore((state) => state.expanded[session.id]);
     const setExpanded = useAgentLogsStore((state) => state.setExpanded);
@@ -59,6 +65,7 @@ export default function AgentLogsActivity({ session }: { session: AgentSession }
             <AgentLogList
                 runId={session.id}
                 projectId={project.id}
+                issueId={issueId}
                 canDownload={Boolean(session.logsKey)}
             />
         </Disclosure>

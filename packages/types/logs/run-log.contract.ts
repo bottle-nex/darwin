@@ -10,6 +10,10 @@ export const RunLogEventKind = {
     Committed: "committed",
     PullRequestOpened: "pull_request_opened",
     Notice: "notice",
+    QuestionAsked: "question_asked",
+    QuestionAnswered: "question_answered",
+    SandboxPaused: "sandbox_paused",
+    SandboxResumed: "sandbox_resumed",
 } as const;
 export type RunLogEventKind = (typeof RunLogEventKind)[keyof typeof RunLogEventKind];
 
@@ -63,7 +67,22 @@ export type RunLogActionBody =
           output?: string;
           exitCode?: number;
       }
-    | { kind: typeof RunLogEventKind.Notice; text: string; level?: RunLogLevel };
+    | { kind: typeof RunLogEventKind.Notice; text: string; level?: RunLogLevel }
+    | {
+          kind: typeof RunLogEventKind.QuestionAsked;
+          questionId: string;
+          key: string;
+          prompt: string;
+          options?: string[];
+      }
+    | {
+          kind: typeof RunLogEventKind.QuestionAnswered;
+          key: string;
+          value: string;
+          source: "connector" | "web" | "timeout";
+      }
+    | { kind: typeof RunLogEventKind.SandboxPaused; reason: string }
+    | { kind: typeof RunLogEventKind.SandboxResumed; pausedMs: number };
 
 export type RunLogEventBody = RunLogMilestoneBody | RunLogActionBody;
 

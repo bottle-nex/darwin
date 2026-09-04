@@ -111,7 +111,64 @@ export default class ConnectorService {
             connectors.map((connector) => this.deliver_one(connector, outbound)),
         );
 
-        return sent.filter(Boolean).length;
+        const delivered = sent.filter(Boolean).length;
+
+        console.log(
+            `[agent→user] asked "${question.key}" (${question.type}) — delivered to ${delivered}/${connectors.length} connector(s) for ${user_ids.length} recipient(s)`,
+        );
+        console.log(`[agent→user]   ${question.prompt}`);
+        if (question.options.length > 0) {
+            console.log(`[agent→user]   options: ${question.options.join(" | ")}`);
+        }
+
+        return delivered;
+    }
+
+    static async notify(user_ids: string[], text: string): Promise<number> {
+        const connectors = (
+            await Promise.all(user_ids.map((user_id) => this.active_connectors(user_id)))
+        ).flat();
+
+        const sent = await Promise.all(
+            connectors.map(async (connector) => {
+                const adapter = get_connector(connector.provider);
+                if (!adapter) return false;
+
+                try {
+                    await adapter.send_notice(this.target_of(connector), text);
+                    return true;
+                } catch (error) {
+                    console.error(`failed notifying over ${connector.provider}: `, error);
+                    return false;
+                }
+            }),
+        );
+
+        const delivered = sent.filter(Boolean).length;
+        console.log(
+            `[agent→user] notice delivered to ${delivered}/${connectors.length} connector(s): ${text}`,
+        );
+
+        return delivered;
+    }
+
+    static async notify_issue(issue_id: string, text: string): Promise<number> {
+        const issue = await prisma.issue.findUnique({
+            where: { id: issue_id },
+            select: {
+                createdById: true,
+                assignees: { select: { id: true } },
+                project: { select: { ownerId: true } },
+            },
+        });
+
+        if (!issue) return 0;
+
+        const assignees = issue.assignees.map((assignee) => assignee.id);
+        const recipients =
+            assignees.length > 0 ? assignees : [issue.createdById ?? issue.project.ownerId];
+
+        return this.notify(recipients, text);
     }
 
     private static async deliver_one(
@@ -161,9 +218,19 @@ export default class ConnectorService {
         });
 
         if (!delivery) return null;
-        if (delivery.question.status !== AgentQuestionStatus.Waiting) return null;
-        if (delivery.question.expiresAt && delivery.question.expiresAt < new Date()) return null;
-        if (delivery.question.type === AgentQuestionType.NeedSecret) return null;
+
+        // A second reply on a settled question is answered here and goes no further. The agent
+        // has already taken the first answer and moved on, so letting a later one through would
+        // either be ignored in silence or, worse, overwrite what it acted on.
+        const settled = this.settled_reason(delivery.question);
+        if (settled) {
+            console.log(
+                `[user→agent] ignored a repeat reply to "${delivery.question.key}" — ${settled}`,
+            );
+
+            await this.reply_with_notice(delivery.connector, settled);
+            return null;
+        }
 
         const answered = await prisma.agentQuestion.update({
             where: { id: delivery.questionId },
@@ -174,7 +241,16 @@ export default class ConnectorService {
             },
         });
 
+        console.log(
+            `[user→agent] answered "${answered.key}" via ${provider} — ${
+                answered.type === AgentQuestionType.NeedSecret
+                    ? "(secret, not logged)"
+                    : reply.value
+            }`,
+        );
+
         await this.supersede_siblings(delivery.questionId, delivery.id, "answered elsewhere");
+        await this.settle(answered);
 
         return answered;
     }
@@ -198,6 +274,54 @@ export default class ConnectorService {
         }
 
         return stale.length;
+    }
+
+    private static settled_reason(question: AgentQuestion): string | null {
+        if (question.type === AgentQuestionType.NeedSecret) {
+            return "this one takes a secret, so it has to be answered on the web";
+        }
+
+        if (question.status === AgentQuestionStatus.Answered) {
+            return question.answerValue
+                ? `already answered with "${question.answerValue}" — the agent has moved on`
+                : "already answered — the agent has moved on";
+        }
+
+        if (question.status === AgentQuestionStatus.Cancelled) {
+            return "this question timed out and the agent carried on without an answer";
+        }
+
+        if (question.expiresAt && question.expiresAt < new Date()) {
+            return "this question has expired and the agent is no longer waiting";
+        }
+
+        return null;
+    }
+
+    private static async reply_with_notice(connector: Connector, text: string) {
+        const adapter = get_connector(connector.provider);
+        if (!adapter) return;
+
+        try {
+            await adapter.send_notice(this.target_of(connector), text);
+        } catch (error) {
+            console.error("could not tell the user their reply was ignored: ", error);
+        }
+    }
+
+    /**
+     * Imported lazily because the approval service reaches back into this one to notify, and a
+     * static import would make that cycle load-bearing at module init.
+     */
+    static async settle(question: AgentQuestion): Promise<void> {
+        if (question.type !== AgentQuestionType.ApprovePullRequest) return;
+
+        try {
+            const { default: PullRequestApprovalService } = await import("./service.pr-approval");
+            await PullRequestApprovalService.settle(question);
+        } catch (error) {
+            console.error("failed settling pull request approval: ", error);
+        }
     }
 
     static async supersede_siblings(question_id: string, keep_delivery_id: string, reason: string) {

@@ -79,10 +79,27 @@ export interface ProjectDetail {
 
 export type KanbanOptionView = "FLAT" | "GROUPED";
 
+export type ExecutionMode = "Autonomous" | "Manual";
+
+export const EXECUTION_MODE_OPTIONS: { id: ExecutionMode; label: string; description: string }[] = [
+    {
+        id: "Autonomous",
+        label: "Autonomous",
+        description: "The agent solves the issue and opens the pull request on its own.",
+    },
+    {
+        id: "Manual",
+        label: "Manual",
+        description:
+            "The agent asks you when the issue is ambiguous, and waits for your approval before opening the pull request.",
+    },
+];
+
 export interface ProjectConfig {
     kanbanOptionView: KanbanOptionView;
     productDiffEnabled: boolean;
     harness: Harness;
     defaultModel: string | null;
     defaultEffort: Effort | null;
+    executionMode: ExecutionMode;
 }

@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import ActivityFeed from "./activity/ActivityFeed";
 import IssueBody from "./IssueBody";
 import IssueTitleField from "./IssueTitleField";
+import PendingQuestions from "./PendingQuestions";
 import type { IssueFormState } from "./useIssueForm";
 
 export default function IssueDetailBody({
@@ -37,6 +38,7 @@ export default function IssueDetailBody({
                 </div>
                 <div className="h-px w-full bg-snow/7" />
                 <ActivityFeed issueId={issueId} scrollElement={scrollElement} />
+                <PendingQuestions issueId={issueId} />
             </div>
         </div>
     );

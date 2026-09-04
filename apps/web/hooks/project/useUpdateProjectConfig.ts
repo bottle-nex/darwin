@@ -4,7 +4,7 @@ import { apiClient } from "@/lib/axios";
 import { UPDATE_PROJECT_CONFIG_URL } from "@/routes/api_routes";
 import type { ApiResponse } from "@/types/api";
 import type { Effort, Harness } from "@/types/harness.type";
-import type { KanbanOptionView, ProjectConfig } from "@/types/project";
+import type { ExecutionMode, KanbanOptionView, ProjectConfig } from "@/types/project";
 
 import { PROJECT_QUERY_KEY } from "./useGetProject";
 
@@ -14,6 +14,7 @@ export interface UpdateProjectConfigInput {
     harness?: Harness;
     default_model?: string;
     default_effort?: Effort;
+    execution_mode?: ExecutionMode;
 }
 
 export function useUpdateProjectConfig() {

@@ -14,6 +14,16 @@ import ProductDiffRunner from "../capsule/service.product_diff";
 import E2B from "../sandbox/service.e2b";
 
 const log = Logger.scope("queue");
+// A dispatch job owns a sandbox for the whole run, and in manual mode that run can sit paused
+// for as long as a person takes to answer. BullMQ's defaults assume a job is seconds long: the
+// lock lapses, the job is treated as stalled, and it is handed to another consumer — which then
+// runs the same issue a second time against the same sandbox. Never redeliver these.
+// Long enough that a busy event loop cannot miss a renewal — BullMQ renews at half this — and
+// short enough that a killed vm's job is reclaimed in a couple of minutes rather than stranding
+// its worker. A paused run does not need the lock to outlast the pause: the process holding it
+// is the vm, which stays alive and keeps renewing while the sandbox sleeps.
+const DISPATCH_LOCK_MS = 2 * 60_000;
+const DISPATCH_STALL_CHECK_MS = 30_000;
 const PRODUCT_DIFF_LOCK_MS = 60_000;
 const PRODUCT_DIFF_STALL_CHECK_MS = 30_000;
 
@@ -76,6 +86,9 @@ export default class QueueService {
                 // quick db update — concurrency:1 would serialize every worker in the
                 // fleet through a single job at a time.
                 concurrency: ENV.VM_DISPATCH_CONCURRENCY,
+                lockDuration: DISPATCH_LOCK_MS,
+                stalledInterval: DISPATCH_STALL_CHECK_MS,
+                maxStalledCount: 0,
             },
         );
 

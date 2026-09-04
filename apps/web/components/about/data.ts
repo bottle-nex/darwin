@@ -112,7 +112,7 @@ export const founders: Founder[] = [
     {
         name: "Anjan Suman",
         role: "Co-Founder",
-        image: "/images/founders/anjan.jpeg",
+        image: "/images/founders/anjan.png",
         linkedin: "https://www.linkedin.com/in/anjanstwt/",
         x: "https://x.com/anjanstwt",
         bio: [

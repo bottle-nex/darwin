@@ -49,5 +49,15 @@ export function render_event(event: RunLogEventBody, phase: RunLogPhase): string
             return chalk.blue(`▪ opened pull request #${event.number}`);
         case RunLogEventKind.Notice:
             return NOTICE_TONE[run_log_level(event)](truncate(event.text, MAX_TEXT));
+        case RunLogEventKind.QuestionAsked:
+            return chalk.yellow(`? asked "${event.key}" — ${truncate(event.prompt, MAX_TEXT)}`);
+        case RunLogEventKind.SandboxPaused:
+            return chalk.yellow(`⏸ sandbox paused — ${truncate(event.reason, MAX_TEXT)}`);
+        case RunLogEventKind.SandboxResumed:
+            return chalk.green(`⏵ sandbox resumed after ${seconds(event.pausedMs)}`);
+        case RunLogEventKind.QuestionAnswered:
+            return chalk.green(
+                `✓ answered "${event.key}" via ${event.source} — ${truncate(event.value, MAX_TEXT)}`,
+            );
     }
 }

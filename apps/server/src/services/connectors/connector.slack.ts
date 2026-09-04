@@ -14,7 +14,9 @@ import {
 } from "./connector.type";
 
 const API_BASE = "https://slack.com/api";
-const BOT_SCOPES = ["chat:write", "im:write", "users:read"].join(",");
+// im:history is what makes a typed reply reach us at all: without it Slack delivers no
+// message.im events, so the bot can post a question and never learn that it was answered.
+const BOT_SCOPES = ["chat:write", "im:write", "im:history", "users:read"].join(",");
 const SIGNATURE_VERSION = "v0";
 const MAX_SIGNATURE_AGE_SECONDS = 300;
 
@@ -125,6 +127,13 @@ class SlackConnector implements ConnectorAdapter {
         });
 
         return posted.ts;
+    }
+
+    public async send_notice(target: DeliveryTarget, text: string) {
+        await this.call(target.credential, "chat.postMessage", {
+            channel: target.externalChatId,
+            text,
+        });
     }
 
     public parse_reply(payload: unknown): ParsedReply | null {

@@ -1,5 +1,5 @@
 import { Action, Permissions } from "@trydarwin/access-control";
-import { Effort, Harness, Prisma, prisma } from "@trydarwin/database";
+import { Effort, ExecutionMode, Harness, Prisma, prisma } from "@trydarwin/database";
 import { Registry } from "@trydarwin/harness";
 import type { Request, Response } from "express";
 import z from "zod";
@@ -17,6 +17,7 @@ const body_schema = z
         harness: z.enum(Harness).optional(),
         default_model: z.string().min(1).optional(),
         default_effort: z.enum(Effort).optional(),
+        execution_mode: z.enum(ExecutionMode).optional(),
     })
     .strict();
 
@@ -35,7 +36,8 @@ export default async function update_project_config_controller(req: Request, res
         }
 
         const { project_id } = parsed_params.data;
-        const { kanban_option_view, harness, default_model, default_effort } = parsed_body.data;
+        const { kanban_option_view, harness, default_model, default_effort, execution_mode } =
+            parsed_body.data;
         const user_id = req.user.id;
 
         const project_role = await Access.project(user_id, project_id);
@@ -73,6 +75,7 @@ export default async function update_project_config_controller(req: Request, res
             ...(harness !== undefined && { harness }),
             ...(default_model !== undefined && { defaultModel: default_model }),
             ...(default_effort !== undefined && { defaultEffort: default_effort }),
+            ...(execution_mode !== undefined && { executionMode: execution_mode }),
         };
         const config = await prisma.projectConfig.upsert({
             where: { projectId: project_id },
@@ -84,6 +87,7 @@ export default async function update_project_config_controller(req: Request, res
                 harness: true,
                 defaultModel: true,
                 defaultEffort: true,
+                executionMode: true,
             },
         });
 

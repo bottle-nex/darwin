@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 
-import { Harness, Prisma, prisma, WorkerStatus } from "@trydarwin/database";
+import { ExecutionMode, Harness, Prisma, prisma, WorkerStatus } from "@trydarwin/database";
 import { type McpServerSpec, Registry } from "@trydarwin/harness";
 import Logger, { format_duration } from "@trydarwin/logger";
 import { RunLogEventKind, type RunLogMilestoneBody, RunLogPhase } from "@trydarwin/types";
@@ -33,6 +33,10 @@ import SandboxStream, { describe_failure, failure_sentence } from "./service.str
 
 const REPO_DIR = "/home/user/repo";
 const SAFE_BRANCH = /^[A-Za-z0-9._/-]+$/;
+// Held while a run drives this worker and renewed as it goes, so a paused run keeps its claim
+// while a crashed process lets it lapse.
+const WORKER_LEASE_MS = 5 * 60_000;
+const WORKER_LEASE_RENEW_MS = 60_000;
 const SANDBOX_TIMEOUT_MS = 15 * 60_000;
 // E2B rejects sandbox creation above 1 hour outright ("Timeout cannot be greater than 1
 // hours") — this is a hard platform cap, not a tunable. A worker loop that legitimately
@@ -210,8 +214,58 @@ export default class E2B {
         }
     }
 
+    /**
+     * Claims the right to drive this worker, so two jobs for the same worker cannot run at once.
+     *
+     * The queue is configured never to redeliver a dispatch job, but a duplicate enqueue would
+     * still land here, and two loops sharing one sandbox re-run the issue the first is paused on.
+     * The lease is renewed while the loop runs and cleared when it ends, so a process that dies
+     * mid-run releases it by letting the lease lapse rather than stranding the worker forever.
+     */
+    private static async claim_lease(worker_id: string): Promise<boolean> {
+        const now = new Date();
+        const claimed = await prisma.worker.updateMany({
+            where: {
+                id: worker_id,
+                OR: [{ leaseExpiresAt: null }, { leaseExpiresAt: { lt: now } }],
+            },
+            data: { leaseExpiresAt: new Date(now.getTime() + WORKER_LEASE_MS) },
+        });
+
+        return claimed.count === 1;
+    }
+
     public static async run_worker_loop(worker_id: string): Promise<void> {
         const log = Logger.scope(`vm:${worker_id.slice(-8)}`);
+
+        if (!(await E2B.claim_lease(worker_id))) {
+            log.warn("another run already holds this worker — ignoring the duplicate job", {
+                worker: worker_id,
+            });
+            return;
+        }
+
+        const renew_lease = setInterval(() => {
+            void prisma.worker
+                .update({
+                    where: { id: worker_id },
+                    data: { leaseExpiresAt: new Date(Date.now() + WORKER_LEASE_MS) },
+                })
+                .catch(() => undefined);
+        }, WORKER_LEASE_RENEW_MS);
+        renew_lease.unref();
+
+        try {
+            await E2B.drive_worker(worker_id, log);
+        } finally {
+            clearInterval(renew_lease);
+            await prisma.worker
+                .update({ where: { id: worker_id }, data: { leaseExpiresAt: null } })
+                .catch(() => undefined);
+        }
+    }
+
+    private static async drive_worker(worker_id: string, log: Logger): Promise<void> {
         const worker = await prisma.worker.findUniqueOrThrow({
             where: { id: worker_id },
             include: { project: { include: { githubInstallation: true } } },
@@ -451,6 +505,7 @@ export default class E2B {
         const ran_agent = requires_agent_run(issue.agentDoneAt, resuming_push);
 
         let run_id: string | undefined;
+        let run_worker_token: string | undefined;
 
         let run_writer: RunLogWriter | null = null;
         const milestone = (phase: RunLogPhase, event: RunLogMilestoneBody) => {
@@ -474,7 +529,7 @@ export default class E2B {
 
             run_id = randomUUID();
             on_run_started(run_id);
-            const run_worker_token = sign_worker_jwt(context.workerId);
+            run_worker_token = sign_worker_jwt(context.workerId);
             const version_result = await sandbox.commands
                 .run(`${agent.binary} --version`)
                 .catch(() => null);
@@ -565,6 +620,15 @@ export default class E2B {
                     },
                     timeout_ms: ISSUE_SOLVE_TIMEOUT_MS,
                     label: `solving agent for issue #${issue.number}`,
+                    ...(issue.executionMode === ExecutionMode.Manual
+                        ? {
+                              pause_on_question: {
+                                  session_id: run_id,
+                                  sandbox_id: sandbox.sandboxId,
+                                  resume_timeout_ms: WORKER_SANDBOX_TIMEOUT_MS,
+                              },
+                          }
+                        : {}),
                     // Fire-and-forget: the trace arrives as the harness streams it, and
                     // holding that stream to await a cache write would slow the run down
                     // to the speed of its own logging.
@@ -628,6 +692,15 @@ export default class E2B {
         const has_unpushed_work = ran_agent || resuming_push || (!existing_pull && !already_pushed);
         if (has_unpushed_work) {
             await E2B.push_issue_branch(sandbox, issue.prBranch, secrets());
+
+            if (issue.executionMode === ExecutionMode.Manual && run_worker_token) {
+                await RunReporter.notify(
+                    run_worker_token,
+                    issue.id,
+                    `Issue #${issue.number} "${issue.title}" is pushed to ${issue.prBranch}.`,
+                    log,
+                );
+            }
         }
 
         if (issue.agentDoneAt === null) {
@@ -635,6 +708,27 @@ export default class E2B {
                 where: { id: issue.id },
                 data: { agentDoneAt: new Date() },
             });
+        }
+
+        // Manual mode stops here. The branch is pushed and the decision is a person's, so the
+        // worker hands it over and takes the next issue rather than holding this sandbox open
+        // until somebody answers.
+        if (
+            issue.executionMode === ExecutionMode.Manual &&
+            !existing_pull &&
+            run_worker_token &&
+            run_id
+        ) {
+            await RunReporter.request_pr_approval(
+                run_worker_token,
+                issue.id,
+                run_id,
+                await sandbox.files.read(PR_BODY_PATH).catch(() => ""),
+                log,
+            );
+
+            log.info(`issue #${issue.number} awaiting pull request approval`);
+            return;
         }
 
         let pull_request: PullRequestSummary;
@@ -753,9 +847,27 @@ export default class E2B {
                 : []),
             `Commit your changes with a clear commit message.`,
             `Do not push the branch or open a pull request — that is handled for you once you finish.`,
+            ...(issue.executionMode === ExecutionMode.Manual
+                ? [
+                      `This issue is being solved in manual mode. Where the issue is ambiguous about what the result should be, call the ask_user tool and wait for the answer instead of choosing for yourself.`,
+                  ]
+                : []),
             `Write a short markdown summary of your change to ${PR_BODY_PATH}. It becomes the pull request description.`,
             `Write your solve report to ${SOLVE_REPORT_PATH}, following the template below exactly.`,
         ];
+
+        const manual_section =
+            issue.executionMode === ExecutionMode.Manual
+                ? `## Asking before you decide
+
+            This issue is in manual mode: a person is standing by to answer you.
+
+            Call the ask_user tool when the issue does not settle what the result should be — which of two reasonable behaviours is wanted, what a value should be, whether a case you found is in scope. Ask with a concrete question and options where there are options; it blocks until they answer, and if nobody answers in time you are told to use your own judgement.
+
+            Ask about the outcome, never about permission to work. Reading files, editing them, running commands and committing are all yours to do without asking. A question about whether you may use a tool wastes the person's time; a question about what the fix should actually do is the reason they are there.
+
+            Ask once for each decision and carry the answer forward. If you can settle it from the codebase, settle it and say so in your report rather than asking.`
+                : null;
 
         const report = `## Your solve report
 
@@ -808,7 +920,7 @@ export default class E2B {
 
             Never start a long-running command in the background and end your turn waiting on it. This is a single non-interactive run: there is no later turn to come back to, so anything left running when you stop is lost and the issue goes unsolved. Run it in the foreground and wait for it to finish.`;
 
-        return [intro, brief, issue_section, history, follow_up, steps, report]
+        return [intro, brief, issue_section, history, follow_up, steps, manual_section, report]
             .filter(Boolean)
             .join("\n\n");
     }
