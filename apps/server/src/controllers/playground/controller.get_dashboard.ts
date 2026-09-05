@@ -1,6 +1,6 @@
 import { Action, Permissions } from "@trymatcha/access-control";
 import { prisma } from "@trymatcha/database";
-import { BackgroundLightingColor, CodeTheme, DefaultHomeView } from "@trymatcha/types";
+import { BackgroundLightingColor, CodeTheme, DefaultHomeView, DiffView } from "@trymatcha/types";
 import type { Request, Response } from "express";
 import z from "zod";
 
@@ -17,6 +17,7 @@ const DEFAULT_USER_CONFIG = {
     backgroundLightingColor: BackgroundLightingColor.Violet,
     defaultHomeView: DefaultHomeView.Kanban,
     codeTheme: CodeTheme.Matcha,
+    diffView: DiffView.Unified,
 };
 
 export default class GetDashboardController {
@@ -80,6 +81,7 @@ export default class GetDashboardController {
                     backgroundLightingColor: true,
                     defaultHomeView: true,
                     codeTheme: true,
+                    diffView: true,
                 },
             });
 

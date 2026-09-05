@@ -200,8 +200,8 @@ enum IssueStatus {
   Parked
 }
 
-/// A `@member` or `#issue` reference inside an issue's description, mirroring
-/// MessageReference for chat. Exactly one of memberId / referencedIssueId is set.
+/// A `@member`, `@team` or `#issue` reference inside an issue's description, mirroring
+/// MessageReference for chat. Exactly one of memberId / referencedIssueId / teamId is set.
 /// The description itself stores only the reference token, so these rows are the
 /// queryable index — backlinks and mention notifications read them.
 model DescriptionReference {
@@ -209,14 +209,17 @@ model DescriptionReference {
   issueId           String
   memberId          String?
   referencedIssueId String?
+  teamId            String?
 
   issue           Issue          @relation(name: "DescriptionReferenceSource", fields: [issueId], references: [id], onDelete: Cascade)
   member          ProjectMember? @relation(fields: [memberId], references: [id], onDelete: Cascade)
   referencedIssue Issue?         @relation(name: "DescriptionReferenceTarget", fields: [referencedIssueId], references: [id], onDelete: Cascade)
+  team            Team?          @relation(fields: [teamId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
 
   @@index([issueId])
   @@index([memberId])
   @@index([referencedIssueId])
+  @@index([teamId])
 }

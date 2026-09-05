@@ -284,6 +284,12 @@ export interface ReferencedIssue {
     priority: number;
 }
 
+export interface ReferencedTeam {
+    id: string;
+    name: string;
+    icon: unknown;
+}
+
 export interface MessageReference {
     id: string;
     chatId: string | null;
@@ -291,10 +297,12 @@ export interface MessageReference {
     teamChatId: string | null;
     memberId: string | null;
     issueId: string | null;
+    teamId: string | null;
     description: string | null;
 
     member?: ProjectMember | null;
     issue?: ReferencedIssue | null;
+    team?: ReferencedTeam | null;
 
     createdAt: Date;
 }

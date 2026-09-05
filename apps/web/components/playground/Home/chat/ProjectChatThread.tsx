@@ -55,7 +55,7 @@ type ChatThreadProps = {
     hasOlder?: boolean;
     pageCount?: number;
     canDeleteAny?: boolean;
-    memberUserIds?: readonly string[];
+    teamId?: string;
     onLoadOlder?: () => Promise<unknown>;
     onRetry?: () => Promise<unknown>;
     onSend: (message: string, references: LabelledReference[], repliedToId?: string) => void;
@@ -92,7 +92,7 @@ export default function ChatThread({
     hasOlder,
     pageCount = 0,
     canDeleteAny,
-    memberUserIds,
+    teamId,
     onLoadOlder,
     onRetry,
     onSend,
@@ -553,7 +553,7 @@ export default function ChatThread({
                     projectId={projectId}
                     placeholder={placeholder}
                     disabled={disabled}
-                    memberUserIds={memberUserIds}
+                    teamId={teamId}
                     onSend={handleSend}
                 >
                     {activeReplyTo ? (

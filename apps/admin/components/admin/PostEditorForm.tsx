@@ -9,7 +9,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import RichTextEditor from "@/components/editor/RichTextEditor";
+import type { Editor } from "@tiptap/react";
+import { RichTextEditor } from "@trymatcha/editor";
+
+import CodeBlockLanguagePicker from "@/components/editor/CodeBlockLanguagePicker";
+import { uploadImage } from "@/lib/uploads";
 import {
     useCreatePost,
     useUpdatePost,
@@ -32,6 +36,8 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
         </div>
     );
 }
+
+const POST_CHAR_LIMIT = 40000;
 
 export default function PostEditorForm({ id }: { id?: string }) {
     const { data: existing, isPending } = usePost(id);
@@ -63,6 +69,7 @@ function PostForm({ id, existing }: { id?: string; existing?: PostDetail }) {
 
     const [content, setContent] = useState(existing?.content ?? "");
     const [bodyEmpty, setBodyEmpty] = useState(!existing?.content);
+    const [editor, setEditor] = useState<Editor | null>(null);
 
     const pending = createPost.isPending || updatePost.isPending;
     const canSave = title.trim().length > 0 && !bodyEmpty && !pending;
@@ -203,13 +210,17 @@ function PostForm({ id, existing }: { id?: string; existing?: PostDetail }) {
 
             <div className="relative mt-6 min-h-[50vh]">
                 <RichTextEditor
+                    placeholder="Write your post… press '/' for commands"
+                    charLimit={POST_CHAR_LIMIT}
+                    onImageUpload={uploadImage}
                     initialContent={existing?.content}
                     onChange={(next) => {
                         setContent(next.html);
                         setBodyEmpty(next.isEmpty);
                     }}
+                    onReady={setEditor}
                 />
-                <aside data-slot="slash-command-portal" className="pointer-events-none" />
+                <CodeBlockLanguagePicker editor={editor} />
             </div>
 
             <p className="mt-12 font-mono text-[10px] tracking-[0.18em] text-mist/20 uppercase">

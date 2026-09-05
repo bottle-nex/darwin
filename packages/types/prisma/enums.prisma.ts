@@ -153,6 +153,7 @@ export const NotificationType = {
     ChatMention: "ChatMention",
     ProjectChatMention: "ProjectChatMention",
     TeamChatMention: "TeamChatMention",
+    DescriptionMention: "DescriptionMention",
     IssueStatusChanged: "IssueStatusChanged",
     IssuePriorityChanged: "IssuePriorityChanged",
     IssueMoved: "IssueMoved",
@@ -218,6 +219,12 @@ export const CodeTheme = {
     A11yDark: "A11yDark",
 } as const;
 export type CodeTheme = (typeof CodeTheme)[keyof typeof CodeTheme];
+
+export const DiffView = {
+    Unified: "Unified",
+    Split: "Split",
+} as const;
+export type DiffView = (typeof DiffView)[keyof typeof DiffView];
 
 export const DefaultHomeView = {
     Inbox: "Inbox",

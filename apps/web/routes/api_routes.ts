@@ -44,6 +44,8 @@ export const PRODUCT_DIFF_ARTIFACT_URLS_URL = (project_id: string, product_diff_
 
 export const REVIEW_URL = (project_id: string, pull_number: number) =>
     `${PROJECT_URL}/${project_id}/review/${pull_number}`;
+export const REVIEW_COMMITS_URL = (project_id: string, pull_number: number) =>
+    `${REVIEW_URL(project_id, pull_number)}/commits`;
 export const REVIEW_FILES_URL = (project_id: string, pull_number: number) =>
     `${REVIEW_URL(project_id, pull_number)}/files`;
 export const REVIEW_COMMENTS_URL = (project_id: string, pull_number: number) =>
@@ -73,6 +75,7 @@ export const DELETE_TEMPLATE_URL = (project_id: string, templateId: string) =>
     `${PROJECT_URL}/${project_id}/templates/${templateId}`;
 
 export const CREATE_TEAM = API_URL + "/teams/create";
+export const UPDATE_TEAM = API_URL + "/teams/update";
 export const GET_TEAM_MEMBERS = (teamId: string) => `${API_URL}/teams/${teamId}/members`;
 export const DELETE_TEAM = (teamId: string) => `${API_URL}/teams/${teamId}`;
 export const CHANGE_MEMBER_AUTHORITY = API_URL + "/teams/change-authority";
@@ -107,7 +110,8 @@ export const SEARCH_ISSUES_URL = (project_id: string, query: string) =>
 export const ISSUE_CONFIG_URL = (id: string) => `${ISSUES_URL}/${id}/config`;
 export const ISSUE_REFERENCES_URL = (id: string) => `${ISSUES_URL}/${id}/references`;
 export const ISSUE_ACTIVITY_URL = (id: string) => `${ISSUES_URL}/${id}/activity`;
-export const ISSUE_SOLVE_REPORTS_URL = (id: string) => `${ISSUES_URL}/${id}/solve-reports`;
+export const ISSUE_ATTEMPTS_URL = (id: string) => `${ISSUES_URL}/${id}/attempts`;
+export const REOPEN_ISSUE_URL = (id: string) => `${ISSUES_URL}/${id}/reopen`;
 export const RUN_LOGS_URL = (runId: string) => `${ISSUES_URL}/runs/${runId}/logs`;
 export const RUN_LOGS_DOWNLOAD_URL = (runId: string) => `${RUN_LOGS_URL(runId)}/download`;
 export const COLUMN_URL = (id: string) => `${ISSUES_URL}/columns/${id}`;

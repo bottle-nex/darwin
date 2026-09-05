@@ -96,10 +96,16 @@ model Team {
   slug        String
   description String?
 
+  /// An `IconPick`: a named icon with a colour, or an emoji. Null falls back to an initials tile.
+  icon Json?
+
   project     Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
   members     TeamMember[]
   invitations Invitation[]
   teamChats   TeamChat[]
+
+  references            MessageReference[]
+  descriptionReferences DescriptionReference[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

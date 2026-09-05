@@ -1,4 +1,4 @@
-import { IssueStatus } from "@trymatcha/types";
+import { hasHumanMove, isBodyEditable, isReopenable } from "@trymatcha/types";
 import type { IconType } from "@trymatcha/ui/icons";
 import {
     HighPriorityIcon,
@@ -9,7 +9,7 @@ import {
 } from "@trymatcha/ui/icons";
 
 import type { IssueTarget } from "@/store/issues/useCreateIssueStore";
-import type { BoardColumn, BoardIssue, ServerIssueStatus } from "@/types/board";
+import type { BoardColumn, BoardIssue } from "@/types/board";
 import type { IssueCommandPage } from "@/types/command.type";
 import type { Priority } from "@/types/kanban";
 
@@ -19,6 +19,15 @@ export const DATE_ICON_COLOR = {
 } as const;
 
 export const ROW_GLYPH_CELL = "flex size-4 shrink-0 items-center justify-center";
+
+export const ATTACHMENT_ROW =
+    "flex w-full items-center gap-2 rounded-md px-0 py-1.5 text-left text-[13.5px] text-neutral-200 no-underline transition-colors hover:bg-snow/5";
+
+export const ATTACHMENT_ROW_CHILD = "pl-[18px]";
+
+export const ATTACHMENT_TREE_BRANCH = "left-0";
+
+export const ATTACHMENT_GLYPH = "size-3.5 shrink-0";
 
 export const STACKED_CAPSULE =
     "w-full rounded-md bg-transparent px-1.5 py-1.5 text-[13.5px] text-neutral-200 ring-0 [&_svg]:size-[18px] hover:bg-snow/5 disabled:cursor-default disabled:text-neutral-400 disabled:hover:bg-transparent";
@@ -55,24 +64,17 @@ export const PRIORITY_OPTIONS: PriorityOption[] = [
 ];
 
 export function isEditable(issue: BoardIssue): boolean {
-    return (
-        issue.status === IssueStatus.Todo ||
-        issue.status === IssueStatus.Queued ||
-        issue.status === IssueStatus.Parked
-    );
+    return isBodyEditable(issue.status);
 }
-
-/**
- * The agent owns where an issue sits on the board while it is working it, so those
- * two fields freeze mid-run. Everything else — priority, tags, assignees, dates —
- * stays editable at any status; retagging a finished issue is normal.
- */
-const AGENT_RUNNING: ServerIssueStatus[] = [IssueStatus.InProgress, IssueStatus.InReview];
 
 export function isFieldEditable(issues: BoardIssue[], field: IssueCommandPage): boolean {
     if (issues.length === 0) return false;
     if (field !== "status" && field !== "move") return true;
-    return issues.every((issue) => !AGENT_RUNNING.includes(issue.status));
+    return issues.every((issue) => hasHumanMove(issue.status));
+}
+
+export function canReopen(issue: BoardIssue): boolean {
+    return isReopenable(issue.status);
 }
 
 export function targetForIssue(issue: BoardIssue, columns: BoardColumn[]): IssueTarget {

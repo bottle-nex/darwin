@@ -1,10 +1,9 @@
-import { Action, Permissions } from "@trymatcha/access-control";
 import { ActivitySurface, prisma } from "@trymatcha/database";
 import { ACTIVITY_ACTOR_SELECT, ActivityService } from "@trymatcha/services";
 import type { Request, Response } from "express";
 import z from "zod";
 
-import Access from "../../access-control/access";
+import { readable_issue_project } from "../../access-control/issue-access";
 import ResponseWriter from "../../services/service.response";
 
 const DEFAULT_LIMIT = 100;
@@ -36,20 +35,8 @@ export default class IssueActivityListController {
         }
 
         try {
-            const issue = await prisma.issue.findUnique({
-                where: { id: params_data.id },
-                select: { projectId: true },
-            });
-            if (!issue) {
-                ResponseWriter.not_found(res, "Issue not found");
-                return;
-            }
-
-            const role = await Access.project(user.id, issue.projectId);
-            if (!role || !Permissions.project(role, Action.project.read)) {
-                ResponseWriter.not_authorized(res, "You dont have access to the project");
-                return;
-            }
+            const project_id = await readable_issue_project(res, user.id, params_data.id);
+            if (!project_id) return;
 
             const limit = query_data.limit ?? DEFAULT_LIMIT;
 

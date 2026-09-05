@@ -8,7 +8,6 @@ import {
 } from "@trymatcha/types";
 import { InboxIcon, NotificationsBellIcon } from "@trymatcha/ui/icons";
 import { isAxiosError } from "axios";
-import { useMemo } from "react";
 
 import PaneEmptyState from "@/components/playground/Core/components/PaneEmptyState";
 import { notification_target } from "@/components/playground/Core/Notifications/notificationView";
@@ -107,10 +106,6 @@ function InboxChatDetail({
     const { data: teamMembers } = useGetTeamMembers(teamId);
     const viewerId = SessionServices.get_user()?.id;
     const viewerMembership = teamMembers?.members.find((member) => member.user.id === viewerId);
-    const memberUserIds = useMemo(
-        () => (teamId ? (teamMembers?.members.map((member) => member.user.id) ?? []) : undefined),
-        [teamId, teamMembers],
-    );
     const thread = teamId ? teamThread : projectThread;
     const accessLost =
         Boolean(teamId) && (teamThread.accessDenied || Boolean(teamMembers && !viewerMembership));
@@ -130,7 +125,7 @@ function InboxChatDetail({
                 pageCount={thread.pageCount}
                 disabled={accessLost}
                 canDeleteAny={teamId ? viewerMembership?.role === TeamRole.Maintainer : undefined}
-                memberUserIds={memberUserIds}
+                teamId={teamId}
                 placeholder={teamId ? "Message the team..." : "Message the project..."}
                 emptyMessage={
                     accessLost ? "You no longer have access to this team." : "No messages yet."

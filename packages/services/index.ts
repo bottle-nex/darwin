@@ -15,4 +15,10 @@ export {
     default as PubSubSystem,
 } from "./src/service.pubsub";
 export { default as PublisherSystem, publisher } from "./src/service.publisher";
+export {
+    DESCRIPTION_REFERENCE_INCLUDE,
+    description_reference_labels,
+    type DescriptionReferenceRow,
+    issue_prompt_text,
+} from "./src/service.references";
 export { default as SubscriberSystem } from "./src/service.subscriber";

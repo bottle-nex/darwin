@@ -18,6 +18,7 @@ export const NOTIFICATION_SCOPE = {
     [NotificationType.ChatMention]: NotificationScope.Project,
     [NotificationType.ProjectChatMention]: NotificationScope.Project,
     [NotificationType.TeamChatMention]: NotificationScope.Project,
+    [NotificationType.DescriptionMention]: NotificationScope.Project,
     [NotificationType.MessageReacted]: NotificationScope.Project,
     [NotificationType.AddedToProject]: NotificationScope.Member,
     [NotificationType.AddedToTeam]: NotificationScope.Member,

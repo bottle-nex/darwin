@@ -28,6 +28,11 @@ enum CodeTheme {
   A11yDark
 }
 
+enum DiffView {
+  Unified
+  Split
+}
+
 enum DefaultHomeView {
   Inbox
   Chats
@@ -96,6 +101,7 @@ model UserConfig {
   backgroundLightingColor   BackgroundLightingColor @default(Violet)
   defaultHomeView           DefaultHomeView         @default(Kanban)
   codeTheme                 CodeTheme               @default(Matcha)
+  diffView                  DiffView                @default(Unified)
 }
 
 model GithubAccount {

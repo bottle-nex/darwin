@@ -1,6 +1,7 @@
 import { createIcon } from "./createIcon";
 import { BsArrowDownShort } from "react-icons/bs";
 import { HiOutlineArrowLeft } from "react-icons/hi2";
+import { IoArrowBackSharp } from "react-icons/io5";
 import { LuChevronDown, LuChevronUp, LuChevronsUpDown, LuSearch } from "react-icons/lu";
 import {
     MdArrowBack,
@@ -31,6 +32,8 @@ export const DiffExpandIcon = createIcon(LuChevronsUpDown);
 export const DropdownCaretIcon = createIcon(MdKeyboardArrowDown);
 
 export const DropdownCaretUpIcon = createIcon(MdKeyboardArrowUp);
+
+export const EnterArrowIcon = createIcon(IoArrowBackSharp);
 
 export const FooterLinkHoverArrowIcon = createIcon(BsArrowDownShort);
 

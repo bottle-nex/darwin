@@ -1,5 +1,6 @@
 "use client";
 
+import { TeamEntityIcon } from "@trymatcha/ui/icons";
 import { forwardRef, useImperativeHandle, useState } from "react";
 
 import PlaygroundAvatar, {
@@ -7,11 +8,19 @@ import PlaygroundAvatar, {
     toneFor,
 } from "@/components/playground/Core/components/PlaygroundAvatar";
 import { Button } from "@/components/ui/button";
+import { IconPickGlyph } from "@/components/ui/IconPicker";
+import { MENU_ITEM, MENU_SURFACE } from "@/components/ui/menuSurface";
 import { useIssueIdentifier } from "@/hooks/issues/useIssueIdentifier";
 import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
 import { cn } from "@/lib/utils";
 
 import type { ReferenceSuggestion } from "./referenceMention";
+
+const ROW_CLASS = cn(MENU_ITEM, "w-full gap-x-2 text-left");
+const PANEL_CLASS = cn(
+    MENU_SURFACE,
+    "pointer-events-auto flex max-h-56 w-72 flex-col gap-px overflow-y-auto",
+);
 
 function keyOf(item: ReferenceSuggestion): string {
     return `${item.kind}:${item.id}`;
@@ -56,6 +65,19 @@ function MemberRow({ item }: { item: Extract<ReferenceSuggestion, { kind: "membe
     );
 }
 
+function TeamRow({ item }: { item: Extract<ReferenceSuggestion, { kind: "team" }> }) {
+    return (
+        <>
+            {item.team.icon ? (
+                <IconPickGlyph pick={item.team.icon} className="size-3.5 shrink-0 text-sm" />
+            ) : (
+                <TeamEntityIcon className="size-3.5 shrink-0 text-neutral-400" />
+            )}
+            <span className="truncate">{item.team.name}</span>
+        </>
+    );
+}
+
 const ReferenceSuggestionList = forwardRef<
     ReferenceSuggestionListHandle,
     ReferenceSuggestionListProps
@@ -87,7 +109,12 @@ const ReferenceSuggestionList = forwardRef<
 
     if (!items.length) {
         return (
-            <div className="pointer-events-auto w-64 rounded-md border border-white/10 bg-neutral-900 p-2 text-[13px] text-neutral-500 shadow-lg">
+            <div
+                className={cn(
+                    MENU_SURFACE,
+                    "pointer-events-auto w-72 py-6 text-center text-sm text-neutral-500",
+                )}
+            >
                 No matches
             </div>
         );
@@ -95,8 +122,9 @@ const ReferenceSuggestionList = forwardRef<
 
     return (
         <div
+            data-lenis-prevent
             onMouseDown={(event) => event.preventDefault()}
-            className="pointer-events-auto flex max-h-56 w-72 flex-col gap-px overflow-y-auto rounded-md border border-white/10 bg-neutral-900 p-1 shadow-lg"
+            className={PANEL_CLASS}
         >
             {items.map((item, index) => (
                 <Button
@@ -106,12 +134,16 @@ const ReferenceSuggestionList = forwardRef<
                     onMouseDown={(event) => event.preventDefault()}
                     onClick={() => command(item)}
                     onMouseEnter={() => setSelectedKey(keyOf(item))}
-                    className={cn(
-                        "flex w-full cursor-pointer items-center gap-x-2 rounded-[5px] px-2 py-1.5 text-left text-[13px] text-neutral-200 transition-colors",
-                        index === selected ? "bg-white/10" : "hover:bg-white/5",
-                    )}
+                    data-selected={index === selected}
+                    className={ROW_CLASS}
                 >
-                    {item.kind === "issue" ? <IssueRow item={item} /> : <MemberRow item={item} />}
+                    {item.kind === "issue" ? (
+                        <IssueRow item={item} />
+                    ) : item.kind === "team" ? (
+                        <TeamRow item={item} />
+                    ) : (
+                        <MemberRow item={item} />
+                    )}
                 </Button>
             ))}
         </div>

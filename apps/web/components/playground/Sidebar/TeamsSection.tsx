@@ -76,12 +76,12 @@ export default function PlaygroundSidebarTeamsSection() {
                             )}
                             label={t.name}
                             leading={rowLeading({
-                                kind: "avatar",
-                                letter: t.name.trim().charAt(0).toUpperCase(),
-                                tone: "indigo",
+                                kind: "pick",
+                                pick: t.icon,
+                                fallback: TeamEntityIcon,
                             })}
                             active={isActive}
-                            indent={12}
+                            indent={22}
                             onClick={() => openTeam(t, projectSlug ?? "")}
                         />
                         {(t.viewerRole || isAdmin) && (
@@ -127,7 +127,7 @@ export default function PlaygroundSidebarTeamsSection() {
                 <Row
                     label="Add team"
                     leading={{ kind: "icon", icon: AddIcon }}
-                    indent={12}
+                    indent={22}
                     onClick={openCreateTeam}
                 />
             )}

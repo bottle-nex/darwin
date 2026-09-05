@@ -5,6 +5,7 @@ import { z } from "zod";
 
 import Access from "../../access-control/access";
 import ResponseWriter from "../../services/service.response";
+import { icon_schema } from "../project/icon.schema";
 
 const body_schema = z.object({
     projectId: z.string(),
@@ -15,6 +16,7 @@ const body_schema = z.object({
         .max(50)
         .regex(/^[a-z0-9-]+$/, "Slug must be lowercase letters, numbers, and hyphens only"),
     description: z.string().optional(),
+    icon: icon_schema.optional(),
 });
 
 export default class CreateTeamController {
@@ -48,6 +50,7 @@ export default class CreateTeamController {
                     name: data.name,
                     slug: data.slug,
                     description: data.description,
+                    icon: data.icon,
                     members: {
                         create: {
                             userId,

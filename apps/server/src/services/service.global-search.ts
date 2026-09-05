@@ -34,6 +34,8 @@ type MessageCandidate = {
 };
 type IdRow = { id: string };
 
+type LabelMatches = { memberIds: string[]; issueIds: string[]; teamIds: string[] };
+
 type SenderRow = { name: string | null; email: string } | null;
 
 type LoadedMessage = {
@@ -96,23 +98,26 @@ function id_list(rows: IdRow[]): string[] {
     return rows.map((row) => row.id);
 }
 
-function reference_targets(member_ids: string[], issue_ids: string[], issue_column: string) {
+function reference_targets(labels: LabelMatches, issue_column: string) {
     const targets: Prisma.Sql[] = [];
-    if (member_ids.length) {
-        targets.push(Prisma.sql`"r"."memberId" IN (${Prisma.join(member_ids)})`);
+    if (labels.memberIds.length) {
+        targets.push(Prisma.sql`"r"."memberId" IN (${Prisma.join(labels.memberIds)})`);
     }
-    if (issue_ids.length) {
+    if (labels.issueIds.length) {
         targets.push(
             issue_column === "referencedIssueId"
-                ? Prisma.sql`"r"."referencedIssueId" IN (${Prisma.join(issue_ids)})`
-                : Prisma.sql`"r"."issueId" IN (${Prisma.join(issue_ids)})`,
+                ? Prisma.sql`"r"."referencedIssueId" IN (${Prisma.join(labels.issueIds)})`
+                : Prisma.sql`"r"."issueId" IN (${Prisma.join(labels.issueIds)})`,
         );
+    }
+    if (labels.teamIds.length) {
+        targets.push(Prisma.sql`"r"."teamId" IN (${Prisma.join(labels.teamIds)})`);
     }
     return targets.length ? Prisma.join(targets, " OR ") : null;
 }
 
-function description_reference_predicate(member_ids: string[], issue_ids: string[]) {
-    const targets = reference_targets(member_ids, issue_ids, "referencedIssueId");
+function description_reference_predicate(labels: LabelMatches) {
+    const targets = reference_targets(labels, "referencedIssueId");
     if (!targets) return Prisma.sql`FALSE`;
     return Prisma.sql`EXISTS (
     SELECT 1 FROM "DescriptionReference" AS "r"
@@ -120,12 +125,8 @@ function description_reference_predicate(member_ids: string[], issue_ids: string
     )`;
 }
 
-function message_reference_predicate(
-    fk_match: Prisma.Sql,
-    member_ids: string[],
-    issue_ids: string[],
-) {
-    const targets = reference_targets(member_ids, issue_ids, "issueId");
+function message_reference_predicate(fk_match: Prisma.Sql, labels: LabelMatches) {
+    const targets = reference_targets(labels, "issueId");
     if (!targets) return Prisma.sql`FALSE`;
     return Prisma.sql`EXISTS (
     SELECT 1 FROM "MessageReference" AS "r"
@@ -146,7 +147,7 @@ export default class GlobalSearchService {
         const prefix = `${escaped}%`;
         const number = parse_issue_number(query);
 
-        const [member_rows, label_issue_rows] = await Promise.all([
+        const [member_rows, label_issue_rows, team_rows] = await Promise.all([
             prisma.$queryRaw<IdRow[]>`
         SELECT "m"."id"
         FROM "ProjectMember" AS "m"
@@ -164,23 +165,31 @@ export default class GlobalSearchService {
         OR "i"."title" ILIKE ${needle} ESCAPE '\')
         LIMIT ${LABEL_MATCH_LIMIT}
         `,
+            prisma.$queryRaw<IdRow[]>`
+        SELECT "t"."id"
+        FROM "Team" AS "t"
+        WHERE "t"."projectId" = ${project_id}
+        AND "t"."name" ILIKE ${needle} ESCAPE '\'
+        LIMIT ${LABEL_MATCH_LIMIT}
+        `,
         ]);
 
-        const member_ids = id_list(member_rows);
-        const label_issue_ids = id_list(label_issue_rows);
+        const labels: LabelMatches = {
+            memberIds: id_list(member_rows),
+            issueIds: id_list(label_issue_rows),
+            teamIds: id_list(team_rows),
+        };
 
         const [issue_candidates, message_candidates] = await Promise.all([
             GlobalSearchService.find_issue_candidates(project_id, {
                 needle,
                 prefix,
                 number,
-                member_ids,
-                label_issue_ids,
+                labels,
             }),
             GlobalSearchService.find_message_candidates(project_id, viewer_id, {
                 needle,
-                member_ids,
-                label_issue_ids,
+                labels,
             }),
         ]);
 
@@ -198,11 +207,10 @@ export default class GlobalSearchService {
             needle: string;
             prefix: string;
             number: number | null;
-            member_ids: string[];
-            label_issue_ids: string[];
+            labels: LabelMatches;
         },
     ) {
-        const references = description_reference_predicate(input.member_ids, input.label_issue_ids);
+        const references = description_reference_predicate(input.labels);
 
         return prisma.$queryRaw<IssueCandidate[]>`
       SELECT "i"."id",
@@ -227,22 +235,19 @@ export default class GlobalSearchService {
     private static find_message_candidates(
         project_id: string,
         viewer_id: string,
-        input: { needle: string; member_ids: string[]; label_issue_ids: string[] },
+        input: { needle: string; labels: LabelMatches },
     ) {
         const comment_references = message_reference_predicate(
             Prisma.sql`"r"."chatId" = "c"."id"`,
-            input.member_ids,
-            input.label_issue_ids,
+            input.labels,
         );
         const project_references = message_reference_predicate(
             Prisma.sql`"r"."projectChatId" = "p"."id"`,
-            input.member_ids,
-            input.label_issue_ids,
+            input.labels,
         );
         const team_references = message_reference_predicate(
             Prisma.sql`"r"."teamChatId" = "t"."id"`,
-            input.member_ids,
-            input.label_issue_ids,
+            input.labels,
         );
 
         return prisma.$queryRaw<MessageCandidate[]>`

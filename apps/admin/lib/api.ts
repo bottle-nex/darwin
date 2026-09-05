@@ -17,7 +17,7 @@ apiClient.interceptors.response.use(
     (error) => {
         if (error.response?.status === 401 && AdminSession.is_authenticated()) {
             AdminSession.clear();
-            window.location.href = "/login";
+            window.location.href = new URL("/login", window.location.origin).toString();
         }
         return Promise.reject(error);
     },

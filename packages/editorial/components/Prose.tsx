@@ -18,9 +18,6 @@ const PROSE_CLASS = [
     "[&_blockquote]:my-10 [&_blockquote]:border-l-2 [&_blockquote]:border-primary/40 [&_blockquote]:pl-5 [&_blockquote]:text-[1.05rem] [&_blockquote]:text-mist/50 [&_blockquote]:italic",
     "[&_hr]:my-14 [&_hr]:border-graphite",
     "[&_img]:my-10 [&_img]:w-full [&_img]:rounded-xl [&_img]:border [&_img]:border-graphite",
-    "[&_table]:my-8 [&_table]:w-full [&_table]:text-left [&_table]:text-[15px]",
-    "[&_th]:border-b [&_th]:border-graphite [&_th]:pb-3 [&_th]:font-medium [&_th]:text-snow",
-    "[&_td]:border-b [&_td]:border-graphite/60 [&_td]:py-3",
 ].join(" ");
 
 type ProseProps = {
@@ -30,6 +27,9 @@ type ProseProps = {
 
 export function Prose({ html, className }: ProseProps) {
     return (
-        <div className={cn(PROSE_CLASS, className)} dangerouslySetInnerHTML={{ __html: html }} />
+        <div
+            className={cn("tiptap", PROSE_CLASS, className)}
+            dangerouslySetInnerHTML={{ __html: html }}
+        />
     );
 }

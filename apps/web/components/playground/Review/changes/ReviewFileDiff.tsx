@@ -1,7 +1,7 @@
 "use client";
-import type { ReviewFile } from "@trymatcha/types";
+import { DiffView, type ReviewFile } from "@trymatcha/types";
 import { DiffExpandIcon, DiffFileRowIcon, ExternalLinkIcon } from "@trymatcha/ui/icons";
-import { useMemo, useState } from "react";
+import { type ReactNode, useMemo, useState } from "react";
 import {
     computeNewLineNumber,
     computeOldLineNumber,
@@ -31,10 +31,18 @@ export default function ReviewFileDiff({
     file,
     projectId,
     pullNumber,
+    viewType,
+    expandable: allowExpand,
 }: {
     file: ReviewFile;
     projectId: string | undefined;
     pullNumber: number;
+    viewType: DiffView;
+    /**
+     * False while a commit filter is on. Expansion reads the file at the pull request's base, which
+     * is the wrong side for one commit's hunks, so the option is withheld rather than shown wrong.
+     */
+    expandable: boolean;
 }) {
     const { name, directory } = splitPath(file.filename);
     const { codeTheme } = useUserConfig();
@@ -49,7 +57,7 @@ export default function ReviewFileDiff({
     );
     const hunks: HunkData[] = useMemo(() => parsed?.hunks ?? [], [parsed]);
 
-    const expandable = file.status !== "added" && Boolean(file.patch);
+    const expandable = allowExpand && file.status !== "added" && Boolean(file.patch);
     const { data: fileSource, isPending: sourcePending } = useReviewFileSource(
         projectId,
         pullNumber,
@@ -148,11 +156,11 @@ export default function ReviewFileDiff({
             ) : (
                 <div className="min-h-0 flex-1 overflow-auto" data-lenis-prevent>
                     <Diff
-                        viewType="unified"
+                        viewType={viewType === DiffView.Split ? "split" : "unified"}
                         diffType={parsed!.type}
                         hunks={renderedHunks}
                         tokens={tokens}
-                        renderGutter={renderGutter}
+                        renderGutter={GUTTER[viewType]}
                         className="review-diff"
                     >
                         {(rendered) =>
@@ -187,11 +195,22 @@ export default function ReviewFileDiff({
     );
 }
 
-function renderGutter({ change, side }: GutterOptions) {
-    if (side === "old") return null;
-    const lineNumber = computeNewLineNumber(change);
-    return lineNumber === -1 ? computeOldLineNumber(change) : lineNumber;
-}
+/**
+ * Unified has a single gutter, so it shows the new line number and falls back to the old one for a
+ * deletion. Split has one gutter per side, and each side counts in its own file.
+ */
+const GUTTER: Record<DiffView, (options: GutterOptions) => ReactNode> = {
+    [DiffView.Unified]: ({ change, side }) => {
+        if (side === "old") return null;
+        const lineNumber = computeNewLineNumber(change);
+        return lineNumber === -1 ? computeOldLineNumber(change) : lineNumber;
+    },
+    [DiffView.Split]: ({ change, side }) => {
+        const lineNumber =
+            side === "old" ? computeOldLineNumber(change) : computeNewLineNumber(change);
+        return lineNumber === -1 ? null : lineNumber;
+    },
+};
 
 function toGitDiff(file: ReviewFile): string {
     const before = file.previousFilename ?? file.filename;

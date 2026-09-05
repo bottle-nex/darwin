@@ -1,13 +1,16 @@
 "use client";
 import { type NodeViewProps, NodeViewWrapper } from "@tiptap/react";
+import type { ReferenceKind } from "@trymatcha/types";
+import { reference_sigil } from "@trymatcha/types";
+import { TeamEntityIcon } from "@trymatcha/ui/icons";
 
 import { displayNameOf } from "@/components/playground/Core/components/PlaygroundAvatar";
+import { IconPickGlyph } from "@/components/ui/IconPicker";
 import { useIssue } from "@/hooks/issues/useIssue";
+import { useGetProject } from "@/hooks/project/useGetProject";
 import { useProjectMembers } from "@/hooks/project/useProjectMembers";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { issueIdentifier } from "@/lib/format";
-
-import { ISSUE_TRIGGER, kindFor, MEMBER_TRIGGER } from "./referenceTriggers";
 
 /**
  * The chip renders the target's current name, looked up by id, so a rename or a
@@ -17,36 +20,46 @@ export default function ReferenceChip({ node }: NodeViewProps) {
     const project = useActiveProject();
     const projectId = project?.id;
     const projectName = project?.name;
-    const char = (node.attrs.mentionSuggestionChar as string) ?? MEMBER_TRIGGER;
-    const isIssue = char === ISSUE_TRIGGER;
+    const kind = ((node.attrs.kind as ReferenceKind | null) ?? "member") as ReferenceKind;
     const id = node.attrs.id as string | null;
 
     const { data: issue, isPending: issuePending } = useIssue(
         projectId,
-        isIssue ? (id ?? undefined) : undefined,
+        kind === "issue" ? (id ?? undefined) : undefined,
     );
-    const { data: members } = useProjectMembers(isIssue ? undefined : projectId);
+    const { data: members } = useProjectMembers(kind === "member" ? projectId : undefined);
+    const { data: detail } = useGetProject(kind === "team" ? projectId : undefined);
 
-    const member = isIssue ? undefined : members?.find((row) => row.memberId === id);
+    const member = kind === "member" ? members?.find((row) => row.memberId === id) : undefined;
+    const team = kind === "team" ? detail?.teams.find((row) => row.id === id) : undefined;
 
     const resolved = issue
         ? `${issueIdentifier(projectName, issue.number)} ${issue.title}`
         : member
           ? displayNameOf(member.name, member.email)
-          : null;
+          : (team?.name ?? null);
 
-    const pending = isIssue ? issuePending : !members;
+    const pending = kind === "issue" ? issuePending : kind === "team" ? !detail : !members;
     const label = resolved ?? (node.attrs.label as string | null) ?? (pending ? "…" : "unknown");
 
     return (
         <NodeViewWrapper
             as="span"
             data-type="mention"
-            data-kind={kindFor(char)}
+            data-kind={kind}
             data-missing={!resolved && !pending ? "true" : undefined}
             className="reference-chip"
         >
-            {char}
+            {kind === "team" &&
+                (team?.icon ? (
+                    <IconPickGlyph
+                        pick={team.icon}
+                        className="mr-0.5 inline size-3 align-[-1px] text-[11px]"
+                    />
+                ) : (
+                    <TeamEntityIcon className="mr-0.5 inline size-3 align-[-1px]" />
+                ))}
+            {reference_sigil(kind)}
             {label}
         </NodeViewWrapper>
     );

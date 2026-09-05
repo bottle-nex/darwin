@@ -1,5 +1,5 @@
 "use client";
-import PlaygroundAvatar from "@/components/playground/Core/components/PlaygroundAvatar";
+import TeamAvatar from "@/components/playground/Core/components/TeamAvatar";
 import { useGetProject } from "@/hooks/project/useGetProject";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { useCommandActionStore } from "@/store/command/useCommandActionStore";
@@ -26,13 +26,7 @@ export default function DeleteTeamPickerDialog() {
             resources={teams.map((team) => ({
                 id: team.id,
                 label: team.name,
-                leading: (
-                    <PlaygroundAvatar
-                        tone="purple"
-                        size="sm"
-                        letter={team.name.slice(0, 2).toUpperCase()}
-                    />
-                ),
+                leading: <TeamAvatar team={team} size="sm" />,
             }))}
             onPick={(id) => {
                 const team = teams.find((candidate) => candidate.id === id);

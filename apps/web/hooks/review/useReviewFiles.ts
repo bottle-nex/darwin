@@ -7,13 +7,14 @@ import type { ApiResponse } from "@/types/api";
 
 import { REVIEW_QUERY_KEY } from "./useReview";
 
-export function useReviewFiles(projectId: string | undefined, pullNumber: number) {
+export function useReviewFiles(projectId: string | undefined, pullNumber: number, sha?: string) {
     return useQuery({
-        queryKey: [...REVIEW_QUERY_KEY, projectId, pullNumber, "files"],
+        queryKey: [...REVIEW_QUERY_KEY, projectId, pullNumber, "files", sha ?? null],
         enabled: Boolean(projectId),
-        queryFn: async () => {
+        queryFn: async ({ signal }) => {
             const res = await apiClient.get<ApiResponse<ReviewFile[]>>(
                 REVIEW_FILES_URL(projectId!, pullNumber),
+                { params: sha ? { sha } : undefined, signal },
             );
             return res.data.data;
         },

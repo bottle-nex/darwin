@@ -4,8 +4,10 @@
    imported by both apps/web and apps/admin so they cannot drift. */
 @import "../../../packages/theme/theme.css";
 @import "react-diff-view/style/index.css";
+@import "../../../packages/editor/tiptap.css";
 
 @source "../**/*.{ts,tsx}";
+@source "../../../packages/editor/**/*.{ts,tsx}";
 @source "../../../packages/editorial/**/*.tsx";
 
 @custom-variant dark (&:where(.dark, .dark *));
@@ -13,6 +15,11 @@
 @layer base {
     * {
         @apply border-border outline-ring/50;
+    }
+
+    html,
+    body {
+        overscroll-behavior: none;
     }
 
     body {
@@ -98,6 +105,44 @@
 }
 
 @layer utilities {
+    .chat-composer {
+        outline: none;
+        font-size: 14px;
+        line-height: 20px;
+    }
+
+    .chat-composer p.is-editor-empty:first-child::before {
+        content: attr(data-placeholder);
+        float: left;
+        height: 0;
+        color: rgba(255, 255, 255, 0.3);
+        pointer-events: none;
+    }
+
+    .chat-composer > p + p {
+        margin-top: 0.25rem;
+    }
+
+    /* @member / @team / #issue chips, both in the composer and in sent messages. */
+    .reference-chip {
+        border-radius: 4px;
+        padding: 0 0.25rem;
+        font-weight: 500;
+        white-space: nowrap;
+        background: rgba(255, 255, 255, 0.1);
+        color: #f5f5f5;
+    }
+
+    .reference-chip[data-kind="member"] {
+        background: rgba(99, 102, 241, 0.22);
+        color: #c7d2fe;
+    }
+
+    .reference-chip[data-kind="team"] {
+        background: rgba(16, 185, 129, 0.2);
+        color: #a7f3d0;
+    }
+
     .grain {
         background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='linear' slope='0.12'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
         background-repeat: repeat;
@@ -228,342 +273,6 @@
             --lit-spread: 120%;
         }
     }
-
-    /* Tiptap issue-description editor (Notion/Linear-style slash-command doc). */
-    .tiptap {
-        outline: none;
-        color: #ededed;
-        font-size: 1rem;
-        line-height: 1.65;
-        --tick: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'><path d='M20 6 9 17l-5-5'/></svg>");
-    }
-
-    .tiptap ::selection {
-        background: color-mix(in srgb, var(--color-matcha) 28%, transparent);
-    }
-    .tiptap > * + * {
-        margin-top: 0.5rem;
-    }
-    .tiptap > * + h1,
-    .tiptap > * + h2,
-    .tiptap > * + h3 {
-        margin-top: 1.75rem;
-    }
-    .tiptap h1 + *,
-    .tiptap h2 + *,
-    .tiptap h3 + * {
-        margin-top: 0.4rem;
-    }
-    .tiptap > hr + h1,
-    .tiptap > hr + h2,
-    .tiptap > hr + h3 {
-        margin-top: 1rem;
-    }
-    .tiptap > p + p {
-        margin-top: 0.3rem;
-    }
-
-    .tiptap li + li {
-        margin-top: 0.25rem;
-    }
-
-    .tiptap .editor-placeholder::before {
-        content: attr(data-placeholder);
-        float: left;
-        height: 0;
-        white-space: nowrap;
-        color: rgba(255, 255, 255, 0.3);
-        pointer-events: none;
-        user-select: none;
-    }
-
-    .tiptap.tiptap-compact {
-        font-size: 13px;
-        line-height: 1.55;
-        min-height: 0.5lh;
-    }
-
-    .tiptap.tiptap-compact h1 {
-        font-size: 1.05rem;
-    }
-
-    .tiptap.tiptap-compact h2 {
-        font-size: 0.95rem;
-    }
-
-    .tiptap.tiptap-compact h3 {
-        font-size: 0.9rem;
-    }
-
-    .tiptap.tiptap-compact > * + * {
-        margin-top: 0.35rem;
-    }
-
-    /* Tiptap chat composer — a single-paragraph box, not a document. */
-    .chat-composer {
-        outline: none;
-        font-size: 14px;
-        line-height: 20px;
-    }
-
-    .chat-composer p.is-editor-empty:first-child::before {
-        content: attr(data-placeholder);
-        float: left;
-        height: 0;
-        color: rgba(255, 255, 255, 0.3);
-        pointer-events: none;
-    }
-
-    .chat-composer > p + p {
-        margin-top: 0.25rem;
-    }
-
-    /* @member / #issue chips, both in the composer and in sent messages. */
-    .reference-chip {
-        border-radius: 4px;
-        padding: 0 0.25rem;
-        font-weight: 500;
-        white-space: nowrap;
-        background: rgba(255, 255, 255, 0.1);
-        color: #f5f5f5;
-    }
-
-    .reference-chip[data-kind="member"] {
-        background: rgba(99, 102, 241, 0.22);
-        color: #c7d2fe;
-    }
-
-    .tiptap h1,
-    .tiptap h2,
-    .tiptap h3 {
-        font-weight: 600;
-        color: #f5f5f5;
-        line-height: 1.3;
-    }
-
-    .tiptap h1 {
-        font-size: 1.5rem;
-    }
-    .tiptap h2 {
-        font-size: 1.25rem;
-    }
-    .tiptap h3 {
-        font-size: 1.05rem;
-    }
-
-    .tiptap ul,
-    .tiptap ol {
-        padding-left: 1.25rem;
-    }
-
-    .tiptap ul {
-        list-style: disc;
-    }
-    .tiptap ol {
-        list-style: decimal;
-    }
-
-    .tiptap ul[data-type="taskList"] {
-        list-style: none;
-        padding-left: 0;
-    }
-
-    .tiptap ul[data-type="taskList"] li {
-        display: flex;
-        align-items: flex-start;
-        gap: 0.5rem;
-    }
-
-    .tiptap ul[data-type="taskList"] li > label {
-        margin-top: 0.25rem;
-        user-select: none;
-        display: flex;
-    }
-    .tiptap ul[data-type="taskList"] li > label input[type="checkbox"] {
-        appearance: none;
-        -webkit-appearance: none;
-        display: grid;
-        place-content: center;
-        width: 0.95rem;
-        height: 0.95rem;
-        margin: 0;
-        border: 1px solid rgba(255, 255, 255, 0.18);
-        border-radius: 0.1875rem;
-        background: var(--color-charcoal);
-        cursor: pointer;
-        transition:
-            background 0.12s ease,
-            border-color 0.12s ease;
-    }
-
-    .tiptap ul[data-type="taskList"] li > label input[type="checkbox"]:hover {
-        border-color: rgba(255, 255, 255, 0.32);
-        background: var(--color-graphite);
-    }
-
-    .tiptap ul[data-type="taskList"] li > label input[type="checkbox"]:checked {
-        background: var(--color-snow);
-        border-color: var(--color-snow);
-    }
-    .tiptap ul[data-type="taskList"] li > label input[type="checkbox"]:checked::after {
-        content: "";
-        width: 0.62rem;
-        height: 0.62rem;
-        background-color: var(--color-ink);
-        -webkit-mask: var(--tick) center / contain no-repeat;
-        mask: var(--tick) center / contain no-repeat;
-    }
-
-    .tiptap ul[data-type="taskList"] li > label input[type="checkbox"]:focus-visible {
-        outline: 2px solid color-mix(in srgb, var(--color-snow) 40%, transparent);
-        outline-offset: 1px;
-    }
-
-    .tiptap ul[data-type="taskList"] li > div {
-        flex: 1;
-    }
-    .tiptap ul[data-type="taskList"] li[data-checked="true"] > div {
-        color: rgba(255, 255, 255, 0.35);
-        text-decoration: line-through;
-    }
-
-    .tiptap blockquote {
-        border-left: 2px solid rgba(255, 255, 255, 0.2);
-        padding-left: 0.75rem;
-        color: rgba(255, 255, 255, 0.6);
-    }
-
-    .tiptap pre {
-        background: rgba(255, 255, 255, 0.06);
-        border-radius: 0.5rem;
-        padding: 0.75rem 1rem;
-        font-family: var(--font-mono);
-        font-size: 0.8rem;
-        overflow-x: auto;
-    }
-
-    .tiptap code {
-        background: rgba(255, 255, 255, 0.08);
-        border-radius: 0.25rem;
-        padding: 0.1rem 0.3rem;
-        font-family: var(--font-mono);
-        font-size: 0.85em;
-    }
-
-    .tiptap pre code {
-        background: none;
-        padding: 0;
-    }
-
-    .tiptap a {
-        color: var(--color-primary);
-        text-decoration: underline;
-        text-decoration-color: color-mix(in srgb, var(--color-primary) 60%, transparent);
-        text-decoration-thickness: 1px;
-        text-underline-offset: 2px;
-        cursor: pointer;
-    }
-
-    .tiptap a:hover {
-        text-decoration-color: var(--color-primary);
-    }
-
-    .tiptap .timestamp-chip {
-        display: inline-block;
-        border-radius: 0.4rem;
-        border: 1px solid rgba(255, 255, 255, 0.12);
-        background: rgba(255, 255, 255, 0.06);
-        padding: 0.05rem 0.4rem;
-        font-family: var(--font-mono);
-        font-size: 0.85em;
-        color: #dcdcdc;
-        white-space: nowrap;
-    }
-
-    .tiptap .timestamp-chip.ProseMirror-selectednode {
-        border-color: color-mix(in srgb, var(--color-primary) 70%, transparent);
-        background: color-mix(in srgb, var(--color-primary) 25%, transparent);
-    }
-
-    .tiptap .tableWrapper {
-        overflow-x: auto;
-    }
-
-    /* Separate cells so each tile can round its own corners; the spacing is the
-       gap between them, which is why the cells draw no border of their own. */
-    .tiptap table {
-        width: 100%;
-        table-layout: fixed;
-        border-collapse: separate;
-        border-spacing: 2px;
-        font-size: 0.9rem;
-    }
-
-    .tiptap table p {
-        margin: 0;
-    }
-
-    .tiptap table .selectedCell {
-        background: color-mix(in srgb, var(--color-primary) 18%, transparent);
-    }
-
-    .tiptap table .column-resize-handle {
-        position: absolute;
-        top: 0;
-        right: -2px;
-        bottom: 0;
-        width: 4px;
-        cursor: col-resize;
-        background: color-mix(in srgb, var(--color-primary) 60%, transparent);
-    }
-
-    .tiptap hr {
-        border: none;
-        border-top: 1px solid rgba(255, 255, 255, 0.1);
-        margin: 1rem 0;
-    }
-    .tiptap .prompt {
-        display: inline;
-        padding: 0.05rem 0.35rem;
-        border-radius: 0.3rem;
-        background: color-mix(in srgb, var(--color-primary) 24%, transparent);
-        box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-primary) 60%, transparent);
-        color: #d7d0ff;
-        cursor: pointer;
-        transition:
-            background 0.12s ease,
-            box-shadow 0.12s ease;
-    }
-
-    .tiptap .prompt:hover {
-        background: color-mix(in srgb, var(--color-primary) 34%, transparent);
-        color: #ede9ff;
-    }
-    .tiptap .prompt.ProseMirror-selectednode {
-        background: var(--color-primary);
-        box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-primary) 35%, transparent);
-        color: #17131f;
-    }
-
-    .tiptap .image-node {
-        display: inline-block;
-        width: calc(25% - 8px);
-        margin: 4px;
-        vertical-align: top;
-    }
-
-    .tiptap .image-node img {
-        width: 100%;
-        height: auto;
-        display: block;
-        border-radius: 0.5rem;
-        object-fit: cover;
-    }
-
-    .tiptap:focus,
-    .tiptap:focus-visible {
-        outline: none;
-    }
 }
 
 .review-diff {
@@ -595,26 +304,35 @@
         transparent
     );
 
-    font-size: 14px;
+    font-size: 13px;
     letter-spacing: 0.01em;
 }
 
 .review-diff .diff-line {
-    line-height: 1.7;
+    line-height: 1.65;
 }
 
 .review-diff .diff-gutter-col {
     width: 3.5rem;
 }
 
-.review-diff .diff-gutter-col:first-of-type {
+/* Unified shows one gutter, so the old side's column is collapsed away. Split needs it: each
+   pane counts lines in its own file. */
+.review-diff.diff-unified .diff-gutter-col:first-of-type {
     width: 0;
 }
 
-.review-diff td.diff-gutter:first-of-type {
+.review-diff.diff-unified td.diff-gutter:first-of-type {
     width: 0;
     padding: 0;
     overflow: hidden;
+}
+
+/* The seam between the two panes. Spelled out rather than taken from a Tailwind token: these
+   rules are plain CSS, so an undefined var falls back to currentColor and the seam picks up each
+   row's gutter colour — red down a deletion, green down an insertion. */
+.review-diff.diff-split td.diff-gutter:nth-of-type(3) {
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .review-diff .diff-gutter {
@@ -624,30 +342,38 @@
     font-variant-numeric: tabular-nums;
 }
 
+/* The library breaks with `word-break: break-all`, which splits identifiers mid-token — a wrapped
+   import reads as `fra` / `mer-motion`. Breaking inside a word is the last resort instead, so a
+   line wraps at its spaces where it has any. Both sides of a row are cells of one table row, so
+   wrapping never costs the two panes their alignment. */
 .review-diff .diff-code {
     padding-left: 0.75rem;
     padding-right: 0.75rem;
+    word-break: normal;
+    overflow-wrap: break-word;
 }
 
+/* The bar down the gutter. Both sides share one stripe; only --diff-bar-color differs. */
 .review-diff .diff-gutter-insert,
 .review-diff .diff-gutter-delete {
     background-position: left top;
     background-repeat: no-repeat;
     background-size: var(--diff-bar-width) 100%;
+    background-image: repeating-linear-gradient(
+        to bottom,
+        var(--diff-bar-color) 0 1px,
+        color-mix(in oklab, var(--diff-bar-color) 25%, transparent) 1px 3px
+    );
 }
 
 .review-diff .diff-gutter-insert {
+    --diff-bar-color: var(--diff-add);
     color: var(--diff-gutter-insert-text-color);
-    background-image: linear-gradient(var(--diff-add), var(--diff-add));
 }
 
 .review-diff .diff-gutter-delete {
+    --diff-bar-color: var(--diff-remove);
     color: var(--diff-gutter-delete-text-color);
-    background-image: repeating-linear-gradient(
-        to bottom,
-        var(--diff-remove) 0 1px,
-        color-mix(in oklab, var(--diff-remove) 25%, transparent) 1px 3px
-    );
 }
 
 .review-diff .diff-decoration-content {

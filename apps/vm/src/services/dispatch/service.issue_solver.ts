@@ -1,9 +1,20 @@
 import type { Effort } from "@trymatcha/database";
-import { Harness, IssueStatus, prisma } from "@trymatcha/database";
+import { ActivityType, Harness, IssueStatus, prisma } from "@trymatcha/database";
 import type Logger from "@trymatcha/logger";
-import { IssueBroadcastService } from "@trymatcha/services";
+import {
+    DESCRIPTION_REFERENCE_INCLUDE,
+    description_reference_labels,
+    issue_prompt_text,
+    IssueBroadcastService,
+} from "@trymatcha/services";
+import type { ActivityPayloadMap } from "@trymatcha/types";
 
 import { ENV } from "../../conf/config.env";
+
+export interface PriorAttempt {
+    attemptNumber: number;
+    report: string;
+}
 
 export interface ClaimedIssue {
     id: string;
@@ -15,6 +26,9 @@ export interface ClaimedIssue {
     harness: Harness;
     model: string;
     effort: Effort | null;
+    attemptNumber: number;
+    priorAttempts: PriorAttempt[];
+    reopenNote: string | null;
 }
 
 function resolve_config(
@@ -33,11 +47,7 @@ export default class IssueSolver {
         log: Logger,
     ): Promise<ClaimedIssue | null> {
         const unfinished_issue = await prisma.issue.findFirst({
-            where: {
-                assignerWorkerId: worker_id,
-                status: IssueStatus.InProgress,
-                prUrl: null,
-            },
+            where: { assignerWorkerId: worker_id, status: IssueStatus.InProgress },
             orderBy: { queuePosition: "asc" },
             select: {
                 id: true,
@@ -62,7 +72,16 @@ export default class IssueSolver {
                 title: unfinished_issue.title,
             });
             const { issueConfig: resuming_config, ...resuming_rest } = unfinished_issue;
-            return { ...resuming_rest, prBranch: pr_branch, ...resolve_config(resuming_config) };
+            return {
+                ...resuming_rest,
+                prBranch: pr_branch,
+                description: await this.prompt_description(
+                    unfinished_issue.id,
+                    unfinished_issue.description,
+                ),
+                ...resolve_config(resuming_config),
+                ...(await this.history_of(unfinished_issue.id)),
+            };
         }
 
         const issue = await prisma.issue.findFirst({
@@ -97,7 +116,54 @@ export default class IssueSolver {
         log.step(`claimed issue #${issue.number}`, { title: issue.title });
         await this.announce_claim(issue.id, log);
         const { issueConfig: claimed_config, ...claimed_rest } = issue;
-        return { ...claimed_rest, prBranch: pr_branch, ...resolve_config(claimed_config) };
+        return {
+            ...claimed_rest,
+            prBranch: pr_branch,
+            description: await this.prompt_description(issue.id, issue.description),
+            ...resolve_config(claimed_config),
+            ...(await this.history_of(issue.id)),
+        };
+    }
+
+    private static async prompt_description(issue_id: string, html: string): Promise<string> {
+        const rows = await prisma.descriptionReference.findMany({
+            where: { issueId: issue_id },
+            include: DESCRIPTION_REFERENCE_INCLUDE,
+        });
+        return issue_prompt_text(html, description_reference_labels(rows));
+    }
+
+    private static async history_of(issue_id: string) {
+        const [sessions, reopen] = await Promise.all([
+            prisma.agentSession.findMany({
+                where: { issueId: issue_id },
+                orderBy: { attemptNumber: "asc" },
+                select: { attemptNumber: true, report: true },
+            }),
+            prisma.issueActivity.findFirst({
+                where: { issueId: issue_id, type: ActivityType.IssueReopened },
+                orderBy: { seq: "desc" },
+                select: { payload: true },
+            }),
+        ]);
+
+        const reopen_payload = reopen
+            ? (reopen.payload as unknown as ActivityPayloadMap["IssueReopened"])
+            : null;
+        const note = reopen_payload ? (reopen_payload.noteText ?? reopen_payload.note) : null;
+
+        return {
+            attemptNumber: sessions.length + 1,
+            priorAttempts: sessions
+                .filter((session): session is { attemptNumber: number; report: string } =>
+                    Boolean(session.report),
+                )
+                .map((session) => ({
+                    attemptNumber: session.attemptNumber,
+                    report: session.report,
+                })),
+            reopenNote: note,
+        };
     }
 
     /**

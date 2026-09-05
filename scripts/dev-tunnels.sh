@@ -2,15 +2,17 @@
 # Exposes the two local services a sandbox has to reach, and points .env at them.
 #
 # The sandbox runs on E2B's infrastructure, so "localhost" inside it is the sandbox — every
-# callback it makes needs a public address. The vm worker keeps the reserved ngrok domain
-# because .env records it; the api server gets a cloudflared quick tunnel, whose hostname is
-# regenerated on every start and so is written back into .env here rather than by hand.
+# callback it makes needs a public address. The vm worker uses this ngrok account's reserved
+# free domain — cloudflared's free "quick tunnels" have no uptime or DNS-propagation guarantee,
+# and in practice one of two tunnels started together would sometimes just never resolve. The
+# api server keeps the cloudflared quick tunnel, whose hostname is regenerated on every start
+# and so is written back into .env here rather than by hand.
 
 set -euo pipefail
 
 VM_PORT="${VM_PORT:-4100}"
 API_PORT="${API_PORT:-4402}"
-NGROK_DOMAIN="${NGROK_DOMAIN:-richness-senorita-oasis.ngrok-free.dev}"
+NGROK_DOMAIN="${NGROK_DOMAIN:-liberalistic-stereographic-leila.ngrok-free.dev}"
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 ENV_FILE="$ROOT/.env"
@@ -30,7 +32,7 @@ for tool in ngrok cloudflared; do
 done
 
 echo "vm worker   :$VM_PORT  -> ngrok      $NGROK_DOMAIN"
-ngrok http --url="$NGROK_DOMAIN" "$VM_PORT" --log=stdout > "$RUN_DIR/ngrok.log" 2>&1 &
+ngrok http --url="https://$NGROK_DOMAIN" "$VM_PORT" --log=stdout > "$RUN_DIR/ngrok.log" 2>&1 &
 NGROK_PID=$!
 
 echo "api server  :$API_PORT  -> cloudflared (assigning hostname...)"

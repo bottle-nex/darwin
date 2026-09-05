@@ -8,7 +8,7 @@ export function ContentCard({ entry, href }: { entry: ContentSummary; href: stri
     return (
         <Link
             href={href}
-            className="group flex flex-col rounded-[10px] border border-graphite bg-linear-to-b from-charcoal to-ink p-3 transition-colors hover:border-edge"
+            className="group flex flex-col rounded-xl border border-graphite bg-linear-to-b from-charcoal to-ink p-3 transition-colors hover:border-edge"
         >
             <CardCover src={entry.coverImage} title={entry.title} version={entry.version} />
 

@@ -9,6 +9,8 @@ import {
 
 const WORDS_PER_MINUTE = 220;
 
+const POST_TABLE_SPAN_ATTRS = [...TABLE_SPAN_ATTRS, "colwidth"];
+
 const ALLOWED_TAGS = [
     ...BASE_ALLOWED_TAGS,
     "u",
@@ -26,12 +28,14 @@ export default class PostContentService {
             allowedTags: ALLOWED_TAGS,
             allowedAttributes: {
                 a: SAFE_LINK_ATTRS,
-                td: TABLE_SPAN_ATTRS,
-                th: TABLE_SPAN_ATTRS,
+                td: POST_TABLE_SPAN_ATTRS,
+                th: POST_TABLE_SPAN_ATTRS,
                 img: ["src", "alt", "title", "width", "height"],
                 code: ["class"],
                 pre: ["class"],
                 div: ["class", "data-type"],
+                figure: ["class", "data-type"],
+                figcaption: ["class", "data-type"],
                 li: ["class", "data-checked"],
                 ul: ["class", "data-type"],
                 span: ["class"],

@@ -1,7 +1,6 @@
 "use client";
 import { FileIcon } from "@trymatcha/ui/icons";
 
-import LogoLoader from "@/components/app/LogoLoader";
 import { PLAYGROUND_PANE_SHELL } from "@/components/playground/Core/components/paneBar";
 import PaneColumns from "@/components/playground/Core/components/PaneColumns";
 import PaneFallback from "@/components/playground/Core/components/PaneFallback";
@@ -10,7 +9,7 @@ import { PaneLeadSlot } from "@/components/playground/Core/components/Playground
 import { Button } from "@/components/ui/button";
 import Markdown from "@/components/utility/Markdown";
 import { useIssue } from "@/hooks/issues/useIssue";
-import { useSolveReports } from "@/hooks/issues/useSolveReports";
+import { useIssueAttempts } from "@/hooks/issues/useIssueAttempts";
 import { useEscapeExit } from "@/hooks/shortcuts/useEscapeExit";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { shortDate } from "@/lib/format";
@@ -32,11 +31,11 @@ export default function SolveReportDisplay({ route }: { route: SolveReportRoute 
     const openIssue = usePaneRouteStore((s) => s.openIssue);
     const openBoard = usePaneRouteStore((s) => s.openBoard);
     const { data: issue, isPending: issuePending } = useIssue(projectId, route.issueId);
-    const { data: reports, isPending: reportsPending } = useSolveReports(route.issueId);
+    const { data: attempts, isPending: attemptsPending } = useIssueAttempts(route.issueId);
 
     useEscapeExit({ onExit: () => (issue ? openIssue(issue.id) : openBoard()) });
 
-    if (issuePending || reportsPending) return <PaneFallback />;
+    if (issuePending || attemptsPending) return <PaneFallback />;
 
     if (!issue) {
         return (
@@ -48,6 +47,10 @@ export default function SolveReportDisplay({ route }: { route: SolveReportRoute 
             </PaneFallback>
         );
     }
+
+    const reported = (attempts?.attempts ?? []).filter(
+        (attempt): attempt is typeof attempt & { report: string } => Boolean(attempt.report),
+    );
 
     return (
         <main className={PLAYGROUND_PANE_SHELL}>
@@ -64,12 +67,12 @@ export default function SolveReportDisplay({ route }: { route: SolveReportRoute 
                     data-lenis-prevent
                     className="no-scrollbar min-h-0 flex-1 overflow-y-auto px-8 py-12"
                 >
-                    {!reports?.length ? (
+                    {!reported.length ? (
                         <p className="text-[13.25px] text-neutral-500">
                             No run has written a report for this issue yet.
                         </p>
                     ) : (
-                        reports.map((entry) => (
+                        reported.map((entry) => (
                             <section
                                 key={entry.id}
                                 className="border-t border-white/5 pt-8 first:border-t-0 first:pt-0 [&+section]:mt-10"
@@ -78,6 +81,12 @@ export default function SolveReportDisplay({ route }: { route: SolveReportRoute 
                                     Attempt {entry.attemptNumber} · {shortDate(entry.startedAt)}
                                     {entry.model ? ` · ${entry.model}` : ""}
                                 </p>
+                                {entry.reopenedBy && (
+                                    <p className="mb-4 border-l border-white/10 pl-3 text-[13px] text-neutral-400">
+                                        Reopened by {entry.reopenedBy.actorName ?? "someone"} —{" "}
+                                        {entry.reopenedBy.note}
+                                    </p>
+                                )}
                                 <Markdown>{entry.report}</Markdown>
                             </section>
                         ))

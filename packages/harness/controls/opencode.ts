@@ -23,13 +23,12 @@ class OpenCodeHarness extends AgentHarness {
     readonly binary = "opencode";
     readonly pinnedVersion = "";
     readonly models = [
-        "opencode/gemini-3.1-pro",
-        "opencode/minimax-m3",
-        "opencode/grok-4.6",
-        "opencode/grok-4.5",
-        "opencode/deepseek-v4-flash",
-        "opencode/mimo-v2.5-free",
-        "opencode/kimi-k3",
+        "opencode-go/deepseek-v4-flash",
+        "opencode-go/mimo-v2.5",
+        "opencode-go/minimax-m3",
+        "opencode-go/grok-4.6",
+        "opencode-go/grok-4.5",
+        "opencode-go/kimi-k3",
     ];
     readonly credentialEnvVar = "OPENCODE_API_KEY";
     readonly credentialSource = CredentialSource.PlatformKey;

@@ -104,7 +104,7 @@ export function LandingNavbar() {
                 "fixed top-0 left-0 right-0 z-50",
                 "transition-[height,border-color] duration-300 ease-out z-100",
                 scrolled ? "h-15" : "h-17",
-                scrolled ? "border-b border-graphite bg-ink" : "border-b border-transparent",
+                scrolled ? "border-b border-graphite/10 bg-ink" : "border-b border-transparent",
             )}
         >
             <div className={cn(landingContainer, "flex h-full items-center justify-between")}>

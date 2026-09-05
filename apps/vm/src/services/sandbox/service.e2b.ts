@@ -57,12 +57,32 @@ const ISSUE_SOLVE_TIMEOUT_MS = 30 * 60_000;
 const ISSUE_PUSH_TIMEOUT_MS = 10 * 60_000;
 const MAX_PUSH_ATTEMPTS = 3;
 
-export function requires_agent_run(
-    existing_pull: boolean,
-    already_pushed: boolean,
-    agent_done_at: Date | null,
-): boolean {
-    return !existing_pull && !already_pushed && agent_done_at === null;
+export function requires_agent_run(agent_done_at: Date | null, resuming_push: boolean): boolean {
+    return agent_done_at === null && !resuming_push;
+}
+
+const BASE_MCP_SERVER: McpServerSpec = {
+    name: "matcha",
+    command: "node",
+    args: [SANDBOX_MCP_ENTRY],
+    env: {
+        MATCHA_SERVER_URL: ENV.PUBLIC_API_URL,
+        MATCHA_SESSION_KIND: "worker",
+    },
+};
+
+interface SolveContext {
+    sandbox: Sandbox;
+    log: Logger;
+    workerId: string;
+    projectId: string;
+    planMd: string | null;
+    repoFullName: string;
+    repoOwner: string;
+    baseBranch: string;
+    ghToken: string;
+    secrets: () => string[];
+    pushRetryIssueId: string | undefined;
 }
 
 class IssueBranchPushError extends Error {}
@@ -196,7 +216,6 @@ export default class E2B {
             where: { id: worker_id },
             include: { project: { include: { githubInstallation: true } } },
         });
-        console.log("worker is 1 : ", worker);
 
         const { project } = worker;
         if (
@@ -210,11 +229,10 @@ export default class E2B {
                 undefined,
                 { worker: worker_id, project: project.id },
             );
-            const worker = await prisma.worker.update({
+            await prisma.worker.update({
                 where: { id: worker_id },
                 data: { status: WorkerStatus.Dead },
             });
-            console.log("worker is 2 : ", worker);
             return;
         }
 
@@ -251,11 +269,10 @@ export default class E2B {
                 log.info("no live sandbox — creating one");
                 sandbox_id = await E2B.create(WORKER_SANDBOX_TIMEOUT_MS);
                 log.info("sandbox created", { sandbox: sandbox_id });
-                const worker = await prisma.worker.update({
+                await prisma.worker.update({
                     where: { id: worker_id },
                     data: { sandboxId: sandbox_id },
                 });
-                console.log("worker is 3 : ", worker);
 
                 log.info("cloning repo into sandbox", { repo: repo_url });
                 await E2B.clone_repo(
@@ -278,23 +295,25 @@ export default class E2B {
 
             await E2B.refresh_origin(sandbox, repo_url, gh_token);
 
-            const mcp_server: McpServerSpec = {
-                name: "matcha",
-                command: "node",
-                args: [SANDBOX_MCP_ENTRY],
-                env: {
-                    MATCHA_SERVER_URL: ENV.PUBLIC_API_URL,
-                    MATCHA_SESSION_KIND: "worker",
-                },
-            };
-
             log.info("worker marked Busy");
-            const worker = await prisma.worker.update({
+            await prisma.worker.update({
                 where: { id: worker_id },
                 data: { status: WorkerStatus.Busy },
             });
 
-            console.log("worker is 4 : ", worker);
+            const context: SolveContext = {
+                sandbox,
+                log,
+                workerId: worker_id,
+                projectId: project.id,
+                planMd: project.planMd,
+                repoFullName: repo_full_name,
+                repoOwner: repo_owner,
+                baseBranch: branch,
+                ghToken: gh_token,
+                secrets,
+                pushRetryIssueId: push_retry_issue_id,
+            };
 
             let solved_count = 0;
 
@@ -306,292 +325,8 @@ export default class E2B {
                     break;
                 }
 
-                const existing_pull = await E2B.find_pull_request(
-                    gh_token,
-                    repo_full_name,
-                    repo_owner,
-                    issue.prBranch,
-                    branch,
-                );
-
-                console.log("existing_pull", existing_pull);
-                const resuming_push = push_retry_issue_id === issue.id;
-                const already_pushed = await E2B.prepare_issue_branch(
-                    sandbox,
-                    issue.prBranch,
-                    branch,
-                    resuming_push,
-                );
-
-                console.log("already_pushed", already_pushed);
-
-                const base_commit = await E2B.head_of(sandbox);
-
-                // Minted after the claim lands, and used as the AgentSession id so a
-                // retried report is an upsert rather than a second attempt row. A resumed
-                // issue whose PR already exists never runs claude, so it has no run.
-                //
-                // Mirrored onto current_run_id so a failure thrown past this scope — a rejected
-                // push is the common one — still names the run it belongs to. Without it the
-                // give-up report writes a bare status change and the reason is lost.
-                let run_id: string | undefined;
-
-                // The milestones are written through whichever writer the run opened, so they
-                // are silently dropped for a resumed issue that never opens one. Fire-and-forget
-                // for the same reason the observed trace is: a milestone that fails to store is
-                // not worth holding the run for.
-                let run_writer: RunLogWriter | null = null;
-                const milestone = (phase: RunLogPhase, event: RunLogMilestoneBody) => {
-                    void run_writer
-                        ?.write_observed(phase, event)
-                        .catch((error: unknown) =>
-                            log.warn("run log milestone not stored", { error: String(error) }),
-                        );
-                };
-
-                let agent_done = issue.agentDoneAt !== null;
-
-                if (existing_pull) {
-                    log.info(`existing PR found for issue #${issue.number}`, {
-                        pull: existing_pull.number,
-                        branch: issue.prBranch,
-                    });
-                } else if (already_pushed) {
-                    log.info(`branch already pushed for issue #${issue.number}`, {
-                        branch: issue.prBranch,
-                    });
-                } else if (resuming_push) {
-                    log.info(`retrying the push for issue #${issue.number}`, {
-                        branch: issue.prBranch,
-                    });
-                } else {
-                    const { harness, model, effort } = issue;
-                    const agent = Registry.get(harness);
-
-                    run_id = randomUUID();
+                await E2B.solve_one_issue(context, issue, (run_id) => {
                     current_run_id = run_id;
-                    const run_worker_token = sign_worker_jwt(worker_id);
-                    const version_result = await sandbox.commands
-                        .run(`${agent.binary} --version`)
-                        .catch(() => null);
-                    const harness_version = version_result?.stdout?.trim() || undefined;
-
-                    await RunReporter.started(
-                        run_worker_token,
-                        { run_id, issue_id: issue.id, harness, model, effort, harness_version },
-                        log,
-                    );
-
-                    // graphify installs first — for OpenCode its own installer writes into
-                    // the same file our MCP config lives in (.opencode/opencode.json), so our
-                    // write has to go last and has to merge rather than overwrite, or one of
-                    // the two configs silently disappears depending on write order.
-                    const is_claude = harness === Harness.Claude;
-                    const graph_state = await GraphService.prepare(sandbox, log, harness);
-
-                    const mcp_config_path = agent.mcpConfigPath();
-                    const existing_mcp_config = await sandbox.files
-                        .read(mcp_config_path)
-                        .catch(() => null);
-                    /**
-                     * The run's identity and log endpoint belong on the MCP server's own env,
-                     * not the harness process's: the agent spawns this server as a child with a
-                     * restricted environment plus whatever this block names, so anything set
-                     * only on the harness never reaches the tool that has to report.
-                     *
-                     * Rebuilt per issue because run_id changes on every pass of this loop while
-                     * the sandbox is reused across all of them.
-                     */
-                    const run_mcp_server: McpServerSpec = {
-                        ...mcp_server,
-                        env: {
-                            ...mcp_server.env,
-                            MATCHA_SANDBOX_TOKEN: run_worker_token,
-                            MATCHA_RUN_ID: run_id,
-                            ...(ENV.VM_PUBLIC_URL ? { MATCHA_VM_URL: ENV.VM_PUBLIC_URL } : {}),
-                        },
-                    };
-                    await sandbox.files.write(
-                        mcp_config_path,
-                        agent.buildMcpConfig(run_mcp_server, existing_mcp_config),
-                    );
-
-                    log.step(`issue #${issue.number} pushed into sandbox`, { title: issue.title });
-                    await sandbox.files.write(
-                        ISSUE_PROMPT_PATH,
-                        E2B.build_issue_prompt(
-                            issue,
-                            branch,
-                            project.planMd,
-                            await E2B.dependencies_installed(sandbox),
-                        ),
-                    );
-
-                    log.info(`invoking ${harness} for issue #${issue.number}`, {
-                        model,
-                        effort,
-                        brief: project.planMd ? "included" : "absent",
-                    });
-
-                    const writer = RunLogWriter.open(
-                        run_id,
-                        { projectId: project.id, issueId: issue.id },
-                        secrets(),
-                        log,
-                    );
-                    RunLogRegistry.register(run_id, writer, run_worker_token);
-                    run_writer = writer;
-
-                    let report;
-                    try {
-                        report = await HarnessRun.execute(sandbox, log, {
-                            harness,
-                            prompt_path: ISSUE_PROMPT_PATH,
-                            model,
-                            effort,
-                            extra_flags: [
-                                ...agent.mcpConfigFlags(mcp_config_path),
-                                ...(is_claude && graph_state === "ready"
-                                    ? [
-                                          `--settings ${GRAPHIFY_SETTINGS}`,
-                                          `--add-dir ${GRAPHIFY_INTEGRATION}`,
-                                      ]
-                                    : []),
-                            ],
-                            envs: {
-                                ...(await resolve_harness_env(harness, project.id)),
-                                GH_TOKEN: gh_token,
-                                ...(graph_state === "ready" ? { GRAPHIFY_OUT } : {}),
-                            },
-                            timeout_ms: ISSUE_SOLVE_TIMEOUT_MS,
-                            label: `solving agent for issue #${issue.number}`,
-                            // Fire-and-forget: the trace arrives as the harness streams it, and
-                            // holding that stream to await a cache write would slow the run down
-                            // to the speed of its own logging.
-                            on_observed: (event) => {
-                                void writer
-                                    .write_observed(RunLogPhase.Agent, event)
-                                    .catch((error: unknown) =>
-                                        log.warn("observed run log event not stored", {
-                                            error: String(error),
-                                        }),
-                                    );
-                            },
-                        });
-                    } catch (error) {
-                        milestone(RunLogPhase.Agent, {
-                            kind: RunLogEventKind.RunFailed,
-                            reason: failure_sentence(
-                                describe_failure("solve issue", error, secrets()),
-                            ),
-                        });
-                        RunLogRegistry.release(run_id);
-                        await RunReporter.failed(
-                            run_worker_token,
-                            run_id,
-                            issue.id,
-                            failure_sentence(describe_failure("solve issue", error, secrets())),
-                            log,
-                        );
-                        throw error;
-                    }
-
-                    milestone(RunLogPhase.Agent, {
-                        kind: RunLogEventKind.AgentFinished,
-                        durationMs: report.duration_ms,
-                    });
-
-                    for (const commit of await E2B.commits_since(sandbox, base_commit)) {
-                        milestone(RunLogPhase.Publish, commit);
-                    }
-
-                    const changes = await E2B.changes_since(sandbox, base_commit);
-                    if (changes) milestone(RunLogPhase.Publish, changes);
-
-                    RunLogRegistry.release(run_id);
-                    await RunReporter.completed(
-                        run_worker_token,
-                        run_id,
-                        issue.id,
-                        report,
-                        changes?.files,
-                        await E2B.read_solve_report(sandbox),
-                        log,
-                    );
-
-                    log.success(`issue #${issue.number} run finished`, {
-                        turns: report.num_turns ?? "unknown",
-                        cost_usd: (report.total_cost_usd ?? 0).toFixed(4),
-                        duration: format_duration(report.duration_ms),
-                    });
-                    log.block(`final message from ${harness}`, report.result ?? "(empty)");
-                }
-
-                if (!existing_pull && !already_pushed) {
-                    await E2B.push_issue_branch(sandbox, issue.prBranch, secrets());
-                }
-
-                if (!agent_done) {
-                    const agentDoneIssue = await prisma.issue.update({
-                        where: { id: issue.id },
-                        data: { agentDoneAt: new Date() },
-                    });
-
-                    console.log("agentDoneIssue", agentDoneIssue);
-                }
-
-                let pull_request: PullRequestSummary;
-                try {
-                    pull_request =
-                        existing_pull ??
-                        (await E2B.ensure_pull_request(
-                            sandbox,
-                            gh_token,
-                            repo_full_name,
-                            repo_owner,
-                            issue,
-                            branch,
-                        ));
-                    console.log("pull request : ", pull_request);
-                } catch (error) {
-                    await OutcomeReporter.publish({
-                        kind: "failed",
-                        issueId: issue.id,
-                        workerId: worker_id,
-                        reason: failure_sentence(
-                            describe_failure("open pull request", error, secrets()),
-                        ),
-                        runId: run_id,
-                    });
-                    throw error;
-                }
-
-                const issueWithPr = await prisma.issue.update({
-                    where: { id: issue.id },
-                    data: {
-                        prUrl: pull_request.htmlUrl,
-                        prNumber: pull_request.number,
-                        prTitle: pull_request.title,
-                    },
-                });
-
-                console.log("issueWithPr", issueWithPr);
-
-                milestone(RunLogPhase.Publish, {
-                    kind: RunLogEventKind.PullRequestOpened,
-                    number: pull_request.number,
-                    url: pull_request.htmlUrl,
-                });
-
-                log.info(`PR ready for issue #${issue.number}`, { pull: pull_request.number });
-                await OutcomeReporter.publish({
-                    kind: "pr_opened",
-                    issueId: issue.id,
-                    workerId: worker_id,
-                    prUrl: pull_request.htmlUrl,
-                    branch: issue.prBranch,
-                    summary: `Completed issue #${issue.number}: ${issue.title}`,
-                    runId: run_id,
                 });
                 solved_count++;
             }
@@ -689,6 +424,269 @@ export default class E2B {
         }
     }
 
+    private static async solve_one_issue(
+        context: SolveContext,
+        issue: ClaimedIssue,
+        on_run_started: (run_id: string) => void,
+    ): Promise<void> {
+        const { sandbox, log, secrets } = context;
+
+        const existing_pull = await E2B.find_pull_request(
+            context.ghToken,
+            context.repoFullName,
+            context.repoOwner,
+            issue.prBranch,
+            context.baseBranch,
+        );
+
+        const resuming_push = context.pushRetryIssueId === issue.id;
+        const already_pushed = await E2B.prepare_issue_branch(
+            sandbox,
+            issue.prBranch,
+            context.baseBranch,
+            resuming_push,
+        );
+
+        const base_commit = await E2B.head_of(sandbox);
+        const ran_agent = requires_agent_run(issue.agentDoneAt, resuming_push);
+
+        let run_id: string | undefined;
+
+        let run_writer: RunLogWriter | null = null;
+        const milestone = (phase: RunLogPhase, event: RunLogMilestoneBody) => {
+            void run_writer
+                ?.write_observed(phase, event)
+                .catch((error: unknown) =>
+                    log.warn("run log milestone not stored", { error: String(error) }),
+                );
+        };
+
+        if (!ran_agent) {
+            log.info(`no agent work owed for issue #${issue.number}`, {
+                branch: issue.prBranch,
+                pull: existing_pull?.number ?? "none",
+                pushed: already_pushed,
+                retryingPush: resuming_push,
+            });
+        } else {
+            const { harness, model, effort } = issue;
+            const agent = Registry.get(harness);
+
+            run_id = randomUUID();
+            on_run_started(run_id);
+            const run_worker_token = sign_worker_jwt(context.workerId);
+            const version_result = await sandbox.commands
+                .run(`${agent.binary} --version`)
+                .catch(() => null);
+            const harness_version = version_result?.stdout?.trim() || undefined;
+
+            await RunReporter.started(
+                run_worker_token,
+                { run_id, issue_id: issue.id, harness, model, effort, harness_version },
+                log,
+            );
+
+            // graphify installs first — for OpenCode its own installer writes into
+            // the same file our MCP config lives in (.opencode/opencode.json), so our
+            // write has to go last and has to merge rather than overwrite, or one of
+            // the two configs silently disappears depending on write order.
+            const is_claude = harness === Harness.Claude;
+            const graph_state = await GraphService.prepare(sandbox, log, harness);
+
+            const mcp_config_path = agent.mcpConfigPath();
+            const existing_mcp_config = await sandbox.files.read(mcp_config_path).catch(() => null);
+            /**
+             * The run's identity and log endpoint belong on the MCP server's own env,
+             * not the harness process's: the agent spawns this server as a child with a
+             * restricted environment plus whatever this block names, so anything set
+             * only on the harness never reaches the tool that has to report.
+             */
+            const run_mcp_server: McpServerSpec = {
+                ...BASE_MCP_SERVER,
+                env: {
+                    ...BASE_MCP_SERVER.env,
+                    MATCHA_SANDBOX_TOKEN: run_worker_token,
+                    MATCHA_RUN_ID: run_id,
+                    ...(ENV.VM_PUBLIC_URL ? { MATCHA_VM_URL: ENV.VM_PUBLIC_URL } : {}),
+                },
+            };
+            await sandbox.files.write(
+                mcp_config_path,
+                agent.buildMcpConfig(run_mcp_server, existing_mcp_config),
+            );
+
+            log.step(`issue #${issue.number} pushed into sandbox`, { title: issue.title });
+            await sandbox.files.write(
+                ISSUE_PROMPT_PATH,
+                E2B.build_issue_prompt(
+                    issue,
+                    context.baseBranch,
+                    context.planMd,
+                    await E2B.dependencies_installed(sandbox),
+                ),
+            );
+
+            log.info(`invoking ${harness} for issue #${issue.number}`, {
+                model,
+                effort,
+                attempt: issue.attemptNumber,
+                brief: context.planMd ? "included" : "absent",
+            });
+
+            const writer = RunLogWriter.open(
+                run_id,
+                { projectId: context.projectId, issueId: issue.id },
+                secrets(),
+                log,
+            );
+            RunLogRegistry.register(run_id, writer, run_worker_token);
+            run_writer = writer;
+
+            let report;
+            try {
+                report = await HarnessRun.execute(sandbox, log, {
+                    harness,
+                    prompt_path: ISSUE_PROMPT_PATH,
+                    model,
+                    effort,
+                    extra_flags: [
+                        ...agent.mcpConfigFlags(mcp_config_path),
+                        ...(is_claude && graph_state === "ready"
+                            ? [
+                                  `--settings ${GRAPHIFY_SETTINGS}`,
+                                  `--add-dir ${GRAPHIFY_INTEGRATION}`,
+                              ]
+                            : []),
+                    ],
+                    envs: {
+                        ...(await resolve_harness_env(harness, context.projectId)),
+                        GH_TOKEN: context.ghToken,
+                        ...(graph_state === "ready" ? { GRAPHIFY_OUT } : {}),
+                    },
+                    timeout_ms: ISSUE_SOLVE_TIMEOUT_MS,
+                    label: `solving agent for issue #${issue.number}`,
+                    // Fire-and-forget: the trace arrives as the harness streams it, and
+                    // holding that stream to await a cache write would slow the run down
+                    // to the speed of its own logging.
+                    on_observed: (event) => {
+                        void writer
+                            .write_observed(RunLogPhase.Agent, event)
+                            .catch((error: unknown) =>
+                                log.warn("observed run log event not stored", {
+                                    error: String(error),
+                                }),
+                            );
+                    },
+                });
+            } catch (error) {
+                milestone(RunLogPhase.Agent, {
+                    kind: RunLogEventKind.RunFailed,
+                    reason: failure_sentence(describe_failure("solve issue", error, secrets())),
+                });
+                RunLogRegistry.release(run_id);
+                await RunReporter.failed(
+                    run_worker_token,
+                    run_id,
+                    issue.id,
+                    failure_sentence(describe_failure("solve issue", error, secrets())),
+                    log,
+                );
+                throw error;
+            }
+
+            milestone(RunLogPhase.Agent, {
+                kind: RunLogEventKind.AgentFinished,
+                durationMs: report.duration_ms,
+            });
+
+            for (const commit of await E2B.commits_since(sandbox, base_commit)) {
+                milestone(RunLogPhase.Publish, commit);
+            }
+
+            const changes = await E2B.changes_since(sandbox, base_commit);
+            if (changes) milestone(RunLogPhase.Publish, changes);
+
+            RunLogRegistry.release(run_id);
+            await RunReporter.completed(
+                run_worker_token,
+                run_id,
+                issue.id,
+                report,
+                changes?.files,
+                await E2B.read_solve_report(sandbox),
+                log,
+            );
+
+            log.success(`issue #${issue.number} run finished`, {
+                turns: report.num_turns ?? "unknown",
+                cost_usd: (report.total_cost_usd ?? 0).toFixed(4),
+                duration: format_duration(report.duration_ms),
+            });
+            log.block(`final message from ${harness}`, report.result ?? "(empty)");
+        }
+
+        const has_unpushed_work = ran_agent || resuming_push || (!existing_pull && !already_pushed);
+        if (has_unpushed_work) {
+            await E2B.push_issue_branch(sandbox, issue.prBranch, secrets());
+        }
+
+        if (issue.agentDoneAt === null) {
+            await prisma.issue.update({
+                where: { id: issue.id },
+                data: { agentDoneAt: new Date() },
+            });
+        }
+
+        let pull_request: PullRequestSummary;
+        try {
+            pull_request =
+                existing_pull ??
+                (await E2B.ensure_pull_request(
+                    sandbox,
+                    context.ghToken,
+                    context.repoFullName,
+                    context.repoOwner,
+                    issue,
+                    context.baseBranch,
+                ));
+        } catch (error) {
+            await OutcomeReporter.publish({
+                kind: "failed",
+                issueId: issue.id,
+                workerId: context.workerId,
+                reason: failure_sentence(describe_failure("open pull request", error, secrets())),
+                runId: run_id,
+            });
+            throw error;
+        }
+
+        await prisma.issue.update({
+            where: { id: issue.id },
+            data: {
+                prUrl: pull_request.htmlUrl,
+                prNumber: pull_request.number,
+                prTitle: pull_request.title,
+            },
+        });
+
+        milestone(RunLogPhase.Publish, {
+            kind: RunLogEventKind.PullRequestOpened,
+            number: pull_request.number,
+            url: pull_request.htmlUrl,
+        });
+
+        log.info(`PR ready for issue #${issue.number}`, { pull: pull_request.number });
+        await OutcomeReporter.publish({
+            kind: "pr_opened",
+            issueId: issue.id,
+            workerId: context.workerId,
+            prUrl: pull_request.htmlUrl,
+            branch: issue.prBranch,
+            summary: `Completed issue #${issue.number}: ${issue.title}`,
+            runId: run_id,
+        });
+    }
+
     /**
      * Checked here rather than remembered from the clone, because a reused sandbox never runs the
      * clone again and a repository we could not install must not be told that it was.
@@ -706,7 +704,11 @@ export default class E2B {
         plan_md: string | null,
         dependencies_installed: boolean,
     ): string {
-        const intro = `You are an autonomous coding agent working inside a fresh clone of this repository at ${REPO_DIR}, currently on branch "${issue.prBranch}".`;
+        const reopened = issue.reopenNote !== null;
+
+        const intro = reopened
+            ? `You are an autonomous coding agent working inside a clone of this repository at ${REPO_DIR}, on branch "${issue.prBranch}". This issue has been worked ${issue.attemptNumber - 1} time${issue.attemptNumber === 2 ? "" : "s"} already and its pull request is open. Someone read that work, found it wanting, and sent the issue back for another pass. Read the commits already on this branch before you change anything.`
+            : `You are an autonomous coding agent working inside a fresh clone of this repository at ${REPO_DIR}, currently on branch "${issue.prBranch}".`;
 
         const brief = plan_md
             ? `## Project brief
@@ -720,8 +722,28 @@ export default class E2B {
 
             ${issue.description}`;
 
+        const history = issue.priorAttempts.length
+            ? `## What earlier attempts did
+
+            Each report below is a previous attempt's own account of this issue. Read the "Ruled out" sections before you start: they name the dead ends already walked, and repeating one spends the whole run learning what is written down here.
+
+            ${issue.priorAttempts.map((attempt) => `### Attempt ${attempt.attemptNumber}\n\n${attempt.report}`).join("\n\n")}`
+            : null;
+
+        const follow_up = issue.reopenNote
+            ? `## What to do now
+
+            This is what the person who sent the issue back asked for. It is the job for this run — not the issue description, which describes work that is already committed on this branch.
+
+            ${issue.reopenNote}
+
+            Build on the commits already here. Do not start the issue over, and do not revert or rewrite earlier commits — the pull request keeps its whole history, and a reviewer is reading it.`
+            : null;
+
         const actions = [
-            `Investigate the issue and read every relevant file before changing it.`,
+            reopened
+                ? `Do what "What to do now" asks. Read the files it concerns, and the commits already on this branch, before changing anything.`
+                : `Investigate the issue and read every relevant file before changing it.`,
             `Stay on the existing branch "${issue.prBranch}". Never switch branches or commit directly to "${base_branch}".`,
             `Implement the fix using your normal tools.`,
             ...(dependencies_installed
@@ -786,7 +808,9 @@ export default class E2B {
 
             Never start a long-running command in the background and end your turn waiting on it. This is a single non-interactive run: there is no later turn to come back to, so anything left running when you stop is lost and the issue goes unsolved. Run it in the foreground and wait for it to finish.`;
 
-        return [intro, brief, issue_section, steps, report].filter(Boolean).join("\n\n");
+        return [intro, brief, issue_section, history, follow_up, steps, report]
+            .filter(Boolean)
+            .join("\n\n");
     }
 
     private static async prepare_issue_branch(

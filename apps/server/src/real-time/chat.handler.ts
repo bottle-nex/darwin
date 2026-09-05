@@ -259,28 +259,27 @@ export default class ChatSocketHandler {
                 JSON.stringify(publish_body),
             );
 
-            const mentioned_user_ids = chat.references.flatMap((reference) =>
-                reference.member ? [reference.member.userId] : [],
-            );
+            const mentioned = await MessageReferenceService.mention_targets({
+                memberIds: resolved.memberIds,
+                teamIds: resolved.teamIds,
+                projectId: issue.projectId,
+                actorId: user.id,
+            });
 
             await Promise.all(
-                chat.references.flatMap((reference) =>
-                    reference.memberId && reference.member?.userId !== user.id
-                        ? [
-                              server_services.notifications.enqueue({
-                                  action: "chat.mention",
-                                  chatId: chat.id,
-                                  memberId: reference.memberId,
-                                  mentionedById: user.id,
-                              }),
-                          ]
-                        : [],
+                mentioned.memberIds.map((memberId) =>
+                    server_services.notifications.enqueue({
+                        action: "chat.mention",
+                        chatId: chat.id,
+                        memberId,
+                        mentionedById: user.id,
+                    }),
                 ),
             );
 
             const referenced = await MessageReferenceService.referenced_issue_recipients({
                 issueIds: resolved.issueIds.filter((id) => id !== issue.id),
-                exclude: [user.id, ...mentioned_user_ids],
+                exclude: [user.id, ...mentioned.userIds],
             });
 
             await Promise.all(
@@ -301,7 +300,7 @@ export default class ChatSocketHandler {
                     creatorId: issue.createdById,
                     exclude: [
                         user.id,
-                        ...mentioned_user_ids,
+                        ...mentioned.userIds,
                         ...referenced.map((target) => target.recipientId),
                     ],
                 }).map((recipientId) =>

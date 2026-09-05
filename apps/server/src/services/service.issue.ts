@@ -1,6 +1,7 @@
 import { Action, Permissions } from "@trymatcha/access-control";
 import { ActivityType, ActorType, IssueStatus, Prisma, prisma } from "@trymatcha/database";
 import { ActivityService, IssueBroadcastService } from "@trymatcha/services";
+import { canMoveIssue, hasHumanMove, isReopenable, ISSUE_LANE_NAME } from "@trymatcha/types";
 import z from "zod";
 
 import { server_services } from "..";
@@ -54,7 +55,7 @@ export type IssueMutationFailure = {
     message?: string;
 };
 
-const ISSUE_ROW_INCLUDE = {
+export const ISSUE_ROW_INCLUDE = {
     creator: true,
     assignees: true,
     tags: true,
@@ -74,6 +75,27 @@ function is_issue_number_collision(error: unknown): boolean {
     const target = error.meta?.target;
     const fields = Array.isArray(target) ? target : [target];
     return fields.includes("number") || fields.includes("Issue_projectId_number_key");
+}
+
+function resolve_next_status(
+    current: IssueStatus,
+    requested: IssueStatus | undefined,
+    next_column_id: string | null,
+): IssueStatus {
+    if (next_column_id !== null) return IssueStatus.Parked;
+    if (requested && requested !== IssueStatus.Parked) return requested;
+    if (current === IssueStatus.Parked) return IssueStatus.Todo;
+    return current;
+}
+
+function move_refusal(from: IssueStatus, to: IssueStatus): string {
+    if (to === IssueStatus.Todo && isReopenable(from)) {
+        return "Reopen this issue instead. Reopening asks for a note saying what to change, which is what tells the agent to do something different this time.";
+    }
+    if (!hasHumanMove(from)) {
+        return `The agent is working this issue. Wait for it to leave ${ISSUE_LANE_NAME[from]}.`;
+    }
+    return `An issue cannot be moved from ${ISSUE_LANE_NAME[from]} to ${ISSUE_LANE_NAME[to]}.`;
 }
 
 function update_issue_row(
@@ -257,15 +279,13 @@ export default class IssueService {
         const next_column_id =
             patch.custom_column_id !== undefined ? patch.custom_column_id : issue.customColumnId;
 
-        let next_status: IssueStatus;
-        if (next_column_id !== null) {
-            next_status = IssueStatus.Parked;
-        } else if (patch.status && patch.status !== IssueStatus.Parked) {
-            next_status = patch.status;
-        } else if (issue.status === IssueStatus.Parked) {
-            next_status = IssueStatus.Todo;
-        } else {
-            next_status = issue.status;
+        const next_status = resolve_next_status(issue.status, patch.status, next_column_id);
+        if (!canMoveIssue(issue.status, next_status)) {
+            return {
+                ok: false,
+                reason: "invalid",
+                message: move_refusal(issue.status, next_status),
+            };
         }
 
         const references =
@@ -303,7 +323,14 @@ export default class IssueService {
             return { updated, activities };
         });
 
-        if (references) await DescriptionReferenceService.write(id, references);
+        if (references) {
+            await DescriptionReferenceService.write({
+                issueId: id,
+                projectId: issue.projectId,
+                actorId: actor.id,
+                resolved: references,
+            });
+        }
 
         await IssueBroadcastService.issue_updated(issue.projectId, updated, issue);
         await ActivityService.publish(issue.projectId, id, activities);

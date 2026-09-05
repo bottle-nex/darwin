@@ -5,16 +5,19 @@ import { z } from "zod";
 
 import Access from "../../access-control/access";
 import ResponseWriter from "../../services/service.response";
+import { icon_schema } from "../project/icon.schema";
 
 const body_schema = z.object({
     teamId: z.string(),
-    name: z.string().min(1),
+    name: z.string().min(1).optional(),
     slug: z
         .string()
         .min(1)
         .max(50)
-        .regex(/^[a-z0-9-]+$/, "Slug must be lowercase letters, numbers, and hyphens only"),
+        .regex(/^[a-z0-9-]+$/, "Slug must be lowercase letters, numbers, and hyphens only")
+        .optional(),
     description: z.string().optional(),
+    icon: icon_schema.nullish(),
 });
 
 export default class UpdateTeamController {
@@ -25,7 +28,7 @@ export default class UpdateTeamController {
         }
 
         try {
-            const { teamId, name, slug, description } = parsed.data;
+            const { teamId, name, slug, description, icon } = parsed.data;
 
             const team = await prisma.team.findUnique({
                 where: { id: teamId },
@@ -47,6 +50,7 @@ export default class UpdateTeamController {
                     name,
                     slug,
                     description,
+                    icon: icon === null ? Prisma.DbNull : (icon ?? undefined),
                 },
             });
 

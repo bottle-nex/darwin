@@ -2,7 +2,6 @@
 import { type ReviewHeader as ReviewHeaderData, ReviewTab } from "@trymatcha/types";
 import { MergeIcon } from "@trymatcha/ui/icons";
 
-import LogoLoader from "@/components/app/LogoLoader";
 import { PLAYGROUND_PANE_SHELL } from "@/components/playground/Core/components/paneBar";
 import PaneColumns from "@/components/playground/Core/components/PaneColumns";
 import PaneFallback from "@/components/playground/Core/components/PaneFallback";
@@ -59,24 +58,32 @@ export default function ReviewDisplay({ route }: { route: ReviewRoute }) {
                     trailingIcon={MergeIcon}
                 />
             </PaneLeadSlot>
-            <ReviewHeader tab={route.tab} htmlUrl={review.htmlUrl} />
-            <ReviewTabPanels tab={route.tab} projectId={projectId} review={review} />
+            <ReviewHeader
+                tab={route.tab}
+                htmlUrl={review.htmlUrl}
+                projectId={projectId}
+                pullNumber={review.pullNumber}
+                commit={route.commit}
+            />
+            <ReviewTabPanels route={route} projectId={projectId} review={review} />
         </main>
     );
 }
 
 function ReviewTabPanels({
-    tab,
+    route,
     projectId,
     review,
 }: {
-    tab: ReviewTab;
+    route: ReviewRoute;
     projectId: string | undefined;
     review: ReviewHeaderData;
 }) {
-    switch (tab) {
+    switch (route.tab) {
         case ReviewTab.Changes:
-            return <ChangesReviewDisplay projectId={projectId} review={review} />;
+            return (
+                <ChangesReviewDisplay projectId={projectId} review={review} commit={route.commit} />
+            );
 
         case ReviewTab.VisualChanges:
             return (

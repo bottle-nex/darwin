@@ -35,11 +35,6 @@ export default function ChatsDisplay() {
     const teamThread = useTeamChatThread(selectedTeam?.id, activeProject?.id);
     const { data: teamMembers } = useGetTeamMembers(selectedTeam?.id);
     const viewerId = SessionServices.get_user()?.id;
-    const memberUserIds = useMemo(
-        () =>
-            selectedTeam ? (teamMembers?.members.map((member) => member.user.id) ?? []) : undefined,
-        [selectedTeam, teamMembers],
-    );
 
     useEffect(() => {
         if (!project) return;
@@ -89,7 +84,7 @@ export default function ChatsDisplay() {
                         selectedTeam
                             ? [
                                   { label: "Chats", onClick: () => selectConversation(null) },
-                                  selectedTeam.name,
+                                  { label: selectedTeam.name, icon: selectedTeam.icon },
                               ]
                             : ["Chats"]
                     }
@@ -102,6 +97,7 @@ export default function ChatsDisplay() {
                             ? {
                                   id: project.id,
                                   name: project.name,
+                                  icon: project.icon,
                                   canCreateTeam: project.viewerRole === ProjectRole.Admin,
                               }
                             : undefined
@@ -136,7 +132,7 @@ export default function ChatsDisplay() {
                                 ? selectedTeam.viewerRole === TeamRole.Maintainer
                                 : undefined
                         }
-                        memberUserIds={memberUserIds}
+                        teamId={selectedTeam?.id}
                         placeholder={
                             selectedTeam
                                 ? `Message ${selectedTeam.name}...`
