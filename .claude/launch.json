@@ -12,6 +12,12 @@
             "runtimeExecutable": "bun",
             "runtimeArgs": ["run", "dev", "--filter=@trymatcha/server"],
             "port": 4402
+        },
+        {
+            "name": "admin",
+            "runtimeExecutable": "bun",
+            "runtimeArgs": ["run", "dev", "--filter=admin"],
+            "port": 4401
         }
     ]
 }

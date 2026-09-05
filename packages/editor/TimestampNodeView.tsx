@@ -3,7 +3,7 @@
 import { NodeViewWrapper, type ReactNodeViewProps } from "@tiptap/react";
 import { useEffect, useRef, useState } from "react";
 
-import { Button } from "@/components/ui/button";
+import { Button } from "./ui/button";
 
 import DateTimePicker, {
     DATE_TIME_SEGMENTS,

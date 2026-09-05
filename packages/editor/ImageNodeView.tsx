@@ -4,9 +4,9 @@ import { NodeViewWrapper, type ReactNodeViewProps } from "@tiptap/react";
 import { CloseIcon, ExpandImageIcon } from "@trymatcha/ui/icons";
 import { useState } from "react";
 
-import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { cn } from "@/lib/utils";
+import { Button } from "./ui/button";
+import { Dialog, DialogContent, DialogTitle } from "./ui/dialog";
+import { cn } from "./lib/cn";
 
 export default function ImageNodeView({ node, deleteNode, selected }: ReactNodeViewProps) {
     const [zoomOpen, setZoomOpen] = useState(false);

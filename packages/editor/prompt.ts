@@ -1,6 +1,6 @@
 import { type Editor, InputRule, Mark, mergeAttributes, Node } from "@tiptap/core";
 
-import { BLANK_QUESTION } from "@/lib/templates/promptHtml";
+import { BLANK_QUESTION } from "./lib/promptHtml";
 
 const PROMPT_NAME = "prompt";
 const BRACES = /\{\{([^}]*)\}\}$/;

@@ -3,11 +3,11 @@
 import type { Editor } from "@tiptap/core";
 import { useEffect, useRef, useState } from "react";
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { MENU_SURFACE } from "@/components/ui/menuSurface";
-import { withProtocol } from "@/lib/urls";
-import { cn } from "@/lib/utils";
+import { Button } from "./ui/button";
+import { Input } from "./ui/input";
+import { MENU_SURFACE } from "./ui/menuSurface";
+import { withProtocol } from "./lib/urls";
+import { cn } from "./lib/cn";
 
 import type { LinkPromptRequest } from "./link";
 

@@ -1,7 +1,7 @@
 import { mergeAttributes, Node } from "@tiptap/core";
 import { ReactNodeViewRenderer } from "@tiptap/react";
 
-import { formatDate } from "@/lib/format";
+import { formatDate } from "./lib/formatDate";
 
 import TimestampNodeView from "./TimestampNodeView";
 

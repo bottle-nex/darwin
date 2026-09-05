@@ -3,8 +3,8 @@
 import { NodeViewContent, NodeViewWrapper, type ReactNodeViewProps } from "@tiptap/react";
 import { DropdownCaretIcon } from "@trymatcha/ui/icons";
 
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { Button } from "./ui/button";
+import { cn } from "./lib/cn";
 
 export default function ToggleNodeView({ node, updateAttributes, editor }: ReactNodeViewProps) {
     const open = node.attrs.open as boolean;

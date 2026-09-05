@@ -529,136 +529,18 @@ const AGENT_WORKED_STATUSES: IssueStatus[] = [
 
 const POSTS = [
     {
-        kind: PostKind.Blog,
-        slug: "why-the-agent-runs-your-code",
-        title: "Why the agent runs your code before it opens a PR",
+        kind: PostKind.Changelog,
+        slug: "changelog-1-0-0",
+        title: "Board, agent, runner, pull request",
         summary:
-            "A patch that compiles in the model's head is a guess. We made the runner the referee.",
-        tags: ["engineering", "runners"],
+            "The first release. An issue goes on the board, an agent claims it, a sandboxed runner proves the fix, and a pull request opens for review.",
+        tags: ["release", "board", "agent", "runners"],
         status: PostStatus.Published,
-        publishedDaysAgo: 4,
-        content:
-            "<p>The first version of matcha wrote patches straight from the issue text. It was fast, it read well, and roughly half of what it produced did not build.</p><h2>The referee</h2><p>Now every attempt gets a sandboxed container that clones the target repo and runs the project's own toolchain. If the suite is red, there is no pull request — the attempt is recorded as failed with the output attached, and the next attempt starts from what the last one learned.</p><p>It is slower per attempt and dramatically cheaper per merged fix.</p>",
-    },
-    {
-        kind: PostKind.Blog,
-        slug: "the-board-is-the-api",
-        title: "The board is the API",
-        summary: "Filing an issue is the only integration surface we ask a team to learn.",
-        tags: ["product", "design"],
-        status: PostStatus.Published,
-        publishedDaysAgo: 12,
-        content:
-            "<p>Every autonomous coding tool eventually invents a control plane. Ours is a Kanban board, because that is the one your team already keeps open.</p><h2>What that buys</h2><ul><li><p>Priority is a column position, not a config file.</p></li><li><p>Ownership is an assignee, not a routing rule.</p></li><li><p>Cancelling work is a drag, not an API call.</p></li></ul>",
-    },
-    {
-        kind: PostKind.Blog,
-        slug: "reading-an-activity-feed",
-        title: "How to read an agent's activity feed",
-        summary: "Every attempt leaves a trail. Here is what each row actually means.",
-        tags: ["engineering", "observability"],
-        status: PostStatus.Published,
-        publishedDaysAgo: 21,
-        content:
-            "<p>An attempt produces between eight and sixty rows of activity. Most of it is noise until you know which rows carry the decisions.</p><h2>The rows that matter</h2><p><code>RunStarted</code> tells you which worker took the issue. <code>BugReproduced</code> is the single strongest predictor of a merged PR. <code>AttemptFailed</code> carries the reason, and it is almost always one of three.</p>",
-    },
-    {
-        kind: PostKind.Blog,
-        slug: "budgets-before-autonomy",
-        title: "Budgets before autonomy",
-        summary: "Nineteen attempts overnight taught us to put a ceiling on ambition.",
-        tags: ["reliability", "cost"],
-        status: PostStatus.Published,
-        publishedDaysAgo: 33,
-        content:
-            "<p>A flaky test suite met a retry policy with no ceiling, and by morning one issue had consumed more compute than the previous week.</p><h2>What we changed</h2><p>Spend is now a per-project ceiling with a warning at eighty percent and a hard stop at a hundred. The hard stop aborts in-flight attempts rather than letting them finish.</p>",
-    },
-    {
-        kind: PostKind.Blog,
-        slug: "sandbox-escape-review",
-        title: "What we look for in a sandbox escape review",
-        summary: "The runner holds a real checkout and real secrets. That deserves paranoia.",
-        tags: ["security"],
-        status: PostStatus.Published,
-        publishedDaysAgo: 48,
-        content:
-            "<p>A runner is a container with a clone of your repository, a scoped token and whatever secrets your build needs. Treat every one of those as a thing an attempt might try to exfiltrate.</p><h2>The checklist</h2><ul><li><p>Scopes are requested per attempt and expire with the lease.</p></li><li><p>Secrets are injected as environment variables and never written to disk.</p></li><li><p>Outbound network is default-deny with an allowlist per project.</p></li></ul>",
-    },
-    {
-        kind: PostKind.Blog,
-        slug: "hiring-engineers-who-review-agents",
-        title: "We are hiring engineers who like reviewing agents",
-        summary: "The job is less writing code and more deciding whether code is right.",
-        tags: ["team"],
-        status: PostStatus.Draft,
-        publishedDaysAgo: null,
-        content:
-            "<p>The interesting half of this product is the review loop. If you enjoy reading a diff and asking what it does not handle, we should talk.</p>",
-    },
-    {
-        kind: PostKind.Changelog,
-        slug: "changelog-2-4-0",
-        title: "Grouped board view and per-column counts",
-        summary: "The board can group by status or stay flat, and every column carries a count.",
-        tags: ["board"],
-        status: PostStatus.Published,
-        publishedDaysAgo: 2,
-        version: "2.4.0",
+        publishedDaysAgo: 3,
+        version: "1.0.0",
         channel: ReleaseChannel.Stable,
         content:
-            "<h2>Added</h2><ul><li><p>Grouped board view, toggled per project.</p></li><li><p>Issue counts on every column header.</p></li></ul><h2>Fixed</h2><ul><li><p>Column order no longer clobbers a concurrent drag.</p></li></ul>",
-    },
-    {
-        kind: PostKind.Changelog,
-        slug: "changelog-2-3-1",
-        title: "Mentions, reactions and a quieter activity feed",
-        summary: "Chat learned @member and #issue references. Noisy rows moved behind a toggle.",
-        tags: ["chat", "activity"],
-        status: PostStatus.Published,
-        publishedDaysAgo: 9,
-        version: "2.3.1",
-        channel: ReleaseChannel.Stable,
-        content:
-            "<h2>Added</h2><ul><li><p><code>@member</code> and <code>#issue</code> references in issue and project chat.</p></li><li><p>One reaction per person per message.</p></li></ul><h2>Changed</h2><ul><li><p>Build and test rows are secondary and hide behind show details.</p></li></ul>",
-    },
-    {
-        kind: PostKind.Changelog,
-        slug: "changelog-2-3-0",
-        title: "Product diffs for agent pull requests",
-        summary: "See the rendered before and after for a PR the agent opened.",
-        tags: ["product-diff"],
-        status: PostStatus.Published,
-        publishedDaysAgo: 18,
-        version: "2.3.0",
-        channel: ReleaseChannel.Beta,
-        content:
-            "<h2>Added</h2><ul><li><p>Product diffs, generated per pull request and opt-in per project.</p></li></ul><h2>Known gaps</h2><ul><li><p>Only routes reachable without authentication are captured.</p></li></ul>",
-    },
-    {
-        kind: PostKind.Changelog,
-        slug: "changelog-2-2-0",
-        title: "Worker pool sizing and queue positions",
-        summary: "Projects can run more than one worker, and queued issues show their place.",
-        tags: ["runners", "queue"],
-        status: PostStatus.Published,
-        publishedDaysAgo: 27,
-        version: "2.2.0",
-        channel: ReleaseChannel.Stable,
-        content:
-            "<h2>Added</h2><ul><li><p>Configurable worker count per project.</p></li><li><p>Queue position on every queued issue.</p></li></ul>",
-    },
-    {
-        kind: PostKind.Changelog,
-        slug: "changelog-2-5-0-rc",
-        title: "Spend ceilings",
-        summary: "A hard stop when a project runs through its budget.",
-        tags: ["cost"],
-        status: PostStatus.Draft,
-        publishedDaysAgo: null,
-        version: "2.5.0",
-        channel: ReleaseChannel.Beta,
-        content:
-            "<h2>Added</h2><ul><li><p>Per-project spend ceiling with a warning threshold and a hard stop.</p></li></ul>",
+            '<p>matcha is live. You file an issue on a board, an agent claims it, a sandboxed runner proves the fix against your real codebase, and a pull request opens for review. Nobody picks up the ticket.</p><h2>How a fix happens</h2><figure data-type="table-figure" class="my-3"><figcaption data-type="table-title" class="mb-1 text-[13px] font-medium text-neutral-300">The four stages</figcaption><table><tbody><tr><th><p>Stage</p></th><th><p>Who acts</p></th><th><p>What must be true to move on</p></th></tr><tr><td><p>File</p></td><td><p>You</p></td><td><p>The issue names a project and a repository</p></td></tr><tr><td><p>Claim</p></td><td><p>Agent</p></td><td><p>A worker slot is free</p></td></tr><tr><td><p>Prove</p></td><td><p>Runner</p></td><td><p>Build and test suite both pass</p></td></tr><tr><td><p>Open</p></td><td><p>Agent</p></td><td><p>A reviewer is assigned</p></td></tr></tbody></table></figure><blockquote><p>A red build never becomes a pull request. The attempt is recorded as failed with the runner output attached, and the next attempt starts from what the last one learned.</p></blockquote><hr><h2>The board</h2><p>Every issue carries the fields your team already uses, and the agent reads all of them.</p><figure data-type="table-figure" class="my-3"><figcaption data-type="table-title" class="mb-1 text-[13px] font-medium text-neutral-300">Issue fields</figcaption><table><tbody><tr><th><p>Field</p></th><th><p>Set by</p></th><th><p>How the agent uses it</p></th></tr><tr><td><p>Status</p></td><td><p>Board column</p></td><td><p>Decides whether the issue is claimable</p></td></tr><tr><td><p>Priority</p></td><td><p>You</p></td><td><p>Orders the queue</p></td></tr><tr><td><p>Tags</p></td><td><p>You</p></td><td><p>Narrows where in the repository to look</p></td></tr><tr><td><p>Description</p></td><td><p>You</p></td><td><p>The brief, including references to other issues</p></td></tr><tr><td><p>Template</p></td><td><p>Project</p></td><td><p>Guarantees the brief has what the agent needs</p></td></tr></tbody></table></figure><ul><li><p><strong>Spaces and projects.</strong> Group work the way your teams are already organised, with one repository per project.</p></li><li><p><strong>Columns.</strong> Configure the pipeline per project. Every column carries a live count.</p></li><li><p><strong>Views.</strong> Group by status or stay flat. The choice is remembered per person, not per project.</p></li></ul><h2>The agent</h2><p>Each claimed issue opens a session. The session is the record of the work and it stays attached to the card.</p><figure data-type="table-figure" class="my-3"><figcaption data-type="table-title" class="mb-1 text-[13px] font-medium text-neutral-300">What a session records</figcaption><table><tbody><tr><th><p>Step</p></th><th><p>What the agent does</p></th><th><p>What you see</p></th></tr><tr><td><p>Read</p></td><td><p>Walks the repository and the issue history</p></td><td><p>Files it opened</p></td></tr><tr><td><p>Ask</p></td><td><p>Stops when the issue is underspecified</p></td><td><p>A question on the card</p></td></tr><tr><td><p>Write</p></td><td><p>Produces one or more commits</p></td><td><p>A running diff</p></td></tr><tr><td><p>Verify</p></td><td><p>Hands the branch to a runner</p></td><td><p>Build and test output</p></td></tr><tr><td><p>Open</p></td><td><p>Raises the pull request</p></td><td><p>A summary of every file touched</p></td></tr></tbody></table></figure><p>An issue can be replayed through the loop without refiling it, and one issue can produce a series of commits inside a single pull request.</p><h2>Runners</h2><p>A runner is an ephemeral container that clones the target repository and runs its own toolchain, not a simulation of it.</p><figure data-type="table-figure" class="my-3"><figcaption data-type="table-title" class="mb-1 text-[13px] font-medium text-neutral-300">Runner settings</figcaption><table><tbody><tr><th><p>Setting</p></th><th><p>Scope</p></th><th><p>Default</p></th></tr><tr><td><p>Worker count</p></td><td><p>Project</p></td><td><p>One</p></td></tr><tr><td><p>Setup command</p></td><td><p>Project</p></td><td><p>Detected from the lockfile</p></td></tr><tr><td><p>Test command</p></td><td><p>Project</p></td><td><p>Detected from the package manifest</p></td></tr><tr><td><p>Secrets</p></td><td><p>Project</p></td><td><p>None, injected at run time and never logged</p></td></tr><tr><td><p>Container lifetime</p></td><td><p>Attempt</p></td><td><p>Destroyed when the attempt ends</p></td></tr></tbody></table></figure><h2>GitHub</h2><p>Install the app once per organization, then connect a repository per project.</p><figure data-type="table-figure" class="my-3"><figcaption data-type="table-title" class="mb-1 text-[13px] font-medium text-neutral-300">What syncs with GitHub</figcaption><table><tbody><tr><th><p>What moves</p></th><th><p>Direction</p></th><th><p>When</p></th></tr><tr><td><p>Existing issues</p></td><td><p>GitHub to matcha</p></td><td><p>On import, then kept linked</p></td></tr><tr><td><p>Status changes</p></td><td><p>Both ways</p></td><td><p>On every transition</p></td></tr><tr><td><p>Commits</p></td><td><p>matcha to GitHub</p></td><td><p>Once the runner reports green</p></td></tr><tr><td><p>Pull requests</p></td><td><p>matcha to GitHub</p></td><td><p>At the end of a successful attempt</p></td></tr><tr><td><p>Review comments</p></td><td><p>GitHub to matcha</p></td><td><p>As they are posted</p></td></tr></tbody></table></figure><h2>Working together</h2><ul><li><p><strong>Chat.</strong> Threads on every issue, project and team, with <code>@member</code> and <code>#issue</code> references.</p></li><li><p><strong>Activity.</strong> A per issue feed of everything that happened, with build and test noise behind a toggle.</p></li><li><p><strong>Notifications.</strong> Scoped to what you own, so a busy board does not become a busy inbox.</p></li></ul><h2>Access</h2><h3>Roles</h3><figure data-type="table-figure" class="my-3"><figcaption data-type="table-title" class="mb-1 text-[13px] font-medium text-neutral-300">Roles</figcaption><table><tbody><tr><th><p>Role</p></th><th><p>Scope</p></th><th><p>Can do</p></th></tr><tr><td><p>Owner</p></td><td><p>Organization</p></td><td><p>Billing, members, every project</p></td></tr><tr><td><p>Admin</p></td><td><p>Organization</p></td><td><p>Members, connectors, every project</p></td></tr><tr><td><p>Maintainer</p></td><td><p>Project</p></td><td><p>Repository, secrets, worker count</p></td></tr><tr><td><p>Member</p></td><td><p>Project</p></td><td><p>File issues, review pull requests</p></td></tr></tbody></table></figure><h3>Sign in and API</h3><ul><li><p>Passwordless email codes, or GitHub OAuth.</p></li><li><p>API keys for filing issues from your own tooling.</p></li></ul><pre><code>POST /api/v1/issues\nAuthorization: Bearer mk_live_...\n\n{ title, body, projectId }</code></pre><hr><h2>Known gaps</h2><figure data-type="table-figure" class="my-3"><figcaption data-type="table-title" class="mb-1 text-[13px] font-medium text-neutral-300">Known gaps</figcaption><table><tbody><tr><th><p>Gap</p></th><th><p>Why</p></th><th><p>For now</p></th></tr><tr><td><p>One toolchain per project</p></td><td><p>The runner image is built once per project</p></td><td><p>Give a custom setup command</p></td></tr><tr><td><p>One repository per pull request</p></td><td><p>The agent branches from a single clone</p></td><td><p>Split the issue</p></td></tr><tr><td><p>Spend ceilings not enforced</p></td><td><p>Metering shipped before the limiter</p></td><td><p>Watch the usage page</p></td></tr></tbody></table></figure>',
     },
 ] as const;
 
@@ -680,7 +562,7 @@ async function reset() {
     await prisma.notification.deleteMany({
         where: { payload: { path: ["orgSlug"], equals: ORG.slug } },
     });
-    await prisma.post.deleteMany({ where: { slug: { in: POSTS.map((post) => post.slug) } } });
+    await prisma.post.deleteMany({});
     await prisma.apiKey.deleteMany({ where: { label: { startsWith: "Nocturn " } } });
     await prisma.user.deleteMany({ where: { email: { endsWith: `@${SEED_EMAIL_DOMAIN}` } } });
 }
@@ -2095,12 +1977,12 @@ async function main() {
                 plainText: text,
                 author: pick(cast).name,
                 tags: [...post.tags],
-                version: "version" in post ? post.version : null,
-                channel: "channel" in post ? post.channel : null,
+                version: post.version,
+                channel: post.channel,
                 status: post.status,
                 readingTime: readingTime(text),
-                publishedAt: post.publishedDaysAgo === null ? null : daysAgo(post.publishedDaysAgo),
-                createdAt: daysAgo(post.publishedDaysAgo ?? 1),
+                publishedAt: daysAgo(post.publishedDaysAgo),
+                createdAt: daysAgo(post.publishedDaysAgo),
             },
         });
     }

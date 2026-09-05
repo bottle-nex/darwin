@@ -22,6 +22,7 @@
         "@tiptap/react": "^3.27.3",
         "@tiptap/starter-kit": "^3.27.3",
         "@tiptap/suggestion": "^3.27.3",
+        "@trymatcha/editor": "*",
         "@trymatcha/types": "*",
         "@trymatcha/ui": "*",
         "axios": "^1.16.1",

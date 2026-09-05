@@ -71,7 +71,7 @@ export default function MessageActions({
                 <ActionButton
                     aria-label="Delete message"
                     onClick={() => onDelete(chat)}
-                    className="hover:bg-destructive/20 hover:text-destructive"
+                    className="hover:bg-[#E34948] hover:text-[#E34948]"
                 >
                     <DeleteIcon className="size-3.5" />
                 </ActionButton>

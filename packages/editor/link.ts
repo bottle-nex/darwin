@@ -1,7 +1,7 @@
 import { Extension } from "@tiptap/core";
 import { type EditorState, Plugin, PluginKey } from "@tiptap/pm/state";
 
-import { isUrl, withProtocol } from "@/lib/urls";
+import { isUrl, withProtocol } from "./lib/urls";
 
 export interface LinkPromptRequest {
     from: number;

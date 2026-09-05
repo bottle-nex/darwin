@@ -3,7 +3,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { Slot } from "radix-ui";
 import * as React from "react";
 
-import { cn } from "@/lib/utils";
+import { cn } from "../lib/cn";
 
 const buttonVariants = cva(
     "group/button inline-flex shrink-0 items-center justify-center rounded-sm border-transparent bg-clip-padding text-[12px] font-500 whitespace-nowrap transition-all outline-none select-none focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-70 aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
@@ -19,7 +19,7 @@ const buttonVariants = cva(
                 outline:
                     "bg-linear-to-b from-white to-neutral-50 text-foreground border border-neutral-200 shadow-[0_1px_2px_0_rgba(15,23,42,0.04)] hover:bg-neutral-50 focus-visible:border-ring aria-expanded:bg-neutral-50 dark:from-neutral-800 dark:to-neutral-800 dark:border-neutral-600 dark:hover:from-neutral-700 dark:hover:to-neutral-700 dark:aria-expanded:from-neutral-700",
                 destructive:
-                    "bg-linear-to-b from-[#E34948] to-[#E34948] text-white shadow-[0_1px_2px_0_rgba(185,28,28,0.15)] hover:brightness-110 focus-visible:ring-destructive/40 dark:from-[#e04646] dark:to-[#cf3636]",
+                    "bg-linear-to-b from-[#e84c4c] to-[#d83a3a] text-white shadow-[0_1px_2px_0_rgba(185,28,28,0.15)] hover:brightness-110 focus-visible:ring-destructive/40 dark:from-[#e04646] dark:to-[#cf3636]",
                 ghost: "text-foreground bg-graphite rounded-sm!",
                 link: "text-primary underline-offset-4 hover:underline",
                 unstyled: "cursor-pointer",

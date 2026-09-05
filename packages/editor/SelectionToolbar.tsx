@@ -16,8 +16,8 @@ import {
 } from "@trymatcha/ui/icons";
 import { type ReactNode, useState } from "react";
 
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { Button } from "./ui/button";
+import { cn } from "./lib/cn";
 
 import { HEADING_ITEMS, LIST_ITEMS, type SlashCommandItem } from "./commandItems";
 

@@ -1,9 +1,9 @@
 "use client";
 import { StepperDecrementIcon, StepperIncrementIcon } from "@trymatcha/ui/icons";
 
-import { Button } from "@/components/ui/button";
-import { MENU_SURFACE } from "@/components/ui/menuSurface";
-import { cn } from "@/lib/utils";
+import { Button } from "./ui/button";
+import { MENU_SURFACE } from "./ui/menuSurface";
+import { cn } from "./lib/cn";
 
 import type { TimestampMode } from "./timestamp";
 

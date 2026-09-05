@@ -20,6 +20,7 @@ import {
 } from "@trymatcha/ui/icons";
 
 import type { TimestampMode } from "./timestamp";
+import { imageUploader } from "./imageUpload";
 
 export interface SlashCommandItem {
     title: string;
@@ -69,23 +70,26 @@ export function isSlashCommandDateInsert(
     return "insertDate" in entry;
 }
 
+function readAsDataUrl(file: File) {
+    return new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = () => reject(reader.error);
+        reader.readAsDataURL(file);
+    });
+}
+
 function insertImage(editor: Editor, range: Range) {
     const input = document.createElement("input");
     input.type = "file";
     input.accept = "image/*";
-    input.onchange = () => {
+    input.onchange = async () => {
         const file = input.files?.[0];
         if (!file) return;
-        const reader = new FileReader();
-        reader.onload = () => {
-            editor
-                .chain()
-                .focus()
-                .deleteRange(range)
-                .setImage({ src: reader.result as string, alt: file.name })
-                .run();
-        };
-        reader.readAsDataURL(file);
+        const upload = imageUploader(editor);
+        const src = await (upload ? upload(file) : readAsDataUrl(file)).catch(() => null);
+        if (!src) return;
+        editor.chain().focus().deleteRange(range).setImage({ src, alt: file.name }).run();
     };
     input.click();
 }

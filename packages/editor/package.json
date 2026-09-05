@@ -1,0 +1,38 @@
+{
+    "name": "@trymatcha/editor",
+    "module": "index.ts",
+    "type": "module",
+    "private": true,
+    "exports": {
+        ".": "./index.ts",
+        "./tiptap.css": "./tiptap.css"
+    },
+    "scripts": {
+        "typecheck": "tsc --noEmit"
+    },
+    "dependencies": {
+        "@tiptap/core": "^3",
+        "@tiptap/extension-character-count": "^3",
+        "@tiptap/extension-image": "^3",
+        "@tiptap/extension-table": "^3",
+        "@tiptap/extension-task-item": "^3",
+        "@tiptap/extension-task-list": "^3",
+        "@tiptap/pm": "^3",
+        "@tiptap/react": "^3",
+        "@tiptap/starter-kit": "^3",
+        "@tiptap/suggestion": "^3",
+        "@trymatcha/ui": "*",
+        "class-variance-authority": "^0.7.1",
+        "clsx": "^2.1.1",
+        "radix-ui": "^1.4.3",
+        "tailwind-merge": "^3.3.1"
+    },
+    "devDependencies": {
+        "@types/react": "^19",
+        "typescript": "^5"
+    },
+    "peerDependencies": {
+        "react": "^19",
+        "typescript": "^5"
+    }
+}

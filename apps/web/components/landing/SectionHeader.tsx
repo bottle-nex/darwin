@@ -20,7 +20,7 @@ export default function SectionHeader({
     return (
         <div className={cn("flex flex-col items-start", className)}>
             <BlurFade duration={1.5} delay={0}>
-                <h2 className="max-w-4xl indent-24 text-[2.5rem] leading-tight tracking-tight font-headline">
+                <h2 className="max-w-4xl text-[2.5rem] leading-tight tracking-tight font-headline">
                     <span className="text-snow">{title} </span>
                     <span className="text-neutral-500">{titleContinued}</span>
                 </h2>
