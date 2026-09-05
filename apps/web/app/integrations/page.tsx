@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 
 export default function IntegrationsPage() {
     return (
-        <main className="min-h-screen bg-ink p-2 md:p-3">
+        <main className="min-h-screen">
             <LandingNavbar />
             <IntegrationsHero />
         </main>
