@@ -229,9 +229,8 @@ const Grainient: React.FC<GrainientProps> = ({
         ctxMap.set(container, { renderer, program, mesh });
 
         const setSize = () => {
-            const rect = container.getBoundingClientRect();
-            const w = Math.max(1, Math.floor(rect.width));
-            const h = Math.max(1, Math.floor(rect.height));
+            const w = Math.max(1, container.clientWidth);
+            const h = Math.max(1, container.clientHeight);
             renderer.setSize(w, h);
             const res = (program.uniforms.iResolution as { value: Float32Array }).value;
             res[0] = gl.drawingBufferWidth;
