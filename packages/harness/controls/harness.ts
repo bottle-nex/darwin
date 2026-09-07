@@ -1,4 +1,5 @@
 import { Harness, Effort } from "@trymatcha/database";
+import { HARNESS_MODELS, HARNESS_SUPPORTS_EFFORT } from "@trymatcha/types";
 
 enum CredentialSource {
     PlatformKey,
@@ -42,14 +43,16 @@ abstract class AgentHarness {
     abstract readonly binary: string;
     abstract readonly pinnedVersion: string;
 
-    // validated strings, not an enum — models change far more often than harnesses do,
-    // and an enum would force a code deploy for every provider release.
-    abstract readonly models: string[];
-
     abstract readonly credentialEnvVar: string;
     abstract readonly credentialSource: CredentialSource;
 
-    abstract readonly supportsEffort: boolean;
+    get models(): string[] {
+        return HARNESS_MODELS[this.harness];
+    }
+
+    get supportsEffort(): boolean {
+        return HARNESS_SUPPORTS_EFFORT[this.harness];
+    }
 
     abstract buildBypassFlags(): string[];
     abstract buildInvocation(input: HarnessInvocationInput): string[];

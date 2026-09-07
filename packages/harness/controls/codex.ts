@@ -15,16 +15,8 @@ class CodexHarness extends AgentHarness {
     readonly harness = Harness.Codex;
     readonly binary = "codex";
     readonly pinnedVersion = "";
-    readonly models = [
-        "gpt-5.6-luna",
-        "gpt-5.6-terra",
-        "gpt-5.6-sol",
-        "gpt-5.6-sol-pro",
-        "gpt-5.6-sol-ultra",
-    ];
     readonly credentialEnvVar = "OPENAI_API_KEY";
     readonly credentialSource = CredentialSource.PlatformKey;
-    readonly supportsEffort = true;
 
     override buildEffortFlags(effort: Effort): string[] {
         return ["-c", `model_reasoning_effort=${effort_to_flag(effort)}`];

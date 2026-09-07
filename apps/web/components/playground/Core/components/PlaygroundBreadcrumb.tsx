@@ -34,7 +34,7 @@ function PickedIcon({ pick, className }: { pick: IconPick; className?: string })
             iconStyle={{ color: pick.color }}
             variant="solid"
             className={cn("size-6 shrink-0", className)}
-            iconClassName="size-4.5"
+            iconClassName="size-4"
         />
     );
 }
@@ -79,6 +79,7 @@ const TAB_TRAILS: Partial<Record<PlaygroundTab, PlaygroundBreadcrumbSegment[]>> 
     [PlaygroundTab.Tags]: ["Tags"],
     [PlaygroundTab.Inbox]: ["Inbox"],
     [PlaygroundTab.Chats]: ["Chats"],
+    [PlaygroundTab.AskDarwin]: ["Ask Darwin"],
     [PlaygroundTab.AssignedToMe]: ["My issues"],
     [PlaygroundTab.SettingsOverview]: ["Settings"],
     [PlaygroundTab.SettingsAppearance]: [

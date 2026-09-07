@@ -7,7 +7,7 @@ import SecretService from "../platform/service.secret";
 const PLATFORM_CREDENTIAL: Partial<Record<Harness, string | undefined>> = {
     Claude: ENV.VM_CLAUDE_CODE_OAUTH_TOKEN,
     Codex: ENV.VM_OPENAI_API_KEY,
-    OpenCode: ENV.VM_OPENCODE_API_KEY,
+    OpenCode: ENV.VM_OPENROUTER_API_KEY,
 };
 
 /**

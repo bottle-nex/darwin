@@ -10,7 +10,8 @@
         "typecheck": "tsc --noEmit"
     },
     "dependencies": {
-        "@trymatcha/database": "*"
+        "@trymatcha/database": "*",
+        "@trymatcha/types": "*"
     },
     "devDependencies": {
         "@types/bun": "latest"

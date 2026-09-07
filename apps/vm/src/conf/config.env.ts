@@ -13,7 +13,7 @@ const envSchema = z.object({
     // Optional: VM boot shouldn't hard-fail for orgs not using Codex yet. A Codex-configured
     // issue hitting a VM with no key set fails that one run with a clear error instead.
     VM_OPENAI_API_KEY: z.string().min(1).optional(),
-    VM_OPENCODE_API_KEY: z.string().min(1).optional(),
+    VM_OPENROUTER_API_KEY: z.string().min(1).optional(),
     VM_BRIEF_MODEL: z.string().default("claude-sonnet-5"),
     VM_BRIEF_EFFORT: z.enum(["low", "medium", "high", "xhigh", "max"]).default("low"),
     VM_SOLVE_MODEL: z.string().default("claude-sonnet-5"),

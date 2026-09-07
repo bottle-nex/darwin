@@ -11,10 +11,8 @@ class ClaudeHarness extends AgentHarness {
     readonly harness = Harness.Claude;
     readonly binary = "claude";
     readonly pinnedVersion = "";
-    readonly models = ["claude-fable-5", "claude-opus-5", "claude-sonnet-5", "claude-haiku-4-5"];
     readonly credentialEnvVar = "CLAUDE_CODE_OAUTH_TOKEN";
     readonly credentialSource = CredentialSource.PlatformKey;
-    readonly supportsEffort = true;
 
     override buildEffortFlags(effort: Effort): string[] {
         return ["--effort", effort_to_flag(effort)];

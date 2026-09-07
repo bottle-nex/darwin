@@ -25,7 +25,7 @@ export default function CreateIssueForm({
     return (
         <div className="relative isolate flex min-h-0 min-w-0 flex-1 flex-col">
             <SubmitWarningToast warning={form.warning} placement="top-center" />
-            <main className="z-10 flex min-h-0 min-w-0 flex-1 flex-col justify-between overflow-hidden rounded-3xl bg-graphite *:px-6">
+            <main className="z-10 flex min-h-0 min-w-0 flex-1 flex-col justify-between overflow-hidden rounded-3xl *:px-6 bg-cement border border-snow/5">
                 <section className="flex flex-col items-start gap-y-3 pt-4 pb-2">
                     <div className="flex w-full items-center justify-between">
                         <div className="flex items-center justify-start gap-x-1 text-snow text-xs">

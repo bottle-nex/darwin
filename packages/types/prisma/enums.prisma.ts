@@ -236,3 +236,19 @@ export const DefaultHomeView = {
     AssignedToMe: "AssignedToMe",
 } as const;
 export type DefaultHomeView = (typeof DefaultHomeView)[keyof typeof DefaultHomeView];
+
+export const Harness = {
+    Claude: "Claude",
+    Codex: "Codex",
+    OpenCode: "OpenCode",
+} as const;
+export type Harness = (typeof Harness)[keyof typeof Harness];
+
+export const Effort = {
+    Low: "Low",
+    Medium: "Medium",
+    High: "High",
+    XHigh: "XHigh",
+    Max: "Max",
+} as const;
+export type Effort = (typeof Effort)[keyof typeof Effort];

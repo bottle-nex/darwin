@@ -19,3 +19,4 @@ export * from "./activity/payload";
 export * from "./review/review.contract";
 export * from "./logs/run-log.contract";
 export * from "./issue/transition";
+export * from "./harness/manifest";

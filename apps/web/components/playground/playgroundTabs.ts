@@ -9,6 +9,7 @@ export enum PlaygroundTab {
     Inbox = "inbox",
     Chats = "chats",
     Agent = "agent",
+    AskDarwin = "ask-darwin",
     Spaces = "spaces",
     Space = "space",
     Gantt = "gantt",

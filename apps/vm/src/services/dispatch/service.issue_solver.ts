@@ -1,5 +1,6 @@
 import type { Effort } from "@trymatcha/database";
 import { ActivityType, Harness, IssueStatus, prisma } from "@trymatcha/database";
+import { Registry } from "@trymatcha/harness";
 import type Logger from "@trymatcha/logger";
 import {
     DESCRIPTION_REFERENCE_INCLUDE,
@@ -38,7 +39,9 @@ function resolve_config(
     model: string;
     effort: Effort | null;
 } {
-    return config ?? { harness: Harness.Claude, model: ENV.VM_SOLVE_MODEL, effort: null };
+    if (!config) return { harness: Harness.Claude, model: ENV.VM_SOLVE_MODEL, effort: null };
+    if (Registry.supportsModel(config.harness, config.model)) return config;
+    return { ...config, model: Registry.get(config.harness).models[0] };
 }
 
 export default class IssueSolver {

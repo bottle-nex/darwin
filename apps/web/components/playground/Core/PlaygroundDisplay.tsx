@@ -10,6 +10,7 @@ import InboxDisplay from "@/components/playground/Home/InboxDisplay/InboxDisplay
 import KanbanDisplay from "@/components/playground/Home/KanbanDisplay/KanbanDisplay";
 import SpacePane from "@/components/playground/Home/KanbanDisplay/SpacePane";
 import MyIssuesDisplay from "@/components/playground/Home/MyIssuesDisplay/MyIssuesDisplay";
+import AskDarwinDisplay from "@/components/playground/Home/panes/AskDarwinDisplay";
 import ChatsDisplay from "@/components/playground/Home/panes/ChatsDisplay";
 import ApiKeysSettingsSection from "@/components/playground/Home/SettingsDisplay/ApiKeysSettingsSection";
 import AppearanceSettingsSection from "@/components/playground/Home/SettingsDisplay/AppearanceSettingsSection";
@@ -48,6 +49,8 @@ function TabPane({ tab }: { tab: string }) {
             );
         case PlaygroundTab.Chats:
             return <ChatsDisplay />;
+        case PlaygroundTab.AskDarwin:
+            return <AskDarwinDisplay />;
         case PlaygroundTab.Inbox:
             return <InboxDisplay />;
 

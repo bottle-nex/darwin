@@ -75,7 +75,7 @@ function SortableIssueRow({
 function DroppableGroupHeader({ groupKey, children }: { groupKey: string; children: ReactNode }) {
     const { setNodeRef } = useDroppable({ id: groupDropId(groupKey) });
     return (
-        <div ref={setNodeRef} className="pb-1">
+        <div ref={setNodeRef} className="py-1">
             {children}
         </div>
     );

@@ -1,6 +1,7 @@
-export type Harness = "Claude" | "Codex" | "OpenCode";
+import type { Effort, Harness } from "@trymatcha/types";
 
-export type Effort = "Low" | "Medium" | "High" | "XHigh" | "Max";
+export type { Effort, Harness } from "@trymatcha/types";
+export { HARNESS_MODELS, HARNESS_SUPPORTS_EFFORT } from "@trymatcha/types";
 
 export const HARNESS_OPTIONS: { id: Harness; label: string; description: string }[] = [
     { id: "Claude", label: "Claude", description: "Anthropic's Claude Code CLI." },
@@ -16,34 +17,11 @@ export const EFFORT_OPTIONS: { id: Effort; label: string }[] = [
     { id: "Max", label: "Max" },
 ];
 
-// Mirrors packages/harness's manifest. Duplicated rather than imported because that package
-// pulls in @trymatcha/database (Prisma client, pg), which can't ship in a browser bundle.
-export const HARNESS_MODELS: Record<Harness, string[]> = {
-    Claude: ["claude-fable-5", "claude-opus-5", "claude-sonnet-5", "claude-haiku-4-5"],
-    Codex: ["gpt-5.6-luna", "gpt-5.6-terra", "gpt-5.6-sol", "gpt-5.6-sol-pro", "gpt-5.6-sol-ultra"],
-    OpenCode: [
-        "opencode-go/deepseek-v4-flash",
-        "opencode-go/mimo-v2.5",
-        "opencode-go/minimax-m3",
-        "opencode-go/grok-4.6",
-        "opencode-go/grok-4.5",
-        "opencode-go/kimi-k3",
-    ],
-};
-
-export const HARNESS_SUPPORTS_EFFORT: Record<Harness, boolean> = {
-    Claude: true,
-    Codex: true,
-    OpenCode: false,
-};
-
-export interface IssueHarnessConfig {
-    harness: Harness;
-    model: string | null;
-    effort: Effort | null;
-}
-
 export interface IssueConfigResponse {
-    config: IssueHarnessConfig;
+    config: {
+        harness: Harness;
+        model: string | null;
+        effort: Effort | null;
+    };
     is_override: boolean;
 }

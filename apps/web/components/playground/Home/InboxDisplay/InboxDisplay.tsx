@@ -90,7 +90,7 @@ export default function InboxDisplay() {
                               ? `Nothing matches “${query.trim()}”.`
                               : "Assignments and mentions for this project land here."
                     }
-                    headerClassName="bg-charcoal/70 backdrop-blur-sm"
+                    headerClassName="backdrop-blur-sm"
                     loading={feed.isLoading}
                     error={feed.isError}
                     pageError={Boolean(feed.error) && notifications.length > 0}
