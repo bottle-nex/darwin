@@ -8,6 +8,7 @@ import PlaygroundAvatar, {
 import UserInfoCard from "@/components/playground/Core/components/UserInfoCard";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import InfoTooltip from "@/components/ui/InfoTooltip";
+import { TooltipComponent } from "@/components/ui/tooltip-component";
 import { formatRelativeTime } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
@@ -158,13 +159,14 @@ export default function ActivityRow({
                         ) : (
                             predicate
                         )}
-                        <time
-                            dateTime={at.toISOString()}
-                            title={at.toLocaleString()}
-                            className="ml-2 text-[11px] whitespace-nowrap text-snow/80"
-                        >
-                            {formatRelativeTime(at)}
-                        </time>
+                        <TooltipComponent content={at.toLocaleString()}>
+                            <time
+                                dateTime={at.toISOString()}
+                                className="ml-2 text-[11px] whitespace-nowrap text-snow/80"
+                            >
+                                {formatRelativeTime(at)}
+                            </time>
+                        </TooltipComponent>
                     </p>
                 </div>
             </div>

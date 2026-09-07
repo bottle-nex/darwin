@@ -4,6 +4,7 @@ import { EMOJI_GROUPS, QUICK_REACTION_EMOJIS } from "@trymatcha/types";
 import { useMemo, useState } from "react";
 
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { TooltipComponent } from "@/components/ui/tooltip-component";
 
 const ALL_EMOJIS = EMOJI_GROUPS.flatMap((group) => group.emojis);
 
@@ -17,15 +18,16 @@ function EmojiButton({
     onSelect: () => void;
 }) {
     return (
-        <button
-            type="button"
-            aria-label={label}
-            title={label}
-            onClick={onSelect}
-            className="flex size-7 cursor-pointer items-center justify-center rounded text-[19px] leading-none transition-colors hover:bg-white/10 focus-visible:bg-white/10 focus-visible:outline-none"
-        >
-            {emoji}
-        </button>
+        <TooltipComponent content={label}>
+            <button
+                type="button"
+                aria-label={label}
+                onClick={onSelect}
+                className="flex size-7 cursor-pointer items-center justify-center rounded text-[19px] leading-none transition-colors hover:bg-white/10 focus-visible:bg-white/10 focus-visible:outline-none"
+            >
+                {emoji}
+            </button>
+        </TooltipComponent>
     );
 }
 

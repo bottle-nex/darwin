@@ -13,6 +13,7 @@ import { ActionButton } from "@/components/playground/Home/chat/MessageActions";
 import MessageBody from "@/components/playground/Home/chat/MessageBody";
 import MessageReactions from "@/components/playground/Home/chat/MessageReactions";
 import EmojiPicker from "@/components/ui/EmojiPicker";
+import { TooltipComponent } from "@/components/ui/tooltip-component";
 import { OPTIMISTIC_ID_PREFIX } from "@/hooks/chats/useChats";
 import { useReactionPending } from "@/hooks/chats/useMessageReactions";
 import { formatRelativeTime } from "@/lib/format";
@@ -125,13 +126,14 @@ function CommentContent({
                 <span className="text-[13px] font-medium text-neutral-200">
                     {senderName(comment)}
                 </span>
-                <time
-                    dateTime={at.toISOString()}
-                    title={at.toLocaleString()}
-                    className="text-[11px] whitespace-nowrap text-snow/50"
-                >
-                    {formatRelativeTime(at)}
-                </time>
+                <TooltipComponent content={at.toLocaleString()}>
+                    <time
+                        dateTime={at.toISOString()}
+                        className="text-[11px] whitespace-nowrap text-snow/50"
+                    >
+                        {formatRelativeTime(at)}
+                    </time>
+                </TooltipComponent>
             </header>
             <div className="mt-1.5 text-[13px] leading-[21px] wrap-anywhere text-neutral-300">
                 {comment.isDeleted ? (

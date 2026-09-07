@@ -10,6 +10,7 @@ import { motion, useReducedMotion } from "motion/react";
 import type { ComponentType, CSSProperties } from "react";
 
 import { AppLogo } from "@/components/logo/AppLogo";
+import { TooltipComponent } from "@/components/ui/tooltip-component";
 import { cn } from "@/lib/utils";
 
 import { landingContainer } from "./LandingSection";
@@ -70,108 +71,112 @@ function IntegrationTile({ tile, large = false }: { tile: IntegrationTileSpec; l
     const Icon = tile.icon;
 
     return (
-        <div
-            className={cn(
-                "relative [--key-radius:20px] [--wall-step:1.4px]",
-                large ? "md:[--wall-step:2.8px]" : "md:[--wall-step:2.4px]",
-            )}
-            title={tile.name}
-        >
-            {/* Ambient color bleed onto the board behind the tile. */}
+        <TooltipComponent content={tile.name}>
             <div
-                aria-hidden
-                className="absolute -inset-8 rounded-full opacity-50 blur-2xl"
-                style={{
-                    background: `radial-gradient(circle, rgba(${tile.glow}, 0.2), transparent 70%)`,
-                }}
-            />
-            {/* Extruded walls: copies of the projected face swept downward, so the box side
-                traces the face's near edge exactly — deepest layer first, rim-lit layer last. */}
-            {Array.from({ length: WALL_LAYERS }, (_, k) => WALL_LAYERS - k).map((depth) => (
+                className={cn(
+                    "relative [--key-radius:20px] [--wall-step:1.4px]",
+                    large ? "md:[--wall-step:2.8px]" : "md:[--wall-step:2.4px]",
+                )}
+            >
+                {/* Ambient color bleed onto the board behind the tile. */}
                 <div
-                    key={depth}
                     aria-hidden
-                    className="absolute inset-0"
+                    className="absolute -inset-8 rounded-full opacity-50 blur-2xl"
                     style={{
-                        // Corners square off and the base tucks inward, so the cap overhangs.
-                        borderRadius: `calc(var(--key-radius) - ${depth}px)`,
-                        transform: `translateY(calc(var(--wall-step) * ${depth})) scaleX(${1 - depth * 0.006}) ${KEY_TILT}`,
-                        background: wallShade(depth / WALL_LAYERS),
-                        // The deepest layer keeps a lit bottom rim so the base edge stays visible.
-                        boxShadow:
-                            depth === WALL_LAYERS
-                                ? "0 10px 18px -6px rgba(0, 0, 0, 0.7), inset 0 -2px 0 rgba(255, 255, 255, 0.07)"
-                                : undefined,
+                        background: `radial-gradient(circle, rgba(${tile.glow}, 0.2), transparent 70%)`,
                     }}
                 />
-            ))}
-            {/* Grounding shadow painted over the base: darkens the box's bottom edge so it
+                {/* Extruded walls: copies of the projected face swept downward, so the box side
+                traces the face's near edge exactly — deepest layer first, rim-lit layer last. */}
+                {Array.from({ length: WALL_LAYERS }, (_, k) => WALL_LAYERS - k).map((depth) => (
+                    <div
+                        key={depth}
+                        aria-hidden
+                        className="absolute inset-0"
+                        style={{
+                            // Corners square off and the base tucks inward, so the cap overhangs.
+                            borderRadius: `calc(var(--key-radius) - ${depth}px)`,
+                            transform: `translateY(calc(var(--wall-step) * ${depth})) scaleX(${1 - depth * 0.006}) ${KEY_TILT}`,
+                            background: wallShade(depth / WALL_LAYERS),
+                            // The deepest layer keeps a lit bottom rim so the base edge stays visible.
+                            boxShadow:
+                                depth === WALL_LAYERS
+                                    ? "0 10px 18px -6px rgba(0, 0, 0, 0.7), inset 0 -2px 0 rgba(255, 255, 255, 0.07)"
+                                    : undefined,
+                        }}
+                    />
+                ))}
+                {/* Grounding shadow painted over the base: darkens the box's bottom edge so it
                 separates from the board instead of blending, and pools underneath it. */}
-            <div
-                aria-hidden
-                className="absolute inset-x-1 -bottom-1 h-3 rounded-[50%] bg-black/45 blur-sm md:-bottom-2 md:h-4 md:blur-md"
-            />
-            <div
-                aria-hidden
-                className="absolute inset-x-0 -bottom-3 h-4 rounded-[50%] bg-black/30 blur-lg md:-bottom-5 md:h-6"
-            />
-            {/* Keycap tilted back onto the board; the face carries the bezel and glow. */}
-            <div
-                className={cn("relative size-20", large ? "md:size-44" : "md:size-36")}
-                style={{ transform: KEY_TILT }}
-            >
-                {/* Top face: thick dark bezel frame with a thin specular along the far edge. */}
                 <div
-                    className={cn(
-                        "absolute inset-0 rounded-[20px] p-1",
-                        large ? "md:p-1.5" : "md:p-[5px]",
-                    )}
-                    style={{
-                        background: `linear-gradient(180deg, rgba(${tile.glow}, 0.45) 0%, #38383e 6%, #1b1b1f 40%, #060607 100%)`,
-                        boxShadow: `0 0 24px rgba(${tile.glow}, 0.16)`,
-                    }}
+                    aria-hidden
+                    className="absolute inset-x-1 -bottom-1 h-3 rounded-[50%] bg-black/45 blur-sm md:-bottom-2 md:h-4 md:blur-md"
+                />
+                <div
+                    aria-hidden
+                    className="absolute inset-x-0 -bottom-3 h-4 rounded-[50%] bg-black/30 blur-lg md:-bottom-5 md:h-6"
+                />
+                {/* Keycap tilted back onto the board; the face carries the bezel and glow. */}
+                <div
+                    className={cn("relative size-20", large ? "md:size-44" : "md:size-36")}
+                    style={{ transform: KEY_TILT }}
                 >
-                    {/* Screen: lit from the top edge, even color wash, dotted texture. */}
+                    {/* Top face: thick dark bezel frame with a thin specular along the far edge. */}
                     <div
                         className={cn(
-                            "relative flex h-full w-full items-center justify-center overflow-hidden rounded-[16px]",
-                            large ? "md:rounded-[14px]" : "md:rounded-[15px]",
+                            "absolute inset-0 rounded-[20px] p-1",
+                            large ? "md:p-1.5" : "md:p-[5px]",
                         )}
                         style={{
-                            background: `radial-gradient(130% 70% at 50% -8%, rgba(${tile.glow}, 0.5), rgba(${tile.glow}, 0.1) 55%, transparent 78%), radial-gradient(60% 45% at 50% 58%, rgba(${tile.glow}, 0.12), transparent 72%), linear-gradient(180deg, #1a1a20, #0c0c0f)`,
-                            boxShadow: `inset 0 0 28px rgba(${tile.glow}, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.12), inset 0 -14px 24px rgba(0, 0, 0, 0.6)`,
+                            background: `linear-gradient(180deg, rgba(${tile.glow}, 0.45) 0%, #38383e 6%, #1b1b1f 40%, #060607 100%)`,
+                            boxShadow: `0 0 24px rgba(${tile.glow}, 0.16)`,
                         }}
                     >
+                        {/* Screen: lit from the top edge, even color wash, dotted texture. */}
                         <div
-                            aria-hidden
-                            className="absolute inset-0 opacity-40"
+                            className={cn(
+                                "relative flex h-full w-full items-center justify-center overflow-hidden rounded-[16px]",
+                                large ? "md:rounded-[14px]" : "md:rounded-[15px]",
+                            )}
                             style={{
-                                backgroundImage: `radial-gradient(rgba(${tile.glow}, 0.55) 0.5px, transparent 0.6px)`,
-                                backgroundSize: "5px 5px",
-                                maskImage:
-                                    "radial-gradient(85% 85% at 50% 35%, black, transparent)",
+                                background: `radial-gradient(130% 70% at 50% -8%, rgba(${tile.glow}, 0.5), rgba(${tile.glow}, 0.1) 55%, transparent 78%), radial-gradient(60% 45% at 50% 58%, rgba(${tile.glow}, 0.12), transparent 72%), linear-gradient(180deg, #1a1a20, #0c0c0f)`,
+                                boxShadow: `inset 0 0 28px rgba(${tile.glow}, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.12), inset 0 -14px 24px rgba(0, 0, 0, 0.6)`,
                             }}
-                        />
-                        <Icon
-                            className={cn("relative size-9", large ? "md:size-20" : "md:size-14")}
-                            style={{
-                                color: tile.iconColor,
-                                filter: `drop-shadow(0 0 8px rgba(${tile.glow}, 0.45))`,
-                            }}
-                        />
+                        >
+                            <div
+                                aria-hidden
+                                className="absolute inset-0 opacity-40"
+                                style={{
+                                    backgroundImage: `radial-gradient(rgba(${tile.glow}, 0.55) 0.5px, transparent 0.6px)`,
+                                    backgroundSize: "5px 5px",
+                                    maskImage:
+                                        "radial-gradient(85% 85% at 50% 35%, black, transparent)",
+                                }}
+                            />
+                            <Icon
+                                className={cn(
+                                    "relative size-9",
+                                    large ? "md:size-20" : "md:size-14",
+                                )}
+                                style={{
+                                    color: tile.iconColor,
+                                    filter: `drop-shadow(0 0 8px rgba(${tile.glow}, 0.45))`,
+                                }}
+                            />
+                        </div>
                     </div>
                 </div>
+                {/* Solder pins where the row bus meets the tile. */}
+                <span
+                    aria-hidden
+                    className="absolute top-1/2 -left-3 size-1.5 -translate-y-1/2 rounded-full bg-[#303036]"
+                />
+                <span
+                    aria-hidden
+                    className="absolute top-1/2 -right-3 size-1.5 -translate-y-1/2 rounded-full bg-[#303036]"
+                />
             </div>
-            {/* Solder pins where the row bus meets the tile. */}
-            <span
-                aria-hidden
-                className="absolute top-1/2 -left-3 size-1.5 -translate-y-1/2 rounded-full bg-[#303036]"
-            />
-            <span
-                aria-hidden
-                className="absolute top-1/2 -right-3 size-1.5 -translate-y-1/2 rounded-full bg-[#303036]"
-            />
-        </div>
+        </TooltipComponent>
     );
 }
 

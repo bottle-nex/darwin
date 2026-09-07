@@ -5,6 +5,7 @@ import { format } from "date-fns";
 import PlaygroundAvatar, {
     toneFor,
 } from "@/components/playground/Core/components/PlaygroundAvatar";
+import { TooltipComponent } from "@/components/ui/tooltip-component";
 import { cn } from "@/lib/utils";
 
 import { notification_view, short_age, theme_of } from "./notificationView";
@@ -67,18 +68,17 @@ export default function NotificationRow({
                     <span className="min-w-0 flex-1 truncate text-[13.5px] text-neutral-300">
                         <span className="font-medium text-neutral-100">{actorName}</span> {action}
                     </span>
-                    <span
-                        className="flex shrink-0 items-center gap-1.5 text-[11.5px] tabular-nums text-neutral-500"
-                        title={format(createdAt, "PPpp")}
-                    >
-                        {short_age(createdAt)}
-                        {is_unread && (
-                            <span
-                                className="size-1.5 shrink-0 rounded-full bg-primary"
-                                aria-hidden
-                            />
-                        )}
-                    </span>
+                    <TooltipComponent content={format(createdAt, "PPpp")}>
+                        <span className="flex shrink-0 items-center gap-1.5 text-[11.5px] tabular-nums text-neutral-500">
+                            {short_age(createdAt)}
+                            {is_unread && (
+                                <span
+                                    className="size-1.5 shrink-0 rounded-full bg-primary"
+                                    aria-hidden
+                                />
+                            )}
+                        </span>
+                    </TooltipComponent>
                 </span>
 
                 {body && (

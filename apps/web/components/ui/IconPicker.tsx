@@ -7,6 +7,7 @@ import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ColorPicker } from "@/components/ui/color-picker";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { TooltipComponent } from "@/components/ui/tooltip-component";
 import { EMOJI_GROUPS } from "@/data/emojis_bulk";
 import { cn } from "@/lib/utils";
 
@@ -82,15 +83,16 @@ function Cell({
     children: React.ReactNode;
 }) {
     return (
-        <button
-            type="button"
-            title={title}
-            aria-label={title}
-            onClick={onClick}
-            className="flex size-7 cursor-pointer items-center justify-center rounded transition-colors hover:bg-white/10"
-        >
-            {children}
-        </button>
+        <TooltipComponent content={title}>
+            <button
+                type="button"
+                aria-label={title}
+                onClick={onClick}
+                className="flex size-7 cursor-pointer items-center justify-center rounded transition-colors hover:bg-white/10"
+            >
+                {children}
+            </button>
+        </TooltipComponent>
     );
 }
 

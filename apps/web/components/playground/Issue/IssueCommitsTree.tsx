@@ -5,6 +5,7 @@ import { Children, type ReactElement, type ReactNode, useState } from "react";
 
 import TreeBranch from "@/components/playground/Core/components/TreeBranch";
 import { reviewSlugFor } from "@/components/playground/Review/reviewSlug";
+import { TooltipComponent } from "@/components/ui/tooltip-component";
 import { useReviewCommits } from "@/hooks/review/useReviewCommits";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { PULL_REQUEST_STATE } from "@/lib/review/pullRequestState";
@@ -80,19 +81,19 @@ export default function IssueCommitsTree({ issue }: { issue: BoardIssue }) {
 
             <TreeRows>
                 {(commits ?? []).map((commit) => (
-                    <button
-                        key={commit.sha}
-                        type="button"
-                        title={commit.subject}
-                        className={cn(ATTACHMENT_ROW, ATTACHMENT_ROW_CHILD, "cursor-pointer")}
-                        onClick={() => openChanges(commit.sha)}
-                    >
-                        <CommitsIcon
-                            className={cn(ATTACHMENT_GLYPH, "text-neutral-400")}
-                            aria-hidden
-                        />
-                        <span className="truncate">{commit.subject}</span>
-                    </button>
+                    <TooltipComponent key={commit.sha} content={commit.subject}>
+                        <button
+                            type="button"
+                            className={cn(ATTACHMENT_ROW, ATTACHMENT_ROW_CHILD, "cursor-pointer")}
+                            onClick={() => openChanges(commit.sha)}
+                        >
+                            <CommitsIcon
+                                className={cn(ATTACHMENT_GLYPH, "text-neutral-400")}
+                                aria-hidden
+                            />
+                            <span className="truncate">{commit.subject}</span>
+                        </button>
+                    </TooltipComponent>
                 ))}
 
                 {reopenable && !merged && (
