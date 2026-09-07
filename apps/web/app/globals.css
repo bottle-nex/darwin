@@ -459,12 +459,3 @@
 :is(.review-diff, .agent-log) .token.italic {
     font-style: italic;
 }
-
-@keyframes hero-shimmer {
-    from {
-        transform: translateX(-100%);
-    }
-    to {
-        transform: translateX(100%);
-    }
-}

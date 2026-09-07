@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useState } from "react";
 
 import { landingContainer } from "@/components/landing/LandingSection";
-import { MatchaLogo } from "@/components/logo/MatchaLogo";
+import { AppLogo } from "@/components/logo/AppLogo";
 import { cn } from "@/lib/utils";
 
 const CARD_SPACING = 40;
@@ -181,14 +181,13 @@ export const IntegrationsHero = ({
                                                             card.logoClassName,
                                                         )}
                                                     />
-                                                    <div className="absolute inset-0 -translate-x-full bg-[linear-gradient(105deg,transparent_42%,rgba(255,255,255,0.16)_50%,transparent_58%)] opacity-0 group-hover:animate-[hero-shimmer_0.9s_ease-out_forwards] group-hover:opacity-100" />
                                                 </div>
                                             ) : (
                                                 <div className="relative h-full w-full">
                                                     <div className="absolute inset-0 bg-neutral-950" />
                                                     <div className="absolute inset-0 bg-[radial-gradient(90%_65%_at_50%_70%,rgba(171,159,242,0.75),rgba(171,159,242,0.25)_50%,transparent_80%)]" />
                                                     <div className="absolute inset-0 bg-[radial-gradient(70%_40%_at_50%_-10%,rgba(171,159,242,0.3),transparent_70%)]" />
-                                                    <MatchaLogo className="absolute top-1/2 left-1/2 h-auto w-28 -translate-x-1/2 -translate-y-1/2 text-snow" />
+                                                    <AppLogo className="absolute top-1/2 left-1/2 h-auto w-28 -translate-x-1/2 -translate-y-1/2 text-snow" />
                                                     <div className="absolute inset-y-0 left-0 w-px bg-white/60" />
                                                     <div className="absolute inset-y-0 left-px w-1 bg-white/15 blur-[1px]" />
                                                 </div>

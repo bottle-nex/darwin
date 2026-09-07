@@ -2,7 +2,7 @@
 
 import { motion, useReducedMotion } from "motion/react";
 
-import { MatchaLogo } from "@/components/logo/MatchaLogo";
+import { AppLogo } from "@/components/logo/AppLogo";
 import SkyHeroLogo from "@/components/new/SkyHeroLogo";
 
 const ENTER = { duration: 1.1, ease: [0.16, 1, 0.3, 1] as const };
@@ -136,7 +136,7 @@ function Sky() {
                 <div className="absolute inset-y-0 left-[64%] w-[8%] bg-ink/[0.08]" />
                 <div className="absolute inset-y-0 left-[72%] w-[28%] bg-white/[0.12]" />
             </div>
-            <MatchaLogo
+            <AppLogo
                 fill="none"
                 stroke="white"
                 strokeWidth={1.5}

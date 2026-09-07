@@ -9,7 +9,7 @@ import {
 import { useInView, useReducedMotion } from "motion/react";
 import { type CSSProperties, useRef } from "react";
 
-import { MatchaLogo } from "@/components/logo/MatchaLogo";
+import { AppLogo } from "@/components/logo/AppLogo";
 import { cn } from "@/lib/utils";
 
 import { landingContainer } from "./LandingSection";
@@ -19,7 +19,7 @@ const LIGHT_DELAY_MS = 200;
 function PromptCard() {
     return (
         <div className="relative flex h-64 w-full flex-col justify-between overflow-hidden rounded-[10px] border border-white/6 bg-linear-to-b from-[#F7F5FF] via-[#EDE8FD] to-[#DCD4FA] p-5 md:h-full">
-            <MatchaLogo className="pointer-events-none absolute -right-8 -bottom-8 h-60 w-auto text-[#ECE6FD]" />
+            <AppLogo className="pointer-events-none absolute -right-8 -bottom-8 h-60 w-auto text-[#ECE6FD]" />
 
             <div className="relative">
                 <h3 className="text-[1.80rem] font-medium text-ink">
@@ -32,7 +32,7 @@ function PromptCard() {
             </div>
 
             <div className="relative flex items-center gap-4">
-                <MatchaLogo className="h-8 w-auto text-ink" />
+                <AppLogo className="h-8 w-auto text-ink" />
                 <span className="h-9 w-px bg-ink/10" />
                 <div>
                     <p className="text-xs font-semibold text-ink">matcha agent</p>
@@ -83,7 +83,7 @@ function FooterContent() {
 
             <div className="flex items-center justify-between border-t border-white/5 pt-5">
                 <div className="flex items-center gap-3">
-                    <MatchaLogo className="h-4 w-auto text-snow" />
+                    <AppLogo className="h-4 w-auto text-snow" />
                     <span className="text-xs text-neutral-600">
                         © 2026 trymatcha. All rights reserved.
                     </span>

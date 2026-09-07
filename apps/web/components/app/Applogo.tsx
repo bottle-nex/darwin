@@ -1,4 +1,4 @@
-import { MatchaLogo } from "@/components/logo/MatchaLogo";
+import { AppLogo as AppLogoMark } from "@/components/logo/AppLogo";
 import { cn } from "@/lib/utils";
 
 interface AppLogoProps {
@@ -16,7 +16,7 @@ export default function AppLogo({
 }: AppLogoProps) {
     return (
         <div className={`flex items-center gap-2 ${className}`}>
-            <MatchaLogo className="w-auto shrink-0" style={{ height: size }} />
+            <AppLogoMark className="w-auto shrink-0" style={{ height: size }} />
             {!iconOnly && (
                 <span
                     className={cn("text-xl font-semibold leading-none tracking-tight")}

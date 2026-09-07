@@ -7,7 +7,7 @@ import {
     type HeroMotion,
     INTRO_AT,
 } from "@/components/join-waitlist/waitlistHeroMotion";
-import { MATCHA_LOGO_PATH, MATCHA_LOGO_SIZE } from "@/components/logo/MatchaLogo";
+import { APP_LOGO_PATH, APP_LOGO_SIZE } from "@/components/logo/AppLogo";
 
 const TILE_SIZE = 76;
 const TILE_DEPTH = 5;
@@ -110,7 +110,7 @@ export default function WaitlistHeroTile({ heroMotion }: Props) {
                     />
                 )}
                 <motion.svg
-                    viewBox={`0 0 ${MATCHA_LOGO_SIZE.width} ${MATCHA_LOGO_SIZE.height}`}
+                    viewBox={`0 0 ${APP_LOGO_SIZE.width} ${APP_LOGO_SIZE.height}`}
                     aria-hidden="true"
                     initial={reduceMotion ? false : { opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
@@ -123,11 +123,7 @@ export default function WaitlistHeroTile({ heroMotion }: Props) {
                             <stop offset="1" stopColor="#d9d6ff" />
                         </linearGradient>
                     </defs>
-                    <path
-                        d={MATCHA_LOGO_PATH}
-                        fill="url(#waitlist-hero-glyph)"
-                        fillRule="evenodd"
-                    />
+                    <path d={APP_LOGO_PATH} fill="url(#waitlist-hero-glyph)" fillRule="evenodd" />
                 </motion.svg>
             </motion.div>
         </motion.div>

@@ -9,7 +9,7 @@ import BentoCard from "./BentoCard";
 const ISO = "matrix(0.866 0.5 -0.866 0.5 0 0)";
 const SQ = Math.SQRT1_2;
 
-/** The matcha mark, verbatim from MatchaLogo (viewBox 792x460). */
+/** The matcha mark, verbatim from AppLogo (viewBox 792x460). */
 const MATCHA_MARK =
     "M626.9 24.4L657 40.8L657 215.5L759.9 147L792 164.5L792 438.5L657 438.5L657 214.6L328.7 447.2L328.7 227.2L0 460.1L0 235.9L297.9 37.4L328.7 54.2L328.7 223Z";
 

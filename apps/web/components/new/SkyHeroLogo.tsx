@@ -1,4 +1,4 @@
-import { MATCHA_LOGO_PATH, MATCHA_LOGO_SIZE } from "@/components/logo/MatchaLogo";
+import { APP_LOGO_PATH, APP_LOGO_SIZE } from "@/components/logo/AppLogo";
 
 const BOUNDARY_GAP = 18;
 const BOUNDARY_LINE = 2;
@@ -8,8 +8,8 @@ const PADDING = 48;
 const FRAME = {
     x: -PADDING,
     y: -PADDING,
-    width: MATCHA_LOGO_SIZE.width + PADDING * 2,
-    height: MATCHA_LOGO_SIZE.height + PADDING * 2,
+    width: APP_LOGO_SIZE.width + PADDING * 2,
+    height: APP_LOGO_SIZE.height + PADDING * 2,
 };
 
 export default function SkyHeroLogo({ className }: { className?: string }) {
@@ -41,12 +41,12 @@ export default function SkyHeroLogo({ className }: { className?: string }) {
                     <stop offset="1" stopColor="#ffffff" stopOpacity="0.15" />
                 </linearGradient>
                 <clipPath id="sky-hero-body">
-                    <path d={MATCHA_LOGO_PATH} />
+                    <path d={APP_LOGO_PATH} />
                 </clipPath>
                 <mask id="sky-hero-boundary-cut" maskUnits="userSpaceOnUse" {...FRAME}>
                     <rect {...FRAME} fill="white" />
                     <path
-                        d={MATCHA_LOGO_PATH}
+                        d={APP_LOGO_PATH}
                         fill="black"
                         stroke="black"
                         strokeWidth={BOUNDARY_GAP * 2}
@@ -56,7 +56,7 @@ export default function SkyHeroLogo({ className }: { className?: string }) {
             </defs>
 
             <path
-                d={MATCHA_LOGO_PATH}
+                d={APP_LOGO_PATH}
                 fill="none"
                 stroke="url(#sky-hero-boundary)"
                 strokeWidth={(BOUNDARY_GAP + BOUNDARY_LINE) * 2}
@@ -65,10 +65,10 @@ export default function SkyHeroLogo({ className }: { className?: string }) {
             />
 
             <g className="drop-shadow-[0_28px_44px_rgba(30,16,90,0.42)]">
-                <path d={MATCHA_LOGO_PATH} fill="url(#sky-hero-glass)" />
-                <path d={MATCHA_LOGO_PATH} fill="url(#sky-hero-gloss)" />
+                <path d={APP_LOGO_PATH} fill="url(#sky-hero-glass)" />
+                <path d={APP_LOGO_PATH} fill="url(#sky-hero-gloss)" />
                 <path
-                    d={MATCHA_LOGO_PATH}
+                    d={APP_LOGO_PATH}
                     fill="none"
                     stroke="url(#sky-hero-bevel)"
                     strokeWidth={BEVEL_WIDTH * 2}

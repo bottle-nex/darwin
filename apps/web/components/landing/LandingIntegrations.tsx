@@ -9,7 +9,7 @@ import {
 import { motion, useReducedMotion } from "motion/react";
 import type { ComponentType, CSSProperties } from "react";
 
-import { MatchaLogo } from "@/components/logo/MatchaLogo";
+import { AppLogo } from "@/components/logo/AppLogo";
 import { cn } from "@/lib/utils";
 
 import { landingContainer } from "./LandingSection";
@@ -36,7 +36,7 @@ const TILES: IntegrationTileSpec[] = [
 /** The hub key at the end of the trunk — everything flows into matcha. */
 const MATCHA_TILE: IntegrationTileSpec = {
     name: "matcha",
-    icon: MatchaLogo,
+    icon: AppLogo,
     iconColor: "#ffffff",
     glow: "255, 255, 255",
 };

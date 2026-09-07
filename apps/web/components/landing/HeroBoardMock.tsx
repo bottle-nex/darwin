@@ -18,7 +18,7 @@ import { AnimatePresence, motion, useInView, useReducedMotion } from "motion/rea
 import { useEffect, useRef, useState } from "react";
 
 import HeroBuddy from "@/components/landing/v2/HeroBuddy";
-import { MatchaLogo } from "@/components/logo/MatchaLogo";
+import { AppLogo } from "@/components/logo/AppLogo";
 import { cn } from "@/lib/utils";
 
 /**
@@ -192,7 +192,7 @@ export default function HeroBoardMock({ className }: { className?: string }) {
             {/* Sidebar */}
             <aside className="hidden w-44 shrink-0 flex-col border-r border-white/6 bg-charcoal p-3 lg:flex">
                 <div className="flex items-center gap-2 px-1.5">
-                    <MatchaLogo className="h-3 w-auto text-snow" />
+                    <AppLogo className="h-3 w-auto text-snow" />
                     <span className="text-sm font-semibold tracking-tight text-snow">matcha</span>
                 </div>
 

@@ -2,7 +2,7 @@
 import { GithubLogoIcon, MergeIcon, RunnerIcon } from "@trymatcha/ui/icons";
 import { motion, useReducedMotion } from "motion/react";
 
-import { MatchaLogo } from "@/components/logo/MatchaLogo";
+import { AppLogo } from "@/components/logo/AppLogo";
 import { CARD_RISE, CARD_STACK } from "@/components/new/landingHeroMotion";
 
 function OverlayCard({
@@ -47,7 +47,7 @@ export default function LandingHeroNotifications() {
         >
             <div className="absolute -inset-12 -z-10 rounded-[48px] bg-black/20 blur-xl" />
             <OverlayCard
-                icon={<MatchaLogo className="h-2.5 w-auto text-snow" />}
+                icon={<AppLogo className="h-2.5 w-auto text-snow" />}
                 title="Morning recap"
                 meta="Summarized at 9:41 AM"
             >

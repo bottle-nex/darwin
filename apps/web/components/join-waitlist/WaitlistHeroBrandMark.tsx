@@ -3,7 +3,7 @@
 import { motion, useTransform } from "motion/react";
 
 import type { HeroMotion } from "@/components/join-waitlist/waitlistHeroMotion";
-import { MATCHA_LOGO_PATH, MATCHA_LOGO_SIZE } from "@/components/logo/MatchaLogo";
+import { APP_LOGO_PATH, APP_LOGO_SIZE } from "@/components/logo/AppLogo";
 
 const BRAND_MARK = { width: 1000, dy: 100, depth: -8 };
 const BRAND_MARK_FADE = "radial-gradient(ellipse at center, black 35%, transparent 80%)";
@@ -23,7 +23,7 @@ export default function WaitlistHeroBrandMark({ color, heroMotion }: Props) {
         >
             <motion.svg
                 width={BRAND_MARK.width}
-                viewBox={`0 0 ${MATCHA_LOGO_SIZE.width} ${MATCHA_LOGO_SIZE.height}`}
+                viewBox={`0 0 ${APP_LOGO_SIZE.width} ${APP_LOGO_SIZE.height}`}
                 aria-hidden="true"
                 style={{ maskImage: BRAND_MARK_FADE, WebkitMaskImage: BRAND_MARK_FADE }}
                 animate={floating ? { opacity: 1, y: [0, -6, 0] } : { opacity: 1 }}
@@ -45,8 +45,8 @@ export default function WaitlistHeroBrandMark({ color, heroMotion }: Props) {
                         <line x1="0.5" y1="0" x2="0.5" y2="3" stroke="white" strokeOpacity="0.4" />
                     </pattern>
                 </defs>
-                <path d={MATCHA_LOGO_PATH} fill={color} fillOpacity="0.22" />
-                <path d={MATCHA_LOGO_PATH} fill="url(#waitlist-hero-hatch)" />
+                <path d={APP_LOGO_PATH} fill={color} fillOpacity="0.22" />
+                <path d={APP_LOGO_PATH} fill="url(#waitlist-hero-hatch)" />
             </motion.svg>
         </motion.div>
     );

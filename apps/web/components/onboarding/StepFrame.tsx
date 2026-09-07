@@ -4,7 +4,7 @@ import { CtaArrowIcon } from "@trymatcha/ui/icons";
 import { motion } from "motion/react";
 import type { ReactNode } from "react";
 
-import { MatchaLogo } from "@/components/logo/MatchaLogo";
+import { AppLogo } from "@/components/logo/AppLogo";
 import { Button } from "@/components/ui/button";
 
 import { stepItemVariants, stepVariants } from "./choreography";
@@ -60,7 +60,7 @@ export default function StepFrame({
                     {step.id === TOUR_STEPS.length ? (
                         <>
                             <span>Finish setup</span>
-                            <MatchaLogo className="size-4.5" />
+                            <AppLogo className="size-4.5" />
                         </>
                     ) : (
                         <>

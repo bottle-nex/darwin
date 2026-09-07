@@ -7,7 +7,7 @@ import {
     SlackLogoIcon,
 } from "@trymatcha/ui/icons";
 
-import { MatchaLogo } from "@/components/logo/MatchaLogo";
+import { AppLogo } from "@/components/logo/AppLogo";
 
 import SettingsHeroCard from "./SettingsHeroCard";
 
@@ -129,7 +129,7 @@ export default function IntegrationsSettingsHeroCard() {
                 ))}
             </div>
             <div className="absolute inset-0 flex items-center justify-center [mask-image:linear-gradient(to_bottom,transparent_8%,black_42%,black_58%,transparent_92%)]">
-                <MatchaLogo
+                <AppLogo
                     className="h-44 w-auto text-snow/5"
                     fill="none"
                     stroke="currentColor"

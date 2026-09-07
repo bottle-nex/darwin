@@ -78,7 +78,7 @@ function BoardGlyph() {
     );
 }
 
-/** The MatchaLogo mark (792×460 viewBox) scaled and centered into the chip-face glyph box. */
+/** The AppLogo mark (792×460 viewBox) scaled and centered into the chip-face glyph box. */
 function MatchaGlyph() {
     return (
         <g

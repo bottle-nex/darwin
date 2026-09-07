@@ -4,7 +4,7 @@ import { motion } from "motion/react";
 
 import { Button } from "@/components/ui/button";
 
-import { MatchaLogo } from "../logo/MatchaLogo";
+import { AppLogo } from "../logo/AppLogo";
 import { screenVariants, stepItemVariants } from "./choreography";
 import type { TourDraft } from "./steps";
 
@@ -63,7 +63,7 @@ export default function DoneScreen({
             <motion.div variants={stepItemVariants} className="mt-10">
                 <Button loading={loading} onClick={onFinish}>
                     <span>Open the board</span>
-                    <MatchaLogo className="size-4.5" />
+                    <AppLogo className="size-4.5" />
                 </Button>
             </motion.div>
         </motion.div>

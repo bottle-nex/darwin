@@ -5,7 +5,7 @@ import { useInView, useReducedMotion } from "motion/react";
 import Link from "next/link";
 import { type CSSProperties, useRef } from "react";
 
-import { MatchaLogo } from "@/components/logo/MatchaLogo";
+import { AppLogo } from "@/components/logo/AppLogo";
 import { cn } from "@/lib/utils";
 
 const LIGHT_DELAY_MS = 200;
@@ -31,7 +31,7 @@ export default function EntryCta() {
             )}
         >
             <span className="flex size-11 items-center justify-center rounded-[10px] bg-graphite">
-                <MatchaLogo className="h-4 w-auto text-snow" />
+                <AppLogo className="h-4 w-auto text-snow" />
             </span>
 
             <h2 className="mt-5 text-[15px] font-medium text-snow">

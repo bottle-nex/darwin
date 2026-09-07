@@ -109,7 +109,7 @@ export function LandingNavbar() {
         >
             <div className={cn(landingContainer, "flex h-full items-center justify-between")}>
                 <Link href="/" aria-label="try matcha home" className="text-snow">
-                    <AppLogo size={20} iconOnly />
+                    <AppLogo size={25} iconOnly />
                 </Link>
 
                 <div className="flex items-center gap-x-6 lg:gap-x-8">

@@ -3,7 +3,7 @@
 import { motion, useReducedMotion } from "motion/react";
 import Image from "next/image";
 
-import { MatchaLogo } from "@/components/logo/MatchaLogo";
+import { AppLogo } from "@/components/logo/AppLogo";
 
 import BentoCard from "./BentoCard";
 
@@ -123,7 +123,7 @@ function MatchaTile() {
                         className="absolute inset-0 flex items-center justify-center rounded-2xl border border-white/20 bg-linear-to-b from-[#232324] to-ink shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]"
                         style={{ transform: `translateZ(${MATCHA_DEPTH}px)` }}
                     >
-                        <MatchaLogo className="h-4.5 w-auto text-snow" />
+                        <AppLogo className="h-4.5 w-auto text-snow" />
                     </motion.span>
                 </motion.div>
             </motion.div>

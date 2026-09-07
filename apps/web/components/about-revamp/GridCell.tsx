@@ -1,6 +1,6 @@
 import Image from "next/image";
 
-import { MatchaLogo } from "@/components/logo/MatchaLogo";
+import { AppLogo } from "@/components/logo/AppLogo";
 import { cn } from "@/lib/utils";
 
 type GridCellProps = {
@@ -22,7 +22,7 @@ export default function GridCell({ variant, imageSrc, imageAlt, darker }: GridCe
     if (variant === "logo") {
         return (
             <div className="flex aspect-square items-center justify-center">
-                <MatchaLogo className="h-8 w-auto text-neutral-100" />
+                <AppLogo className="h-8 w-auto text-neutral-100" />
             </div>
         );
     }
