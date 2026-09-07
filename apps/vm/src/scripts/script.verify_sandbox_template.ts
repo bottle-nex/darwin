@@ -70,18 +70,18 @@ interface Requirement {
 }
 
 const REQUIREMENTS: Requirement[] = [
-    { name: "claude", command: "claude --version", needed_for: "running the solving agent" },
+    { name: "claude", command: "claude --version", needed_for: "running the claude models" },
+    { name: "codex", command: "codex --version", needed_for: "running the openai models" },
+    {
+        name: "opencode",
+        command: "opencode --version",
+        needed_for: "running the opensource models",
+    },
     { name: "gh", command: "gh --version", needed_for: "github cli inside the sandbox" },
     { name: "git", command: "git --version", needed_for: "cloning and branching" },
     { name: "node", command: "node --version", needed_for: "running sandbox-mcp" },
+    { name: "pip", command: "pip --version", needed_for: "installation of graphify" },
     {
-        /**
-         * Serving the tools, not just located and not just started. A bundle with an import the
-         * sandbox cannot resolve is still a file on disk, and a stdio MCP server that dies on
-         * startup is invisible — the agent simply runs without the tools and nothing anywhere
-         * says why. A bundle that starts but predates a tool fails the same way, which is what
-         * the handshake below catches and booting it did not.
-         */
         name: "sandbox-mcp",
         command: mcp_tools_probe(),
         needed_for: "report_progress, report_status and ask_user — how the agent reports and asks",
@@ -105,6 +105,11 @@ const REQUIREMENTS: Requirement[] = [
         name: "npx",
         command: "npx --version",
         needed_for: "installing and running the capsule build harness",
+    },
+    {
+        name: "pipx",
+        command: "pipx --version",
+        needed_for: "installation for graphify",
     },
     { name: "pnpm", command: "pnpm --version", needed_for: "installing pnpm-lock.yaml projects" },
     { name: "yarn", command: "yarn --version", needed_for: "installing yarn.lock projects" },
