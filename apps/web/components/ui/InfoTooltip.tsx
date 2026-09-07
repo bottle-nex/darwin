@@ -37,9 +37,17 @@ export default function InfoTooltip({
                 side={side}
                 align={align}
                 sideOffset={sideOffset}
-                className={cn("max-w-50 rounded-md! min-w-0 p-2 px-3", className)}
+                className={cn(
+                    "min-w-0 max-w-64 rounded-xl border border-white/8 shadow-[0_4px_16px_rgba(0,0,0,0.35)]",
+                    typeof content === "string" ? "px-4 py-3" : "px-3 py-2",
+                    className,
+                )}
             >
-                {content}
+                {typeof content === "string" ? (
+                    <p className="text-[13px] leading-relaxed text-snow/90">{content}</p>
+                ) : (
+                    content
+                )}
             </HoverCardContent>
         </HoverCard>
     );
