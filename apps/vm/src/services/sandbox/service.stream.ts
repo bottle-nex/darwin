@@ -62,18 +62,7 @@ export default class SandboxStream {
         };
     }
 
-<<<<<<< HEAD
-    /**
-     * Mirror a command whose output is plain text, dimmed so sandbox output reads as background
-     * behind darwin's own lines.
-     *
-     * `secrets` is not optional in spirit: clone_repo puts a live GitHub installation token in
-     * the remote URL and git echoes that URL back in its own error messages, so anything
-     * streaming a clone has to blank the token before it reaches the terminal.
-     */
-=======
     // Mirrors plain-text command output dimmed as background noise, blanking secrets since clone_repo's URL carries a live token that git echoes back on error.
->>>>>>> b6fcad70 (updated e2b related files.)
     public static plain(log: Logger, secrets: string[] = []) {
         const emit = (line: string) =>
             log.stream(chalk.dim(truncate(redact(line, secrets), MAX_LINE)));

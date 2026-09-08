@@ -37,16 +37,10 @@ ENV PIPX_BIN_DIR=/usr/local/bin
 RUN pipx install "graphifyy==${GRAPHIFY_VERSION}" \
     && graphify --version
 
-<<<<<<< HEAD
+# Uploading the mcp client
 COPY packages/sandbox-mcp/dist/index.js /opt/darwin/sandbox-mcp/index.js
 COPY docker/sandbox-mcp.runtime.package.json /opt/darwin/sandbox-mcp/package.json
 RUN cd /opt/darwin/sandbox-mcp && npm install --omit=dev
-=======
-# Uploading the mcp client
-COPY packages/sandbox-mcp/dist/index.js /opt/matcha/sandbox-mcp/index.js
-COPY docker/sandbox-mcp.runtime.package.json /opt/matcha/sandbox-mcp/package.json
-RUN cd /opt/matcha/sandbox-mcp && npm install --omit=dev
->>>>>>> b6fcad70 (updated e2b related files.)
 
 # Installation of playwright
 ENV PLAYWRIGHT_BROWSERS_PATH=/home/user/.cache/ms-playwright
@@ -58,18 +52,12 @@ RUN apt-get update \
        unzip fonts-liberation fonts-dejavu-core fonts-noto-core fonts-noto-color-emoji \
     && rm -rf /var/lib/apt/lists/*
 
-<<<<<<< HEAD
+# Uploading of capsule check package
 COPY packages/capsule-check/dist/index.js /opt/darwin/capsule-check/index.js
 COPY docker/capsule-check.runtime.package.json /opt/darwin/capsule-check/package.json
-RUN cd /opt/darwin/capsule-check \
-=======
-# Uploading of capsule check package
-COPY packages/capsule-check/dist/index.js /opt/matcha/capsule-check/index.js
-COPY docker/capsule-check.runtime.package.json /opt/matcha/capsule-check/package.json
 
 # Installation of chromium for playwright
-RUN cd /opt/matcha/capsule-check \
->>>>>>> b6fcad70 (updated e2b related files.)
+RUN cd /opt/darwin/capsule-check \
     && npm install --omit=dev \
     && npx playwright install --with-deps chromium \
     && chmod -R a+rX /opt/darwin/capsule-check /home/user/.cache/ms-playwright
