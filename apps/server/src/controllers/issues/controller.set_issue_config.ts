@@ -1,5 +1,13 @@
 import { Action, Permissions } from "@trydarwin/access-control";
-import { ActivityType, ActorType, Effort, Harness, IssueStatus, prisma } from "@trydarwin/database";
+import {
+    ActivityType,
+    ActorType,
+    Effort,
+    ExecutionMode,
+    Harness,
+    IssueStatus,
+    prisma,
+} from "@trydarwin/database";
 import { Registry } from "@trydarwin/harness";
 import { ActivityService } from "@trydarwin/services";
 import type { Request, Response } from "express";
@@ -27,6 +35,7 @@ export default class IssueSetConfigController {
         harness: z.enum(Harness),
         model: z.string().min(1),
         effort: z.enum(Effort).optional(),
+        execution_mode: z.enum(ExecutionMode).optional(),
     });
 
     static async process(req: Request, res: Response) {
@@ -45,7 +54,7 @@ export default class IssueSetConfigController {
             return;
         }
 
-        const { harness, model, effort } = body_data;
+        const { harness, model, effort, execution_mode } = body_data;
 
         if (!Registry.supportsModel(harness, model)) {
             ResponseWriter.invalid_data(
@@ -118,9 +127,15 @@ export default class IssueSetConfigController {
 
                 const config = await tx.issueConfig.upsert({
                     where: { issueId: params_data.id },
-                    create: { issueId: params_data.id, harness, model, effort },
-                    update: { harness, model, effort },
-                    select: { harness: true, model: true, effort: true },
+                    create: {
+                        issueId: params_data.id,
+                        harness,
+                        model,
+                        effort,
+                        executionMode: execution_mode ?? null,
+                    },
+                    update: { harness, model, effort, executionMode: execution_mode ?? null },
+                    select: { harness: true, model: true, effort: true, executionMode: true },
                 });
 
                 const changed =

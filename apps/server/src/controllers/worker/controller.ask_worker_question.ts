@@ -46,6 +46,21 @@ export default class AskWorkerQuestion {
                 return;
             }
 
+            // An agent only ever waits on its newest question: if it is asking again, whatever it
+            // asked before was abandoned — usually because that tool call died — and leaving the
+            // old row Waiting would strand it and give the pause supervisor a stale question to
+            // hold the sandbox for.
+            const superseded = await prisma.agentQuestion.updateMany({
+                where: { agentSessionId: session_id, status: AgentQuestionStatus.Waiting },
+                data: { status: AgentQuestionStatus.Cancelled },
+            });
+
+            if (superseded.count > 0) {
+                console.log(
+                    `[agent→user] cancelled ${superseded.count} abandoned question(s) before asking "${data.key}"`,
+                );
+            }
+
             const question = await prisma.agentQuestion.create({
                 data: {
                     agentSessionId: session_id,

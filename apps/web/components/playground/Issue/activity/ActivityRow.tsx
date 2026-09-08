@@ -110,9 +110,11 @@ function ActorName({ actor }: { actor: ActivityActorView }) {
  */
 export default function ActivityRow({
     activity,
+    issueId,
     rail = { above: true, below: true },
 }: {
     activity: IssueActivity;
+    issueId?: string;
     rail?: { above: boolean; below: boolean };
 }) {
     const { glyph, render, detail } = activity_entry(activity.type);
@@ -170,7 +172,7 @@ export default function ActivityRow({
                     </p>
                 </div>
             </div>
-            {runSession && <AgentLogsActivity session={runSession} />}
+            {runSession && <AgentLogsActivity session={runSession} issueId={issueId} />}
         </div>
     );
 }

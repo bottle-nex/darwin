@@ -3,6 +3,7 @@ import type Logger from "@trydarwin/logger";
 import type { CommandStartOpts, Sandbox } from "e2b";
 
 import SandboxStream from "../sandbox/service.stream";
+import GitConfig from "./service.git_config";
 
 const REPO_DIR = "/home/user/repo";
 const GRAPHIFY_ROOT = "/home/user/.darwin/graphify";
@@ -66,6 +67,8 @@ export default class GraphService {
                 await GraphService.run_checked(sandbox, `printf ready > ${state_file}`);
             }
 
+            await GitConfig.configure(sandbox);
+
             log.success("code graph ready", {
                 harness,
                 took: `${Math.round((Date.now() - started) / 1000)}s`,
@@ -100,7 +103,7 @@ export default class GraphService {
         }
     }
 
-    private static async run_checked(
+    static async run_checked(
         sandbox: Sandbox,
         command: string,
         options: CommandStartOpts & { background?: false } = {},

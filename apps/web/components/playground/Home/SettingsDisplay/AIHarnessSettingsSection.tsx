@@ -1,7 +1,4 @@
 "use client";
-import { useState } from "react";
-
-import { Button } from "@/components/ui/button";
 import SelectField from "@/components/ui/SelectField";
 import NoResource from "@/components/utility/NoResource";
 import ProjectsGlyph from "@/components/utility/ProjectsGlyph";
@@ -15,6 +12,7 @@ import {
     HARNESS_OPTIONS,
     HARNESS_SUPPORTS_EFFORT,
 } from "@/types/harness.type";
+import { EXECUTION_MODE_OPTIONS } from "@/types/project";
 
 import SettingsRow from "./SettingsRow";
 import SettingsTilePicker from "./SettingsTilePicker";
@@ -32,10 +30,6 @@ export default function AIHarnessSettingsSection({
     const { data: config } = useGetProjectConfig(projectId);
     const update = useUpdateProjectConfig();
 
-    const [harnessDraft, setHarnessDraft] = useState<Harness | null>(null);
-    const [modelDraft, setModelDraft] = useState<string | null>(null);
-    const [effortDraft, setEffortDraft] = useState<Effort | null>(null);
-
     if (!isAdmin) {
         return (
             <NoResource
@@ -47,61 +41,38 @@ export default function AIHarnessSettingsSection({
         );
     }
 
-    const savedHarness = config?.harness ?? "Claude";
-    const harness = harnessDraft ?? savedHarness;
+    const harness = config?.harness ?? "Claude";
     const availableModels = HARNESS_MODELS[harness];
     const supportsEffort = HARNESS_SUPPORTS_EFFORT[harness];
-
-    const savedModel = config?.defaultModel ?? null;
-    const model = modelDraft ?? (harnessDraft ? null : savedModel);
-
-    const savedEffort = config?.defaultEffort ?? null;
-    const effort = effortDraft ?? (harnessDraft ? null : savedEffort);
-
-    const dirty =
-        harness !== savedHarness ||
-        model !== savedModel ||
-        effort !== (supportsEffort ? savedEffort : null);
-    const canSave = dirty && Boolean(model) && !update.isPending;
+    const model = config?.defaultModel ?? null;
+    const effort = config?.defaultEffort ?? null;
+    const mode = config?.executionMode ?? "Autonomous";
 
     function pickHarness(next: Harness) {
-        setHarnessDraft(next);
-        setModelDraft(null);
-        setEffortDraft(null);
-    }
-
-    function save() {
-        if (!canSave || !model) return;
+        const nextModel = HARNESS_MODELS[next][0] ?? null;
         update.mutate({
             projectId,
-            harness,
-            default_model: model,
-            ...(supportsEffort && effort ? { default_effort: effort } : {}),
+            harness: next,
+            ...(nextModel ? { default_model: nextModel } : {}),
         });
     }
 
     return (
-        <SettingsUtilityCard
-            title="AI Harness"
-            rows
-            footer={
-                <>
-                    {update.isSuccess && !dirty && (
-                        <span className="mr-auto text-[11px] text-matcha">Saved</span>
-                    )}
-                    <Button
-                        type="button"
-                        variant="flat-primary"
-                        size="sm"
-                        loading={update.isPending}
-                        disabled={!canSave}
-                        onClick={save}
-                    >
-                        Save changes
-                    </Button>
-                </>
-            }
-        >
+        <SettingsUtilityCard title="AI Harness" rows>
+            <SettingsRow
+                label="Execution mode"
+                description="How much the agent decides on its own. An issue can override this."
+                stack
+            >
+                <SettingsTilePicker
+                    name="executionMode"
+                    columns={2}
+                    options={EXECUTION_MODE_OPTIONS}
+                    value={mode}
+                    onChange={(next) => update.mutate({ projectId, execution_mode: next })}
+                />
+            </SettingsRow>
+
             <SettingsRow
                 label="Harness"
                 description="The agent CLI that runs issues in this project."
@@ -121,7 +92,7 @@ export default function AIHarnessSettingsSection({
                     aria-label="Default model"
                     className="w-64"
                     value={model ?? undefined}
-                    onChange={setModelDraft}
+                    onChange={(next) => update.mutate({ projectId, default_model: next })}
                     placeholder="Select a model"
                     options={availableModels.map((m) => ({ value: m, label: m }))}
                 />
@@ -133,7 +104,9 @@ export default function AIHarnessSettingsSection({
                         aria-label="Default effort"
                         className="w-64"
                         value={effort ?? undefined}
-                        onChange={(v) => setEffortDraft(v as Effort)}
+                        onChange={(next) =>
+                            update.mutate({ projectId, default_effort: next as Effort })
+                        }
                         placeholder="Select an effort level"
                         options={EFFORT_OPTIONS.map((e) => ({ value: e.id, label: e.label }))}
                     />

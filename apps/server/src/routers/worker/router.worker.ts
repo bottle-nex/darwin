@@ -1,6 +1,7 @@
 import { Router } from "express";
 
 import AskWorkerQuestionController from "../../controllers/worker/controller.ask_worker_question";
+import WorkerCheckpointsController from "../../controllers/worker/controller.checkpoints";
 import ReportRunCompletedController from "../../controllers/worker/controller.report_run_completed";
 import ReportRunFailedController from "../../controllers/worker/controller.report_run_failed";
 import ReportRunStartedController from "../../controllers/worker/controller.report_run_started";
@@ -15,5 +16,11 @@ worker_router.post("/run-completed", require_worker_auth, ReportRunCompletedCont
 worker_router.post("/run-failed", require_worker_auth, ReportRunFailedController.process);
 worker_router.post("/ask", require_worker_auth, AskWorkerQuestionController.ask);
 worker_router.get("/answer", require_worker_auth, AskWorkerQuestionController.answer);
+worker_router.post("/notify", require_worker_auth, WorkerCheckpointsController.notify);
+worker_router.post(
+    "/pr-approval",
+    require_worker_auth,
+    WorkerCheckpointsController.request_pr_approval,
+);
 
 export default worker_router;

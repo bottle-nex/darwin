@@ -59,6 +59,11 @@ export default function IssueDisplayPane({
         if (await form.submit()) close();
     }
 
+    function discardAndClose() {
+        form.discardDraft();
+        close();
+    }
+
     return (
         <IssueDropdown issueId={issue.id} issue={issue}>
             <main className={PLAYGROUND_PANE_SHELL}>
@@ -91,7 +96,7 @@ export default function IssueDisplayPane({
                     onOpenChange={setConfirmingClose}
                     title="Save your changes?"
                     description="This issue has unsaved edits. Closing it now will lose them."
-                    cancel={{ label: "Discard", variant: "destructive", onClick: close }}
+                    cancel={{ label: "Discard", variant: "destructive", onClick: discardAndClose }}
                     confirm={{ label: "Save", variant: "tertiary", onClick: saveAndClose }}
                     pending={form.pending}
                 />

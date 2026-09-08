@@ -6,7 +6,10 @@ import { PRIORITY_TO_NUMBER } from "@/components/playground/Issue/issueHelpers";
 import { useCreateIssue } from "@/hooks/issues/useCreateIssue";
 import { useGetIssueConfig, useSetIssueConfig } from "@/hooks/issues/useIssueConfig";
 import { useUpdateIssue } from "@/hooks/issues/useUpdateIssue";
+import { useGetProjectConfig } from "@/hooks/project/useGetProjectConfig";
 import { useActiveProject } from "@/hooks/useActiveProject";
+import { editDraftKey } from "@/lib/issueDrafts/db";
+import { useIssueDraftStorage } from "@/lib/issueDrafts/useIssueDraftStorage";
 import { KanbanMappers } from "@/lib/kanban/KanbanMappers";
 import { toast } from "@/lib/toast";
 import type { IssueTarget } from "@/store/issues/useCreateIssueStore";
@@ -14,25 +17,34 @@ import { usePaneRouteStore } from "@/store/playground/usePaneRouteStore";
 import type { BoardIssue } from "@/types/board";
 import type { Effort, Harness } from "@/types/harness.type";
 import { HARNESS_MODELS, HARNESS_SUPPORTS_EFFORT } from "@/types/harness.type";
+import type { IssueDraftFields } from "@/types/issueDraft.type";
 import type { Priority } from "@/types/kanban";
+import type { ExecutionMode } from "@/types/project";
 
 import { useSubmitWarning } from "./SubmitWarningToast";
 import { useIssueDescription } from "./useIssueDescription";
 
 const FROZEN_HARNESS_STATUSES = ["InProgress", "InReview", "Done", "Failed", "Cancelled"];
 
-type HarnessDraft = { harness: Harness; model: string | null; effort: Effort | null };
+type HarnessDraft = {
+    harness: Harness;
+    model: string | null;
+    effort: Effort | null;
+    executionMode: ExecutionMode;
+};
 
 export type HarnessConfigState = {
     harness: Harness;
     model: string | null;
     effort: Effort | null;
+    executionMode: ExecutionMode;
     modelOptions: string[];
     supportsEffort: boolean;
     frozen: boolean;
     setHarness: (value: Harness) => void;
     setModel: (value: string) => void;
     setEffort: (value: Effort) => void;
+    setExecutionMode: (value: ExecutionMode) => void;
 };
 
 type UseIssueFormArgs = {
@@ -58,6 +70,8 @@ export type IssueFormFields = {
     setTargetDate: (value: Date | undefined) => void;
     membersOpen: boolean;
     setMembersOpen: (value: boolean) => void;
+    executionMode: ExecutionMode;
+    setExecutionMode: (value: ExecutionMode) => void;
 };
 
 function sameIds(a: { id: string }[], b: { id: string }[]) {
@@ -92,6 +106,11 @@ export function useIssueForm({
         issue?.targetDate ? new Date(issue.targetDate) : undefined,
     );
     const [membersOpen, setMembersOpen] = useState(false);
+    const { data: projectConfigData } = useGetProjectConfig(projectId);
+    const [newIssueExecutionModeDraft, setNewIssueExecutionModeDraft] =
+        useState<ExecutionMode | null>(null);
+    const newIssueExecutionMode =
+        newIssueExecutionModeDraft ?? projectConfigData?.executionMode ?? "Autonomous";
 
     const [syncedIssue, setSyncedIssue] = useState(issue);
     if (issue && syncedIssue && issue !== syncedIssue) {
@@ -125,18 +144,21 @@ export function useIssueForm({
     const savedHarness = issueConfigData?.config.harness ?? "Claude";
     const savedModel = issueConfigData?.config.model ?? null;
     const savedEffort = issueConfigData?.config.effort ?? null;
+    const savedExecutionMode = issueConfigData?.config.executionMode ?? "Autonomous";
 
     const [harnessDraft, setHarnessDraft] = useState<HarnessDraft | null>(null);
     const currentHarness = harnessDraft?.harness ?? savedHarness;
     const currentModel = harnessDraft ? harnessDraft.model : savedModel;
     const currentEffort = harnessDraft ? harnessDraft.effort : savedEffort;
+    const currentExecutionMode = harnessDraft ? harnessDraft.executionMode : savedExecutionMode;
     const harnessSupportsEffort = HARNESS_SUPPORTS_EFFORT[currentHarness];
 
     const harnessDirty =
         harnessDraft !== null &&
         (currentHarness !== savedHarness ||
             currentModel !== savedModel ||
-            currentEffort !== savedEffort);
+            currentEffort !== savedEffort ||
+            currentExecutionMode !== savedExecutionMode);
 
     function setHarness(next: Harness) {
         const nextModel = HARNESS_MODELS[next].includes(currentModel ?? "")
@@ -146,27 +168,49 @@ export function useIssueForm({
             harness: next,
             model: nextModel,
             effort: HARNESS_SUPPORTS_EFFORT[next] ? currentEffort : null,
+            executionMode: currentExecutionMode,
         });
     }
 
     function setModel(next: string) {
-        setHarnessDraft({ harness: currentHarness, model: next, effort: currentEffort });
+        setHarnessDraft({
+            harness: currentHarness,
+            model: next,
+            effort: currentEffort,
+            executionMode: currentExecutionMode,
+        });
     }
 
     function setEffort(next: Effort) {
-        setHarnessDraft({ harness: currentHarness, model: currentModel, effort: next });
+        setHarnessDraft({
+            harness: currentHarness,
+            model: currentModel,
+            effort: next,
+            executionMode: currentExecutionMode,
+        });
+    }
+
+    function setExecutionMode(next: ExecutionMode) {
+        setHarnessDraft({
+            harness: currentHarness,
+            model: currentModel,
+            effort: currentEffort,
+            executionMode: next,
+        });
     }
 
     const harnessConfig: HarnessConfigState = {
         harness: currentHarness,
         model: currentModel,
         effort: currentEffort,
+        executionMode: currentExecutionMode,
         modelOptions: HARNESS_MODELS[currentHarness],
         supportsEffort: harnessSupportsEffort,
         frozen: harnessFrozen,
         setHarness,
         setModel,
         setEffort,
+        setExecutionMode,
     };
 
     const titleRef = useRef<HTMLTextAreaElement>(null);
@@ -226,6 +270,7 @@ export function useIssueForm({
                                   issueId: issue.id,
                                   harness: currentHarness,
                                   model: currentModel,
+                                  execution_mode: currentExecutionMode,
                                   ...(harnessSupportsEffort && currentEffort
                                       ? { effort: currentEffort }
                                       : {}),
@@ -245,6 +290,7 @@ export function useIssueForm({
                     tag_ids: tagIds,
                     start_date: startDate?.toISOString(),
                     target_date: targetDate?.toISOString(),
+                    execution_mode: newIssueExecutionMode,
                 });
                 toast.success("Issue created.", {
                     description: created.issue.title,
@@ -254,6 +300,7 @@ export function useIssueForm({
                     },
                 });
             }
+            clearDraft();
             onSubmitted?.();
             return true;
         } catch {
@@ -302,6 +349,67 @@ export function useIssueForm({
 
     const isDirty = hasEdits();
 
+    // Drafts only cover editing an existing issue — a New Issue that's never been submitted
+    // has nothing on the server to reconcile with, so it isn't autosaved.
+    const draftKey = issue ? editDraftKey(issue.id) : "";
+    const draftEnabled = !readOnly && draftKey.length > 0;
+    const hydratedDraftRef = useRef(false);
+    const draftStorage = useIssueDraftStorage({
+        key: draftKey,
+        enabled: draftEnabled,
+        onLoad: (draft) => {
+            if (hydratedDraftRef.current) return;
+            hydratedDraftRef.current = true;
+            if (!draft) return;
+            setTitle(draft.title);
+            body.loadDraft(draft.descriptionHtml, initialDescription ?? "");
+            setPriority(draft.priority);
+            setMemberIds(draft.memberIds);
+            setTagIds(draft.tagIds);
+            setStartDate(draft.startDate ? new Date(draft.startDate) : undefined);
+            setTargetDate(draft.targetDate ? new Date(draft.targetDate) : undefined);
+        },
+    });
+    const hasDraftableContent = isEdit && isDirty;
+
+    useEffect(() => {
+        if (!hasDraftableContent) return;
+        const snapshot: IssueDraftFields = {
+            title,
+            descriptionHtml: body.html,
+            priority,
+            memberIds,
+            tagIds,
+            startDate: startDate ? startDate.toISOString() : null,
+            targetDate: targetDate ? targetDate.toISOString() : null,
+        };
+        draftStorage.persist(snapshot);
+    });
+
+    const unmountHandledRef = useRef(false);
+
+    function clearDraft() {
+        unmountHandledRef.current = true;
+        draftStorage.discard();
+    }
+
+    function discardDraft() {
+        hydratedDraftRef.current = true;
+        clearDraft();
+    }
+
+    const autoSubmitOnExitRef = useRef(() => {});
+    useEffect(() => {
+        autoSubmitOnExitRef.current = () => {
+            if (unmountHandledRef.current || readOnly || !isEdit) return;
+            if (isDirty) submitRef.current();
+        };
+    });
+
+    useEffect(() => {
+        return () => autoSubmitOnExitRef.current();
+    }, []);
+
     const fields: IssueFormFields = {
         title,
         setTitle,
@@ -317,6 +425,8 @@ export function useIssueForm({
         setTargetDate,
         membersOpen,
         setMembersOpen,
+        executionMode: newIssueExecutionMode,
+        setExecutionMode: setNewIssueExecutionModeDraft,
     };
 
     return {
@@ -335,6 +445,7 @@ export function useIssueForm({
         readOnly,
         isDirty,
         harnessConfig,
+        discardDraft,
     };
 }
 

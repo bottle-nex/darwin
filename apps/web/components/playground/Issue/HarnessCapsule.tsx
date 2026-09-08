@@ -3,6 +3,7 @@ import type { Effort, Harness } from "@/types/harness.type";
 import { EFFORT_OPTIONS, HARNESS_OPTIONS } from "@/types/harness.type";
 
 import Capsule, { type CapsuleOption } from "./Capsule";
+import ExecutionModeCapsule from "./ExecutionModeCapsule";
 import { STACKED_CAPSULE } from "./issueHelpers";
 import type { HarnessConfigState } from "./useIssueForm";
 
@@ -24,9 +25,11 @@ export default function HarnessCapsules({ harnessConfig }: { harnessConfig: Harn
         modelOptions,
         supportsEffort,
         frozen,
+        executionMode,
         setHarness,
         setModel,
         setEffort,
+        setExecutionMode,
     } = harnessConfig;
 
     const modelCapsuleOptions: CapsuleOption[] = modelOptions.map((m) => ({ value: m, label: m }));
@@ -49,6 +52,12 @@ export default function HarnessCapsules({ harnessConfig }: { harnessConfig: Harn
                 disabled={frozen}
                 className={STACKED_CAPSULE}
                 placeholder="No model selected"
+            />
+            <ExecutionModeCapsule
+                value={executionMode}
+                onChange={setExecutionMode}
+                disabled={frozen}
+                className={STACKED_CAPSULE}
             />
             {supportsEffort && (
                 <Capsule

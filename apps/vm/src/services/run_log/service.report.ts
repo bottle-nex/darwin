@@ -61,6 +61,30 @@ export default class RunReporter {
         );
     }
 
+    /**
+     * Tells the people on an issue that its branch is now on the remote. Best-effort like the
+     * rest of this class: a chat platform that is down must not fail a run whose work is
+     * already pushed.
+     */
+    static async notify(token: string, issue_id: string, text: string, log: Logger) {
+        await this.post("/notify", token, { issue_id, text }, log);
+    }
+
+    /**
+     * Hands the pull request decision to a person and returns. The worker does not wait: the
+     * issue is parked as AwaitingApproval and the pull request is opened by the server once the
+     * answer arrives, so a sandbox is not held for however long that takes.
+     */
+    static async request_pr_approval(
+        token: string,
+        issue_id: string,
+        session_id: string,
+        pr_body: string,
+        log: Logger,
+    ) {
+        await this.post("/pr-approval", token, { issue_id, session_id, pr_body }, log);
+    }
+
     private static async post(path: string, token: string, body: unknown, log: Logger) {
         try {
             const response = await fetch(`${ENV.PUBLIC_API_URL}/api/v1/worker${path}`, {

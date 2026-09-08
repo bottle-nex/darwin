@@ -2,6 +2,7 @@
 import { CalendarIcon } from "@trydarwin/ui/icons";
 
 import Capsule from "./Capsule";
+import ExecutionModeCapsule from "./ExecutionModeCapsule";
 import { DATE_ICON_COLOR, STACKED_CAPSULE } from "./issueHelpers";
 import MembersCapsule from "./MembersCapsule";
 import PriorityCapsule from "./PriorityCapsule";
@@ -35,6 +36,13 @@ export default function IssueFields({
         <PriorityCapsule
             value={fields.priority}
             onChange={fields.setPriority}
+            className={capsuleClass}
+        />
+    );
+    const executionMode = (
+        <ExecutionModeCapsule
+            value={fields.executionMode}
+            onChange={fields.setExecutionMode}
             className={capsuleClass}
         />
     );
@@ -82,6 +90,7 @@ export default function IssueFields({
         return (
             <div className="flex items-center gap-x-2.5">
                 {priority}
+                {executionMode}
                 {tags}
                 {members}
                 {startDate}

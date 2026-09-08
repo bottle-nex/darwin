@@ -35,6 +35,7 @@ export default async function get_project_config_controller(req: Request, res: R
                 harness: true,
                 defaultModel: true,
                 defaultEffort: true,
+                executionMode: true,
             },
         });
 

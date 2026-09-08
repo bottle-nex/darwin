@@ -6,11 +6,7 @@ import {
     OutboundSocketMessageType,
     project_channel_name,
     RUN_LOG_CACHE_INDEX_KEY,
-    run_log_cache_key,
-    run_log_meta_key,
-    run_log_object_key,
-    run_log_prefix,
-    run_log_segment_key,
+    RunLog,
     type RunLogEvent,
 } from "@trydarwin/types";
 
@@ -62,7 +58,7 @@ export default class RunLogFlusher {
     }
 
     private static async read_meta(run_id: string): Promise<RunLogMeta | null> {
-        const meta = await redis().hgetall(run_log_meta_key(run_id));
+        const meta = await redis().hgetall(RunLog.meta_key(run_id));
         if (!meta.projectId) return null;
         return {
             projectId: meta.projectId,
@@ -82,7 +78,7 @@ export default class RunLogFlusher {
             return;
         }
 
-        const cache_key = run_log_cache_key(run_id);
+        const cache_key = RunLog.cache_key(run_id);
         const payloads = await client.zrangebyscore(
             cache_key,
             `(${meta.flushed}`,
@@ -128,14 +124,14 @@ export default class RunLogFlusher {
         const body = gzipSync(Buffer.from(payloads.join("\n")));
 
         await StorageService.put_run_log_segment(
-            run_log_segment_key(meta.projectId, run_id, first_seq),
+            RunLog.segment_key(meta.projectId, run_id, first_seq),
             body,
         );
 
-        const meta_key = run_log_meta_key(run_id);
+        const meta_key = RunLog.meta_key(run_id);
         await redis()
             .multi()
-            .zremrangebyscore(run_log_cache_key(run_id), "-inf", last_seq)
+            .zremrangebyscore(RunLog.cache_key(run_id), "-inf", last_seq)
             .hset(meta_key, { flushed: last_seq })
             .hincrby(meta_key, "segments", 1)
             .hincrby(meta_key, "sizeBytes", body.length)
@@ -164,7 +160,7 @@ export default class RunLogFlusher {
         run_id: string,
         meta: RunLogMeta,
     ): Promise<string | null> {
-        const prefix = run_log_prefix(meta.projectId, run_id);
+        const prefix = RunLog.prefix(meta.projectId, run_id);
         const keys = await StorageService.list_run_log_segments(prefix);
         if (!keys.length) return null;
 
@@ -173,7 +169,7 @@ export default class RunLogFlusher {
             parts.push(await StorageService.read_run_log_segment(key));
         }
 
-        const archive_key = run_log_object_key(meta.projectId, run_id);
+        const archive_key = RunLog.object_key(meta.projectId, run_id);
         await StorageService.put_run_log_segment(archive_key, Buffer.concat(parts));
         await StorageService.remove_run_log_segments(keys);
         return archive_key;
@@ -196,8 +192,8 @@ export default class RunLogFlusher {
 
         await client
             .multi()
-            .del(run_log_cache_key(run_id))
-            .del(run_log_meta_key(run_id))
+            .del(RunLog.cache_key(run_id))
+            .del(RunLog.meta_key(run_id))
             .srem(RUN_LOG_CACHE_INDEX_KEY, run_id)
             .exec();
 

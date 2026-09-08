@@ -9,12 +9,7 @@ export function truncate(text: string, limit: number): string {
     return flat.length > limit ? `${flat.slice(0, limit - 1)}…` : flat;
 }
 
-/**
- * Blank known secrets, then blank anything shaped like a credential in a URL.
- *
- * Two passes because they fail differently: the known-value pass cannot miss a format variant,
- * and the pattern pass still catches a credential nobody remembered to hand over.
- */
+// Blanks known secrets first, then anything shaped like a credential in a URL — the pattern pass catches what the known-value pass misses.
 export function redact(text: string, secrets: string[]): string {
     const known = secrets.reduce(
         (out, secret) => (secret ? out.split(secret).join("***") : out),
@@ -23,13 +18,7 @@ export function redact(text: string, secrets: string[]): string {
     return known.replace(CREDENTIAL_IN_URL, "//***:***@");
 }
 
-/**
- * Pull the readable part out of a failed sandbox command.
- *
- * E2B throws a CommandExitError whose message is only "exit status 1". The output that says what
- * actually broke sits on the error itself, so reading the message alone records nothing useful and
- * leaves a repair agent guessing.
- */
+// Pulls the readable failure text out of a command error, since E2B's CommandExitError message is just "exit status 1".
 export function command_error_text(error: unknown): string {
     const result = error as { stderr?: unknown; stdout?: unknown; exitCode?: unknown };
     const parts = [result?.stderr, result?.stdout]
@@ -45,14 +34,7 @@ export interface FailureReport {
     message: string;
 }
 
-/**
- * Describe a failure well enough to act on it without reading the code that raised it.
- *
- * A failure is only useful when it says which step broke and what that step actually printed. The
- * stage supplies the first; command_error_text supplies the second. Redaction is not optional: the
- * git remote carries a live installation token, git echoes that URL back in its own fatal
- * messages, and these strings are written to the database.
- */
+// Describes a failure well enough to act on without reading code: names the stage and the command's own output, both redacted since these strings get written to the database.
 export function describe_failure(stage: string, error: unknown, secrets: string[]): FailureReport {
     return { stage, message: redact(command_error_text(error), secrets) };
 }
@@ -62,16 +44,7 @@ export function failure_sentence(failure: FailureReport): string {
 }
 
 export default class SandboxStream {
-    /**
-     * Turn e2b's chunk callbacks into whole lines.
-     *
-     * e2b hands over arbitrary byte chunks — one chunk can be half a line, three lines, or a
-     * fragment mid-word — so the tail of every chunk is carried until its line completes.
-     *
-     * Splits on carriage returns as well as newlines: git reports clone progress by overwriting
-     * a single line with `\r`, and a newline-only split would hold the whole clone in the buffer
-     * and emit it as one line at the end.
-     */
+    // Turns e2b's arbitrary byte-chunk callbacks into whole lines, splitting on \r too since git overwrites a line with carriage returns during clone progress.
     public static lines() {
         let remainder = "";
 
@@ -89,14 +62,7 @@ export default class SandboxStream {
         };
     }
 
-    /**
-     * Mirror a command whose output is plain text, dimmed so sandbox output reads as background
-     * behind darwin's own lines.
-     *
-     * `secrets` is not optional in spirit: clone_repo puts a live GitHub installation token in
-     * the remote URL and git echoes that URL back in its own error messages, so anything
-     * streaming a clone has to blank the token before it reaches the terminal.
-     */
+    // Mirrors plain-text command output dimmed as background noise, blanking secrets since clone_repo's URL carries a live token that git echoes back on error.
     public static plain(log: Logger, secrets: string[] = []) {
         const emit = (line: string) =>
             log.stream(chalk.dim(truncate(redact(line, secrets), MAX_LINE)));

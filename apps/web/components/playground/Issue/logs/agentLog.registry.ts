@@ -8,8 +8,12 @@ import {
     EditIcon,
     ErrorCircleIcon,
     FileIcon,
+    HelpIcon,
     type IconType,
+    PausedStateIcon,
+    PlayCircleIcon,
     PullRequestOpenIcon,
+    ReplyIcon,
     SearchIcon,
     StatusInfoIcon,
 } from "@trydarwin/ui/icons";
@@ -26,6 +30,10 @@ export const ICON: Record<RunLogEventKind, IconType> = {
     [RunLogEventKind.ChangesSummary]: ChangedFilesIcon,
     [RunLogEventKind.AgentFinished]: CheckIcon,
     [RunLogEventKind.RunFailed]: ErrorCircleIcon,
+    [RunLogEventKind.QuestionAsked]: HelpIcon,
+    [RunLogEventKind.QuestionAnswered]: ReplyIcon,
+    [RunLogEventKind.SandboxPaused]: PausedStateIcon,
+    [RunLogEventKind.SandboxResumed]: PlayCircleIcon,
 };
 
 /** Info reads at the row's own weight; a warn or error tints the title it belongs to. */
@@ -84,5 +92,13 @@ export function titleOf(event: RunLogEvent): string {
             return event.subject;
         case RunLogEventKind.PullRequestOpened:
             return `Opened pull request #${event.number}`;
+        case RunLogEventKind.QuestionAsked:
+            return `Asked: ${event.prompt}`;
+        case RunLogEventKind.QuestionAnswered:
+            return `Answered via ${event.source}: ${event.value}`;
+        case RunLogEventKind.SandboxPaused:
+            return `Sandbox paused — ${event.reason}`;
+        case RunLogEventKind.SandboxResumed:
+            return `Sandbox resumed after ${duration(event.pausedMs)}`;
     }
 }

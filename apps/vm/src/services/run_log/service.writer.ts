@@ -79,6 +79,21 @@ const observed_event_schema = z.union([
             number: z.number().int(),
             url: z.string(),
         }),
+        z.object({
+            kind: z.literal(RunLogEventKind.QuestionAsked),
+            questionId: z.string(),
+            key: z.string(),
+            prompt: z.string(),
+            options: z.array(z.string()).optional(),
+        }),
+        z.object({
+            kind: z.literal(RunLogEventKind.QuestionAnswered),
+            key: z.string(),
+            value: z.string(),
+            source: z.enum(["connector", "web", "timeout"]),
+        }),
+        z.object({ kind: z.literal(RunLogEventKind.SandboxPaused), reason: z.string() }),
+        z.object({ kind: z.literal(RunLogEventKind.SandboxResumed), pausedMs: z.number() }),
     ]),
 ]);
 
@@ -195,6 +210,11 @@ export default class RunLogWriter {
                 return `${body.kind}:${body.path}`;
             case RunLogEventKind.Search:
                 return `${body.kind}:${body.pattern}`;
+            // Keyed by the question, since a run asks several in a row and they would otherwise
+            // all share one identity and be dropped as repeats of each other.
+            case RunLogEventKind.QuestionAsked:
+            case RunLogEventKind.QuestionAnswered:
+                return `${body.kind}:${body.key}`;
             case RunLogEventKind.Command:
                 return `${body.kind}:${body.command}`;
             default:
@@ -261,6 +281,16 @@ export default class RunLogWriter {
             case RunLogEventKind.Notice: {
                 const text = this.clean(event.text, RUN_LOG_MAX_NOTICE_LENGTH);
                 return text ? { ...event, text } : null;
+            }
+            case RunLogEventKind.QuestionAsked: {
+                const prompt = this.clean(event.prompt, RUN_LOG_MAX_NOTICE_LENGTH);
+                return prompt ? { ...event, prompt } : null;
+            }
+            // An answer is typed by a person and lands in stored output like any other text, so
+            // it is redacted and capped the same way rather than trusted.
+            case RunLogEventKind.QuestionAnswered: {
+                const value = this.clean(event.value, RUN_LOG_MAX_NOTICE_LENGTH);
+                return value ? { ...event, value } : null;
             }
             default:
                 return event;

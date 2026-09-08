@@ -10,6 +10,10 @@ export const RunLogEventKind = {
     Committed: "committed",
     PullRequestOpened: "pull_request_opened",
     Notice: "notice",
+    QuestionAsked: "question_asked",
+    QuestionAnswered: "question_answered",
+    SandboxPaused: "sandbox_paused",
+    SandboxResumed: "sandbox_resumed",
 } as const;
 export type RunLogEventKind = (typeof RunLogEventKind)[keyof typeof RunLogEventKind];
 
@@ -63,7 +67,22 @@ export type RunLogActionBody =
           output?: string;
           exitCode?: number;
       }
-    | { kind: typeof RunLogEventKind.Notice; text: string; level?: RunLogLevel };
+    | { kind: typeof RunLogEventKind.Notice; text: string; level?: RunLogLevel }
+    | {
+          kind: typeof RunLogEventKind.QuestionAsked;
+          questionId: string;
+          key: string;
+          prompt: string;
+          options?: string[];
+      }
+    | {
+          kind: typeof RunLogEventKind.QuestionAnswered;
+          key: string;
+          value: string;
+          source: "connector" | "web" | "timeout";
+      }
+    | { kind: typeof RunLogEventKind.SandboxPaused; reason: string }
+    | { kind: typeof RunLogEventKind.SandboxResumed; pausedMs: number };
 
 export type RunLogEventBody = RunLogMilestoneBody | RunLogActionBody;
 
@@ -111,33 +130,49 @@ export const RUN_LOG_MAX_COMMIT_BODY_LENGTH = 2_000;
 
 export const RUN_LOG_CACHE_INDEX_KEY = "run-logs:index";
 
-export function run_log_cache_key(run_id: string): string {
-    return `run-logs:${run_id}:events`;
-}
+export default class RunLog {
+    public static RUN_LOG_BLOCKED_KEYWORDS: string[] = [
+        "password",
+        "secret",
+        "api_key",
+        "apikey",
+        "private_key",
+        "access_token",
+        "graphify",
+        "code graph",
+        "sandbox",
+    ];
 
-export function run_log_meta_key(run_id: string): string {
-    return `run-logs:${run_id}:meta`;
-}
+    public static cache_key(run_id: string): string {
+        return `run-logs:${run_id}:events`;
+    }
 
-// Segments live under their own prefix so the combined archive can sit beside them without
-// being picked up by the listing that later deletes them.
-export function run_log_prefix(project_id: string, run_id: string): string {
-    return `run-logs/${project_id}/${run_id}/segments/`;
-}
+    public static meta_key(run_id: string): string {
+        return `run-logs:${run_id}:meta`;
+    }
 
-// The sequence number is zero-padded because segments are read back in the order object
-// storage lists them, which is plain lexicographic sorting.
-export function run_log_segment_key(project_id: string, run_id: string, first_seq: number): string {
-    const ordered = String(first_seq).padStart(12, "0");
-    return `${run_log_prefix(project_id, run_id)}${ordered}.jsonl.gz`;
-}
+    public static prefix(project_id: string, run_id: string): string {
+        return `run-logs/${project_id}/${run_id}/segments/`;
+    }
 
-export function run_log_object_key(project_id: string, run_id: string): string {
-    return `run-logs/${project_id}/${run_id}/run.jsonl.gz`;
-}
+    public static segment_key(project_id: string, run_id: string, first_seq: number): string {
+        const ordered = String(first_seq).padStart(12, "0");
+        return `${this.prefix(project_id, run_id)}${ordered}.jsonl.gz`;
+    }
 
-// TextEncoder rather than Buffer: this module is bundled into the browser too, where Buffer
-// is not defined.
-export function run_log_event_bytes(event: RunLogEvent): number {
-    return new TextEncoder().encode(JSON.stringify(event)).length;
+    public static object_key(project_id: string, run_id: string): string {
+        return `run-logs/${project_id}/${run_id}/run.jsonl.gz`;
+    }
+
+    public static event_bytes(event: RunLogEvent): number {
+        return new TextEncoder().encode(JSON.stringify(event)).length;
+    }
+
+    public static event_is_blocked(event: RunLogEventBody): boolean {
+        if (!this.RUN_LOG_BLOCKED_KEYWORDS.length) return false;
+        const haystack = JSON.stringify(event).toLowerCase();
+        return this.RUN_LOG_BLOCKED_KEYWORDS.some((keyword) =>
+            haystack.includes(keyword.toLowerCase()),
+        );
+    }
 }

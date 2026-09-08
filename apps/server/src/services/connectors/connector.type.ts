@@ -35,6 +35,7 @@ export interface ConnectorAdapter {
     link_complete(payload: unknown): Promise<LinkedIdentity | null>;
     verify_request(req: Request): boolean;
     send_question(target: DeliveryTarget, question: OutboundQuestion): Promise<string>;
+    send_notice(target: DeliveryTarget, text: string): Promise<void>;
     parse_reply(payload: unknown): ParsedReply | null;
     supersede(target: DeliveryTarget, externalMessageId: string, reason: string): Promise<void>;
 }

@@ -35,8 +35,41 @@ enum AgentQuestionType {
     APPROVE_COST = "ApproveCost",
 }
 
+/**
+ * A pause freezes this process mid-request, and the connection it was holding is gone when the
+ * snapshot is restored. Without a deadline that first poll after a resume waits on a dead socket
+ * for as long as the OS takes to notice — long enough to burn the MCP client's own request
+ * timeout, which is frozen through the pause and so only ever sees unpaused time. Failing fast
+ * and polling again is what lets an answer come back in seconds however long the wait was.
+ */
+const REQUEST_TIMEOUT_MS = 5000;
+
+/**
+ * Accepts whatever the model called the kind of question and settles on the closest real one.
+ *
+ * The schema used to reject anything outside the enum, which cost a whole turn every time a
+ * model reached for a reasonable synonym — "NeedClarification" for Clarify. The kind only shapes
+ * how the question is rendered, so guessing wrong is worth far less than losing the question.
+ */
+function normalize_question_type(value: string): AgentQuestionType {
+    const match = Object.values(AgentQuestionType).find(
+        (kind) => kind.toLowerCase() === value.toLowerCase(),
+    );
+    if (match) return match;
+
+    const loose = value.toLowerCase().replace(/[^a-z]/g, "");
+    if (loose.includes("secret")) return AgentQuestionType.NEED_SECRET;
+    if (loose.includes("choice") || loose.includes("choose")) return AgentQuestionType.NEED_CHOICE;
+    if (loose.includes("confirm") || loose.includes("approve")) return AgentQuestionType.CONFIRM;
+    if (loose.includes("file")) return AgentQuestionType.NEED_FILE;
+    if (loose.includes("access")) return AgentQuestionType.NEED_ACCESS;
+    if (loose.includes("value")) return AgentQuestionType.NEED_VALUE;
+
+    return AgentQuestionType.CLARIFY;
+}
+
 type AskArgs = {
-    type: AgentQuestionType;
+    type: string;
     key: string;
     prompt: string;
     options?: string[];
@@ -69,7 +102,11 @@ export class McpServerService {
             "ask_user",
             "Ask the user for input you cannot derive (secret, choice, confirm). Blocks until answered.",
             {
-                type: z.enum(AgentQuestionType),
+                type: z
+                    .string()
+                    .describe(
+                        `One of ${Object.values(AgentQuestionType).join(", ")}. Anything close is accepted.`,
+                    ),
                 key: z.string(),
                 prompt: z.string(),
                 options: z.array(z.string()).optional(),
@@ -104,8 +141,19 @@ export class McpServerService {
             body: JSON.stringify(args),
         });
 
+        // A pause snapshots this process but drops its open connections, so the request in
+        // flight when the sandbox was paused fails the moment it resumes. Polling has nothing to
+        // lose by retrying, and treating a dropped request as fatal would end the run at exactly
+        // the point the answer finally arrived.
         for (;;) {
-            const res = await this.api(`/sandbox/answer?key=${encodeURIComponent(args.key)}`);
+            let res: Response;
+            try {
+                res = await this.api(`/sandbox/answer?key=${encodeURIComponent(args.key)}`);
+            } catch {
+                await this.sleep(McpServerService.POLL_INTERVAL_MS);
+                continue;
+            }
+
             if (res.status === 200) {
                 const body = (await res.json()) as {
                     error?: { code?: string };
@@ -137,6 +185,7 @@ export class McpServerService {
     private api(path: string, init?: RequestInit) {
         return fetch(`${McpServerService.SERVER}/api/v1/setup${path}`, {
             ...init,
+            signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
             headers: {
                 authorization: `Bearer ${McpServerService.TOKEN}`,
                 "content-type": "application/json",
@@ -184,7 +233,11 @@ export class WorkerMcpServerService {
             "ask_user",
             "Ask the person who filed this issue for input you cannot derive (choice, confirm, clarification). Blocks until answered or until nobody answers in time.",
             {
-                type: z.enum(AgentQuestionType),
+                type: z
+                    .string()
+                    .describe(
+                        `One of ${Object.values(AgentQuestionType).join(", ")}. Anything close is accepted.`,
+                    ),
                 key: z.string(),
                 prompt: z.string(),
                 options: z.array(z.string()).optional(),
@@ -208,16 +261,29 @@ export class WorkerMcpServerService {
     }
 
     private async ask_user(args: AskArgs) {
-        const asked = await this.api("/ask", {
-            method: "POST",
-            body: JSON.stringify(args),
-        });
+        let asked: Response;
+        try {
+            asked = await this.api("/ask", {
+                method: "POST",
+                body: JSON.stringify({ ...args, type: normalize_question_type(args.type) }),
+            });
+        } catch {
+            return this.text("could not reach the user; proceed with your best judgement");
+        }
 
         if (!asked.ok)
             return this.text("could not reach the user; proceed with your best judgement");
 
+        // See the note on the setup server's poll: a resumed sandbox loses the request that was
+        // in flight when it paused, so a dropped connection is a retry, not a failure.
         for (;;) {
-            const res = await this.api(`/answer?key=${encodeURIComponent(args.key)}`);
+            let res: Response;
+            try {
+                res = await this.api(`/answer?key=${encodeURIComponent(args.key)}`);
+            } catch {
+                await this.sleep(WorkerMcpServerService.POLL_INTERVAL_MS);
+                continue;
+            }
 
             if (res.status === 200) {
                 const body = (await res.json()) as {
@@ -283,6 +349,7 @@ export class WorkerMcpServerService {
     private api(path: string, init?: RequestInit) {
         return fetch(`${WorkerMcpServerService.SERVER}/api/v1/worker${path}`, {
             ...init,
+            signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
             headers: {
                 authorization: `Bearer ${WorkerMcpServerService.TOKEN}`,
                 "content-type": "application/json",

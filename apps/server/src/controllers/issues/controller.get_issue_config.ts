@@ -1,4 +1,4 @@
-import { Harness, prisma } from "@trydarwin/database";
+import { ExecutionMode, Harness, prisma } from "@trydarwin/database";
 import type { Request, Response } from "express";
 import z from "zod";
 
@@ -29,11 +29,23 @@ export default class IssueGetConfigController {
                 where: { id: params_data.id },
                 select: {
                     projectId: true,
-                    issueConfig: { select: { harness: true, model: true, effort: true } },
+                    issueConfig: {
+                        select: {
+                            harness: true,
+                            model: true,
+                            effort: true,
+                            executionMode: true,
+                        },
+                    },
                     project: {
                         select: {
                             projectConfig: {
-                                select: { harness: true, defaultModel: true, defaultEffort: true },
+                                select: {
+                                    harness: true,
+                                    defaultModel: true,
+                                    defaultEffort: true,
+                                    executionMode: true,
+                                },
                             },
                         },
                     },
@@ -50,13 +62,26 @@ export default class IssueGetConfigController {
                 return;
             }
 
-            const config = issue.issueConfig ?? {
-                harness: issue.project.projectConfig?.harness ?? Harness.Claude,
-                model: issue.project.projectConfig?.defaultModel ?? null,
-                effort: issue.project.projectConfig?.defaultEffort ?? null,
-            };
+            const project_mode =
+                issue.project.projectConfig?.executionMode ?? ExecutionMode.Autonomous;
 
-            ResponseWriter.success(res, { config, is_override: Boolean(issue.issueConfig) });
+            const config = issue.issueConfig
+                ? {
+                      ...issue.issueConfig,
+                      executionMode: issue.issueConfig.executionMode ?? project_mode,
+                  }
+                : {
+                      harness: issue.project.projectConfig?.harness ?? Harness.Claude,
+                      model: issue.project.projectConfig?.defaultModel ?? null,
+                      effort: issue.project.projectConfig?.defaultEffort ?? null,
+                      executionMode: project_mode,
+                  };
+
+            ResponseWriter.success(res, {
+                config,
+                is_override: Boolean(issue.issueConfig),
+                project_execution_mode: project_mode,
+            });
         } catch (error) {
             console.error("error in IssueGetConfigController:", error);
             ResponseWriter.system_error(res);

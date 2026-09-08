@@ -1,5 +1,7 @@
 import { createIcon } from "./createIcon";
+import { FaAutoprefixer } from "react-icons/fa";
 import { FiDownload, FiRefreshCw } from "react-icons/fi";
+import { GrManual } from "react-icons/gr";
 import { HiBars3CenterLeft, HiCalendar, HiOutlineArrowPath } from "react-icons/hi2";
 import { LuFileText, LuSparkles, LuSquareTerminal } from "react-icons/lu";
 import { MdAutorenew, MdBlock, MdEditCalendar, MdMoreHoriz, MdStar, MdStop } from "react-icons/md";
@@ -8,7 +10,11 @@ import { RiLoader4Line } from "react-icons/ri";
 
 export const AgentStepIcon = createIcon(LuSparkles);
 
+export const AutonomousModeIcon = createIcon(FaAutoprefixer);
+
 export const CalendarIcon = createIcon(HiCalendar);
+
+export const ManualModeIcon = createIcon(GrManual);
 
 export const CommandIcon = createIcon(LuSquareTerminal);
 

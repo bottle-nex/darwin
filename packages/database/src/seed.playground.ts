@@ -508,6 +508,11 @@ const STATUS_FLOW: Record<IssueStatus, IssueStatus[]> = {
     [IssueStatus.Todo]: [],
     [IssueStatus.Queued]: [IssueStatus.Queued],
     [IssueStatus.InProgress]: [IssueStatus.Queued, IssueStatus.InProgress],
+    [IssueStatus.AwaitingApproval]: [
+        IssueStatus.Queued,
+        IssueStatus.InProgress,
+        IssueStatus.AwaitingApproval,
+    ],
     [IssueStatus.InReview]: [IssueStatus.Queued, IssueStatus.InProgress, IssueStatus.InReview],
     [IssueStatus.Done]: [
         IssueStatus.Queued,

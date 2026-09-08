@@ -1,5 +1,5 @@
 import type { Effort } from "@trydarwin/database";
-import { ActivityType, Harness, IssueStatus, prisma } from "@trydarwin/database";
+import { ActivityType, ExecutionMode, Harness, IssueStatus, prisma } from "@trydarwin/database";
 import { Registry } from "@trydarwin/harness";
 import type Logger from "@trydarwin/logger";
 import {
@@ -30,18 +30,54 @@ export interface ClaimedIssue {
     attemptNumber: number;
     priorAttempts: PriorAttempt[];
     reopenNote: string | null;
+    executionMode: ExecutionMode;
 }
 
-function resolve_config(
-    config: { harness: Harness; model: string; effort: Effort | null } | null,
-): {
+type ResolvedConfig = {
     harness: Harness;
     model: string;
     effort: Effort | null;
-} {
-    if (!config) return { harness: Harness.Claude, model: ENV.VM_SOLVE_MODEL, effort: null };
-    if (Registry.supportsModel(config.harness, config.model)) return config;
-    return { ...config, model: Registry.get(config.harness).models[0] };
+    executionMode: ExecutionMode;
+};
+
+/**
+ * The issue's own mode wins, the project's is the fallback, and Autonomous is what a project
+ * with no config row means. Resolved once at claim time so a mode changed mid-run cannot split
+ * a single run between two behaviours.
+ *
+ * The model is validated against the harness's own registry — a harness whose available models
+ * changed since the config was saved falls back to its first model rather than failing the claim.
+ */
+function resolve_config(
+    config: {
+        harness: Harness;
+        model: string;
+        effort: Effort | null;
+        executionMode: ExecutionMode | null;
+    } | null,
+    project_mode: ExecutionMode | null,
+): ResolvedConfig {
+    const executionMode = config?.executionMode ?? project_mode ?? ExecutionMode.Autonomous;
+
+    if (!config) {
+        return {
+            harness: Harness.Claude,
+            model: ENV.VM_SOLVE_MODEL,
+            effort: null,
+            executionMode,
+        };
+    }
+
+    const model = Registry.supportsModel(config.harness, config.model)
+        ? config.model
+        : Registry.get(config.harness).models[0];
+
+    return {
+        harness: config.harness,
+        model,
+        effort: config.effort,
+        executionMode,
+    };
 }
 
 export default class IssueSolver {
@@ -59,7 +95,10 @@ export default class IssueSolver {
                 description: true,
                 prBranch: true,
                 agentDoneAt: true,
-                issueConfig: { select: { harness: true, model: true, effort: true } },
+                issueConfig: {
+                    select: { harness: true, model: true, effort: true, executionMode: true },
+                },
+                project: { select: { projectConfig: { select: { executionMode: true } } } },
             },
         });
 
@@ -74,7 +113,11 @@ export default class IssueSolver {
             log.step(`resuming issue #${unfinished_issue.number}`, {
                 title: unfinished_issue.title,
             });
-            const { issueConfig: resuming_config, ...resuming_rest } = unfinished_issue;
+            const {
+                issueConfig: resuming_config,
+                project: resuming_project,
+                ...resuming_rest
+            } = unfinished_issue;
             return {
                 ...resuming_rest,
                 prBranch: pr_branch,
@@ -82,7 +125,10 @@ export default class IssueSolver {
                     unfinished_issue.id,
                     unfinished_issue.description,
                 ),
-                ...resolve_config(resuming_config),
+                ...resolve_config(
+                    resuming_config,
+                    resuming_project.projectConfig?.executionMode ?? null,
+                ),
                 ...(await this.history_of(unfinished_issue.id)),
             };
         }
@@ -96,7 +142,10 @@ export default class IssueSolver {
                 title: true,
                 description: true,
                 agentDoneAt: true,
-                issueConfig: { select: { harness: true, model: true, effort: true } },
+                issueConfig: {
+                    select: { harness: true, model: true, effort: true, executionMode: true },
+                },
+                project: { select: { projectConfig: { select: { executionMode: true } } } },
             },
         });
 
@@ -118,12 +167,12 @@ export default class IssueSolver {
 
         log.step(`claimed issue #${issue.number}`, { title: issue.title });
         await this.announce_claim(issue.id, log);
-        const { issueConfig: claimed_config, ...claimed_rest } = issue;
+        const { issueConfig: claimed_config, project: claimed_project, ...claimed_rest } = issue;
         return {
             ...claimed_rest,
             prBranch: pr_branch,
             description: await this.prompt_description(issue.id, issue.description),
-            ...resolve_config(claimed_config),
+            ...resolve_config(claimed_config, claimed_project.projectConfig?.executionMode ?? null),
             ...(await this.history_of(issue.id)),
         };
     }

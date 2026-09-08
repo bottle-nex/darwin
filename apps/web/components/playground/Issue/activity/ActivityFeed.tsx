@@ -462,7 +462,11 @@ export default function ActivityFeed({
                                                 canDelete={commentsHistory.canDelete}
                                             />
                                         ) : (
-                                            <ActivityRow activity={entry.activity} rail={rail} />
+                                            <ActivityRow
+                                                activity={entry.activity}
+                                                issueId={issueId}
+                                                rail={rail}
+                                            />
                                         )}
                                     </div>
                                 );

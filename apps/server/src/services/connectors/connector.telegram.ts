@@ -126,6 +126,15 @@ class TelegramConnector implements ConnectorAdapter {
         });
     }
 
+    public async send_notice(target: DeliveryTarget, text: string) {
+        await this.call("sendMessage", {
+            chat_id: target.externalChatId,
+            text,
+            parse_mode: "HTML",
+            link_preview_options: { is_disabled: true },
+        });
+    }
+
     public async send_linked_confirmation(external_chat_id: string) {
         await this.call("sendMessage", {
             chat_id: external_chat_id,

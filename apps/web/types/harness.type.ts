@@ -1,5 +1,7 @@
 import type { Effort, Harness } from "@trydarwin/types";
 
+import type { ExecutionMode } from "./project";
+
 export type { Effort, Harness } from "@trydarwin/types";
 export { HARNESS_MODELS, HARNESS_SUPPORTS_EFFORT } from "@trydarwin/types";
 
@@ -17,11 +19,15 @@ export const EFFORT_OPTIONS: { id: Effort; label: string }[] = [
     { id: "Max", label: "Max" },
 ];
 
+export interface IssueHarnessConfig {
+    harness: Harness;
+    model: string | null;
+    effort: Effort | null;
+    executionMode: ExecutionMode;
+}
+
 export interface IssueConfigResponse {
-    config: {
-        harness: Harness;
-        model: string | null;
-        effort: Effort | null;
-    };
+    config: IssueHarnessConfig;
     is_override: boolean;
+    project_execution_mode: ExecutionMode;
 }

@@ -6,6 +6,7 @@ import { apiClient } from "@/lib/axios";
 import { ISSUE_CONFIG_URL } from "@/routes/api_routes";
 import type { ApiResponse } from "@/types/api";
 import type { Effort, Harness, IssueConfigResponse } from "@/types/harness.type";
+import type { ExecutionMode } from "@/types/project";
 
 function issueConfigKey(issueId: string) {
     return ["issue", issueId, "config"];
@@ -29,6 +30,7 @@ interface SetIssueConfigInput {
     harness: Harness;
     model: string;
     effort?: Effort;
+    execution_mode?: ExecutionMode;
 }
 
 export function useSetIssueConfig() {
