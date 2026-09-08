@@ -1,6 +1,6 @@
-import ParticleSphere from "@/components/rishi/ParticleSphere";
 import { DracoMark } from "@/components/rishi/DracoMark";
 import { GlassDIcon } from "@/components/rishi/GlassDIcon";
+import ParticleSphere from "@/components/rishi/ParticleSphere";
 
 export default function RishiPage() {
     return (

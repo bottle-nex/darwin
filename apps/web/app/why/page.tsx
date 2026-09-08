@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 
 import { LandingNavbar } from "@/components/new/LandingNavbar";
-import WhyHero from "@/components/why/WhyHero";
 import WhyDarwin from "@/components/why/WhyDarwin";
+import WhyHero from "@/components/why/WhyHero";
 
 export const metadata: Metadata = {
     title: "Why darwin",
