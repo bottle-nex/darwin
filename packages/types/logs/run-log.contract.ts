@@ -131,7 +131,6 @@ export const RUN_LOG_MAX_COMMIT_BODY_LENGTH = 2_000;
 export const RUN_LOG_CACHE_INDEX_KEY = "run-logs:index";
 
 export default class RunLog {
-
     public static RUN_LOG_BLOCKED_KEYWORDS: string[] = [
         "password",
         "secret",
@@ -172,6 +171,8 @@ export default class RunLog {
     public static event_is_blocked(event: RunLogEventBody): boolean {
         if (!this.RUN_LOG_BLOCKED_KEYWORDS.length) return false;
         const haystack = JSON.stringify(event).toLowerCase();
-        return this.RUN_LOG_BLOCKED_KEYWORDS.some((keyword) => haystack.includes(keyword.toLowerCase()));
+        return this.RUN_LOG_BLOCKED_KEYWORDS.some((keyword) =>
+            haystack.includes(keyword.toLowerCase()),
+        );
     }
 }

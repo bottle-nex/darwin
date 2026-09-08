@@ -1,9 +1,9 @@
 "use client";
 import type { Effort, Harness } from "@/types/harness.type";
 import { EFFORT_OPTIONS, HARNESS_OPTIONS } from "@/types/harness.type";
-import { EXECUTION_MODE_OPTIONS, type ExecutionMode } from "@/types/project";
 
 import Capsule, { type CapsuleOption } from "./Capsule";
+import ExecutionModeCapsule from "./ExecutionModeCapsule";
 import { STACKED_CAPSULE } from "./issueHelpers";
 import type { HarnessConfigState } from "./useIssueForm";
 
@@ -13,11 +13,6 @@ const HARNESS_CAPSULE_OPTIONS: CapsuleOption[] = HARNESS_OPTIONS.map((option) =>
 }));
 
 const EFFORT_CAPSULE_OPTIONS: CapsuleOption[] = EFFORT_OPTIONS.map((option) => ({
-    value: option.id,
-    label: option.label,
-}));
-
-const EXECUTION_MODE_CAPSULE_OPTIONS: CapsuleOption[] = EXECUTION_MODE_OPTIONS.map((option) => ({
     value: option.id,
     label: option.label,
 }));
@@ -58,11 +53,9 @@ export default function HarnessCapsules({ harnessConfig }: { harnessConfig: Harn
                 className={STACKED_CAPSULE}
                 placeholder="No model selected"
             />
-            <Capsule
-                type="dropdown"
-                options={EXECUTION_MODE_CAPSULE_OPTIONS}
+            <ExecutionModeCapsule
                 value={executionMode}
-                onChange={(next) => setExecutionMode(next as ExecutionMode)}
+                onChange={setExecutionMode}
                 disabled={frozen}
                 className={STACKED_CAPSULE}
             />

@@ -8,6 +8,7 @@ import { forwardRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import type { CalendarRange } from "@/components/ui/calendar";
 import DatePopover from "@/components/ui/DatePopover";
+import IconWrapper from "@/components/ui/IconWrapper";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 
@@ -15,6 +16,7 @@ export interface CapsuleOption {
     value: string;
     label: string;
     dotClassName?: string;
+    icon?: IconType;
 }
 
 export const CapsuleTrigger = forwardRef<
@@ -63,6 +65,14 @@ function CapsuleOptionList({ options, value, onSelect }: CapsuleOptionListProps)
                             {option.dotClassName && (
                                 <span className={cn("size-2 rounded-full", option.dotClassName)} />
                             )}
+                            {option.icon && (
+                                <IconWrapper
+                                    variant="ghost"
+                                    size="small"
+                                    icon={option.icon}
+                                    className="size-4"
+                                />
+                            )}
                             {option.label}
                         </span>
                         {isSelected && <CheckIcon className="size-4 shrink-0 text-neutral-400" />}
@@ -105,6 +115,14 @@ function CapsuleDropdown({
                 <CapsuleTrigger disabled={disabled} className={className}>
                     {selected?.dotClassName && (
                         <span className={cn("size-2 rounded-full", selected.dotClassName)} />
+                    )}
+                    {selected?.icon && (
+                        <IconWrapper
+                            variant="ghost"
+                            size="small"
+                            icon={selected.icon}
+                            className="size-4"
+                        />
                     )}
                     {selected?.label ?? placeholder}
                 </CapsuleTrigger>

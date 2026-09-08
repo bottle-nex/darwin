@@ -2,7 +2,6 @@ import type Sandbox from "e2b";
 
 import GraphService from "./service.graph";
 
-
 const GIT_AGENT_NAME = "darwin";
 const GIT_AGENT_EMAIL = "agent@heydarwin.app";
 

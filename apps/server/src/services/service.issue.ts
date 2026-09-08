@@ -1,5 +1,7 @@
 import { Action, Permissions } from "@trydarwin/access-control";
-import { ActivityType, ActorType, IssueStatus, Prisma, prisma } from "@trydarwin/database";
+import type { ExecutionMode } from "@trydarwin/database";
+import { ActivityType, ActorType, Harness, IssueStatus, Prisma, prisma } from "@trydarwin/database";
+import { Registry } from "@trydarwin/harness";
 import { ActivityService, IssueBroadcastService } from "@trydarwin/services";
 import { canMoveIssue, hasHumanMove, isReopenable, ISSUE_LANE_NAME } from "@trydarwin/types";
 import z from "zod";
@@ -20,6 +22,7 @@ export type CreateIssueInput = {
     target_date?: Date;
     assignee_ids?: string[];
     tag_ids?: string[];
+    execution_mode?: ExecutionMode;
     created_by: { id: string; name: string };
     github_link?: {
         githubIssueId: string;
@@ -140,6 +143,24 @@ export default class IssueService {
                         },
                         select: { id: true, status: true },
                     });
+
+                    if (input.execution_mode) {
+                        const project_config = await tx.projectConfig.findUnique({
+                            where: { projectId: input.project_id },
+                            select: { harness: true, defaultModel: true },
+                        });
+                        const harness = project_config?.harness ?? Harness.Claude;
+                        const model =
+                            project_config?.defaultModel ?? Registry.get(harness).models[0];
+                        await tx.issueConfig.create({
+                            data: {
+                                issueId: created.id,
+                                harness,
+                                model,
+                                executionMode: input.execution_mode,
+                            },
+                        });
+                    }
 
                     if (input.github_link) {
                         await tx.githubIssueLink.create({

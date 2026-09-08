@@ -5,6 +5,7 @@ import { upsertBoardIssue } from "@/hooks/issues/useBoard";
 import { apiClient } from "@/lib/axios";
 import { CREATE_ISSUE_URL } from "@/routes/api_routes";
 import type { ApiResponse } from "@/types/api";
+import type { ExecutionMode } from "@/types/project";
 
 export interface CreateIssueInput {
     project_id: string;
@@ -18,6 +19,7 @@ export interface CreateIssueInput {
     /** Required (at least one) when not filing into a custom column. */
     assignee_ids?: string[];
     tag_ids?: string[];
+    execution_mode?: ExecutionMode;
 }
 
 interface CreatedIssue {

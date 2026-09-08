@@ -1,5 +1,5 @@
 import { Action, Permissions } from "@trydarwin/access-control";
-import { prisma } from "@trydarwin/database";
+import { ExecutionMode, prisma } from "@trydarwin/database";
 import type { Request, Response } from "express";
 import z from "zod";
 
@@ -20,6 +20,7 @@ export default class IssueCreateController {
             target_date: z.coerce.date().optional(),
             assignee_ids: z.array(z.string()).max(20).optional(),
             tag_ids: z.array(z.string()).max(20).optional(),
+            execution_mode: z.enum(ExecutionMode).optional(),
         })
         .refine((data) => data.custom_column_id || data.description.trim().length > 0, {
             message: "Description is required",
@@ -117,6 +118,7 @@ export default class IssueCreateController {
                 target_date: parsed_body.data.target_date,
                 assignee_ids: parsed_body.data.assignee_ids,
                 tag_ids: parsed_body.data.tag_ids,
+                execution_mode: parsed_body.data.execution_mode,
                 created_by: { id: user.id, name: user.name },
             });
 

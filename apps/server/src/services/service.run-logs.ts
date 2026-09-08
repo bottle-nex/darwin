@@ -22,12 +22,7 @@ type CachedRun = { projectId: string; segments: number; dropped: number };
 
 export default class RunLogService {
     private static async cached_run(run_id: string): Promise<CachedRun | null> {
-        const meta = await redis.hmget(
-            RunLog.meta_key(run_id),
-            "projectId",
-            "segments",
-            "dropped",
-        );
+        const meta = await redis.hmget(RunLog.meta_key(run_id), "projectId", "segments", "dropped");
         const [projectId, segments, dropped] = meta;
         if (!projectId) return null;
         return {

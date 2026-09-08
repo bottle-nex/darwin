@@ -34,7 +34,7 @@ type FailureFields = () => Record<string, string>;
 export default class WorkerLoop {
     public static async run(worker_id: string): Promise<void> {
         const log = Logger.scope(`vm:${worker_id.slice(-8)}`);
-        
+
         const claimed = await WorkerLoop.claim_lease(worker_id);
 
         if (!claimed) {

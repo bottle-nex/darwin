@@ -6,6 +6,7 @@ import { PRIORITY_TO_NUMBER } from "@/components/playground/Issue/issueHelpers";
 import { useCreateIssue } from "@/hooks/issues/useCreateIssue";
 import { useGetIssueConfig, useSetIssueConfig } from "@/hooks/issues/useIssueConfig";
 import { useUpdateIssue } from "@/hooks/issues/useUpdateIssue";
+import { useGetProjectConfig } from "@/hooks/project/useGetProjectConfig";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { KanbanMappers } from "@/lib/kanban/KanbanMappers";
 import { toast } from "@/lib/toast";
@@ -66,6 +67,8 @@ export type IssueFormFields = {
     setTargetDate: (value: Date | undefined) => void;
     membersOpen: boolean;
     setMembersOpen: (value: boolean) => void;
+    executionMode: ExecutionMode;
+    setExecutionMode: (value: ExecutionMode) => void;
 };
 
 function sameIds(a: { id: string }[], b: { id: string }[]) {
@@ -100,6 +103,11 @@ export function useIssueForm({
         issue?.targetDate ? new Date(issue.targetDate) : undefined,
     );
     const [membersOpen, setMembersOpen] = useState(false);
+    const { data: projectConfigData } = useGetProjectConfig(projectId);
+    const [newIssueExecutionModeDraft, setNewIssueExecutionModeDraft] =
+        useState<ExecutionMode | null>(null);
+    const newIssueExecutionMode =
+        newIssueExecutionModeDraft ?? projectConfigData?.executionMode ?? "Autonomous";
 
     const [syncedIssue, setSyncedIssue] = useState(issue);
     if (issue && syncedIssue && issue !== syncedIssue) {
@@ -279,6 +287,7 @@ export function useIssueForm({
                     tag_ids: tagIds,
                     start_date: startDate?.toISOString(),
                     target_date: targetDate?.toISOString(),
+                    execution_mode: newIssueExecutionMode,
                 });
                 toast.success("Issue created.", {
                     description: created.issue.title,
@@ -351,6 +360,8 @@ export function useIssueForm({
         setTargetDate,
         membersOpen,
         setMembersOpen,
+        executionMode: newIssueExecutionMode,
+        setExecutionMode: setNewIssueExecutionModeDraft,
     };
 
     return {
