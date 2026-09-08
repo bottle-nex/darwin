@@ -107,8 +107,8 @@ function TaskCard({ task }: { task: ReviewTask }) {
                     ))}
                 </span>
                 <span className="text-[10px] text-muted-foreground">
-                    <span className="text-[11px] font-semibold text-foreground">{task.done}</span>{" "}
-                    / {BAR_COUNT}
+                    <span className="text-[11px] font-semibold text-foreground">{task.done}</span> /{" "}
+                    {BAR_COUNT}
                 </span>
                 {task.owner && (
                     <Image

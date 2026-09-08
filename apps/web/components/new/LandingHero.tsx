@@ -61,7 +61,10 @@ export default function LandingHero() {
                 className="mx-auto max-w-7xl flex items-center justify-center h-full"
             >
                 <section className="max-w-3xl translate-y-[1vh]">
-                    <motion.p variants={HERO_BADGE} className="mx-auto flex w-fit items-center gap-x-2 rounded-lg bg-primary/20 hover:bg-primary/30 transition-all duration-150 ease-in cursor-pointer hover:-translate-y-0.5 px-4 py-2 text-[12px] text-[#6c4dd1]">
+                    <motion.p
+                        variants={HERO_BADGE}
+                        className="mx-auto flex w-fit items-center gap-x-2 rounded-lg bg-primary/20 hover:bg-primary/30 transition-all duration-150 ease-in cursor-pointer hover:-translate-y-0.5 px-4 py-2 text-[12px] text-[#6c4dd1]"
+                    >
                         <span className="font-mono text-[11px] tracking-[0.2em]">NEW</span>
                         <span className="font-medium">Runners now run your test suite</span>
                         <span className="text-[#6c4dd1]/55">See the changelog</span>

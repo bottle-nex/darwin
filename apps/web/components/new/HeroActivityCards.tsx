@@ -91,9 +91,7 @@ export default function HeroActivityCards({ className }: { className?: string })
 
                 <div className="mt-2 flex items-start gap-1.5">
                     <PullRequestOpenIcon className="mt-px size-4.25 shrink-0 text-emerald-600" />
-                    <p className={CARD_TITLE}>
-                        Throw OtpExpiredError instead of returning null
-                    </p>
+                    <p className={CARD_TITLE}>Throw OtpExpiredError instead of returning null</p>
                 </div>
 
                 <div className={CHIP_ROW}>

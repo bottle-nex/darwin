@@ -117,8 +117,8 @@ function TaskRow({ task }: { task: Task }) {
                     />
                 </span>
                 <span className="text-[10px] whitespace-nowrap text-muted-foreground">
-                    <span className="text-[11px] font-semibold text-foreground">{task.done}</span>{" "}
-                    / {task.total}
+                    <span className="text-[11px] font-semibold text-foreground">{task.done}</span> /{" "}
+                    {task.total}
                 </span>
             </span>
             <span>
