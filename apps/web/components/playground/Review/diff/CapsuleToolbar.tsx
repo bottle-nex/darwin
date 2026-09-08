@@ -1,12 +1,12 @@
 "use client";
-import type { CapsuleControl } from "@trymatcha/types";
+import type { CapsuleControl } from "@trydarwin/types";
 import {
     CapsuleSplitViewIcon,
     DesktopViewportIcon,
     MobileViewportIcon,
     OptionsMenuIcon,
     SliderCompareIcon,
-} from "@trymatcha/ui/icons";
+} from "@trydarwin/ui/icons";
 import { useState } from "react";
 
 import { BLURRED_BG_TWO } from "@/components/playground/Home/KanbanDisplay/cardStyles";

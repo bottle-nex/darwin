@@ -1,7 +1,7 @@
 "use client";
 
 import { NodeViewContent, NodeViewWrapper, type ReactNodeViewProps } from "@tiptap/react";
-import { DropdownCaretIcon } from "@trymatcha/ui/icons";
+import { DropdownCaretIcon } from "@trydarwin/ui/icons";
 
 import { Button } from "./ui/button";
 import { cn } from "./lib/cn";

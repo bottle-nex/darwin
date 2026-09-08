@@ -5,7 +5,7 @@ import {
     CommentCountIcon,
     ShowcaseDueDateIcon,
     ShowcaseReplyIndicatorIcon,
-} from "@trymatcha/ui/icons";
+} from "@trydarwin/ui/icons";
 import { motion } from "motion/react";
 import Image from "next/image";
 import { memo } from "react";
@@ -37,7 +37,7 @@ const TASKS: ReviewTask[] = [
         files: 6,
         eta: "2 days",
         done: 12,
-        doneBar: "bg-emerald-400",
+        doneBar: "bg-emerald-500",
         delay: 0.35,
         owner: true,
     },
@@ -48,7 +48,7 @@ const TASKS: ReviewTask[] = [
         files: 2,
         eta: "5 days",
         done: 4,
-        doneBar: "bg-amber-400",
+        doneBar: "bg-amber-500",
         delay: 0.6,
         dim: true,
     },
@@ -72,15 +72,15 @@ function TaskCard({ task }: { task: ReviewTask }) {
             variants={appear(task.delay)}
             className={
                 task.dim
-                    ? "mt-3 rounded-md border border-white/6 bg-charcoal p-4 opacity-70"
-                    : "rounded-md border border-white/6 bg-charcoal p-4"
+                    ? "mt-3 rounded-md border border-edge bg-charcoal p-4 opacity-80"
+                    : "rounded-md border border-edge bg-charcoal p-4"
             }
         >
-            <p className="text-[13px] font-semibold text-neutral-100">{task.title}</p>
-            <p className="mt-1.5 text-[11px] leading-relaxed text-neutral-500">
+            <p className="text-[13px] font-semibold text-foreground">{task.title}</p>
+            <p className="mt-1.5 text-[11px] leading-relaxed text-muted-foreground">
                 {task.description}
             </p>
-            <div className="mt-3 flex items-center gap-3.5 text-[11px] text-neutral-500">
+            <div className="mt-3 flex items-center gap-3.5 text-[11px] text-muted-foreground">
                 <ShowcaseReplyIndicatorIcon className="size-3.5" />
                 <span className="flex items-center gap-1">
                     <CommentCountIcon className="size-3" /> {task.comments}
@@ -92,7 +92,7 @@ function TaskCard({ task }: { task: ReviewTask }) {
                     <ShowcaseDueDateIcon className="size-3" /> {task.eta}
                 </span>
             </div>
-            <div className="mt-3.5 flex items-center gap-2.5 border-t border-white/4 pt-3">
+            <div className="mt-3.5 flex items-center gap-2.5 border-t border-edge pt-3">
                 <span className="flex items-center gap-[2.5px]">
                     {Array.from({ length: BAR_COUNT }, (_, i) => (
                         <motion.span
@@ -101,13 +101,13 @@ function TaskCard({ task }: { task: ReviewTask }) {
                             className={
                                 i < task.done
                                     ? `h-3 w-0.75 origin-bottom rounded-full ${task.doneBar}`
-                                    : "h-3 w-0.75 origin-bottom rounded-full bg-white/15"
+                                    : "h-3 w-0.75 origin-bottom rounded-full bg-foreground/12"
                             }
                         />
                     ))}
                 </span>
-                <span className="text-[10px] text-neutral-500">
-                    <span className="text-[11px] font-semibold text-neutral-100">{task.done}</span>{" "}
+                <span className="text-[10px] text-muted-foreground">
+                    <span className="text-[11px] font-semibold text-foreground">{task.done}</span>{" "}
                     / {BAR_COUNT}
                 </span>
                 {task.owner && (
@@ -116,7 +116,7 @@ function TaskCard({ task }: { task: ReviewTask }) {
                         alt=""
                         width={20}
                         height={20}
-                        className="ml-auto size-6 rounded-sm border border-white/15 object-cover select-none"
+                        className="ml-auto size-6 rounded-sm border border-edge object-cover select-none"
                     />
                 )}
             </div>

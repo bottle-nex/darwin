@@ -1,6 +1,6 @@
-import { Harness } from "@trymatcha/database";
-import type Logger from "@trymatcha/logger";
-import type { CapsuleChange, CapsuleControl, CapsuleViewport } from "@trymatcha/types";
+import { Harness } from "@trydarwin/database";
+import type Logger from "@trydarwin/logger";
+import type { CapsuleChange, CapsuleControl, CapsuleViewport } from "@trydarwin/types";
 import type { Sandbox } from "e2b";
 import { z } from "zod";
 

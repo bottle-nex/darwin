@@ -19,13 +19,13 @@ const eslintConfig = defineConfig([
                     paths: [
                         {
                             name: "react-icons",
-                            message: 'Import icons from "@trymatcha/ui/icons" instead.',
+                            message: 'Import icons from "@trydarwin/ui/icons" instead.',
                         },
                     ],
                     patterns: [
                         {
                             group: ["react-icons/*"],
-                            message: 'Import icons from "@trymatcha/ui/icons" instead.',
+                            message: 'Import icons from "@trydarwin/ui/icons" instead.',
                         },
                     ],
                 },

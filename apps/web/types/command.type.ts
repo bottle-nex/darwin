@@ -1,4 +1,4 @@
-import type { IconType } from "@trymatcha/ui/icons";
+import type { IconType } from "@trydarwin/ui/icons";
 
 export enum CommandKind {
     Issue = "Issue",

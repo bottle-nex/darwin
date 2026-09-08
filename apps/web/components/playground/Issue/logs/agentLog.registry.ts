@@ -1,4 +1,4 @@
-import { type RunLogEvent, RunLogEventKind, RunLogLevel } from "@trymatcha/types";
+import { type RunLogEvent, RunLogEventKind, RunLogLevel } from "@trydarwin/types";
 import {
     AgentStepIcon,
     ChangedFilesIcon,
@@ -12,7 +12,7 @@ import {
     PullRequestOpenIcon,
     SearchIcon,
     StatusInfoIcon,
-} from "@trymatcha/ui/icons";
+} from "@trydarwin/ui/icons";
 
 export const ICON: Record<RunLogEventKind, IconType> = {
     [RunLogEventKind.Step]: AgentStepIcon,

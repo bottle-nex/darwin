@@ -1,4 +1,4 @@
-import { ContentCard, type ContentSummary } from "@trymatcha/editorial";
+import { ContentCard, type ContentSummary } from "@trydarwin/editorial";
 
 type EntryGridProps = {
     entries: ContentSummary[];

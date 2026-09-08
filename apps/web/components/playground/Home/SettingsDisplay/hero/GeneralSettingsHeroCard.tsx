@@ -1,4 +1,4 @@
-import { SettingsGeneralIcon } from "@trymatcha/ui/icons";
+import { SettingsGeneralIcon } from "@trydarwin/ui/icons";
 
 import SettingsHeroCard, {
     HeroChip,

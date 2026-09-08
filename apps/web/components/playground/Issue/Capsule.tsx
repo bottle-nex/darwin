@@ -1,7 +1,7 @@
 "use client";
 
-import type { IconType } from "@trymatcha/ui/icons";
-import { CalendarIcon, CheckIcon } from "@trymatcha/ui/icons";
+import type { IconType } from "@trydarwin/ui/icons";
+import { CalendarIcon, CheckIcon } from "@trydarwin/ui/icons";
 import { format } from "date-fns";
 import { forwardRef, useState } from "react";
 

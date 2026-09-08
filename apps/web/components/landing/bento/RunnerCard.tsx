@@ -13,8 +13,8 @@ const PLANE_TRANSFORM = "translate(-50%, -50%) rotateX(55deg) rotateZ(45deg)";
 /** Slab thicknesses, in px along the plane normal. */
 const STRIP_DEPTH = 12;
 const TILE_DEPTH = 10;
-const MATCHA_DEPTH = 16;
-const MATCHA_LIFT_Z = 30;
+const DARWIN_DEPTH = 16;
+const DARWIN_LIFT_Z = 30;
 
 type DockTile = {
     name: string;
@@ -26,7 +26,7 @@ type DockTile = {
 
 const DOCK_TILES: DockTile[] = [
     { name: "GitHub", icon: "/images/integrations/github.svg", blur: 1.5, opacity: 0.55 },
-    { name: "matcha" },
+    { name: "darwin" },
     { name: "Linear", icon: "/images/integrations/linear.svg", blur: 2, opacity: 0.5 },
     { name: "Notion", icon: "/images/integrations/notion.svg", blur: 2.5, opacity: 0.45 },
     { name: "Figma", icon: "/images/integrations/figma.svg", blur: 3.5, opacity: 0.4 },
@@ -50,11 +50,11 @@ function sideLayerOffsets(depth: number, count: number) {
     return Array.from({ length: count }, (_, i) => (depth * i) / count);
 }
 
-/** The matcha slab rises off the dock once the faded neighbours have settled. */
+/** The darwin slab rises off the dock once the faded neighbours have settled. */
 const LIFT = {
     hidden: { z: 2 },
     visible: {
-        z: MATCHA_LIFT_Z,
+        z: DARWIN_LIFT_Z,
         transition: { delay: 0.7, type: "spring" as const, bounce: 0.3, duration: 0.9 },
     },
 };
@@ -69,13 +69,13 @@ function FadedTile({ tile, delay }: { tile: DockTile; delay: number }) {
                 <motion.span
                     key={z}
                     variants={fadeTo(presence * 0.85, delay)}
-                    className="absolute inset-0 rounded-2xl border border-white/[0.07] bg-cement"
+                    className="absolute inset-0 rounded-2xl border border-edge bg-cement"
                     style={{ ...soften, transform: `translateZ(${z + 1}px)` }}
                 />
             ))}
             <motion.span
                 variants={fadeTo(presence, delay)}
-                className="absolute inset-0 flex items-center justify-center rounded-2xl border border-white/10 bg-[#232324]"
+                className="absolute inset-0 flex items-center justify-center rounded-2xl border border-edge bg-graphite"
                 style={{ ...soften, transform: `translateZ(${TILE_DEPTH + 1}px)` }}
             >
                 <Image
@@ -84,19 +84,19 @@ function FadedTile({ tile, delay }: { tile: DockTile; delay: number }) {
                     width={28}
                     height={28}
                     className="select-none"
-                    style={{ filter: "grayscale(1) invert(0.85)" }}
+                    style={{ filter: "grayscale(1)" }}
                 />
             </motion.span>
         </div>
     );
 }
 
-function MatchaTile() {
+function DarwinTile() {
     return (
         <div className="relative h-14 w-14" style={{ transformStyle: "preserve-3d" }}>
             <motion.span
                 variants={fadeTo(1, 0.7)}
-                className="absolute -inset-1.5 rounded-2xl bg-black/60 blur-md"
+                className="absolute -inset-1.5 rounded-2xl bg-foreground/20 blur-md"
                 style={{ transform: "translateZ(3px)" }}
             />
             <motion.div
@@ -110,20 +110,20 @@ function MatchaTile() {
                     variants={{ hovering: { z: 14 } }}
                     transition={{ type: "spring", stiffness: 210, damping: 20 }}
                 >
-                    {sideLayerOffsets(MATCHA_DEPTH, 6).map((z) => (
+                    {sideLayerOffsets(DARWIN_DEPTH, 6).map((z) => (
                         <motion.span
                             key={z}
                             variants={fadeTo(1, 0.7)}
-                            className="absolute inset-0 rounded-2xl border border-white/10 bg-ink"
+                            className="absolute inset-0 rounded-2xl border border-edge bg-cement"
                             style={{ transform: `translateZ(${z}px)` }}
                         />
                     ))}
                     <motion.span
                         variants={fadeTo(1, 0.7)}
-                        className="absolute inset-0 flex items-center justify-center rounded-2xl border border-white/20 bg-linear-to-b from-[#232324] to-ink shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]"
-                        style={{ transform: `translateZ(${MATCHA_DEPTH}px)` }}
+                        className="absolute inset-0 flex items-center justify-center rounded-2xl border border-edge bg-linear-to-b from-graphite to-cement shadow-[0_2px_6px_-2px_rgba(24,24,27,0.18)]"
+                        style={{ transform: `translateZ(${DARWIN_DEPTH}px)` }}
                     >
-                        <AppLogo className="h-4.5 w-auto text-snow" />
+                        <AppLogo className="h-4.5 w-auto text-foreground" />
                     </motion.span>
                 </motion.div>
             </motion.div>
@@ -159,24 +159,24 @@ function DockScene() {
                             <motion.span
                                 key={z}
                                 variants={fadeTo(1, 0.1)}
-                                className="absolute inset-0 rounded-[22px] border border-white/6 bg-charcoal"
+                                className="absolute inset-0 rounded-[22px] border border-edge bg-hover"
                                 style={{ transform: `translateZ(${z - STRIP_DEPTH}px)` }}
                             />
                         ))}
                         <motion.span
                             variants={fadeTo(1, 0.1)}
-                            className="absolute inset-0 rounded-[22px] border border-white/10 bg-graphite shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]"
+                            className="absolute inset-0 rounded-[22px] border border-edge bg-cement"
                         />
                         {DOCK_TILES.map((tile, i) =>
                             tile.icon ? (
                                 <FadedTile key={tile.name} tile={tile} delay={0.3 + i * 0.08} />
                             ) : (
-                                <MatchaTile key={tile.name} />
+                                <DarwinTile key={tile.name} />
                             ),
                         )}
                         <motion.span
                             variants={fadeTo(1, 0.55)}
-                            className="absolute bottom-2 left-[68px] h-1 w-1 rounded-full bg-white/30"
+                            className="absolute bottom-2 left-[68px] h-1 w-1 rounded-full bg-foreground/25"
                             style={{ transform: "translateZ(1px)" }}
                         />
                     </div>

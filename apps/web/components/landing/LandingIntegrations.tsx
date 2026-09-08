@@ -5,7 +5,7 @@ import {
     LinearLogoIcon,
     NotionLogoIcon,
     SlackLogoIcon,
-} from "@trymatcha/ui/icons";
+} from "@trydarwin/ui/icons";
 import { motion, useReducedMotion } from "motion/react";
 import type { ComponentType, CSSProperties } from "react";
 
@@ -34,9 +34,9 @@ const TILES: IntegrationTileSpec[] = [
     { name: "Jira", icon: JiraLogoIcon, iconColor: "#7aaeff", glow: "96, 150, 255" },
 ];
 
-/** The hub key at the end of the trunk — everything flows into matcha. */
-const MATCHA_TILE: IntegrationTileSpec = {
-    name: "matcha",
+/** The hub key at the end of the trunk — everything flows into darwin. */
+const DARWIN_TILE: IntegrationTileSpec = {
+    name: "darwin",
     icon: AppLogo,
     iconColor: "#ffffff",
     glow: "255, 255, 255",
@@ -185,7 +185,7 @@ function IntegrationTile({ tile, large = false }: { tile: IntegrationTileSpec; l
  * equal columns, so their centers are at x = 100/300/500/700/900 in a 1000-wide
  * viewBox stretched across the grid (preserveAspectRatio="none"). y=0 is the bus
  * line through the tile pins. One route per tile drops out of the key, elbows
- * toward the center and joins a five-line trunk that runs down into the matcha
+ * toward the center and joins a five-line trunk that runs down into the darwin
  * hub key (the routes end at y=300, behind the hub, so the pulses appear to be
  * absorbed by it). Negative begins stagger the pulses mid-cycle from first paint.
  */
@@ -223,7 +223,7 @@ function CircuitBoard() {
                 transition={{ delay: TRACE_DELAY - 0.4, duration: 0.6 }}
             />
 
-            {/* The five routes, drawn from each key down into the matcha hub. */}
+            {/* The five routes, drawn from each key down into the darwin hub. */}
             {/* No non-scaling-stroke on these: it breaks the pathLength dash math under the
                 stretched viewBox, leaving long routes drawn short of their endpoint. */}
             {FLOW_PATHS.map((d, i) => (
@@ -366,7 +366,7 @@ export default function LandingIntegrations() {
                         </motion.div>
                     ))}
                 </div>
-                {/* Board area the trunk descends through, down to the matcha hub key. */}
+                {/* Board area the trunk descends through, down to the darwin hub key. */}
                 <div aria-hidden className="hidden md:block md:h-72 mt-15" />
                 <div className="absolute -bottom-2 left-1/2 hidden -translate-x-1/2 md:block">
                     <motion.div
@@ -374,7 +374,7 @@ export default function LandingIntegrations() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ ...HUB_ENTRY, ease: EASE_OUT }}
                     >
-                        <IntegrationTile tile={MATCHA_TILE} large />
+                        <IntegrationTile tile={DARWIN_TILE} large />
                     </motion.div>
                 </div>
             </div>

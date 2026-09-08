@@ -10,9 +10,17 @@ const OCTOCAT_PATH =
     "M128.001 0C57.317 0 0 57.307 0 128.001c0 56.554 36.676 104.535 87.535 121.46c6.397 1.185 8.746-2.777 8.746-6.158c0-3.052-.12-13.135-.174-23.83c-35.61 7.742-43.124-15.103-43.124-15.103c-5.823-14.795-14.213-18.73-14.213-18.73c-11.613-7.944.876-7.78.876-7.78c12.853.902 19.621 13.19 19.621 13.19c11.417 19.568 29.945 13.911 37.249 10.64c1.149-8.272 4.466-13.92 8.127-17.116c-28.431-3.236-58.318-14.212-58.318-63.258c0-13.975 5-25.394 13.188-34.358c-1.329-3.224-5.71-16.242 1.24-33.874c0 0 10.749-3.44 35.21 13.121c10.21-2.836 21.16-4.258 32.038-4.307c10.878.049 21.837 1.47 32.066 4.307c24.431-16.56 35.165-13.12 35.165-13.12c6.967 17.63 2.584 30.65 1.255 33.873c8.207 8.964 13.173 20.383 13.173 34.358c0 49.163-29.944 59.988-58.447 63.157c4.591 3.972 8.682 11.762 8.682 23.704c0 17.126-.148 30.91-.148 35.126c0 3.407 2.304 7.398 8.792 6.14C219.37 232.5 256 184.537 256 128.002C256 57.307 198.691 0 128.001 0";
 
 const PILL_VARIANTS = {
-    solid: { fill: "#ffffff", stroke: "none", text: "#0a0a0a" },
-    muted: { fill: "#262626", stroke: "none", text: "#a3a3a3" },
-    outline: { fill: "#161616", stroke: "#d4d4d4", text: "#e5e5e5" },
+    solid: { fill: "var(--color-foreground)", stroke: "none", text: "var(--color-ink)" },
+    muted: {
+        fill: "var(--color-graphite)",
+        stroke: "var(--color-edge)",
+        text: "var(--color-muted-foreground)",
+    },
+    outline: {
+        fill: "var(--color-graphite)",
+        stroke: "rgba(24, 24, 27, 0.32)",
+        text: "var(--color-foreground)",
+    },
 } as const;
 
 function DbGlyph({ cx, cy, color }: { cx: number; cy: number; color: string }) {
@@ -67,7 +75,7 @@ function CheckDot({ x, y, delay }: { x: number; y: number; delay: number }) {
             <circle cx={x} cy={y} r={10} fill="var(--color-primary)" />
             <path
                 d={`M${x - 4.5} ${y + 0.5}l3.5 3.5 6.5-7`}
-                stroke="#0a0a0a"
+                stroke="var(--color-primary-foreground)"
                 strokeWidth={2.2}
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -85,7 +93,7 @@ function JunctionDot({ x, y, delay }: { x: number; y: number; delay: number }) {
             cx={x}
             cy={y}
             r={6}
-            fill="#0a0a0a"
+            fill="var(--color-ink)"
             stroke="var(--color-primary)"
             strokeWidth={2}
         />
@@ -114,7 +122,7 @@ function MonoLabel({
             y={y}
             fontSize={17}
             textAnchor={anchor}
-            fill={dim ? "#525252" : "#737373"}
+            fill={dim ? "var(--color-muted-foreground)" : "#4e4e54"}
         >
             {text}
         </motion.text>
@@ -129,7 +137,7 @@ function Stub({ x, y1, y2, delay }: { x: number; y1: number; y2: number; delay: 
             y1={y1}
             x2={x}
             y2={y2}
-            stroke="#4a4a4a"
+            stroke="rgba(24, 24, 27, 0.22)"
             strokeWidth={1.5}
             strokeDasharray="2 6"
             strokeLinecap="round"
@@ -142,7 +150,7 @@ function BranchCurve({ d, delay }: { d: string; delay: number }) {
         <motion.path
             variants={fade(delay)}
             d={d}
-            stroke="#4a4a4a"
+            stroke="rgba(24, 24, 27, 0.22)"
             strokeWidth={1.5}
             strokeDasharray="1.5 7"
             strokeLinecap="round"
@@ -187,7 +195,14 @@ const SWEEP = {
 function ShootingStar({ y }: { y: number }) {
     return (
         <g>
-            <line x1={0} y1={y} x2={1360} y2={y} stroke="#2e2e2e" strokeWidth={1.5} />
+            <line
+                x1={0}
+                y1={y}
+                x2={1360}
+                y2={y}
+                stroke="rgba(24, 24, 27, 0.16)"
+                strokeWidth={1.5}
+            />
             <motion.line
                 variants={{
                     hidden: { pathLength: 0 },
@@ -255,7 +270,14 @@ function NodeCircle({
 }) {
     return (
         <motion.g variants={pop(delay)} className={POP_ORIGIN}>
-            <circle cx={x} cy={y} r={22} fill="#161616" stroke="#333333" strokeWidth={1.5} />
+            <circle
+                cx={x}
+                cy={y}
+                r={22}
+                fill="var(--color-graphite)"
+                stroke="rgba(24, 24, 27, 0.18)"
+                strokeWidth={1.5}
+            />
             {children}
         </motion.g>
     );
@@ -286,7 +308,7 @@ function BranchingDiagram() {
                             y1={0}
                             x2={0.5}
                             y2={560}
-                            stroke="#191919"
+                            stroke="rgba(24, 24, 27, 0.09)"
                             strokeWidth={1}
                             strokeDasharray="4 6"
                         />
@@ -308,7 +330,14 @@ function BranchingDiagram() {
                             strokeOpacity={0.55}
                             strokeWidth={1}
                         />
-                        <line x1={40.5} y1={2} x2={40.5} y2={22} stroke="#333333" strokeWidth={1} />
+                        <line
+                            x1={40.5}
+                            y1={2}
+                            x2={40.5}
+                            y2={22}
+                            stroke="rgba(24, 24, 27, 0.18)"
+                            strokeWidth={1}
+                        />
                     </pattern>
                     <radialGradient id="grid-fade" cx="0.5" cy="0.5" r="0.72">
                         <stop offset="0" stopColor="#ffffff" />
@@ -333,9 +362,9 @@ function BranchingDiagram() {
                         x2={800}
                         y2={0}
                     >
-                        <stop offset="0" stopColor="#2e2e2e" />
-                        <stop offset="0.85" stopColor="#2e2e2e" />
-                        <stop offset="1" stopColor="#2e2e2e" stopOpacity={0} />
+                        <stop offset="0" stopColor="#18181b" stopOpacity={0.18} />
+                        <stop offset="0.85" stopColor="#18181b" stopOpacity={0.18} />
+                        <stop offset="1" stopColor="#18181b" stopOpacity={0} />
                     </linearGradient>
                     <linearGradient
                         id="fade-test"
@@ -345,9 +374,9 @@ function BranchingDiagram() {
                         x2={1240}
                         y2={0}
                     >
-                        <stop offset="0" stopColor="#2e2e2e" />
-                        <stop offset="0.78" stopColor="#2e2e2e" />
-                        <stop offset="1" stopColor="#2e2e2e" stopOpacity={0} />
+                        <stop offset="0" stopColor="#18181b" stopOpacity={0.18} />
+                        <stop offset="0.78" stopColor="#18181b" stopOpacity={0.18} />
+                        <stop offset="1" stopColor="#18181b" stopOpacity={0} />
                     </linearGradient>
                     <linearGradient
                         id="comet-tail"
@@ -358,8 +387,8 @@ function BranchingDiagram() {
                         y2={0}
                     >
                         <stop offset="0" stopColor="var(--color-primary)" stopOpacity={0} />
-                        <stop offset="0.5" stopColor="var(--color-primary)" stopOpacity={0.45} />
-                        <stop offset="1" stopColor="var(--color-primary)" stopOpacity={0.85} />
+                        <stop offset="0.5" stopColor="var(--color-primary)" stopOpacity={0.3} />
+                        <stop offset="1" stopColor="var(--color-primary)" stopOpacity={0.55} />
                     </linearGradient>
                     <linearGradient
                         id="comet-core"
@@ -369,9 +398,9 @@ function BranchingDiagram() {
                         x2={0}
                         y2={0}
                     >
-                        <stop offset="0" stopColor="#e8e3fd" stopOpacity={0} />
-                        <stop offset="0.55" stopColor="#e8e3fd" stopOpacity={0.55} />
-                        <stop offset="1" stopColor="#e8e3fd" stopOpacity={1} />
+                        <stop offset="0" stopColor="var(--color-primary)" stopOpacity={0} />
+                        <stop offset="0.55" stopColor="var(--color-primary)" stopOpacity={0.6} />
+                        <stop offset="1" stopColor="var(--color-primary)" stopOpacity={1} />
                     </linearGradient>
                     <clipPath id="avatar-clip">
                         <circle cx={956} cy={208} r={21} />
@@ -400,7 +429,7 @@ function BranchingDiagram() {
                         duration={0.7}
                     />
                     <NodeCircle x={310} y={208} delay={0.75}>
-                        <path d="M310 200l8.5 15h-17z" fill="#d4d4d4" />
+                        <path d="M310 200l8.5 15h-17z" fill="var(--color-foreground)" />
                     </NodeCircle>
                     <BranchPill
                         x={372}
@@ -438,7 +467,7 @@ function BranchingDiagram() {
                     />
                     <NodeCircle x={574} y={382} delay={0.95}>
                         <g transform="translate(562.5 371) scale(0.09)">
-                            <path d={OCTOCAT_PATH} fill="#a3a3a3" />
+                            <path d={OCTOCAT_PATH} fill="var(--color-foreground)" />
                         </g>
                     </NodeCircle>
                     <BranchPill
@@ -461,7 +490,7 @@ function BranchingDiagram() {
                         cx={1090}
                         cy={454}
                         r={5}
-                        fill="#333333"
+                        fill="rgba(24, 24, 27, 0.28)"
                     />
                     <MonoLabel
                         x={1106}
@@ -479,7 +508,7 @@ function BranchingDiagram() {
                         x1={1016}
                         x2={1360}
                         y={126}
-                        stroke="#2e2e2e"
+                        stroke="rgba(24, 24, 27, 0.18)"
                         delay={1.45}
                         duration={0.6}
                     />
@@ -488,8 +517,8 @@ function BranchingDiagram() {
                             cx={956}
                             cy={208}
                             r={22}
-                            fill="#161616"
-                            stroke="#444444"
+                            fill="var(--color-graphite)"
+                            stroke="rgba(24, 24, 27, 0.18)"
                             strokeWidth={1.5}
                         />
                         <image

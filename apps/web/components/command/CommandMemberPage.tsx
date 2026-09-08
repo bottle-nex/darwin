@@ -1,5 +1,5 @@
 "use client";
-import { ProjectRole, TeamRole } from "@trymatcha/types";
+import { ProjectRole, TeamRole } from "@trydarwin/types";
 
 import { CommandEmpty, CommandGroup, CommandItem, CommandList } from "@/components/ui/command";
 import type { MemberCommandActions } from "@/hooks/team/useMemberCommandActions";

@@ -48,7 +48,7 @@ export function shortDate(date: string | Date): string {
 
 /**
  * How an issue is named everywhere it is shown: the project's first three letters,
- * uppercased, then the number — "trymatcha" issue 42 reads `TRY-42`.
+ * uppercased, then the number — "trydarwin" issue 42 reads `TRY-42`.
  *
  * Punctuation and spaces are stripped before slicing, so "My App" keys as `MYA`
  * rather than `MY ` with a trailing space. Some callers hand this an already

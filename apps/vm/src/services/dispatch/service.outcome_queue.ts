@@ -1,4 +1,4 @@
-import { type IssueOutcomeJobData, QueueName } from "@trymatcha/types";
+import { type IssueOutcomeJobData, QueueName } from "@trydarwin/types";
 import { Queue } from "bullmq";
 
 import queue_config from "../../conf/config.queue";

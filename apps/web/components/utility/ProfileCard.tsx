@@ -1,12 +1,12 @@
 "use client";
 import { useQueryClient } from "@tanstack/react-query";
-import { TeamRole } from "@trymatcha/types";
+import { TeamRole } from "@trydarwin/types";
 import {
     ChangeRoleIcon,
     OverflowMenuVerticalIcon,
     RemoveMemberIcon,
     SubmenuDisclosureIcon,
-} from "@trymatcha/ui/icons";
+} from "@trydarwin/ui/icons";
 import axios from "axios";
 import Image from "next/image";
 

@@ -1,5 +1,5 @@
 "use client";
-import { GithubLogoIcon } from "@trymatcha/ui/icons";
+import { GithubLogoIcon } from "@trydarwin/ui/icons";
 import { useState } from "react";
 
 import { useIssueImportConfig } from "@/hooks/github/useIssueImportConfig";

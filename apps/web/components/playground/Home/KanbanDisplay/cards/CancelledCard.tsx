@@ -1,4 +1,4 @@
-import { CancelledCardIcon } from "@trymatcha/ui/icons";
+import { CancelledCardIcon } from "@trydarwin/ui/icons";
 
 import type { Issue } from "@/types/kanban";
 

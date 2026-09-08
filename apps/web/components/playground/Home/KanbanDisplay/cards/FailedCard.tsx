@@ -1,4 +1,4 @@
-import { RunFailedIcon } from "@trymatcha/ui/icons";
+import { RunFailedIcon } from "@trydarwin/ui/icons";
 
 import type { Issue } from "@/types/kanban";
 

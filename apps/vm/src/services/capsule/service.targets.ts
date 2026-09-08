@@ -1,4 +1,4 @@
-import type { CapsuleChange } from "@trymatcha/types";
+import type { CapsuleChange } from "@trydarwin/types";
 import type { Sandbox } from "e2b";
 
 import type { AppProfile } from "./service.workspace";

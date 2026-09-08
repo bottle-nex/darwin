@@ -15,7 +15,7 @@ export default function LandingAiEra() {
                     The all new AI Era
                 </h2>
                 <p className="text-snow/60 mt-5 max-w-md text-center text-lg leading-relaxed">
-                    File an issue on the board — a matcha agent picks it up, ships the fix, and
+                    File an issue on the board — a darwin agent picks it up, ships the fix, and
                     opens the PR.
                 </p>
 

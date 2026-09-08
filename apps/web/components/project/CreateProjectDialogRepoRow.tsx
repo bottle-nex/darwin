@@ -1,5 +1,5 @@
 "use client";
-import { GithubLogoIcon, PrivateRepoIcon } from "@trymatcha/ui/icons";
+import { GithubLogoIcon, PrivateRepoIcon } from "@trydarwin/ui/icons";
 
 import { Button } from "@/components/ui/button";
 import { formatRelativeTime } from "@/lib/format";

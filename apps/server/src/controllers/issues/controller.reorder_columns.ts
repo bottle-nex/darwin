@@ -1,5 +1,5 @@
-import { Action, Permissions } from "@trymatcha/access-control";
-import { prisma } from "@trymatcha/database";
+import { Action, Permissions } from "@trydarwin/access-control";
+import { prisma } from "@trydarwin/database";
 import type { Request, Response } from "express";
 import z from "zod";
 
@@ -60,20 +60,20 @@ export default class ColumnReorderController {
                     throw new StaleColumnListError();
                 }
 
-                await Promise.all(
-                    data.column_ids.map((columnId, order) =>
-                        tx.customColumnOrder.upsert({
-                            where: { userId_columnId: { userId: user.id, columnId } },
-                            create: {
-                                userId: user.id,
-                                spaceId: data.space_id,
-                                columnId,
-                                order,
-                            },
-                            update: { order },
-                        }),
-                    ),
-                );
+                // Sequential, not Promise.all: a transaction pins one pg connection, so firing
+                // every upsert at once overlaps queries on it — which pg 9 rejects outright.
+                for (const [order, columnId] of data.column_ids.entries()) {
+                    await tx.customColumnOrder.upsert({
+                        where: { userId_columnId: { userId: user.id, columnId } },
+                        create: {
+                            userId: user.id,
+                            spaceId: data.space_id,
+                            columnId,
+                            order,
+                        },
+                        update: { order },
+                    });
+                }
             });
 
             ResponseWriter.success(res, { ok: true }, "Column order updated");

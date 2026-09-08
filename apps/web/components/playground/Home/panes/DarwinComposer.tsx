@@ -1,5 +1,5 @@
 "use client";
-import { SendIcon } from "@trymatcha/ui/icons";
+import { SendIcon, StopGenerationIcon } from "@trydarwin/ui/icons";
 import { type KeyboardEvent, useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -9,12 +9,20 @@ import { cn } from "@/lib/utils";
 
 type DarwinComposerProps = {
     onSend: (text: string) => void;
+    onStop?: () => void;
+    /** True while an answer is streaming: the send button becomes a stop button. */
+    streaming?: boolean;
     className?: string;
 };
 
-export default function DarwinComposer({ onSend, className }: DarwinComposerProps) {
+export default function DarwinComposer({
+    onSend,
+    onStop,
+    streaming = false,
+    className,
+}: DarwinComposerProps) {
     const [draft, setDraft] = useState("");
-    const canSend = draft.trim().length > 0;
+    const canSend = draft.trim().length > 0 && !streaming;
 
     function submit() {
         if (!canSend) return;
@@ -40,21 +48,22 @@ export default function DarwinComposer({ onSend, className }: DarwinComposerProp
                 value={draft}
                 onChange={(event) => setDraft(event.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="Ask Darwin anything…"
+                placeholder={streaming ? "Darwin is answering…" : "Ask Darwin anything…"}
                 spellCheck={false}
-                className="no-scrollbar max-h-60 min-h-20 resize-none bg-transparent px-1 py-1 text-[15px] leading-relaxed hover:bg-transparent"
+                disabled={streaming}
+                className="no-scrollbar max-h-60 min-h-16 resize-none bg-transparent px-1 py-1 text-[15px] leading-relaxed hover:bg-transparent"
             />
             <div className="flex items-center justify-end pt-2">
                 <Button
                     variant="unstyled"
-                    onClick={submit}
-                    disabled={!canSend}
-                    aria-label="Send message"
+                    onClick={streaming ? onStop : submit}
+                    disabled={streaming ? !onStop : !canSend}
+                    aria-label={streaming ? "Stop Darwin" : "Send message"}
                     className="group rounded-full"
                 >
                     <IconWrapper
                         className="cursor-pointer"
-                        icon={SendIcon}
+                        icon={streaming ? StopGenerationIcon : SendIcon}
                         variant="ghost"
                         size="big"
                     />

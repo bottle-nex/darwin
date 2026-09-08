@@ -23,7 +23,7 @@ import {
     SpaceEntityIcon,
     TagIcon,
     TeamEntityIcon,
-} from "@trymatcha/ui/icons";
+} from "@trydarwin/ui/icons";
 import { useEffect, useRef } from "react";
 
 import { PRIORITY_OPTIONS } from "@/components/playground/Issue/issueHelpers";

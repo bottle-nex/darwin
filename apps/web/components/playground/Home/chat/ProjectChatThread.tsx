@@ -6,8 +6,8 @@ import {
     ProjectRole,
     type ThreadMessage,
     to_plain_text,
-} from "@trymatcha/types";
-import { CloseIcon, CommentCountIcon } from "@trymatcha/ui/icons";
+} from "@trydarwin/types";
+import { CloseIcon, CommentCountIcon } from "@trydarwin/ui/icons";
 import {
     type FocusEvent,
     useCallback,

@@ -1,5 +1,5 @@
-import { prisma } from "@trymatcha/database";
-import { reference_key } from "@trymatcha/types";
+import { prisma } from "@trydarwin/database";
+import { reference_key } from "@trydarwin/types";
 
 const MENTION_SPAN = /<span[^>]*data-type="mention"[^>]*>([\s\S]*?)<\/span>/g;
 const DATA_ID = /data-id="([^"]+)"/;

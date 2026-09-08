@@ -1,3 +1,4 @@
+import type { DarwinRunOutcome, DarwinStreamEvent } from "../darwin/darwin.contract";
 import type { RunLogEvent } from "../logs/run-log.contract";
 import type {
     AgentSession,
@@ -22,6 +23,8 @@ export enum InboundSocketMessageType {
     TEAM_CHAT_REACTION_TOGGLE = "TEAM_CHAT_REACTION_TOGGLE",
     RUN_LOG_SUBSCRIBE = "RUN_LOG_SUBSCRIBE",
     RUN_LOG_UNSUBSCRIBE = "RUN_LOG_UNSUBSCRIBE",
+    DARWIN_RUN_SUBSCRIBE = "DARWIN_RUN_SUBSCRIBE",
+    DARWIN_RUN_UNSUBSCRIBE = "DARWIN_RUN_UNSUBSCRIBE",
 }
 
 export type InboundSocketMessage =
@@ -86,6 +89,15 @@ export type InboundSocketMessage =
     | {
           type: InboundSocketMessageType.RUN_LOG_UNSUBSCRIBE;
           payload: { runId: string };
+      }
+    | {
+          type: InboundSocketMessageType.DARWIN_RUN_SUBSCRIBE;
+          /** `cursor` is the last seq already rendered; the server replays only the gap. */
+          payload: { runId: string; cursor?: number };
+      }
+    | {
+          type: InboundSocketMessageType.DARWIN_RUN_UNSUBSCRIBE;
+          payload: { runId: string };
       };
 
 export enum OutboundSocketMessageType {
@@ -106,6 +118,8 @@ export enum OutboundSocketMessageType {
     AGENT_SESSION_UPDATED = "AGENT_SESSION_UPDATED",
     RUN_LOG_APPENDED = "RUN_LOG_APPENDED",
     RUN_LOG_SEALED = "RUN_LOG_SEALED",
+    DARWIN_RUN_APPENDED = "DARWIN_RUN_APPENDED",
+    DARWIN_RUN_SEALED = "DARWIN_RUN_SEALED",
 }
 
 export type OutboundSocketMessage =
@@ -217,6 +231,19 @@ export type OutboundSocketMessage =
           projectId: string;
           runId: string;
           payload: { eventCount: number; droppedEvents: number };
+      }
+    /** Batched so a fast token stream costs one frame per flush rather than one per token. */
+    | {
+          type: OutboundSocketMessageType.DARWIN_RUN_APPENDED;
+          projectId: string;
+          runId: string;
+          payload: { events: DarwinStreamEvent[]; cursor: number };
+      }
+    | {
+          type: OutboundSocketMessageType.DARWIN_RUN_SEALED;
+          projectId: string;
+          runId: string;
+          payload: { status: DarwinRunOutcome; eventCount: number };
       };
 
 export function project_channel_name(project_id: string): string {

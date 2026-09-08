@@ -1,5 +1,5 @@
 "use client";
-import { CloseIcon } from "@trymatcha/ui/icons";
+import { CloseIcon } from "@trydarwin/ui/icons";
 import { useState } from "react";
 
 import { PANE_TOP_BAR_HEIGHT } from "@/components/playground/Core/components/PlaygroundPaneFrame";

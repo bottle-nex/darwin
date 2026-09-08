@@ -1,6 +1,6 @@
 "use client";
 
-import { EMOJI_GROUPS, QUICK_REACTION_EMOJIS } from "@trymatcha/types";
+import { EMOJI_GROUPS, QUICK_REACTION_EMOJIS } from "@trydarwin/types";
 import { useMemo, useState } from "react";
 
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";

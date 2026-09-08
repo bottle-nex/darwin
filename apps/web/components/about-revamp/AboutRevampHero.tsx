@@ -1,5 +1,5 @@
 "use client";
-import { XLogoIcon } from "@trymatcha/ui/icons";
+import { XLogoIcon } from "@trydarwin/ui/icons";
 import Link from "next/link";
 
 import HeroBuddy from "@/components/landing/v2/HeroBuddy";
@@ -25,7 +25,7 @@ export default function AboutRevampHero() {
                             )}
                         >
                             <HeroBuddy className="size-6 -my-1" />
-                            About matcha
+                            About darwin
                         </div>
                     </Reveal>
 
@@ -39,7 +39,7 @@ export default function AboutRevampHero() {
 
                     <Reveal immediate delay={0.16}>
                         <p className="max-w-md text-sm text-neutral-400 sm:text-base">
-                            Matcha turns a Kanban board into a pipeline of pull requests, file the
+                            Darwin turns a Kanban board into a pipeline of pull requests, file the
                             issue, review the diff.
                         </p>
                     </Reveal>

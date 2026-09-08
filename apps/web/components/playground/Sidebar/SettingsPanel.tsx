@@ -1,5 +1,5 @@
 "use client";
-import { SettingsOverviewIcon } from "@trymatcha/ui/icons";
+import { SettingsOverviewIcon } from "@trydarwin/ui/icons";
 
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { cn } from "@/lib/utils";

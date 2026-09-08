@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 
-import { IssueStatus, Prisma, prisma } from "@trymatcha/database";
+import { IssueStatus, Prisma, prisma } from "@trydarwin/database";
 import z from "zod";
 
 import type {
@@ -12,7 +12,7 @@ import type {
 import { BOARD_SYSTEM_STATUSES } from "../controllers/issues/board-query.schema";
 
 /** The board facet's sentinel for "not on any space", matching the client. */
-const AGENT_BOARD = "agent";
+export const AGENT_BOARD = "agent";
 
 export const BOARD_ISSUE_SELECT = {
     id: true,
@@ -450,42 +450,40 @@ export default class BoardIssueService {
         }
 
         const where = Prisma.sql`WHERE ${Prisma.join(predicates, " AND ")}`;
-        return prisma.$transaction(
+        // The transaction holds only the two statements that must agree on one snapshot, run in
+        // sequence: it pins a single pg connection, and overlapping queries on it are removed in
+        // pg 9. Hydration happens after, on the pool, where each relation gets its own connection.
+        const { page_rows, count_rows } = await prisma.$transaction(
             async (transaction) => {
-                const [page_rows, count_rows] = await Promise.all([
-                    transaction.$queryRaw<MyIssueRow[]>`
-                        SELECT "i"."id", "i"."createdAt", "i"."sortOrder", "i"."number", "i"."priority"
-                        FROM "Issue" AS "i"
-                        ${where}
-                        ORDER BY "i"."sortOrder" DESC, "i"."id" DESC
-                        LIMIT ${limit + 1}
-                    `,
-                    decoded
-                        ? Promise.resolve(undefined)
-                        : transaction.$queryRaw<{ total: bigint }[]>`
-                              SELECT COUNT(*)::bigint AS "total"
-                              FROM "Issue" AS "i"
-                              WHERE ${Prisma.join(base_predicates, " AND ")}
-                          `,
-                ]);
-
-                const has_more = page_rows.length > limit;
-                const cursor_rows = has_more ? page_rows.slice(0, limit) : page_rows;
-                const full_rows = await BoardIssueService.load_rows(
-                    cursor_rows.map((row) => row.id),
-                    transaction,
-                );
-                const last = cursor_rows.at(-1);
-                return {
-                    items: full_rows,
-                    nextCursor:
-                        has_more && last ? BoardIssueService.encode_sort_cursor(scope, last) : null,
-                    hasMore: has_more,
-                    ...(count_rows ? { total: Number(count_rows[0]?.total ?? 0) } : {}),
-                };
+                const rows = await transaction.$queryRaw<MyIssueRow[]>`
+                    SELECT "i"."id", "i"."createdAt", "i"."sortOrder", "i"."number", "i"."priority"
+                    FROM "Issue" AS "i"
+                    ${where}
+                    ORDER BY "i"."sortOrder" DESC, "i"."id" DESC
+                    LIMIT ${limit + 1}
+                `;
+                const totals = decoded
+                    ? undefined
+                    : await transaction.$queryRaw<{ total: bigint }[]>`
+                          SELECT COUNT(*)::bigint AS "total"
+                          FROM "Issue" AS "i"
+                          WHERE ${Prisma.join(base_predicates, " AND ")}
+                      `;
+                return { page_rows: rows, count_rows: totals };
             },
             { isolationLevel: Prisma.TransactionIsolationLevel.RepeatableRead },
         );
+
+        const has_more = page_rows.length > limit;
+        const cursor_rows = has_more ? page_rows.slice(0, limit) : page_rows;
+        const full_rows = await BoardIssueService.load_rows(cursor_rows.map((row) => row.id));
+        const last = cursor_rows.at(-1);
+        return {
+            items: full_rows,
+            nextCursor: has_more && last ? BoardIssueService.encode_sort_cursor(scope, last) : null,
+            hasMore: has_more,
+            ...(count_rows ? { total: Number(count_rows[0]?.total ?? 0) } : {}),
+        };
     }
 
     static my_issues_scope(
@@ -521,43 +519,42 @@ export default class BoardIssueService {
         if (decoded) page_predicates.push(BoardIssueService.my_cursor_predicate(decoded));
 
         const order = BoardIssueService.my_order_sql(query.order);
-        return prisma.$transaction(
+        // See search_board: only the statements that must share a snapshot stay in the
+        // transaction, and hydration runs afterwards on the pool.
+        const { rows, count_rows } = await prisma.$transaction(
             async (transaction) => {
-                const [rows, count_rows] = await Promise.all([
-                    transaction.$queryRaw<MyIssueRow[]>(Prisma.sql`
-                        SELECT "i"."id", "i"."createdAt", "i"."sortOrder", "i"."number", "i"."priority"
-                        FROM "Issue" AS "i"
-                        WHERE ${Prisma.join(page_predicates, " AND ")}
-                        ORDER BY ${order}
-                        LIMIT ${query.limit + 1}
-                    `),
-                    decoded
-                        ? Promise.resolve(undefined)
-                        : transaction.$queryRaw<{ total: bigint }[]>(Prisma.sql`
-                              SELECT COUNT(*)::bigint AS "total"
-                              FROM "Issue" AS "i"
-                              WHERE ${Prisma.join(base_predicates, " AND ")}
-                          `),
-                ]);
-                const page_rows = rows.length > query.limit ? rows.slice(0, query.limit) : rows;
-                const full_rows = await BoardIssueService.load_rows(
-                    page_rows.map((row) => row.id),
-                    transaction,
-                );
-                const last = page_rows.at(-1);
-                const has_more = rows.length > query.limit;
-                return {
-                    items: full_rows,
-                    nextCursor:
-                        has_more && last
-                            ? BoardIssueService.encode_my_issue_cursor(scope, query.order, last)
-                            : null,
-                    hasMore: has_more,
-                    ...(count_rows ? { total: Number(count_rows[0]?.total ?? 0) } : {}),
-                };
+                const page = await transaction.$queryRaw<MyIssueRow[]>(Prisma.sql`
+                    SELECT "i"."id", "i"."createdAt", "i"."sortOrder", "i"."number", "i"."priority"
+                    FROM "Issue" AS "i"
+                    WHERE ${Prisma.join(page_predicates, " AND ")}
+                    ORDER BY ${order}
+                    LIMIT ${query.limit + 1}
+                `);
+                const totals = decoded
+                    ? undefined
+                    : await transaction.$queryRaw<{ total: bigint }[]>(Prisma.sql`
+                          SELECT COUNT(*)::bigint AS "total"
+                          FROM "Issue" AS "i"
+                          WHERE ${Prisma.join(base_predicates, " AND ")}
+                      `);
+                return { rows: page, count_rows: totals };
             },
             { isolationLevel: Prisma.TransactionIsolationLevel.RepeatableRead },
         );
+
+        const page_rows = rows.length > query.limit ? rows.slice(0, query.limit) : rows;
+        const full_rows = await BoardIssueService.load_rows(page_rows.map((row) => row.id));
+        const last = page_rows.at(-1);
+        const has_more = rows.length > query.limit;
+        return {
+            items: full_rows,
+            nextCursor:
+                has_more && last
+                    ? BoardIssueService.encode_my_issue_cursor(scope, query.order, last)
+                    : null,
+            hasMore: has_more,
+            ...(count_rows ? { total: Number(count_rows[0]?.total ?? 0) } : {}),
+        };
     }
 
     static sort_my_issue_rows<T extends MyIssueRow>(rows: T[], order: MyIssuesOrder) {
@@ -584,12 +581,9 @@ export default class BoardIssueService {
         });
     }
 
-    private static async load_rows(
-        ids: string[],
-        client: Prisma.TransactionClient | typeof prisma = prisma,
-    ) {
+    private static async load_rows(ids: string[]) {
         if (!ids.length) return [];
-        const rows = await client.issue.findMany({
+        const rows = await prisma.issue.findMany({
             where: { id: { in: ids } },
             select: BOARD_ISSUE_SELECT,
         });

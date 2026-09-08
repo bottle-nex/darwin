@@ -1,7 +1,7 @@
 "use client";
 
-import type { ReferencedIssueLabel } from "@trymatcha/types";
-import { UnknownStatusIcon } from "@trymatcha/ui/icons";
+import type { ReferencedIssueLabel } from "@trydarwin/types";
+import { UnknownStatusIcon } from "@trydarwin/ui/icons";
 
 import { Button } from "@/components/ui/button";
 import { useIssueIdentifier } from "@/hooks/issues/useIssueIdentifier";

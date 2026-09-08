@@ -1,5 +1,5 @@
-import { prisma } from "@trymatcha/database";
-import { SidebarTheme } from "@trymatcha/types";
+import { prisma } from "@trydarwin/database";
+import { SidebarTheme } from "@trydarwin/types";
 import type { Request, Response } from "express";
 import { z } from "zod";
 

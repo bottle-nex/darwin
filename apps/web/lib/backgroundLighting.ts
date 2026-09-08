@@ -1,4 +1,10 @@
-import { BackgroundLightingColor, CodeTheme, DefaultHomeView, DiffView } from "@trymatcha/types";
+import {
+    BackgroundLightingColor,
+    CodeTheme,
+    DefaultHomeView,
+    DiffView,
+    SwipeTarget,
+} from "@trydarwin/types";
 
 /**
  * `selectionAlpha` is how strongly a selected card or row is washed with the accent.
@@ -96,8 +102,9 @@ export const DEFAULT_USER_CONFIG = {
     backgroundLightingEnabled: true,
     backgroundLightingColor: BackgroundLightingColor.Violet,
     defaultHomeView: DefaultHomeView.Kanban,
-    codeTheme: CodeTheme.Matcha,
+    codeTheme: CodeTheme.Darwin,
     diffView: DiffView.Unified,
+    swipeTarget: SwipeTarget.Settings,
 };
 
 export const GLOW_STORAGE_KEY = "playground-background-glow";

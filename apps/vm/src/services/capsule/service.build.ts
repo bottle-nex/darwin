@@ -1,4 +1,4 @@
-import type Logger from "@trymatcha/logger";
+import type Logger from "@trydarwin/logger";
 import type { Sandbox } from "e2b";
 
 import { command_error_text } from "../sandbox/service.stream";
@@ -7,7 +7,7 @@ import type { AppProfile } from "./service.workspace";
 
 const REPO_DIR = "/home/user/repo";
 const DIST_ROOT = "/home/user/dist";
-const CARRY_DIR = "/home/user/matcha-carry";
+const CARRY_DIR = "/home/user/darwin-carry";
 const BUILD_TIMEOUT_MS = 6 * 60_000;
 const MAX_BUILD_ERROR_CHARS = 2000;
 
@@ -25,13 +25,13 @@ export function build_command(revision: CapsuleRevision): string {
 }
 
 export function checkout_steps(profile: AppProfile, sha: string): string[] {
-    const matcha = `${app_root(profile)}/.matcha`;
+    const darwin = `${app_root(profile)}/.darwin`;
     return [
         `rm -rf ${CARRY_DIR}`,
-        `if [ -d ${matcha} ]; then mv ${matcha} ${CARRY_DIR}; fi`,
+        `if [ -d ${darwin} ]; then mv ${darwin} ${CARRY_DIR}; fi`,
         `git checkout --force ${sha}`,
         `mkdir -p ${app_root(profile)}`,
-        `if [ -d ${CARRY_DIR} ]; then mv ${CARRY_DIR} ${matcha}; fi`,
+        `if [ -d ${CARRY_DIR} ]; then mv ${CARRY_DIR} ${darwin}; fi`,
     ];
 }
 

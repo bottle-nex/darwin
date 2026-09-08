@@ -1,7 +1,7 @@
 "use client";
 
 import * as SelectPrimitive from "@radix-ui/react-select";
-import { CheckIcon, DropdownCaretIcon, DropdownCaretUpIcon } from "@trymatcha/ui/icons";
+import { CheckIcon, DropdownCaretIcon, DropdownCaretUpIcon } from "@trydarwin/ui/icons";
 import * as React from "react";
 
 import { cn } from "@/lib/utils";

@@ -3,8 +3,8 @@ import {
     type ReferencedIssueLabel,
     type ThreadMessage,
     to_plain_text,
-} from "@trymatcha/types";
-import { DropdownCaretIcon } from "@trymatcha/ui/icons";
+} from "@trydarwin/types";
+import { DropdownCaretIcon } from "@trydarwin/ui/icons";
 import { motion } from "motion/react";
 import { useState } from "react";
 

@@ -1,4 +1,4 @@
-import { OrgRole, ProjectRole, TeamRole } from "@trymatcha/types";
+import { OrgRole, ProjectRole, TeamRole } from "@trydarwin/types";
 import Action from "./actions";
 
 export type OrgAction = (typeof Action.org)[keyof typeof Action.org];

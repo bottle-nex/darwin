@@ -102,7 +102,7 @@ export default function SkyHero() {
                         to pull request
                     </h1>
                     <p className="mt-5 max-w-[34ch] text-[17px] leading-[1.45] text-ink/80">
-                        matcha picks issues off your board, ships the fix inside a sandboxed runner,
+                        darwin picks issues off your board, ships the fix inside a sandboxed runner,
                         and opens the PR for review.
                     </p>
                     <div className="mt-9 flex flex-wrap items-center gap-x-5 gap-y-4">

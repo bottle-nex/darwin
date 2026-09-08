@@ -1,4 +1,4 @@
-import { SettingsApiKeysIcon } from "@trymatcha/ui/icons";
+import { SettingsApiKeysIcon } from "@trydarwin/ui/icons";
 
 import SettingsHeroCard, {
     HeroButton,

@@ -4,7 +4,7 @@ import {
     DefaultTemplateIcon,
     TemplateFallbackIcon,
     TemplateTriggerIcon,
-} from "@trymatcha/ui/icons";
+} from "@trydarwin/ui/icons";
 import { useState } from "react";
 
 import { Command, CommandGroup, CommandItem, CommandList } from "@/components/ui/command";

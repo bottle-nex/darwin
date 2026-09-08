@@ -1,4 +1,4 @@
-import { ISSUE_LANE_NAME } from "@trymatcha/types";
+import { ISSUE_LANE_NAME } from "@trydarwin/types";
 import {
     CancelledStatusIcon,
     DoneStatusIcon,
@@ -8,7 +8,7 @@ import {
     OffBoardStatusIcon,
     QueuedStatusIcon,
     TodoStatusIcon,
-} from "@trymatcha/ui/icons";
+} from "@trydarwin/ui/icons";
 
 import { type KanbanColumnDef, KanbanStatus, type Priority } from "@/types/kanban";
 

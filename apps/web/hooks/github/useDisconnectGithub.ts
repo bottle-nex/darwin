@@ -5,7 +5,7 @@ import { apiClient } from "@/lib/axios";
 import { GITHUB_DISCONNECT } from "@/routes/api_routes";
 import type { ApiResponse } from "@/types/api";
 
-/** Disconnect an org's GitHub installation (matcha-side link only). */
+/** Disconnect an org's GitHub installation (darwin-side link only). */
 export function useDisconnectGithub() {
     const queryClient = useQueryClient();
     return useMutation({

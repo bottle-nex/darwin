@@ -8,7 +8,7 @@ import {
     useQuery,
     useQueryClient,
 } from "@tanstack/react-query";
-import type { CursorPage, Issue } from "@trymatcha/types";
+import type { CursorPage, Issue } from "@trydarwin/types";
 import {
     createContext,
     createElement,

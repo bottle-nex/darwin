@@ -1,5 +1,5 @@
 "use client";
-import { CalendarIcon } from "@trymatcha/ui/icons";
+import { CalendarIcon } from "@trydarwin/ui/icons";
 
 import Capsule from "./Capsule";
 import { DATE_ICON_COLOR, STACKED_CAPSULE } from "./issueHelpers";

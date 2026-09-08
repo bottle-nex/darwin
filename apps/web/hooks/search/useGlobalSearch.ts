@@ -1,6 +1,6 @@
 "use client";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { type GlobalSearchResult, MIN_GLOBAL_SEARCH_QUERY_LENGTH } from "@trymatcha/types";
+import { type GlobalSearchResult, MIN_GLOBAL_SEARCH_QUERY_LENGTH } from "@trydarwin/types";
 
 import { apiClient } from "@/lib/axios";
 import { GLOBAL_SEARCH_URL } from "@/routes/api_routes";

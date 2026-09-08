@@ -1,6 +1,7 @@
 import { create } from "zustand";
 
 import { isSettingsTab, PLAYGROUND_DEFAULT_TAB } from "@/components/playground/playgroundTabs";
+import { paneForTab } from "@/components/playground/Sidebar/sidebarPanes";
 import { useCreateIssueStore } from "@/store/issues/useCreateIssueStore";
 import { usePaneRouteStore } from "@/store/playground/usePaneRouteStore";
 import type { BoardSpace } from "@/types/board";
@@ -29,6 +30,15 @@ export const SPACE_TAB = "space";
  */
 interface PlaygroundNavState {
     tab: string;
+    /**
+     * What the main pane keeps mounted while Settings is open on top of it. Every non-settings
+     * tab qualifies, Darwin included — it is a main-pane view like any other.
+     */
+    lastMainTab: string;
+    /**
+     * Where the sidebar's Back returns to. Narrower than {@link lastMainTab}: Darwin replaces the
+     * sidebar body, so returning to it would leave Back with nowhere to go.
+     */
     lastWorkspaceTab: string;
     selectedTeam: ProjectTeam | null;
     /** Slug of the project the selected team belongs to — guards stale detail. */
@@ -38,11 +48,16 @@ interface PlaygroundNavState {
     selectedSpaceProjectSlug: string | null;
     setTab: (tabId: string) => void;
     hydrateTab: (tabId: string) => void;
-    returnFromSettings: () => void;
+    returnToWorkspace: () => void;
     openTeam: (team: ProjectTeam, projectSlug: string) => void;
     clearTeam: () => void;
     openSpace: (space: BoardSpace, projectSlug: string) => void;
     clearSpace: () => void;
+}
+
+/** Settings and Darwin replace the sidebar body, so neither is a place `back` should return to. */
+function is_workspace_tab(tabId: string) {
+    return paneForTab(tabId) === "workspace";
 }
 
 function leave_pane() {
@@ -52,6 +67,7 @@ function leave_pane() {
 
 export const usePlaygroundNavStore = create<PlaygroundNavState>((set) => ({
     tab: PLAYGROUND_DEFAULT_TAB,
+    lastMainTab: PLAYGROUND_DEFAULT_TAB,
     lastWorkspaceTab: PLAYGROUND_DEFAULT_TAB,
     selectedTeam: null,
     selectedTeamProjectSlug: null,
@@ -61,15 +77,17 @@ export const usePlaygroundNavStore = create<PlaygroundNavState>((set) => ({
         leave_pane();
         set((state) => ({
             tab: tabId,
-            lastWorkspaceTab: isSettingsTab(tabId) ? state.lastWorkspaceTab : tabId,
+            lastMainTab: isSettingsTab(tabId) ? state.lastMainTab : tabId,
+            lastWorkspaceTab: is_workspace_tab(tabId) ? tabId : state.lastWorkspaceTab,
         }));
     },
     hydrateTab: (tabId) =>
         set((state) => ({
             tab: tabId,
-            lastWorkspaceTab: isSettingsTab(tabId) ? state.lastWorkspaceTab : tabId,
+            lastMainTab: isSettingsTab(tabId) ? state.lastMainTab : tabId,
+            lastWorkspaceTab: is_workspace_tab(tabId) ? tabId : state.lastWorkspaceTab,
         })),
-    returnFromSettings: () => {
+    returnToWorkspace: () => {
         leave_pane();
         set((state) => ({ tab: state.lastWorkspaceTab }));
     },
@@ -79,6 +97,7 @@ export const usePlaygroundNavStore = create<PlaygroundNavState>((set) => ({
             selectedTeam: team,
             selectedTeamProjectSlug: projectSlug,
             tab: TEAM_DETAIL_TAB,
+            lastMainTab: TEAM_DETAIL_TAB,
             lastWorkspaceTab: TEAM_DETAIL_TAB,
         });
     },
@@ -87,6 +106,7 @@ export const usePlaygroundNavStore = create<PlaygroundNavState>((set) => ({
             selectedTeam: null,
             selectedTeamProjectSlug: null,
             tab: PLAYGROUND_DEFAULT_TAB,
+            lastMainTab: PLAYGROUND_DEFAULT_TAB,
             lastWorkspaceTab: PLAYGROUND_DEFAULT_TAB,
         }),
     openSpace: (space, projectSlug) => {
@@ -95,6 +115,7 @@ export const usePlaygroundNavStore = create<PlaygroundNavState>((set) => ({
             selectedSpace: space,
             selectedSpaceProjectSlug: projectSlug,
             tab: SPACE_TAB,
+            lastMainTab: SPACE_TAB,
             lastWorkspaceTab: SPACE_TAB,
         });
     },
@@ -103,6 +124,7 @@ export const usePlaygroundNavStore = create<PlaygroundNavState>((set) => ({
             selectedSpace: null,
             selectedSpaceProjectSlug: null,
             tab: PLAYGROUND_DEFAULT_TAB,
+            lastMainTab: PLAYGROUND_DEFAULT_TAB,
             lastWorkspaceTab: PLAYGROUND_DEFAULT_TAB,
         }),
 }));

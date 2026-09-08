@@ -4,7 +4,7 @@ import {
     notification_scope,
     type NotificationFeedPage,
     NotificationScope,
-} from "@trymatcha/types";
+} from "@trydarwin/types";
 
 import type { NotificationFeedData, NotificationReadTarget } from "@/types/notificationFeed.type";
 

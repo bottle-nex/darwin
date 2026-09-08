@@ -11,7 +11,7 @@ import { LandingNavbar } from "@/components/new/LandingNavbar";
 import { getPosts, getReleases } from "@/lib/content";
 
 export const metadata: Metadata = {
-    title: "What's new in Matcha",
+    title: "What's new in Darwin",
     description: "Releases, notes on agents, and everything we have been shipping.",
 };
 

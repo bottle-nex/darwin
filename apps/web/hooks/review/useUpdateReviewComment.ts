@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { ReviewComment } from "@trymatcha/types";
+import type { ReviewComment } from "@trydarwin/types";
 
 import { apiClient } from "@/lib/axios";
 import { REVIEW_COMMENT_URL } from "@/routes/api_routes";

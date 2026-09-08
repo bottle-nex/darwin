@@ -9,16 +9,16 @@ import BentoCard from "./BentoCard";
 const ISO = "matrix(0.866 0.5 -0.866 0.5 0 0)";
 const SQ = Math.SQRT1_2;
 
-/** The matcha mark, verbatim from AppLogo (viewBox 792x460). */
-const MATCHA_MARK =
+/** The darwin mark, verbatim from AppLogo (viewBox 792x460). */
+const DARWIN_MARK =
     "M626.9 24.4L657 40.8L657 215.5L759.9 147L792 164.5L792 438.5L657 438.5L657 214.6L328.7 447.2L328.7 227.2L0 460.1L0 235.9L297.9 37.4L328.7 54.2L328.7 223Z";
 
-const SLAB_FILL = "#151516";
-const BELT_FILL = "#131314";
-const TOP_STROKE = "#4a4a4a";
-const SIDE_STROKE = "#383838";
-const DETAIL_STROKE = "#525252";
-const BRIGHT = "#d4d4d4";
+const SLAB_FILL = "#ffffff";
+const BELT_FILL = "#f7f7f8";
+const TOP_STROKE = "#a3a3a3";
+const SIDE_STROKE = "#d4d4d4";
+const DETAIL_STROKE = "#b8b8b8";
+const BRIGHT = "#808080";
 
 function isoX(u: number, v: number) {
     return 0.866 * (u - v);
@@ -224,9 +224,9 @@ function ConveyorScene() {
                     <g transform={ISO}>
                         <g transform="translate(-14.3 -8.3) scale(0.036)">
                             <path
-                                d={MATCHA_MARK}
-                                fill="#48484a"
-                                className="transition-[fill] duration-500 group-hover:fill-[#7a7a7e]"
+                                d={DARWIN_MARK}
+                                fill="#8e8e96"
+                                className="transition-[fill] duration-500 group-hover:fill-[#808080]"
                             />
                         </g>
                     </g>
@@ -252,7 +252,7 @@ function ConveyorScene() {
                             vectorEffect="non-scaling-stroke"
                         />
                     </g>
-                    <rect x={-11} y={-35} width={22} height={70} rx={11} fill="#232324" />
+                    <rect x={-11} y={-35} width={22} height={70} rx={11} fill="#ebebed" />
                     <SlotTicks u={-35} v={-24} />
                     <SlotTicks u={35} v={12} />
                     <SlotTicks u={0} v={16} />
@@ -269,15 +269,15 @@ function ConveyorScene() {
                                         width={74}
                                         height={24}
                                         rx={8}
-                                        fill="#1c1c1c"
-                                        stroke="#3f3f3f"
+                                        fill="#18181b"
+                                        stroke="#a3a3a3"
                                     />
                                     <text
                                         x={0}
                                         y={3.5}
                                         fontSize={10}
                                         textAnchor="middle"
-                                        fill="#d4d4d4"
+                                        fill="#ffffff"
                                     >
                                         PR #142
                                     </text>

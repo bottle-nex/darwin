@@ -1,0 +1,114 @@
+/// One Ask Darwin conversation. Scoped to a project *and* a user: threads are private
+/// notebooks rather than a shared channel, so a teammate never reads another member's questions.
+model DarwinThread {
+  id        String  @id @default(cuid())
+  projectId String
+  userId    String
+  /// First ~60 characters of the opening user message, for the thread list. Null until the first turn.
+  title     String?
+
+  project  Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user     User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages DarwinMessage[]
+  runs     DarwinRun[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([projectId, userId, updatedAt(sort: Desc)])
+}
+
+/// One message in the OpenAI wire format, stored verbatim so a thread replays into the model
+/// without re-derivation. `toolCalls` is the raw array from an assistant turn; `toolCallId` and
+/// `name` are set only on Tool rows. `seq` is monotonic per thread and is what both the history
+/// window and the stream replay cursor order by.
+model DarwinMessage {
+  id         String     @id @default(cuid())
+  threadId   String
+  runId      String?
+  seq        Int
+  role       DarwinRole
+  content    String?    @db.Text
+  toolCalls  Json?
+  toolCallId String?
+  name       String?
+
+  thread       DarwinThread     @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  run          DarwinRun?       @relation(fields: [runId], references: [id], onDelete: SetNull)
+  toolCallRows DarwinToolCall[]
+
+  createdAt DateTime @default(now())
+
+  @@unique([threadId, seq])
+  @@index([threadId, seq])
+  @@index([runId])
+}
+
+/// The execution record for one tool the model asked for. Duplicates what is already inside
+/// `DarwinMessage.toolCalls` on purpose: that column is wire format the model reads back, while
+/// this row is the queryable audit trail and carries timing and outcome the wire format cannot hold.
+model DarwinToolCall {
+  id        String @id @default(cuid())
+  messageId String
+  threadId  String
+  /// The provider's `tool_call.id`, unique only within its own assistant message.
+  callId    String
+  name      String
+
+  arguments  Json
+  result     Json?
+  status     DarwinToolStatus @default(Pending)
+  error      String?          @db.Text
+  durationMs Int?
+
+  message DarwinMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([messageId, callId])
+  @@index([threadId, createdAt])
+  @@index([name, createdAt])
+}
+
+/// One press of send: the unit a client subscribes to over the socket, the unit a cancel targets,
+/// and the only thing that tells a cancelled answer apart from a crashed one.
+model DarwinRun {
+  id       String          @id @default(cuid())
+  threadId String
+  status   DarwinRunStatus @default(Streaming)
+  model    String
+
+  iterations       Int     @default(0)
+  promptTokens     Int     @default(0)
+  completionTokens Int     @default(0)
+  error            String? @db.Text
+
+  thread   DarwinThread    @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  messages DarwinMessage[]
+
+  createdAt   DateTime  @default(now())
+  completedAt DateTime?
+
+  @@index([threadId, createdAt(sort: Desc)])
+  @@index([status, createdAt])
+}
+
+enum DarwinRole {
+  System
+  User
+  Assistant
+  Tool
+}
+
+enum DarwinToolStatus {
+  Pending
+  Ok
+  Error
+}
+
+enum DarwinRunStatus {
+  Streaming
+  Done
+  Cancelled
+  Error
+}

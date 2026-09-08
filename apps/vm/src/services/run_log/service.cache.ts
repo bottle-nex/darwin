@@ -8,7 +8,7 @@ import {
     RUN_LOG_MAX_BYTES,
     run_log_meta_key,
     type RunLogEvent,
-} from "@trymatcha/types";
+} from "@trydarwin/types";
 
 import { redis } from "../platform/service.redis";
 

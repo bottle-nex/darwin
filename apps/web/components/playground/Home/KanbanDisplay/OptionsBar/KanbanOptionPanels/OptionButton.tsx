@@ -1,5 +1,5 @@
 "use client";
-import type { IconType } from "@trymatcha/ui/icons";
+import type { IconType } from "@trydarwin/ui/icons";
 import { forwardRef } from "react";
 
 import { Button } from "@/components/ui/button";

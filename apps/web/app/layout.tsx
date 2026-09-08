@@ -2,6 +2,7 @@ import "./globals.css";
 
 import type { Metadata } from "next";
 import { Geist_Mono, Google_Sans_Flex, JetBrains_Mono, Titillium_Web } from "next/font/google";
+import localFont from "next/font/local";
 import { getServerSession } from "next-auth";
 
 import SessionSetter from "@/components/utility/SessionSetter";
@@ -26,6 +27,13 @@ const googleSansFlex = Google_Sans_Flex({
     subsets: ["latin"],
 });
 
+const departureMono = localFont({
+    src: "../public/fonts/DepartureMono-Regular.woff2",
+    variable: "--font-departure-mono",
+    weight: "400",
+    display: "swap",
+});
+
 const titilliumWeb = Titillium_Web({
     variable: "--font-titillium-web",
     subsets: ["latin"],
@@ -33,7 +41,7 @@ const titilliumWeb = Titillium_Web({
 });
 
 export const metadata: Metadata = {
-    title: "Matcha",
+    title: "Darwin",
     description: "The modern WhatsApp marketing platform for teams that want to grow.",
 };
 
@@ -48,7 +56,7 @@ export default async function RootLayout({
         <html
             lang="en"
             suppressHydrationWarning
-            className={`${googleSansFlex.variable} ${geistMono.variable} ${jetBrainsMono.variable} ${titilliumWeb.variable} h-full antialiased`}
+            className={`${googleSansFlex.variable} ${geistMono.variable} ${jetBrainsMono.variable} ${titilliumWeb.variable} ${departureMono.variable} h-full antialiased`}
         >
             <body className="min-h-full flex flex-col">
                 <ThemeScope />

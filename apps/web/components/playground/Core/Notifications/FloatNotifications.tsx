@@ -1,6 +1,6 @@
 "use client";
-import { type Notification, NotificationScope } from "@trymatcha/types";
-import { CloseIcon } from "@trymatcha/ui/icons";
+import { type Notification, NotificationScope } from "@trydarwin/types";
+import { CloseIcon } from "@trydarwin/ui/icons";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { useEffect, useState } from "react";
 

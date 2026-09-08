@@ -3,7 +3,7 @@ import {
     InvitationPendingIcon,
     OverflowMenuVerticalIcon,
     RevokeInviteIcon,
-} from "@trymatcha/ui/icons";
+} from "@trydarwin/ui/icons";
 
 import PlaygroundAvatar, {
     initialOf,

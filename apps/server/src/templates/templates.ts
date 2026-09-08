@@ -50,7 +50,7 @@ export default class EmailTemplate {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="color-scheme" content="light dark" />
     <meta name="supported-color-schemes" content="light dark" />
-    <title>matcha</title>
+    <title>darwin</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&family=Azeret+Mono:wght@400;600&display=swap');
         @media (prefers-color-scheme: dark) {
@@ -70,7 +70,7 @@ export default class EmailTemplate {
                     <tr>
                         <td style="padding:0 4px 20px;">
                             <span style="font-family:${this.FONT_SANS};font-size:20px;font-weight:600;letter-spacing:-0.01em;color:${c.text};" class="mc-text">
-                                matcha<span style="color:${c.accent};">.</span>
+                                darwin<span style="color:${c.accent};">.</span>
                             </span>
                         </td>
                     </tr>
@@ -82,7 +82,7 @@ export default class EmailTemplate {
                     <tr>
                         <td style="padding:20px 4px 0;">
                             <p class="mc-muted" style="margin:0;font-family:${this.FONT_SANS};font-size:12px;line-height:18px;color:${c.muted};">
-                                Sent by matcha. You received this email because a sign-in was requested for this address.
+                                Sent by darwin. You received this email because a sign-in was requested for this address.
                             </p>
                         </td>
                     </tr>
@@ -106,7 +106,7 @@ export default class EmailTemplate {
         message?: string;
     }): { subject: string; html: string; text: string } {
         const c = this.COLORS;
-        const subject = `You've been invited to join ${target} on trymatcha`;
+        const subject = `You've been invited to join ${target} on trydarwin`;
 
         const note = message
             ? `
@@ -126,7 +126,7 @@ export default class EmailTemplate {
             You've been invited
         </h1>
         <p class="mc-muted" style="margin:0 0 24px;font-family:${this.FONT_SANS};font-size:14px;line-height:21px;color:${c.muted};">
-            ${this.escape_html(inviter)} invited you to join <strong style="color:${c.text};">${this.escape_html(target)}</strong> on matcha.
+            ${this.escape_html(inviter)} invited you to join <strong style="color:${c.text};">${this.escape_html(target)}</strong> on darwin.
         </p>
         ${note}
         <table role="presentation" cellpadding="0" cellspacing="0" border="0">
@@ -138,7 +138,7 @@ export default class EmailTemplate {
             If you weren't expecting this, you can safely ignore this email.
         </p>`;
 
-        const text = `${inviter} invited you to join ${target} on matcha.${
+        const text = `${inviter} invited you to join ${target} on darwin.${
             message ? `\n\n"${message}"` : ""
         }\n\nAccept the invitation here: ${url}\n\nIf you weren't expecting this, you can ignore this email.`;
 
@@ -162,7 +162,7 @@ export default class EmailTemplate {
             Your sign-in code
         </h1>
         <p class="mc-muted" style="margin:0 0 24px;font-family:${this.FONT_SANS};font-size:14px;line-height:21px;color:${c.muted};">
-            Enter this code to finish signing in to matcha.
+            Enter this code to finish signing in to darwin.
         </p>
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
             <tr>
@@ -181,9 +181,9 @@ export default class EmailTemplate {
         </p>`;
 
         return {
-            subject: "Your matcha sign-in code",
-            html: this.layout({ preheader: `Your matcha sign-in code is ${code}`, bodyHtml }),
-            text: `Your matcha sign-in code is ${code}.
+            subject: "Your darwin sign-in code",
+            html: this.layout({ preheader: `Your darwin sign-in code is ${code}`, bodyHtml }),
+            text: `Your darwin sign-in code is ${code}.
 
 It expires in ${expiryMinutes} minutes. If you didn't request this, you can ignore this email.`,
         };
@@ -235,7 +235,7 @@ It expires in ${expiryMinutes} minutes. If you didn't request this, you can igno
         url: string;
     }): { subject: string; html: string; text: string } {
         const c = this.COLORS;
-        const subject = `${senderName} mentioned you on matcha`;
+        const subject = `${senderName} mentioned you on darwin`;
 
         const bodyHtml = `
         <h1 class="mc-text" style="margin:0 0 8px;font-family:${this.FONT_SANS};font-size:18px;font-weight:600;color:${c.text};">
@@ -285,10 +285,10 @@ It expires in ${expiryMinutes} minutes. If you didn't request this, you can igno
             You no longer have access
         </h1>
         <p class="mc-muted" style="margin:0;font-family:${this.FONT_SANS};font-size:14px;line-height:21px;color:${c.muted};">
-            ${this.escape_html(actorName)} removed you from the ${scopeType} <strong style="color:${c.text};">${this.escape_html(scopeName)}</strong> on matcha.
+            ${this.escape_html(actorName)} removed you from the ${scopeType} <strong style="color:${c.text};">${this.escape_html(scopeName)}</strong> on darwin.
         </p>`;
 
-        const text = `${actorName} removed you from the ${scopeType} "${scopeName}" on matcha.`;
+        const text = `${actorName} removed you from the ${scopeType} "${scopeName}" on darwin.`;
 
         return {
             subject,

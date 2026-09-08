@@ -1,5 +1,5 @@
 "use client";
-import { FileIcon } from "@trymatcha/ui/icons";
+import { FileIcon } from "@trydarwin/ui/icons";
 
 import { PLAYGROUND_PANE_SHELL } from "@/components/playground/Core/components/paneBar";
 import PaneColumns from "@/components/playground/Core/components/PaneColumns";

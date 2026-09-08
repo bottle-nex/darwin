@@ -1,5 +1,5 @@
-import { Harness, PlanStatus, prisma } from "@trymatcha/database";
-import Logger, { format_duration } from "@trymatcha/logger";
+import { Harness, PlanStatus, prisma } from "@trydarwin/database";
+import Logger, { format_duration } from "@trydarwin/logger";
 import { Sandbox } from "e2b";
 
 import { ENV } from "../../conf/config.env";

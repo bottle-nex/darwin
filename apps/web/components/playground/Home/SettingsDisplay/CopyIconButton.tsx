@@ -1,5 +1,5 @@
 "use client";
-import { CheckIcon, CopyIcon } from "@trymatcha/ui/icons";
+import { CheckIcon, CopyIcon } from "@trydarwin/ui/icons";
 import { useEffect, useState } from "react";
 
 import { cn } from "@/lib/utils";

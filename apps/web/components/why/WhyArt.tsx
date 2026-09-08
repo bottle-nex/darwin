@@ -5,7 +5,7 @@ const GREEN = "#34D59A";
 const LAVENDER = "var(--color-primary)";
 
 export const PLATE_BONE = "#EDE7DA";
-export const PLATE_MATCHA = "#DCE4CE";
+export const PLATE_DARWIN = "#DCE4CE";
 
 const INK_WIDTH = 7.5;
 const INK_WIDTH_HEAVY = 9;

@@ -1,5 +1,5 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { Action, Permissions } from "@trymatcha/access-control";
+import { Action, Permissions } from "@trydarwin/access-control";
 import { z } from "zod";
 
 import Access from "../access-control/access";
@@ -14,13 +14,13 @@ function text(message: string) {
 
 export function build_claude_mcp_server(user: AuthUser): McpServer {
     const mcp_server = new McpServer({
-        name: "matcha-mcp",
+        name: "darwin-mcp",
         version: "0.1.0",
     });
 
     mcp_server.tool(
         "create_issue",
-        "Create an issue on a matcha project board. `project` is required and matched fuzzily " +
+        "Create an issue on a darwin project board. `project` is required and matched fuzzily " +
             "against the projects you have access to; pass `org` too if the project name is ambiguous " +
             'across organizations. `assignee` is matched fuzzily against project members — pass "me" ' +
             "to assign yourself. If a project or assignee can't be confidently resolved, this returns " +

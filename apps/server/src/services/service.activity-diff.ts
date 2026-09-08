@@ -1,7 +1,7 @@
-import type { IssueStatus } from "@trymatcha/database";
-import { ActivitySurface, ActivityType } from "@trymatcha/database";
-import type { ActivityEvent } from "@trymatcha/services";
-import type { ActivityLocationRef } from "@trymatcha/types";
+import type { IssueStatus } from "@trydarwin/database";
+import { ActivitySurface, ActivityType } from "@trydarwin/database";
+import type { ActivityEvent } from "@trydarwin/services";
+import type { ActivityLocationRef } from "@trydarwin/types";
 
 /**
  * Collapses the (status, customColumn) pair into the one thing it represents.
@@ -16,7 +16,7 @@ export function location_of(
 }
 
 /**
- * The one key both merge paths must agree on. A merge started inside matcha and the
+ * The one key both merge paths must agree on. A merge started inside darwin and the
  * `pull_request` webhook GitHub sends back for that same merge are one event, so they
  * have to collide on `@@unique([issueId, dedupeKey])` instead of writing two rows.
  */

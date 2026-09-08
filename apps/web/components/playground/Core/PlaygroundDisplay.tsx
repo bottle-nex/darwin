@@ -125,7 +125,7 @@ function RetainedWorkspacePane({ tab, hidden }: { tab: string; hidden: boolean }
 
 export default function PlaygroundDisplay({ isLoading }: { isLoading?: boolean }) {
     const tab = usePlaygroundNavStore((s) => s.tab);
-    const lastWorkspaceTab = usePlaygroundNavStore((s) => s.lastWorkspaceTab);
+    const lastMainTab = usePlaygroundNavStore((s) => s.lastMainTab);
     const inSettings = isSettingsTab(tab);
 
     return (
@@ -141,7 +141,7 @@ export default function PlaygroundDisplay({ isLoading }: { isLoading?: boolean }
                             inSettings && "pointer-events-none invisible",
                         )}
                     >
-                        <RetainedWorkspacePane tab={lastWorkspaceTab} hidden={inSettings} />
+                        <RetainedWorkspacePane tab={lastMainTab} hidden={inSettings} />
                     </div>
                     {inSettings && (
                         <div className="absolute inset-0 flex min-h-0 flex-col">

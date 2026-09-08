@@ -1,5 +1,5 @@
 "use client";
-import { FileIcon } from "@trymatcha/ui/icons";
+import { FileIcon } from "@trydarwin/ui/icons";
 
 import { useIssueAttempts } from "@/hooks/issues/useIssueAttempts";
 import { cn } from "@/lib/utils";

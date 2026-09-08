@@ -1,6 +1,6 @@
 "use client";
 
-import { TeamEntityIcon } from "@trymatcha/ui/icons";
+import { TeamEntityIcon } from "@trydarwin/ui/icons";
 import { forwardRef, useImperativeHandle, useState } from "react";
 
 import PlaygroundAvatar, {

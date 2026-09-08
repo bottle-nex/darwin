@@ -1,7 +1,7 @@
-import { Effort, type Harness } from "@trymatcha/database";
-import { Registry } from "@trymatcha/harness";
-import type Logger from "@trymatcha/logger";
-import type { RunLogEventBody } from "@trymatcha/types";
+import { Effort, type Harness } from "@trydarwin/database";
+import { Registry } from "@trydarwin/harness";
+import type Logger from "@trydarwin/logger";
+import type { RunLogEventBody } from "@trydarwin/types";
 import chalk from "chalk";
 import type { Sandbox } from "e2b";
 

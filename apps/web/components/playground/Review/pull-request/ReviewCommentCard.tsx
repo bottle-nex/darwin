@@ -1,6 +1,6 @@
 "use client";
 
-import type { ReviewComment } from "@trymatcha/types";
+import type { ReviewComment } from "@trydarwin/types";
 import {
     CheckIcon,
     CopyIcon,
@@ -11,7 +11,7 @@ import {
     ReviewVerdictApprovedIcon,
     ReviewVerdictCommentIcon,
     ReviewVerdictRejectedIcon,
-} from "@trymatcha/ui/icons";
+} from "@trydarwin/ui/icons";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";

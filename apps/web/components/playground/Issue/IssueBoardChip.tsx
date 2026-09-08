@@ -1,5 +1,5 @@
 "use client";
-import { SpaceEntityIcon } from "@trymatcha/ui/icons";
+import { SpaceEntityIcon } from "@trydarwin/ui/icons";
 
 import { IconPickGlyph } from "@/components/ui/IconPicker";
 import { useBoardColumns } from "@/hooks/issues/useBoardColumns";

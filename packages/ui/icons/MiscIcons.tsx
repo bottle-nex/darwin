@@ -2,7 +2,7 @@ import { createIcon } from "./createIcon";
 import { FiDownload, FiRefreshCw } from "react-icons/fi";
 import { HiBars3CenterLeft, HiCalendar, HiOutlineArrowPath } from "react-icons/hi2";
 import { LuFileText, LuSparkles, LuSquareTerminal } from "react-icons/lu";
-import { MdAutorenew, MdEditCalendar, MdMoreHoriz, MdStar } from "react-icons/md";
+import { MdAutorenew, MdBlock, MdEditCalendar, MdMoreHoriz, MdStar, MdStop } from "react-icons/md";
 import { PiDotsThreeOutlineVerticalLight } from "react-icons/pi";
 import { RiLoader4Line } from "react-icons/ri";
 
@@ -11,6 +11,9 @@ export const AgentStepIcon = createIcon(LuSparkles);
 export const CalendarIcon = createIcon(HiCalendar);
 
 export const CommandIcon = createIcon(LuSquareTerminal);
+
+/** A feature switched off, as opposed to `CancelledCardIcon`, which is a card's own state. */
+export const DisabledIcon = createIcon(MdBlock);
 
 export const DownloadIcon = createIcon(FiDownload);
 
@@ -34,3 +37,6 @@ export const ResponsePeriodMarkerIcon = createIcon(MdStar);
 export const RetryActionIcon = createIcon(FiRefreshCw);
 
 export const StatusChangedIcon = createIcon(HiOutlineArrowPath);
+
+/** Halting a stream in progress, as opposed to `PausedStateIcon`, which is a resting state. */
+export const StopGenerationIcon = createIcon(MdStop);

@@ -1,5 +1,5 @@
 import { type QueryClient, useInfiniteQuery } from "@tanstack/react-query";
-import type { CursorPage, LabelledReference, ProjectChat } from "@trymatcha/types";
+import type { CursorPage, LabelledReference, ProjectChat } from "@trydarwin/types";
 
 import { apiClient } from "@/lib/axios";
 import { PROJECT_CHAT_URL } from "@/routes/api_routes";

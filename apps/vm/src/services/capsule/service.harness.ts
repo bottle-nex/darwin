@@ -5,18 +5,18 @@ import type { AppProfile } from "./service.workspace";
 
 const REPO_DIR = "/home/user/repo";
 
-export const GLOBAL_CSS_ALIAS = "@matcha/global.css";
+export const GLOBAL_CSS_ALIAS = "@darwin/global.css";
 
 export function app_root(profile: AppProfile): string {
     return profile.appDir === "." ? REPO_DIR : `${REPO_DIR}/${profile.appDir}`;
 }
 
 export function harness_dir(profile: AppProfile): string {
-    return `${app_root(profile)}/.matcha/harness`;
+    return `${app_root(profile)}/.darwin/harness`;
 }
 
 export function capsules_dir(profile: AppProfile): string {
-    return `${app_root(profile)}/.matcha/capsules`;
+    return `${app_root(profile)}/.darwin/capsules`;
 }
 
 export type CapsuleRevision = "base" | "head";
@@ -107,7 +107,7 @@ ${tailwind_import}import { defineConfig } from "vite";
 import { viteSingleFile } from "vite-plugin-singlefile";
 import tsconfigPaths from "vite-tsconfig-paths";
 
-import overrides from "./matcha.overrides";
+import overrides from "./darwin.overrides";
 
 ${FONT_TRANSFORM_PLUGIN}
 
@@ -140,7 +140,7 @@ ${postcss}    server: {
 `;
 }
 
-export const OVERRIDES_FILE = "matcha.overrides.ts";
+export const OVERRIDES_FILE = "darwin.overrides.ts";
 
 /**
  * The one file in the harness the repair agent owns.
@@ -183,7 +183,7 @@ function fontDeclarations(clause) {
 }
 
 const nextFontShim = {
-    name: "matcha:next-font",
+    name: "darwin:next-font",
     enforce: "pre",
     transform(code, id) {
         if (!id.match(/\\.[jt]sx?$/) || !code.includes("next/font")) return null;
@@ -486,7 +486,7 @@ export default class CapsuleHarness {
         await sandbox.commands.run(`mkdir -p ${harness_dir(profile)}`);
         await sandbox.files.write(
             `${harness_dir(profile)}/package.json`,
-            `${JSON.stringify({ name: "matcha-capsule-harness", private: true, type: "module" }, null, 4)}\n`,
+            `${JSON.stringify({ name: "darwin-capsule-harness", private: true, type: "module" }, null, 4)}\n`,
         );
         await sandbox.commands.run(
             `npm install --no-audit --no-fund ${harness_dependencies(profile).join(" ")}`,

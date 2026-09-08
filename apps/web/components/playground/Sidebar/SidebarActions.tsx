@@ -1,5 +1,5 @@
 "use client";
-import { ComposeIssueIcon } from "@trymatcha/ui/icons";
+import { ComposeIssueIcon } from "@trydarwin/ui/icons";
 
 import { Button } from "@/components/ui/button";
 import { TooltipComponent } from "@/components/ui/tooltip-component";

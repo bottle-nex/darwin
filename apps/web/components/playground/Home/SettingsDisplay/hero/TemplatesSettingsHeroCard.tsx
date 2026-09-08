@@ -1,4 +1,4 @@
-import { SettingsTemplatesIcon } from "@trymatcha/ui/icons";
+import { SettingsTemplatesIcon } from "@trydarwin/ui/icons";
 
 import SettingsHeroCard, {
     HeroButton,

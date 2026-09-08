@@ -4,7 +4,7 @@ import {
     InboundSocketMessageType,
     type LabelledReference,
     type ProjectChat,
-} from "@trymatcha/types";
+} from "@trydarwin/types";
 import { useMemo } from "react";
 
 import { send_socket_message } from "@/hooks/socket/useWebSocket";

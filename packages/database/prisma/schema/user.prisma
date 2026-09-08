@@ -14,10 +14,10 @@ enum BackgroundLightingColor {
   Neutral
 }
 
-// Syntax colours for the code diff in a review's Changes tab. Matcha is the house
+// Syntax colours for the code diff in a review's Changes tab. Darwin is the house
 // theme; the actual colour values live in apps/web/lib/codeThemes.ts.
 enum CodeTheme {
-  Matcha
+  Darwin
   NightOwl
   OneDark
   Dracula
@@ -28,12 +28,21 @@ enum CodeTheme {
   A11yDark
 }
 
+/// Which sidebar face a two-finger swipe opens. `Off` disables the gesture, which matters on
+/// trackpads where an ordinary horizontal scroll is easy to trigger by accident.
+enum SwipeTarget {
+  Settings
+  Darwin
+  Off
+}
+
 enum DiffView {
   Unified
   Split
 }
 
 enum DefaultHomeView {
+  AskDarwin
   Inbox
   Chats
   Kanban
@@ -91,6 +100,7 @@ model User {
   githubImportConfigs  GithubIssueImport[]   @relation(name: "GithubImportConfigurer")
   connectors           Connector[]
   connectorLinkTokens  ConnectorLinkToken[]
+  darwinThreads        DarwinThread[]
 }
 
 model UserConfig {
@@ -100,8 +110,9 @@ model UserConfig {
   backgroundLightingEnabled Boolean                 @default(true)
   backgroundLightingColor   BackgroundLightingColor @default(Violet)
   defaultHomeView           DefaultHomeView         @default(Kanban)
-  codeTheme                 CodeTheme               @default(Matcha)
+  codeTheme                 CodeTheme               @default(Darwin)
   diffView                  DiffView                @default(Unified)
+  swipeTarget               SwipeTarget             @default(Settings)
 }
 
 model GithubAccount {

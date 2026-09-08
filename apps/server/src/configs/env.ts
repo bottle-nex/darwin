@@ -23,7 +23,7 @@ const envSchema = z.object({
     SERVER_OTP_COOLDOWN_SECONDS: z.coerce.number().default(60),
     SERVER_OTP_MAX_ATTEMPTS: z.coerce.number().default(5),
     SERVER_RESEND_API_KEY: z.string().min(1, "Resend api key is required"),
-    SERVER_EMAIL_FROM: z.string().min(1).default("matcha <noreply@highgarden.app>"),
+    SERVER_EMAIL_FROM: z.string().min(1).default("darwin <noreply@highgarden.app>"),
     SERVER_WEB_URL: z.url({ protocol: /^https?$/ }),
     PUBLIC_API_URL: z.url({ protocol: /^https?$/ }),
     SERVER_ADMIN_URL: z.url({ protocol: /^https?$/ }).default("http://localhost:4401"),
@@ -65,6 +65,25 @@ const envSchema = z.object({
     TELEGRAM_WEBHOOK_SECRET: z.string().optional(),
     SERVER_AGENT_QUESTION_TTL_SECONDS: z.coerce.number().default(86400),
     SERVER_CONNECTOR_LINK_TTL_SECONDS: z.coerce.number().default(600),
+    SERVER_OPENROUTER_API_KEY: z.string().min(1, "OpenRouter API key is required"),
+    SERVER_DARWIN_MODEL: z.string().min(1).default("z-ai/glm-4.7"),
+    SERVER_DARWIN_MAX_ITERATIONS: z.coerce.number().int().min(1).max(20).default(8),
+    SERVER_DARWIN_MAX_TOKENS: z.coerce.number().int().min(256).default(2048),
+    SERVER_DARWIN_TIMEOUT_MS: z.coerce.number().int().min(1000).default(120000),
+    SERVER_DARWIN_HISTORY_LIMIT: z.coerce.number().int().min(1).max(50).default(6),
+    SERVER_DARWIN_QUANTIZATIONS: z
+        .string()
+        .default("fp8")
+        .transform((val) =>
+            val
+                .split(",")
+                .map((entry) => entry.trim())
+                .filter(Boolean),
+        ),
+    SERVER_DARWIN_ALLOW_FALLBACKS: z
+        .string()
+        .default("false")
+        .transform((val) => val === "true"),
 });
 
 function parseEnv() {

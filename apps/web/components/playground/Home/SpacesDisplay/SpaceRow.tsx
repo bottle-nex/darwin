@@ -1,5 +1,5 @@
 "use client";
-import { DeleteIcon, EditIcon, OverflowMenuIcon, SpaceEntityIcon } from "@trymatcha/ui/icons";
+import { DeleteIcon, EditIcon, OverflowMenuIcon, SpaceEntityIcon } from "@trydarwin/ui/icons";
 
 import SelectableRow from "@/components/playground/Core/components/SelectableRow";
 import { Button } from "@/components/ui/button";

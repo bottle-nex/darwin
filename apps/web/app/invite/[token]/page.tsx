@@ -34,7 +34,7 @@ function Brand() {
             >
                 <span className="size-2 rounded-full bg-[#1a2e05]/80" />
             </span>
-            <span className="text-sm font-semibold tracking-tight text-foreground">matcha</span>
+            <span className="text-sm font-semibold tracking-tight text-foreground">darwin</span>
         </div>
     );
 }
@@ -59,7 +59,7 @@ export default function InvitePage() {
             <Shell>
                 <Brand />
                 <h1 className="text-xl font-semibold tracking-tight text-foreground">
-                    You&apos;ve been invited to matcha
+                    You&apos;ve been invited to darwin
                 </h1>
                 <p className="mt-1 text-sm text-muted-foreground">
                     Sign in or create an account to view this invitation.

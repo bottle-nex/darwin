@@ -1,4 +1,4 @@
-import { ActivityType, ActorType, IssueStatus, prisma } from "@trymatcha/database";
+import { ActivityType, ActorType, IssueStatus, prisma } from "@trydarwin/database";
 import {
     type ActivityActor,
     type ActivityEvent,
@@ -6,8 +6,8 @@ import {
     type BroadcastableIssue,
     IssueBroadcastService,
     type IssueLocation,
-} from "@trymatcha/services";
-import type { IssueOutcomeJobData } from "@trymatcha/types";
+} from "@trydarwin/services";
+import type { IssueOutcomeJobData } from "@trydarwin/types";
 
 import { server_services } from "..";
 import { location_of, pull_request_activity_key } from "./service.activity-diff";

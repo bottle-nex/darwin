@@ -13,7 +13,7 @@ import {
     PullRequestOpenIcon,
     SearchIcon,
     SwitcherToggleIcon,
-} from "@trymatcha/ui/icons";
+} from "@trydarwin/ui/icons";
 import { AnimatePresence, motion, useInView, useReducedMotion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 
@@ -22,7 +22,7 @@ import { AppLogo } from "@/components/logo/AppLogo";
 import { cn } from "@/lib/utils";
 
 /**
- * App-shell mock of the matcha dashboard: sidebar, top bar and a kanban board.
+ * App-shell mock of the darwin dashboard: sidebar, top bar and a kanban board.
  * One featured issue travels across the columns on a loop — claimed by an
  * agent, worked, reviewed, merged — while a log line ticks in the top bar.
  */
@@ -193,7 +193,7 @@ export default function HeroBoardMock({ className }: { className?: string }) {
             <aside className="hidden w-44 shrink-0 flex-col border-r border-white/6 bg-charcoal p-3 lg:flex">
                 <div className="flex items-center gap-2 px-1.5">
                     <AppLogo className="h-3 w-auto text-snow" />
-                    <span className="text-sm font-semibold tracking-tight text-snow">matcha</span>
+                    <span className="text-sm font-semibold tracking-tight text-snow">darwin</span>
                 </div>
 
                 <button className="mt-4 flex items-center justify-between rounded-md border border-white/8 bg-white/[0.03] px-2 py-1.5">

@@ -1,5 +1,5 @@
 "use client";
-import { SidebarToggleIcon } from "@trymatcha/ui/icons";
+import { SidebarToggleIcon } from "@trydarwin/ui/icons";
 
 import { Button } from "@/components/ui/button";
 import { TooltipComponent } from "@/components/ui/tooltip-component";

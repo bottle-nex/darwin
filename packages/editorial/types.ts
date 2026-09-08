@@ -1,4 +1,4 @@
-import type { Post, PostKind, ReleaseChannel } from "@trymatcha/types";
+import type { Post, PostKind, ReleaseChannel } from "@trydarwin/types";
 
 export type { PostKind, ReleaseChannel };
 

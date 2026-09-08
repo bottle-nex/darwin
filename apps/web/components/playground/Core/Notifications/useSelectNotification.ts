@@ -1,5 +1,5 @@
 "use client";
-import type { Notification } from "@trymatcha/types";
+import type { Notification } from "@trydarwin/types";
 import { useParams, useRouter } from "next/navigation";
 
 import { PlaygroundTab } from "@/components/playground/playgroundTabs";

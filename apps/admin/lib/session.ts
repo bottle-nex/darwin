@@ -1,5 +1,5 @@
-export const ADMIN_TOKEN_COOKIE = "matcha_admin_token";
-export const EMAIL_COOKIE = "matcha_admin_email";
+export const ADMIN_TOKEN_COOKIE = "darwin_admin_token";
+export const EMAIL_COOKIE = "darwin_admin_email";
 
 const MAX_AGE_SECONDS = 12 * 60 * 60;
 

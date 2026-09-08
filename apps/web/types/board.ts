@@ -1,4 +1,4 @@
-import type { CursorPage, IssueStatus } from "@trymatcha/types";
+import type { CursorPage, IssueStatus } from "@trydarwin/types";
 
 import type { IconPick } from "@/components/ui/IconPicker";
 import type { BoardFilters } from "@/types/boardFilter";

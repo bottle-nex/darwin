@@ -1,10 +1,9 @@
 "use client";
-import type { BackgroundLightingColor, CodeTheme, DiffView } from "@trymatcha/types";
+import type { BackgroundLightingColor, CodeTheme, DiffView, SwipeTarget } from "@trydarwin/types";
 import { useParams } from "next/navigation";
 import { Slider } from "radix-ui";
 
 import {
-    DEFAULT_HOME_VIEW_OPTIONS,
     defaultHomeViewToTab,
     type PlaygroundTab,
     tabToDefaultHomeView,
@@ -26,11 +25,23 @@ import {
     type CodeTokenRole,
 } from "@/lib/codeThemes";
 import { DIFF_VIEWS } from "@/lib/review/diffView";
+import { SWIPE_TARGETS } from "@/lib/swipeTarget";
 import { cn } from "@/lib/utils";
 import { useBackgroundLightingStore } from "@/store/playground/useBackgroundLightingStore";
 
+import { HOME_VIEW_OPTIONS } from "./homeViewOptions";
 import SettingsRow, { SETTINGS_CONTROL_WIDTH } from "./SettingsRow";
 import SettingsUtilityCard from "./SettingsUtilityCard";
+
+/** A picker row that names its option with the same glyph the rest of the app draws it with. */
+function GlyphOption({ glyph, label }: { glyph: React.ReactNode; label: string }) {
+    return (
+        <span className="flex items-center gap-2.5">
+            {glyph}
+            {label}
+        </span>
+    );
+}
 
 function ColorOption({ label, rgb }: { label: string; rgb: string }) {
     return (
@@ -164,26 +175,58 @@ export default function AppearanceSettingsSection() {
 
     return (
         <div className="flex flex-col gap-12">
-            <SettingsUtilityCard title="Preferences" rows>
+            <SettingsUtilityCard title="Navigation" rows>
                 <SettingsRow
                     label="Default home view"
                     description="The view a project opens on when you don't link to a specific tab."
                 >
                     <SelectField
                         aria-label="Default home view"
-                        className="w-40"
+                        className="w-48 pl-1"
+                        itemClassName="pl-1"
                         value={defaultHomeViewToTab(config.defaultHomeView)}
                         onChange={(tab) => {
                             const view = tabToDefaultHomeView(tab as PlaygroundTab);
                             if (view) updateConfig.mutate({ defaultHomeView: view });
                         }}
-                        options={DEFAULT_HOME_VIEW_OPTIONS.map((option) => ({
+                        options={HOME_VIEW_OPTIONS.map((option) => ({
                             value: option.tab,
-                            label: option.label,
+                            label: <GlyphOption glyph={option.glyph} label={option.label} />,
                         }))}
                     />
                 </SettingsRow>
 
+                <SettingsRow
+                    label="Two-finger swipe"
+                    description="Which panel a sideways two-finger swipe on the sidebar opens."
+                >
+                    <SelectField
+                        aria-label="Two-finger swipe"
+                        className="w-48 pl-1"
+                        itemClassName="pl-1"
+                        value={config.swipeTarget}
+                        onChange={(target) =>
+                            updateConfig.mutate({ swipeTarget: target as SwipeTarget })
+                        }
+                        options={SWIPE_TARGETS.map((target) => ({
+                            value: target.value,
+                            label: (
+                                <GlyphOption
+                                    glyph={
+                                        <target.icon
+                                            className="size-3.5 text-neutral-400"
+                                            aria-hidden
+                                        />
+                                    }
+                                    label={target.label}
+                                />
+                            ),
+                        }))}
+                    />
+                </SettingsRow>
+            </SettingsUtilityCard>
+
+            <SettingsUtilityCard title="Background lighting" rows>
                 <SettingsRow
                     label="Background lighting"
                     description="An ambient glow behind the workspace. Follows your account, not this project."
@@ -196,14 +239,12 @@ export default function AppearanceSettingsSection() {
                         aria-label="Enable background lighting"
                     />
                 </SettingsRow>
-            </SettingsUtilityCard>
 
-            <SettingsUtilityCard
-                title="Color & direction"
-                className={cn(!enabled && "pointer-events-none opacity-50")}
-                rows
-            >
-                <SettingsRow label="Color" description="The hue the glow is tinted with.">
+                <SettingsRow
+                    label="Color"
+                    description="The hue the glow is tinted with."
+                    className={cn(!enabled && "pointer-events-none opacity-50")}
+                >
                     <SelectField
                         aria-label="Background lighting color"
                         className="w-40 pl-1"
@@ -222,7 +263,11 @@ export default function AppearanceSettingsSection() {
                     />
                 </SettingsRow>
 
-                <SettingsRow label="Direction" description={`Sweep angle — ${angle}°.`}>
+                <SettingsRow
+                    label="Direction"
+                    description={`Sweep angle — ${angle}°.`}
+                    className={cn(!enabled && "pointer-events-none opacity-50")}
+                >
                     <Slider.Root
                         value={[angle]}
                         min={0}
@@ -261,10 +306,15 @@ export default function AppearanceSettingsSection() {
                         options={DIFF_VIEWS.map((view) => ({
                             value: view.value,
                             label: (
-                                <span className="flex items-center gap-2.5">
-                                    <view.icon className="size-3.5 text-neutral-400" aria-hidden />
-                                    {view.label}
-                                </span>
+                                <GlyphOption
+                                    glyph={
+                                        <view.icon
+                                            className="size-3.5 text-neutral-400"
+                                            aria-hidden
+                                        />
+                                    }
+                                    label={view.label}
+                                />
                             ),
                         }))}
                     />

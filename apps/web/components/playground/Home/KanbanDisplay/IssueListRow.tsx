@@ -1,6 +1,6 @@
 "use client";
 
-import { PullRequestOpenIcon } from "@trymatcha/ui/icons";
+import { PullRequestOpenIcon } from "@trydarwin/ui/icons";
 
 import PlaygroundAvatar from "@/components/playground/Core/components/PlaygroundAvatar";
 import SelectableRow from "@/components/playground/Core/components/SelectableRow";

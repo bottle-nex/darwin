@@ -1,9 +1,9 @@
 import { randomUUID } from "node:crypto";
 
-import { Harness, Prisma, prisma, WorkerStatus } from "@trymatcha/database";
-import { type McpServerSpec, Registry } from "@trymatcha/harness";
-import Logger, { format_duration } from "@trymatcha/logger";
-import { RunLogEventKind, type RunLogMilestoneBody, RunLogPhase } from "@trymatcha/types";
+import { Harness, Prisma, prisma, WorkerStatus } from "@trydarwin/database";
+import { type McpServerSpec, Registry } from "@trydarwin/harness";
+import Logger, { format_duration } from "@trydarwin/logger";
+import { RunLogEventKind, type RunLogMilestoneBody, RunLogPhase } from "@trydarwin/types";
 import type { CommandResult, SnapshotInfo } from "e2b";
 import { Sandbox } from "e2b";
 
@@ -52,7 +52,7 @@ const COMMIT_FORMAT = "%H%x1f%s%x1f%b%x1e";
 const PR_BODY_PATH = "/home/user/pr_body.md";
 const SOLVE_REPORT_PATH = "/home/user/solve_report.md";
 const SOLVE_REPORT_MAX_CHARS = 16_000;
-const SANDBOX_MCP_ENTRY = "/opt/matcha/sandbox-mcp/index.js";
+const SANDBOX_MCP_ENTRY = "/opt/darwin/sandbox-mcp/index.js";
 const ISSUE_SOLVE_TIMEOUT_MS = 30 * 60_000;
 const ISSUE_PUSH_TIMEOUT_MS = 10 * 60_000;
 const MAX_PUSH_ATTEMPTS = 3;
@@ -62,12 +62,12 @@ export function requires_agent_run(agent_done_at: Date | null, resuming_push: bo
 }
 
 const BASE_MCP_SERVER: McpServerSpec = {
-    name: "matcha",
+    name: "darwin",
     command: "node",
     args: [SANDBOX_MCP_ENTRY],
     env: {
-        MATCHA_SERVER_URL: ENV.PUBLIC_API_URL,
-        MATCHA_SESSION_KIND: "worker",
+        DARWIN_SERVER_URL: ENV.PUBLIC_API_URL,
+        DARWIN_SESSION_KIND: "worker",
     },
 };
 
@@ -505,9 +505,9 @@ export default class E2B {
                 ...BASE_MCP_SERVER,
                 env: {
                     ...BASE_MCP_SERVER.env,
-                    MATCHA_SANDBOX_TOKEN: run_worker_token,
-                    MATCHA_RUN_ID: run_id,
-                    ...(ENV.VM_PUBLIC_URL ? { MATCHA_VM_URL: ENV.VM_PUBLIC_URL } : {}),
+                    DARWIN_SANDBOX_TOKEN: run_worker_token,
+                    DARWIN_RUN_ID: run_id,
+                    ...(ENV.VM_PUBLIC_URL ? { DARWIN_VM_URL: ENV.VM_PUBLIC_URL } : {}),
                 },
             };
             await sandbox.files.write(

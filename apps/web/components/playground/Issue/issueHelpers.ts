@@ -1,12 +1,12 @@
-import { hasHumanMove, isBodyEditable, isReopenable } from "@trymatcha/types";
-import type { IconType } from "@trymatcha/ui/icons";
+import { hasHumanMove, isBodyEditable, isReopenable } from "@trydarwin/types";
+import type { IconType } from "@trydarwin/ui/icons";
 import {
     HighPriorityIcon,
     LowPriorityIcon,
     MediumPriorityIcon,
     NoPriorityIcon,
     UrgentPriorityIcon,
-} from "@trymatcha/ui/icons";
+} from "@trydarwin/ui/icons";
 
 import type { IssueTarget } from "@/store/issues/useCreateIssueStore";
 import type { BoardColumn, BoardIssue } from "@/types/board";

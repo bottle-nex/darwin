@@ -5,7 +5,7 @@ import {
     type TeamChat,
     TeamRole,
     type ThreadMessage,
-} from "@trymatcha/types";
+} from "@trydarwin/types";
 import { useEffect, useMemo } from "react";
 
 import PlaygroundBreadcrumb from "@/components/playground/Core/components/PlaygroundBreadcrumb";

@@ -1,6 +1,6 @@
 "use client";
 
-import { ErrorCircleIcon, LoadingSpinnerIcon, SuccessCircleIcon } from "@trymatcha/ui/icons";
+import { ErrorCircleIcon, LoadingSpinnerIcon, SuccessCircleIcon } from "@trydarwin/ui/icons";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useRef, useState } from "react";
 

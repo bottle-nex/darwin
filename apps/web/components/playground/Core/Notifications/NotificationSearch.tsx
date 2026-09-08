@@ -1,5 +1,5 @@
 "use client";
-import { CloseIcon, SearchIcon } from "@trymatcha/ui/icons";
+import { CloseIcon, SearchIcon } from "@trydarwin/ui/icons";
 
 import { Input } from "@/components/ui/input";
 

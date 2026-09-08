@@ -1,4 +1,4 @@
-import Logger from "@trymatcha/logger";
+import Logger from "@trydarwin/logger";
 import Redis from "ioredis";
 
 import { ENV } from "../config/config.env";

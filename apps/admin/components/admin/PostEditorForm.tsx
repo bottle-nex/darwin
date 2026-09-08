@@ -3,14 +3,14 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import type { PostKind, ReleaseChannel } from "@trymatcha/types";
+import type { PostKind, ReleaseChannel } from "@trydarwin/types";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import type { Editor } from "@tiptap/react";
-import { RichTextEditor } from "@trymatcha/editor";
+import { RichTextEditor } from "@trydarwin/editor";
 
 import CodeBlockLanguagePicker from "@/components/editor/CodeBlockLanguagePicker";
 import { uploadImage } from "@/lib/uploads";

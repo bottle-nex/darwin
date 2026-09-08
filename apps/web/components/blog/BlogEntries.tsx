@@ -1,4 +1,4 @@
-import type { ContentSummary } from "@trymatcha/editorial";
+import type { ContentSummary } from "@trydarwin/editorial";
 
 import EntryGrid from "./EntryGrid";
 

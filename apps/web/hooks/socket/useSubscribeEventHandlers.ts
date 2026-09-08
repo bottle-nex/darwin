@@ -1,6 +1,6 @@
 "use client";
 import { useQueryClient } from "@tanstack/react-query";
-import { OutboundSocketMessageType } from "@trymatcha/types";
+import { OutboundSocketMessageType } from "@trydarwin/types";
 import { useEffect, useRef } from "react";
 
 import { reconcileBoardProject } from "@/hooks/issues/boardCache";
@@ -71,6 +71,10 @@ export function useSubscribeEventHandlers(project_id: string | undefined) {
                 SocketHandlers.handle_run_log_appended(queryClient, message),
             [OutboundSocketMessageType.RUN_LOG_SEALED]: (message) =>
                 SocketHandlers.handle_run_log_sealed(queryClient, message),
+            [OutboundSocketMessageType.DARWIN_RUN_APPENDED]: (message) =>
+                SocketHandlers.handle_darwin_run_appended(queryClient, message),
+            [OutboundSocketMessageType.DARWIN_RUN_SEALED]: (message) =>
+                SocketHandlers.handle_darwin_run_sealed(queryClient, message),
         };
 
         Object.entries(handlers_map).forEach(([type, handler]) => {

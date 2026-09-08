@@ -1,4 +1,4 @@
-import { CtaArrowIcon } from "@trymatcha/ui/icons";
+import { CtaArrowIcon } from "@trydarwin/ui/icons";
 
 import { cn } from "@/lib/utils";
 
@@ -21,7 +21,7 @@ export default function LandingHero() {
                 </BlurFade>
                 <div className="flex w-full items-center">
                     <BlurFade delay={0.2} className="text-snow/60 text-lg w-[60%]">
-                        Matcha&apos;s agents claim your issues, build and verify the fix in a
+                        Darwin&apos;s agents claim your issues, build and verify the fix in a
                         sandboxed runner, and hand back a PR ready for review.
                     </BlurFade>
                     <span className="flex-1 flex justify-end gap-2">

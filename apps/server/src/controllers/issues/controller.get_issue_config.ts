@@ -1,4 +1,4 @@
-import { Harness, prisma } from "@trymatcha/database";
+import { Harness, prisma } from "@trydarwin/database";
 import type { Request, Response } from "express";
 import z from "zod";
 

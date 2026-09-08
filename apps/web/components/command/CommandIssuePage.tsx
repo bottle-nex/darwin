@@ -1,5 +1,5 @@
 "use client";
-import { CheckIcon } from "@trymatcha/ui/icons";
+import { CheckIcon } from "@trydarwin/ui/icons";
 
 import { boardDestinationRows } from "@/components/playground/Issue/boardDestinationRows";
 import { PRIORITY_OPTIONS, PRIORITY_TO_NUMBER } from "@/components/playground/Issue/issueHelpers";

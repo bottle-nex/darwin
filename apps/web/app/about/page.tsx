@@ -8,7 +8,7 @@ import { Footer } from "@/components/app/Footer";
 import { NavBar } from "@/components/nav/Navbar";
 
 export const metadata: Metadata = {
-    title: "About matcha",
+    title: "About darwin",
     description:
         "The team building agents that turn your board into pull requests. File the issue, review the diff.",
 };

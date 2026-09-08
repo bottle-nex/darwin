@@ -1,5 +1,5 @@
-import { Action, Permissions } from "@trymatcha/access-control";
-import { InvitationStatus, Prisma, prisma, ProjectRole } from "@trymatcha/database";
+import { Action, Permissions } from "@trydarwin/access-control";
+import { InvitationStatus, Prisma, prisma, ProjectRole } from "@trydarwin/database";
 import { createHash, randomBytes } from "crypto";
 import type { Request, Response } from "express";
 import { z } from "zod";

@@ -1,5 +1,5 @@
 "use client";
-import { NavCtaArrowIcon, PhoneContactIcon } from "@trymatcha/ui/icons";
+import { NavCtaArrowIcon, PhoneContactIcon } from "@trydarwin/ui/icons";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -48,7 +48,7 @@ export function AboutRevampNavBar() {
             )}
         >
             <div className="mx-auto flex h-full max-w-7xl items-center justify-between px-6">
-                <Link href="/" aria-label="try matcha home" className="shrink-0">
+                <Link href="/" aria-label="try darwin home" className="shrink-0">
                     <AppLogo size={20} />
                 </Link>
 

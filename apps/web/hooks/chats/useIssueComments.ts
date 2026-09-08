@@ -5,7 +5,7 @@ import {
     InboundSocketMessageType,
     type LabelledReference,
     ProjectRole,
-} from "@trymatcha/types";
+} from "@trydarwin/types";
 import { useMemo } from "react";
 
 import { useProjectMembers } from "@/hooks/project/useProjectMembers";

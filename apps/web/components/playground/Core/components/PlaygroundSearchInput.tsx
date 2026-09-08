@@ -1,5 +1,5 @@
 "use client";
-import { SearchIcon } from "@trymatcha/ui/icons";
+import { SearchIcon } from "@trydarwin/ui/icons";
 import { useEffect, useRef } from "react";
 
 import { Input } from "@/components/ui/input";

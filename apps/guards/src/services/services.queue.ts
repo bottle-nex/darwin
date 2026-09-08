@@ -1,4 +1,4 @@
-import Logger from "@trymatcha/logger";
+import Logger from "@trydarwin/logger";
 import { Queue } from "bullmq";
 import queue_config from "../config/config.queue";
 import {
@@ -6,7 +6,7 @@ import {
     type RouteJobData,
     type DispatchJobData,
     type IssueOutcomeJobData,
-} from "@trymatcha/types";
+} from "@trydarwin/types";
 
 const log = Logger.scope("queue");
 

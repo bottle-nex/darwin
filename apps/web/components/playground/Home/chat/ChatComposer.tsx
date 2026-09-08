@@ -5,8 +5,8 @@ import { type Editor, Extension } from "@tiptap/core";
 import Placeholder from "@tiptap/extension-placeholder";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import type { LabelledReference } from "@trymatcha/types";
-import { EmojiReactionIcon, SendIcon } from "@trymatcha/ui/icons";
+import type { LabelledReference } from "@trydarwin/types";
+import { EmojiReactionIcon, SendIcon } from "@trydarwin/ui/icons";
 import { forwardRef, useEffect, useId, useImperativeHandle, useMemo, useRef } from "react";
 
 import { Button } from "@/components/ui/button";

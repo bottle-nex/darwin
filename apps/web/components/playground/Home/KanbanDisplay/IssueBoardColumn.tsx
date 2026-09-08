@@ -7,7 +7,7 @@ import {
     DeleteIcon,
     EditIcon,
     OverflowMenuIcon,
-} from "@trymatcha/ui/icons";
+} from "@trydarwin/ui/icons";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";

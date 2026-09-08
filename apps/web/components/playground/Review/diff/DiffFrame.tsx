@@ -1,5 +1,5 @@
 "use client";
-import { BeforeAfterFrameIcon } from "@trymatcha/ui/icons";
+import { BeforeAfterFrameIcon } from "@trydarwin/ui/icons";
 import type { ReactNode } from "react";
 
 import { MICRO_LABEL } from "@/components/playground/Core/components/paneBar";

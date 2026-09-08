@@ -4,7 +4,7 @@ import {
     AgentClaimsArt,
     FileIssueArt,
     PLATE_BONE,
-    PLATE_MATCHA,
+    PLATE_DARWIN,
     ReviewPrArt,
     VerifiedArt,
 } from "./WhyArt";
@@ -35,7 +35,7 @@ const WHY_STAGES: WhyStage[] = [
         title: "An agent claims it",
         description:
             "It pulls the card and reads the repo before touching a single line, learning your conventions, your structure, and the blast radius of the change. Then it plans the work.",
-        plate: PLATE_MATCHA,
+        plate: PLATE_DARWIN,
         Art: AgentClaimsArt,
     },
     {
@@ -51,7 +51,7 @@ const WHY_STAGES: WhyStage[] = [
         title: "You review the PR",
         description:
             "The diff and the reasoning land in your repo as a pull request. Approve it, or send it back with notes. Nothing merges itself.",
-        plate: PLATE_MATCHA,
+        plate: PLATE_DARWIN,
         Art: ReviewPrArt,
     },
 ];

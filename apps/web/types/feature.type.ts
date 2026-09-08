@@ -1,6 +1,6 @@
 import type { ComponentType } from "react";
 
-/** A single card in the landing "Why matcha" feature row. */
+/** A single card in the landing "Why darwin" feature row. */
 export type Feature = {
     title: string;
     body: string;

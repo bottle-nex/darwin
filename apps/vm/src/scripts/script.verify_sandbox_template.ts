@@ -1,4 +1,4 @@
-import Logger from "@trymatcha/logger";
+import Logger from "@trydarwin/logger";
 import { Sandbox } from "e2b";
 
 import { ENV } from "../conf/config.env";
@@ -18,8 +18,8 @@ const log = Logger.scope("template");
 
 const TEMPLATE_NAME = "node-py-claude-template";
 const TEMPLATE_TAG = "stable";
-const SANDBOX_MCP_ENTRY = "/opt/matcha/sandbox-mcp/index.js";
-const CAPSULE_CHECK_ENTRY = "/opt/matcha/capsule-check/index.js";
+const SANDBOX_MCP_ENTRY = "/opt/darwin/sandbox-mcp/index.js";
+const CAPSULE_CHECK_ENTRY = "/opt/darwin/capsule-check/index.js";
 const SANDBOX_MCP_TOOLS = ["report_status", "report_progress"];
 
 /**
@@ -56,7 +56,7 @@ const mcp_tools_probe = () => {
 
     return [
         `printf '%s\n' ${handshake}`,
-        `| MATCHA_SESSION_KIND=worker node ${SANDBOX_MCP_ENTRY} 2>/dev/null`,
+        `| DARWIN_SESSION_KIND=worker node ${SANDBOX_MCP_ENTRY} 2>/dev/null`,
         `| grep -oE '${served}' | sort -u`,
         `| awk 'END { if (NR == ${SANDBOX_MCP_TOOLS.length}) print "${SANDBOX_MCP_TOOLS.join(", ")}"; else exit 1 }'`,
     ].join(" ");
@@ -98,7 +98,7 @@ const REQUIREMENTS: Requirement[] = [
     },
     {
         name: "chromium",
-        command: `cd /opt/matcha/capsule-check && node -e "import('playwright').then(async (p) => { const b = await p.chromium.launch(); console.log(b.version()); await b.close(); })"`,
+        command: `cd /opt/darwin/capsule-check && node -e "import('playwright').then(async (p) => { const b = await p.chromium.launch(); console.log(b.version()); await b.close(); })"`,
         needed_for: "opening capsule pages to check them",
     },
     {

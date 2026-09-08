@@ -1,5 +1,5 @@
 "use client";
-import { AccessRestrictedIcon } from "@trymatcha/ui/icons";
+import { AccessRestrictedIcon } from "@trydarwin/ui/icons";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";

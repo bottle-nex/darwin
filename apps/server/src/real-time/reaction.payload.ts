@@ -1,4 +1,4 @@
-import { is_reaction_emoji } from "@trymatcha/types";
+import { is_reaction_emoji } from "@trydarwin/types";
 import z from "zod";
 
 export const reaction_payload_schema = z.object({

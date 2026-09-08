@@ -1,5 +1,5 @@
 "use client";
-import type { IconType } from "@trymatcha/ui/icons";
+import type { IconType } from "@trydarwin/ui/icons";
 import {
     CalendarIcon,
     ChatsNavIcon,
@@ -16,7 +16,7 @@ import {
     SpaceEntityIcon,
     TagIcon,
     TodoStatusIcon,
-} from "@trymatcha/ui/icons";
+} from "@trydarwin/ui/icons";
 import { motion, useReducedMotion } from "motion/react";
 
 import HeroBuddy from "@/components/landing/v2/HeroBuddy";
@@ -49,18 +49,18 @@ const SIDEBAR_TEAMS = [
 ];
 
 const TAG_DOTS: Record<string, string> = {
-    bug: "bg-rose-400",
-    database: "bg-sky-400",
-    infra: "bg-blue-400",
-    enhancement: "bg-emerald-400",
-    dx: "bg-cyan-400",
-    flaky: "bg-orange-400",
-    feature: "bg-emerald-400",
-    performance: "bg-yellow-400",
-    agent: "bg-violet-400",
-    runner: "bg-emerald-400",
-    blocked: "bg-rose-400",
-    security: "bg-pink-400",
+    bug: "bg-rose-500",
+    database: "bg-sky-500",
+    infra: "bg-blue-500",
+    enhancement: "bg-emerald-500",
+    dx: "bg-cyan-500",
+    flaky: "bg-orange-500",
+    feature: "bg-emerald-500",
+    performance: "bg-yellow-500",
+    agent: "bg-violet-500",
+    runner: "bg-emerald-500",
+    blocked: "bg-rose-500",
+    security: "bg-pink-500",
 };
 
 type BoardCard = {
@@ -86,7 +86,7 @@ const COLUMNS: BoardColumn[] = [
         title: "To Do",
         count: 30,
         icon: TodoStatusIcon,
-        tint: "text-neutral-100",
+        tint: "text-foreground/75",
         cards: [
             {
                 id: "NOC-18",
@@ -117,7 +117,7 @@ const COLUMNS: BoardColumn[] = [
         title: "Queued",
         count: 30,
         icon: QueuedStatusIcon,
-        tint: "text-[#50B5E2]",
+        tint: "text-[#2A7FAE]",
         cards: [
             {
                 id: "NOC-23",
@@ -156,7 +156,7 @@ const COLUMNS: BoardColumn[] = [
         title: "In Progress",
         count: 30,
         icon: InProgressStatusIcon,
-        tint: "text-[#D69E1F]",
+        tint: "text-[#9C700F]",
         cards: [
             {
                 id: "NOC-33",
@@ -194,7 +194,7 @@ const COLUMNS: BoardColumn[] = [
         title: "In Review",
         count: 30,
         icon: InReviewStatusIcon,
-        tint: "text-[#8999FF]",
+        tint: "text-[#5462CE]",
         cards: [
             {
                 id: "NOC-47",
@@ -245,13 +245,13 @@ function SidebarRow({
         <div
             className={cn(
                 "flex items-center gap-1 rounded-[5px] py-1 pr-2.5 pl-2 font-medium tracking-wider",
-                active ? "bg-active text-snow" : "text-snow/80",
+                active ? "bg-active text-foreground" : "text-foreground/70",
             )}
         >
             <span className="flex size-5 shrink-0 items-center justify-center">{leading}</span>
             <span className="min-w-0 flex-1 truncate text-[12.5px]">{label}</span>
             {badge && (
-                <span className="inline-flex size-4 shrink-0 items-center justify-center rounded-full bg-neutral-700 text-[8px] font-medium text-neutral-300 tabular-nums">
+                <span className="inline-flex size-4 shrink-0 items-center justify-center rounded-full bg-foreground/8 text-[8px] font-medium text-muted-foreground tabular-nums">
                     {badge}
                 </span>
             )}
@@ -261,18 +261,18 @@ function SidebarRow({
 
 function SidebarSectionTitle({ title }: { title: string }) {
     return (
-        <div className="flex items-center gap-x-2 px-2 py-1.5 text-[12px] font-medium text-neutral-500 capitalize">
+        <div className="flex items-center gap-x-2 px-2 py-1.5 text-[12px] font-medium text-muted-foreground capitalize">
             <span>{title}</span>
-            <DropdownCaretIcon className="size-3 text-neutral-500" />
+            <DropdownCaretIcon className="size-3 text-muted-foreground" />
         </div>
     );
 }
 
 function BoardCardView({ card }: { card: BoardCard }) {
     return (
-        <div className="flex flex-col gap-2 rounded-lg border border-white/5 bg-white/[0.03] px-3.5 py-2.5">
+        <div className="flex flex-col gap-2 rounded-lg border border-edge bg-snow px-3.5 py-2.5 shadow-[0_1px_2px_rgba(24,24,27,0.05)]">
             <div className="flex items-center justify-between">
-                <span className="text-[10px] tracking-widest text-neutral-500 uppercase">
+                <span className="text-[10px] tracking-widest text-muted-foreground uppercase">
                     {card.id}
                 </span>
                 <div className="flex -space-x-1.5">
@@ -280,7 +280,7 @@ function BoardCardView({ card }: { card: BoardCard }) {
                         <span
                             key={`${card.id}-${letter}-${index}`}
                             className={cn(
-                                "flex size-4.5 items-center justify-center rounded-full bg-gradient-to-br text-[8px] font-semibold text-white ring-2 ring-[#0a0a0b]",
+                                "flex size-4.5 items-center justify-center rounded-full bg-gradient-to-br text-[8px] font-semibold text-white ring-2 ring-snow",
                                 AVATAR_TONES[index % AVATAR_TONES.length],
                             )}
                         >
@@ -289,34 +289,34 @@ function BoardCardView({ card }: { card: BoardCard }) {
                     ))}
                 </div>
             </div>
-            <p className="text-[12.5px] leading-snug text-neutral-200">{card.title}</p>
+            <p className="text-[12.5px] leading-snug text-foreground">{card.title}</p>
             <div className="flex items-center gap-1.5 overflow-hidden whitespace-nowrap">
-                <span className="flex h-5 shrink-0 items-center rounded-md border border-white/8 px-1.5">
-                    <PriorityFieldIcon className="size-3 text-neutral-500" />
+                <span className="flex h-5 shrink-0 items-center rounded-md border border-edge px-1.5">
+                    <PriorityFieldIcon className="size-3 text-muted-foreground" />
                 </span>
                 {card.tags.map((tag) => (
                     <span
                         key={tag}
-                        className="flex h-5 shrink-0 items-center gap-1.5 rounded-full border border-white/8 px-2 text-[10.5px] text-neutral-400"
+                        className="flex h-5 shrink-0 items-center gap-1.5 rounded-full border border-edge px-2 text-[10.5px] text-muted-foreground"
                     >
                         <span className={cn("size-1.5 rounded-full", TAG_DOTS[tag])} />
                         {tag}
                     </span>
                 ))}
                 {card.date && (
-                    <span className="flex h-5 shrink-0 items-center gap-1.5 rounded-full border border-white/8 px-2 text-[10.5px] text-neutral-400">
-                        <CalendarIcon className="size-3 text-amber-400/80" />
+                    <span className="flex h-5 shrink-0 items-center gap-1.5 rounded-full border border-edge px-2 text-[10.5px] text-muted-foreground">
+                        <CalendarIcon className="size-3 text-amber-600" />
                         {card.date}
                     </span>
                 )}
                 {card.pr && (
-                    <span className="flex h-5 shrink-0 items-center gap-1.5 rounded-full border border-white/8 px-2 text-[10.5px] text-neutral-400">
-                        <MergeIcon className="size-3 text-neutral-400" />
+                    <span className="flex h-5 shrink-0 items-center gap-1.5 rounded-full border border-edge px-2 text-[10.5px] text-muted-foreground">
+                        <MergeIcon className="size-3 text-muted-foreground" />
                         {card.pr}
                     </span>
                 )}
             </div>
-            <span className="text-[10.5px] text-neutral-600">{card.created}</span>
+            <span className="text-[10.5px] text-muted-foreground/70">{card.created}</span>
         </div>
     );
 }
@@ -331,11 +331,11 @@ export default function LandingHeroBoard() {
             variants={MOCK_FADE}
             className="relative flex h-full gap-1.5 p-2"
         >
-            <aside className="flex w-52 shrink-0 flex-col gap-3 overflow-hidden rounded-xl border-[1.5px] border-snow/5 bg-charcoal/70 px-2 pt-3">
+            <aside className="flex w-52 shrink-0 flex-col gap-3 overflow-hidden rounded-xl border-[1.5px] border-edge bg-charcoal px-2 pt-3">
                 <div className="flex items-center gap-2 px-2">
                     <PlaygroundAvatar letter="NO" tone="blue" size="md" />
-                    <span className="text-[13px] font-semibold text-neutral-100">Nocturn</span>
-                    <DropdownCaretIcon className="size-3 text-neutral-500" />
+                    <span className="text-[13px] font-semibold text-foreground">Nocturn</span>
+                    <DropdownCaretIcon className="size-3 text-muted-foreground" />
                 </div>
                 <div className="flex flex-col gap-0.5">
                     {SIDEBAR_NAV.map((row) => (
@@ -343,7 +343,7 @@ export default function LandingHeroBoard() {
                             key={row.label}
                             label={row.label}
                             badge={row.badge}
-                            leading={<row.icon className="size-3.75 text-snow/80" />}
+                            leading={<row.icon className="size-3.75 text-foreground/70" />}
                         />
                     ))}
                 </div>
@@ -358,7 +358,7 @@ export default function LandingHeroBoard() {
                         <SidebarRow
                             key={row.label}
                             label={row.label}
-                            leading={<row.icon className="size-3.75 text-snow/80" />}
+                            leading={<row.icon className="size-3.75 text-foreground/70" />}
                         />
                     ))}
                 </div>
@@ -380,11 +380,11 @@ export default function LandingHeroBoard() {
                 </div>
             </aside>
 
-            <div className="flex min-w-0 flex-1 flex-col overflow-hidden rounded-xl border-[1.5px] border-snow/5 bg-charcoal/70">
-                <div className="flex h-11 shrink-0 items-center gap-1.5 border-b border-white/5 px-5 text-[12px] text-neutral-400">
+            <div className="flex min-w-0 flex-1 flex-col overflow-hidden rounded-xl border-[1.5px] border-edge bg-charcoal">
+                <div className="flex h-11 shrink-0 items-center gap-1.5 border-b border-edge px-5 text-[12px] text-muted-foreground">
                     <span>Nocturn</span>
-                    <span className="text-neutral-600">›</span>
-                    <span className="text-neutral-200">Agent</span>
+                    <span className="text-muted-foreground/70">›</span>
+                    <span className="text-foreground">Agent</span>
                 </div>
                 <div className="flex min-h-0 flex-1 gap-5 overflow-hidden px-5 pt-4">
                     {COLUMNS.map((column) => (
@@ -394,7 +394,7 @@ export default function LandingHeroBoard() {
                                 <span className={cn("text-[12.5px] font-semibold", column.tint)}>
                                     {column.title}
                                 </span>
-                                <span className="text-[11.5px] text-neutral-500">
+                                <span className="text-[11.5px] text-muted-foreground">
                                     {column.count}
                                 </span>
                             </div>

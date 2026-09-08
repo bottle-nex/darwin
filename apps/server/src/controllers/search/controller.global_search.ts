@@ -1,5 +1,5 @@
-import { Action, Permissions } from "@trymatcha/access-control";
-import { MAX_GLOBAL_SEARCH_QUERY_LENGTH, MIN_GLOBAL_SEARCH_QUERY_LENGTH } from "@trymatcha/types";
+import { Action, Permissions } from "@trydarwin/access-control";
+import { MAX_GLOBAL_SEARCH_QUERY_LENGTH, MIN_GLOBAL_SEARCH_QUERY_LENGTH } from "@trydarwin/types";
 import type { Request, Response } from "express";
 import z from "zod";
 

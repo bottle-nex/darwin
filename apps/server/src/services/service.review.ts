@@ -1,6 +1,6 @@
-import { ActivityType, ActorType, prisma } from "@trymatcha/database";
-import { ActivityService } from "@trymatcha/services";
-import { type ReviewHeader, ReviewState } from "@trymatcha/types";
+import { ActivityType, ActorType, prisma } from "@trydarwin/database";
+import { ActivityService } from "@trydarwin/services";
+import { type ReviewHeader, ReviewState } from "@trydarwin/types";
 
 import { pull_request_activity_key } from "./service.activity-diff";
 import GithubPullsService, { type PullRequestRef } from "./service.github_pulls";

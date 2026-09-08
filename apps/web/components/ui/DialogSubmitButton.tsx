@@ -1,5 +1,5 @@
 "use client";
-import { CommandKeyIcon, EnterKeyIcon } from "@trymatcha/ui/icons";
+import { CommandKeyIcon, EnterKeyIcon } from "@trydarwin/ui/icons";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";

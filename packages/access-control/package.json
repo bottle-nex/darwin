@@ -1,5 +1,5 @@
 {
-    "name": "@trymatcha/access-control",
+    "name": "@trydarwin/access-control",
     "module": "index.ts",
     "type": "module",
     "private": true,
@@ -7,7 +7,7 @@
         ".": "./index.ts"
     },
     "dependencies": {
-        "@trymatcha/types": "*"
+        "@trydarwin/types": "*"
     },
     "devDependencies": {
         "@types/bun": "latest"

@@ -4,8 +4,8 @@ import {
     AgentSessionStatus,
     IssueStatus,
     prisma,
-} from "@trymatcha/database";
-import { ActivityService, IssueBroadcastService } from "@trymatcha/services";
+} from "@trydarwin/database";
+import { ActivityService, IssueBroadcastService } from "@trydarwin/services";
 import type { Request, Response } from "express";
 import z from "zod";
 

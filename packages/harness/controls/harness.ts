@@ -1,5 +1,5 @@
-import { Harness, Effort } from "@trymatcha/database";
-import { HARNESS_MODELS, HARNESS_SUPPORTS_EFFORT } from "@trymatcha/types";
+import { Harness, Effort } from "@trydarwin/database";
+import { HARNESS_MODELS, HARNESS_SUPPORTS_EFFORT } from "@trydarwin/types";
 
 enum CredentialSource {
     PlatformKey,

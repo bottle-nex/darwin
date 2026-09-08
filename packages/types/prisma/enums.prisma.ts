@@ -208,7 +208,7 @@ export type BackgroundLightingColor =
     (typeof BackgroundLightingColor)[keyof typeof BackgroundLightingColor];
 
 export const CodeTheme = {
-    Matcha: "Matcha",
+    Darwin: "Darwin",
     NightOwl: "NightOwl",
     OneDark: "OneDark",
     Dracula: "Dracula",
@@ -220,6 +220,13 @@ export const CodeTheme = {
 } as const;
 export type CodeTheme = (typeof CodeTheme)[keyof typeof CodeTheme];
 
+export const SwipeTarget = {
+    Settings: "Settings",
+    Darwin: "Darwin",
+    Off: "Off",
+} as const;
+export type SwipeTarget = (typeof SwipeTarget)[keyof typeof SwipeTarget];
+
 export const DiffView = {
     Unified: "Unified",
     Split: "Split",
@@ -227,6 +234,7 @@ export const DiffView = {
 export type DiffView = (typeof DiffView)[keyof typeof DiffView];
 
 export const DefaultHomeView = {
+    AskDarwin: "AskDarwin",
     Inbox: "Inbox",
     Chats: "Chats",
     Kanban: "Kanban",

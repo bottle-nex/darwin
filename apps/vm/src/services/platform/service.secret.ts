@@ -1,6 +1,6 @@
 import { createDecipheriv } from "node:crypto";
 
-import { prisma } from "@trymatcha/database";
+import { prisma } from "@trydarwin/database";
 
 import { ENV } from "../../conf/config.env";
 

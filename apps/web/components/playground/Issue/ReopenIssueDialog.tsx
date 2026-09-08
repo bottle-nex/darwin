@@ -1,6 +1,6 @@
 "use client";
 import type { Editor } from "@tiptap/react";
-import { BreadcrumbSeparatorIcon } from "@trymatcha/ui/icons";
+import { BreadcrumbSeparatorIcon } from "@trydarwin/ui/icons";
 import { useState } from "react";
 
 import Disclosure from "@/components/playground/Core/components/Disclosure";

@@ -1,5 +1,5 @@
-import Logger from "@trymatcha/logger";
-import { IssueStatus, WorkerStatus, prisma } from "@trymatcha/database";
+import Logger from "@trydarwin/logger";
+import { IssueStatus, WorkerStatus, prisma } from "@trydarwin/database";
 import { guard_services } from "..";
 
 const log = Logger.scope("reconciler");

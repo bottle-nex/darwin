@@ -1,4 +1,4 @@
-import { EnvSecretIcon } from "@trymatcha/ui/icons";
+import { EnvSecretIcon } from "@trydarwin/ui/icons";
 
 import SettingsHeroCard, {
     HeroButton,

@@ -4,8 +4,8 @@ import {
     type ActivityPayload,
     type ActivityPayloadMap,
     ActivityType,
-} from "@trymatcha/types";
-import type { IconType } from "@trymatcha/ui/icons";
+} from "@trydarwin/types";
+import type { IconType } from "@trydarwin/ui/icons";
 import {
     AssigneeAddedActivityIcon,
     AssigneeRemovedActivityIcon,
@@ -22,7 +22,7 @@ import {
     TagIcon,
     TodoStatusIcon,
     UntrackedActivityIcon,
-} from "@trymatcha/ui/icons";
+} from "@trydarwin/ui/icons";
 import { type ComponentProps, forwardRef, type ReactNode } from "react";
 
 import TagDisplay from "@/components/playground/Home/TagsDisplay/TagDisplay";

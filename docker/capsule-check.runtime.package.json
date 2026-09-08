@@ -1,5 +1,5 @@
 {
-    "name": "matcha-capsule-check-runtime",
+    "name": "darwin-capsule-check-runtime",
     "version": "0.0.0",
     "private": true,
     "type": "module",

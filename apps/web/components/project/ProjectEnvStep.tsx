@@ -5,7 +5,7 @@ import {
     HideSecretIcon,
     ImportUploadIcon,
     RevealSecretIcon,
-} from "@trymatcha/ui/icons";
+} from "@trydarwin/ui/icons";
 import { type Dispatch, type SetStateAction, useRef } from "react";
 
 import { Button } from "@/components/ui/button";

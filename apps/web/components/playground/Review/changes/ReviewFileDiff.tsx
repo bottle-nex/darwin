@@ -1,6 +1,6 @@
 "use client";
-import { DiffView, type ReviewFile } from "@trymatcha/types";
-import { DiffExpandIcon, DiffFileRowIcon, ExternalLinkIcon } from "@trymatcha/ui/icons";
+import { DiffView, type ReviewFile } from "@trydarwin/types";
+import { DiffExpandIcon, DiffFileRowIcon, ExternalLinkIcon } from "@trydarwin/ui/icons";
 import { type ReactNode, useMemo, useState } from "react";
 import {
     computeNewLineNumber,

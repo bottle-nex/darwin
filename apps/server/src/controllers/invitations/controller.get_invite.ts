@@ -1,4 +1,4 @@
-import { prisma } from "@trymatcha/database";
+import { prisma } from "@trydarwin/database";
 import { createHash } from "crypto";
 import type { Request, Response } from "express";
 import z from "zod";

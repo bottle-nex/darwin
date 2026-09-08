@@ -1,4 +1,4 @@
-import Logger from "@trymatcha/logger";
+import Logger from "@trydarwin/logger";
 
 import { ENV } from "./src/conf/config.env";
 import { start_run_log_server } from "./src/http/server.run_logs";
@@ -8,7 +8,7 @@ export const vm_services = new InitServices();
 
 start_run_log_server();
 
-Logger.banner("matcha vm", {
+Logger.banner("darwin vm", {
     listening: "onboard + dispatch",
     dispatch_concurrency: ENV.VM_DISPATCH_CONCURRENCY,
     onboard_concurrency: 1,

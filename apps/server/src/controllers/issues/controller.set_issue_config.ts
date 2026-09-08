@@ -1,7 +1,7 @@
-import { Action, Permissions } from "@trymatcha/access-control";
-import { ActivityType, ActorType, Effort, Harness, IssueStatus, prisma } from "@trymatcha/database";
-import { Registry } from "@trymatcha/harness";
-import { ActivityService } from "@trymatcha/services";
+import { Action, Permissions } from "@trydarwin/access-control";
+import { ActivityType, ActorType, Effort, Harness, IssueStatus, prisma } from "@trydarwin/database";
+import { Registry } from "@trydarwin/harness";
+import { ActivityService } from "@trydarwin/services";
 import type { Request, Response } from "express";
 import z from "zod";
 

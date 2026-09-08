@@ -5,7 +5,7 @@ import {
     FilterIcon,
     KanbanColumnsIcon,
     OptionsMenuIcon,
-} from "@trymatcha/ui/icons";
+} from "@trydarwin/ui/icons";
 
 import type { KanbanOptionView } from "@/types/project";
 

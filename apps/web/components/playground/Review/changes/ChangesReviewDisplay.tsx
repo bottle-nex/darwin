@@ -1,5 +1,5 @@
 "use client";
-import { DiffView, type ReviewFile, type ReviewHeader } from "@trymatcha/types";
+import { DiffView, type ReviewFile, type ReviewHeader } from "@trydarwin/types";
 import { useState } from "react";
 
 import LogoLoader from "@/components/app/LogoLoader";

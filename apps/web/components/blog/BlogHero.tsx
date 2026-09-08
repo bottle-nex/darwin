@@ -1,4 +1,4 @@
-import { ChangelogBackdrop } from "@trymatcha/editorial";
+import { ChangelogBackdrop } from "@trydarwin/editorial";
 
 import { cn } from "@/lib/utils";
 
@@ -18,13 +18,13 @@ export default function BlogHero({ active }: { active: BlogTab }) {
                     </BlurFade>
 
                     <BlurFade delay={0.1} className="font-headline text-6xl text-snow">
-                        What&apos;s new in Matcha.
+                        What&apos;s new in Darwin.
                         <br />
                         Built to ship better.
                     </BlurFade>
 
                     <BlurFade delay={0.2} className="text-lg text-snow/60 md:w-[85%]">
-                        See what we&apos;ve been shipping at Matcha, from smarter agents and faster
+                        See what we&apos;ve been shipping at Darwin, from smarter agents and faster
                         workflows to the improvements that make building and shipping software
                         easier.
                     </BlurFade>

@@ -1,6 +1,12 @@
-import { Action, Permissions } from "@trymatcha/access-control";
-import { prisma } from "@trymatcha/database";
-import { BackgroundLightingColor, CodeTheme, DefaultHomeView, DiffView } from "@trymatcha/types";
+import { Action, Permissions } from "@trydarwin/access-control";
+import { prisma } from "@trydarwin/database";
+import {
+    BackgroundLightingColor,
+    CodeTheme,
+    DefaultHomeView,
+    DiffView,
+    SwipeTarget,
+} from "@trydarwin/types";
 import type { Request, Response } from "express";
 import z from "zod";
 
@@ -16,8 +22,9 @@ const DEFAULT_USER_CONFIG = {
     backgroundLightingEnabled: true,
     backgroundLightingColor: BackgroundLightingColor.Violet,
     defaultHomeView: DefaultHomeView.Kanban,
-    codeTheme: CodeTheme.Matcha,
+    codeTheme: CodeTheme.Darwin,
     diffView: DiffView.Unified,
+    swipeTarget: SwipeTarget.Settings,
 };
 
 export default class GetDashboardController {
@@ -82,6 +89,7 @@ export default class GetDashboardController {
                     defaultHomeView: true,
                     codeTheme: true,
                     diffView: true,
+                    swipeTarget: true,
                 },
             });
 

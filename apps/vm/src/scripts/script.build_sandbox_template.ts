@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 
-import Logger from "@trymatcha/logger";
+import Logger from "@trydarwin/logger";
 import { defaultBuildLogger, Template } from "e2b";
 
 import { ENV } from "../conf/config.env";
@@ -19,7 +19,7 @@ const log = Logger.scope("template");
  *
  * Prerequisite: `packages/sandbox-mcp/dist/index.js` and `packages/capsule-check/dist/index.js`
  * must be current, since the Dockerfile copies them in — build them first with
- * `bun run build --filter=@trymatcha/sandbox-mcp --filter=@trymatcha/capsule-check`.
+ * `bun run build --filter=@trydarwin/sandbox-mcp --filter=@trydarwin/capsule-check`.
  */
 
 const TEMPLATE_NAME = "node-py-claude-template";
@@ -35,12 +35,12 @@ const BUNDLES: { name: string; path: string; filter: string }[] = [
     {
         name: "sandbox-mcp",
         path: `${REPO_ROOT}packages/sandbox-mcp/dist/index.js`,
-        filter: "@trymatcha/sandbox-mcp",
+        filter: "@trydarwin/sandbox-mcp",
     },
     {
         name: "capsule-check",
         path: `${REPO_ROOT}packages/capsule-check/dist/index.js`,
-        filter: "@trymatcha/capsule-check",
+        filter: "@trydarwin/capsule-check",
     },
 ];
 

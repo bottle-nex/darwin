@@ -1,14 +1,14 @@
-import type { Effort } from "@trymatcha/database";
-import { ActivityType, Harness, IssueStatus, prisma } from "@trymatcha/database";
-import { Registry } from "@trymatcha/harness";
-import type Logger from "@trymatcha/logger";
+import type { Effort } from "@trydarwin/database";
+import { ActivityType, Harness, IssueStatus, prisma } from "@trydarwin/database";
+import { Registry } from "@trydarwin/harness";
+import type Logger from "@trydarwin/logger";
 import {
     DESCRIPTION_REFERENCE_INCLUDE,
     description_reference_labels,
     issue_prompt_text,
     IssueBroadcastService,
-} from "@trymatcha/services";
-import type { ActivityPayloadMap } from "@trymatcha/types";
+} from "@trydarwin/services";
+import type { ActivityPayloadMap } from "@trydarwin/types";
 
 import { ENV } from "../../conf/config.env";
 
@@ -190,6 +190,6 @@ export default class IssueSolver {
     }
 
     private static pr_branch(issue_id: string): string {
-        return `matcha/issue-${issue_id}`;
+        return `darwin/issue-${issue_id}`;
     }
 }

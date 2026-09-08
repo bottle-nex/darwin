@@ -1,5 +1,5 @@
 "use client";
-import { type Capsule, capsule_control_hash, type CapsuleRevision } from "@trymatcha/types";
+import { type Capsule, capsule_control_hash, type CapsuleRevision } from "@trydarwin/types";
 import { useEffect, useRef, useState } from "react";
 
 import {

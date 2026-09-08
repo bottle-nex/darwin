@@ -1,5 +1,5 @@
 {
-    "name": "@trymatcha/capsule-check",
+    "name": "@trydarwin/capsule-check",
     "version": "0.0.0",
     "private": true,
     "type": "module",
@@ -10,13 +10,13 @@
         "typecheck": "tsc --noEmit"
     },
     "dependencies": {
-        "@trymatcha/types": "*",
+        "@trydarwin/types": "*",
         "@types/node": "^25.9.3",
         "playwright": "^1.50.0"
     },
     "devDependencies": {
-        "@trymatcha/eslint-config": "*",
-        "@trymatcha/typescript-config": "*",
+        "@trydarwin/eslint-config": "*",
+        "@trydarwin/typescript-config": "*",
         "@types/bun": "latest",
         "@typescript-eslint/eslint-plugin": "^7.1.0",
         "@typescript-eslint/parser": "^7.1.0",

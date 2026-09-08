@@ -1,4 +1,4 @@
-import { Harness } from "@trymatcha/database";
+import { Harness } from "@trydarwin/database";
 
 import ClaudeEventParser from "./parser.claude";
 import CodexEventParser from "./parser.codex";

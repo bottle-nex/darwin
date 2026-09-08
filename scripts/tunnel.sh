@@ -8,7 +8,7 @@
 
 set -uo pipefail
 
-TUNNEL_NAME="${TUNNEL_NAME:-matcha-dev}"
+TUNNEL_NAME="${TUNNEL_NAME:-darwin-dev}"
 CF_DIR="$HOME/.cloudflared"
 CERT="$CF_DIR/cert.pem"
 CONFIG="$CF_DIR/config.yml"

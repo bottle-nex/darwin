@@ -1,6 +1,6 @@
 "use client";
-import type { OrgAction, ProjectAction, TeamAction } from "@trymatcha/access-control";
-import { Action, Permissions } from "@trymatcha/access-control";
+import type { OrgAction, ProjectAction, TeamAction } from "@trydarwin/access-control";
+import { Action, Permissions } from "@trydarwin/access-control";
 import React, { createContext, useContext, useState } from "react";
 
 export type OrgRole = "Owner" | "Admin" | "Member" | "Billing";

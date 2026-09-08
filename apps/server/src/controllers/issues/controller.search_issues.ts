@@ -1,6 +1,6 @@
-import { Action, Permissions } from "@trymatcha/access-control";
-import type { Prisma } from "@trymatcha/database";
-import { prisma } from "@trymatcha/database";
+import { Action, Permissions } from "@trydarwin/access-control";
+import type { Prisma } from "@trydarwin/database";
+import { prisma } from "@trydarwin/database";
 import type { Request, Response } from "express";
 
 import Access from "../../access-control/access";

@@ -3,8 +3,8 @@ import type {
     GlobalSearchMessageHit,
     GlobalSearchMessageThread,
     GlobalSearchResult,
-} from "@trymatcha/types";
-import { ChatsNavIcon } from "@trymatcha/ui/icons";
+} from "@trydarwin/types";
+import { ChatsNavIcon } from "@trydarwin/ui/icons";
 
 import { PlaygroundTab } from "@/components/playground/playgroundTabs";
 import { CommandGroup, CommandItem } from "@/components/ui/command";

@@ -1,6 +1,6 @@
 "use client";
 import { defaultRangeExtractor, type Range, useVirtualizer } from "@tanstack/react-virtual";
-import { ActivityType, type Chat, to_plain_text } from "@trymatcha/types";
+import { ActivityType, type Chat, to_plain_text } from "@trydarwin/types";
 import {
     type FocusEvent,
     useCallback,

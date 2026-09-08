@@ -5,7 +5,7 @@ import {
     LinearLogoIcon,
     NotionLogoIcon,
     SlackLogoIcon,
-} from "@trymatcha/ui/icons";
+} from "@trydarwin/ui/icons";
 
 import { AppLogo } from "@/components/logo/AppLogo";
 

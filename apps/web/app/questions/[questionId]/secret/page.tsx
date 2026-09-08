@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import SecretAnswerForm from "@/components/connectors/SecretAnswerForm";
 
 export const metadata: Metadata = {
-    title: "Provide a secret · matcha",
+    title: "Provide a secret · darwin",
 };
 
 export default async function QuestionSecretPage({

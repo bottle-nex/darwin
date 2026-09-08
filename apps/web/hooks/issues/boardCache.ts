@@ -1,5 +1,5 @@
 import type { InfiniteData, QueryClient, QueryKey } from "@tanstack/react-query";
-import { type CursorPage, type Issue, IssueStatus } from "@trymatcha/types";
+import { type CursorPage, type Issue, IssueStatus } from "@trydarwin/types";
 
 import { hasActiveFilters, issueMatchesFilters } from "@/lib/kanban/boardFilter";
 import { removeInfinitePageItem, updateInfinitePageItem } from "@/lib/pagination/infinitePages";

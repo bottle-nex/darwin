@@ -1,4 +1,4 @@
-import { type PostKind, prisma } from "@trymatcha/database";
+import { type PostKind, prisma } from "@trydarwin/database";
 import type { Request, Response } from "express";
 
 import ResponseWriter from "../../services/service.response";

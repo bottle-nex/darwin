@@ -4,7 +4,7 @@ This file provides guidance to Codex (Codex.ai/code) when working with code in t
 
 ## Product
 
-**matcha** (trymatcha) is an autonomous, agentic engineering platform built around a **canvas/board** where teams file issues — and an LLM agent picks them up, implements the fix, and raises a PR end-to-end.
+**darwin** (trydarwin) is an autonomous, agentic engineering platform built around a **canvas/board** where teams file issues — and an LLM agent picks them up, implements the fix, and raises a PR end-to-end.
 
 The flow we're building toward:
 
@@ -23,8 +23,8 @@ Bun-managed Turborepo monorepo. `bun@1.3.2` is pinned via `packageManager`; use 
 
 - `apps/web` — Next.js 16 (App Router) + React 19 + Tailwind v4 + shadcn/ui (`new-york` style, lucide icons). Uses `@/*` path alias to the web app root. Zustand for client state, Lenis for smooth scroll (wired via `providers/LenisProvider`), Motion for animation.
 - `apps/server` — Express 5 API run on the **Bun runtime** (`bun run --watch src/index.ts`). ESM (`"type": "module"`). Top-level `await` is used in `src/index.ts`; do not rewrap it in an IIFE.
-- `packages/database` — Prisma schema + client. Prisma generates the client into `packages/database/generated/client` (gitignored). The package's `exports["."]` is `src/client.ts`, which re-exports everything from the generated client. Always import via `@trymatcha/database`, not from `../generated/client`.
-- `packages/config-eslint`, `packages/config-typescript` — shared configs (`@trymatcha/eslint-config`, `@trymatcha/typescript-config`).
+- `packages/database` — Prisma schema + client. Prisma generates the client into `packages/database/generated/client` (gitignored). The package's `exports["."]` is `src/client.ts`, which re-exports everything from the generated client. Always import via `@trydarwin/database`, not from `../generated/client`.
+- `packages/config-eslint`, `packages/config-typescript` — shared configs (`@trydarwin/eslint-config`, `@trydarwin/typescript-config`).
 
 Local infra is `docker-compose up -d`: Postgres 16 on `:5433` and Redis 7 with `notify-keyspace-events Ex` on `:6379` (the Redis flag is required — OTP/expiry logic relies on it).
 
@@ -54,10 +54,10 @@ bun run db:migrate:dev       # prisma migrate dev (interactive — prompts for n
 bun run db:migrate:deploy    # prisma migrate deploy (production)
 bun run db:push              # prisma db push (no migration file)
 bun run db:seed              # tsx packages/database/src/seed.ts
-bun run generate             # prisma generate — also runs automatically as predev/prebuild in @trymatcha/database
+bun run generate             # prisma generate — also runs automatically as predev/prebuild in @trydarwin/database
 ```
 
-Scope a turbo task to one workspace with a filter, e.g. `bun run dev --filter=web` or `bun run typecheck --filter=@trymatcha/server`.
+Scope a turbo task to one workspace with a filter, e.g. `bun run dev --filter=web` or `bun run typecheck --filter=@trydarwin/server`.
 
 Prisma Studio: `cd packages/database && bun run studio`.
 
@@ -114,7 +114,7 @@ Optimize every change for the next reader: the simplest thing that works, named 
 - **Icons** — never hand-pick a `react-icons` import. Before adding an icon, grep for how that concept is already drawn and reuse the exact same import: a calendar is `HiCalendar`, a status circle comes from `KanbanBoard.COLUMNS`, a priority glyph from `PRIORITY_OPTIONS`. Two glyphs for one concept (the sidebar's calendar differing from the card's) is a real defect, not a nitpick. If a shared map exists, extend it rather than choosing locally; if nothing exists, pick one deliberately and say so — it becomes the canonical one. The same rule covers the colours attached to those icons.
 - **Naming** — pick meaningful, self-explanatory names for variables, functions, files, and types. A name should tell you what the thing is without reading its body.
 - **React files** — every component file is `PascalCase.tsx` (e.g. `CreateProjectDialog.tsx`). App Router route files (`page.tsx`, `layout.tsx`, `route.ts`) stay lowercase per Next.js.
-- **Types** — shared/domain types live in `apps/web/types/` (or the `@trymatcha/types` package for cross-app types), named `<domain>.type.ts` (e.g. `kanban.type.ts`, `board.type.ts`). Keep component-local `Props` inline; promote a type to the folder once more than one file needs it.
+- **Types** — shared/domain types live in `apps/web/types/` (or the `@trydarwin/types` package for cross-app types), named `<domain>.type.ts` (e.g. `kanban.type.ts`, `board.type.ts`). Keep component-local `Props` inline; promote a type to the folder once more than one file needs it.
 - **Zustand** — one small, single-purpose store per concern under `apps/web/store/<feature>/use<Feature>Store.ts`. Don't funnel unrelated state into a single mega-store. Server data stays in React Query hooks (`apps/web/hooks/`), not Zustand.
 
 ## Formatting

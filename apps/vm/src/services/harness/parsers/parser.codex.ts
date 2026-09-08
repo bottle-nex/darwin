@@ -1,4 +1,4 @@
-import type { RunLogEventBody } from "@trymatcha/types";
+import type { RunLogEventBody } from "@trydarwin/types";
 
 import type { AgentReport, HarnessEventParser } from "./parser.types";
 

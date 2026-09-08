@@ -5,7 +5,7 @@ import {
     PullRequestOpenIcon,
     RunnerIcon,
     SuccessCircleIcon,
-} from "@trymatcha/ui/icons";
+} from "@trydarwin/ui/icons";
 
 import PlaygroundAvatar, {
     type AvatarTone,

@@ -1,5 +1,5 @@
 "use client";
-import { ProjectReferenceIcon } from "@trymatcha/ui/icons";
+import { ProjectReferenceIcon } from "@trydarwin/ui/icons";
 
 import PlaygroundAvatar, {
     displayNameOf,

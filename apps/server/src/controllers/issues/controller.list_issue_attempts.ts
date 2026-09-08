@@ -1,5 +1,5 @@
-import { ActivityType, prisma } from "@trymatcha/database";
-import type { ActivityPayloadMap } from "@trymatcha/types";
+import { ActivityType, prisma } from "@trydarwin/database";
+import type { ActivityPayloadMap } from "@trydarwin/types";
 import type { Request, Response } from "express";
 import z from "zod";
 

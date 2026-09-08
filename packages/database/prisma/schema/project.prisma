@@ -53,6 +53,7 @@ model Project {
 
   projectConfig     ProjectConfig?
   githubIssueImport GithubIssueImport?
+  darwinThreads     DarwinThread[]
 
   @@unique([orgId, slug])
   @@index([ownerId])

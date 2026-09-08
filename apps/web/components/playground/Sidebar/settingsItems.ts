@@ -1,4 +1,4 @@
-import type { IconType } from "@trymatcha/ui/icons";
+import type { IconType } from "@trydarwin/ui/icons";
 import {
     EnvSecretIcon,
     HarnessIcon,
@@ -8,7 +8,7 @@ import {
     SettingsGeneralIcon,
     SettingsIntegrationsIcon,
     SettingsTemplatesIcon,
-} from "@trymatcha/ui/icons";
+} from "@trydarwin/ui/icons";
 
 import { PlaygroundTab } from "../playgroundTabs";
 

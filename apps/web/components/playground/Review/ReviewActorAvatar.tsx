@@ -1,4 +1,4 @@
-import type { ReviewActor } from "@trymatcha/types";
+import type { ReviewActor } from "@trydarwin/types";
 import Image from "next/image";
 
 import { cn } from "@/lib/utils";

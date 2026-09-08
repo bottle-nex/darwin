@@ -1,6 +1,6 @@
 "use client";
 import { useQueryClient } from "@tanstack/react-query";
-import { InboundSocketMessageType, type LabelledReference, type TeamChat } from "@trymatcha/types";
+import { InboundSocketMessageType, type LabelledReference, type TeamChat } from "@trydarwin/types";
 import { isAxiosError } from "axios";
 import { useMemo } from "react";
 

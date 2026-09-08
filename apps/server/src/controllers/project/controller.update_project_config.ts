@@ -1,6 +1,6 @@
-import { Action, Permissions } from "@trymatcha/access-control";
-import { Effort, Harness, Prisma, prisma } from "@trymatcha/database";
-import { Registry } from "@trymatcha/harness";
+import { Action, Permissions } from "@trydarwin/access-control";
+import { Effort, Harness, Prisma, prisma } from "@trydarwin/database";
+import { Registry } from "@trydarwin/harness";
 import type { Request, Response } from "express";
 import z from "zod";
 

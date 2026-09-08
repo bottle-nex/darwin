@@ -10,7 +10,7 @@ import {
     KanbanColumnsIcon,
     SubmenuDisclosureIcon,
     TagIcon,
-} from "@trymatcha/ui/icons";
+} from "@trydarwin/ui/icons";
 import { type ReactNode, useState } from "react";
 
 import MemberOptionRow from "@/components/playground/Core/components/MemberOptionRow";

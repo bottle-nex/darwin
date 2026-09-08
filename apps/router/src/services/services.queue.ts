@@ -1,8 +1,8 @@
-import Logger from "@trymatcha/logger";
+import Logger from "@trydarwin/logger";
 import { Queue, Worker, type Job } from "bullmq";
 import queue_config from "../config/config.queue";
 import RouterProcessor from "../processors/processor.route";
-import { QueueName, type DispatchJobData, type RouteJobData } from "@trymatcha/types";
+import { QueueName, type DispatchJobData, type RouteJobData } from "@trydarwin/types";
 
 const log = Logger.scope("queue");
 

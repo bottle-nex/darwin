@@ -1,12 +1,12 @@
 "use client";
-import type { IconType } from "@trymatcha/ui/icons";
+import type { IconType } from "@trydarwin/ui/icons";
 import {
     AddIcon,
     CheckIcon,
     LogoutIcon,
     SettingsIcon,
     SubmenuDisclosureIcon,
-} from "@trymatcha/ui/icons";
+} from "@trydarwin/ui/icons";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";

@@ -1,5 +1,5 @@
-import { Action, Permissions } from "@trymatcha/access-control";
-import { prisma } from "@trymatcha/database";
+import { Action, Permissions } from "@trydarwin/access-control";
+import { prisma } from "@trydarwin/database";
 import type { Response } from "express";
 
 import ResponseWriter from "../services/service.response";

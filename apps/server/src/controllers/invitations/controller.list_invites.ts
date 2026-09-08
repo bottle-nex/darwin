@@ -1,4 +1,4 @@
-import { InvitationStatus, prisma } from "@trymatcha/database";
+import { InvitationStatus, prisma } from "@trydarwin/database";
 import type { Request, Response } from "express";
 
 import ResponseWriter from "../../services/service.response";

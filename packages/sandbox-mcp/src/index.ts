@@ -45,13 +45,13 @@ type AskArgs = {
 export class McpServerService {
     private mcp_server: McpServer;
 
-    private static readonly SERVER = process.env.MATCHA_SERVER_URL!;
-    private static readonly TOKEN = process.env.MATCHA_SANDBOX_TOKEN!; // per-session token
+    private static readonly SERVER = process.env.DARWIN_SERVER_URL!;
+    private static readonly TOKEN = process.env.DARWIN_SANDBOX_TOKEN!; // per-session token
     private static readonly POLL_INTERVAL_MS = 1000;
 
     constructor() {
         this.mcp_server = new McpServer({
-            name: "matcha-setup-mcp",
+            name: "darwin-setup-mcp",
             version: "0.1.0",
         });
         this.register_tools();
@@ -165,15 +165,15 @@ enum WorkerRuntimeStatus {
 export class WorkerMcpServerService {
     private mcp_server: McpServer;
 
-    private static readonly SERVER = process.env.MATCHA_SERVER_URL!;
-    private static readonly TOKEN = process.env.MATCHA_SANDBOX_TOKEN!; // per-worker token
+    private static readonly SERVER = process.env.DARWIN_SERVER_URL!;
+    private static readonly TOKEN = process.env.DARWIN_SANDBOX_TOKEN!; // per-worker token
     private static readonly POLL_INTERVAL_MS = 1000;
 
     private run_log_seq = 0;
 
     constructor() {
         this.mcp_server = new McpServer({
-            name: "matcha-worker-mcp",
+            name: "darwin-worker-mcp",
             version: "0.1.0",
         });
         this.register_tools();
@@ -248,8 +248,8 @@ export class WorkerMcpServerService {
         const event = to_run_log_event(args);
         if (!event) return this.text("ignored");
 
-        const vm_url = process.env.MATCHA_VM_URL;
-        const run_id = process.env.MATCHA_RUN_ID;
+        const vm_url = process.env.DARWIN_VM_URL;
+        const run_id = process.env.DARWIN_RUN_ID;
         if (!vm_url || !run_id) return this.text("progress reporting is not configured");
 
         this.run_log_seq += 1;
@@ -299,7 +299,7 @@ export class WorkerMcpServerService {
     }
 }
 
-const session_kind = process.env.MATCHA_SESSION_KIND ?? "setup";
+const session_kind = process.env.DARWIN_SESSION_KIND ?? "setup";
 console.error(`[sandbox-mcp] starting in "${session_kind}" mode`);
 
 if (session_kind === "worker") {

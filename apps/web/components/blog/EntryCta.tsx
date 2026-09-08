@@ -1,6 +1,6 @@
 "use client";
 
-import { CtaArrowIcon } from "@trymatcha/ui/icons";
+import { CtaArrowIcon } from "@trydarwin/ui/icons";
 import { useInView, useReducedMotion } from "motion/react";
 import Link from "next/link";
 import { type CSSProperties, useRef } from "react";
@@ -35,7 +35,7 @@ export default function EntryCta() {
             </span>
 
             <h2 className="mt-5 text-[15px] font-medium text-snow">
-                Get started with matcha for free
+                Get started with darwin for free
             </h2>
             <p className="mt-2 text-[14px] leading-relaxed text-mist/45">
                 Drop an issue on the board and the agent takes it from there — clones the repo,

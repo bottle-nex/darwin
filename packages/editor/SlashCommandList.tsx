@@ -1,6 +1,6 @@
 "use client";
 
-import { SubmenuDisclosureIcon } from "@trymatcha/ui/icons";
+import { SubmenuDisclosureIcon } from "@trydarwin/ui/icons";
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
 
 import { Button } from "./ui/button";

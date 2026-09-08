@@ -13,7 +13,7 @@ import {
     StrikethroughFormatIcon,
     TextParagraphIcon,
     UnderlineFormatIcon,
-} from "@trymatcha/ui/icons";
+} from "@trydarwin/ui/icons";
 import { type ReactNode, useState } from "react";
 
 import { Button } from "./ui/button";

@@ -1,4 +1,4 @@
-import { PausedStateIcon } from "@trymatcha/ui/icons";
+import { PausedStateIcon } from "@trydarwin/ui/icons";
 
 import { GanttTimeline } from "@/lib/gantt/GanttTimeline";
 

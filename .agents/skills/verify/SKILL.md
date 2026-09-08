@@ -1,19 +1,19 @@
 ---
 name: verify
-description: How to run and drive trymatcha locally to verify changes (server, sockets, DB)
+description: How to run and drive trydarwin locally to verify changes (server, sockets, DB)
 ---
 
-# Verifying trymatcha changes
+# Verifying trydarwin changes
 
 ## Infra
 
-- Postgres + Redis run via `docker-compose up -d`. **Container names are `nanbe-postgres` / `nanbe-redis` and the database is `nanbe`** (names reused from an older project — this IS trymatcha's data). Redis is on host port **6370**, Postgres on 5433.
+- Postgres + Redis run via `docker-compose up -d`. **Container names are `nanbe-postgres` / `nanbe-redis` and the database is `nanbe`** (names reused from an older project — this IS trydarwin's data). Redis is on host port **6370**, Postgres on 5433.
 - Query the DB directly: `docker exec nanbe-postgres psql -U user -d nanbe -tA -c "..."` (expect harmless collation-version warnings).
 - One `.env` at the repo root; server reads `SERVER_*` keys.
 
 ## Server
 
-- `bun run dev --filter=@trymatcha/server` → Express + ws on `:8080` (`SERVER_PORT`). Health: `curl localhost:8080/api/v1/health`.
+- `bun run dev --filter=@trydarwin/server` → Express + ws on `:8080` (`SERVER_PORT`). Health: `curl localhost:8080/api/v1/health`.
 - The user often already has it running (`lsof -i :8080`); it's `bun --watch`, so file edits hot-reload — no restart needed.
 
 ## Driving the WebSocket surface

@@ -23,7 +23,7 @@ const GRADIENT = [
     "linear-gradient(148deg, #141414 0%, #101010 10%, #0d0d0d 20%, #0b0b0b 32%, #0a0a0a 44%, #0a0a0a 100%)",
 ].join(", ");
 
-const URL_PREFIX = "trymatcha.com/";
+const URL_PREFIX = "trydarwin.com/";
 
 const DESCRIPTION_LIMIT = 150;
 

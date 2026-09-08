@@ -1,5 +1,5 @@
 "use client";
-import { LoadingSpinnerIcon } from "@trymatcha/ui/icons";
+import { LoadingSpinnerIcon } from "@trydarwin/ui/icons";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect } from "react";
 

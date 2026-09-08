@@ -1,5 +1,5 @@
 "use client";
-import { SearchIcon } from "@trymatcha/ui/icons";
+import { SearchIcon } from "@trydarwin/ui/icons";
 import type { ReactNode } from "react";
 
 import {

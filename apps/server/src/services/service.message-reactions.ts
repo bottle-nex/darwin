@@ -1,5 +1,5 @@
-import { Prisma, prisma } from "@trymatcha/database";
-import type { ReactionSummary } from "@trymatcha/types";
+import { Prisma, prisma } from "@trydarwin/database";
+import type { ReactionSummary } from "@trydarwin/types";
 
 type ReactionGroup = { messageId: string; emoji: string; count: number };
 type ReactionUpdate = {

@@ -1,7 +1,7 @@
 /** @type {import("eslint").Linter.Config} */
 module.exports = {
     root: true,
-    extends: ["@trymatcha/eslint-config/library.js"],
+    extends: ["@trydarwin/eslint-config/library.js"],
     parser: "@typescript-eslint/parser",
     parserOptions: {
         project: true,

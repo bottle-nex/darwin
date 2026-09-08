@@ -53,7 +53,7 @@ const HERO_CARDS: HeroCard[] = [
         left: "left-[160px]",
     },
     {
-        name: "matcha",
+        name: "darwin",
         left: "left-[200px]",
         className: "transition-opacity duration-300",
     },

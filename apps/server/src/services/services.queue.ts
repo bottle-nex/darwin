@@ -6,7 +6,7 @@ import {
     type ProductDiffJobData,
     QueueName,
     type RouteJobData,
-} from "@trymatcha/types";
+} from "@trydarwin/types";
 import { Queue } from "bullmq";
 
 import queue_config from "../configs/config.queue";

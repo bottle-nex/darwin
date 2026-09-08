@@ -1,5 +1,5 @@
 import type { Editor, Range } from "@tiptap/core";
-import type { IconType } from "@trymatcha/ui/icons";
+import type { IconType } from "@trydarwin/ui/icons";
 import {
     BlockquoteFormatIcon,
     BulletListIcon,
@@ -17,7 +17,7 @@ import {
     NumberedListIcon,
     TableInsertIcon,
     ToggleListIcon,
-} from "@trymatcha/ui/icons";
+} from "@trydarwin/ui/icons";
 
 import type { TimestampMode } from "./timestamp";
 import { imageUploader } from "./imageUpload";

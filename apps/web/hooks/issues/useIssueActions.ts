@@ -1,12 +1,12 @@
 "use client";
-import type { IconType } from "@trymatcha/ui/icons";
+import type { IconType } from "@trydarwin/ui/icons";
 import {
     CopyFieldIdIcon,
     CopyFieldMarkdownIcon,
     CopyFieldNumberIcon,
     CopyFieldTitleIcon,
     CopyFieldUrlIcon,
-} from "@trymatcha/ui/icons";
+} from "@trydarwin/ui/icons";
 import { isAxiosError } from "axios";
 
 import {

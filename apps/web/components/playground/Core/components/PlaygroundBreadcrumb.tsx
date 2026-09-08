@@ -1,6 +1,6 @@
 "use client";
-import type { IconType } from "@trymatcha/ui/icons";
-import { BreadcrumbSeparatorIcon, ICONS } from "@trymatcha/ui/icons";
+import type { IconType } from "@trydarwin/ui/icons";
+import { BreadcrumbSeparatorIcon, ICONS } from "@trydarwin/ui/icons";
 import { Fragment, type ReactNode } from "react";
 
 import { PlaygroundTab } from "@/components/playground/playgroundTabs";

@@ -1,6 +1,6 @@
 "use client";
 
-import { SearchIcon } from "@trymatcha/ui/icons";
+import { SearchIcon } from "@trydarwin/ui/icons";
 import { Command as CommandPrimitive } from "cmdk";
 import * as React from "react";
 

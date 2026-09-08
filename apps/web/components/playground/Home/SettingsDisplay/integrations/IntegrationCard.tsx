@@ -1,6 +1,6 @@
 "use client";
-import type { IconType } from "@trymatcha/ui/icons";
-import { ExternalLinkIcon } from "@trymatcha/ui/icons";
+import type { IconType } from "@trydarwin/ui/icons";
+import { ExternalLinkIcon } from "@trydarwin/ui/icons";
 
 import { Button } from "@/components/ui/button";
 import Pill, { type PillTone } from "@/components/ui/Pill";

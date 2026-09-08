@@ -1,5 +1,5 @@
 {
-    "name": "@trymatcha/services",
+    "name": "@trydarwin/services",
     "module": "index.ts",
     "type": "module",
     "private": true,
@@ -10,8 +10,8 @@
         "typecheck": "tsc --noEmit"
     },
     "dependencies": {
-        "@trymatcha/database": "*",
-        "@trymatcha/types": "*",
+        "@trydarwin/database": "*",
+        "@trydarwin/types": "*",
         "ioredis": "^5.11.0",
         "turndown": "^7.2.4"
     },

@@ -1,4 +1,4 @@
-import type { ContentEntry, ContentSummary } from "@trymatcha/editorial";
+import type { ContentEntry, ContentSummary } from "@trydarwin/editorial";
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:4402";
 

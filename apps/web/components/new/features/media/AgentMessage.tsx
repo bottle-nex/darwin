@@ -4,7 +4,7 @@ import AppLogo from "@/components/app/Applogo";
 
 /**
  * The chat mock the feature cards' upper sections start out with: a message
- * bubble with the matcha tile beneath it.
+ * bubble with the darwin tile beneath it.
  *
  * A convenience, not a constraint — a card's media component is free to drop this
  * and render something else entirely. Positions are absolute against the media

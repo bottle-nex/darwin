@@ -56,7 +56,7 @@ export default function AdminLoginForm() {
         <main className="flex min-h-dvh w-full flex-col items-center justify-center bg-ink px-4 text-white">
             <div className="w-full max-w-80">
                 <div className="flex flex-col items-center">
-                    <h1 className="text-xl font-medium tracking-tight">matcha admin</h1>
+                    <h1 className="text-xl font-medium tracking-tight">darwin admin</h1>
                     <p className="mt-1.5 text-center text-sm text-white/40">
                         Sign in with an allowlisted address.
                     </p>

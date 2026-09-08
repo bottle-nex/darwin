@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import type { ReviewFile } from "@trymatcha/types";
+import type { ReviewFile } from "@trydarwin/types";
 
 import { apiClient } from "@/lib/axios";
 import { REVIEW_FILES_URL } from "@/routes/api_routes";

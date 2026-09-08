@@ -1,4 +1,4 @@
-import { OtpSeparatorIcon } from "@trymatcha/ui/icons";
+import { OtpSeparatorIcon } from "@trydarwin/ui/icons";
 import { OTPInput, OTPInputContext } from "input-otp";
 import * as React from "react";
 

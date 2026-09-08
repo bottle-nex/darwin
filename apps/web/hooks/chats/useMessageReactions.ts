@@ -9,7 +9,7 @@ import {
     type ReactionDelta,
     type ReactionSummary,
     type TeamChat,
-} from "@trymatcha/types";
+} from "@trydarwin/types";
 import { useSyncExternalStore } from "react";
 
 import { send_socket_message } from "@/hooks/socket/useWebSocket";

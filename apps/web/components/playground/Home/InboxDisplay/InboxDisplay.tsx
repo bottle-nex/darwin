@@ -1,5 +1,5 @@
 "use client";
-import type { Notification } from "@trymatcha/types";
+import type { Notification } from "@trydarwin/types";
 import { useState } from "react";
 
 import PlaygroundBreadcrumb from "@/components/playground/Core/components/PlaygroundBreadcrumb";

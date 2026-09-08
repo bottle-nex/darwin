@@ -1,4 +1,4 @@
-import type { ReactionSummary } from "@trymatcha/types";
+import type { ReactionSummary } from "@trydarwin/types";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";

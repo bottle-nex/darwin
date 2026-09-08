@@ -1,10 +1,10 @@
-import type { Prisma } from "@trymatcha/database";
-import { prisma } from "@trymatcha/database";
+import type { Prisma } from "@trydarwin/database";
+import { prisma } from "@trydarwin/database";
 import {
     type MemberNotificationType,
     OutboundSocketMessageType,
     type ProjectNotificationType,
-} from "@trymatcha/types";
+} from "@trydarwin/types";
 
 import { server_services } from "..";
 

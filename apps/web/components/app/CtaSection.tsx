@@ -1,5 +1,5 @@
 "use client";
-import { CtaGetStartedIcon, CtaMeetTeamIcon } from "@trymatcha/ui/icons";
+import { CtaGetStartedIcon, CtaMeetTeamIcon } from "@trydarwin/ui/icons";
 import Link from "next/link";
 
 import HeroBuddy from "@/components/landing/v2/HeroBuddy";
@@ -82,7 +82,7 @@ export default function CtaSection() {
                                         Meet the team
                                     </div>
                                     <div className="mt-0.5 text-[13px] text-neutral-700">
-                                        The people behind matcha
+                                        The people behind darwin
                                     </div>
                                 </Link>
                             </div>

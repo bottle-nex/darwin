@@ -1,5 +1,5 @@
-import type { LabelledReference } from "@trymatcha/types";
-import { to_plain_text } from "@trymatcha/types";
+import type { LabelledReference } from "@trydarwin/types";
+import { to_plain_text } from "@trydarwin/types";
 import TurndownService from "turndown";
 
 export const DESCRIPTION_REFERENCE_INCLUDE = {

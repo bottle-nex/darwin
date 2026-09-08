@@ -1,4 +1,4 @@
-import type { ProjectRole, TeamRole } from "@trymatcha/types";
+import type { ProjectRole, TeamRole } from "@trydarwin/types";
 
 export const MEMBER_SELECTION_PREFIX = {
     member: "member:",

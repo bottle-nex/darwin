@@ -1,4 +1,4 @@
-import { DefaultHomeView } from "@trymatcha/types";
+import { DefaultHomeView } from "@trydarwin/types";
 
 /**
  * The playground's tabs. Each value is the id of the sidebar row that selects
@@ -59,17 +59,8 @@ export function isPlaygroundTab(tab: string): tab is PlaygroundTab {
     return PLAYGROUND_TABS.has(tab);
 }
 
-export const DEFAULT_HOME_VIEW_OPTIONS: { tab: PlaygroundTab; label: string }[] = [
-    { tab: PlaygroundTab.Inbox, label: "Inbox" },
-    { tab: PlaygroundTab.Chats, label: "Chats" },
-    { tab: PlaygroundTab.Agent, label: "Agent" },
-    { tab: PlaygroundTab.Spaces, label: "Spaces" },
-    { tab: PlaygroundTab.Gantt, label: "Gantt" },
-    { tab: PlaygroundTab.Tags, label: "Tags" },
-    { tab: PlaygroundTab.AssignedToMe, label: "My issues" },
-];
-
 const DEFAULT_HOME_VIEW_TO_TAB: Record<DefaultHomeView, PlaygroundTab> = {
+    [DefaultHomeView.AskDarwin]: PlaygroundTab.AskDarwin,
     [DefaultHomeView.Inbox]: PlaygroundTab.Inbox,
     [DefaultHomeView.Chats]: PlaygroundTab.Chats,
     [DefaultHomeView.Kanban]: PlaygroundTab.Agent,

@@ -1,7 +1,7 @@
-import type { Prisma } from "@trymatcha/database";
-import { prisma } from "@trymatcha/database";
-import Logger from "@trymatcha/logger";
-import type { CapsuleManifest, ProductDiffStatus } from "@trymatcha/types";
+import type { Prisma } from "@trydarwin/database";
+import { prisma } from "@trydarwin/database";
+import Logger from "@trydarwin/logger";
+import type { CapsuleManifest, ProductDiffStatus } from "@trydarwin/types";
 import { Sandbox } from "e2b";
 
 import { ENV } from "../../conf/config.env";
@@ -23,7 +23,7 @@ const log = Logger.scope("product-diff");
 
 const SANDBOX_TIMEOUT_MS = 40 * 60_000;
 const CHECK_TIMEOUT_MS = 6 * 60_000;
-const CHECK_ENTRY = "/opt/matcha/capsule-check/index.js";
+const CHECK_ENTRY = "/opt/darwin/capsule-check/index.js";
 const REVISIONS: CapsuleRevision[] = ["base", "head"];
 const SAFE_SHA = /^[0-9a-f]{7,64}$/;
 

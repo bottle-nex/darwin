@@ -1,5 +1,5 @@
 "use client";
-import type { Notification } from "@trymatcha/types";
+import type { Notification } from "@trydarwin/types";
 
 import { VirtualizedRows } from "@/components/playground/Home/KanbanDisplay/VirtualizedRows";
 

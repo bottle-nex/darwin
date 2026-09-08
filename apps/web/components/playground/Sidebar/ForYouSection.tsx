@@ -1,5 +1,5 @@
 "use client";
-import { AskDarwinIcon, ChatsNavIcon, InboxIcon, MyIssuesIcon } from "@trymatcha/ui/icons";
+import { AskDarwinIcon, ChatsNavIcon, InboxIcon, MyIssuesIcon } from "@trydarwin/ui/icons";
 
 import { useNotificationBadges } from "@/hooks/notifications/useNotificationBadges";
 
@@ -9,6 +9,7 @@ import Row from "./SidebarRow";
 
 // Everything waiting on you personally, as opposed to the board at large.
 const FOR_YOU_ROWS: { id: string; label: string; icon: React.ComponentType }[] = [
+    { id: PlaygroundTab.AskDarwin, label: "Darwin", icon: AskDarwinIcon },
     { id: PlaygroundTab.Inbox, label: "Inbox", icon: InboxIcon },
     {
         id: PlaygroundTab.AssignedToMe,
@@ -16,7 +17,6 @@ const FOR_YOU_ROWS: { id: string; label: string; icon: React.ComponentType }[] =
         icon: MyIssuesIcon,
     },
     { id: PlaygroundTab.Chats, label: "Chats", icon: ChatsNavIcon },
-    { id: PlaygroundTab.AskDarwin, label: "Darwin", icon: AskDarwinIcon },
 ];
 
 export default function PlaygroundSidebarForYouSection({

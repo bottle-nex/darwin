@@ -1,4 +1,4 @@
-import { InvitationStatus, OrgRole, prisma, TeamRole } from "@trymatcha/database";
+import { InvitationStatus, OrgRole, prisma, TeamRole } from "@trydarwin/database";
 import { createHash } from "crypto";
 import type { Request, Response } from "express";
 import { z } from "zod";

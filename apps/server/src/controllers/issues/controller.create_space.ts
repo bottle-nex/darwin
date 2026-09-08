@@ -1,10 +1,10 @@
-import { Action, Permissions } from "@trymatcha/access-control";
-import { Prisma, prisma } from "@trymatcha/database";
+import { Action, Permissions } from "@trydarwin/access-control";
+import { Prisma } from "@trydarwin/database";
 import type { Request, Response } from "express";
 import z from "zod";
 
 import Access from "../../access-control/access";
-import { SPACE_SELECT } from "../../services/service.board-issues";
+import BoardItemService from "../../services/service.board-items";
 import ResponseWriter from "../../services/service.response";
 import { icon_schema } from "../project/icon.schema";
 
@@ -54,26 +54,13 @@ export default class SpaceCreateController {
         }
 
         try {
-            const space = await prisma.$transaction(async (tx) => {
-                const last_space = await tx.space.findFirst({
-                    where: { projectId: data.project_id },
-                    orderBy: { order: "desc" },
-                    select: { order: true },
-                });
-
-                return tx.space.create({
-                    data: {
-                        projectId: data.project_id,
-                        name: data.name,
-                        slug: data.slug,
-                        description: data.description ?? null,
-                        startDate: data.start_date ?? null,
-                        targetDate: data.target_date ?? null,
-                        order: (last_space?.order ?? 0) + 1,
-                        icon: data.icon ?? undefined,
-                    },
-                    select: SPACE_SELECT,
-                });
+            const space = await BoardItemService.create_space(data.project_id, {
+                name: data.name,
+                slug: data.slug,
+                description: data.description,
+                start_date: data.start_date,
+                target_date: data.target_date,
+                icon: data.icon ?? undefined,
             });
 
             ResponseWriter.created(res, { space }, "Space created successfully");

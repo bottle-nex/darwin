@@ -1,4 +1,4 @@
-import type { GithubIssuePayload } from "@trymatcha/types";
+import type { GithubIssuePayload } from "@trydarwin/types";
 import crypto from "crypto";
 
 import { ENV } from "../configs/env";

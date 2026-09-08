@@ -1,4 +1,4 @@
-import { prisma, WorkerStatus } from "@trymatcha/database";
+import { prisma, WorkerStatus } from "@trydarwin/database";
 import type { Request, Response } from "express";
 import { z } from "zod";
 

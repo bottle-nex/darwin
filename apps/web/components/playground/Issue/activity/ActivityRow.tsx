@@ -1,5 +1,5 @@
 "use client";
-import { ActivityType, ActorType, AgentSessionStatus, type IssueActivity } from "@trymatcha/types";
+import { ActivityType, ActorType, AgentSessionStatus, type IssueActivity } from "@trydarwin/types";
 
 import HeroBuddy from "@/components/landing/v2/HeroBuddy";
 import PlaygroundAvatar, {
@@ -35,7 +35,7 @@ export function actor_of(activity: IssueActivity): ActivityActorView {
         return {
             id: activity.actorWorkerId ?? "agent",
             userId: null,
-            name: frozen?.name ?? "matcha",
+            name: frozen?.name ?? "darwin",
             image: null,
             isAgent: true,
         };

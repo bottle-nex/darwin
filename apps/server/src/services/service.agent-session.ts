@@ -1,7 +1,7 @@
-import { prisma } from "@trymatcha/database";
+import { prisma } from "@trydarwin/database";
 import z from "zod";
 
-// this is what vm will report (a clone of AgentReport from @trymatcha/vm)
+// this is what vm will report (a clone of AgentReport from @trydarwin/vm)
 export const run_stats_schema = z
     .object({
         num_turns: z.number().int().min(0).optional(),

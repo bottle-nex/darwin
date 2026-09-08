@@ -1,12 +1,12 @@
 "use client";
-import type { ReviewHeader } from "@trymatcha/types";
-import type { IconType } from "@trymatcha/ui/icons";
+import type { ReviewHeader } from "@trydarwin/types";
+import type { IconType } from "@trydarwin/ui/icons";
 import {
     BranchMergeDirectionIcon,
     ChangedFilesIcon,
     CommentCountIcon,
     CommitsIcon,
-} from "@trymatcha/ui/icons";
+} from "@trydarwin/ui/icons";
 import type { ReactNode } from "react";
 
 import { formatRelativeTime } from "@/lib/format";

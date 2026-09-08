@@ -1,6 +1,6 @@
-import { Action, Permissions } from "@trymatcha/access-control";
-import { prisma } from "@trymatcha/database";
-import { OutboundSocketMessageType, type TeamRole } from "@trymatcha/types";
+import { Action, Permissions } from "@trydarwin/access-control";
+import { prisma } from "@trydarwin/database";
+import { OutboundSocketMessageType, type TeamRole } from "@trydarwin/types";
 import { WebSocket } from "ws";
 import z from "zod";
 

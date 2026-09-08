@@ -8,7 +8,7 @@ import {
     type ReviewLabel,
     ReviewMergeMethod,
     type ReviewState,
-} from "@trymatcha/types";
+} from "@trydarwin/types";
 
 import GithubAppService from "./service.github_app";
 

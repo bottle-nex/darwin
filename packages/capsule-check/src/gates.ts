@@ -1,4 +1,4 @@
-import { meaningful_diagnostics } from "@trymatcha/types";
+import { meaningful_diagnostics } from "@trydarwin/types";
 
 export type CapsuleFidelity = "Verified" | "Partial" | "Failed";
 

@@ -1,7 +1,7 @@
 "use client";
 
-import type { IconType } from "@trymatcha/ui/icons";
-import { PlatformBoardIcon, PlatformRunnersIcon } from "@trymatcha/ui/icons";
+import type { IconType } from "@trydarwin/ui/icons";
+import { PlatformBoardIcon, PlatformRunnersIcon } from "@trydarwin/ui/icons";
 import { motion, useInView, useReducedMotion } from "motion/react";
 import { useRef, useState } from "react";
 
@@ -21,6 +21,8 @@ const RUNNER_Y = 650;
 
 /** Clearance between a guide segment's end and a chip's outline (covers the float drift). */
 const GUIDE_MARGIN = 16;
+
+const GUIDE_STROKE = "#d4d4d8";
 
 /**
  * The dashed guides only span the gaps between chips. Each chip's silhouette at the
@@ -78,8 +80,8 @@ function BoardGlyph() {
     );
 }
 
-/** The AppLogo mark (792×460 viewBox) scaled and centered into the chip-face glyph box. */
-function MatchaGlyph() {
+/** The DarwinLogo mark (792×460 viewBox) scaled and centered into the chip-face glyph box. */
+function DarwinGlyph() {
     return (
         <g
             transform="rotate(-90) scale(0.078) translate(-396 -230)"
@@ -123,19 +125,19 @@ function GhostLayerBlock({
             onMouseEnter={() => onHoverChange(layer.id)}
             onMouseLeave={() => onHoverChange(null)}
             className={cn(
-                "group flex flex-1 flex-col p-8 transition-colors duration-300 hover:bg-white/2 md:p-10",
+                "group flex flex-1 flex-col p-8 transition-colors duration-300 hover:bg-hover md:p-10",
                 className,
             )}
         >
             <div>
                 <Icon
-                    className="size-4 text-neutral-500 transition-colors duration-300 group-hover:text-neutral-200"
+                    className="size-4 text-muted-foreground/80 transition-colors duration-300 group-hover:text-foreground"
                     strokeWidth={1.5}
                 />
-                <h3 className="mt-5 text-sm font-medium tracking-[0.18em] text-neutral-400 uppercase transition-colors duration-300 group-hover:text-snow">
+                <h3 className="mt-5 text-sm font-medium tracking-[0.18em] text-foreground/75 uppercase transition-colors duration-300 group-hover:text-foreground">
                     {layer.title}
                 </h3>
-                <p className="mt-4 max-w-70 text-[0.8125rem] leading-relaxed text-neutral-600 transition-colors duration-300 group-hover:text-neutral-400">
+                <p className="mt-4 max-w-70 text-[0.8125rem] leading-relaxed text-muted-foreground transition-colors duration-300 group-hover:text-foreground/85">
                     {layer.description}
                 </p>
             </div>
@@ -152,7 +154,7 @@ function StackDiagram({ highlighted }: { highlighted: GhostLayerId | null }) {
         <motion.svg
             ref={diagramRef}
             role="img"
-            aria-label="Exploded view of the matcha stack: the board, the agent, and code runners"
+            aria-label="Exploded view of the darwin stack: the board, the agent, and code runners"
             viewBox="0 0 620 800"
             className="mx-auto block w-full max-w-125"
             initial={reduceMotion ? false : "hidden"}
@@ -167,7 +169,7 @@ function StackDiagram({ highlighted }: { highlighted: GhostLayerId | null }) {
                         y1={y1}
                         x2={guideX}
                         y2={y2}
-                        stroke="#39393d"
+                        stroke={GUIDE_STROKE}
                         strokeWidth={1}
                         strokeDasharray="4 7"
                         variants={fade(0.55 + i * 0.08)}
@@ -201,14 +203,14 @@ function StackDiagram({ highlighted }: { highlighted: GhostLayerId | null }) {
                 variant="active"
                 x={CHIP_X}
                 y={AGENT_Y}
-                glyph={<MatchaGlyph />}
+                glyph={<DarwinGlyph />}
                 float={{ amplitude: 6, duration: 5.2, delay: 0 }}
                 active={isVisible}
             />
 
             <motion.g variants={fade(1)} className="max-md:hidden">
-                <rect x={462} y={396.5} width={7} height={7} fill="#a3a3a3" />
-                <line x1={472} y1={400} x2={620} y2={400} stroke="#39393d" strokeWidth={1} />
+                <rect x={462} y={396.5} width={7} height={7} fill="var(--color-muted-foreground)" />
+                <line x1={472} y1={400} x2={620} y2={400} stroke={GUIDE_STROKE} strokeWidth={1} />
             </motion.g>
         </motion.svg>
     );
@@ -228,12 +230,12 @@ export default function LandingPlatformStack() {
             </Reveal>
 
             <Reveal delay={0.15} className="mt-16">
-                <div className="grid grid-cols-1 border border-white/5 rounded-[10px] md:grid-cols-[minmax(0,1fr)_minmax(0,1.45fr)_minmax(0,1fr)]">
-                    <div className="flex flex-col max-md:border-b max-md:border-white/5 md:border-r md:border-white/5">
+                <div className="grid grid-cols-1 rounded-[10px] border border-edge md:grid-cols-[minmax(0,1fr)_minmax(0,1.45fr)_minmax(0,1fr)]">
+                    <div className="flex flex-col max-md:border-b max-md:border-edge md:border-r md:border-edge">
                         <GhostLayerBlock
                             layer={BOARD_LAYER}
                             onHoverChange={setHighlighted}
-                            className="border-b border-white/5"
+                            className="border-b border-edge"
                         />
                         <GhostLayerBlock
                             layer={RUNNER_LAYER}
@@ -246,29 +248,29 @@ export default function LandingPlatformStack() {
                         <StackDiagram highlighted={highlighted} />
                     </figure>
 
-                    <aside className="relative flex items-center p-8 max-md:border-t max-md:border-white/5 md:p-10 md:pl-6">
+                    <aside className="relative flex items-center p-8 max-md:border-t max-md:border-edge md:p-10 md:pl-6">
                         <span
                             aria-hidden
-                            className="absolute inset-y-0 left-8 w-px bg-white/5 md:left-6"
+                            className="absolute inset-y-0 left-8 w-px bg-edge md:left-6"
                         />
                         <div className="relative flex-1 pl-10">
                             <span
                                 aria-hidden
-                                className="absolute -top-4 -right-8 left-0 h-px bg-white/5 md:-right-10"
+                                className="absolute -top-4 -right-8 left-0 h-px bg-edge md:-right-10"
                             />
                             <span
                                 aria-hidden
-                                className="absolute -right-8 -bottom-4 left-0 h-px bg-white/5 md:-right-10"
+                                className="absolute -right-8 -bottom-4 left-0 h-px bg-edge md:-right-10"
                             />
                             <span
                                 aria-hidden
                                 className="absolute -inset-y-4 -left-px w-0.5 rounded-full bg-primary"
                             />
                             <HeroBuddy className="size-6 -my-1" move={false} />
-                            <h3 className="mt-5 text-base font-medium tracking-[0.16em] text-snow uppercase">
+                            <h3 className="mt-5 text-base font-medium tracking-[0.16em] text-foreground uppercase">
                                 The agent works it
                             </h3>
-                            <p className="mt-4 max-w-sm text-[0.8125rem] leading-relaxed text-neutral-400">
+                            <p className="mt-4 max-w-sm text-[0.8125rem] leading-relaxed text-muted-foreground">
                                 An agent claims the card and reads your repo before touching a line:
                                 your conventions, your structure, the blast radius of the change. It
                                 writes the fix the way your team would, proves it on a runner, and

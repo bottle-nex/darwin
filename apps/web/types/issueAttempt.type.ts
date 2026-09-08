@@ -1,4 +1,4 @@
-import type { AgentSessionStatus } from "@trymatcha/types";
+import type { AgentSessionStatus } from "@trydarwin/types";
 
 export interface IssueAttemptReopen {
     note: string;

@@ -1,4 +1,4 @@
-import { type RunLogEvent, type RunLogPage, RunLogState } from "@trymatcha/types";
+import { type RunLogEvent, type RunLogPage, RunLogState } from "@trydarwin/types";
 
 export const RUN_LOG_CLIENT_EVENT_CAP = 20_000;
 

@@ -1,7 +1,7 @@
 import { randomBytes } from "node:crypto";
 
 import { Octokit } from "@octokit/rest";
-import { prisma } from "@trymatcha/database";
+import { prisma } from "@trydarwin/database";
 
 import { ENV } from "../configs/env";
 import { redis } from "./service.redis";

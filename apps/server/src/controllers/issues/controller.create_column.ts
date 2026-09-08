@@ -1,9 +1,10 @@
-import { Action, Permissions } from "@trymatcha/access-control";
-import { prisma } from "@trymatcha/database";
+import { Action, Permissions } from "@trydarwin/access-control";
+import { prisma } from "@trydarwin/database";
 import type { Request, Response } from "express";
 import z from "zod";
 
 import Access from "../../access-control/access";
+import BoardItemService from "../../services/service.board-items";
 import ResponseWriter from "../../services/service.response";
 
 export default class ColumnCreateController {
@@ -44,22 +45,10 @@ export default class ColumnCreateController {
                 return;
             }
 
-            const column = await prisma.$transaction(async (tx) => {
-                const last_column = await tx.customColumn.findFirst({
-                    where: { spaceId: parsed_body.data.space_id },
-                    orderBy: { order: "desc" },
-                    select: { order: true },
-                });
-
-                return tx.customColumn.create({
-                    data: {
-                        spaceId: parsed_body.data.space_id,
-                        label: parsed_body.data.label,
-                        order: (last_column?.order ?? 0) + 1,
-                    },
-                    select: { id: true, spaceId: true, label: true, order: true },
-                });
-            });
+            const column = await BoardItemService.create_column(
+                parsed_body.data.space_id,
+                parsed_body.data.label,
+            );
 
             ResponseWriter.created(res, { column }, "Column created successfully");
         } catch (err) {

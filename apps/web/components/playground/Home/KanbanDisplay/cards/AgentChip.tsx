@@ -1,4 +1,4 @@
-import { AgentIcon } from "@trymatcha/ui/icons";
+import { AgentIcon } from "@trydarwin/ui/icons";
 
 /** Small chip showing the Claude model assigned to an issue. */
 export default function AgentChip({ name }: { name: string }) {

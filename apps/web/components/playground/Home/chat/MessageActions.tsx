@@ -1,7 +1,7 @@
 "use client";
 
-import { type ThreadMessage, to_plain_text } from "@trymatcha/types";
-import { CopyIcon, DeleteIcon, EmojiReactionIcon, ReplyIcon } from "@trymatcha/ui/icons";
+import { type ThreadMessage, to_plain_text } from "@trydarwin/types";
+import { CopyIcon, DeleteIcon, EmojiReactionIcon, ReplyIcon } from "@trydarwin/ui/icons";
 import type { ComponentProps } from "react";
 
 import { Button } from "@/components/ui/button";

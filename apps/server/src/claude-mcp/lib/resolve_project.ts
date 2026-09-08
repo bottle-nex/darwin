@@ -1,4 +1,4 @@
-import { prisma } from "@trymatcha/database";
+import { prisma } from "@trydarwin/database";
 
 import { best_matches } from "./fuzzy";
 

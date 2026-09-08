@@ -1,8 +1,8 @@
 "use client";
 import { type NodeViewProps, NodeViewWrapper } from "@tiptap/react";
-import type { ReferenceKind } from "@trymatcha/types";
-import { reference_sigil } from "@trymatcha/types";
-import { TeamEntityIcon } from "@trymatcha/ui/icons";
+import type { ReferenceKind } from "@trydarwin/types";
+import { reference_sigil } from "@trydarwin/types";
+import { TeamEntityIcon } from "@trydarwin/ui/icons";
 
 import { displayNameOf } from "@/components/playground/Core/components/PlaygroundAvatar";
 import { IconPickGlyph } from "@/components/ui/IconPicker";

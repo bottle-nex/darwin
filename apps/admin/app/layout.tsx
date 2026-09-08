@@ -21,8 +21,8 @@ const titilliumWeb = Titillium_Web({
 });
 
 export const metadata: Metadata = {
-    title: "matcha admin",
-    description: "Internal content tooling for matcha.",
+    title: "darwin admin",
+    description: "Internal content tooling for darwin.",
     robots: { index: false, follow: false },
 };
 

@@ -1,4 +1,4 @@
-import { type RunLogEventBody, RunLogEventKind } from "@trymatcha/types";
+import { type RunLogEventBody, RunLogEventKind } from "@trydarwin/types";
 
 import type { AgentReport, HarnessEventParser } from "./parser.types";
 
@@ -14,7 +14,7 @@ const SEARCH = /^✱ (?:Grep|Glob) "(.+)" \d+ match(?:es)?$/;
  * Lines that echo a tool call rather than report an action of their own.
  *
  * `⟩` renders the arguments of the tool opencode is about to run and `⚙` renders the call
- * itself, so a matcha_report_progress call prints its own payload here. Reading those would
+ * itself, so a darwin_report_progress call prints its own payload here. Reading those would
  * record every reported action twice: once from the agent's own report, and once from opencode
  * narrating that the report happened.
  */

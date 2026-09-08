@@ -3,7 +3,7 @@ import {
     NotificationType,
     type OutboundSocketMessage,
     OutboundSocketMessageType,
-} from "@trymatcha/types";
+} from "@trydarwin/types";
 
 import { append_activities, update_agent_session } from "@/hooks/activity/useActivity";
 import { rollbackPendingChatCreate } from "@/hooks/chats/chatCache";
@@ -23,6 +23,7 @@ import {
 } from "@/hooks/chats/useMessageReactions";
 import { mark_project_chat_deleted, upsert_project_chat } from "@/hooks/chats/useProjectChat";
 import { mark_team_chat_deleted, upsert_team_chat } from "@/hooks/chats/useTeamChat";
+import { append_darwin_events, seal_darwin_run } from "@/hooks/darwin/useDarwinThread";
 import { updateBoardIssue, upsertBoardIssue } from "@/hooks/issues/useBoard";
 import { issueAttemptsKey } from "@/hooks/issues/useIssueAttempts";
 import { upsert_notification } from "@/hooks/notifications/notificationCache";
@@ -190,5 +191,20 @@ export class SocketHandlers {
     static handle_run_log_sealed(queryClient: QueryClient, message: OutboundSocketMessage) {
         if (message.type !== OutboundSocketMessageType.RUN_LOG_SEALED) return;
         seal_run_log(queryClient, message.runId, message.payload.droppedEvents);
+    }
+
+    static handle_darwin_run_appended(queryClient: QueryClient, message: OutboundSocketMessage) {
+        if (message.type !== OutboundSocketMessageType.DARWIN_RUN_APPENDED) return;
+        append_darwin_events(
+            queryClient,
+            message.runId,
+            message.payload.events,
+            message.payload.cursor,
+        );
+    }
+
+    static handle_darwin_run_sealed(queryClient: QueryClient, message: OutboundSocketMessage) {
+        if (message.type !== OutboundSocketMessageType.DARWIN_RUN_SEALED) return;
+        seal_darwin_run(queryClient, message.runId, message.payload.status);
     }
 }

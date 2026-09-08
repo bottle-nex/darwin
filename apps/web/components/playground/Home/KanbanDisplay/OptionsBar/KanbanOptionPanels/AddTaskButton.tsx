@@ -5,7 +5,7 @@ import {
     ComposeIssueIcon,
     DropdownCaretIcon,
     ImportUploadIcon,
-} from "@trymatcha/ui/icons";
+} from "@trydarwin/ui/icons";
 
 import {
     DropdownMenu,

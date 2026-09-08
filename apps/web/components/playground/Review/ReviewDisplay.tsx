@@ -1,6 +1,6 @@
 "use client";
-import { type ReviewHeader as ReviewHeaderData, ReviewTab } from "@trymatcha/types";
-import { MergeIcon } from "@trymatcha/ui/icons";
+import { type ReviewHeader as ReviewHeaderData, ReviewTab } from "@trydarwin/types";
+import { MergeIcon } from "@trydarwin/ui/icons";
 
 import { PLAYGROUND_PANE_SHELL } from "@/components/playground/Core/components/paneBar";
 import PaneColumns from "@/components/playground/Core/components/PaneColumns";

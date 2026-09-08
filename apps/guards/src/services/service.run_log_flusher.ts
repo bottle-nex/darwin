@@ -1,7 +1,7 @@
 import { gzipSync } from "node:zlib";
 
-import { AgentSessionStatus, prisma } from "@trymatcha/database";
-import Logger from "@trymatcha/logger";
+import { AgentSessionStatus, prisma } from "@trydarwin/database";
+import Logger from "@trydarwin/logger";
 import {
     OutboundSocketMessageType,
     project_channel_name,
@@ -12,7 +12,7 @@ import {
     run_log_prefix,
     run_log_segment_key,
     type RunLogEvent,
-} from "@trymatcha/types";
+} from "@trydarwin/types";
 
 import { redis } from "./service.redis";
 import StorageService from "./service.storage";

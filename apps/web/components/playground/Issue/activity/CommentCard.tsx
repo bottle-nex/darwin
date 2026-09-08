@@ -1,6 +1,6 @@
 "use client";
-import { type Chat, type LabelledReference, to_plain_text } from "@trymatcha/types";
-import { CopyIcon, DeleteIcon, EmojiReactionIcon, ReplyIcon } from "@trymatcha/ui/icons";
+import { type Chat, type LabelledReference, to_plain_text } from "@trydarwin/types";
+import { CopyIcon, DeleteIcon, EmojiReactionIcon, ReplyIcon } from "@trydarwin/ui/icons";
 import { useRef } from "react";
 
 import PlaygroundAvatar, {

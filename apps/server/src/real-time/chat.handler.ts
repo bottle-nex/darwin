@@ -1,18 +1,23 @@
-import { Action, Permissions } from "@trymatcha/access-control";
-import { prisma } from "@trymatcha/database";
-import { OutboundSocketMessageType } from "@trymatcha/types";
+import { Action, Permissions } from "@trydarwin/access-control";
+import { prisma } from "@trydarwin/database";
+import { OutboundSocketMessageType } from "@trydarwin/types";
 import { WebSocket } from "ws";
 import z from "zod";
 
 import { server_services } from "..";
 import Access from "../access-control/access";
-import { issue_recipients } from "../notifications/recipients";
+import type { CommentFailureReason } from "../services/service.issue-comment";
+import IssueCommentService from "../services/service.issue-comment";
 import MessageReactionService from "../services/service.message-reactions";
-import MessageReferenceService, {
-    MESSAGE_REFERENCE_INCLUDE,
-} from "../services/service.message-references";
 import type { AuthUser } from "../types/express.d";
 import { pending_operation_id, reaction_payload_schema } from "./reaction.payload";
+
+const COMMENT_ERRORS: Record<CommentFailureReason, string> = {
+    issue_not_found: "Issue not found",
+    forbidden: "You dont have access to this project",
+    reply_not_found: "Replied message not found",
+    empty_message: "Message is empty",
+};
 
 export default class ChatSocketHandler {
     static payload_schema = z.object({
@@ -189,129 +194,17 @@ export default class ChatSocketHandler {
         const { issueId, message, repliedToId, operationId } = parsed.data;
 
         try {
-            const issue = await prisma.issue.findUnique({
-                where: { id: issueId },
-                select: {
-                    id: true,
-                    projectId: true,
-                    createdById: true,
-                    assignees: { select: { id: true } },
-                },
-            });
-            if (!issue || issue.projectId !== project_id) {
-                ChatSocketHandler.send_error(ws, "Issue not found", operationId);
-                return;
-            }
-
-            const role = await Access.project(user.id, issue.projectId);
-            if (!role || !Permissions.project(role, Action.project.read)) {
-                ChatSocketHandler.send_error(
-                    ws,
-                    "You dont have access to this project",
-                    operationId,
-                );
-                return;
-            }
-
-            let thread_root_id: string | undefined;
-            if (repliedToId) {
-                const replied_to = await prisma.chat.findUnique({
-                    where: { id: repliedToId },
-                    select: { issueId: true, repliedToId: true },
-                });
-                if (!replied_to || replied_to.issueId !== issue.id) {
-                    ChatSocketHandler.send_error(ws, "Replied message not found", operationId);
-                    return;
-                }
-                thread_root_id = replied_to.repliedToId ?? repliedToId;
-            }
-
-            const resolved = await MessageReferenceService.resolve(message, issue.projectId);
-            if (!resolved.message) {
-                ChatSocketHandler.send_error(ws, "Message is empty", operationId);
-                return;
-            }
-
-            const chat = await prisma.chat.create({
-                data: {
-                    issueId: issue.id,
-                    senderId: user.id,
-                    message: resolved.message,
-                    repliedToId: thread_root_id,
-                    references: { create: MessageReferenceService.to_rows(resolved) },
-                },
-                include: {
-                    sender: true,
-                    repliedTo: { include: { sender: true } },
-                    references: { include: MESSAGE_REFERENCE_INCLUDE },
-                },
-            });
-
-            const channel_name = server_services.publisher.get_channel_name(issue.projectId);
-            const publish_body = {
-                type: OutboundSocketMessageType.CHAT_CREATED,
-                projectId: issue.projectId,
-                payload: { ...chat, reactions: [] },
-                operationId,
-            };
-            await server_services.publisher.publish_message(
-                channel_name,
-                JSON.stringify(publish_body),
-            );
-
-            const mentioned = await MessageReferenceService.mention_targets({
-                memberIds: resolved.memberIds,
-                teamIds: resolved.teamIds,
-                projectId: issue.projectId,
+            const result = await IssueCommentService.create({
+                issueId,
+                projectId: project_id,
                 actorId: user.id,
+                message,
+                repliedToId,
+                operationId,
             });
-
-            await Promise.all(
-                mentioned.memberIds.map((memberId) =>
-                    server_services.notifications.enqueue({
-                        action: "chat.mention",
-                        chatId: chat.id,
-                        memberId,
-                        mentionedById: user.id,
-                    }),
-                ),
-            );
-
-            const referenced = await MessageReferenceService.referenced_issue_recipients({
-                issueIds: resolved.issueIds.filter((id) => id !== issue.id),
-                exclude: [user.id, ...mentioned.userIds],
-            });
-
-            await Promise.all(
-                referenced.map((target) =>
-                    server_services.notifications.enqueue({
-                        action: "issue.referenced",
-                        issueId: target.issueId,
-                        chatId: chat.id,
-                        recipientId: target.recipientId,
-                        actorId: user.id,
-                    }),
-                ),
-            );
-
-            await Promise.all(
-                issue_recipients({
-                    assigneeIds: issue.assignees.map((assignee) => assignee.id),
-                    creatorId: issue.createdById,
-                    exclude: [
-                        user.id,
-                        ...mentioned.userIds,
-                        ...referenced.map((target) => target.recipientId),
-                    ],
-                }).map((recipientId) =>
-                    server_services.notifications.enqueue({
-                        action: "issue.commented",
-                        chatId: chat.id,
-                        recipientId,
-                        senderId: user.id,
-                    }),
-                ),
-            );
+            if (!result.ok) {
+                ChatSocketHandler.send_error(ws, COMMENT_ERRORS[result.reason], operationId);
+            }
         } catch (error) {
             console.error("ChatSocketHandler error: ", error);
             ChatSocketHandler.send_error(ws, "Something went wrong", operationId);

@@ -9,10 +9,10 @@ import BentoCard from "./BentoCard";
 const ISO = "matrix(0.866 0.5 -0.866 0.5 0 0)";
 const SQ = Math.SQRT1_2;
 
-const SLAB_FILL = "#151516";
-const TOP_STROKE = "#4a4a4a";
-const SIDE_STROKE = "#383838";
-const DETAIL_STROKE = "#525252";
+const SLAB_FILL = "#ffffff";
+const TOP_STROKE = "#a3a3a3";
+const SIDE_STROKE = "#d4d4d4";
+const DETAIL_STROKE = "#b8b8b8";
 
 function isoX(u: number, v: number) {
     return 0.866 * (u - v);
@@ -136,15 +136,15 @@ function BoardDetail() {
     );
 }
 
-/** The AppLogo mark (792×460 viewBox) engraved on the top slab — the agent itself. */
-const MATCHA_MARK =
+/** The DarwinLogo mark (792×460 viewBox) engraved on the top slab — the agent itself. */
+const DARWIN_MARK =
     "M626.9 24.4L657 40.8L657 215.5L759.9 147L792 164.5L792 438.5L657 438.5L657 214.6L328.7 447.2L328.7 227.2L0 460.1L0 235.9L297.9 37.4L328.7 54.2L328.7 223Z";
 
 function AgentDetail() {
     return (
         <g fill="none" stroke={DETAIL_STROKE} strokeWidth={1}>
             <g transform="translate(2 -90) scale(0.062) translate(-396 -230)">
-                <path d={MATCHA_MARK} strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
+                <path d={DARWIN_MARK} strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
             </g>
             <line x1={-30} y1={-54} x2={34} y2={-54} vectorEffect="non-scaling-stroke" />
         </g>
@@ -234,7 +234,7 @@ function IsoGridBackdrop() {
                 >
                     <path
                         d="M0 0L96 55.4256M0 55.4256L96 0"
-                        stroke="#1e1e1f"
+                        stroke="#e7e7ea"
                         strokeWidth={1}
                         fill="none"
                     />

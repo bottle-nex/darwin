@@ -1,4 +1,4 @@
-import { Harness, type Effort } from "@trymatcha/database";
+import { Harness, type Effort } from "@trydarwin/database";
 import {
     AgentHarness,
     CredentialSource,
@@ -36,7 +36,7 @@ class ClaudeHarness extends AgentHarness {
     }
 
     mcpConfigPath(): string {
-        return "/home/user/matcha_mcp_config.json";
+        return "/home/user/darwin_mcp_config.json";
     }
 
     buildMcpConfig(server: McpServerSpec, _existing: string | null): string {

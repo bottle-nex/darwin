@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckIcon, GithubLogoIcon } from "@trymatcha/ui/icons";
+import { CheckIcon, GithubLogoIcon } from "@trydarwin/ui/icons";
 import { useParams } from "next/navigation";
 
 import { Button } from "@/components/ui/button";

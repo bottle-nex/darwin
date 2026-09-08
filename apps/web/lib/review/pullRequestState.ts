@@ -1,10 +1,10 @@
-import type { ReviewState } from "@trymatcha/types";
+import type { ReviewState } from "@trydarwin/types";
 import {
     type IconType,
     MergeIcon,
     PullRequestClosedIcon,
     PullRequestOpenIcon,
-} from "@trymatcha/ui/icons";
+} from "@trydarwin/ui/icons";
 
 /**
  * How a pull request's state is drawn app-wide. Kanban status colours are a

@@ -1,6 +1,6 @@
 "use client";
 
-import { type IconType, KanbanColumnsIcon } from "@trymatcha/ui/icons";
+import { type IconType, KanbanColumnsIcon } from "@trydarwin/ui/icons";
 import { useMemo } from "react";
 
 import {

@@ -1,6 +1,6 @@
 import { randomBytes } from "node:crypto";
 
-import { type Connector, ConnectorStatus, prisma, Provider } from "@trymatcha/database";
+import { type Connector, ConnectorStatus, prisma, Provider } from "@trydarwin/database";
 
 import { ENV } from "../../configs/env";
 import SecretService from "../service.secret";

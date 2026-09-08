@@ -4,7 +4,7 @@
 
 **Goal:** Reliably generate Product Diffs for standalone Next.js applications and Next.js applications inside Turborepo and Nx workspaces, with precise business-facing diagnostics and a framework-adapter boundary ready for Vite + React.
 
-**Architecture:** Keep `ProductDiffRunner` framework-neutral: it checks out revisions, delegates preparation and lifecycle to a selected adapter, captures verified previews, pairs them, and publishes artifacts. `NextProductDiffAdapter` owns Next application selection, workspace command resolution, router-safe preview surface generation, startup diagnostics, and cleanup; sandbox-local inspection and scaffolding stay in `@trymatcha/preview-runner`.
+**Architecture:** Keep `ProductDiffRunner` framework-neutral: it checks out revisions, delegates preparation and lifecycle to a selected adapter, captures verified previews, pairs them, and publishes artifacts. `NextProductDiffAdapter` owns Next application selection, workspace command resolution, router-safe preview surface generation, startup diagnostics, and cleanup; sandbox-local inspection and scaffolding stay in `@trydarwin/preview-runner`.
 
 **Tech Stack:** Bun, TypeScript, Zod, Prisma/Postgres, BullMQ, E2B, Next.js, Playwright, React 19, TanStack Query.
 
@@ -116,7 +116,7 @@ Add the exact diagnostic and configuration interfaces to `packages/types/product
 
 Run: `bun test apps/server/src/services/service.product_diff.test.ts`
 
-Run: `bun run typecheck --filter=@trymatcha/server --filter=@trymatcha/types --filter=@trymatcha/database`
+Run: `bun run typecheck --filter=@trydarwin/server --filter=@trydarwin/types --filter=@trydarwin/database`
 
 Expected: all pass.
 
@@ -170,7 +170,7 @@ The registry iterates registered adapters in deterministic order and returns the
 
 Run: `bun test apps/vm/src/services/product_diff/adapter.contract.test.ts`
 
-Run: `bun run typecheck --filter=@trymatcha/vm`
+Run: `bun run typecheck --filter=@trydarwin/vm`
 
 Expected: all pass.
 
@@ -232,7 +232,7 @@ Choose an application when changed paths belong to exactly one app. Use explicit
 
 Run: `bun test packages/preview-runner/src/adapters/next/workspace.test.ts apps/vm/src/services/product_diff/adapters/next/service.next_workspace_resolver.test.ts`
 
-Run: `bun run typecheck --filter=@trymatcha/preview-runner --filter=@trymatcha/vm`
+Run: `bun run typecheck --filter=@trydarwin/preview-runner --filter=@trydarwin/vm`
 
 Expected: all pass.
 
@@ -294,7 +294,7 @@ Replace direct `next dev` invocation with `PreviewServer.start(plan)`. Install f
 
 Run: `bun test apps/vm/src/services/product_diff/adapters/next/service.next_preview_launcher.test.ts`
 
-Run: `bun run typecheck --filter=@trymatcha/vm`
+Run: `bun run typecheck --filter=@trydarwin/vm`
 
 Expected: all pass.
 
@@ -347,7 +347,7 @@ Expected: failure because the unique surface API does not exist.
 
 - [ ] **Step 3: Implement unique, tracked surfaces**
 
-Replace the fixed `matcha-preview` route segment with a validated job-scoped segment supplied by the VM. Generate only the router selected by the Next workspace plan. Return every generated file path. Remove `PagesEscape` as an implicit automatic fallback. Surface creation must reject a customer-path collision rather than overwrite customer files.
+Replace the fixed `darwin-preview` route segment with a validated job-scoped segment supplied by the VM. Generate only the router selected by the Next workspace plan. Return every generated file path. Remove `PagesEscape` as an implicit automatic fallback. Surface creation must reject a customer-path collision rather than overwrite customer files.
 
 - [ ] **Step 4: Require browser validation before screenshot capture**
 
@@ -357,7 +357,7 @@ Call `PreviewRunner.check` after the probe route is healthy and after harness ta
 
 Run: `bun test packages/preview-runner/src/adapters/next/preview_surface.test.ts`
 
-Run: `bun run typecheck --filter=@trymatcha/preview-runner --filter=@trymatcha/vm`
+Run: `bun run typecheck --filter=@trydarwin/preview-runner --filter=@trydarwin/vm`
 
 Expected: all pass.
 
@@ -404,13 +404,13 @@ Keep checkout, pull freshness checks, artifact upload, pairing, and sandbox shut
 
 - [ ] **Step 4: Persist concise diagnostics and preserve full redacted logs**
 
-Set `ConfigurationRequired` for ambiguous selection or missing explicit configuration, `PreviewUnavailable` for project boot or browser-render failures, and `Failed` for Matcha failures. Store the structured diagnostic JSON and continue limiting the user-facing error string. Include adapter and workspace information in the manifest warnings only when a run reaches Ready.
+Set `ConfigurationRequired` for ambiguous selection or missing explicit configuration, `PreviewUnavailable` for project boot or browser-render failures, and `Failed` for Darwin failures. Store the structured diagnostic JSON and continue limiting the user-facing error string. Include adapter and workspace information in the manifest warnings only when a run reaches Ready.
 
 - [ ] **Step 5: Run the orchestration test, VM typecheck, and formatter check**
 
 Run: `bun test apps/vm/src/services/service.product_diff.test.ts`
 
-Run: `bun run typecheck --filter=@trymatcha/vm`
+Run: `bun run typecheck --filter=@trydarwin/vm`
 
 Run: `bunx prettier --check apps/vm/src/services/service.product_diff.ts apps/vm/src/services/product_diff`
 
@@ -471,7 +471,7 @@ Validate all override fields with Zod and reject unsafe launch commands. Return 
 
 Run: `bun test apps/server/src/controllers/project/controller.update_project_config.test.ts`
 
-Run: `bun run typecheck --filter=@trymatcha/server --filter=web`
+Run: `bun run typecheck --filter=@trydarwin/server --filter=web`
 
 Expected: all pass.
 
@@ -523,7 +523,7 @@ Keep fixtures small and local: no network images, external APIs, or secrets. Eac
 
 - [ ] **Step 4: Rebuild the sandbox bundle and template**
 
-Run: `bun run build --filter=@trymatcha/preview-runner`
+Run: `bun run build --filter=@trydarwin/preview-runner`
 
 Increment the preview-runner protocol version in both VM and sandbox runtime when its command contract changes. Then run: `bun run template` and `bun run template:verify`.
 

@@ -1,5 +1,5 @@
-import { Action, Permissions } from "@trymatcha/access-control";
-import { prisma } from "@trymatcha/database";
+import { Action, Permissions } from "@trydarwin/access-control";
+import { prisma } from "@trydarwin/database";
 import type { Request, Response } from "express";
 import { z } from "zod";
 
@@ -13,7 +13,7 @@ const params_schema = z.object({
 /**
  * `DELETE /github/connect/:orgId` — disconnect the org's GitHub installation.
  *
- * Deletes the matcha-side link (projects keep their repo metadata but lose the
+ * Deletes the darwin-side link (projects keep their repo metadata but lose the
  * live `githubInstallation` relation via `onDelete: SetNull`). This does NOT
  * uninstall the App on GitHub — the user must revoke that from GitHub settings.
  */

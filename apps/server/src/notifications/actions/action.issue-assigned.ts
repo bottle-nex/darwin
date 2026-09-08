@@ -1,5 +1,5 @@
-import { NotificationType, prisma } from "@trymatcha/database";
-import type { NotificationJobData } from "@trymatcha/types";
+import { NotificationType, prisma } from "@trydarwin/database";
+import type { NotificationJobData } from "@trydarwin/types";
 
 import { ENV } from "../../configs/env";
 import { sendIssueAssignedEmail } from "../../services/service.email";

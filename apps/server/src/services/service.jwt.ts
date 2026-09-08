@@ -74,7 +74,7 @@ export interface SandboxClaims {
 
 /**
  * Sign a short-lived JWT scoped to one SetupSession — handed to the E2B sandbox as
- * MATCHA_SANDBOX_TOKEN so sandbox-mcp can call back in without a user session.
+ * DARWIN_SANDBOX_TOKEN so sandbox-mcp can call back in without a user session.
  */
 export function signSandboxJwt(session_id: string): string {
     return jwt.sign({ session_id } satisfies SandboxClaims, ENV.JWT_SECRET, {
@@ -106,7 +106,7 @@ export interface WorkerClaims {
 
 /**
  * Sign a short-lived JWT scoped to one Worker — handed to the E2B sandbox as
- * MATCHA_SANDBOX_TOKEN so sandbox-mcp can report status/PR outcome without a user session.
+ * DARWIN_SANDBOX_TOKEN so sandbox-mcp can report status/PR outcome without a user session.
  */
 export function signWorkerJwt(worker_id: string): string {
     return jwt.sign({ worker_id } satisfies WorkerClaims, ENV.JWT_SECRET, {

@@ -1,4 +1,4 @@
-import type { GithubImportTarget } from "@trymatcha/types";
+import type { GithubImportTarget } from "@trydarwin/types";
 
 export type IssueImportConfig = {
     enabled: boolean;

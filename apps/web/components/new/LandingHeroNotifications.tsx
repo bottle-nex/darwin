@@ -1,5 +1,5 @@
 "use client";
-import { GithubLogoIcon, MergeIcon, RunnerIcon } from "@trymatcha/ui/icons";
+import { GithubLogoIcon, MergeIcon, RunnerIcon } from "@trydarwin/ui/icons";
 import { motion, useReducedMotion } from "motion/react";
 
 import { AppLogo } from "@/components/logo/AppLogo";

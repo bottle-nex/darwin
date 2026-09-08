@@ -1,6 +1,6 @@
 "use client";
-import { type ChatPreviewMessage, to_plain_text } from "@trymatcha/types";
-import { AddIcon, SearchToggleIcon } from "@trymatcha/ui/icons";
+import { type ChatPreviewMessage, to_plain_text } from "@trydarwin/types";
+import { AddIcon, SearchToggleIcon } from "@trydarwin/ui/icons";
 import { AnimatePresence } from "motion/react";
 import { useState } from "react";
 

@@ -1,5 +1,5 @@
-import type { Effort, Harness } from "@trymatcha/database";
-import type Logger from "@trymatcha/logger";
+import type { Effort, Harness } from "@trydarwin/database";
+import type Logger from "@trydarwin/logger";
 
 import { ENV } from "../../conf/config.env";
 import type { AgentReport } from "../harness/parsers/parser.index";

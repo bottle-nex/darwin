@@ -14,7 +14,7 @@ export default function LandingFeatures() {
     return (
         <main className="min-h-screen w-screen max-w-7xl mx-auto flex flex-col pt-40">
             <div className="flex flex-col">
-                <div className="text-[#8166db] font-medium tracking-tight">Why matcha</div>
+                <div className="text-[#8166db] font-medium tracking-tight">Why darwin</div>
                 <div className="w-full flex justify-between items-end pt-4">
                     <div className="text-5xl font-medium max-w-xl">
                         The engineer that never leaves the board.

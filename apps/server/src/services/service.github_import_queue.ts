@@ -1,4 +1,4 @@
-import { type GithubImportJobData, QueueName } from "@trymatcha/types";
+import { type GithubImportJobData, QueueName } from "@trydarwin/types";
 import { type Job, Worker } from "bullmq";
 
 import queue_config from "../configs/config.queue";

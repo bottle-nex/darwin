@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import type { ReviewCommit } from "@trymatcha/types";
+import type { ReviewCommit } from "@trydarwin/types";
 
 import { apiClient } from "@/lib/axios";
 import { REVIEW_COMMITS_URL } from "@/routes/api_routes";

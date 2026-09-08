@@ -1,5 +1,5 @@
 "use client";
-import { AddIcon, DeleteIcon, TeamEntityIcon } from "@trymatcha/ui/icons";
+import { AddIcon, DeleteIcon, TeamEntityIcon } from "@trydarwin/ui/icons";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";

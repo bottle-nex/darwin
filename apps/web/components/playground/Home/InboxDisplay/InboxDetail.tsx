@@ -5,8 +5,8 @@ import {
     type TeamChat,
     TeamRole,
     type ThreadMessage,
-} from "@trymatcha/types";
-import { InboxIcon, NotificationsBellIcon } from "@trymatcha/ui/icons";
+} from "@trydarwin/types";
+import { InboxIcon, NotificationsBellIcon } from "@trydarwin/ui/icons";
 import { isAxiosError } from "axios";
 
 import PaneEmptyState from "@/components/playground/Core/components/PaneEmptyState";

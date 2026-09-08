@@ -1,6 +1,6 @@
 "use client";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import type { Notification, NotificationFeedPage } from "@trymatcha/types";
+import type { Notification, NotificationFeedPage } from "@trydarwin/types";
 import { isAxiosError } from "axios";
 import { useMemo } from "react";
 

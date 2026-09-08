@@ -1,6 +1,6 @@
 "use client";
 
-import { AddIcon, CheckIcon, LoadingSpinnerIcon, TagIcon } from "@trymatcha/ui/icons";
+import { AddIcon, CheckIcon, LoadingSpinnerIcon, TagIcon } from "@trydarwin/ui/icons";
 import { useState } from "react";
 
 import TagDisplay from "@/components/playground/Home/TagsDisplay/TagDisplay";

@@ -85,21 +85,21 @@ export default function BoardCard({ lit, litDelay }: { lit: boolean; litDelay: n
                                 <stop offset="1" stopColor="#333333" />
                             </linearGradient>
                             <linearGradient id="board-prong" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="0" stopColor="#c2c2c2" />
-                                <stop offset="1" stopColor="#7c7c7c" />
+                                <stop offset="0" stopColor="#a5a5a5" />
+                                <stop offset="1" stopColor="#6a6a6a" />
                             </linearGradient>
                             <linearGradient id="board-face" x1="0" y1="0" x2="0" y2="1">
                                 <stop offset="0" stopColor="#6a6a6a" />
                                 <stop offset="1" stopColor="#3d3d3d" />
                             </linearGradient>
                             <radialGradient id="board-glow" cx="0.5" cy="0.5" r="0.5">
-                                <stop offset="0" stopColor="#ffffff" stopOpacity={0.07} />
-                                <stop offset="1" stopColor="#ffffff" stopOpacity={0} />
+                                <stop offset="0" stopColor="#18181b" stopOpacity={0.05} />
+                                <stop offset="1" stopColor="#18181b" stopOpacity={0} />
                             </radialGradient>
                         </defs>
 
                         <motion.g variants={fade(0.1)}>
-                            <g stroke="#242424" strokeWidth={1} fill="none">
+                            <g stroke="#e2e2e6" strokeWidth={1} fill="none">
                                 {CIRCUIT_TRACES.map((trace) => (
                                     <path key={trace.d} d={trace.d} />
                                 ))}
@@ -132,7 +132,7 @@ export default function BoardCard({ lit, litDelay }: { lit: boolean; litDelay: n
                                     cx={trace.dot.x}
                                     cy={trace.dot.y}
                                     r={1.8}
-                                    fill="#383838"
+                                    fill="#d0d0d6"
                                 />
                             ))}
                             {CIRCUIT_DOTS.map((dot) => (
@@ -141,7 +141,7 @@ export default function BoardCard({ lit, litDelay }: { lit: boolean; litDelay: n
                                     cx={dot.x}
                                     cy={dot.y}
                                     r={1.2}
-                                    fill="#383838"
+                                    fill="#d0d0d6"
                                 />
                             ))}
                         </motion.g>
@@ -257,7 +257,7 @@ export default function BoardCard({ lit, litDelay }: { lit: boolean; litDelay: n
                                 bounce: 0.35,
                                 duration: 0.6,
                             }}
-                            className="rounded-[6px] border border-[#3f3f3f] bg-graphite px-3 py-0.5 font-mono text-[11px] whitespace-nowrap text-neutral-300"
+                            className="rounded-[6px] border border-edge bg-graphite px-3 py-0.5 font-mono text-[11px] whitespace-nowrap text-foreground/70 shadow-[0_1px_2px_rgba(24,24,27,0.06)]"
                         >
                             Connect your GitHub
                         </motion.div>

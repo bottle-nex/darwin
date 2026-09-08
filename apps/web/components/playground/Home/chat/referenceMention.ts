@@ -9,7 +9,7 @@ import {
     reference_sigil,
     reference_token,
     type ReferenceKind,
-} from "@trymatcha/types";
+} from "@trydarwin/types";
 
 import { displayNameOf } from "@/components/playground/Core/components/PlaygroundAvatar";
 import type { ProjectMember } from "@/hooks/project/useProjectMembers";

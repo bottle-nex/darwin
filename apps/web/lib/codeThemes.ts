@@ -1,4 +1,4 @@
-import { CodeTheme } from "@trymatcha/types";
+import { CodeTheme } from "@trydarwin/types";
 
 // Prism tags code with about 30 different token classes. Colouring each one per theme
 // would mean 30 values x 9 themes, so they are grouped into these 11 roles instead.
@@ -36,13 +36,13 @@ export const CODE_TOKEN_VARS: Record<CodeTokenRole, string> = {
     variable: "--code-variable",
 };
 
-// Matcha is the house theme and keeps the colours the diff had before themes were
+// Darwin is the house theme and keeps the colours the diff had before themes were
 // selectable, so nobody sees a change until they pick something else. It is very close
 // rather than exact: grouping 30 token classes into 11 roles means booleans and
 // SCREAMING_CASE constants now take the number colour instead of their own.
 export const CODE_THEME_PRESETS: Record<CodeTheme, CodeThemePreset> = {
-    [CodeTheme.Matcha]: {
-        label: "Matcha",
+    [CodeTheme.Darwin]: {
+        label: "Darwin",
         colors: {
             plain: "#e6e6e6",
             comment: "#637777",
@@ -193,7 +193,7 @@ export const CODE_THEMES = Object.keys(CODE_THEME_PRESETS) as CodeTheme[];
 // dashboard response from before this column existed would otherwise read `colors`
 // off undefined and crash the whole Changes tab.
 export function codeThemePreset(theme: CodeTheme | undefined): CodeThemePreset {
-    return (theme && CODE_THEME_PRESETS[theme]) ?? CODE_THEME_PRESETS[CodeTheme.Matcha];
+    return (theme && CODE_THEME_PRESETS[theme]) ?? CODE_THEME_PRESETS[CodeTheme.Darwin];
 }
 
 // Builds the `style` object the diff puts on its root element. Setting the variables

@@ -6,7 +6,7 @@ import {
     DeleteIcon,
     OverflowMenuIcon,
     TeamEntityIcon,
-} from "@trymatcha/ui/icons";
+} from "@trydarwin/ui/icons";
 import { useParams } from "next/navigation";
 
 import { Button } from "@/components/ui/button";

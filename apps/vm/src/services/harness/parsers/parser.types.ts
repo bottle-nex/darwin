@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars -- base no-unused-vars doesn't understand named params in a
    TS function-type signature; this file only ever declares types. */
-import type { RunLogEventBody } from "@trymatcha/types";
+import type { RunLogEventBody } from "@trydarwin/types";
 
 export interface AgentReport {
     result?: string;

@@ -1,4 +1,4 @@
-import { ProcessingSpinnerIcon, RunnerIcon } from "@trymatcha/ui/icons";
+import { ProcessingSpinnerIcon, RunnerIcon } from "@trydarwin/ui/icons";
 
 import type { Issue } from "@/types/kanban";
 

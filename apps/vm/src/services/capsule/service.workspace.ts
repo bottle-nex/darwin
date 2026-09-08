@@ -1,4 +1,4 @@
-import type Logger from "@trymatcha/logger";
+import type Logger from "@trydarwin/logger";
 import type { Sandbox } from "e2b";
 
 import { describe_failure } from "../sandbox/service.stream";

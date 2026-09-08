@@ -10,7 +10,7 @@ import {
     SearchToggleIcon,
     SortAlphabeticalIcon,
     SortIcon,
-} from "@trymatcha/ui/icons";
+} from "@trydarwin/ui/icons";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useRef } from "react";
 

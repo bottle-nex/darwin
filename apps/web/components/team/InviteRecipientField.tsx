@@ -1,6 +1,6 @@
 "use client";
 
-import { CloseIcon } from "@trymatcha/ui/icons";
+import { CloseIcon } from "@trydarwin/ui/icons";
 import { Command as CommandPrimitive } from "cmdk";
 import { type KeyboardEvent, useRef, useState } from "react";
 

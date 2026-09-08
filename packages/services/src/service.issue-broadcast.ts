@@ -1,5 +1,5 @@
-import type { Prisma } from "@trymatcha/database";
-import { OutboundSocketMessageType } from "@trymatcha/types";
+import type { Prisma } from "@trydarwin/database";
+import { OutboundSocketMessageType } from "@trydarwin/types";
 
 import { publisher } from "./service.publisher";
 

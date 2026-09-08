@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import type { ProductDiffDetail } from "@trymatcha/types";
+import type { ProductDiffDetail } from "@trydarwin/types";
 
 import { apiClient } from "@/lib/axios";
 import { PRODUCT_DIFF_URL } from "@/routes/api_routes";

@@ -1,5 +1,5 @@
 "use client";
-import { GitBranchIcon, GithubLogoIcon, LoadingSpinnerIcon } from "@trymatcha/ui/icons";
+import { GitBranchIcon, GithubLogoIcon, LoadingSpinnerIcon } from "@trydarwin/ui/icons";
 import { useMemo, useState } from "react";
 
 import { CapsuleTrigger } from "@/components/playground/Issue/Capsule";

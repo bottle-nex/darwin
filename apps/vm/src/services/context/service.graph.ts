@@ -1,11 +1,11 @@
-import { Harness } from "@trymatcha/database";
-import type Logger from "@trymatcha/logger";
+import { Harness } from "@trydarwin/database";
+import type Logger from "@trydarwin/logger";
 import type { CommandStartOpts, Sandbox } from "e2b";
 
 import SandboxStream from "../sandbox/service.stream";
 
 const REPO_DIR = "/home/user/repo";
-const GRAPHIFY_ROOT = "/home/user/.matcha/graphify";
+const GRAPHIFY_ROOT = "/home/user/.darwin/graphify";
 export const GRAPHIFY_OUT = `${GRAPHIFY_ROOT}/graphify-out`;
 export const GRAPHIFY_INTEGRATION = `${GRAPHIFY_ROOT}/integration`;
 export const GRAPHIFY_SETTINGS = `${GRAPHIFY_INTEGRATION}/.claude/settings.json`;

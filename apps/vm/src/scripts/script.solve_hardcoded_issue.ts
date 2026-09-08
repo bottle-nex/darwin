@@ -1,5 +1,5 @@
-import { Harness, IssueStatus, prisma, WorkerStatus } from "@trymatcha/database";
-import Logger from "@trymatcha/logger";
+import { Harness, IssueStatus, prisma, WorkerStatus } from "@trydarwin/database";
+import Logger from "@trydarwin/logger";
 
 import { ENV } from "../conf/config.env";
 import E2B from "../services/sandbox/service.e2b";

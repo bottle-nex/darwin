@@ -1,5 +1,5 @@
 {
-    "name": "@trymatcha/editorial",
+    "name": "@trydarwin/editorial",
     "module": "index.ts",
     "type": "module",
     "private": true,
@@ -10,7 +10,7 @@
         "typecheck": "tsc --noEmit"
     },
     "dependencies": {
-        "@trymatcha/types": "*",
+        "@trydarwin/types": "*",
         "clsx": "^2.1.1",
         "tailwind-merge": "^3.3.1"
     },

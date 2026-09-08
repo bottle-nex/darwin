@@ -1,7 +1,7 @@
 "use client";
-import { Action, Permissions } from "@trymatcha/access-control";
-import { type ReviewHeader, ReviewState } from "@trymatcha/types";
-import type { IconType } from "@trymatcha/ui/icons";
+import { Action, Permissions } from "@trydarwin/access-control";
+import { type ReviewHeader, ReviewState } from "@trydarwin/types";
+import type { IconType } from "@trydarwin/ui/icons";
 import {
     CheckIcon,
     ErrorCircleIcon,
@@ -10,7 +10,7 @@ import {
     MergeToneWarningIcon,
     PullRequestClosedIcon,
     StatusInfoIcon,
-} from "@trymatcha/ui/icons";
+} from "@trydarwin/ui/icons";
 import axios from "axios";
 import { useState } from "react";
 

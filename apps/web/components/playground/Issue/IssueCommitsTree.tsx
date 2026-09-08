@@ -1,6 +1,6 @@
 "use client";
-import { IssueStatus, ReviewTab } from "@trymatcha/types";
-import { AddIcon, CommitsIcon } from "@trymatcha/ui/icons";
+import { IssueStatus, ReviewTab } from "@trydarwin/types";
+import { AddIcon, CommitsIcon } from "@trydarwin/ui/icons";
 import { Children, type ReactElement, type ReactNode, useState } from "react";
 
 import TreeBranch from "@/components/playground/Core/components/TreeBranch";

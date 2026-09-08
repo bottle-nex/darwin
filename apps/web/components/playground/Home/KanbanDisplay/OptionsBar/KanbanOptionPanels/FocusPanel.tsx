@@ -5,7 +5,7 @@ import {
     DefaultFocusIcon,
     KanbanBoardLayoutIcon,
     KanbanColumnsIcon,
-} from "@trymatcha/ui/icons";
+} from "@trydarwin/ui/icons";
 
 import {
     DropdownMenu,

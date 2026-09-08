@@ -1,7 +1,7 @@
 import "../conf/config.env";
 
-import { Prisma, prisma } from "@trymatcha/database";
-import Logger from "@trymatcha/logger";
+import { Prisma, prisma } from "@trydarwin/database";
+import Logger from "@trydarwin/logger";
 
 import ProductDiffRunner from "../services/capsule/service.product_diff";
 

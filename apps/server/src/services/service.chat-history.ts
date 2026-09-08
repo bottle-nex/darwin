@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 
-import { prisma } from "@trymatcha/database";
-import type { CursorPage, ReactionSummary } from "@trymatcha/types";
+import { prisma } from "@trydarwin/database";
+import type { CursorPage, ReactionSummary } from "@trydarwin/types";
 import z from "zod";
 
 import MessageReactionService from "./service.message-reactions";

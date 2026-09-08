@@ -1,4 +1,4 @@
-import { ClockIcon, CommentCountIcon, PausedStateIcon } from "@trymatcha/ui/icons";
+import { ClockIcon, CommentCountIcon, PausedStateIcon } from "@trydarwin/ui/icons";
 
 import { TooltipComponent } from "@/components/ui/tooltip-component";
 import { useIssueIdentifier } from "@/hooks/issues/useIssueIdentifier";

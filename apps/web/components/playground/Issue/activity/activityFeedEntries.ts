@@ -1,4 +1,4 @@
-import type { Chat, IssueActivity } from "@trymatcha/types";
+import type { Chat, IssueActivity } from "@trydarwin/types";
 
 import type { CommentThread } from "./CommentCard";
 

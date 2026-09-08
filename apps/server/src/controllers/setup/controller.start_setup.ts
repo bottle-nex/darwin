@@ -1,5 +1,5 @@
-import { Action, Permissions } from "@trymatcha/access-control";
-import { PlanStatus, prisma } from "@trymatcha/database";
+import { Action, Permissions } from "@trydarwin/access-control";
+import { PlanStatus, prisma } from "@trydarwin/database";
 import chalk from "chalk";
 import type { Request, Response } from "express";
 import z from "zod";

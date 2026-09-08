@@ -1,5 +1,5 @@
 "use client";
-import type { ReviewHeader } from "@trymatcha/types";
+import type { ReviewHeader } from "@trydarwin/types";
 
 import LogoLoader from "@/components/app/LogoLoader";
 import Markdown from "@/components/utility/Markdown";

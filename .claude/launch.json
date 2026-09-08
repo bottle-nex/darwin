@@ -10,7 +10,7 @@
         {
             "name": "server",
             "runtimeExecutable": "bun",
-            "runtimeArgs": ["run", "dev", "--filter=@trymatcha/server"],
+            "runtimeArgs": ["run", "dev", "--filter=@trydarwin/server"],
             "port": 4402
         },
         {

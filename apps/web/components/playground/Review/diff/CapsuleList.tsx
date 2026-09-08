@@ -1,6 +1,6 @@
 "use client";
-import type { Capsule } from "@trymatcha/types";
-import { DiffFileRowIcon } from "@trymatcha/ui/icons";
+import type { Capsule } from "@trydarwin/types";
+import { DiffFileRowIcon } from "@trydarwin/ui/icons";
 
 import { splitPath } from "@/components/playground/Review/changes/ReviewFileRow";
 import { Button } from "@/components/ui/button";

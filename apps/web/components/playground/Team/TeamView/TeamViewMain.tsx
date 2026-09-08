@@ -1,5 +1,5 @@
 "use client";
-import { DeleteIcon, InviteMemberIcon } from "@trymatcha/ui/icons";
+import { DeleteIcon, InviteMemberIcon } from "@trydarwin/ui/icons";
 import { useParams } from "next/navigation";
 import { useState } from "react";
 

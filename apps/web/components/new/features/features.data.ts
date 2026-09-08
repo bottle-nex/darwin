@@ -8,7 +8,7 @@ import RealActionMedia from "./media/RealActionMedia";
 export const FEATURES: Feature[] = [
     {
         title: "Always context-aware",
-        body: "Matcha remembers your preferences, priorities, and past decisions — so you never have to repeat yourself. It understands your work the way a long-time colleague would.",
+        body: "Darwin remembers your preferences, priorities, and past decisions — so you never have to repeat yourself. It understands your work the way a long-time colleague would.",
         Media: ContextAwareMedia,
     },
     {

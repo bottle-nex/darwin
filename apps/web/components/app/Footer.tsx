@@ -1,4 +1,4 @@
-import { FooterLinkHoverArrowIcon } from "@trymatcha/ui/icons";
+import { FooterLinkHoverArrowIcon } from "@trydarwin/ui/icons";
 import Link from "next/link";
 
 import { cn } from "@/lib/utils";

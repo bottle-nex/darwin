@@ -1,5 +1,5 @@
 {
-    "name": "@trymatcha/editor",
+    "name": "@trydarwin/editor",
     "module": "index.ts",
     "type": "module",
     "private": true,
@@ -21,7 +21,7 @@
         "@tiptap/react": "^3",
         "@tiptap/starter-kit": "^3",
         "@tiptap/suggestion": "^3",
-        "@trymatcha/ui": "*",
+        "@trydarwin/ui": "*",
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
         "radix-ui": "^1.4.3",

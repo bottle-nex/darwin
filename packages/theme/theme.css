@@ -56,6 +56,7 @@
     --font-serif: var(--font-sans);
     --font-grotesk: var(--font-sans);
     --font-headline: var(--font-titillium-web);
+    --font-pixel: var(--font-departure-mono), ui-monospace, monospace;
     --font-arimo: var(--font-sans);
 }
 
@@ -65,27 +66,35 @@
  * so either can be retuned without shifting the other. Utility classes like
  * `bg-charcoal` always resolve through these custom properties, so scoping
  * them here is enough — no component classNames need to change.
+ *
+ * The landing site runs light on a neutral near-white ground, so its surface
+ * scale reads as lift rather than darkness: `ink` is the page, `charcoal` the
+ * recessed well, `cement` and `graphite` the raised card and chip. Text takes
+ * `foreground` / `muted-foreground`, never `snow`, which stays a real white.
  */
 .theme-landing {
-    --color-ink: #0a0a0a;
-    --color-charcoal: #121213;
-    --color-cement: #181819;
-    --color-graphite: #1d1d1e;
+    --color-ink: #fcfcfc;
+    --color-charcoal: #f7f7f8;
+    --color-cement: #ffffff;
+    --color-graphite: #ffffff;
+
+    --color-active: #ebebed;
+    --color-hover: #f2f2f4;
 
     --color-snow: #ffffff;
-    --color-mist: #f4f4f4;
+    --color-mist: #f4f4f5;
 
-    --color-primary: #ab9ff2;
+    --color-primary: #7c5ce6;
     --color-primary-foreground: var(--color-snow);
-    --color-matcha: #9bc24f;
-    --color-matcha-foreground: #14150c;
-    --color-brick: #6e1d1d;
-    --color-brick-foreground: #f2bcb9;
+    --color-matcha: #5f8a1c;
+    --color-matcha-foreground: var(--color-snow);
+    --color-brick: #fbe3e1;
+    --color-brick-foreground: #9b2c2c;
 
-    --color-edge: #212122;
+    --color-edge: #e7e7ea;
 
-    --color-background: #fff8ed;
-    --color-foreground: #171717;
+    --color-background: #fcfcfc;
+    --color-foreground: #18181b;
     --color-surface: var(--color-mist);
     --color-card: var(--color-snow);
     --color-card-foreground: var(--color-foreground);
@@ -94,13 +103,13 @@
     --color-secondary: var(--color-mist);
     --color-secondary-foreground: var(--color-foreground);
     --color-muted: var(--color-mist);
-    --color-muted-foreground: #737373;
+    --color-muted-foreground: #6b6b70;
     --color-accent: var(--color-mist);
     --color-accent-foreground: var(--color-foreground);
-    --color-destructive: #e7000b;
-    --color-border: #e5e5e5;
-    --color-input: #e5e5e5;
-    --color-ring: #a3a3a3;
+    --color-destructive: #c1121f;
+    --color-border: #e7e7ea;
+    --color-input: #e7e7ea;
+    --color-ring: #7c5ce6;
 }
 
 .theme-playground {

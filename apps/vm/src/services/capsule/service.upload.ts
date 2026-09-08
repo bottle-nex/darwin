@@ -2,14 +2,14 @@ import { mkdtemp, readdir, readFile, rm, stat, writeFile } from "node:fs/promise
 import { tmpdir } from "node:os";
 import { extname, join, posix, relative, sep } from "node:path";
 
-import type Logger from "@trymatcha/logger";
+import type Logger from "@trydarwin/logger";
 import {
     type Capsule,
     CAPSULE_MANIFEST_VERSION,
     type CapsuleFidelity,
     type CapsuleManifest,
     type CapsuleRevision as ManifestRevision,
-} from "@trymatcha/types";
+} from "@trydarwin/types";
 import type { Sandbox } from "e2b";
 import { Client as MinioClient } from "minio";
 
@@ -161,7 +161,7 @@ export default class CapsuleUpload {
         );
 
         const archive = await sandbox.files.read(ARCHIVE_PATH, { format: "bytes" });
-        const staged = await mkdtemp(join(tmpdir(), "matcha-capsules-"));
+        const staged = await mkdtemp(join(tmpdir(), "darwin-capsules-"));
         const local_archive = join(staged, "dist.tar.gz");
         await writeFile(local_archive, Buffer.from(archive));
 

@@ -4,7 +4,7 @@ import {
     ExternalLinkIcon,
     NavCtaArrowIcon,
     PhoneContactIcon,
-} from "@trymatcha/ui/icons";
+} from "@trydarwin/ui/icons";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -60,7 +60,7 @@ export function NavBar({ isMarkettingPage = false }: { isMarkettingPage?: boolea
         >
             <div className="mx-auto max-w-7xl flex h-full items-center justify-between">
                 <div className="flex items-center gap-8 justify-between">
-                    <Link href="/" aria-label="try matcha home">
+                    <Link href="/" aria-label="try darwin home">
                         <AppLogo size={20} className={isMarkettingPage ? "text-neutral-100" : ""} />
                     </Link>
                 </div>

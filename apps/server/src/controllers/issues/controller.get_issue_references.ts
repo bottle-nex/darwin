@@ -1,5 +1,5 @@
-import { prisma } from "@trymatcha/database";
-import { to_plain_text } from "@trymatcha/types";
+import { prisma } from "@trydarwin/database";
+import { to_plain_text } from "@trydarwin/types";
 import type { Request, Response } from "express";
 
 import { readable_issue_project } from "../../access-control/issue-access";

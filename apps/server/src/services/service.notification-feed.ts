@@ -1,11 +1,11 @@
 import { createHash } from "node:crypto";
 
-import { type Prisma, prisma } from "@trymatcha/database";
+import { type Prisma, prisma } from "@trydarwin/database";
 import {
     type CursorPage,
     MEMBER_NOTIFICATION_TYPES,
     PROJECT_NOTIFICATION_TYPES,
-} from "@trymatcha/types";
+} from "@trydarwin/types";
 import z from "zod";
 
 import PaginationService, {

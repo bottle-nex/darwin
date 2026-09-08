@@ -1,4 +1,4 @@
-import { Action, Permissions } from "@trymatcha/access-control";
+import { Action, Permissions } from "@trydarwin/access-control";
 import type { Request, Response } from "express";
 
 import Access from "../../access-control/access";

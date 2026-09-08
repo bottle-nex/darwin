@@ -1,4 +1,4 @@
-import type { TeamRole } from "@trymatcha/types";
+import type { TeamRole } from "@trydarwin/types";
 
 import { cn } from "@/lib/utils";
 

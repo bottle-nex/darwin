@@ -1,6 +1,6 @@
 # GitHub Onboarding & Context Flow
 
-matcha gives its agent context about a project through a **thin project brief** (an
+darwin gives its agent context about a project through a **thin project brief** (an
 auto-generated `CLAUDE.md`-style doc) plus **live exploration** of the cloned code
 inside an ephemeral E2B runner. No vector index, no code graph — the live filesystem
 is always the source of truth; the brief just saves the agent its orientation cost.

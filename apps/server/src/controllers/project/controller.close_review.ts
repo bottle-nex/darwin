@@ -1,5 +1,5 @@
-import { Action } from "@trymatcha/access-control";
-import { ReviewState } from "@trymatcha/types";
+import { Action } from "@trydarwin/access-control";
+import { ReviewState } from "@trydarwin/types";
 import type { Request, Response } from "express";
 
 import GithubPullsService from "../../services/service.github_pulls";

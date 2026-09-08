@@ -1,6 +1,6 @@
 "use client";
-import type { ReviewFile } from "@trymatcha/types";
-import { DiffFileRowIcon } from "@trymatcha/ui/icons";
+import type { ReviewFile } from "@trydarwin/types";
+import { DiffFileRowIcon } from "@trydarwin/ui/icons";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";

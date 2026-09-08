@@ -1,5 +1,5 @@
 "use client";
-import { CheckIcon, SearchIcon } from "@trymatcha/ui/icons";
+import { CheckIcon, SearchIcon } from "@trydarwin/ui/icons";
 import { type ReactNode, useState } from "react";
 
 import MemberOptionRow from "@/components/playground/Core/components/MemberOptionRow";

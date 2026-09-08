@@ -1,5 +1,5 @@
-import { type ContentEntry, StatusTag } from "@trymatcha/editorial";
-import { formatDate } from "@trymatcha/editorial";
+import { type ContentEntry, StatusTag } from "@trydarwin/editorial";
+import { formatDate } from "@trydarwin/editorial";
 
 function Dot() {
     return <span className="text-mist/20">·</span>;

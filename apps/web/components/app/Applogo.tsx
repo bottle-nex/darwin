@@ -22,7 +22,7 @@ export default function AppLogo({
                     className={cn("text-xl font-semibold leading-none tracking-tight")}
                     style={{ fontSize: textSize }}
                 >
-                    <span className="font-normal opacity-55">try</span>matcha
+                    <span className="font-normal opacity-55">try</span>darwin
                     <span className="text-primary">.</span>
                 </span>
             )}

@@ -1,4 +1,4 @@
-import { Provider } from "@trymatcha/database";
+import { Provider } from "@trydarwin/database";
 import type { Request, Response } from "express";
 
 import { ENV } from "../../configs/env";

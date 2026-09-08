@@ -1,5 +1,5 @@
 "use client";
-import { SpaceEntityIcon } from "@trymatcha/ui/icons";
+import { SpaceEntityIcon } from "@trydarwin/ui/icons";
 import type { ComponentType, ReactNode } from "react";
 
 import HeroBuddy from "@/components/landing/v2/HeroBuddy";

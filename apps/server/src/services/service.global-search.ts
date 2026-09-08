@@ -1,4 +1,4 @@
-import { Prisma, prisma } from "@trymatcha/database";
+import { Prisma, prisma } from "@trydarwin/database";
 import {
     filter_reference_tokens,
     GLOBAL_SEARCH_GROUP_CAP,
@@ -9,7 +9,7 @@ import {
     type LabelledReference,
     MIN_GLOBAL_SEARCH_QUERY_LENGTH,
     to_plain_text,
-} from "@trymatcha/types";
+} from "@trydarwin/types";
 
 import { escape_like } from "./service.board-issues";
 import { MESSAGE_REFERENCE_INCLUDE } from "./service.message-references";

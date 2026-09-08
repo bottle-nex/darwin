@@ -1,7 +1,7 @@
 "use client";
 
-import { ProjectRole } from "@trymatcha/types";
-import { BreadcrumbSeparatorIcon } from "@trymatcha/ui/icons";
+import { ProjectRole } from "@trydarwin/types";
+import { BreadcrumbSeparatorIcon } from "@trydarwin/ui/icons";
 import * as React from "react";
 
 import PlaygroundAvatar from "@/components/playground/Core/components/PlaygroundAvatar";

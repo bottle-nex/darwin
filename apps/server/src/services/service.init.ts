@@ -1,4 +1,4 @@
-import { publisher, type PublisherSystem } from "@trymatcha/services";
+import { publisher, type PublisherSystem } from "@trydarwin/services";
 
 import NotificationQueueService from "../notifications/service.notification-queue";
 import { ConnectorService } from "./connectors";

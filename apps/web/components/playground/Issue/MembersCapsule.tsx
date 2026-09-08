@@ -1,6 +1,6 @@
 "use client";
 
-import { AssigneeGroupIcon } from "@trymatcha/ui/icons";
+import { AssigneeGroupIcon } from "@trydarwin/ui/icons";
 import { useState } from "react";
 
 import MemberOptionRow from "@/components/playground/Core/components/MemberOptionRow";

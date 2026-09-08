@@ -1,4 +1,4 @@
-import { HarnessIcon } from "@trymatcha/ui/icons";
+import { HarnessIcon } from "@trydarwin/ui/icons";
 
 import SettingsHeroCard, {
     HeroChip,

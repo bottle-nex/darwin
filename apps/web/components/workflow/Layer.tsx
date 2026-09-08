@@ -1,6 +1,6 @@
 "use client";
 
-import { ResponsePeriodMarkerIcon } from "@trymatcha/ui/icons";
+import { ResponsePeriodMarkerIcon } from "@trydarwin/ui/icons";
 import {
     animate,
     motion,

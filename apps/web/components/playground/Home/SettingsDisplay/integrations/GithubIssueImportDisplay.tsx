@@ -1,6 +1,6 @@
 "use client";
-import { GithubImportTarget, IMPORTED_TAG_NAME } from "@trymatcha/types";
-import { BackChevronIcon, CheckIcon, GithubLogoIcon } from "@trymatcha/ui/icons";
+import { GithubImportTarget, IMPORTED_TAG_NAME } from "@trydarwin/types";
+import { BackChevronIcon, CheckIcon, GithubLogoIcon } from "@trydarwin/ui/icons";
 
 import TagDisplay from "@/components/playground/Home/TagsDisplay/TagDisplay";
 import { Button } from "@/components/ui/button";
@@ -127,7 +127,7 @@ export default function GithubIssueImportDisplay({
                                 GitHub
                             </h2>
                             <span className="truncate text-[12px] text-snow/40">
-                                Issue tracking · Built by matcha
+                                Issue tracking · Built by darwin
                             </span>
                         </div>
                     </header>
@@ -186,7 +186,7 @@ export default function GithubIssueImportDisplay({
 
                     <p className="text-[13px] leading-[1.65] text-snow/55">
                         Your team files issues where it already works. When someone opens one on{" "}
-                        {repo ?? "the connected repository"}, matcha copies it onto this
+                        {repo ?? "the connected repository"}, darwin copies it onto this
                         project&apos;s board — title, body and author — tagged so you can tell
                         imported work apart at a glance.
                     </p>

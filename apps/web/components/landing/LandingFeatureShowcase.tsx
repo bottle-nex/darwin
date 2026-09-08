@@ -1,5 +1,5 @@
 "use client";
-import { CtaArrowIcon } from "@trymatcha/ui/icons";
+import { CtaArrowIcon } from "@trydarwin/ui/icons";
 import { useInView } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 
@@ -74,7 +74,7 @@ export default function LandingFeatureShowcase() {
         <LandingSection>
             <SectionHeader
                 title="Point it at your repo."
-                titleContinued="matcha runs the rest of the loop."
+                titleContinued="darwin runs the rest of the loop."
                 description="One GitHub connection powers everything, issues on a board, agents in sandboxed runners, pull requests back to you."
             />
             <div className="mt-16 grid gap-12 md:grid-cols-[300px_minmax(0,1fr)] md:gap-16">
@@ -93,8 +93,8 @@ export default function LandingFeatureShowcase() {
                                 className={cn(
                                     "group/nav flex items-center gap-3 rounded-md px-2 py-2.5 text-left transition-colors duration-300",
                                     active === i
-                                        ? "text-snow"
-                                        : "text-neutral-500 hover:text-neutral-300",
+                                        ? "text-foreground"
+                                        : "text-muted-foreground hover:text-foreground",
                                 )}
                             >
                                 <span className="font-mono text-xs">{feature.index}</span>
@@ -127,10 +127,10 @@ export default function LandingFeatureShowcase() {
                             </Reveal>
                             <Reveal delay={0.1}>
                                 <div className="mt-6">
-                                    <h3 className="text-lg text-snow md:text-xl">
+                                    <h3 className="text-lg text-foreground md:text-xl">
                                         {feature.heading}
                                     </h3>
-                                    <p className="mt-2 max-w-[54ch] text-sm leading-relaxed text-neutral-500 md:text-base">
+                                    <p className="mt-2 max-w-[54ch] text-sm leading-relaxed text-muted-foreground md:text-base">
                                         {feature.description}
                                     </p>
                                 </div>

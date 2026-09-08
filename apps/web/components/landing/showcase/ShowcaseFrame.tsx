@@ -35,7 +35,12 @@ export default function ShowcaseFrame({
     children,
 }: ShowcaseFrameProps) {
     return (
-        <div className={cn("relative h-110 w-full overflow-hidden rounded-lg md:h-140", className)}>
+        <div
+            className={cn(
+                "relative h-110 w-full overflow-hidden rounded-lg border border-edge md:h-140",
+                className,
+            )}
+        >
             <FlutedGlass
                 style={shaderStyle}
                 image={image}
@@ -59,7 +64,7 @@ export default function ShowcaseFrame({
                 fit="cover"
                 {...glass}
             />
-            <div className="absolute inset-0 bg-ink/25" />
+            <div className="absolute inset-0 bg-ink/40" />
             <div className="absolute inset-0 flex items-center justify-center p-6">
                 <div className={cn("w-full max-w-110", contentClassName)}>{children}</div>
             </div>

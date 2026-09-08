@@ -1,5 +1,5 @@
 {
-    "extends": "@trymatcha/typescript-config/base.json",
+    "extends": "@trydarwin/typescript-config/base.json",
     "include": ["src/**/*.ts", "tsup.config.ts"],
     "exclude": ["node_modules", "dist"],
     "compilerOptions": {

@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { Issue } from "@trymatcha/types";
+import type { Issue } from "@trydarwin/types";
 
 import { upsertBoardIssue } from "@/hooks/issues/useBoard";
 import { apiClient } from "@/lib/axios";

@@ -1,5 +1,5 @@
 "use client";
-import type { CapsuleControl } from "@trymatcha/types";
+import type { CapsuleControl } from "@trydarwin/types";
 
 import { Input } from "@/components/ui/input";
 import SelectField from "@/components/ui/SelectField";

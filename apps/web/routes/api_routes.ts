@@ -170,3 +170,10 @@ export const CONNECTOR_URL = (provider: string) => `${CONNECTORS_URL}/${provider
 
 export const QUESTION_URL = (questionId: string) => `${API_URL}/questions/${questionId}`;
 export const QUESTION_SECRET_URL = (questionId: string) => `${QUESTION_URL(questionId)}/secret`;
+
+export const DARWIN_URL = API_URL + "/darwin";
+export const DARWIN_MESSAGES_URL = DARWIN_URL + "/messages";
+export const DARWIN_CANCEL_RUN_URL = (run_id: string) => `${DARWIN_URL}/runs/${run_id}/cancel`;
+export const DARWIN_THREADS_URL = (project_id: string) => `${DARWIN_URL}/threads/${project_id}`;
+export const DARWIN_THREAD_URL = (project_id: string, thread_id: string) =>
+    `${DARWIN_THREADS_URL(project_id)}/${thread_id}`;

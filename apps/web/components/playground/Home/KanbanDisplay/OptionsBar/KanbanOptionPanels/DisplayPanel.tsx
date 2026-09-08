@@ -4,7 +4,7 @@ import {
     KanbanBoardLayoutIcon,
     KanbanListViewIcon,
     OptionsMenuIcon,
-} from "@trymatcha/ui/icons";
+} from "@trydarwin/ui/icons";
 import { motion } from "motion/react";
 
 import { Button } from "@/components/ui/button";

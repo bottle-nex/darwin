@@ -1,5 +1,5 @@
 {
-    "extends": "@trymatcha/typescript-config/base.json",
+    "extends": "@trydarwin/typescript-config/base.json",
     "compilerOptions": {
         "types": ["bun"],
         "target": "ESNext",

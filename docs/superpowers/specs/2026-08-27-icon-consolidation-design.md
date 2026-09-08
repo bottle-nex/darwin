@@ -19,7 +19,7 @@ One new package, `packages/ui`, with an `icons/` folder. Every icon apps/web and
 
 ```
 packages/ui/
-  package.json          "@trymatcha/ui", exports: { "./icons": "./icons/index.ts" }
+  package.json          "@trydarwin/ui", exports: { "./icons": "./icons/index.ts" }
   tsconfig.json          mirrors packages/editorial's (moduleResolution: bundler, jsx: react-jsx, noEmit: true)
   icons/
     index.ts             flat barrel — every icon re-exported by name, this is the only import path consumers use
@@ -268,9 +268,9 @@ After this migration, no file in `apps/web` or `apps/admin` imports from `react-
 233 import lines across more than 150 files is too many to hand-edit safely. The implementation plan should generate this mechanically:
 
 1. Build `packages/ui/icons` first — every file described above, the `createIcon` factory, the `IconTooltip` primitive, the barrel, the catalog file, the moved custom-icon files.
-2. Write a script that, given the canonical mapping above (plus the mechanical names for the ~200 non-conflicting icons), rewrites every import line in `apps/web` and `apps/admin` to pull from `@trymatcha/ui/icons`, and renames every JSX/reference usage of the old identifier to the new one, in the same file.
+2. Write a script that, given the canonical mapping above (plus the mechanical names for the ~200 non-conflicting icons), rewrites every import line in `apps/web` and `apps/admin` to pull from `@trydarwin/ui/icons`, and renames every JSX/reference usage of the old identifier to the new one, in the same file.
 3. Handle the two flagged non-mechanical cases by hand, not via the script: `FaCaretDown`/`FaCaretRight`'s swap-to-rotate change, and a visual check on `HiMenuAlt2` → `HiBars3CenterLeft` before committing to it.
-4. Remove `react-icons` from `apps/web/package.json` and `apps/admin/package.json`; add `@trymatcha/ui` as a dependency of both.
+4. Remove `react-icons` from `apps/web/package.json` and `apps/admin/package.json`; add `@trydarwin/ui` as a dependency of both.
 5. Add the `no-restricted-imports` rule to the shared eslint config.
 6. Verify: `bun run typecheck` (catches any import that doesn't exist — the main safety net, since a *wrong-but-valid* icon choice is a design-review problem, not a compiler one), `bun run lint` (catches any remaining direct `react-icons` import, and the dead `IoSendSharp` import), then a plain `grep -rl "from \"react-icons" apps/` returning nothing outside `packages/ui`.
 7. Spot-check a handful of the higher-risk renames in a running app (the ones that changed visual weight: `DiffReviewDisplay.tsx`'s warning triangle, `DiffFrame.tsx`'s help icon, `SettingsDisplay.tsx`'s lock, `ChatComposer.tsx`'s send icon).

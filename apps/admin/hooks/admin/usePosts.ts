@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import type { PostKind, PostStatus, ReleaseChannel } from "@trymatcha/types";
+import type { PostKind, PostStatus, ReleaseChannel } from "@trydarwin/types";
 import { apiClient } from "@/lib/api";
 import { POSTS_URL, post_url } from "@/routes/api_routes";
 

@@ -1,5 +1,5 @@
 "use client";
-import { PullRequestOpenIcon } from "@trymatcha/ui/icons";
+import { PullRequestOpenIcon } from "@trydarwin/ui/icons";
 
 import { reviewSlugFor } from "@/components/playground/Review/reviewSlug";
 import IconWrapper from "@/components/ui/IconWrapper";

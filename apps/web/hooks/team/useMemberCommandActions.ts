@@ -1,6 +1,6 @@
 "use client";
 
-import type { ProjectRole, TeamRole } from "@trymatcha/types";
+import type { ProjectRole, TeamRole } from "@trydarwin/types";
 
 import useRevokeInvite from "@/hooks/invitations/useRevokeInvite";
 import { useChangeMemberAuthority } from "@/hooks/team/useChangeMemberAuthority";

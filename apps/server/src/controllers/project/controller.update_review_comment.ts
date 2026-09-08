@@ -1,4 +1,4 @@
-import { Action } from "@trymatcha/access-control";
+import { Action } from "@trydarwin/access-control";
 import type { Request, Response } from "express";
 import z from "zod";
 

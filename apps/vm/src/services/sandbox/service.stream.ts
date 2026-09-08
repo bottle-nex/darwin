@@ -1,4 +1,4 @@
-import type Logger from "@trymatcha/logger";
+import type Logger from "@trydarwin/logger";
 import chalk from "chalk";
 
 const MAX_LINE = 160;
@@ -91,7 +91,7 @@ export default class SandboxStream {
 
     /**
      * Mirror a command whose output is plain text, dimmed so sandbox output reads as background
-     * behind matcha's own lines.
+     * behind darwin's own lines.
      *
      * `secrets` is not optional in spirit: clone_repo puts a live GitHub installation token in
      * the remote URL and git echoes that URL back in its own error messages, so anything

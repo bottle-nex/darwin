@@ -1,4 +1,4 @@
-import { LoadingSpinnerIcon } from "@trymatcha/ui/icons";
+import { LoadingSpinnerIcon } from "@trydarwin/ui/icons";
 import { cva, type VariantProps } from "class-variance-authority";
 import { Slot } from "radix-ui";
 import * as React from "react";

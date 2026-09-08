@@ -3,7 +3,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { Slot } from "radix-ui";
 import { Azeret_Mono } from "next/font/google";
 import { cn } from "@/lib/utils";
-import { LoadingSpinnerIcon } from "@trymatcha/ui/icons";
+import { LoadingSpinnerIcon } from "@trydarwin/ui/icons";
 
 export const azeretMono = Azeret_Mono({
     subsets: ["latin"],

@@ -1,6 +1,6 @@
 # Project Setup Architecture
 
-How a connected GitHub repo gets onboarded into matcha — cloned, stood up, verified,
+How a connected GitHub repo gets onboarded into darwin — cloned, stood up, verified,
 and made ready for the agent to start solving issues. This is the design we settled
 on; it is directional, not all built yet.
 
@@ -8,12 +8,11 @@ on; it is directional, not all built yet.
 
 ## 1. What "setup" means
 
-When an org connects a repo to a project, matcha must learn two completely different
+When an org connects a repo to a project, darwin must learn two completely different
 kinds of context about it:
 
 - **Comprehension context** — _what the code does._ Embeddings + a curated
-  "repo map" so the agent understands the codebase. Cheap, no execution. (The
-  embeddings pipeline already exists in `apps/agent/src/embeddings/`.)
+  "repo map" so the agent understands the codebase. Cheap, no execution.
 - **Runnable context** — _how to build / run / test it._ Detect dependencies and
   services, collect secrets, get the project to a **known-green baseline**, and
   freeze that. This is the hard part and the focus of this doc.

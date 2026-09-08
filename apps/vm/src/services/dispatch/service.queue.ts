@@ -1,11 +1,11 @@
-import { prisma } from "@trymatcha/database";
-import Logger from "@trymatcha/logger";
+import { prisma } from "@trydarwin/database";
+import Logger from "@trydarwin/logger";
 import {
     type DispatchJobData,
     type OnboardJobData,
     type ProductDiffJobData,
     QueueName,
-} from "@trymatcha/types";
+} from "@trydarwin/types";
 import { type Job, Worker } from "bullmq";
 
 import { ENV } from "../../conf/config.env";

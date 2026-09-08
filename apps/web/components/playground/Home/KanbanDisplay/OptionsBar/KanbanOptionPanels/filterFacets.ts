@@ -1,5 +1,5 @@
 "use client";
-import type { IconType } from "@trymatcha/ui/icons";
+import type { IconType } from "@trydarwin/ui/icons";
 import {
     AssigneeGroupIcon,
     CalendarIcon,
@@ -9,7 +9,7 @@ import {
     SpaceEntityIcon,
     StatusFieldIcon,
     TagIcon,
-} from "@trymatcha/ui/icons";
+} from "@trydarwin/ui/icons";
 import { useMemo } from "react";
 
 import { DATE_ICON_COLOR, PRIORITY_OPTIONS } from "@/components/playground/Issue/issueHelpers";

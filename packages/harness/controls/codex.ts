@@ -1,4 +1,4 @@
-import { Harness, type Effort } from "@trymatcha/database";
+import { Harness, type Effort } from "@trydarwin/database";
 import {
     AgentHarness,
     CredentialSource,

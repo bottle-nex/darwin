@@ -1,4 +1,4 @@
-import { OrgRole, Prisma, prisma } from "@trymatcha/database";
+import { OrgRole, Prisma, prisma } from "@trydarwin/database";
 import type { Request, Response } from "express";
 import { z } from "zod";
 

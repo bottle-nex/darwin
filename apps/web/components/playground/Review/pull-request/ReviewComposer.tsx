@@ -1,8 +1,8 @@
 "use client";
 import type { Editor } from "@tiptap/react";
-import { Action, Permissions } from "@trymatcha/access-control";
-import type { ReviewHeader } from "@trymatcha/types";
-import { GithubLogoIcon, SendIcon } from "@trymatcha/ui/icons";
+import { Action, Permissions } from "@trydarwin/access-control";
+import type { ReviewHeader } from "@trydarwin/types";
+import { GithubLogoIcon, SendIcon } from "@trydarwin/ui/icons";
 import axios from "axios";
 import { useEffect, useRef, useState } from "react";
 

@@ -1,5 +1,5 @@
 "use client";
-import { TeamEntityIcon } from "@trymatcha/ui/icons";
+import { TeamEntityIcon } from "@trydarwin/ui/icons";
 import { useParams } from "next/navigation";
 
 import PaneEmptyState from "@/components/playground/Core/components/PaneEmptyState";

@@ -1,5 +1,5 @@
 "use client";
-import { IssueStatus } from "@trymatcha/types";
+import { IssueStatus } from "@trydarwin/types";
 import { useEffect, useRef } from "react";
 
 import { hasActiveFilters } from "@/lib/kanban/boardFilter";

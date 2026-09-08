@@ -1,4 +1,4 @@
-import Logger from "@trymatcha/logger";
+import Logger from "@trydarwin/logger";
 import {
     ActivityType,
     ActorType,
@@ -10,15 +10,15 @@ import {
     type Issue,
     type Prisma,
     type Worker,
-} from "@trymatcha/database";
+} from "@trydarwin/database";
 import type QueueService from "../services/services.queue";
 import { ChatAnthropic } from "@langchain/anthropic";
 import { ENV } from "../config/config.env";
 import z from "zod";
 import { RunnableSequence } from "@langchain/core/runnables";
 import { routerPrompt } from "../prompts/prompt.router";
-import { Registry } from "@trymatcha/harness";
-import { ActivityService, IssueBroadcastService } from "@trymatcha/services";
+import { Registry } from "@trydarwin/harness";
+import { ActivityService, IssueBroadcastService } from "@trydarwin/services";
 
 const log = Logger.scope("route");
 

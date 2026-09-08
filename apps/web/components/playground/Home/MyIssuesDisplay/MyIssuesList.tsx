@@ -1,6 +1,6 @@
 "use client";
 
-import { MyIssuesIcon } from "@trymatcha/ui/icons";
+import { MyIssuesIcon } from "@trydarwin/ui/icons";
 import type { ReactNode } from "react";
 
 import LogoLoader from "@/components/app/LogoLoader";

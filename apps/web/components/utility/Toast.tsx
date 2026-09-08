@@ -1,5 +1,5 @@
 "use client";
-import type { IconType } from "@trymatcha/ui/icons";
+import type { IconType } from "@trydarwin/ui/icons";
 import {
     CloseIcon,
     ErrorCircleIcon,
@@ -7,7 +7,7 @@ import {
     SuccessCircleIcon,
     ToastDefaultIcon,
     ToastWarningIcon,
-} from "@trymatcha/ui/icons";
+} from "@trydarwin/ui/icons";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 

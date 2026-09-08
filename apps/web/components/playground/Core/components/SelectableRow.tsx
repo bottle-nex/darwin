@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckIcon } from "@trymatcha/ui/icons";
+import { CheckIcon } from "@trydarwin/ui/icons";
 import type { ComponentPropsWithoutRef } from "react";
 
 import { cn } from "@/lib/utils";

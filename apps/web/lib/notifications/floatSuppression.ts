@@ -1,4 +1,4 @@
-import { type Notification, notification_scope, NotificationScope } from "@trymatcha/types";
+import { type Notification, notification_scope, NotificationScope } from "@trydarwin/types";
 
 import { PlaygroundTab } from "@/components/playground/playgroundTabs";
 

@@ -1,5 +1,5 @@
-import Logger from "@trymatcha/logger";
-import { RunLogPhase } from "@trymatcha/types";
+import Logger from "@trydarwin/logger";
+import { RunLogPhase } from "@trydarwin/types";
 import { z } from "zod";
 
 import { ENV } from "../conf/config.env";

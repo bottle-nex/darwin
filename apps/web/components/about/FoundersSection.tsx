@@ -1,4 +1,4 @@
-import { LinkedInLogoIcon, XLogoIcon } from "@trymatcha/ui/icons";
+import { LinkedInLogoIcon, XLogoIcon } from "@trydarwin/ui/icons";
 import Image from "next/image";
 import Link from "next/link";
 

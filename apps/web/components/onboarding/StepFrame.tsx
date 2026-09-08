@@ -1,6 +1,6 @@
 "use client";
 
-import { CtaArrowIcon } from "@trymatcha/ui/icons";
+import { CtaArrowIcon } from "@trydarwin/ui/icons";
 import { motion } from "motion/react";
 import type { ReactNode } from "react";
 

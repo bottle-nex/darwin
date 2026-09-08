@@ -1,6 +1,6 @@
 "use client";
-import { ReviewTab } from "@trymatcha/types";
-import { GithubLogoIcon } from "@trymatcha/ui/icons";
+import { ReviewTab } from "@trydarwin/types";
+import { GithubLogoIcon } from "@trydarwin/ui/icons";
 
 import IconWrapper from "@/components/ui/IconWrapper";
 import { usePaneRouteStore } from "@/store/playground/usePaneRouteStore";

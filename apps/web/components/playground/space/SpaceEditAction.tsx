@@ -1,5 +1,5 @@
 "use client";
-import { EditIcon } from "@trymatcha/ui/icons";
+import { EditIcon } from "@trydarwin/ui/icons";
 
 import OptionButton from "@/components/playground/Home/KanbanDisplay/OptionsBar/KanbanOptionPanels/OptionButton";
 import { PlaygroundTab } from "@/components/playground/playgroundTabs";

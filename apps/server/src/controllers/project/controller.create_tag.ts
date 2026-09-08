@@ -1,9 +1,10 @@
-import { Action, Permissions } from "@trymatcha/access-control";
-import { Prisma, prisma } from "@trymatcha/database";
+import { Action, Permissions } from "@trydarwin/access-control";
+import { Prisma } from "@trydarwin/database";
 import type { Request, Response } from "express";
 import z from "zod";
 
 import Access from "../../access-control/access";
+import BoardItemService from "../../services/service.board-items";
 import ResponseWriter from "../../services/service.response";
 
 const body_schema = z.object({
@@ -40,20 +41,9 @@ export default async function create_tag_controller(req: Request, res: Response)
             return;
         }
 
-        const tag = await prisma.tag.create({
-            data: {
-                projectId: project_id,
-                name: data.name,
-                color: data.color,
-                createdById: user.id,
-            },
-            select: {
-                id: true,
-                name: true,
-                color: true,
-                createdAt: true,
-                creator: { select: { id: true, name: true, image: true } },
-            },
+        const tag = await BoardItemService.create_tag(project_id, user.id, {
+            name: data.name,
+            color: data.color,
         });
 
         ResponseWriter.created(res, tag, "Tag created");

@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { ReviewHeader } from "@trymatcha/types";
+import type { ReviewHeader } from "@trydarwin/types";
 
 import { apiClient } from "@/lib/axios";
 import { REVIEW_MERGE_URL } from "@/routes/api_routes";

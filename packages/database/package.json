@@ -1,5 +1,5 @@
 {
-    "name": "@trymatcha/database",
+    "name": "@trydarwin/database",
     "version": "1.0.0",
     "exports": {
         ".": "./src/client.ts"
@@ -30,9 +30,9 @@
         "pg": "^8.16.3"
     },
     "devDependencies": {
-        "@trymatcha/eslint-config": "*",
-        "@trymatcha/types": "*",
-        "@trymatcha/typescript-config": "*",
+        "@trydarwin/eslint-config": "*",
+        "@trydarwin/types": "*",
+        "@trydarwin/typescript-config": "*",
         "@types/pg": "^8.16.0",
         "@typescript-eslint/eslint-plugin": "^7.1.0",
         "@typescript-eslint/parser": "^7.1.0",

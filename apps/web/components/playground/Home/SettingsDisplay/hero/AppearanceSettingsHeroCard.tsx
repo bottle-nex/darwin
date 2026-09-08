@@ -1,4 +1,4 @@
-import { CheckIcon } from "@trymatcha/ui/icons";
+import { CheckIcon } from "@trydarwin/ui/icons";
 
 import { cn } from "@/lib/utils";
 
@@ -12,7 +12,7 @@ import SettingsHeroCard, {
 
 const GLOWS = [
     { rgb: "132, 114, 245", label: "Violet", selected: true },
-    { rgb: "155, 194, 79", label: "Matcha", selected: false },
+    { rgb: "155, 194, 79", label: "Darwin", selected: false },
     { rgb: "96, 165, 250", label: "Blue", selected: false },
 ];
 

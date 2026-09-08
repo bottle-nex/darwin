@@ -1,7 +1,7 @@
 import { extname } from "node:path";
 
-import { prisma } from "@trymatcha/database";
-import type { ProductDiffStatus, ProductDiffSummary } from "@trymatcha/types";
+import { prisma } from "@trydarwin/database";
+import type { ProductDiffStatus, ProductDiffSummary } from "@trydarwin/types";
 
 import GithubPullsService from "./service.github_pulls";
 import StorageService from "./service.storage";

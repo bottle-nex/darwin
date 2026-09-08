@@ -50,9 +50,9 @@ ENV PIPX_BIN_DIR=/usr/local/bin
 RUN pipx install "graphifyy==${GRAPHIFY_VERSION}" \
     && graphify --version
 
-COPY packages/sandbox-mcp/dist/index.js /opt/matcha/sandbox-mcp/index.js
-COPY docker/sandbox-mcp.runtime.package.json /opt/matcha/sandbox-mcp/package.json
-RUN cd /opt/matcha/sandbox-mcp && npm install --omit=dev
+COPY packages/sandbox-mcp/dist/index.js /opt/darwin/sandbox-mcp/index.js
+COPY docker/sandbox-mcp.runtime.package.json /opt/darwin/sandbox-mcp/package.json
+RUN cd /opt/darwin/sandbox-mcp && npm install --omit=dev
 
 # Product Diff renders a project's real components in a real browser, so the template carries
 # Chromium and the fonts it needs. Without the font packages every glyph renders as a tofu box
@@ -70,12 +70,12 @@ RUN apt-get update \
        unzip fonts-liberation fonts-dejavu-core fonts-noto-core fonts-noto-color-emoji \
     && rm -rf /var/lib/apt/lists/*
 
-COPY packages/capsule-check/dist/index.js /opt/matcha/capsule-check/index.js
-COPY docker/capsule-check.runtime.package.json /opt/matcha/capsule-check/package.json
-RUN cd /opt/matcha/capsule-check \
+COPY packages/capsule-check/dist/index.js /opt/darwin/capsule-check/index.js
+COPY docker/capsule-check.runtime.package.json /opt/darwin/capsule-check/package.json
+RUN cd /opt/darwin/capsule-check \
     && npm install --omit=dev \
     && npx playwright install --with-deps chromium \
-    && chmod -R a+rX /opt/matcha/capsule-check /home/user/.cache/ms-playwright
+    && chmod -R a+rX /opt/darwin/capsule-check /home/user/.cache/ms-playwright
 
 # Prepared at build time rather than on demand: a sandbox may have no registry reach at the
 # moment it needs to install a project, and corepack would otherwise try to download the manager
@@ -90,10 +90,10 @@ RUN corepack enable \
 # installer picks its own destination, and a PATH that is subtly wrong produces an image where
 # every bun project silently fails to install.
 ENV BUN_VERSION=1.3.2
-ENV BUN_INSTALL=/opt/matcha/bun
+ENV BUN_INSTALL=/opt/darwin/bun
 RUN curl -fsSL https://bun.sh/install | bash -s "bun-v${BUN_VERSION}" \
     && BUN_BIN="$(find /opt /root /home /usr/local -maxdepth 4 -type f -name bun 2>/dev/null | head -1)" \
     && test -n "${BUN_BIN}" \
     && install -m 0755 "${BUN_BIN}" /usr/local/bin/bun \
-    && chmod -R a+rX /opt/matcha/bun \
+    && chmod -R a+rX /opt/darwin/bun \
     && bun --version

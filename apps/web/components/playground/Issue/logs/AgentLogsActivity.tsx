@@ -1,6 +1,6 @@
 "use client";
 import { useQueryClient } from "@tanstack/react-query";
-import { type AgentSession, type RunLogPage } from "@trymatcha/types";
+import { type AgentSession, type RunLogPage } from "@trydarwin/types";
 
 import HeroBuddy from "@/components/landing/v2/HeroBuddy";
 import Disclosure from "@/components/playground/Core/components/Disclosure";

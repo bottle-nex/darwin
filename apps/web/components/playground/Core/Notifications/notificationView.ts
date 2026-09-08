@@ -1,5 +1,5 @@
-import { type Notification, NotificationType } from "@trymatcha/types";
-import type { IconType } from "@trymatcha/ui/icons";
+import { type Notification, NotificationType } from "@trydarwin/types";
+import type { IconType } from "@trydarwin/ui/icons";
 import {
     AccessChangedIcon,
     CommentCountIcon,
@@ -17,7 +17,7 @@ import {
     StatusChangedIcon,
     TeamEntityIcon,
     WarningTriangleIcon,
-} from "@trymatcha/ui/icons";
+} from "@trydarwin/ui/icons";
 import { format, formatDistanceToNowStrict, isToday, isYesterday } from "date-fns";
 
 import { issueIdentifier } from "@/lib/format";
@@ -256,7 +256,7 @@ export function notification_view(notification: Notification): NotificationView 
         default:
             return {
                 actorId: notification.id,
-                actorName: "matcha",
+                actorName: "darwin",
                 action: "sent you an update",
                 body: "",
                 issueRef: null,

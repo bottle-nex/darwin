@@ -1,5 +1,5 @@
 {
-    "name": "@trymatcha/sandbox-mcp",
+    "name": "@trydarwin/sandbox-mcp",
     "version": "0.0.0",
     "private": true,
     "type": "module",
@@ -10,13 +10,13 @@
     },
     "dependencies": {
         "@modelcontextprotocol/sdk": "^1.0.0",
-        "@trymatcha/database": "*",
-        "@trymatcha/types": "*",
+        "@trydarwin/database": "*",
+        "@trydarwin/types": "*",
         "@types/node": "^25.9.3",
         "zod": "^4.4.3"
     },
     "devDependencies": {
-        "@trymatcha/typescript-config": "*",
+        "@trydarwin/typescript-config": "*",
         "tsup": "^8.0.0",
         "typescript": "^5"
     }

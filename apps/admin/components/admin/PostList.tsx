@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import type { PostKind } from "@trymatcha/types";
+import type { PostKind } from "@trydarwin/types";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { usePosts, useDeletePost, type PostRow } from "@/hooks/admin/usePosts";

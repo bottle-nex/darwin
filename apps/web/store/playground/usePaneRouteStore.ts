@@ -1,4 +1,4 @@
-import { ReviewTab } from "@trymatcha/types";
+import { ReviewTab } from "@trydarwin/types";
 import { create } from "zustand";
 
 export type PaneRoute =

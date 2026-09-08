@@ -4,8 +4,9 @@ import type {
     DefaultHomeView,
     DiffView,
     ProjectRole,
+    SwipeTarget,
     TeamRole,
-} from "@trymatcha/types";
+} from "@trydarwin/types";
 
 import type { IconPick } from "@/components/ui/IconPicker";
 
@@ -31,6 +32,7 @@ export interface UserConfig {
     defaultHomeView: DefaultHomeView;
     codeTheme: CodeTheme;
     diffView: DiffView;
+    swipeTarget: SwipeTarget;
 }
 
 export interface DashboardData {

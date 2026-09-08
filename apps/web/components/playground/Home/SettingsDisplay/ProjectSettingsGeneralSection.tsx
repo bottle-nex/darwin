@@ -1,5 +1,5 @@
 "use client";
-import { DeleteIcon } from "@trymatcha/ui/icons";
+import { DeleteIcon } from "@trydarwin/ui/icons";
 import { isAxiosError } from "axios";
 import { useRouter } from "next/navigation";
 import { useState } from "react";

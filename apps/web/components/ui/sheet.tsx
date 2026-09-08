@@ -1,6 +1,6 @@
 "use client";
 
-import { CloseIcon } from "@trymatcha/ui/icons";
+import { CloseIcon } from "@trydarwin/ui/icons";
 import { Dialog as SheetPrimitive } from "radix-ui";
 import * as React from "react";
 

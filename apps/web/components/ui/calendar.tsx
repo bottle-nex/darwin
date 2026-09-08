@@ -1,6 +1,6 @@
 "use client";
 
-import { CalendarNavNextIcon, CalendarNavPrevIcon } from "@trymatcha/ui/icons";
+import { CalendarNavNextIcon, CalendarNavPrevIcon } from "@trydarwin/ui/icons";
 import { addDays, isBefore, startOfDay } from "date-fns";
 import * as React from "react";
 import { type ChevronProps, DayPicker, type Matcher } from "react-day-picker";

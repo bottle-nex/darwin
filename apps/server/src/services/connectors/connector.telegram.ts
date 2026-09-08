@@ -1,4 +1,4 @@
-import { AgentQuestionType, Provider } from "@trymatcha/database";
+import { AgentQuestionType, Provider } from "@trydarwin/database";
 import type { Request } from "express";
 
 import { ENV } from "../../configs/env";
@@ -129,7 +129,7 @@ class TelegramConnector implements ConnectorAdapter {
     public async send_linked_confirmation(external_chat_id: string) {
         await this.call("sendMessage", {
             chat_id: external_chat_id,
-            text: "matcha is connected. Agent questions will arrive here.",
+            text: "darwin is connected. Agent questions will arrive here.",
         });
     }
 

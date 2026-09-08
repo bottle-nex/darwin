@@ -1,5 +1,5 @@
 "use client";
-import { ReviewTab } from "@trymatcha/types";
+import { ReviewTab } from "@trydarwin/types";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";

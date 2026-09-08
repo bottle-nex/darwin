@@ -1,7 +1,7 @@
 "use client";
 import { closestCorners, DndContext, DragOverlay } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
-import { IssueStatus } from "@trymatcha/types";
+import { IssueStatus } from "@trydarwin/types";
 import type { ReactNode } from "react";
 
 import { type FacetIssueGroup, useIssueGroups } from "@/hooks/issues/useIssueGroups";

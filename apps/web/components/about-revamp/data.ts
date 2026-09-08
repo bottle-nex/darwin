@@ -13,7 +13,7 @@ export type SpecialCell = {
     imageAlt?: string;
 };
 
-// 5 cells scattered across the grid: 4 founder photos + 1 matcha logo.
+// 5 cells scattered across the grid: 4 founder photos + 1 darwin logo.
 export const specialCells: SpecialCell[] = [
     { row: 2, col: 2, variant: "image", imageSrc: founders[0].image, imageAlt: founders[0].name },
     { row: 2, col: 13, variant: "image", imageSrc: founders[1].image, imageAlt: founders[1].name },

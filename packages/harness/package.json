@@ -1,5 +1,5 @@
 {
-    "name": "@trymatcha/harness",
+    "name": "@trydarwin/harness",
     "module": "index.ts",
     "type": "module",
     "private": true,
@@ -10,8 +10,8 @@
         "typecheck": "tsc --noEmit"
     },
     "dependencies": {
-        "@trymatcha/database": "*",
-        "@trymatcha/types": "*"
+        "@trydarwin/database": "*",
+        "@trydarwin/types": "*"
     },
     "devDependencies": {
         "@types/bun": "latest"

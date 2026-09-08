@@ -1,6 +1,6 @@
-import type { ActivityType, ActorType, AgentSession, Prisma } from "@trymatcha/database";
-import { ActivitySurface } from "@trymatcha/database";
-import { type ActivityPayloadMap, OutboundSocketMessageType } from "@trymatcha/types";
+import type { ActivityType, ActorType, AgentSession, Prisma } from "@trydarwin/database";
+import { ActivitySurface } from "@trydarwin/database";
+import { type ActivityPayloadMap, OutboundSocketMessageType } from "@trydarwin/types";
 
 import { publisher } from "./service.publisher";
 

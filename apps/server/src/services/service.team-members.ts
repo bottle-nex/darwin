@@ -1,4 +1,4 @@
-import { InvitationStatus, prisma, TeamRole } from "@trymatcha/database";
+import { InvitationStatus, prisma, TeamRole } from "@trydarwin/database";
 
 type AddProjectMembersInput = {
     teamId: string;

@@ -1,5 +1,5 @@
 import type { InfiniteData } from "@tanstack/react-query";
-import type { CursorPage } from "@trymatcha/types";
+import type { CursorPage } from "@trydarwin/types";
 
 type Identifiable = {
     id: string;

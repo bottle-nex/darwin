@@ -1,4 +1,4 @@
-import type { ProjectRole } from "@trymatcha/types";
+import type { ProjectRole } from "@trydarwin/types";
 
 import { cn } from "@/lib/utils";
 

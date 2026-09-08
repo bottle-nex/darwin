@@ -1,5 +1,5 @@
 "use client";
-import { GanttNavIcon, SpaceEntityIcon, TagIcon } from "@trymatcha/ui/icons";
+import { GanttNavIcon, SpaceEntityIcon, TagIcon } from "@trydarwin/ui/icons";
 
 import HeroBuddy from "@/components/landing/v2/HeroBuddy";
 

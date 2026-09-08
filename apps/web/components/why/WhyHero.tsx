@@ -1,4 +1,4 @@
-import { CtaArrowIcon } from "@trymatcha/ui/icons";
+import { CtaArrowIcon } from "@trydarwin/ui/icons";
 
 import ShowcaseFrame from "../landing/showcase/ShowcaseFrame";
 import { Button } from "../ui/button";

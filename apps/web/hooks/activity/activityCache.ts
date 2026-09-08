@@ -1,5 +1,5 @@
 import type { InfiniteData } from "@tanstack/react-query";
-import type { AgentSession, IssueActivity } from "@trymatcha/types";
+import type { AgentSession, IssueActivity } from "@trydarwin/types";
 
 export const ACTIVITY_PAGE_LIMIT = 100;
 export const ACTIVITY_AUTO_FILL_PAGE_CAP = 3;

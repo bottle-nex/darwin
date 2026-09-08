@@ -1,7 +1,7 @@
 "use client";
 
 import { NodeViewWrapper, type ReactNodeViewProps } from "@tiptap/react";
-import { CloseIcon, ExpandImageIcon } from "@trymatcha/ui/icons";
+import { CloseIcon, ExpandImageIcon } from "@trydarwin/ui/icons";
 import { useState } from "react";
 
 import { Button } from "./ui/button";

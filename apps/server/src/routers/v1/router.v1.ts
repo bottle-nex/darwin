@@ -7,6 +7,7 @@ import chats_router from "../chats/router.chats";
 import claude_mcp_keys_router from "../claude-mcp/router.claude-mcp-keys";
 import connectors_router from "../connectors/router.connectors";
 import content_router from "../content/router.content";
+import darwin_router from "../darwin/router.darwin";
 import github_router from "../github/router.github";
 import invitations_router from "../invitations/router.invitations";
 import issues_router from "../issues/router.issues";
@@ -49,5 +50,6 @@ v1_router.use("/claude-mcp/mcp", claude_mcp_router);
 v1_router.use("/worker", worker_router);
 v1_router.use("/admin", admin_router);
 v1_router.use("/content", content_router);
+v1_router.use("/darwin", darwin_router);
 
 export default v1_router;

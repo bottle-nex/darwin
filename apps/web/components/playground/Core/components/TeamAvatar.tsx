@@ -1,6 +1,6 @@
 "use client";
 
-import type { IconPick } from "@trymatcha/types";
+import type { IconPick } from "@trydarwin/types";
 
 import PlaygroundAvatar, {
     type AvatarSize,

@@ -1,5 +1,5 @@
 "use client";
-import type { InboundSocketMessage, OutboundSocketMessageType } from "@trymatcha/types";
+import type { InboundSocketMessage, OutboundSocketMessageType } from "@trydarwin/types";
 import { useEffect, useRef, useState } from "react";
 
 import SessionServices from "@/lib/session";

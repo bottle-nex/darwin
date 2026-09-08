@@ -1,7 +1,7 @@
 "use client";
 
-import type { IconPick } from "@trymatcha/types";
-import { CheckIcon, ICONS, type IconType, ProjectAvatarPickerIcon } from "@trymatcha/ui/icons";
+import type { IconPick } from "@trydarwin/types";
+import { CheckIcon, ICONS, type IconType, ProjectAvatarPickerIcon } from "@trydarwin/ui/icons";
 import { useMemo, useState } from "react";
 
 import { Button } from "@/components/ui/button";

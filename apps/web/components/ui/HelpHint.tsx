@@ -1,5 +1,5 @@
 "use client";
-import { HelpIcon } from "@trymatcha/ui/icons";
+import { HelpIcon } from "@trydarwin/ui/icons";
 import type { ReactNode } from "react";
 
 import InfoTooltip from "@/components/ui/InfoTooltip";

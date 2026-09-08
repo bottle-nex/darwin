@@ -1,5 +1,5 @@
 {
-    "name": "matcha-sandbox-mcp-runtime",
+    "name": "darwin-sandbox-mcp-runtime",
     "version": "0.0.0",
     "private": true,
     "type": "module",

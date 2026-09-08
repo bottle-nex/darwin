@@ -8,7 +8,7 @@ import {
     type RunLogEventBody,
     RunLogEventKind,
     RunLogLevel,
-} from "@trymatcha/types";
+} from "@trydarwin/types";
 import { z } from "zod";
 
 export const REPORT_PROGRESS_DESCRIPTION = [

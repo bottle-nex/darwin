@@ -1,6 +1,6 @@
 "use client";
-import type { Capsule } from "@trymatcha/types";
-import { DiffPreviewIcon, RetryActionIcon, WarningTriangleIcon } from "@trymatcha/ui/icons";
+import type { Capsule } from "@trydarwin/types";
+import { DiffPreviewIcon, RetryActionIcon, WarningTriangleIcon } from "@trydarwin/ui/icons";
 import { useMemo, useState } from "react";
 
 import LogoLoader from "@/components/app/LogoLoader";

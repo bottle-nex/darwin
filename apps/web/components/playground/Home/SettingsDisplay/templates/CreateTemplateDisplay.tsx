@@ -1,7 +1,7 @@
 "use client";
 
 import type { Editor } from "@tiptap/react";
-import { BackChevronIcon, CheckIcon, TemplateDocumentIcon } from "@trymatcha/ui/icons";
+import { BackChevronIcon, CheckIcon, TemplateDocumentIcon } from "@trydarwin/ui/icons";
 import { AxiosError } from "axios";
 import { useState } from "react";
 

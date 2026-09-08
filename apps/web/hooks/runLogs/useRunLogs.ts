@@ -5,7 +5,7 @@ import {
     type RunLogEvent,
     type RunLogPage,
     RunLogState,
-} from "@trymatcha/types";
+} from "@trydarwin/types";
 import { useEffect } from "react";
 
 import { send_socket_message } from "@/hooks/socket/useWebSocket";

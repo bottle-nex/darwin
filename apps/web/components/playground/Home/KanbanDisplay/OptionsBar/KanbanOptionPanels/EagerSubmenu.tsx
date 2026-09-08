@@ -1,5 +1,5 @@
 "use client";
-import { SubmenuDisclosureIcon } from "@trymatcha/ui/icons";
+import { SubmenuDisclosureIcon } from "@trydarwin/ui/icons";
 import { type ReactNode, useState } from "react";
 
 import {

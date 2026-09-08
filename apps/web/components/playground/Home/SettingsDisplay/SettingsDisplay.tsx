@@ -1,5 +1,5 @@
 "use client";
-import { AccessRestrictedIcon } from "@trymatcha/ui/icons";
+import { AccessRestrictedIcon } from "@trydarwin/ui/icons";
 import { useParams } from "next/navigation";
 
 import NoResource from "@/components/utility/NoResource";

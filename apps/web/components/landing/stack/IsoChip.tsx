@@ -9,6 +9,21 @@ import type { ReactNode } from "react";
  */
 const PRIMARY = "var(--color-primary)";
 
+const GHOST_TOP_FACE = "#ffffff";
+const GHOST_SIDE_FACE = "#dcdce1";
+const GHOST_EDGE = "#c4c4cb";
+const GHOST_DETAIL = "#c9c9d0";
+const GHOST_INSET = "#d2d2d8";
+const GHOST_SCREW = "#b8b8c0";
+const GHOST_GLYPH = "#85858d";
+
+const ACTIVE_TOP_FACE_LIGHT = "#ffffff";
+const ACTIVE_TOP_FACE_SHADE = "#f4f4f5";
+const ACTIVE_GLYPH = "#fafafa";
+const ACTIVE_EDGE = "color-mix(in srgb, var(--color-primary) 72%, #18181b)";
+const ACTIVE_INSET = "color-mix(in srgb, var(--color-primary) 42%, transparent)";
+const ACTIVE_DETAIL = "rgba(24, 24, 27,0.4)";
+
 export const HALF_W = 138.56;
 export const HALF_H = 80;
 export const DEPTH = 34;
@@ -126,10 +141,9 @@ export default function IsoChip({
 }: IsoChipProps) {
     const reduceMotion = useReducedMotion();
     const isGhost = variant === "ghost";
-    const lineColor = isGhost
-        ? "#47474c"
-        : "color-mix(in srgb, var(--color-primary) 55%, transparent)";
-    const detailColor = isGhost ? "#3c3c40" : "rgba(12,12,12,0.65)";
+    const edgeColor = isGhost ? GHOST_EDGE : ACTIVE_EDGE;
+    const insetColor = isGhost ? GHOST_INSET : ACTIVE_INSET;
+    const detailColor = isGhost ? GHOST_DETAIL : ACTIVE_DETAIL;
 
     return (
         <motion.g
@@ -166,8 +180,8 @@ export default function IsoChip({
                                     x2="1"
                                     y2="1"
                                 >
-                                    <stop offset="0" stopColor="#161616" />
-                                    <stop offset="1" stopColor="#0d0d0d" />
+                                    <stop offset="0" stopColor={ACTIVE_TOP_FACE_LIGHT} />
+                                    <stop offset="1" stopColor={ACTIVE_TOP_FACE_SHADE} />
                                 </linearGradient>
                                 <filter
                                     id="iso-chip-glow"
@@ -179,7 +193,11 @@ export default function IsoChip({
                                     <feGaussianBlur stdDeviation={18} />
                                 </filter>
                             </defs>
-                            <g filter="url(#iso-chip-glow)" opacity={0.28}>
+                            <g
+                                filter="url(#iso-chip-glow)"
+                                opacity={0.22}
+                                transform="translate(0 16)"
+                            >
                                 <path d={TOP_FACE} fill={PRIMARY} />
                                 <path d={BODY} fill={PRIMARY} />
                             </g>
@@ -188,8 +206,8 @@ export default function IsoChip({
 
                     <path
                         d={BODY}
-                        fill={isGhost ? "#101012" : PRIMARY}
-                        stroke={lineColor}
+                        fill={isGhost ? GHOST_SIDE_FACE : PRIMARY}
+                        stroke={edgeColor}
                         strokeWidth={1}
                     />
 
@@ -215,14 +233,14 @@ export default function IsoChip({
 
                     <path
                         d={TOP_FACE}
-                        fill={isGhost ? "#141416" : "url(#iso-chip-face-sheen)"}
-                        stroke={lineColor}
+                        fill={isGhost ? GHOST_TOP_FACE : "url(#iso-chip-face-sheen)"}
+                        stroke={edgeColor}
                         strokeWidth={1}
                     />
                     <path
                         d={TOP_INSET}
                         fill="none"
-                        stroke={lineColor}
+                        stroke={insetColor}
                         strokeWidth={0.75}
                         opacity={0.8}
                     />
@@ -232,16 +250,16 @@ export default function IsoChip({
                             cx={screwX}
                             cy={screwY}
                             r={2.5}
-                            fill={isGhost ? "#4c4c52" : PRIMARY}
+                            fill={isGhost ? GHOST_SCREW : PRIMARY}
                         />
                     ))}
 
                     {isGhost ? (
-                        <path d={FACE_PANEL} fill="none" stroke="#3c3c40" strokeWidth={0.75} />
+                        <path d={FACE_PANEL} fill="none" stroke={insetColor} strokeWidth={0.75} />
                     ) : (
                         <path d={FACE_PANEL} fill={PRIMARY} />
                     )}
-                    <g transform={ISO_MATRIX} color={isGhost ? "#5b5b61" : "#0a0a0a"}>
+                    <g transform={ISO_MATRIX} color={isGhost ? GHOST_GLYPH : ACTIVE_GLYPH}>
                         {glyph}
                     </g>
                 </motion.g>

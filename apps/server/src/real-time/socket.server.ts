@@ -1,32 +1,41 @@
-import { Action, Permissions } from "@trymatcha/access-control";
-import { SubscriberSystem } from "@trymatcha/services";
+import { Action, Permissions } from "@trydarwin/access-control";
+import { SubscriberSystem } from "@trydarwin/services";
 import {
     AppSocketCloseCode,
     type InboundSocketMessage,
     InboundSocketMessageType,
+    OutboundSocketMessageType,
     StandardSocketCloseCode,
-} from "@trymatcha/types";
+} from "@trydarwin/types";
 import type { IncomingMessage, Server } from "http";
 import { type RawData, WebSocket, WebSocketServer } from "ws";
 
 import Access from "../access-control/access";
+import DarwinStream from "../services/darwin/service.darwin_stream";
 import { verifySessionJwt } from "../services/service.jwt";
 import PresenceService from "../services/service.presence";
 import type { AuthUser } from "../types/express.d";
 import ChatSocketHandler from "./chat.handler";
+import DarwinRunSocketHandler from "./darwin-run.handler";
 import ProjectChatSocketHandler from "./project-chat.handler";
 import RunLogSocketHandler from "./run-log.handler";
 import TeamChatSocketHandler from "./team-chat.handler";
 
 const PRESENCE_HEARTBEAT_MS = 30_000;
 
+/** Namespaces a subscription so two id spaces can share one fan-out map. */
+function stream_key(kind: "run" | "darwin", id: string) {
+    return `${kind}:${id}`;
+}
+
 export default class SocketServer {
     private wss: WebSocketServer;
     private project_connections: Map<string, Set<WebSocket>> = new Map();
     private user_connections: Map<string, Set<WebSocket>> = new Map();
     private connection_users: Map<WebSocket, AuthUser> = new Map();
-    private run_connections: Map<string, Set<WebSocket>> = new Map();
-    private connection_runs: Map<WebSocket, Set<string>> = new Map();
+    // Keyed "<kind>:<id>" so a DarwinRun and an AgentSession can never share a slot.
+    private stream_connections: Map<string, Set<WebSocket>> = new Map();
+    private connection_streams: Map<WebSocket, Set<string>> = new Map();
     private subscriber_system: SubscriberSystem;
 
     constructor(server: Server) {
@@ -51,7 +60,12 @@ export default class SocketServer {
             if (channel.scope !== "project") return this.send_to_user(channel.id, message);
 
             const run_id = RunLogSocketHandler.target_run(message);
-            if (run_id) return this.send_to_run(run_id, message);
+            if (run_id) return this.send_to_stream(stream_key("run", run_id), message);
+
+            const darwin_run_id = DarwinRunSocketHandler.target_run(message);
+            if (darwin_run_id)
+                return this.send_to_stream(stream_key("darwin", darwin_run_id), message);
+
             this.broadcast_message(channel.id, message);
         });
     }
@@ -157,7 +171,13 @@ export default class SocketServer {
                     await this.subscribe_run_logs(ws, project_id, message.payload.runId);
                     return;
                 case InboundSocketMessageType.RUN_LOG_UNSUBSCRIBE:
-                    this.unsubscribe_run_logs(ws, message.payload.runId);
+                    this.unsubscribe_stream(ws, stream_key("run", message.payload.runId));
+                    return;
+                case InboundSocketMessageType.DARWIN_RUN_SUBSCRIBE:
+                    await this.subscribe_darwin_run(ws, project_id, message.payload);
+                    return;
+                case InboundSocketMessageType.DARWIN_RUN_UNSUBSCRIBE:
+                    this.unsubscribe_stream(ws, stream_key("darwin", message.payload.runId));
                     return;
             }
         } catch (error) {
@@ -166,40 +186,79 @@ export default class SocketServer {
     }
 
     private async subscribe_run_logs(ws: WebSocket, project_id: string, run_id: string) {
-        if (this.connection_runs.get(ws)?.has(run_id)) return;
+        const key = stream_key("run", run_id);
+        if (this.connection_streams.get(ws)?.has(key)) return;
+        // Run logs are shared, so project membership is enough here.
         if (!(await RunLogSocketHandler.belongs_to_project(run_id, project_id))) return;
-        if (ws.readyState !== WebSocket.OPEN) return;
+        this.attach_stream(ws, key);
+    }
 
-        let subscribers = this.run_connections.get(run_id);
+    /**
+     * Attach a socket to one Darwin run's event stream, then replay whatever it missed.
+     *
+     * Ownership is checked against the project *and* the user: a Darwin thread is one person's
+     * notebook, unlike run logs. `cursor` is the last seq the client already rendered, so a tab
+     * reloaded mid-answer picks up exactly where it left off instead of losing those tokens.
+     */
+    private async subscribe_darwin_run(
+        ws: WebSocket,
+        project_id: string,
+        payload: { runId: string; cursor?: number },
+    ) {
+        const key = stream_key("darwin", payload.runId);
+        if (this.connection_streams.get(ws)?.has(key)) return;
+
+        const user = this.connection_users.get(ws);
+        if (!user) return;
+        if (!(await DarwinRunSocketHandler.belongs_to(payload.runId, project_id, user.id))) return;
+        if (!this.attach_stream(ws, key)) return;
+
+        const missed = await DarwinStream.replay(payload.runId, payload.cursor ?? null);
+        if (!missed.length || ws.readyState !== WebSocket.OPEN) return;
+        ws.send(
+            JSON.stringify({
+                type: OutboundSocketMessageType.DARWIN_RUN_APPENDED,
+                projectId: project_id,
+                runId: payload.runId,
+                payload: { events: missed, cursor: missed[missed.length - 1]!.seq },
+            }),
+        );
+    }
+
+    private attach_stream(ws: WebSocket, key: string): boolean {
+        if (ws.readyState !== WebSocket.OPEN) return false;
+
+        let subscribers = this.stream_connections.get(key);
         if (!subscribers) {
             subscribers = new Set();
-            this.run_connections.set(run_id, subscribers);
+            this.stream_connections.set(key, subscribers);
         }
         subscribers.add(ws);
 
-        let runs = this.connection_runs.get(ws);
-        if (!runs) {
-            runs = new Set();
-            this.connection_runs.set(ws, runs);
+        let keys = this.connection_streams.get(ws);
+        if (!keys) {
+            keys = new Set();
+            this.connection_streams.set(ws, keys);
         }
-        runs.add(run_id);
+        keys.add(key);
+        return true;
     }
 
-    private unsubscribe_run_logs(ws: WebSocket, run_id: string) {
-        const subscribers = this.run_connections.get(run_id);
+    private unsubscribe_stream(ws: WebSocket, key: string) {
+        const subscribers = this.stream_connections.get(key);
         if (subscribers) {
             subscribers.delete(ws);
-            if (subscribers.size === 0) this.run_connections.delete(run_id);
+            if (subscribers.size === 0) this.stream_connections.delete(key);
         }
 
-        const runs = this.connection_runs.get(ws);
-        if (!runs) return;
-        runs.delete(run_id);
-        if (runs.size === 0) this.connection_runs.delete(ws);
+        const keys = this.connection_streams.get(ws);
+        if (!keys) return;
+        keys.delete(key);
+        if (keys.size === 0) this.connection_streams.delete(ws);
     }
 
-    private send_to_run(run_id: string, message: string) {
-        const subscribers = this.run_connections.get(run_id);
+    private send_to_stream(key: string, message: string) {
+        const subscribers = this.stream_connections.get(key);
         if (!subscribers) return;
         for (const ws of subscribers) {
             if (ws.readyState === WebSocket.OPEN) ws.send(message);
@@ -338,12 +397,12 @@ export default class SocketServer {
         const user = this.connection_users.get(ws);
         this.connection_users.delete(ws);
 
-        for (const run_id of this.connection_runs.get(ws) ?? []) {
-            const subscribers = this.run_connections.get(run_id);
+        for (const key of this.connection_streams.get(ws) ?? []) {
+            const subscribers = this.stream_connections.get(key);
             subscribers?.delete(ws);
-            if (subscribers && subscribers.size === 0) this.run_connections.delete(run_id);
+            if (subscribers && subscribers.size === 0) this.stream_connections.delete(key);
         }
-        this.connection_runs.delete(ws);
+        this.connection_streams.delete(ws);
 
         const connections = this.project_connections.get(project_id);
         if (connections) {

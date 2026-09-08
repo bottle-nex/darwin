@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import type { ProjectRole } from "@trymatcha/types";
+import type { ProjectRole } from "@trydarwin/types";
 
 import { apiClient } from "@/lib/axios";
 import { LIST_PROJECT_MEMBERS_URL } from "@/routes/api_routes";

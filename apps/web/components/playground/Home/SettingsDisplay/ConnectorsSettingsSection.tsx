@@ -1,5 +1,5 @@
 "use client";
-import { TelegramLogoIcon } from "@trymatcha/ui/icons";
+import { TelegramLogoIcon } from "@trydarwin/ui/icons";
 import { useSearchParams } from "next/navigation";
 import { type ComponentType, useEffect } from "react";
 import { toast } from "sonner";
@@ -21,12 +21,12 @@ const PROVIDER_META: Record<
     Slack: {
         label: "Slack",
         icon: SlackIcon,
-        description: "matcha DMs you the question. Reply in the thread to answer.",
+        description: "darwin DMs you the question. Reply in the thread to answer.",
     },
     Telegram: {
         label: "Telegram",
         icon: TelegramLogoIcon,
-        description: "matcha messages you on Telegram. Reply to answer.",
+        description: "darwin messages you on Telegram. Reply to answer.",
     },
 };
 

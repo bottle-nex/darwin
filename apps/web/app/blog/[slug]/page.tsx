@@ -1,5 +1,5 @@
-import { CardCover, ContentCard, Prose } from "@trymatcha/editorial";
-import { BlogBackNavIcon } from "@trymatcha/ui/icons";
+import { CardCover, ContentCard, Prose } from "@trydarwin/editorial";
+import { BlogBackNavIcon } from "@trydarwin/ui/icons";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";

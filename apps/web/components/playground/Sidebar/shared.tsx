@@ -1,7 +1,7 @@
 "use client";
 
-import type { IconType } from "@trymatcha/ui/icons";
-import { AddIcon } from "@trymatcha/ui/icons";
+import type { IconType } from "@trydarwin/ui/icons";
+import { AddIcon } from "@trydarwin/ui/icons";
 
 import PlaygroundAvatar, {
     type AvatarTone,

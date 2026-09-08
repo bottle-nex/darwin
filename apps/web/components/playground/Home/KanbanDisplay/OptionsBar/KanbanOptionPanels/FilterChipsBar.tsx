@@ -1,5 +1,5 @@
 "use client";
-import { CloseIcon } from "@trymatcha/ui/icons";
+import { CloseIcon } from "@trydarwin/ui/icons";
 import { format, parseISO } from "date-fns";
 import { type ComponentProps, forwardRef } from "react";
 

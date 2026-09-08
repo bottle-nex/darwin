@@ -1,5 +1,5 @@
 "use client";
-import type { Notification } from "@trymatcha/types";
+import type { Notification } from "@trydarwin/types";
 import { format } from "date-fns";
 
 import PlaygroundAvatar, {

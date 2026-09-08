@@ -29,7 +29,7 @@ export default function AdminShell({
                         href="/"
                         className="font-mono text-[11px] tracking-[0.18em] text-mist/70 uppercase transition-colors hover:text-snow"
                     >
-                        matcha admin
+                        darwin admin
                     </Link>
                     <div className="flex items-center gap-x-4">
                         <span className="hidden text-[13px] text-mist/35 sm:block">{email}</span>

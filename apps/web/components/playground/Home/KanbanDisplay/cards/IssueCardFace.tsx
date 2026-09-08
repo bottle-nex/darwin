@@ -1,5 +1,5 @@
 "use client";
-import { CalendarIcon, UnknownStatusIcon } from "@trymatcha/ui/icons";
+import { CalendarIcon, UnknownStatusIcon } from "@trydarwin/ui/icons";
 import type { ReactNode } from "react";
 
 import PlaygroundAvatar from "@/components/playground/Core/components/PlaygroundAvatar";

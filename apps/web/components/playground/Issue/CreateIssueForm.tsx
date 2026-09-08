@@ -1,5 +1,5 @@
 "use client";
-import { BreadcrumbSeparatorIcon } from "@trymatcha/ui/icons";
+import { BreadcrumbSeparatorIcon } from "@trydarwin/ui/icons";
 
 import { useActiveProject } from "@/hooks/useActiveProject";
 import type { IssueTarget } from "@/store/issues/useCreateIssueStore";

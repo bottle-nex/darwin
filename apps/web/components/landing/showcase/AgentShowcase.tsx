@@ -40,7 +40,7 @@ const TASKS: Task[] = [
         done: 14,
         total: 20,
         pct: 70,
-        bar: "bg-[#6b8afd]",
+        bar: "bg-[#4a6cf0]",
         tag: "Research",
         tagStyle: TAG_STYLES.research,
         priority: "Medium",
@@ -53,7 +53,7 @@ const TASKS: Task[] = [
         done: 6,
         total: 12,
         pct: 50,
-        bar: "bg-[#d9a13c]",
+        bar: "bg-[#c2871f]",
         tag: "Research",
         tagStyle: TAG_STYLES.research,
         priority: "High",
@@ -66,7 +66,7 @@ const TASKS: Task[] = [
         done: 0,
         total: 9,
         pct: 0,
-        bar: "bg-neutral-500",
+        bar: "bg-muted-foreground",
         tag: "Meeting",
         tagStyle: TAG_STYLES.meeting,
         priority: "Low",
@@ -87,14 +87,14 @@ function grow(pct: number, delay: number) {
 }
 
 function Checkbox() {
-    return <span className="size-3.5 rounded-[4px] border border-white/12 bg-white/4" />;
+    return <span className="size-3.5 rounded-[4px] border border-edge bg-foreground/4" />;
 }
 
 function SectionLabel({ label }: { label: string }) {
     return (
         <div className="flex items-center gap-2">
-            <span className="h-3 w-0.5 rounded-full bg-neutral-400" />
-            <span className="text-[11px] font-medium text-neutral-300">{label}</span>
+            <span className="h-3 w-0.5 rounded-full bg-muted-foreground" />
+            <span className="text-[11px] font-medium text-foreground/85">{label}</span>
         </div>
     );
 }
@@ -103,21 +103,21 @@ function TaskRow({ task }: { task: Task }) {
     return (
         <motion.div
             variants={appear(task.delay)}
-            className={cn(ROW_GRID, "border-b border-white/4 py-2.5 last:border-0")}
+            className={cn(ROW_GRID, "border-b border-edge py-2.5 last:border-0")}
         >
             <Checkbox />
-            <span className="truncate text-[11px] font-medium whitespace-nowrap text-neutral-100 md:text-xs">
+            <span className="truncate text-[11px] font-medium whitespace-nowrap text-foreground md:text-xs">
                 {task.name}
             </span>
             <span className="flex items-center gap-2">
-                <span className="h-1 w-10 overflow-hidden rounded-full bg-white/10">
+                <span className="h-1 w-10 overflow-hidden rounded-full bg-foreground/10">
                     <motion.span
                         variants={grow(task.pct, task.delay + 0.2)}
                         className={cn("block h-full rounded-full", task.bar)}
                     />
                 </span>
-                <span className="text-[10px] whitespace-nowrap text-neutral-500">
-                    <span className="text-[11px] font-semibold text-neutral-100">{task.done}</span>{" "}
+                <span className="text-[10px] whitespace-nowrap text-muted-foreground">
+                    <span className="text-[11px] font-semibold text-foreground">{task.done}</span>{" "}
                     / {task.total}
                 </span>
             </span>
@@ -127,7 +127,7 @@ function TaskRow({ task }: { task: Task }) {
             <span>
                 <PriorityPill label={task.priority} className={task.priorityStyle} />
             </span>
-            <span className="text-[11px] whitespace-nowrap text-neutral-300">{task.due}</span>
+            <span className="text-[11px] whitespace-nowrap text-muted-foreground">{task.due}</span>
         </motion.div>
     );
 }
@@ -146,15 +146,15 @@ export default memo(function AgentShowcase() {
                 >
                     <motion.div
                         variants={appear(0.35)}
-                        className="-mr-20 overflow-hidden rounded-md border border-white/6 bg-charcoal"
+                        className="-mr-20 overflow-hidden rounded-md border border-edge bg-charcoal"
                     >
-                        <div className="border-b border-white/6 px-3 py-2.5">
+                        <div className="border-b border-edge px-3 py-2.5">
                             <SectionLabel label="To Do" />
                         </div>
                         <div
                             className={cn(
                                 ROW_GRID,
-                                "border-b border-white/5 py-2 text-[10px] text-neutral-600",
+                                "border-b border-edge py-2 text-[10px] text-muted-foreground/70",
                             )}
                         >
                             <Checkbox />
@@ -171,7 +171,7 @@ export default memo(function AgentShowcase() {
 
                     <motion.div
                         variants={appear(0.9)}
-                        className="mt-auto -mr-20 rounded-md border border-white/5 bg-charcoal px-3 py-2.5 opacity-45"
+                        className="mt-auto -mr-20 rounded-md border border-edge bg-charcoal px-3 py-2.5 opacity-60"
                     >
                         <SectionLabel label="In Progress" />
                     </motion.div>

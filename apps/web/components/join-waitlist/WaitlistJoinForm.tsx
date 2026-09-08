@@ -1,6 +1,6 @@
 "use client";
 
-import { EnterArrowIcon } from "@trymatcha/ui/icons";
+import { EnterArrowIcon } from "@trydarwin/ui/icons";
 import { AnimatePresence, motion } from "motion/react";
 import { type KeyboardEvent, useState } from "react";
 

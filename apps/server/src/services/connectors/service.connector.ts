@@ -6,7 +6,7 @@ import {
     ConnectorStatus,
     prisma,
     type Provider,
-} from "@trymatcha/database";
+} from "@trydarwin/database";
 
 import { ENV } from "../../configs/env";
 import SecretService from "../service.secret";

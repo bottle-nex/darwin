@@ -9,8 +9,8 @@ import {
     reference_labels,
     reference_split_pattern,
     reference_teams,
-} from "@trymatcha/types";
-import { TeamEntityIcon } from "@trymatcha/ui/icons";
+} from "@trydarwin/types";
+import { TeamEntityIcon } from "@trydarwin/ui/icons";
 
 import { IconPickGlyph } from "@/components/ui/IconPicker";
 import { useIssueIdentifier } from "@/hooks/issues/useIssueIdentifier";

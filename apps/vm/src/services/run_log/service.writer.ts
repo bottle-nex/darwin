@@ -1,4 +1,4 @@
-import type Logger from "@trymatcha/logger";
+import type Logger from "@trydarwin/logger";
 import {
     RUN_LOG_MAX_COMMAND_LENGTH,
     RUN_LOG_MAX_COMMIT_BODY_LENGTH,
@@ -11,7 +11,7 @@ import {
     RunLogEventKind,
     RunLogLevel,
     type RunLogPhase,
-} from "@trymatcha/types";
+} from "@trydarwin/types";
 import { z } from "zod";
 
 import { redact } from "../sandbox/service.stream";

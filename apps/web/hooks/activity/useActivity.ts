@@ -1,5 +1,5 @@
 import { type QueryClient, useInfiniteQuery } from "@tanstack/react-query";
-import type { AgentSession, IssueActivity } from "@trymatcha/types";
+import type { AgentSession, IssueActivity } from "@trydarwin/types";
 
 import { apiClient } from "@/lib/axios";
 import { ISSUE_ACTIVITY_URL } from "@/routes/api_routes";

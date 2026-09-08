@@ -1,5 +1,5 @@
-import { prisma } from "@trymatcha/database";
-import { OutboundSocketMessageType } from "@trymatcha/types";
+import { prisma } from "@trydarwin/database";
+import { OutboundSocketMessageType } from "@trydarwin/types";
 
 const RUN_LOG_MARKER = '"RUN_LOG_';
 

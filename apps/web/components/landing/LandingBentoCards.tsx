@@ -51,7 +51,7 @@ function ProcessConnectors() {
                     key={path}
                     d={path}
                     fill="none"
-                    stroke="#4a4a4a"
+                    stroke="#d4d4d8"
                     strokeWidth={1}
                     strokeDasharray="5 5"
                     strokeLinecap="round"

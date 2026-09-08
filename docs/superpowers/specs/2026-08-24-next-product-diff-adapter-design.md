@@ -24,9 +24,9 @@ The product reports one of these outcomes:
 | --- | --- |
 | Ready | Base and head previews were verified, captured, compared, and published. |
 | Unsupported | No installed adapter supports the repository. |
-| ConfigurationRequired | A supported application exists, but Matcha cannot confidently select or start it without project configuration. |
+| ConfigurationRequired | A supported application exists, but Darwin cannot confidently select or start it without project configuration. |
 | PreviewUnavailable | The selected application could not start or render with its current dependencies and safe preview configuration. |
-| Failed | Matcha infrastructure or an unexpected internal error failed. |
+| Failed | Darwin infrastructure or an unexpected internal error failed. |
 | Stale | The pull request changed while Product Diff was running. |
 
 Every non-ready outcome retains redacted diagnostics: the selected application, workspace type, command category, health route, and first relevant failure.

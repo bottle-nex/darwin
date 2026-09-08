@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { TeamRole } from "@trymatcha/types";
+import type { TeamRole } from "@trydarwin/types";
 
 import { TEAM_MEMBERS_QUERY_KEY } from "@/hooks/team/useGetTeamMembers";
 import { apiClient } from "@/lib/axios";

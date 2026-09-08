@@ -1,6 +1,6 @@
 "use client";
 
-import { CloseIcon } from "@trymatcha/ui/icons";
+import { CloseIcon } from "@trydarwin/ui/icons";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import type { ReactNode } from "react";
 

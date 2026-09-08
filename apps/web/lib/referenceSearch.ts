@@ -1,5 +1,5 @@
 import type { QueryClient } from "@tanstack/react-query";
-import type { IssueStatus } from "@trymatcha/types";
+import type { IssueStatus } from "@trydarwin/types";
 
 import { PROJECT_QUERY_KEY } from "@/hooks/project/useGetProject";
 import { PROJECT_MEMBERS_QUERY_KEY, type ProjectMember } from "@/hooks/project/useProjectMembers";

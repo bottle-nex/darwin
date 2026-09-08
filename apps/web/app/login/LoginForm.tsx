@@ -87,7 +87,7 @@ export default function LoginForm({ callbackUrl = "/playground" }: LoginFormProp
             <div className="w-full max-w-80">
                 <div className="flex flex-col items-center">
                     <AppLogo iconOnly className="mb-6 scale-125" />
-                    <h1 className="text-xl font-medium tracking-tight">Log in to matcha</h1>
+                    <h1 className="text-xl font-medium tracking-tight">Log in to darwin</h1>
                 </div>
 
                 <div className="mt-8 flex flex-col gap-y-3">
