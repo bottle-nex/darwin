@@ -2,10 +2,8 @@ import { gunzipSync } from "node:zlib";
 
 import {
     RUN_LOG_ARCHIVE_EVENT_CAP,
-    run_log_cache_key,
-    run_log_meta_key,
     RUN_LOG_PAGE_LIMIT,
-    run_log_prefix,
+    RunLog,
     type RunLogEvent,
 } from "@trydarwin/types";
 
@@ -25,7 +23,7 @@ type CachedRun = { projectId: string; segments: number; dropped: number };
 export default class RunLogService {
     private static async cached_run(run_id: string): Promise<CachedRun | null> {
         const meta = await redis.hmget(
-            run_log_meta_key(run_id),
+            RunLog.meta_key(run_id),
             "projectId",
             "segments",
             "dropped",
@@ -79,7 +77,7 @@ export default class RunLogService {
         limit: number,
     ): Promise<RunLogEvent[]> {
         const payloads = await redis.zrangebyscore(
-            run_log_cache_key(run_id),
+            RunLog.cache_key(run_id),
             cursor === null ? "-inf" : `(${cursor}`,
             "+inf",
             "LIMIT",
@@ -101,7 +99,7 @@ export default class RunLogService {
         if (cached) {
             if (cached.segments < 1) return [];
             return RunLogService.decode(
-                await StorageService.read_run_log_archive(run_log_prefix(cached.projectId, run_id)),
+                await StorageService.read_run_log_archive(RunLog.prefix(cached.projectId, run_id)),
             );
         }
         if (!sealed_key) return [];

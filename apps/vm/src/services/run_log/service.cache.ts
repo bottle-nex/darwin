@@ -2,11 +2,9 @@ import {
     OutboundSocketMessageType,
     project_channel_name,
     RUN_LOG_CACHE_INDEX_KEY,
-    run_log_cache_key,
-    run_log_event_bytes,
     RUN_LOG_HOT_TTL_SECONDS,
     RUN_LOG_MAX_BYTES,
-    run_log_meta_key,
+    RunLog,
     type RunLogEvent,
 } from "@trydarwin/types";
 
@@ -39,8 +37,8 @@ export default class RunLogCache {
         event: RunLogEvent,
     ): Promise<RunLogAppendResult> {
         const client = redis();
-        const cache_key = run_log_cache_key(run_id);
-        const meta_key = run_log_meta_key(run_id);
+        const cache_key = RunLog.cache_key(run_id);
+        const meta_key = RunLog.meta_key(run_id);
 
         const [last_seq, bytes] = await client.hmget(meta_key, "seq", "bytes");
         const highest_seq = Number(last_seq ?? 0);
@@ -48,6 +46,7 @@ export default class RunLogCache {
 
         if (event.seq <= highest_seq) return "duplicate";
         if (event.seq > highest_seq + SEQ_LOOKAHEAD_LIMIT) return "refused";
+        if (RunLog.event_is_blocked(event)) return "refused";
 
         if (total_bytes >= RUN_LOG_MAX_BYTES) {
             await client.hincrby(meta_key, "dropped", 1);
@@ -61,7 +60,7 @@ export default class RunLogCache {
                 projectId: owner.projectId,
                 issueId: owner.issueId,
                 seq: event.seq,
-                bytes: total_bytes + run_log_event_bytes(event),
+                bytes: total_bytes + RunLog.event_bytes(event),
             })
             .hincrby(meta_key, "received", 1)
             .sadd(RUN_LOG_CACHE_INDEX_KEY, run_id)
@@ -91,14 +90,16 @@ export default class RunLogCache {
      * key events by sequence, so re-publishing the same number replaces rather than appends.
      */
     static async replace(run_id: string, owner: RunLogOwner, event: RunLogEvent): Promise<void> {
+        if (RunLog.event_is_blocked(event)) return;
+
         const client = redis();
-        const cache_key = run_log_cache_key(run_id);
+        const cache_key = RunLog.cache_key(run_id);
 
         await client
             .multi()
             .zremrangebyscore(cache_key, event.seq, event.seq)
             .zadd(cache_key, event.seq, JSON.stringify(event))
-            .hincrby(run_log_meta_key(run_id), "bytes", run_log_event_bytes(event))
+            .hincrby(RunLog.meta_key(run_id), "bytes", RunLog.event_bytes(event))
             .exec();
 
         await client.publish(
