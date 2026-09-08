@@ -4,6 +4,7 @@ export interface Tag {
     color: string;
     createdAt: string;
     creator: TagCreator | null;
+    issueCount: number;
 }
 
 export interface TagCreator {

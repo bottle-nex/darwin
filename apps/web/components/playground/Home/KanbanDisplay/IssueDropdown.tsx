@@ -31,6 +31,7 @@ import { useBoardDestinations } from "@/hooks/issues/useBoardDestinations";
 import { COPY_FIELDS, useIssueActions } from "@/hooks/issues/useIssueActions";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { DATE_SHORTCUTS_WITH_CLEAR } from "@/lib/dateShortcuts";
+import { issueHref } from "@/lib/issueHref";
 import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
 import { cn } from "@/lib/utils";
 import type { BoardIssue } from "@/types/board";
@@ -105,7 +106,7 @@ export default function IssueDropdown({
                 <ContextMenuSeparator />
 
                 <Submenu
-                    disabled={!editable}
+                    disabled={actions.statusOptions.length === 0}
                     className="w-44"
                     trigger={
                         <>
@@ -117,7 +118,7 @@ export default function IssueDropdown({
                         </>
                     }
                 >
-                    {KanbanBoard.COLUMNS.map((column) => (
+                    {actions.statusOptions.map((column) => (
                         <ContextMenuItem
                             key={column.status}
                             onSelect={() => actions.setStatus(column.status)}
@@ -321,7 +322,7 @@ export default function IssueDropdown({
                             onSelect={() =>
                                 actions.copyField(
                                     field.label,
-                                    field.value(issue, actions.issueHref(), projectName),
+                                    field.value(issue, issueHref(issue.id), projectName),
                                 )
                             }
                         >

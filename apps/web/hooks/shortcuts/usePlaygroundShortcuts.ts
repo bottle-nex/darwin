@@ -4,6 +4,7 @@ import {
     ChangeRoleIcon,
     ChatsNavIcon,
     CommandMenuIcon,
+    CopyFieldUrlIcon,
     CopyIcon,
     DeleteIcon,
     EditCalendarIcon,
@@ -28,12 +29,15 @@ import { useEffect, useRef } from "react";
 
 import { PRIORITY_OPTIONS } from "@/components/playground/Issue/issueHelpers";
 import { PlaygroundTab } from "@/components/playground/playgroundTabs";
+import { issueHref } from "@/lib/issueHref";
 import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
+import { toast } from "@/lib/toast";
 import { useCommandActionStore } from "@/store/command/useCommandActionStore";
 import { commandContext } from "@/store/command/useCommandContextStore";
 import { useCommandMenuStore } from "@/store/command/useCommandMenuStore";
 import { useCreateIssueStore } from "@/store/issues/useCreateIssueStore";
 import { useDeleteIssueStore } from "@/store/issues/useDeleteIssueStore";
+import { useHoveredIssueStore } from "@/store/issues/useHoveredIssueStore";
 import { useIssueSelectionStore } from "@/store/issues/useIssueSelectionStore";
 import { useNotificationsPanelStore } from "@/store/playground/useNotificationsPanelStore";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
@@ -60,14 +64,38 @@ function openTab(tab: PlaygroundTab) {
     usePlaygroundNavStore.getState().setTab(tab);
 }
 
-function issueTargets(context: CommandContext): string[] {
-    const selected = useIssueSelectionStore.getState().ids;
+function issueIdAt(x: number, y: number): string | null {
+    for (const element of document.elementsFromPoint(x, y)) {
+        const row = element.closest<HTMLElement>("[data-issue-id]");
+        if (row?.dataset.issueId) return row.dataset.issueId;
+    }
+    return null;
+}
+
+export function resolveIssueTargets(
+    selected: string[],
+    hovered: string | null,
+    openIssueId: string | null,
+): string[] {
     if (selected.length) return selected;
-    return context.issueId ? [context.issueId] : [];
+    if (hovered) return [hovered];
+    return openIssueId ? [openIssueId] : [];
+}
+
+function issueTargets(context: CommandContext): string[] {
+    return resolveIssueTargets(
+        useIssueSelectionStore.getState().ids,
+        useHoveredIssueStore.getState().id,
+        context.issueId,
+    );
 }
 
 function onIssue(context: CommandContext): boolean {
     return issueTargets(context).length > 0;
+}
+
+function onOneIssue(context: CommandContext): boolean {
+    return issueTargets(context).length === 1;
 }
 
 function spaceTargets(context: CommandContext): string[] {
@@ -120,7 +148,7 @@ function openNewTeam() {
 }
 
 export const COMBINATIONS: Record<string, CommandAction> = {
-    "e s": {
+    s: {
         kind: CommandKind.Issue,
         label: "Change status",
         icon: KanbanBoard.COLUMNS[0].icon,
@@ -128,7 +156,7 @@ export const COMBINATIONS: Record<string, CommandAction> = {
         opensPage: true,
         run: openMenuPage("status"),
     },
-    "e p": {
+    p: {
         kind: CommandKind.Issue,
         label: "Set priority",
         icon: PRIORITY_OPTIONS[0].icon,
@@ -136,7 +164,7 @@ export const COMBINATIONS: Record<string, CommandAction> = {
         opensPage: true,
         run: openMenuPage("priority"),
     },
-    "e a": {
+    a: {
         kind: CommandKind.Issue,
         label: "Assign to",
         icon: AssigneeGroupIcon,
@@ -144,7 +172,7 @@ export const COMBINATIONS: Record<string, CommandAction> = {
         opensPage: true,
         run: openMenuPage("assignees"),
     },
-    "e t": {
+    l: {
         kind: CommandKind.Issue,
         label: "Edit tags",
         icon: TagIcon,
@@ -152,7 +180,7 @@ export const COMBINATIONS: Record<string, CommandAction> = {
         opensPage: true,
         run: openMenuPage("tags"),
     },
-    "e d": {
+    t: {
         kind: CommandKind.Issue,
         label: "Set dates",
         icon: EditCalendarIcon,
@@ -160,7 +188,7 @@ export const COMBINATIONS: Record<string, CommandAction> = {
         opensPage: true,
         run: openMenuPage("dates"),
     },
-    "e m": {
+    m: {
         kind: CommandKind.Issue,
         label: "Move to column",
         icon: KanbanColumnsIcon,
@@ -175,6 +203,18 @@ export const COMBINATIONS: Record<string, CommandAction> = {
         isAvailable: onIssue,
         opensPage: true,
         run: openMenuPage("copy"),
+    },
+    c: {
+        kind: CommandKind.Issue,
+        label: "Copy issue URL",
+        icon: CopyFieldUrlIcon,
+        isAvailable: onOneIssue,
+        run: () => {
+            const [issueId] = issueTargets(commandContext());
+            if (!issueId) return;
+            navigator.clipboard.writeText(issueHref(issueId));
+            toast.success("Copied URL.");
+        },
     },
     "g d": {
         kind: CommandKind.Space,
@@ -194,7 +234,7 @@ export const COMBINATIONS: Record<string, CommandAction> = {
             if (spaceId) useSpaceFormStore.getState().openEdit(spaceId);
         },
     },
-    "m r": {
+    "r t": {
         kind: CommandKind.Member,
         label: "Set team role",
         icon: ChangeRoleIcon,
@@ -202,7 +242,7 @@ export const COMBINATIONS: Record<string, CommandAction> = {
         opensPage: true,
         run: openMenuPage("member-team-role"),
     },
-    "m p": {
+    "r p": {
         kind: CommandKind.Member,
         label: "Set project role",
         icon: ChangeRoleIcon,
@@ -300,20 +340,20 @@ export const COMBINATIONS: Record<string, CommandAction> = {
         icon: OrganizationEntityIcon,
         run: () => useCommandActionStore.getState().start("new-organization"),
     },
-    "s o": {
+    "w o": {
         kind: CommandKind.Switch,
         label: "Switch Organization",
         icon: OrganizationEntityIcon,
         run: () => useCommandActionStore.getState().start("switch-organization"),
     },
-    "s p": {
+    "w p": {
         kind: CommandKind.Switch,
         label: "Switch Project",
         icon: ProjectEntityIcon,
         isAvailable: inOrg,
         run: () => useCommandActionStore.getState().start("switch-project"),
     },
-    "s m": {
+    "w m": {
         kind: CommandKind.Switch,
         label: "Switch Team",
         icon: TeamEntityIcon,
@@ -517,9 +557,16 @@ export default function usePlaygroundShortcuts() {
             if (handleKeys([token])) event.preventDefault();
         }
 
+        function handlePointerOver(event: PointerEvent) {
+            if (useCommandMenuStore.getState().isOpen) return;
+            useHoveredIssueStore.getState().setHovered(issueIdAt(event.clientX, event.clientY));
+        }
+
         window.addEventListener("keydown", handleKeyDown);
+        window.addEventListener("pointerover", handlePointerOver);
         return () => {
             window.removeEventListener("keydown", handleKeyDown);
+            window.removeEventListener("pointerover", handlePointerOver);
             reset();
         };
     }, []);

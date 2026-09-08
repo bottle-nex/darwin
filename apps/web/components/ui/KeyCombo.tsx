@@ -12,7 +12,7 @@ export default function KeyCombo({ keys, className }: KeyComboProps) {
                 <kbd
                     key={index}
                     className={cn(
-                        "inline-flex min-w-6 items-center justify-center rounded border border-white/7 px-1.5 py-0.5 text-xs font-medium text-neutral-300 uppercase",
+                        "inline-flex size-5 shrink-0 items-center justify-center rounded bg-white/10 text-xs font-medium text-neutral-200 uppercase",
                         className,
                     )}
                 >

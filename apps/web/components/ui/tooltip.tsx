@@ -26,7 +26,7 @@ function TooltipTrigger({ ...props }: React.ComponentProps<typeof TooltipPrimiti
     return <TooltipPrimitive.Trigger data-slot="tooltip-trigger" {...props} />;
 }
 
-const SINGLE_LINE_MAX_HEIGHT_PX = 20;
+const SINGLE_LINE_MAX_HEIGHT_PX = 32;
 
 function TooltipContent({
     className,

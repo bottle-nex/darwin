@@ -2,6 +2,7 @@
 import { type ReactNode, useState } from "react";
 
 import CommandIssuePage, { ISSUE_PAGE_TITLE } from "@/components/command/CommandIssuePage";
+import IssueFieldTooltip from "@/components/playground/Issue/IssueFieldTooltip";
 import { Command, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useIssueActions } from "@/hooks/issues/useIssueActions";
@@ -74,18 +75,20 @@ export default function IssueFieldChip({
 
     return (
         <Popover open={open} onOpenChange={setOpen}>
-            <PopoverTrigger asChild>
-                <button
-                    type="button"
-                    aria-label={ISSUE_PAGE_TITLE[field]}
-                    data-row-editor
-                    onPointerDown={(event) => event.stopPropagation()}
-                    onClick={(event) => event.stopPropagation()}
-                    className={className ?? "cursor-pointer"}
-                >
-                    {children}
-                </button>
-            </PopoverTrigger>
+            <IssueFieldTooltip field={field}>
+                <PopoverTrigger asChild>
+                    <button
+                        type="button"
+                        aria-label={ISSUE_PAGE_TITLE[field]}
+                        data-row-editor
+                        onPointerDown={(event) => event.stopPropagation()}
+                        onClick={(event) => event.stopPropagation()}
+                        className={className ?? "cursor-pointer"}
+                    >
+                        {children}
+                    </button>
+                </PopoverTrigger>
+            </IssueFieldTooltip>
             <PopoverContent className={cn("w-56 p-0", contentClassName)}>
                 <IssueFieldMenu
                     issueId={issueId}

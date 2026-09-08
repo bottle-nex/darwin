@@ -36,11 +36,14 @@ export default async function list_tags_controller(req: Request, res: Response) 
                 color: true,
                 createdAt: true,
                 creator: { select: { id: true, name: true, image: true } },
+                _count: { select: { issues: true } },
             },
             orderBy: { createdAt: "asc" },
         });
 
-        ResponseWriter.success(res, { tags });
+        ResponseWriter.success(res, {
+            tags: tags.map(({ _count, ...tag }) => ({ ...tag, issueCount: _count.issues })),
+        });
     } catch (err) {
         console.error("list_tags_controller failed: ", err);
         ResponseWriter.system_error(res);

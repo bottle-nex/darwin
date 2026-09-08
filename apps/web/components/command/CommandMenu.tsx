@@ -25,6 +25,7 @@ import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import { cn } from "@/lib/utils";
 import { useCommandContextStore } from "@/store/command/useCommandContextStore";
 import { useCommandMenuStore } from "@/store/command/useCommandMenuStore";
+import { useHoveredIssueStore } from "@/store/issues/useHoveredIssueStore";
 import { useIssueSelectionStore } from "@/store/issues/useIssueSelectionStore";
 import { useSpaceSelectionStore } from "@/store/space/useSpaceSelectionStore";
 import { useMemberSelectionStore } from "@/store/team/useMemberSelectionStore";
@@ -86,7 +87,13 @@ function CommandMenuBody({ onDone }: { onDone: () => void }) {
 
     const identifier = useIssueIdentifier();
     const selectedIds = useIssueSelectionStore((s) => s.ids);
-    const actions = useIssueActions(selectedIds.length ? selectedIds : issueId);
+    const hoveredIssueId = useHoveredIssueStore((s) => s.id);
+    const issueTargetIds = useMemo(() => {
+        if (selectedIds.length) return selectedIds;
+        const target = hoveredIssueId ?? issueId;
+        return target ? [target] : EMPTY_SELECTION;
+    }, [selectedIds, hoveredIssueId, issueId]);
+    const actions = useIssueActions(issueTargetIds);
 
     const selectedSpaceIds = useSpaceSelectionStore((s) => s.ids);
     const spaceTargets = useMemo(
@@ -117,14 +124,12 @@ function CommandMenuBody({ onDone }: { onDone: () => void }) {
                     (entry) =>
                         entry.kind === kind &&
                         entry.combo !== "mod+k" &&
-                        (kind !== CommandKind.Issue ||
-                            Boolean(issueId) ||
-                            selectedIds.length > 0) &&
+                        (kind !== CommandKind.Issue || issueTargetIds.length > 0) &&
                         (kind !== CommandKind.Space || spaceTargets.length > 0) &&
                         (kind !== CommandKind.Member || selectedMemberKeys.length > 0),
                 ),
             })).filter((group) => group.entries.length > 0),
-        [issueId, selectedIds.length, spaceTargets.length, selectedMemberKeys.length],
+        [issueTargetIds.length, spaceTargets.length, selectedMemberKeys.length],
     );
 
     const groups = useMemo(

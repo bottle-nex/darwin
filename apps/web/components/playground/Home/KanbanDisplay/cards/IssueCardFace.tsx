@@ -81,7 +81,6 @@ export default function IssueCardFace({
                 icon={priorityOption.icon}
                 iconClassName={cn("text-neutral-300", priorityOption.iconClassName)}
                 className="size-6"
-                title={priorityOption.label}
             />
         ) : null;
 

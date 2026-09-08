@@ -1,4 +1,5 @@
 "use client";
+import { canMoveIssue } from "@trydarwin/types";
 import type { IconType } from "@trydarwin/ui/icons";
 import {
     CopyFieldIdIcon,
@@ -25,6 +26,8 @@ import { useProjectMembers } from "@/hooks/project/useProjectMembers";
 import { useListTags } from "@/hooks/tags/useListTags";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { issueIdentifier } from "@/lib/format";
+import { issueHref } from "@/lib/issueHref";
+import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
 import { htmlToMarkdown } from "@/lib/markdown";
 import { toast } from "@/lib/toast";
 import { useDeleteIssueStore } from "@/store/issues/useDeleteIssueStore";
@@ -146,11 +149,6 @@ export function useIssueActions(target: IssueActionTarget) {
         );
     }
 
-    function issueHref(): string {
-        const base = window.location.pathname.replace(/\/issue\/[^/]+\/?$/, "");
-        return `${window.location.origin}${base}/issue/${issue?.id}`;
-    }
-
     return {
         issue,
         issues,
@@ -158,6 +156,11 @@ export function useIssueActions(target: IssueActionTarget) {
         sharedStatus: shared(issues, (row) => row.status),
         sharedPriority: shared(issues, (row) => row.priority),
         sharedColumnId: shared(issues, (row) => row.customColumnId),
+        statusOptions: issues.length
+            ? KanbanBoard.COLUMNS.filter((column) =>
+                  issues.every((row) => canMoveIssue(row.status, column.status)),
+              )
+            : [],
         projectId,
         spaceBoards,
         members: members ?? [],
@@ -166,7 +169,6 @@ export function useIssueActions(target: IssueActionTarget) {
         canEdit,
         assigneeIds,
         tagIds,
-        issueHref,
 
         setStatus: (status: ServerIssueStatus) => patch({ status, custom_column_id: null }),
         setPriority: (priority: Priority) => patch({ priority: PRIORITY_TO_NUMBER[priority] }),
@@ -226,8 +228,9 @@ export function useIssueActions(target: IssueActionTarget) {
         },
 
         openInNewTab: () => {
+            if (!issue) return;
             const anchor = document.createElement("a");
-            anchor.href = issueHref();
+            anchor.href = issueHref(issue.id);
             anchor.target = "_blank";
             anchor.rel = "noopener";
             anchor.click();

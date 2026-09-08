@@ -9,7 +9,7 @@ import { useBoardDestinations } from "@/hooks/issues/useBoardDestinations";
 import { COPY_FIELDS, type IssueActions } from "@/hooks/issues/useIssueActions";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { DATE_SHORTCUTS_WITH_CLEAR } from "@/lib/dateShortcuts";
-import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
+import { issueHref } from "@/lib/issueHref";
 import { cn } from "@/lib/utils";
 import type { IssueCommandPage } from "@/types/command.type";
 
@@ -50,7 +50,10 @@ export default function CommandIssuePage({
 
             {page === "status" && (
                 <CommandGroup>
-                    {KanbanBoard.COLUMNS.map((column) => (
+                    {actions.statusOptions.length === 0 && (
+                        <CommandItem disabled>This status is agent-controlled</CommandItem>
+                    )}
+                    {actions.statusOptions.map((column) => (
                         <CommandItem
                             key={column.status}
                             value={column.title}
@@ -209,7 +212,7 @@ export default function CommandIssuePage({
                                 pick(() =>
                                     actions.copyField(
                                         field.label,
-                                        field.value(issue, actions.issueHref(), projectName),
+                                        field.value(issue, issueHref(issue.id), projectName),
                                     ),
                                 )
                             }

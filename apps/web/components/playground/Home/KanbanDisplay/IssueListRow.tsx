@@ -87,9 +87,7 @@ export default function IssueListRow({
                     <span className="text-snow">#{pullNumber}</span>
                 </IconWrapper>
             </button>
-        ) : (
-            <span className="hidden w-16 shrink-0 sm:block" />
-        );
+        ) : null;
     const row = (
         <SelectableRow
             data-issue-id={issueId}
@@ -152,7 +150,7 @@ export default function IssueListRow({
                     issueId={issueId}
                     issue={boardIssue}
                     field="tags"
-                    className="hidden shrink-0 cursor-pointer items-center disabled:cursor-default lg:flex py-0.5"
+                    className="hidden ml-auto shrink-0 cursor-pointer items-center disabled:cursor-default lg:flex py-0.5"
                 >
                     <IssueTags tags={tags} className="flex-nowrap" />
                 </IssueFieldChip>
