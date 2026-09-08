@@ -3,6 +3,7 @@ import ConfirmDialog from "@/components/utility/ConfirmDialog";
 import { useBulkDeleteIssues } from "@/hooks/issues/useBulkDeleteIssues";
 import { useIssues } from "@/hooks/issues/useIssue";
 import { useActiveProject } from "@/hooks/useActiveProject";
+import { deleteIssueDrafts, editDraftKey } from "@/lib/issueDrafts/db";
 import { toast } from "@/lib/toast";
 import { useDeleteIssueStore } from "@/store/issues/useDeleteIssueStore";
 import { useIssueSelectionStore } from "@/store/issues/useIssueSelectionStore";
@@ -32,6 +33,7 @@ export default function DeleteIssueDialog() {
                             ? `Deleted ${data.deleted.length} issues.`
                             : "Issue deleted.",
                     );
+                    deleteIssueDrafts(data.deleted.map(editDraftKey));
                     close();
                     useIssueSelectionStore.getState().clear();
                     if (usePaneRouteStore.getState().route.kind === "issue") {

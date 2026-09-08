@@ -36,6 +36,17 @@ export function useIssueDescription(initialHtml?: string) {
         }));
     }
 
+    /** Resumes a locally saved draft. `serverBaseline` keeps `isDirty` comparing against what's actually on the server, not the resumed text. */
+    function loadDraft(html: string, serverBaseline: string) {
+        setDraft((current) => ({
+            ...current,
+            html,
+            isEmpty: html.trim().length === 0,
+            editorKey: current.editorKey + 1,
+            baseline: serverBaseline,
+        }));
+    }
+
     function onEditorChange(state: IssueDescriptionState) {
         setDraft((current) => ({
             ...current,
@@ -58,6 +69,7 @@ export function useIssueDescription(initialHtml?: string) {
         isDirty,
         editorKey: draft.editorKey,
         pickTemplate,
+        loadDraft,
         onEditorChange,
         toHtml,
     };

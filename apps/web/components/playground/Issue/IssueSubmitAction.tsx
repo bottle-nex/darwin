@@ -23,12 +23,13 @@ export default function IssueSubmitAction({
     const { body, submit, pending, warning, shakeControls, isEdit, isCustom, isMac, readOnly } =
         form;
 
-    if (readOnly) return null;
+    // Editing an existing issue autosaves on exit — this button only covers creating a new one.
+    if (readOnly || isEdit) return null;
 
     return (
         <section className={cn("h-fit flex items-center justify-end", className)}>
             <div className="flex items-center justify-end gap-x-2">
-                {!isEdit && !isCustom && body.prompts > 0 && (
+                {!isCustom && body.prompts > 0 && (
                     <span className="shrink-0 text-xs text-white/45">
                         {body.prompts} field{body.prompts === 1 ? "" : "s"} left
                     </span>
@@ -39,7 +40,7 @@ export default function IssueSubmitAction({
                     )}
                     <motion.div animate={shakeControls} className="relative z-10">
                         <Button variant="flat-primary" size="sm" onClick={submit} loading={pending}>
-                            {isEdit ? "Save" : "Create Issue"}
+                            Create Issue
                             <ShortcutHint>
                                 {isMac ? (
                                     <CommandKeyIcon />

@@ -8,6 +8,8 @@ import { useGetIssueConfig, useSetIssueConfig } from "@/hooks/issues/useIssueCon
 import { useUpdateIssue } from "@/hooks/issues/useUpdateIssue";
 import { useGetProjectConfig } from "@/hooks/project/useGetProjectConfig";
 import { useActiveProject } from "@/hooks/useActiveProject";
+import { editDraftKey } from "@/lib/issueDrafts/db";
+import { useIssueDraftStorage } from "@/lib/issueDrafts/useIssueDraftStorage";
 import { KanbanMappers } from "@/lib/kanban/KanbanMappers";
 import { toast } from "@/lib/toast";
 import type { IssueTarget } from "@/store/issues/useCreateIssueStore";
@@ -15,6 +17,7 @@ import { usePaneRouteStore } from "@/store/playground/usePaneRouteStore";
 import type { BoardIssue } from "@/types/board";
 import type { Effort, Harness } from "@/types/harness.type";
 import { HARNESS_MODELS, HARNESS_SUPPORTS_EFFORT } from "@/types/harness.type";
+import type { IssueDraftFields } from "@/types/issueDraft.type";
 import type { Priority } from "@/types/kanban";
 import type { ExecutionMode } from "@/types/project";
 
@@ -297,6 +300,7 @@ export function useIssueForm({
                     },
                 });
             }
+            clearDraft();
             onSubmitted?.();
             return true;
         } catch {
@@ -345,6 +349,67 @@ export function useIssueForm({
 
     const isDirty = hasEdits();
 
+    // Drafts only cover editing an existing issue — a New Issue that's never been submitted
+    // has nothing on the server to reconcile with, so it isn't autosaved.
+    const draftKey = issue ? editDraftKey(issue.id) : "";
+    const draftEnabled = !readOnly && draftKey.length > 0;
+    const hydratedDraftRef = useRef(false);
+    const draftStorage = useIssueDraftStorage({
+        key: draftKey,
+        enabled: draftEnabled,
+        onLoad: (draft) => {
+            if (hydratedDraftRef.current) return;
+            hydratedDraftRef.current = true;
+            if (!draft) return;
+            setTitle(draft.title);
+            body.loadDraft(draft.descriptionHtml, initialDescription ?? "");
+            setPriority(draft.priority);
+            setMemberIds(draft.memberIds);
+            setTagIds(draft.tagIds);
+            setStartDate(draft.startDate ? new Date(draft.startDate) : undefined);
+            setTargetDate(draft.targetDate ? new Date(draft.targetDate) : undefined);
+        },
+    });
+    const hasDraftableContent = isEdit && isDirty;
+
+    useEffect(() => {
+        if (!hasDraftableContent) return;
+        const snapshot: IssueDraftFields = {
+            title,
+            descriptionHtml: body.html,
+            priority,
+            memberIds,
+            tagIds,
+            startDate: startDate ? startDate.toISOString() : null,
+            targetDate: targetDate ? targetDate.toISOString() : null,
+        };
+        draftStorage.persist(snapshot);
+    });
+
+    const unmountHandledRef = useRef(false);
+
+    function clearDraft() {
+        unmountHandledRef.current = true;
+        draftStorage.discard();
+    }
+
+    function discardDraft() {
+        hydratedDraftRef.current = true;
+        clearDraft();
+    }
+
+    const autoSubmitOnExitRef = useRef(() => {});
+    useEffect(() => {
+        autoSubmitOnExitRef.current = () => {
+            if (unmountHandledRef.current || readOnly || !isEdit) return;
+            if (isDirty) submitRef.current();
+        };
+    });
+
+    useEffect(() => {
+        return () => autoSubmitOnExitRef.current();
+    }, []);
+
     const fields: IssueFormFields = {
         title,
         setTitle,
@@ -380,6 +445,7 @@ export function useIssueForm({
         readOnly,
         isDirty,
         harnessConfig,
+        discardDraft,
     };
 }
 

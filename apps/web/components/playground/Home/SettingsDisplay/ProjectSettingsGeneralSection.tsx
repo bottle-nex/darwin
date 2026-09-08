@@ -13,7 +13,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog";
-import { type IconPick, IconPickButton } from "@/components/ui/IconPicker";
+import { IconPickButton } from "@/components/ui/IconPicker";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
@@ -21,7 +21,7 @@ import { useDeleteProject } from "@/hooks/project/useDeleteProject";
 import { useGetProjectConfig } from "@/hooks/project/useGetProjectConfig";
 import { useUpdateProject } from "@/hooks/project/useUpdateProject";
 import { cn } from "@/lib/utils";
-import type { KanbanOptionView, ProjectDetail } from "@/types/project";
+import type { ProjectDetail } from "@/types/project";
 
 import ProjectSettingsBoardSection from "./ProjectSettingsBoardSection";
 import SettingsRow, { SETTINGS_CONTROL_WIDTH } from "./SettingsRow";
@@ -42,44 +42,35 @@ export default function ProjectSettingsGeneralSection({
     const [name, setName] = useState(project.name);
     const [slug, setSlug] = useState(project.slug);
     const [description, setDescription] = useState(project.description ?? "");
-    const [icon, setIcon] = useState<IconPick | null>(project.icon);
     const [iconOpen, setIconOpen] = useState(false);
     const [confirmOpen, setConfirmOpen] = useState(false);
-    const [optionsBarDraft, setOptionsBarDraft] = useState<KanbanOptionView | null>(null);
-    const [productDiffDraft, setProductDiffDraft] = useState<boolean | null>(null);
 
     const { data: config } = useGetProjectConfig(project.id);
-    const savedOptionsBar = config?.kanbanOptionView ?? "FLAT";
-    const optionsBarView = optionsBarDraft ?? savedOptionsBar;
-    const optionsBarDirty = optionsBarDraft !== null && optionsBarDraft !== savedOptionsBar;
-    const savedProductDiff = config?.productDiffEnabled ?? false;
-    const productDiffEnabled = productDiffDraft ?? savedProductDiff;
-    const productDiffDirty = productDiffDraft !== null && productDiffDraft !== savedProductDiff;
-
-    const iconDirty = JSON.stringify(icon) !== JSON.stringify(project.icon);
-    const dirty =
-        name.trim() !== project.name ||
-        slug.trim() !== project.slug ||
-        description.trim() !== (project.description ?? "") ||
-        iconDirty ||
-        optionsBarDirty ||
-        productDiffDirty;
-    const canSave = name.trim().length > 0 && slug.trim().length > 0 && dirty && !update.isPending;
+    const optionsBarView = config?.kanbanOptionView ?? "FLAT";
+    const productDiffEnabled = config?.productDiffEnabled ?? false;
 
     const slugTaken =
         isAxiosError(update.error) && update.error.response?.data?.error?.code === "SLUG_TAKEN";
 
-    function save() {
-        if (!canSave) return;
-        update.mutate({
-            project_id: project.id,
-            name: name.trim(),
-            slug: slug.trim(),
-            description: description.trim(),
-            ...(iconDirty && icon && { icon }),
-            ...(optionsBarDirty && { kanban_option_view: optionsBarView }),
-            ...(productDiffDirty && { product_diff_enabled: productDiffEnabled }),
-        });
+    function commitName() {
+        const next = name.trim();
+        if (next.length > 0 && next !== project.name) {
+            update.mutate({ project_id: project.id, name: next });
+        }
+    }
+
+    function commitSlug() {
+        const next = slug.trim();
+        if (next.length > 0 && next !== project.slug) {
+            update.mutate({ project_id: project.id, slug: next });
+        }
+    }
+
+    function commitDescription() {
+        const next = description.trim();
+        if (next !== (project.description ?? "")) {
+            update.mutate({ project_id: project.id, description: next });
+        }
     }
 
     function remove() {
@@ -93,8 +84,8 @@ export default function ProjectSettingsGeneralSection({
             <SettingsUtilityCard title="Project" rows>
                 <SettingsRow label="Icon" description="Shown next to the project everywhere.">
                     <IconPickButton
-                        pick={icon}
-                        onSelect={setIcon}
+                        pick={project.icon}
+                        onSelect={(next) => update.mutate({ project_id: project.id, icon: next })}
                         open={iconOpen}
                         onOpenChange={setIconOpen}
                         label="Pick project icon"
@@ -107,6 +98,7 @@ export default function ProjectSettingsGeneralSection({
                         variant="outline"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
+                        onBlur={commitName}
                         className={cn(SETTINGS_CONTROL_WIDTH, "h-8 px-2.5 text-[13px]")}
                     />
                 </SettingsRow>
@@ -127,6 +119,7 @@ export default function ProjectSettingsGeneralSection({
                         onChange={(e) =>
                             setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""))
                         }
+                        onBlur={commitSlug}
                         className={cn(SETTINGS_CONTROL_WIDTH, "h-8 px-2.5 font-mono text-[13px]")}
                     />
                 </SettingsRow>
@@ -135,6 +128,7 @@ export default function ProjectSettingsGeneralSection({
                     <Textarea
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}
+                        onBlur={commitDescription}
                         maxLength={150}
                         placeholder="Add description for your project"
                         className="max-h-40 min-h-0 w-full resize-none overflow-y-auto px-0! py-0 text-[13px] bg-transparent!"
@@ -142,27 +136,7 @@ export default function ProjectSettingsGeneralSection({
                 </SettingsRow>
             </SettingsUtilityCard>
 
-            <SettingsUtilityCard
-                title="Board & previews"
-                rows
-                footer={
-                    <>
-                        {update.isSuccess && !dirty && (
-                            <span className="mr-auto text-[11px] text-matcha">Saved</span>
-                        )}
-                        <Button
-                            type="button"
-                            variant="flat-primary"
-                            size="sm"
-                            loading={update.isPending}
-                            disabled={!canSave}
-                            onClick={save}
-                        >
-                            Save changes
-                        </Button>
-                    </>
-                }
-            >
+            <SettingsUtilityCard title="Board & previews" rows>
                 <SettingsRow
                     label="Options bar"
                     description="Choose how kanban controls are laid out."
@@ -170,7 +144,9 @@ export default function ProjectSettingsGeneralSection({
                 >
                     <ProjectSettingsBoardSection
                         value={optionsBarView}
-                        onChange={setOptionsBarDraft}
+                        onChange={(next) =>
+                            update.mutate({ project_id: project.id, kanban_option_view: next })
+                        }
                     />
                 </SettingsRow>
 
@@ -180,7 +156,9 @@ export default function ProjectSettingsGeneralSection({
                 >
                     <Switch
                         checked={productDiffEnabled}
-                        onCheckedChange={setProductDiffDraft}
+                        onCheckedChange={(next) =>
+                            update.mutate({ project_id: project.id, product_diff_enabled: next })
+                        }
                         aria-label="Enable Product Diff"
                     />
                 </SettingsRow>
