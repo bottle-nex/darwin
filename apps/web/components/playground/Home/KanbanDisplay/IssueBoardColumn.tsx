@@ -223,7 +223,7 @@ export default function IssueBoardColumn({
                             variant="unstyled"
                             type="button"
                             onClick={onCreate}
-                            className="mt-2 flex w-full shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-[9px] px-2 py-1.5 text-center text-[13px] font-medium text-neutral-400 opacity-0 transition-opacity hover:bg-white/5 hover:text-neutral-200 focus-visible:opacity-100 group-hover:opacity-100"
+                            className="mt-2 flex w-full shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-[9px] bg-white/5 px-2 py-1.5 text-center text-[13px] font-medium text-neutral-400 transition-colors hover:bg-white/8 hover:text-neutral-200"
                         >
                             <AddIcon className="size-3.5" aria-hidden />
                             Add an Issue
