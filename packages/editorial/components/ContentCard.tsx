@@ -19,7 +19,7 @@ export function ContentCard({ entry, href }: { entry: ContentSummary; href: stri
                     <span>{formatDate(entry.publishedAt)}</span>
                 </div>
 
-                <h2 className="mt-3 text-xl leading-snug tracking-tight text-snow transition-colors group-hover:text-primary">
+                <h2 className="mt-3 text-xl leading-snug tracking-tight text-overlay transition-colors group-hover:text-primary">
                     {entry.title}
                 </h2>
 

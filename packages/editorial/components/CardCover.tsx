@@ -66,7 +66,7 @@ export function CardCover({ src, title, version, size = "card" }: CardCoverProps
 
             <span
                 className={cn(
-                    "relative z-10 font-headline tracking-tight text-snow/85",
+                    "relative z-10 font-headline tracking-tight text-overlay/85",
                     style.version,
                 )}
             >

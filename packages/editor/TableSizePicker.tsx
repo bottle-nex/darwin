@@ -35,7 +35,7 @@ export default function TableSizePicker({ rows, cols, onHover, onSelect }: Table
                                     "size-4 cursor-pointer rounded-[3px] border transition-colors",
                                     row < rows && col < cols
                                         ? "border-primary bg-primary/40"
-                                        : "border-white/15 bg-white/5",
+                                        : "border-overlay/15 bg-overlay/5",
                                 )}
                             />
                         ))}

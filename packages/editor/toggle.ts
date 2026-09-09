@@ -95,7 +95,7 @@ export const ToggleBody = Node.create({
             "div",
             mergeAttributes(HTMLAttributes, {
                 "data-type": "toggle-body",
-                class: "ml-[0.44rem] border-l border-white/10 pl-4",
+                class: "ml-[0.44rem] border-l border-overlay/10 pl-4",
             }),
             0,
         ];

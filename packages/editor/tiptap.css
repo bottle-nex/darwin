@@ -4,7 +4,7 @@
     /* Tiptap issue-description editor (Notion/Linear-style slash-command doc). */
     .tiptap {
         outline: none;
-        color: #ededed;
+        color: var(--color-foreground);
         font-size: 1rem;
         line-height: 1.65;
         --tick: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'><path d='M20 6 9 17l-5-5'/></svg>");
@@ -44,7 +44,7 @@
         float: left;
         height: 0;
         white-space: nowrap;
-        color: rgba(255, 255, 255, 0.3);
+        color: color-mix(in oklab, var(--color-overlay) 38%, transparent);
         pointer-events: none;
         user-select: none;
     }
@@ -76,7 +76,7 @@
     .tiptap h2,
     .tiptap h3 {
         font-weight: 600;
-        color: #f5f5f5;
+        color: var(--color-foreground);
         line-height: 1.3;
     }
 
@@ -126,7 +126,7 @@
         width: 0.95rem;
         height: 0.95rem;
         margin: 0;
-        border: 1px solid rgba(255, 255, 255, 0.18);
+        border: 1px solid color-mix(in oklab, var(--color-overlay) 18%, transparent);
         border-radius: 0.1875rem;
         background: var(--color-charcoal);
         cursor: pointer;
@@ -136,7 +136,7 @@
     }
 
     .tiptap ul[data-type="taskList"] li > label input[type="checkbox"]:hover {
-        border-color: rgba(255, 255, 255, 0.32);
+        border-color: color-mix(in oklab, var(--color-overlay) 32%, transparent);
         background: var(--color-graphite);
     }
 
@@ -162,18 +162,18 @@
         flex: 1;
     }
     .tiptap ul[data-type="taskList"] li[data-checked="true"] > div {
-        color: rgba(255, 255, 255, 0.35);
+        color: color-mix(in oklab, var(--color-overlay) 40%, transparent);
         text-decoration: line-through;
     }
 
     .tiptap blockquote {
-        border-left: 2px solid rgba(255, 255, 255, 0.2);
+        border-left: 2px solid color-mix(in oklab, var(--color-overlay) 22%, transparent);
         padding-left: 0.75rem;
-        color: rgba(255, 255, 255, 0.6);
+        color: color-mix(in oklab, var(--color-overlay) 62%, transparent);
     }
 
     .tiptap pre {
-        background: rgba(255, 255, 255, 0.06);
+        background: color-mix(in oklab, var(--color-overlay) 6%, transparent);
         border-radius: 0.5rem;
         padding: 0.75rem 1rem;
         font-family: var(--font-mono);
@@ -182,7 +182,7 @@
     }
 
     .tiptap code {
-        background: rgba(255, 255, 255, 0.08);
+        background: color-mix(in oklab, var(--color-overlay) 8%, transparent);
         border-radius: 0.25rem;
         padding: 0.1rem 0.3rem;
         font-family: var(--font-mono);
@@ -210,12 +210,12 @@
     .tiptap .timestamp-chip {
         display: inline-block;
         border-radius: 0.4rem;
-        border: 1px solid rgba(255, 255, 255, 0.12);
-        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid color-mix(in oklab, var(--color-overlay) 12%, transparent);
+        background: color-mix(in oklab, var(--color-overlay) 6%, transparent);
         padding: 0.05rem 0.4rem;
         font-family: var(--font-mono);
         font-size: 0.85em;
-        color: #dcdcdc;
+        color: var(--color-neutral-200);
         white-space: nowrap;
     }
 
@@ -282,7 +282,7 @@
 
     .tiptap hr {
         border: none;
-        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        border-top: 1px solid var(--color-border);
         margin: 1rem 0;
     }
     .tiptap .prompt {
@@ -291,7 +291,7 @@
         border-radius: 0.3rem;
         background: color-mix(in srgb, var(--color-primary) 24%, transparent);
         box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-primary) 60%, transparent);
-        color: #d7d0ff;
+        color: var(--color-primary);
         cursor: pointer;
         transition:
             background 0.12s ease,

@@ -91,7 +91,7 @@ export default function DateTimePicker({
                             aria-label={`Increase ${name}`}
                             onMouseDown={(event) => event.preventDefault()}
                             onClick={() => onStep(name, 1)}
-                            className="cursor-pointer rounded-[3px] px-1 text-neutral-500 hover:bg-white/10 hover:text-neutral-200"
+                            className="cursor-pointer rounded-[3px] px-1 text-neutral-500 hover:bg-overlay/10 hover:text-neutral-200"
                         >
                             <StepperIncrementIcon className="size-3" />
                         </Button>
@@ -104,7 +104,7 @@ export default function DateTimePicker({
                                 "min-w-10 cursor-pointer rounded-[4px] px-1.5 py-0.5 text-center font-mono text-[13px] transition-colors",
                                 segment === name
                                     ? "bg-primary/30 text-neutral-100"
-                                    : "text-neutral-300 hover:bg-white/5",
+                                    : "text-neutral-300 hover:bg-overlay/5",
                             )}
                         >
                             {segmentLabel(draft, name)}
@@ -115,7 +115,7 @@ export default function DateTimePicker({
                             aria-label={`Decrease ${name}`}
                             onMouseDown={(event) => event.preventDefault()}
                             onClick={() => onStep(name, -1)}
-                            className="cursor-pointer rounded-[3px] px-1 text-neutral-500 hover:bg-white/10 hover:text-neutral-200"
+                            className="cursor-pointer rounded-[3px] px-1 text-neutral-500 hover:bg-overlay/10 hover:text-neutral-200"
                         >
                             <StepperDecrementIcon className="size-3" />
                         </Button>
@@ -132,7 +132,7 @@ export default function DateTimePicker({
                     "cursor-pointer rounded-[4px] px-1.5 py-0.5 text-[12px] transition-colors",
                     segment === "mode"
                         ? "bg-primary/30 text-neutral-100"
-                        : "text-neutral-400 hover:bg-white/5",
+                        : "text-neutral-400 hover:bg-overlay/5",
                 )}
             >
                 {MODE_LABEL[draft.mode]}
@@ -143,7 +143,7 @@ export default function DateTimePicker({
                 type="button"
                 onMouseDown={(event) => event.preventDefault()}
                 onClick={onInsert}
-                className="cursor-pointer rounded-[5px] bg-white/10 px-2 py-1 text-[12px] text-neutral-100 transition-colors hover:bg-white/20"
+                className="cursor-pointer rounded-[5px] bg-overlay/10 px-2 py-1 text-[12px] text-neutral-100 transition-colors hover:bg-overlay/20"
             >
                 {confirmLabel}
             </Button>

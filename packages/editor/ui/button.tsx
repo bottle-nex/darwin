@@ -23,7 +23,7 @@ const buttonVariants = cva(
                 ghost: "text-foreground bg-graphite rounded-sm!",
                 link: "text-primary underline-offset-4 hover:underline",
                 unstyled: "cursor-pointer",
-                flat: "bg-snow/8 text-snow hover:bg-snow/12 rounded-[8px]!",
+                flat: "bg-overlay/8 text-overlay hover:bg-overlay/12 rounded-[8px]!",
                 "flat-primary": "bg-primary text-ink hover:bg-primary/85 rounded-[8px]!",
                 "flat-destructive": "bg-red-600/12 text-red-500 hover:bg-red-500/20 rounded-[8px]!",
             },

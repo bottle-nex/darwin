@@ -30,7 +30,7 @@ export default function ImageNodeView({ node, deleteNode, selected }: ReactNodeV
                     onMouseDown={(event) => event.stopPropagation()}
                     onClick={() => setZoomOpen(true)}
                     aria-label="Zoom image"
-                    className="flex size-6 cursor-pointer items-center justify-center rounded-md bg-black/60 text-white hover:bg-black/80"
+                    className="flex size-6 cursor-pointer items-center justify-center rounded-md bg-overlay/60 text-ink hover:bg-overlay/80"
                 >
                     <ExpandImageIcon className="size-3.5" />
                 </Button>
@@ -40,7 +40,7 @@ export default function ImageNodeView({ node, deleteNode, selected }: ReactNodeV
                     onMouseDown={(event) => event.stopPropagation()}
                     onClick={() => deleteNode()}
                     aria-label="Delete image"
-                    className="flex size-6 cursor-pointer items-center justify-center rounded-md bg-black/60 text-white hover:bg-rose-500/80"
+                    className="flex size-6 cursor-pointer items-center justify-center rounded-md bg-overlay/60 text-ink hover:bg-rose-500/80"
                 >
                     <CloseIcon className="size-3.5" />
                 </Button>
