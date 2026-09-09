@@ -1,4 +1,5 @@
 import { TooltipProvider } from "@/components/ui/tooltip";
+import ThemeFlashGuard from "@/components/utility/ThemeFlashGuard";
 import AccessControlProvider from "@/context/context.access-control";
 import {
     ACCENT_RGB_VAR,
@@ -35,6 +36,7 @@ export default function PlaygroundLayout({ children }: { children: React.ReactNo
                 <script dangerouslySetInnerHTML={{ __html: restoreSidebarWidthScript }} />
                 <script dangerouslySetInnerHTML={{ __html: restoreGlowScript }} />
                 <div className="theme-playground h-dvh overflow-hidden overscroll-none bg-ink">
+                    <ThemeFlashGuard />
                     {children}
                 </div>
             </TooltipProvider>

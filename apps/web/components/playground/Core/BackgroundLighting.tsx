@@ -14,12 +14,17 @@ import {
     GLOW_Y_VAR,
 } from "@/lib/backgroundLighting";
 import { useBackgroundLightingStore } from "@/store/playground/useBackgroundLightingStore";
+import { adoptAccountScheme } from "@/store/playground/usePlaygroundThemeStore";
 
 export default function BackgroundLighting() {
     const { orgSlug } = useParams<{ orgSlug: string }>();
     const { data: dashboard } = useGetDashboard(orgSlug);
     const config = dashboard?.userConfig;
     const angle = useBackgroundLightingStore((state) => state.angle);
+
+    useLayoutEffect(() => {
+        if (config) adoptAccountScheme(config.colorScheme);
+    }, [config]);
 
     useLayoutEffect(() => {
         if (!config) return;
@@ -37,11 +42,14 @@ export default function BackgroundLighting() {
             <div
                 className="absolute inset-0 transition-opacity duration-200"
                 style={{
-                    opacity: `var(${GLOW_OPACITY_VAR}, 1)`,
+                    opacity: `calc(var(${GLOW_OPACITY_VAR}, 1) * var(--glow-alpha-scale, 1))`,
                     background: `radial-gradient(ellipse 230% 210% at var(${GLOW_X_VAR}, 2.4%) var(${GLOW_Y_VAR}, 22.5%), ${GLOW_STOPS})`,
                 }}
             />
-            <div className="grain absolute inset-0 opacity-[0.01]" />
+            <div
+                className="grain absolute inset-0"
+                style={{ opacity: "var(--grain-opacity, 0.01)" }}
+            />
         </div>
     );
 }

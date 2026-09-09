@@ -1,7 +1,16 @@
 "use client";
-import type { BackgroundLightingColor, CodeTheme, DiffView, SwipeTarget } from "@trydarwin/types";
+import type {
+    BackgroundLightingColor,
+    CodeTheme,
+    ColorScheme,
+    DiffView,
+    SwipeTarget,
+} from "@trydarwin/types";
+import type { IconType } from "@trydarwin/ui/icons";
+import { ThemeDarkIcon, ThemeLightIcon, ThemeSystemIcon } from "@trydarwin/ui/icons";
 import { useParams } from "next/navigation";
 import { Slider } from "radix-ui";
+import { useEffect } from "react";
 
 import {
     defaultHomeViewToTab,
@@ -28,10 +37,49 @@ import { DIFF_VIEWS } from "@/lib/review/diffView";
 import { SWIPE_TARGETS } from "@/lib/swipeTarget";
 import { cn } from "@/lib/utils";
 import { useBackgroundLightingStore } from "@/store/playground/useBackgroundLightingStore";
+import {
+    adoptAccountScheme,
+    changeColorScheme,
+    type ColorScheme as ThemeScheme,
+    usePlaygroundThemeStore,
+} from "@/store/playground/usePlaygroundThemeStore";
 
 import { HOME_VIEW_OPTIONS } from "./homeViewOptions";
 import SettingsRow, { SETTINGS_CONTROL_WIDTH } from "./SettingsRow";
 import SettingsUtilityCard from "./SettingsUtilityCard";
+
+const THEME_SCHEMES: Array<{ scheme: ThemeScheme; label: string; icon: IconType }> = [
+    { scheme: "light", label: "Light", icon: ThemeLightIcon },
+    { scheme: "dark", label: "Dark", icon: ThemeDarkIcon },
+    { scheme: "system", label: "System", icon: ThemeSystemIcon },
+];
+
+function ThemeSchemeField({ stored }: { stored: ColorScheme }) {
+    const scheme = usePlaygroundThemeStore((state) => state.scheme);
+
+    useEffect(() => {
+        adoptAccountScheme(stored);
+    }, [stored]);
+
+    return (
+        <SelectField
+            aria-label="Theme"
+            className="w-48 pl-3"
+            itemClassName="pl-2"
+            value={scheme}
+            onChange={(next) => changeColorScheme(next as ThemeScheme)}
+            options={THEME_SCHEMES.map((option) => ({
+                value: option.scheme,
+                label: (
+                    <GlyphOption
+                        glyph={<option.icon className="size-3.5 text-neutral-400" aria-hidden />}
+                        label={option.label}
+                    />
+                ),
+            }))}
+        />
+    );
+}
 
 /** A picker row that names its option with the same glyph the rest of the app draws it with. */
 function GlyphOption({ glyph, label }: { glyph: React.ReactNode; label: string }) {
@@ -47,13 +95,13 @@ function ColorOption({ label, rgb }: { label: string; rgb: string }) {
     return (
         <span className="flex items-center gap-2.5">
             <span
-                className="h-6 w-10 shrink-0 overflow-hidden rounded-[5px] p-1.5 ring-1 ring-snow/10 ring-inset"
+                className="h-6 w-10 shrink-0 overflow-hidden rounded-[5px] p-1.5 ring-1 ring-overlay/10 ring-inset"
                 style={{
                     background: `linear-gradient(135deg, rgba(${rgb}, 0.25), transparent 70%), var(--color-charcoal)`,
                 }}
             >
-                <span className="block h-[3px] w-4 rounded-full bg-snow/30" />
-                <span className="mt-1 block h-[3px] w-2.5 rounded-full bg-snow/15" />
+                <span className="block h-[3px] w-4 rounded-full bg-overlay/30" />
+                <span className="mt-1 block h-[3px] w-2.5 rounded-full bg-overlay/15" />
             </span>
             {label}
         </span>
@@ -110,7 +158,7 @@ const PREVIEW_LINES: Array<Array<[CodeTokenRole, string]>> = [
 function ThemeOption({ label, colors }: CodeThemePreset) {
     return (
         <span className="flex items-center gap-2.5">
-            <span className="flex h-6 w-10 shrink-0 flex-col justify-center gap-[3px] overflow-hidden rounded-[5px] bg-charcoal px-1.5 ring-1 ring-snow/10 ring-inset">
+            <span className="flex h-6 w-10 shrink-0 flex-col justify-center gap-[3px] overflow-hidden rounded-[5px] bg-[#141414] px-1.5 ring-1 ring-overlay/10 ring-inset">
                 <span className="flex gap-[3px]">
                     <span
                         className="block h-[3px] w-2 rounded-full"
@@ -143,7 +191,7 @@ function CodeThemePreview({ theme }: { theme: CodeTheme }) {
     const { colors } = codeThemePreset(theme);
     return (
         <pre
-            className="overflow-x-auto text-[12.5px] leading-[1.7]"
+            className="overflow-x-auto rounded-lg bg-[#0c0c0c] p-4 text-[12.5px] leading-[1.7]"
             style={{
                 color: colors.plain,
                 fontFamily: "var(--font-jetbrains-mono), ui-monospace, monospace",
@@ -175,6 +223,12 @@ export default function AppearanceSettingsSection() {
 
     return (
         <div className="flex flex-col gap-12">
+            <SettingsUtilityCard title="Theme" rows>
+                <SettingsRow label="Theme" description="Follows your account, not this device.">
+                    <ThemeSchemeField stored={config.colorScheme} />
+                </SettingsRow>
+            </SettingsUtilityCard>
+
             <SettingsUtilityCard title="Navigation" rows>
                 <SettingsRow
                     label="Default home view"
@@ -182,8 +236,8 @@ export default function AppearanceSettingsSection() {
                 >
                     <SelectField
                         aria-label="Default home view"
-                        className="w-48 pl-1"
-                        itemClassName="pl-1"
+                        className="w-48 pl-3"
+                        itemClassName="pl-2"
                         value={defaultHomeViewToTab(config.defaultHomeView)}
                         onChange={(tab) => {
                             const view = tabToDefaultHomeView(tab as PlaygroundTab);
@@ -202,8 +256,8 @@ export default function AppearanceSettingsSection() {
                 >
                     <SelectField
                         aria-label="Two-finger swipe"
-                        className="w-48 pl-1"
-                        itemClassName="pl-1"
+                        className="w-48 pl-3"
+                        itemClassName="pl-2"
                         value={config.swipeTarget}
                         onChange={(target) =>
                             updateConfig.mutate({ swipeTarget: target as SwipeTarget })
@@ -247,8 +301,8 @@ export default function AppearanceSettingsSection() {
                 >
                     <SelectField
                         aria-label="Background lighting color"
-                        className="w-40 pl-1"
-                        itemClassName="pl-1"
+                        className="w-40 pl-3"
+                        itemClassName="pl-2"
                         disabled={!enabled}
                         value={config.backgroundLightingColor}
                         onChange={(color) =>
@@ -280,13 +334,13 @@ export default function AppearanceSettingsSection() {
                             "relative flex h-5 touch-none items-center select-none",
                         )}
                     >
-                        <Slider.Track className="relative h-1 flex-1 overflow-hidden rounded-full bg-white/8">
-                            <Slider.Range className="absolute h-full bg-white/25" />
+                        <Slider.Track className="relative h-1 flex-1 overflow-hidden rounded-full bg-overlay/8">
+                            <Slider.Range className="absolute h-full bg-overlay/25" />
                         </Slider.Track>
                         <Slider.Thumb
                             aria-label="Background lighting direction"
                             aria-valuetext={`${angle} degrees`}
-                            className="block size-3 cursor-grab rounded-full bg-white shadow-[0_1px_5px_rgba(0,0,0,0.55)] outline-none transition-transform hover:scale-110 focus-visible:ring-2 focus-visible:ring-primary/50 active:cursor-grabbing"
+                            className="block size-3 cursor-grab rounded-full bg-overlay outline-none transition-transform hover:scale-110 focus-visible:ring-2 focus-visible:ring-primary/50 active:cursor-grabbing"
                         />
                     </Slider.Root>
                 </SettingsRow>
@@ -299,8 +353,8 @@ export default function AppearanceSettingsSection() {
                 >
                     <SelectField
                         aria-label="Diff view"
-                        className="w-48 pl-1"
-                        itemClassName="pl-1"
+                        className="w-48 pl-3"
+                        itemClassName="pl-2"
                         value={config.diffView}
                         onChange={(view) => updateConfig.mutate({ diffView: view as DiffView })}
                         options={DIFF_VIEWS.map((view) => ({
@@ -326,8 +380,8 @@ export default function AppearanceSettingsSection() {
                 >
                     <SelectField
                         aria-label="Code theme"
-                        className="w-48 pl-1"
-                        itemClassName="pl-1"
+                        className="w-48 pl-3"
+                        itemClassName="pl-2"
                         value={config.codeTheme}
                         onChange={(theme) => updateConfig.mutate({ codeTheme: theme as CodeTheme })}
                         options={CODE_THEMES.map((theme) => ({

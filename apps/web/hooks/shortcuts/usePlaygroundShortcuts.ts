@@ -24,6 +24,9 @@ import {
     SpaceEntityIcon,
     TagIcon,
     TeamEntityIcon,
+    ThemeDarkIcon,
+    ThemeLightIcon,
+    ThemeSystemIcon,
 } from "@trydarwin/ui/icons";
 import { useEffect, useRef } from "react";
 
@@ -41,6 +44,7 @@ import { useHoveredIssueStore } from "@/store/issues/useHoveredIssueStore";
 import { useIssueSelectionStore } from "@/store/issues/useIssueSelectionStore";
 import { useNotificationsPanelStore } from "@/store/playground/useNotificationsPanelStore";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
+import { changeColorScheme } from "@/store/playground/usePlaygroundThemeStore";
 import { useShortcutSheetStore } from "@/store/playground/useShortcutSheetStore";
 import { useSidebarWidthStore } from "@/store/playground/useSidebarWidthStore";
 import { useNewProjectStore } from "@/store/project/useNewProjectStore";
@@ -339,6 +343,24 @@ export const COMBINATIONS: Record<string, CommandAction> = {
         label: "New Organization",
         icon: OrganizationEntityIcon,
         run: () => useCommandActionStore.getState().start("new-organization"),
+    },
+    "t l": {
+        kind: CommandKind.Switch,
+        label: "Change interface theme: Light",
+        icon: ThemeLightIcon,
+        run: () => changeColorScheme("light"),
+    },
+    "t d": {
+        kind: CommandKind.Switch,
+        label: "Change interface theme: Dark",
+        icon: ThemeDarkIcon,
+        run: () => changeColorScheme("dark"),
+    },
+    "t s": {
+        kind: CommandKind.Switch,
+        label: "Change interface theme: System",
+        icon: ThemeSystemIcon,
+        run: () => changeColorScheme("system"),
     },
     "w o": {
         kind: CommandKind.Switch,

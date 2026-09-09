@@ -15,7 +15,7 @@
 
     /* Accents. */
     --color-primary: #ab9ff2; /* brand purple */
-    --color-primary-foreground: var(--color-snow);
+    --color-primary-foreground: var(--color-ink);
     --color-matcha: #9bc24f; /* interaction accent: focus rings, success, toggles */
     --color-matcha-foreground: #14150c; /* text/icons on matcha fills */
     --color-brick: #6e1d1d; /* muted maroon: warning/error pill fills */
@@ -234,7 +234,7 @@
      * written and anywhere the playground scope is used outside the app shell.
      */
     --color-primary: rgb(var(--playground-primary-rgb, 171, 159, 242));
-    --color-primary-foreground: var(--color-snow);
+    --color-primary-foreground: var(--color-ink);
     --color-matcha: #9bc24f;
     --color-matcha-foreground: #14150c;
     --color-brick: #6e1d1d;
@@ -321,6 +321,12 @@
     --diff-lineno: var(--color-neutral-600);
     --diff-selection: color-mix(in oklab, var(--color-sky-400) 24%, transparent);
     --diff-plain: #e6e6e6;
+
+    --workspace-backdrop:
+        radial-gradient(120% 110% at 100% 100%, rgba(10, 10, 10, 0.98) 0%, rgba(10, 10, 10, 0.7) 32%, rgba(10, 10, 10, 0) 66%),
+        radial-gradient(85% 62% at 0% -16%, rgba(20, 20, 20, 0.75) 0%, rgba(16, 16, 16, 0.32) 22%, rgba(13, 13, 13, 0.1) 44%, rgba(10, 10, 10, 0) 62%),
+        radial-gradient(65% 48% at -18% 60%, rgba(15, 15, 15, 0.28) 0%, rgba(12, 12, 12, 0.1) 32%, rgba(10, 10, 10, 0) 60%),
+        linear-gradient(148deg, #141414 0%, #101010 10%, #0d0d0d 20%, #0b0b0b 32%, #0a0a0a 44%, #0a0a0a 100%);
 
     --color-mention-member: #c7d2fe;
     --color-mention-team: #a7f3d0;
@@ -445,6 +451,12 @@
     --diff-lineno: #797b86;
     --diff-selection: rgba(124, 92, 230, 0.18);
     --diff-plain: #24292f;
+
+    --workspace-backdrop:
+        radial-gradient(120% 110% at 100% 100%, rgba(233, 233, 239, 0.9) 0%, rgba(238, 238, 243, 0.5) 32%, rgba(255, 255, 255, 0) 66%),
+        radial-gradient(85% 62% at 0% -16%, rgba(255, 255, 255, 0.95) 0%, rgba(250, 250, 252, 0.45) 22%, rgba(246, 246, 249, 0.15) 44%, rgba(255, 255, 255, 0) 62%),
+        radial-gradient(65% 48% at -18% 60%, rgba(236, 236, 242, 0.35) 0%, rgba(244, 244, 248, 0.12) 32%, rgba(255, 255, 255, 0) 60%),
+        linear-gradient(148deg, #ffffff 0%, #fdfdfe 10%, #fbfbfc 20%, #f9f9fb 32%, #f6f6f8 44%, #f6f6f8 100%);
 
     --color-mention-member: #4338ca;
     --color-mention-team: #14603f;
