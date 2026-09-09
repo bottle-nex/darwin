@@ -3,6 +3,7 @@ import { prisma } from "@trydarwin/database";
 import {
     BackgroundLightingColor,
     CodeTheme,
+    ColorScheme,
     DefaultHomeView,
     DiffView,
     SwipeTarget,
@@ -25,6 +26,7 @@ const DEFAULT_USER_CONFIG = {
     codeTheme: CodeTheme.Darwin,
     diffView: DiffView.Unified,
     swipeTarget: SwipeTarget.Settings,
+    colorScheme: ColorScheme.Dark,
 };
 
 export default class GetDashboardController {
@@ -90,6 +92,7 @@ export default class GetDashboardController {
                     codeTheme: true,
                     diffView: true,
                     swipeTarget: true,
+                    colorScheme: true,
                 },
             });
 

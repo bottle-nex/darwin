@@ -41,6 +41,12 @@ enum DiffView {
   Split
 }
 
+enum ColorScheme {
+  Dark
+  Light
+  System
+}
+
 enum DefaultHomeView {
   AskDarwin
   Inbox
@@ -113,6 +119,7 @@ model UserConfig {
   codeTheme                 CodeTheme               @default(Darwin)
   diffView                  DiffView                @default(Unified)
   swipeTarget               SwipeTarget             @default(Settings)
+  colorScheme               ColorScheme             @default(Dark)
 }
 
 model GithubAccount {

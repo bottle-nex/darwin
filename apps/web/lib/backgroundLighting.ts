@@ -1,6 +1,7 @@
 import {
     BackgroundLightingColor,
     CodeTheme,
+    ColorScheme,
     DefaultHomeView,
     DiffView,
     SwipeTarget,
@@ -105,6 +106,7 @@ export const DEFAULT_USER_CONFIG = {
     codeTheme: CodeTheme.Darwin,
     diffView: DiffView.Unified,
     swipeTarget: SwipeTarget.Settings,
+    colorScheme: ColorScheme.Dark,
 };
 
 export const GLOW_STORAGE_KEY = "playground-background-glow";

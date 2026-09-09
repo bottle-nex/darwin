@@ -1,6 +1,7 @@
 import type {
     BackgroundLightingColor,
     CodeTheme,
+    ColorScheme,
     DefaultHomeView,
     DiffView,
     ProjectRole,
@@ -33,6 +34,7 @@ export interface UserConfig {
     codeTheme: CodeTheme;
     diffView: DiffView;
     swipeTarget: SwipeTarget;
+    colorScheme: ColorScheme;
 }
 
 export interface DashboardData {

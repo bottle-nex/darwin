@@ -2,6 +2,7 @@ import { prisma } from "@trydarwin/database";
 import {
     BackgroundLightingColor,
     CodeTheme,
+    ColorScheme,
     DefaultHomeView,
     DiffView,
     SwipeTarget,
@@ -27,6 +28,7 @@ const body_schema = z.object({
     codeTheme: z.enum(Object.values(CodeTheme) as [CodeTheme, ...CodeTheme[]]).optional(),
     diffView: z.enum(Object.values(DiffView) as [DiffView, ...DiffView[]]).optional(),
     swipeTarget: z.enum(Object.values(SwipeTarget) as [SwipeTarget, ...SwipeTarget[]]).optional(),
+    colorScheme: z.enum(Object.values(ColorScheme) as [ColorScheme, ...ColorScheme[]]).optional(),
 });
 
 export default class UpdateUserConfigController {
@@ -50,6 +52,7 @@ export default class UpdateUserConfigController {
                     codeTheme: true,
                     diffView: true,
                     swipeTarget: true,
+                    colorScheme: true,
                 },
             });
 

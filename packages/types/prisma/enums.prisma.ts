@@ -240,6 +240,13 @@ export const DiffView = {
 } as const;
 export type DiffView = (typeof DiffView)[keyof typeof DiffView];
 
+export const ColorScheme = {
+    Dark: "Dark",
+    Light: "Light",
+    System: "System",
+} as const;
+export type ColorScheme = (typeof ColorScheme)[keyof typeof ColorScheme];
+
 export const DefaultHomeView = {
     AskDarwin: "AskDarwin",
     Inbox: "Inbox",
