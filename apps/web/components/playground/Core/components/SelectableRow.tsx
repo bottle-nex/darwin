@@ -66,8 +66,8 @@ export default function SelectableRow({
                 className={cn(
                     "flex size-3.5 shrink-0 cursor-pointer items-center justify-center rounded border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50",
                     selected
-                        ? "border-primary bg-primary text-ink"
-                        : "invisible border-white/25 group-hover/selectable:visible focus-visible:visible",
+                        ? "border-primary bg-primary text-primary-foreground"
+                        : "invisible border-overlay/25 group-hover/selectable:visible focus-visible:visible",
                 )}
             >
                 {selected && <CheckIcon className="size-2.5" aria-hidden />}

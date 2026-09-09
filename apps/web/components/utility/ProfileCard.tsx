@@ -95,15 +95,14 @@ export default function ProfileCard({
         <div
             className={cn(
                 "relative",
-                "h-74 w-66 bg-charcoal ring ring-white/5 rounded-xl p-2",
+                "surface-card h-74 w-66 rounded-xl p-2",
                 "flex flex-col justify-between items-center",
-                "shadow-md",
             )}
         >
             <div className="relative h-28 w-full rounded-md overflow-hidden">
                 <DropdownMenu modal={false}>
                     <DropdownMenuTrigger asChild>
-                        <div className="absolute z-10 right-0 p-1 rounded-sm bg-linear-to-bl from-black/50 to-transparent cursor-pointer">
+                        <div className="absolute z-10 right-0 p-1 rounded-sm bg-linear-to-bl from-[var(--surface-scrim)] to-transparent cursor-pointer">
                             <OverflowMenuVerticalIcon />
                         </div>
                     </DropdownMenuTrigger>
@@ -138,11 +137,11 @@ export default function ProfileCard({
                                 </DropdownMenuSubContent>
                             </DropdownMenuSub>
                         </div>
-                        <DropdownMenuSeparator className="h-0.5 bg-[#0F0F0F] shadow-xs shadow-white/4" />
+                        <DropdownMenuSeparator className="h-0.5 bg-border" />
                         <div className="p-1">
                             <DropdownMenuItem className={"group"} onClick={handleKick}>
                                 <RemoveMemberIcon
-                                    className="size-4 text-neutral-400 group-hover:text-red-300"
+                                    className="size-4 text-neutral-400 group-hover:text-danger"
                                     aria-hidden
                                 />
                                 Kick
@@ -157,12 +156,12 @@ export default function ProfileCard({
                     className="object-cover"
                 />
             </div>
-            <div className="absolute top-23 left-5 bg-red size-14 rounded-full ring-2 ring-charcoal overflow-hidden ">
+            <div className="absolute top-23 left-5 size-14 rounded-full ring-2 ring-charcoal overflow-hidden">
                 {profilimage ? (
                     <Image src={profilimage} alt={name} fill className="object-cover" />
                 ) : (
                     <div className="h-full w-full  bg-charcoal ">
-                        <div className="h-full w-full bg-neutral-800/30 flex justify-center items-center">
+                        <div className="h-full w-full bg-overlay/10 flex justify-center items-center">
                             {name.charAt(0).toUpperCase()}
                         </div>
                     </div>
@@ -171,28 +170,30 @@ export default function ProfileCard({
             <div className="w-full flex flex-col justify-between gap-y-2 ">
                 <div className="w-full flex flex-col leading-tight">
                     <div className="truncate ">{name}</div>
-                    <div className="text-white/40 text-xs ">{role}</div>
+                    <div className="text-overlay/40 text-xs">{role}</div>
                 </div>
-                <div className="flex h-11 w-full overflow-hidden rounded-md border border-white/5 bg-neutral-800/30">
+                <div className="surface-sunken flex h-11 w-full overflow-hidden rounded-md">
                     <div className="flex flex-1 flex-col items-center justify-center">
                         <span className="text-[10px] text-neutral-500">Created</span>
-                        <span className="text-xs font-medium text-white">
+                        <span className="text-xs font-medium text-foreground">
                             {issues?.created || 0}
                         </span>
                     </div>
 
-                    <div className="w-px bg-white/5" />
+                    <div className="w-px bg-overlay/5" />
 
                     <div className="flex flex-1 flex-col items-center justify-center">
                         <span className="text-[10px] text-neutral-500">Fixed</span>
-                        <span className="text-xs font-medium text-white">{issues?.fixed || 0}</span>
+                        <span className="text-xs font-medium text-foreground">
+                            {issues?.fixed || 0}
+                        </span>
                     </div>
 
-                    <div className="w-px bg-white/5" />
+                    <div className="w-px bg-overlay/5" />
 
                     <div className="flex flex-1 flex-col items-center justify-center">
                         <span className="text-[10px] text-neutral-500">Not Answered</span>
-                        <span className="text-xs font-medium text-white">
+                        <span className="text-xs font-medium text-foreground">
                             {issues?.notAnswered || 0}
                         </span>
                     </div>
@@ -208,7 +209,6 @@ export default function ProfileCard({
                 >
                     Message
                 </Button>
-                {/* <DropdownMenuSeparator className="h-0.5 bg-[#0F0F0F] shadow-xs shadow-white/4" /> */}
             </div>
         </div>
     );

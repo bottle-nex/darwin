@@ -20,7 +20,7 @@ export default function PaneEmptyState({
     return (
         <div className="flex flex-1 flex-col items-center justify-center px-6 pb-16 text-center">
             <span
-                className="flex size-14 items-center justify-center rounded-2xl bg-charcoal text-neutral-300 ring-1 ring-white/10"
+                className="flex size-14 items-center justify-center rounded-2xl bg-charcoal text-neutral-300 ring-1 ring-overlay/10"
                 aria-hidden
             >
                 <Icon className="size-6" />

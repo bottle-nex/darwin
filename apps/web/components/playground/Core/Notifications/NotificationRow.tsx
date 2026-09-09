@@ -96,7 +96,7 @@ export default function NotificationRow({
                         )}
                         {issueRef && projectSlug && (
                             <span
-                                className="size-0.5 shrink-0 rounded-full bg-white/20"
+                                className="size-0.5 shrink-0 rounded-full bg-overlay/20"
                                 aria-hidden
                             />
                         )}

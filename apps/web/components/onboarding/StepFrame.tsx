@@ -11,7 +11,7 @@ import { stepItemVariants, stepVariants } from "./choreography";
 import { TOUR_STEPS, type TourStep } from "./steps";
 
 export const UNDERLINE_FIELD =
-    "h-11 rounded-none border-0 border-b border-white/12 bg-transparent px-0 text-lg text-neutral-100 shadow-none placeholder:text-neutral-600 hover:bg-transparent focus-visible:border-primary focus-visible:ring-0 dark:bg-transparent";
+    "h-11 rounded-none border-0 border-b border-[#ffffff1f] bg-transparent px-0 text-lg text-[#f5f5f5] shadow-none placeholder:text-neutral-600 hover:bg-transparent focus-visible:border-primary focus-visible:ring-0 dark:bg-transparent";
 
 export function StepItem({ children, className }: { children: ReactNode; className?: string }) {
     return (
@@ -48,10 +48,10 @@ export default function StepFrame({
             <StepItem className="text-[13px] text-neutral-500">
                 Step {step.id} of {TOUR_STEPS.length} · {step.name}
             </StepItem>
-            <StepItem className="mt-3 text-4xl font-medium tracking-tight text-neutral-100 md:text-5xl">
+            <StepItem className="mt-3 text-4xl font-medium tracking-tight text-[#f5f5f5] md:text-5xl">
                 {step.title}
             </StepItem>
-            <StepItem className="mt-4 max-w-md text-[15px] leading-relaxed text-neutral-400">
+            <StepItem className="mt-4 max-w-md text-[15px] leading-relaxed text-[#9a9ca6]">
                 {step.blurb}
             </StepItem>
             <div className="mt-9 space-y-7">{children}</div>

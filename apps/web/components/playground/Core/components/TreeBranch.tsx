@@ -19,7 +19,7 @@ export default function TreeBranch({ last, className }: { last: boolean; classNa
             fill="none"
             aria-hidden
             style={{ width: WIDTH, height: "100%" }}
-            className={cn("pointer-events-none absolute top-0 left-2.5 text-snow/20", className)}
+            className={cn("pointer-events-none absolute top-0 left-2.5 text-overlay/20", className)}
         >
             <path
                 d={last ? ELBOW : `${ELBOW} ${SPINE}`}

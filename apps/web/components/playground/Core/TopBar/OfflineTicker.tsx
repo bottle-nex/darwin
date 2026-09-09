@@ -25,7 +25,7 @@ export default function OfflineTicker() {
         <div
             role="status"
             aria-live="polite"
-            className="flex shrink-0 items-center gap-1.5 px-2 py-1 text-[11px] font-medium text-neutral-400 bg-cement rounded-full tracking-wide"
+            className="flex shrink-0 items-center gap-1.5 px-2 py-1 text-[11px] font-medium text-neutral-400 bg-overlay/8 rounded-full tracking-wide"
         >
             <ThinkingOrb state="solving" size={20} aria-label="Offline" />
             Offline

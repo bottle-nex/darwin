@@ -95,7 +95,7 @@ function FloatNotificationCard({ notification, glass, onSelect }: FloatNotificat
             onFocusCapture={() => setPaused(true)}
             onBlurCapture={() => setPaused(false)}
             className={cn(
-                "group pointer-events-auto relative overflow-hidden rounded-xl gradient-border before:z-10 shadow-lg",
+                "group pointer-events-auto relative overflow-hidden rounded-xl gradient-border before:z-10 shadow-[var(--shadow-menu)]",
                 BLURRED_BG_TWO(glass),
             )}
         >
@@ -107,7 +107,7 @@ function FloatNotificationCard({ notification, glass, onSelect }: FloatNotificat
                         onSelect(notification);
                         dismiss(id);
                     }}
-                    className="absolute inset-0 cursor-pointer transition-colors duration-150 hover:bg-white/4 focus-visible:bg-white/4 focus-visible:outline-none"
+                    className="absolute inset-0 cursor-pointer transition-colors duration-150 hover:bg-overlay/4 focus-visible:bg-overlay/4 focus-visible:outline-none"
                 />
             )}
 
@@ -146,7 +146,7 @@ function FloatNotificationCard({ notification, glass, onSelect }: FloatNotificat
                             )}
                             {issueRef && projectSlug && (
                                 <span
-                                    className="size-0.5 shrink-0 rounded-full bg-white/20"
+                                    className="size-0.5 shrink-0 rounded-full bg-overlay/20"
                                     aria-hidden
                                 />
                             )}
@@ -160,7 +160,7 @@ function FloatNotificationCard({ notification, glass, onSelect }: FloatNotificat
                 type="button"
                 onClick={() => dismiss(id)}
                 aria-label="Dismiss notification"
-                className="absolute top-2 right-2 flex size-5 cursor-pointer items-center justify-center rounded-md text-neutral-500 opacity-0 transition-opacity group-hover:opacity-100 hover:bg-white/7 hover:text-neutral-100 focus-visible:opacity-100 focus-visible:outline-none"
+                className="absolute top-2 right-2 flex size-5 cursor-pointer items-center justify-center rounded-md text-neutral-500 opacity-0 transition-opacity group-hover:opacity-100 hover:bg-overlay/7 hover:text-neutral-100 focus-visible:opacity-100 focus-visible:outline-none"
             >
                 <CloseIcon className="size-3" aria-hidden />
             </button>

@@ -30,12 +30,7 @@ export default function Disclosure({
     children: ReactNode;
 }) {
     return (
-        <section
-            className={cn(
-                "overflow-hidden rounded-[8px] border border-snow/3 bg-graphite/40",
-                className,
-            )}
-        >
+        <section className={cn("surface-card overflow-hidden rounded-[8px]", className)}>
             <div className="relative">
                 <button
                     type="button"
@@ -44,7 +39,7 @@ export default function Disclosure({
                     className="group flex w-full cursor-pointer items-center gap-2 px-3 py-2.5 text-left"
                 >
                     {leading}
-                    <span className="text-[12px] font-medium text-snow/50 transition-colors group-hover:text-snow/70">
+                    <span className="text-[12px] font-medium text-overlay/50 transition-colors group-hover:text-overlay/70">
                         {label}
                     </span>
                     <DropdownCaretIcon
@@ -67,7 +62,9 @@ export default function Disclosure({
                         transition={DISCLOSURE_SPRING}
                         className="overflow-hidden"
                     >
-                        <div className="border-t border-snow/3">{children}</div>
+                        <div className="border-t border-[var(--surface-card-border)]">
+                            {children}
+                        </div>
                     </motion.div>
                 )}
             </AnimatePresence>

@@ -44,7 +44,7 @@ export default function GithubConnectButton() {
                 loading={disconnect.isPending}
                 iconOnly
                 title="GitHub connected — click to disconnect"
-                className="flex h-6.75 cursor-pointer items-center gap-1 rounded-sm px-2.5 text-[11px] font-medium text-neutral-300 hover:bg-white/10"
+                className="flex h-6.75 cursor-pointer items-center gap-1 rounded-sm px-2.5 text-[11px] font-medium text-neutral-300 hover:bg-overlay/10"
             >
                 <GithubLogoIcon className="size-3.5" aria-hidden />
                 <CheckIcon className="size-3 text-matcha" aria-hidden />

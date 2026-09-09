@@ -39,7 +39,7 @@ export default function PlaygroundSearchInput({
                 onChange={(e) => onChange(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder={placeholder}
-                className="h-7 w-full rounded-md bg-transparent pr-3 pl-8 text-[12px] text-neutral-100 placeholder:text-neutral-500 hover:bg-transparent focus:border-white/25 focus:outline-none shadow-none"
+                className="h-7 w-full rounded-md bg-transparent pr-3 pl-8 text-[12px] text-neutral-100 placeholder:text-neutral-500 hover:bg-transparent focus:border-overlay/25 focus:outline-none shadow-none"
             />
         </div>
     );

@@ -82,8 +82,8 @@ export default function PlaygroundProjectSwitcher() {
                                 className={cn(
                                     "flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 text-left text-[13px] outline-none transition-colors select-none",
                                     p.slug === projectSlug
-                                        ? "bg-white/8 text-neutral-100"
-                                        : "text-neutral-300 hover:bg-white/5 hover:text-neutral-100",
+                                        ? "bg-overlay/8 text-neutral-100"
+                                        : "text-neutral-300 hover:bg-overlay/5 hover:text-neutral-100",
                                 )}
                             >
                                 <PlaygroundAvatar

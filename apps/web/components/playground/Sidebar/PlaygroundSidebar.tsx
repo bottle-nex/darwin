@@ -44,7 +44,7 @@ export default function PlaygroundSidebar() {
                     transformOrigin: "left center",
                 }}
                 className={cn(
-                    "relative h-full min-h-0 overflow-hidden rounded-lg border-[1.5px] border-snow/5 bg-charcoal/60",
+                    "surface-chrome relative h-full min-h-0 overflow-hidden rounded-lg border-[1.5px]",
                     collapsed && "pointer-events-none",
                 )}
             >

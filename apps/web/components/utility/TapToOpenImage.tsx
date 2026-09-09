@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 const ACTION_CHIP =
-    "flex size-6 cursor-pointer items-center justify-center rounded-md text-neutral-400 hover:bg-snow/8 hover:text-neutral-100";
+    "flex size-6 cursor-pointer items-center justify-center rounded-md text-neutral-400 hover:bg-overlay/8 hover:text-neutral-100";
 
 const GROW = { type: "spring", stiffness: 260, damping: 30 } as const;
 

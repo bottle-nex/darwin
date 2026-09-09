@@ -3,7 +3,6 @@ import { CloseIcon } from "@trydarwin/ui/icons";
 import { useState } from "react";
 
 import { PANE_TOP_BAR_HEIGHT } from "@/components/playground/Core/components/PlaygroundPaneFrame";
-import { BLURRED_BG_PANEL } from "@/components/playground/Home/KanbanDisplay/cardStyles";
 import { useMarkNotificationsRead } from "@/hooks/notifications/useMarkNotificationsRead";
 import { useMemberNotifications } from "@/hooks/notifications/useMemberNotifications";
 import { useUserConfig } from "@/hooks/user/useUserConfig";
@@ -36,8 +35,8 @@ export default function NotificationsPanel() {
             <div
                 style={{ width: PANEL_WIDTH - PANEL_GUTTER, marginLeft: PANEL_GUTTER }}
                 className={cn(
-                    "relative flex h-full flex-col rounded-lg border-[1.5px] border-snow/5",
-                    BLURRED_BG_PANEL(glass),
+                    "surface-menu relative flex h-full flex-col rounded-lg border-[1.5px]",
+                    glass && "backdrop-blur-xl",
                 )}
             >
                 <header
@@ -46,7 +45,7 @@ export default function NotificationsPanel() {
                 >
                     <h2 className="text-[14px] font-medium text-neutral-100">Notifications</h2>
                     {unreadCount > 0 && (
-                        <span className="rounded-full bg-white/7 px-1.5 py-0.5 text-[10px] font-medium text-neutral-300 tabular-nums">
+                        <span className="rounded-full bg-overlay/7 px-1.5 py-0.5 text-[10px] font-medium text-neutral-300 tabular-nums">
                             {unreadCount}
                         </span>
                     )}
@@ -55,7 +54,7 @@ export default function NotificationsPanel() {
                             <button
                                 type="button"
                                 onClick={() => mark_read({ scope: "member" })}
-                                className="cursor-pointer rounded-md px-1.5 py-1 text-[11px] text-neutral-400 transition-colors hover:bg-white/5 hover:text-neutral-100"
+                                className="cursor-pointer rounded-md px-1.5 py-1 text-[11px] text-neutral-400 transition-colors hover:bg-overlay/5 hover:text-neutral-100"
                             >
                                 Mark all read
                             </button>
@@ -64,7 +63,7 @@ export default function NotificationsPanel() {
                             type="button"
                             onClick={close}
                             aria-label="Close notifications"
-                            className="flex size-7 cursor-pointer items-center justify-center rounded-md text-neutral-400 transition-colors hover:bg-white/5 hover:text-neutral-100"
+                            className="flex size-7 cursor-pointer items-center justify-center rounded-md text-neutral-400 transition-colors hover:bg-overlay/5 hover:text-neutral-100"
                         >
                             <CloseIcon className="size-4" aria-hidden />
                         </button>
@@ -88,7 +87,7 @@ export default function NotificationsPanel() {
                             ? `Nothing matches “${query.trim()}”.`
                             : "Team and role changes will show up here."
                     }
-                    headerClassName={glass ? "bg-charcoal/70 backdrop-blur-sm" : "bg-charcoal"}
+                    headerClassName={cn("bg-[var(--surface-menu)]", glass && "backdrop-blur-sm")}
                     loading={feed.isLoading}
                     error={feed.isError}
                     pageError={Boolean(feed.error) && feed.notifications.length > 0}

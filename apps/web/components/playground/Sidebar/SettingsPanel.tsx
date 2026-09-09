@@ -28,7 +28,7 @@ export default function PlaygroundSidebarSettingsPanel({
                 className={cn(
                     topMatch?.tab === item.tab &&
                         selectedRowId !== item.tab &&
-                        "bg-white/3 text-neutral-100",
+                        "bg-active text-neutral-100",
                 )}
                 leading={{ kind: "icon", icon: item.icon }}
                 label={item.label}

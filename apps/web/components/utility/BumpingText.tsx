@@ -39,7 +39,7 @@ export function BumpingText({
                     data-char
                     className={cn(
                         "text-[12px] transition-colors duration-200",
-                        isSelected ? "text-white" : "text-neutral-500",
+                        isSelected ? "text-foreground" : "text-neutral-500",
                     )}
                 >
                     {char === " " ? " " : char}

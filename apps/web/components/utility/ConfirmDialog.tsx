@@ -93,7 +93,7 @@ export default function ConfirmDialog({
                     </div>
                 )}
 
-                {error && <p className="text-[12px] text-red-400">{error}</p>}
+                {error && <p className="text-[12px] text-danger">{error}</p>}
 
                 <DialogFooter className="mt-2 gap-2">
                     <Button

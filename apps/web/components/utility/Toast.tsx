@@ -43,9 +43,9 @@ const VIEWPORT_CLASSES: Record<ToastPosition, string> = {
 const STATUS_CONFIG: Record<ToastStatus, { icon: IconType; iconClassName: string }> = {
     default: { icon: ToastDefaultIcon, iconClassName: "text-neutral-300" },
     success: { icon: SuccessCircleIcon, iconClassName: "text-matcha" },
-    info: { icon: StatusInfoIcon, iconClassName: "text-blue-400" },
-    warning: { icon: ToastWarningIcon, iconClassName: "text-yellow-400" },
-    error: { icon: ErrorCircleIcon, iconClassName: "text-rose-500" },
+    info: { icon: StatusInfoIcon, iconClassName: "text-info" },
+    warning: { icon: ToastWarningIcon, iconClassName: "text-warning" },
+    error: { icon: ErrorCircleIcon, iconClassName: "text-danger" },
 };
 
 type ToasterProps = {
@@ -213,22 +213,13 @@ function ToastCard({
                 zIndex,
                 pointerEvents: stackOpacity === 0 ? "none" : "auto",
             }}
-            className="group overflow-hidden rounded-lg bg-cement shadow-[0_10px_30px_-12px_rgba(0,0,0,0.55),inset_0_1px_0_0_var(--color-edge)]"
+            className="surface-menu group overflow-hidden rounded-lg shadow-[var(--shadow-toast)]"
         >
-            <div
-                aria-hidden
-                className="pointer-events-none absolute inset-0"
-                style={{
-                    background:
-                        "linear-gradient(115deg, transparent 46%, rgba(255,255,255,0.05) 100%, transparent 54%)",
-                }}
-            />
-
             <div className="relative flex items-start gap-3 p-3.5 pr-9">
                 <Icon className={cn("mt-0.5 size-5 shrink-0", iconClassName)} aria-hidden />
 
                 <span className="flex min-w-0 flex-1 flex-col">
-                    <span className="text-[13px] font-medium text-neutral-100">{toast.title}</span>
+                    <span className="text-[13px] font-medium text-foreground">{toast.title}</span>
                     {toast.description && (
                         <span className="mt-0.5 text-[12.5px] leading-snug text-neutral-400">
                             {toast.description}
@@ -243,7 +234,7 @@ function ToastCard({
                             toast.action?.onClick();
                             onDismiss();
                         }}
-                        className="shrink-0 self-center rounded-md bg-white/8 px-3 py-1.5 text-xs font-medium text-neutral-100 transition-colors hover:bg-white/12"
+                        className="shrink-0 self-center rounded-md bg-overlay/8 px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-overlay/12"
                     >
                         {toast.action.label}
                     </button>
@@ -254,7 +245,7 @@ function ToastCard({
                 type="button"
                 onClick={onDismiss}
                 aria-label="Dismiss notification"
-                className="absolute top-2 right-2 flex size-5 items-center justify-center rounded-md text-neutral-600 opacity-0 transition-opacity group-hover:opacity-100 hover:bg-white/6 hover:text-neutral-200 focus-visible:opacity-100 focus-visible:outline-none"
+                className="absolute top-2 right-2 flex size-5 items-center justify-center rounded-md text-neutral-600 opacity-0 transition-opacity group-hover:opacity-100 hover:bg-overlay/6 hover:text-neutral-200 focus-visible:opacity-100 focus-visible:outline-none"
             >
                 <CloseIcon className="size-3" aria-hidden />
             </button>

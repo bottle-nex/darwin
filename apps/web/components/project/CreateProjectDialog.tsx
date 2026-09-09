@@ -22,9 +22,9 @@ import { cn } from "@/lib/utils";
 import { useNewProjectStore } from "@/store/project/useNewProjectStore";
 
 export const FIELD =
-    "mt-1.5 border-white/10 bg-white/5 text-neutral-200 placeholder:text-neutral-500 focus-visible:border-matcha focus-visible:ring-matcha/30";
+    "mt-1.5 border-overlay/10 bg-overlay/5 text-neutral-200 placeholder:text-neutral-500 focus-visible:border-matcha focus-visible:ring-matcha/30";
 
-export const SURFACE = "rounded-lg bg-white/5 shadow-[inset_0_1px_0_0_var(--color-edge)]";
+export const SURFACE = "rounded-lg bg-overlay/5 shadow-[inset_0_1px_0_0_var(--color-edge)]";
 
 export default function CreateProjectDialog() {
     const { open, setOpen, targetOrgSlug, setTargetOrgSlug, forceCreate, setForceCreate } =
@@ -96,7 +96,7 @@ export default function CreateProjectDialog() {
                     {createdProjectId ? "Environment variables" : "Create project"}
                 </DialogTitle>
 
-                <section className="flex items-center gap-x-1 px-6 pt-4 pb-2 text-xs text-snow">
+                <section className="flex items-center gap-x-1 px-6 pt-4 pb-2 text-xs text-overlay">
                     <PlaygroundAvatar
                         letter={org?.name.slice(0, 2) ?? ""}
                         tone="emerald"
@@ -143,7 +143,7 @@ export default function CreateProjectDialog() {
                                 size="xs"
                                 disabled={setSecrets.isPending}
                                 onClick={() => handleOpenChange(false)}
-                                className="cursor-pointer px-2 text-xs text-white/50 hover:text-white/80"
+                                className="cursor-pointer px-2 text-xs text-overlay/50 hover:text-overlay/80"
                             >
                                 Skip for now
                             </Button>

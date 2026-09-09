@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import ThemeFlashGuard from "@/components/utility/ThemeFlashGuard";
 import { useCreateOrganization } from "@/hooks/playground/useCreateOrganization";
 import { ORGANIZATIONS_QUERY_KEY } from "@/hooks/playground/useFetchOrganizations";
 import { slugify } from "@/lib/format";
@@ -16,13 +17,6 @@ import { cn } from "@/lib/utils";
 import { useNewProjectStore } from "@/store/project/useNewProjectStore";
 import type { Organization } from "@/types/organization";
 
-const GRADIENT = [
-    "radial-gradient(120% 110% at 100% 100%, rgba(10,10,10,0.98) 0%, rgba(10,10,10,0.7) 32%, rgba(10,10,10,0) 66%)",
-    "radial-gradient(85% 62% at 0% -16%, rgba(20,20,20,0.75) 0%, rgba(16,16,16,0.32) 22%, rgba(13,13,13,0.1) 44%, rgba(10,10,10,0) 62%)",
-    "radial-gradient(65% 48% at -18% 60%, rgba(15,15,15,0.28) 0%, rgba(12,12,12,0.1) 32%, rgba(10,10,10,0) 60%)",
-    "linear-gradient(148deg, #141414 0%, #101010 10%, #0d0d0d 20%, #0b0b0b 32%, #0a0a0a 44%, #0a0a0a 100%)",
-].join(", ");
-
 const URL_PREFIX = "trydarwin.com/";
 
 const DESCRIPTION_LIMIT = 150;
@@ -30,9 +24,9 @@ const DESCRIPTION_LIMIT = 150;
 const SLUG_LIMIT = 50;
 
 const CONTROL =
-    "h-10.75 w-full rounded-xl border border-snow/8 bg-ink px-3.5 text-[14px] text-neutral-100 shadow-none transition-colors placeholder:text-neutral-600 hover:bg-charcoal focus-visible:bg-cement bg-charcoal";
+    "h-10.75 w-full rounded-xl px-3.5 text-[14px] text-neutral-100 shadow-none transition-colors placeholder:text-neutral-600";
 
-const INPUT_SURFACE = "bg-[#121213] hover:bg-[#121213] focus-visible:bg-[#121213]";
+const INPUT_SURFACE = "surface-inset";
 
 const LABEL = "text-[12.5px] font-normal text-neutral-500";
 
@@ -101,22 +95,29 @@ export default function WorkspacePage() {
 
     return (
         <main className="theme-playground relative h-dvh w-full overflow-hidden bg-ink">
-            <div className="absolute inset-0" style={{ backgroundImage: GRADIENT }} />
-            <svg
-                aria-hidden
-                className="pointer-events-none absolute inset-0 h-full w-full opacity-[0.035]"
-            >
-                <filter id="workspace-grain">
-                    <feTurbulence
-                        type="fractalNoise"
-                        baseFrequency="0.9"
-                        numOctaves="1"
-                        stitchTiles="stitch"
-                    />
-                    <feColorMatrix type="saturate" values="0" />
-                </filter>
-                <rect width="100%" height="100%" filter="url(#workspace-grain)" />
-            </svg>
+            <ThemeFlashGuard />
+            <div
+                className="absolute inset-0"
+                style={{ backgroundImage: "var(--workspace-backdrop)" }}
+            />
+            <div>
+                <svg
+                    aria-hidden
+                    className="pointer-events-none absolute inset-0 h-full w-full"
+                    style={{ opacity: "var(--grain-opacity, 0.035)" }}
+                >
+                    <filter id="workspace-grain">
+                        <feTurbulence
+                            type="fractalNoise"
+                            baseFrequency="0.9"
+                            numOctaves="1"
+                            stitchTiles="stitch"
+                        />
+                        <feColorMatrix type="saturate" values="0" />
+                    </filter>
+                    <rect width="100%" height="100%" filter="url(#workspace-grain)" />
+                </svg>
+            </div>
 
             <div className="relative z-10 flex h-full items-center justify-center px-6">
                 <div className="w-full max-w-100">
@@ -149,8 +150,14 @@ export default function WorkspacePage() {
                             <Label htmlFor="workspace-slug" className={LABEL}>
                                 URL
                             </Label>
-                            <div className={cn(CONTROL, "flex items-stretch overflow-hidden px-0")}>
-                                <span className="flex shrink-0 items-center border-r border-graphite px-3.5 text-[14px] text-neutral-500">
+                            <div
+                                className={cn(
+                                    CONTROL,
+                                    INPUT_SURFACE,
+                                    "flex items-stretch overflow-hidden px-0",
+                                )}
+                            >
+                                <span className="flex shrink-0 items-center border-r border-border px-3.5 text-[14px] text-neutral-500">
                                     {URL_PREFIX}
                                 </span>
                                 <Input
@@ -170,7 +177,7 @@ export default function WorkspacePage() {
                                 />
                             </div>
                             {slugTaken && (
-                                <p className="text-[12px] text-red-400">
+                                <p className="text-[12px] text-danger">
                                     That slug is already taken.
                                 </p>
                             )}
@@ -197,7 +204,7 @@ export default function WorkspacePage() {
                             loading={createOrganization.isPending}
                             className={cn(
                                 CONTROL,
-                                "mt-4 justify-center font-medium hover:bg-cement",
+                                "mt-4 justify-center border border-overlay/8 bg-charcoal font-medium hover:bg-cement",
                             )}
                         >
                             Create workspace

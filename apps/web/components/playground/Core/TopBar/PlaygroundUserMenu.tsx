@@ -113,10 +113,10 @@ export default function PlaygroundUserMenu() {
                         variant="unstyled"
                         type="button"
                         aria-label="Account menu"
-                        className="flex w-fit min-w-0 cursor-pointer items-center gap-2.5 rounded-md px-2 py-1.5 text-left transition-colors hover:bg-white/5 data-[state=open]:bg-white/5"
+                        className="flex w-fit min-w-0 cursor-pointer items-center gap-2.5 rounded-md px-2 py-1.5 text-left transition-colors hover:bg-overlay/5 data-[state=open]:bg-overlay/5"
                     >
                         {user?.image ? (
-                            <span className="relative size-5 shrink-0 overflow-hidden rounded-full ring-1 ring-white/10">
+                            <span className="relative size-5 shrink-0 overflow-hidden rounded-full ring-1 ring-overlay/10">
                                 <Image
                                     src={user.image}
                                     alt=""

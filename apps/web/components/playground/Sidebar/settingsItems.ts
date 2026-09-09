@@ -27,6 +27,9 @@ export const ACCOUNT_SETTINGS: SettingsItem[] = [
         description: "Lighting, code theme, and home view.",
         icon: SettingsAppearanceIcon,
         facets: [
+            "Theme",
+            "Light mode",
+            "Dark mode",
             "Default home view",
             "Background lighting",
             "Glow color",

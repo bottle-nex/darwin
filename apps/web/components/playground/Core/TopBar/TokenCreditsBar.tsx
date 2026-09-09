@@ -18,7 +18,7 @@ export default function TokenCreditsBar() {
                     key={index}
                     className={cn(
                         "h-3.5 w-0.5 shrink-0 rounded-full",
-                        index < SPENT_BARS ? "bg-primary" : "bg-cement",
+                        index < SPENT_BARS ? "bg-primary" : "bg-overlay/12",
                     )}
                 />
             ))}

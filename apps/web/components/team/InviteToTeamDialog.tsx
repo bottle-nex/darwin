@@ -181,7 +181,7 @@ function InviteForm({
             onKeyDown={(event) => handleDialogSubmitKey(event, handleSubmit)}
         >
             <section className="flex flex-col items-start gap-y-3 pt-4 pb-2">
-                <div className="flex items-center justify-start gap-x-1 text-snow text-xs">
+                <div className="flex items-center justify-start gap-x-1 text-overlay text-xs">
                     <PlaygroundAvatar
                         letter={orgName.slice(0, 2)}
                         tone="emerald"
@@ -245,7 +245,7 @@ function InviteForm({
                                     }}
                                     className={cn(
                                         "flex cursor-pointer flex-col items-start gap-0.5 rounded-md px-2 py-1.5 text-left transition-colors",
-                                        option === role ? "bg-white/8" : "hover:bg-white/5",
+                                        option === role ? "bg-overlay/8" : "hover:bg-overlay/5",
                                     )}
                                 >
                                     <span className="text-[13px] text-neutral-200">{option}</span>

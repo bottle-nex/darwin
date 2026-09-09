@@ -43,8 +43,8 @@ export default function PlaygroundSidebarRow({
             className={cn(
                 "group flex w-full cursor-pointer items-center gap-1 rounded-md py-1 pr-2.5 text-left text-[13.25px] ring-inset focus-visible:ring-1 focus-visible:ring-primary focus-visible:outline-hidden rounded-[5px] tracking-wider font-medium",
                 active
-                    ? "bg-active text-snow/90"
-                    : "text-snow/65 hover:bg-hover hover:text-neutral-100",
+                    ? "bg-active text-overlay/90"
+                    : "text-overlay/65 hover:bg-hover hover:text-neutral-100",
                 className,
             )}
             style={{ paddingLeft: 8 + indent }}
@@ -65,7 +65,7 @@ export default function PlaygroundSidebarRow({
             </span>
 
             {badge !== undefined && (
-                <span className="inline-flex size-4 shrink-0 items-center justify-center rounded-full bg-neutral-700 text-[8px] font-medium tabular-nums text-neutral-300">
+                <span className="inline-flex size-4 shrink-0 items-center justify-center rounded-full bg-overlay/15 text-[8px] font-medium tabular-nums text-neutral-300">
                     {badge}
                 </span>
             )}

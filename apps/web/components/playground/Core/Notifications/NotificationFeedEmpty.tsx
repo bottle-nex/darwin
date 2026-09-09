@@ -12,7 +12,7 @@ export default function NotificationFeedEmpty({
     return (
         <div className="flex flex-col items-center px-6 py-10 text-center">
             <span
-                className="flex size-11 items-center justify-center rounded-xl bg-white/4 text-neutral-400 ring-1 ring-white/8"
+                className="flex size-11 items-center justify-center rounded-xl bg-overlay/4 text-neutral-400 ring-1 ring-overlay/8"
                 aria-hidden
             >
                 <NotificationsBellIcon className="size-5" />

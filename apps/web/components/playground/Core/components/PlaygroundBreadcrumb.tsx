@@ -189,7 +189,7 @@ export default function PlaygroundBreadcrumb({
     return (
         <nav className="flex min-w-0 items-center gap-0.5 text-[13px]">
             {!project ? (
-                <span className="h-3 w-24 animate-pulse rounded bg-white/5" />
+                <span className="h-3 w-24 animate-pulse rounded bg-overlay/5" />
             ) : segments.length ? (
                 <Button
                     variant="unstyled"

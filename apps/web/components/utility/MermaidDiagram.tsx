@@ -42,11 +42,11 @@ export default function MermaidDiagram({
 
     const current = rendered?.source === source ? rendered : null;
 
-    if (!current) return <div className="my-3 h-24 animate-pulse rounded-md bg-white/4" />;
+    if (!current) return <div className="my-3 h-24 animate-pulse rounded-md bg-[#0c0c0c]" />;
 
     if (!current.svg) {
         return (
-            <pre className="my-3 overflow-x-auto rounded-md bg-black/30 p-3 font-mono text-[12px] text-neutral-400">
+            <pre className="my-3 overflow-x-auto rounded-md bg-overlay/6 p-3 font-mono text-[12px] text-neutral-400">
                 {source}
             </pre>
         );
@@ -55,7 +55,7 @@ export default function MermaidDiagram({
     return (
         <div
             className={cn(
-                "my-3 overflow-x-auto rounded-md bg-black/20 p-3 [&_svg]:mx-auto [&_svg]:h-auto [&_svg]:max-w-full",
+                "my-3 overflow-x-auto rounded-md bg-[#0c0c0c] p-3 [&_svg]:mx-auto [&_svg]:h-auto [&_svg]:max-w-full",
                 className,
             )}
             dangerouslySetInnerHTML={{ __html: current.svg }}

@@ -195,7 +195,7 @@ function Chip({
     onRemove: () => void;
 }) {
     return (
-        <span className="flex items-center gap-1.5 rounded-full bg-white/5 py-1 pr-1 pl-1.5 text-[12px] text-neutral-200">
+        <span className="flex items-center gap-1.5 rounded-full bg-overlay/5 py-1 pr-1 pl-1.5 text-[12px] text-neutral-200">
             {leading}
             <span className="max-w-56 truncate">{label}</span>
             <Button
@@ -203,7 +203,7 @@ function Chip({
                 type="button"
                 onClick={onRemove}
                 aria-label={`Remove ${label}`}
-                className="flex size-4 cursor-pointer items-center justify-center rounded-full text-neutral-500 hover:bg-white/10 hover:text-neutral-100"
+                className="flex size-4 cursor-pointer items-center justify-center rounded-full text-neutral-500 hover:bg-overlay/10 hover:text-neutral-100"
             >
                 <CloseIcon className="size-3" />
             </Button>

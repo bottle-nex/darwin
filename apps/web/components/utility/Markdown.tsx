@@ -46,7 +46,7 @@ const COMPONENTS: Components = {
             href={href}
             target="_blank"
             rel="noreferrer"
-            className="text-violet-300 underline decoration-violet-300/30 underline-offset-2 hover:decoration-violet-300"
+            className="text-primary underline decoration-primary/30 underline-offset-2 hover:decoration-primary"
         >
             {children}
         </a>
@@ -56,11 +56,11 @@ const COMPONENTS: Components = {
     ),
     em: ({ children }) => <em className="text-neutral-300 italic">{children}</em>,
     blockquote: ({ children }) => (
-        <blockquote className="my-3 border-l-2 border-violet-400/30 pl-3 text-neutral-500 italic">
+        <blockquote className="my-3 border-l-2 border-primary/30 pl-3 text-neutral-500 italic">
             {children}
         </blockquote>
     ),
-    hr: () => <hr className="my-4 border-white/5" />,
+    hr: () => <hr className="my-4 border-border" />,
     code: ({ className, children }) => {
         if (/language-mermaid/.test(className ?? "")) {
             return <MermaidDiagram source={textOf(children).trimEnd()} />;
@@ -72,7 +72,7 @@ const COMPONENTS: Components = {
                     "font-mono text-[12px]",
                     isBlock
                         ? "text-neutral-300"
-                        : "rounded bg-white/6 px-1.5 py-0.5 text-violet-200",
+                        : "rounded bg-overlay/6 px-1.5 py-0.5 text-primary",
                 )}
             >
                 {children}
@@ -82,7 +82,7 @@ const COMPONENTS: Components = {
     pre: ({ children }) => {
         if (isMermaidBlock(children)) return <>{children}</>;
         return (
-            <pre className="my-3 overflow-x-auto rounded-md bg-black/30 p-3 leading-[1.6] shadow-[inset_0_1px_0_0_var(--color-edge)]">
+            <pre className="surface-sunken my-3 overflow-x-auto rounded-md p-3 leading-[1.6]">
                 {children}
             </pre>
         );
@@ -93,12 +93,12 @@ const COMPONENTS: Components = {
         </div>
     ),
     th: ({ children }) => (
-        <th className="border-b border-white/10 px-2 py-1.5 text-[12px] font-semibold text-neutral-300">
+        <th className="border-b border-border px-2 py-1.5 text-[12px] font-semibold text-neutral-300">
             {children}
         </th>
     ),
     td: ({ children }) => (
-        <td className="border-b border-white/5 px-2 py-1.5 text-neutral-400">{children}</td>
+        <td className="border-b border-border-subtle px-2 py-1.5 text-neutral-400">{children}</td>
     ),
 };
 
@@ -107,7 +107,7 @@ function isMermaidBlock(children: ReactNode): boolean {
     return /language-mermaid/.test(children.props.className ?? "");
 }
 
-/** Renders GitHub-flavored markdown styled for the dark playground surfaces. */
+/** Renders GitHub-flavored markdown styled for the playground surfaces. */
 export default function Markdown({
     children,
     className,

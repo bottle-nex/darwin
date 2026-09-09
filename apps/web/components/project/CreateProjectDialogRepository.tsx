@@ -68,7 +68,7 @@ export default function CreateProjectDialogRepository({
                 disabled={!org || connect.isPending}
                 onClick={() => org && connect.mutate(org.id)}
             >
-                <GithubLogoIcon className="size-3.5 text-white/60" aria-hidden />
+                <GithubLogoIcon className="size-3.5 text-overlay/60" aria-hidden />
                 Connect GitHub
             </CapsuleTrigger>
         );
@@ -79,7 +79,7 @@ export default function CreateProjectDialogRepository({
             <Popover open={repoOpen} onOpenChange={setRepoOpen}>
                 <PopoverTrigger asChild>
                     <CapsuleTrigger>
-                        <GithubLogoIcon className="size-3.5 text-white/60" aria-hidden />
+                        <GithubLogoIcon className="size-3.5 text-overlay/60" aria-hidden />
                         <span className="max-w-52 truncate">
                             {selectedRepo?.fullName ?? "Repository"}
                         </span>
@@ -124,7 +124,7 @@ export default function CreateProjectDialogRepository({
                 <Popover open={branchOpen} onOpenChange={setBranchOpen} modal>
                     <PopoverTrigger asChild>
                         <CapsuleTrigger>
-                            <GitBranchIcon className="size-3.5 text-white/60" aria-hidden />
+                            <GitBranchIcon className="size-3.5 text-overlay/60" aria-hidden />
                             <span className="max-w-40 truncate font-mono">{selectedBranch}</span>
                         </CapsuleTrigger>
                     </PopoverTrigger>

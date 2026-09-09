@@ -46,7 +46,7 @@ export default function PlaygroundShortcutSheet() {
         <Sheet open={isOpen} onOpenChange={handleOpenChange}>
             <SheetContent
                 side="right"
-                className="top-3 right-3 bottom-3 h-auto w-90 max-w-[calc(100%-1.5rem)] gap-0 rounded-2xl border border-white/5 text-neutral-100 shadow-xl will-change-transform ease-[cubic-bezier(0.32,0.72,0,1)] data-[state=closed]:duration-200 data-[state=open]:duration-300"
+                className="top-3 right-3 bottom-3 h-auto w-90 max-w-[calc(100%-1.5rem)] gap-0 rounded-2xl border border-overlay/5 text-neutral-100 shadow-xl will-change-transform ease-[cubic-bezier(0.32,0.72,0,1)] data-[state=closed]:duration-200 data-[state=open]:duration-300"
             >
                 <SheetHeader className="gap-3 px-4 py-4">
                     <SheetTitle className="text-[15px] font-semibold text-neutral-100">

@@ -19,14 +19,14 @@ export default function NotificationSearch({ value, onChange }: NotificationSear
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
                 placeholder="Search notifications"
-                className="h-8 rounded-md bg-white/4 pr-8 pl-8 text-[12.5px] shadow-none hover:bg-white/7"
+                className="h-8 rounded-md bg-overlay/4 pr-8 pl-8 text-[12.5px] shadow-none hover:bg-overlay/7"
             />
             {value && (
                 <button
                     type="button"
                     onClick={() => onChange("")}
                     aria-label="Clear search"
-                    className="absolute top-1/2 right-2 flex size-4 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-white/7 text-neutral-300 transition-colors hover:bg-white/12 hover:text-neutral-100"
+                    className="absolute top-1/2 right-2 flex size-4 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-overlay/7 text-neutral-300 transition-colors hover:bg-overlay/12 hover:text-neutral-100"
                 >
                     <CloseIcon className="size-2.5" aria-hidden />
                 </button>

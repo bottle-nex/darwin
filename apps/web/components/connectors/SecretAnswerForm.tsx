@@ -13,12 +13,12 @@ export default function SecretAnswerForm({ questionId }: { questionId: string })
     const [value, setValue] = useState("");
 
     if (isLoading) {
-        return <p className="text-[13px] text-snow/50">Loading…</p>;
+        return <p className="text-[13px] text-overlay/50">Loading…</p>;
     }
 
     if (isError || !question) {
         return (
-            <p className="text-[13px] text-snow/60">
+            <p className="text-[13px] text-overlay/60">
                 This question could not be found, or it is not yours to answer.
             </p>
         );
@@ -26,7 +26,7 @@ export default function SecretAnswerForm({ questionId }: { questionId: string })
 
     if (question.status !== "Waiting") {
         return (
-            <p className="text-[13px] text-snow/60">
+            <p className="text-[13px] text-overlay/60">
                 This question is no longer waiting for an answer.
             </p>
         );
@@ -50,10 +50,10 @@ export default function SecretAnswerForm({ questionId }: { questionId: string })
         >
             <div className="flex flex-col gap-1">
                 {question.projectName ? (
-                    <span className="text-[12px] text-snow/50">{question.projectName}</span>
+                    <span className="text-[12px] text-overlay/50">{question.projectName}</span>
                 ) : null}
-                <h1 className="font-mono text-lg font-600 text-snow">{question.key}</h1>
-                <p className="text-[13px] text-snow/70">{question.prompt}</p>
+                <h1 className="font-mono text-lg font-600 text-overlay">{question.key}</h1>
+                <p className="text-[13px] text-overlay/70">{question.prompt}</p>
             </div>
 
             <Input
@@ -64,7 +64,7 @@ export default function SecretAnswerForm({ questionId }: { questionId: string })
                 onChange={(event) => setValue(event.target.value)}
             />
 
-            <p className="text-[12px] text-snow/45">
+            <p className="text-[12px] text-overlay/45">
                 Stored encrypted and injected into the sandbox as an environment variable. It is
                 never shown again and never sent to Slack or Telegram.
             </p>

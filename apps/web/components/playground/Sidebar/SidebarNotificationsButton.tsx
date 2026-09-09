@@ -28,13 +28,13 @@ export default function SidebarNotificationsButton() {
                 aria-pressed={notificationsOpen}
                 className={cn(
                     SIDEBAR_ICON_BUTTON_CLASS,
-                    notificationsOpen && "bg-white/8 text-neutral-100",
+                    notificationsOpen && "bg-overlay/8 text-neutral-100",
                 )}
             >
                 <NotificationsBellIcon className="size-3.75" aria-hidden />
                 {memberUnread > 0 ? (
                     <span
-                        className="absolute top-0 right-0 flex h-3 min-w-3 items-center justify-center rounded-full bg-primary px-0.5 text-[8px] leading-none font-medium text-ink tabular-nums"
+                        className="absolute top-0 right-0 flex h-3 min-w-3 items-center justify-center rounded-full bg-primary px-0.5 text-[8px] leading-none font-medium text-primary-foreground tabular-nums"
                         aria-hidden
                     >
                         {memberUnread > 9 ? "9+" : memberUnread}

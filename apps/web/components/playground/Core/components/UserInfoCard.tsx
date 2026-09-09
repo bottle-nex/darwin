@@ -37,16 +37,16 @@ export default function UserInfoCard({ userId, fallbackName, fallbackImage }: Us
                     className="rounded-full"
                 />
                 <div className="min-w-0">
-                    <p className="truncate text-[13px] font-medium text-snow">{name}</p>
+                    <p className="truncate text-[13px] font-medium text-overlay">{name}</p>
                     {member && (
                         <p className="truncate text-[11.5px] text-neutral-500">{member.email}</p>
                     )}
                 </div>
             </div>
 
-            <div className="my-2.5 h-px bg-white/5" />
+            <div className="my-2.5 h-px bg-overlay/5" />
 
-            <div className="space-y-1.5 text-[12.5px] text-snow/80">
+            <div className="space-y-1.5 text-[12.5px] text-overlay/80">
                 <div className="flex items-center gap-2">
                     <span className="flex size-3.5 items-center justify-center">
                         <span

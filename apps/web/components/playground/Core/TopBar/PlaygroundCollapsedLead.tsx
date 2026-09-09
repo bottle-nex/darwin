@@ -21,7 +21,7 @@ export default function PlaygroundCollapsedLead() {
                     type="button"
                     onClick={toggle}
                     aria-label="Expand sidebar"
-                    className="flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-md text-neutral-400 transition-colors hover:bg-white/5 hover:text-neutral-100"
+                    className="flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-md text-neutral-400 transition-colors hover:bg-overlay/5 hover:text-neutral-100"
                 >
                     <SidebarToggleIcon className="size-4" aria-hidden />
                 </Button>

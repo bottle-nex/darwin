@@ -41,7 +41,7 @@ export default function ResourcePickerDialog({
         <Dialog open onOpenChange={onOpenChange}>
             <DialogContent
                 showCloseButton={false}
-                className="top-[18%] w-125 max-w-[calc(100%-2rem)] translate-y-0 gap-0 overflow-hidden rounded-2xl border-white/10 p-0 sm:max-w-none"
+                className="top-[18%] w-125 max-w-[calc(100%-2rem)] translate-y-0 gap-0 overflow-hidden rounded-2xl border-overlay/10 p-0 sm:max-w-none"
             >
                 <DialogTitle className="sr-only">{title}</DialogTitle>
                 <Command loop disablePointerSelection className="bg-transparent">
@@ -59,8 +59,8 @@ export default function ResourcePickerDialog({
                                 value={`${resource.label} ${resource.id}`}
                                 onSelect={() => onPick(resource.id)}
                                 className={cn(
-                                    "px-2.5 py-2 hover:bg-white/5",
-                                    destructive && "text-rose-300/90",
+                                    "px-2.5 py-2 hover:bg-overlay/5",
+                                    destructive && "text-danger/90",
                                 )}
                             >
                                 <span className="flex min-w-0 items-center gap-2.5">

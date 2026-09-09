@@ -24,7 +24,7 @@ export default function PaneFallback({ children }: { children?: ReactNode }) {
                     {children}
                 </div>
             ) : (
-                <LogoLoader className="h-full w-full text-snow" />
+                <LogoLoader className="h-full w-full text-overlay" />
             )}
         </main>
     );

@@ -100,7 +100,7 @@ function CreateTeamForm({ projectId, onClose }: { projectId: string | null; onCl
             onKeyDown={(event) => handleDialogSubmitKey(event, submit)}
         >
             <section className="flex flex-col items-start gap-y-3 pt-4 pb-2">
-                <div className="flex items-center justify-start gap-x-1 text-snow text-xs">
+                <div className="flex items-center justify-start gap-x-1 text-overlay text-xs">
                     <PlaygroundAvatar
                         letter={project?.name.slice(0, 2) ?? ""}
                         tone={project ? toneFor(project.id) : "emerald"}
@@ -156,7 +156,7 @@ function CreateTeamForm({ projectId, onClose }: { projectId: string | null; onCl
                     <Popover open={slugOpen} onOpenChange={setSlugOpen}>
                         <PopoverTrigger asChild>
                             <CapsuleTrigger>
-                                <span className="font-mono text-white/40">@</span>
+                                <span className="font-mono text-overlay/40">@</span>
                                 <span className="max-w-40 truncate font-mono">
                                     {resolvedSlug || "slug"}
                                 </span>

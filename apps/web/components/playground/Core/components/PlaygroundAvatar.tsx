@@ -23,7 +23,7 @@ const AVATAR_TONE = {
         glow: "shadow-[0_2px_6px_-1px_rgba(16,185,129,0.5)]",
     },
     dark: {
-        bg: "bg-linear-to-br from-neutral-600 via-neutral-700 to-neutral-900 text-white",
+        bg: "bg-linear-to-br from-[#626262] via-[#404040] to-[#171717] text-white",
         glow: "shadow-[0_2px_6px_-1px_rgba(0,0,0,0.45)]",
     },
 } as const;
@@ -48,8 +48,8 @@ export type AvatarSize = keyof typeof AVATAR_SIZE;
 const BASE =
     "relative inline-flex shrink-0 items-center justify-center overflow-hidden font-semibold leading-none ring-1 ring-inset";
 
-const LETTER_RING = "ring-white/15";
-const PICKED_ICON_SURFACE = "bg-graphite/70 ring-[0.5px] ring-white/8";
+const LETTER_RING = "ring-overlay/15";
+const PICKED_ICON_SURFACE = "bg-graphite/70 ring-[0.5px] ring-overlay/8";
 const PICKED_EMOJI_SURFACE = "bg-transparent ring-0";
 
 // top sheen — bright highlight fading to nothing, like the logo's radial sheen

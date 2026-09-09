@@ -32,8 +32,8 @@ export default function MemberOptionRow({
                 className={cn(
                     "flex size-3.5 shrink-0 items-center justify-center rounded border transition-colors",
                     checked
-                        ? "border-neutral-200 bg-neutral-200 text-neutral-900"
-                        : "border-white/25",
+                        ? "border-primary bg-primary text-primary-foreground"
+                        : "border-overlay/25",
                 )}
             >
                 {checked && <CheckIcon className="size-2.5" aria-hidden />}

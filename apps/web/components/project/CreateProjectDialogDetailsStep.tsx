@@ -113,7 +113,7 @@ export default function CreateProjectDialogDetailsStep({
                     <Popover open={slugOpen} onOpenChange={setSlugOpen}>
                         <PopoverTrigger asChild>
                             <CapsuleTrigger>
-                                <span className="font-mono text-white/40">@</span>
+                                <span className="font-mono text-overlay/40">@</span>
                                 <span className="max-w-40 truncate font-mono">
                                     {slug || "slug"}
                                 </span>
@@ -144,7 +144,7 @@ export default function CreateProjectDialogDetailsStep({
 
                 <div className="flex h-fit items-center justify-end gap-x-2">
                     {mustCreateProject && (
-                        <span className="mr-auto text-xs text-white/45">
+                        <span className="mr-auto text-xs text-overlay/45">
                             Every organization needs at least one project to continue.
                         </span>
                     )}
@@ -157,7 +157,7 @@ export default function CreateProjectDialogDetailsStep({
                         size="xs"
                         onClick={onCancel}
                         disabled={createProject.isPending}
-                        className="cursor-pointer px-2 text-xs text-white/50 hover:text-white/80"
+                        className="cursor-pointer px-2 text-xs text-overlay/50 hover:text-overlay/80"
                     >
                         {mustCreateProject ? "Log out" : "Cancel"}
                     </Button>

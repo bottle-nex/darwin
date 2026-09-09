@@ -54,7 +54,7 @@ export default function SidebarResizeHandle() {
         >
             <span className="absolute inset-y-0 -left-1 -right-1" aria-hidden />
             {!collapsed && (
-                <span className="pointer-events-none h-[90%] w-1 bg-transparent transition-colors group-hover:bg-white/20" />
+                <span className="pointer-events-none h-[90%] w-1 bg-transparent transition-colors group-hover:bg-overlay/20" />
             )}
         </div>
     );

@@ -65,7 +65,7 @@ export default function CommandMenu() {
                 showCloseButton={false}
                 className={cn(
                     "top-[18%] w-180 max-w-[calc(100%-2rem)] translate-y-0 sm:max-w-none",
-                    "gap-0 overflow-hidden rounded-2xl border-white/10 p-0",
+                    "gap-0 overflow-hidden rounded-2xl border-overlay/10 p-0",
                 )}
             >
                 <DialogTitle className="sr-only">Command menu</DialogTitle>
@@ -191,7 +191,7 @@ function CommandMenuBody({ onDone }: { onDone: () => void }) {
                             <button
                                 type="button"
                                 onClick={back}
-                                className="flex shrink-0 cursor-pointer items-center gap-1.5 rounded-md px-2 py-1 text-[11px] text-neutral-500 hover:bg-white/5 hover:text-neutral-300"
+                                className="flex shrink-0 cursor-pointer items-center gap-1.5 rounded-md px-2 py-1 text-[11px] text-neutral-500 hover:bg-overlay/5 hover:text-neutral-300"
                             >
                                 <CommandBackIcon className="size-3" aria-hidden />
                                 Back
@@ -250,15 +250,14 @@ function CommandMenuBody({ onDone }: { onDone: () => void }) {
                                         onSelect={() => run(entry)}
                                         className={cn(
                                             "justify-between p-2.5 text-[13.5px]",
-                                            entry.destructive &&
-                                                "text-rose-400 hover:text-rose-400!",
+                                            entry.destructive && "text-danger hover:text-danger!",
                                         )}
                                     >
                                         <span className="flex min-w-0 items-center gap-2">
                                             <entry.icon
                                                 className={cn(
                                                     "size-4 text-neutral-400",
-                                                    entry.destructive && "text-rose-400!",
+                                                    entry.destructive && "text-danger!",
                                                 )}
                                                 aria-hidden
                                             />

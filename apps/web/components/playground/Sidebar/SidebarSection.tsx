@@ -62,7 +62,7 @@ export default function PlaygroundSidebarSection({
                         variant === "inline" &&
                             "gap-x-2 px-2 py-1.5 text-[12px] font-medium text-neutral-400",
                         isTree &&
-                            "gap-1 rounded-[5px] px-2 py-1 text-[12.5px] font-medium tracking-wider text-snow/65 hover:bg-hover hover:text-neutral-100",
+                            "gap-1 rounded-[5px] px-2 py-1 text-[12.5px] font-medium tracking-wider text-overlay/65 hover:bg-hover hover:text-neutral-100",
                     )}
                 >
                     {isTree && (

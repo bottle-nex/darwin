@@ -31,7 +31,7 @@ const UNTITLED = "Untitled chat";
 // Mirrors the teams row: hidden until the row is hovered, the active one, or the menu is open,
 // so a list of chats stays a list of titles rather than a column of dots.
 const MENU_BUTTON =
-    "absolute top-1/2 right-1 flex size-6 -translate-y-1/2 cursor-pointer items-center justify-center rounded text-neutral-400 ring-inset transition-opacity hover:bg-white/5 hover:text-neutral-200 focus-visible:pointer-events-auto focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-hidden group-hover/thread:pointer-events-auto group-hover/thread:opacity-100 data-[state=open]:pointer-events-auto data-[state=open]:opacity-100";
+    "absolute top-1/2 right-1 flex size-6 -translate-y-1/2 cursor-pointer items-center justify-center rounded text-neutral-400 ring-inset transition-opacity hover:bg-overlay/5 hover:text-neutral-200 focus-visible:pointer-events-auto focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-hidden group-hover/thread:pointer-events-auto group-hover/thread:opacity-100 data-[state=open]:pointer-events-auto data-[state=open]:opacity-100";
 
 /**
  * The sidebar's Darwin face: past conversations, newest first.
@@ -102,7 +102,7 @@ export default function PlaygroundSidebarDarwinPanel({ query }: { query: string 
                                         setDraft(null);
                                     }
                                 }}
-                                className="h-7 rounded-[5px] bg-snow/5 px-2 text-[12.5px]"
+                                className="h-7 rounded-[5px] bg-overlay/5 px-2 text-[12.5px]"
                                 aria-label="Chat name"
                             />
                         ) : (
@@ -112,7 +112,7 @@ export default function PlaygroundSidebarDarwinPanel({ query }: { query: string 
                                         "pr-8",
                                         topMatch?.id === thread.id &&
                                             thread.id !== threadId &&
-                                            "bg-white/3 text-neutral-100",
+                                            "bg-active text-neutral-100",
                                     )}
                                     leading={{
                                         kind: "node",

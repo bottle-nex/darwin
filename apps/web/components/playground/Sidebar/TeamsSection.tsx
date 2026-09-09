@@ -72,7 +72,7 @@ export default function PlaygroundSidebarTeamsSection() {
                         <Row
                             className={cn(
                                 !isActive &&
-                                    "group-hover/team:bg-white/3 group-hover/team:text-neutral-100",
+                                    "group-hover/team:bg-active group-hover/team:text-neutral-100",
                             )}
                             label={t.name}
                             leading={rowLeading({
@@ -92,7 +92,7 @@ export default function PlaygroundSidebarTeamsSection() {
                                         type="button"
                                         aria-label={`${t.name} actions`}
                                         className={cn(
-                                            "absolute top-1/2 right-1 flex size-6 -translate-y-1/2 cursor-pointer items-center justify-center rounded text-neutral-400 ring-inset transition-opacity hover:bg-white/5 hover:text-neutral-200 focus-visible:pointer-events-auto focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-hidden group-hover/team:pointer-events-auto group-hover/team:opacity-100 data-[state=open]:pointer-events-auto data-[state=open]:opacity-100",
+                                            "absolute top-1/2 right-1 flex size-6 -translate-y-1/2 cursor-pointer items-center justify-center rounded text-neutral-400 ring-inset transition-opacity hover:bg-overlay/5 hover:text-neutral-200 focus-visible:pointer-events-auto focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-hidden group-hover/team:pointer-events-auto group-hover/team:opacity-100 data-[state=open]:pointer-events-auto data-[state=open]:opacity-100",
                                             isActive
                                                 ? "opacity-100"
                                                 : "pointer-events-none opacity-0",

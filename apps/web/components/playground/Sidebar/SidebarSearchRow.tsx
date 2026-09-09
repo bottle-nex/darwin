@@ -68,7 +68,7 @@ export default function SidebarSearchRow({
                     type="button"
                     onClick={onBack}
                     tabIndex={searching ? -1 : 0}
-                    className="flex h-7 cursor-pointer items-center gap-0.5 rounded-full pl-1.75 pr-3.25 text-[12.5px] text-snow/80 transition-colors hover:bg-active hover:text-snow/90"
+                    className="flex h-7 cursor-pointer items-center gap-0.5 rounded-full pl-1.75 pr-3.25 text-[12.5px] text-overlay/80 transition-colors hover:bg-active hover:text-overlay/90"
                 >
                     <BackChevronIcon className="size-4 shrink-0" aria-hidden />
                     Back
@@ -147,7 +147,7 @@ export default function SidebarSearchRow({
                         }
                     }}
                     placeholder={`Search ${label}...`}
-                    className="h-7 rounded-[6px] bg-snow/5 pr-8 pl-7 text-[12.5px] hover:bg-snow/7"
+                    className="h-7 rounded-[6px] bg-overlay/5 pr-8 pl-7 text-[12.5px] hover:bg-overlay/7"
                 />
                 <Button
                     variant="unstyled"
