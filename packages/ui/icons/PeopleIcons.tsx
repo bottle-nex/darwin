@@ -1,14 +1,14 @@
 import { createIcon } from "./createIcon";
-import { HiTag, HiUserGroup, HiUsers } from "react-icons/hi2";
+import { HiInbox, HiTag, HiUserGroup, HiUsers } from "react-icons/hi2";
 import { LuUser } from "react-icons/lu";
-import { MdAssignmentInd, MdInbox } from "react-icons/md";
+import { MdAssignmentInd } from "react-icons/md";
 import { PiUserFocusFill } from "react-icons/pi";
 
 export const AssigneeGroupIcon = createIcon(HiUsers);
 
 export const CreatorIcon = createIcon(LuUser);
 
-export const InboxIcon = createIcon(MdInbox);
+export const InboxIcon = createIcon(HiInbox);
 
 export const MyIssuesIcon = createIcon(MdAssignmentInd);
 
