@@ -136,6 +136,56 @@
     }
 }
 
+@layer components {
+    /*
+     * Surface recipes. Dark lifts a surface with fill alpha; light needs a
+     * border and a shadow. Both live in the token set (theme.css) so a
+     * component just names the role it wants.
+     */
+    .surface-card {
+        background: var(--surface-card);
+        border: 1px solid var(--surface-card-border);
+        box-shadow: var(--shadow-card);
+    }
+
+    .surface-card-interactive:hover {
+        background: var(--surface-card-hover);
+    }
+
+    .surface-raised {
+        background: var(--surface-raised);
+        border: 1px solid var(--surface-raised-border);
+        box-shadow: var(--shadow-card);
+    }
+
+    .surface-sunken {
+        background: var(--surface-sunken);
+        border: 1px solid var(--surface-sunken-border);
+    }
+
+    .surface-inset {
+        background: var(--surface-inset);
+        border: 1px solid var(--surface-inset-border);
+    }
+
+    .surface-menu {
+        background: var(--surface-menu);
+        border: 1px solid var(--surface-menu-border);
+        box-shadow: var(--shadow-menu);
+    }
+
+    .surface-chrome {
+        background: var(--surface-chrome);
+        border-color: var(--surface-chrome-border);
+    }
+
+    /* Modal backdrop. Light dims far less than dark — a 50% black veil over a
+       white app reads as a blackout rather than a scrim. */
+    .surface-scrim {
+        background: var(--surface-scrim);
+    }
+}
+
 @layer utilities {
     .chat-composer {
         outline: none;
@@ -147,7 +197,7 @@
         content: attr(data-placeholder);
         float: left;
         height: 0;
-        color: rgba(255, 255, 255, 0.3);
+        color: color-mix(in oklab, var(--color-overlay) 38%, transparent);
         pointer-events: none;
     }
 
@@ -161,18 +211,18 @@
         padding: 0 0.25rem;
         font-weight: 500;
         white-space: nowrap;
-        background: rgba(255, 255, 255, 0.1);
-        color: #f5f5f5;
+        background: color-mix(in oklab, var(--color-overlay) 12%, transparent);
+        color: var(--color-foreground);
     }
 
     .reference-chip[data-kind="member"] {
-        background: rgba(99, 102, 241, 0.22);
-        color: #c7d2fe;
+        background: color-mix(in oklab, var(--color-primary) 20%, transparent);
+        color: var(--color-mention-member);
     }
 
     .reference-chip[data-kind="team"] {
-        background: rgba(16, 185, 129, 0.2);
-        color: #a7f3d0;
+        background: color-mix(in oklab, var(--color-matcha) 20%, transparent);
+        color: var(--color-mention-team);
     }
 
     .grain {
@@ -215,20 +265,20 @@
            rather than a single smooth ramp. */
         background: conic-gradient(
             from 140deg,
-            rgba(38, 38, 38, 1) 0deg,
-            rgba(38, 38, 38, 0.35) 26deg,
+            rgb(var(--gradient-border-rgb, 38 38 38) / 1) 0deg,
+            rgb(var(--gradient-border-rgb, 38 38 38) / 0.35) 26deg,
             transparent 52deg,
             transparent 88deg,
-            rgba(38, 38, 38, 0.7) 118deg,
-            rgba(38, 38, 38, 1) 148deg,
-            rgba(38, 38, 38, 0.3) 176deg,
+            rgb(var(--gradient-border-rgb, 38 38 38) / 0.7) 118deg,
+            rgb(var(--gradient-border-rgb, 38 38 38) / 1) 148deg,
+            rgb(var(--gradient-border-rgb, 38 38 38) / 0.3) 176deg,
             transparent 204deg,
             transparent 236deg,
-            rgba(38, 38, 38, 0.65) 264deg,
+            rgb(var(--gradient-border-rgb, 38 38 38) / 0.65) 264deg,
             transparent 292deg,
             transparent 320deg,
-            rgba(38, 38, 38, 0.9) 346deg,
-            rgba(38, 38, 38, 1) 360deg
+            rgb(var(--gradient-border-rgb, 38 38 38) / 0.9) 346deg,
+            rgb(var(--gradient-border-rgb, 38 38 38) / 1) 360deg
         );
         -webkit-mask:
             linear-gradient(#fff 0 0) content-box,
@@ -249,6 +299,14 @@
         --lit-rgb: 24 24 27;
         --lit-alpha: 0.5;
     }
+
+    /* A white sheen is invisible on a white ground, so the edge inverts. */
+    .theme-playground.light .lit-edge,
+    .theme-playground.light .top-lit-edge {
+        --lit-rgb: 35 36 43;
+        --lit-alpha: 0.5;
+    }
+
 
     .lit-edge::before,
     .lit-edge::after {
@@ -344,33 +402,29 @@
 }
 
 .review-diff {
-    --diff-add: var(--color-green-500);
-    --diff-remove: var(--color-rose-500);
+    --diff-add: var(--diff-add-bar);
+    --diff-remove: var(--diff-remove-bar);
     --diff-bar-width: 4px;
 
     --diff-background-color: transparent;
     /* Goes through --code-plain so the theme owns the base text colour too. It has to
        be declared here rather than overridden from a parent: a variable set on an
        element always wins over one inherited from an ancestor. */
-    --diff-text-color: var(--code-plain, #e6e6e6);
+    --diff-text-color: var(--code-plain, var(--diff-plain));
     --diff-font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
-    --diff-selection-background-color: color-mix(in oklab, var(--color-sky-400) 24%, transparent);
+    --diff-selection-background-color: var(--diff-selection);
 
-    --diff-gutter-insert-background-color: color-mix(in oklab, var(--diff-add) 20%, transparent);
-    --diff-gutter-delete-background-color: color-mix(in oklab, var(--diff-remove) 20%, transparent);
-    --diff-gutter-insert-text-color: var(--color-emerald-300);
-    --diff-gutter-delete-text-color: var(--color-rose-300);
+    --diff-gutter-insert-background-color: var(--diff-add-gutter);
+    --diff-gutter-delete-background-color: var(--diff-remove-gutter);
+    --diff-gutter-insert-text-color: var(--diff-add-gutter-text);
+    --diff-gutter-delete-text-color: var(--diff-remove-gutter-text);
 
-    --diff-code-insert-background-color: color-mix(in oklab, var(--diff-add) 13%, transparent);
-    --diff-code-delete-background-color: color-mix(in oklab, var(--diff-remove) 13%, transparent);
+    --diff-code-insert-background-color: var(--diff-add-line);
+    --diff-code-delete-background-color: var(--diff-remove-line);
     --diff-code-insert-text-color: inherit;
     --diff-code-delete-text-color: inherit;
-    --diff-code-insert-edit-background-color: color-mix(in oklab, var(--diff-add) 32%, transparent);
-    --diff-code-delete-edit-background-color: color-mix(
-        in oklab,
-        var(--diff-remove) 32%,
-        transparent
-    );
+    --diff-code-insert-edit-background-color: var(--diff-add-word);
+    --diff-code-delete-edit-background-color: var(--diff-remove-word);
 
     font-size: 13px;
     letter-spacing: 0.01em;
@@ -400,12 +454,12 @@
    rules are plain CSS, so an undefined var falls back to currentColor and the seam picks up each
    row's gutter colour — red down a deletion, green down an insertion. */
 .review-diff.diff-split td.diff-gutter:nth-of-type(3) {
-    border-left: 1px solid rgba(255, 255, 255, 0.1);
+    border-left: 1px solid var(--diff-seam);
 }
 
 .review-diff .diff-gutter {
     cursor: default;
-    color: var(--color-neutral-600);
+    color: var(--diff-lineno);
     padding-right: 0.75rem;
     font-variant-numeric: tabular-nums;
 }

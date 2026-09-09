@@ -24,6 +24,62 @@
     /* Hairline card borders and inset top-edge highlights. */
     --color-edge: #212122;
 
+    /* Translucent hover/lift/hairline washes over a surface — flips warmth per scope. */
+    --color-overlay: #ffffff;
+
+    /* Dividers inside a card, one step quieter than `border`. */
+    --color-border-subtle: #ededed;
+
+    /*
+     * Semantic status colours. Each is a text tone plus a fill and edge tuned
+     * to sit on the scope's own ground, so a warning pill never has to pick
+     * raw palette shades that only work on one background.
+     */
+    --color-success: #4ade80;
+    --color-success-surface: rgba(74, 222, 128, 0.12);
+    --color-success-edge: rgba(74, 222, 128, 0.28);
+    --color-warning: #f5c451;
+    --color-warning-surface: rgba(245, 196, 81, 0.12);
+    --color-warning-edge: rgba(245, 196, 81, 0.28);
+    --color-danger: #f0736f;
+    --color-danger-surface: rgba(240, 115, 111, 0.12);
+    --color-danger-edge: rgba(240, 115, 111, 0.28);
+    --color-info: #60a5fa;
+    --color-info-surface: rgba(96, 165, 250, 0.12);
+    --color-info-edge: rgba(96, 165, 250, 0.28);
+
+    /*
+     * Elevation. Dark builds lift from fill lightness, light builds it from a
+     * real border plus a shadow, so the whole recipe — not just the colour —
+     * has to be a token. Consumed through the `.surface-*` classes in
+     * globals.css; the raw vars exist so one-offs can compose them.
+     */
+    --shadow-card: none;
+    --shadow-menu: 0 8px 24px rgba(0, 0, 0, 0.45);
+    --shadow-dialog: 0 24px 60px rgba(0, 0, 0, 0.55);
+    --shadow-toast: 0 10px 30px -12px rgba(0, 0, 0, 0.55);
+    --shadow-drag: 0 12px 28px rgba(0, 0, 0, 0.55);
+
+    /*
+     * Defaults so a `.surface-*` class rendered outside any scope — the admin
+     * app, or before the scope class lands on <body> — still paints something
+     * rather than resolving to an invalid declaration.
+     */
+    --surface-card: var(--color-snow);
+    --surface-card-border: var(--color-border);
+    --surface-card-hover: var(--color-mist);
+    --surface-raised: var(--color-snow);
+    --surface-raised-border: var(--color-border);
+    --surface-sunken: var(--color-mist);
+    --surface-sunken-border: var(--color-border);
+    --surface-inset: var(--color-mist);
+    --surface-inset-border: var(--color-border);
+    --surface-menu: var(--color-snow);
+    --surface-menu-border: var(--color-border);
+    --surface-chrome: var(--color-snow);
+    --surface-chrome-border: var(--color-border);
+    --surface-scrim: rgba(0, 0, 0, 0.5);
+
     /* Semantic roles (consumed by shadcn/ui components). */
     --color-background: #fff8ed;
     --color-foreground: #171717;
@@ -83,6 +139,7 @@
 
     --color-snow: #ffffff;
     --color-mist: #f4f4f5;
+    --color-overlay: #18181b;
 
     --color-primary: #7c5ce6;
     --color-primary-foreground: var(--color-snow);
@@ -108,8 +165,55 @@
     --color-accent-foreground: var(--color-foreground);
     --color-destructive: #c1121f;
     --color-border: #e7e7ea;
+    --color-border-subtle: #f0f0f2;
     --color-input: #e7e7ea;
     --color-ring: #7c5ce6;
+
+    /*
+     * The landing site has no dark counterpart, but it renders the same shared
+     * primitives as the playground, so it needs the same vocabulary defined or
+     * those components resolve to nothing here.
+     */
+    --color-success: #17803d;
+    --color-success-surface: rgba(23, 128, 61, 0.09);
+    --color-success-edge: rgba(23, 128, 61, 0.22);
+    --color-warning: #a15c07;
+    --color-warning-surface: rgba(161, 92, 7, 0.1);
+    --color-warning-edge: rgba(161, 92, 7, 0.22);
+    --color-danger: #c1121f;
+    --color-danger-surface: rgba(193, 18, 31, 0.08);
+    --color-danger-edge: rgba(193, 18, 31, 0.22);
+    --color-info: #1f6feb;
+    --color-info-surface: rgba(31, 111, 235, 0.09);
+    --color-info-edge: rgba(31, 111, 235, 0.22);
+
+    --surface-card: #ffffff;
+    --surface-card-border: #e7e7ea;
+    --surface-card-hover: #fbfbfc;
+    --surface-raised: #ffffff;
+    --surface-raised-border: #e7e7ea;
+    --surface-sunken: #f7f7f8;
+    --surface-sunken-border: #ededf0;
+    --surface-inset: #f4f4f5;
+    --surface-inset-border: #e7e7ea;
+    --surface-menu: #ffffff;
+    --surface-menu-border: #e7e7ea;
+    --surface-chrome: #fcfcfc;
+    --surface-chrome-border: #e7e7ea;
+    --surface-scrim: rgba(20, 20, 26, 0.28);
+
+    --shadow-card: 0 1px 2px rgba(16, 24, 40, 0.05);
+    --shadow-menu:
+        0 4px 12px rgba(16, 24, 40, 0.08), 0 1px 3px rgba(16, 24, 40, 0.04);
+    --shadow-dialog:
+        0 16px 48px rgba(16, 24, 40, 0.12), 0 2px 8px rgba(16, 24, 40, 0.06);
+    --shadow-toast: 0 8px 24px rgba(16, 24, 40, 0.1);
+    --shadow-drag: 0 8px 20px rgba(16, 24, 40, 0.14);
+
+    --gradient-border-rgb: 38 38 38;
+    --color-mention-member: #4338ca;
+    --color-mention-team: #14603f;
+    color-scheme: light;
 }
 
 .theme-playground {
@@ -122,6 +226,7 @@
 
     --color-snow: #ffffff;
     --color-mist: #f4f4f4;
+    --color-overlay: #ffffff;
 
     /*
      * Follows the background-lighting colour the user picked. The fallback is
@@ -161,10 +266,188 @@
      * above — scope-override just the shades in use so text genuinely follows
      * the Codex tone everywhere it's rendered.
      */
+    --color-neutral-50: #fafafa;
     --color-neutral-100: #e4e4e4;
     --color-neutral-200: #cfcfcf;
     --color-neutral-300: #b5b5b5;
     --color-neutral-400: #999999;
     --color-neutral-500: #828282;
     --color-neutral-600: #626262;
+
+    --color-border-subtle: #1c1c1c;
+
+    /*
+     * Every surface recipe below is today's exact expression spelled out as a
+     * token, so the dark board renders byte-identically after the migration.
+     * Only the light scope diverges.
+     */
+    --surface-card: color-mix(in srgb, var(--color-overlay) 4%, transparent);
+    --surface-card-border: color-mix(in srgb, var(--color-overlay) 5%, transparent);
+    --surface-card-hover: color-mix(in srgb, var(--color-overlay) 6%, transparent);
+    --surface-raised: color-mix(in srgb, var(--color-overlay) 3%, transparent);
+    --surface-raised-border: color-mix(in srgb, var(--color-overlay) 8%, transparent);
+    --surface-sunken: color-mix(in srgb, var(--color-ink) 20%, transparent);
+    --surface-sunken-border: color-mix(in srgb, var(--color-overlay) 3%, transparent);
+    --surface-inset: color-mix(in srgb, var(--color-overlay) 6%, transparent);
+    --surface-inset-border: color-mix(in srgb, var(--color-overlay) 5%, transparent);
+    --surface-menu: var(--color-graphite);
+    --surface-menu-border: color-mix(in srgb, var(--color-overlay) 5%, transparent);
+    --surface-chrome: color-mix(in srgb, var(--color-charcoal) 60%, transparent);
+    --surface-chrome-border: color-mix(in srgb, var(--color-overlay) 5%, transparent);
+    --surface-scrim: rgba(0, 0, 0, 0.5);
+
+    /* Conic ring used by `.gradient-border`. */
+    --gradient-border-rgb: 38 38 38;
+    /* The ambient glow is designed for this ground; light dials it down. */
+    --glow-alpha-scale: 1;
+    --grain-opacity: 0.01;
+
+    /*
+     * Diff palette. Dark tints one hue at low alpha, which works over near
+     * black; light needs genuinely different fills, so these are explicit
+     * rather than the same hue at another opacity.
+     */
+    --diff-add-line: color-mix(in oklab, var(--color-green-500) 13%, transparent);
+    --diff-remove-line: color-mix(in oklab, var(--color-rose-500) 13%, transparent);
+    --diff-add-word: color-mix(in oklab, var(--color-green-500) 32%, transparent);
+    --diff-remove-word: color-mix(in oklab, var(--color-rose-500) 32%, transparent);
+    --diff-add-gutter: color-mix(in oklab, var(--color-green-500) 20%, transparent);
+    --diff-remove-gutter: color-mix(in oklab, var(--color-rose-500) 20%, transparent);
+    --diff-add-gutter-text: var(--color-emerald-300);
+    --diff-remove-gutter-text: var(--color-rose-300);
+    --diff-add-bar: var(--color-green-500);
+    --diff-remove-bar: var(--color-rose-500);
+    --diff-seam: rgba(255, 255, 255, 0.1);
+    --diff-lineno: var(--color-neutral-600);
+    --diff-selection: color-mix(in oklab, var(--color-sky-400) 24%, transparent);
+    --diff-plain: #e6e6e6;
+
+    --color-mention-member: #c7d2fe;
+    --color-mention-team: #a7f3d0;
+
+    color-scheme: dark;
+}
+
+/*
+ * Light pilot for the playground/workspace app, toggled by the user in
+ * Settings → Appearance (see usePlaygroundThemeStore). Applied as a second
+ * class alongside `.theme-playground` so anything unstyled here silently
+ * falls back to the dark values above — the dark palette itself never
+ * changes. Modeled on Linear's light theme: crisp white/gray surfaces, high
+ * contrast near-black text — not a warm/tinted scale.
+ */
+.theme-playground.light {
+    --color-ink: #ffffff;
+    --color-charcoal: #fafafb;
+    --color-cement: #ffffff;
+    --color-graphite: #ffffff;
+    --color-active: #ebebef;
+    --color-hover: #f4f4f6;
+
+    --color-snow: #ffffff;
+    --color-mist: #f2f2f5;
+    --color-overlay: #23242b;
+
+    --color-primary: #7c5ce6;
+    --color-primary-foreground: var(--color-snow);
+    --color-matcha: #4f7a15;
+    --color-matcha-foreground: var(--color-snow);
+    --color-brick: #fdecea;
+    --color-brick-foreground: #a02622;
+
+    --color-edge: #e5e5ea;
+
+    --color-background: #ffffff;
+    --color-foreground: #23242b;
+    --color-surface: #f6f6f8;
+    --color-card: var(--color-cement);
+    --color-card-foreground: var(--color-foreground);
+    --color-popover: #ffffff;
+    --color-popover-foreground: var(--color-foreground);
+    --color-secondary: var(--color-mist);
+    --color-secondary-foreground: var(--color-foreground);
+    --color-muted: var(--color-mist);
+    --color-muted-foreground: #797b86;
+    --color-accent: var(--color-mist);
+    --color-accent-foreground: var(--color-foreground);
+    --color-destructive: #cf3b3b;
+    --color-border: #e5e5ea;
+    --color-border-subtle: #efeff2;
+    --color-input: #e5e5ea;
+    --color-ring: #7c5ce6;
+
+    --color-success: #17803d;
+    --color-success-surface: rgba(23, 128, 61, 0.09);
+    --color-success-edge: rgba(23, 128, 61, 0.22);
+    --color-warning: #a15c07;
+    --color-warning-surface: rgba(161, 92, 7, 0.1);
+    --color-warning-edge: rgba(161, 92, 7, 0.22);
+    --color-danger: #cf3b3b;
+    --color-danger-surface: rgba(207, 59, 59, 0.08);
+    --color-danger-edge: rgba(207, 59, 59, 0.22);
+    --color-info: #1f6feb;
+    --color-info-surface: rgba(31, 111, 235, 0.09);
+    --color-info-edge: rgba(31, 111, 235, 0.22);
+
+    /*
+     * The text ramp keeps Linear's faint cool cast. Every step down to 500 is
+     * at or above 4.5:1 on white, so metadata stays legible rather than
+     * merely tasteful; 600 is decorative only.
+     */
+    --color-neutral-50: #17181d;
+    --color-neutral-100: #23242b;
+    --color-neutral-200: #3a3c46;
+    --color-neutral-300: #4e505b;
+    --color-neutral-400: #63656f;
+    --color-neutral-500: #797b86;
+    --color-neutral-600: #9a9ca6;
+
+    /* Lift comes from a real border and a real shadow, never from fill alpha. */
+    --surface-card: #ffffff;
+    --surface-card-border: #e5e5ea;
+    --surface-card-hover: #fbfbfc;
+    --surface-raised: #ffffff;
+    --surface-raised-border: #e5e5ea;
+    --surface-sunken: #f8f8fa;
+    --surface-sunken-border: #ececf0;
+    --surface-inset: #f2f2f5;
+    --surface-inset-border: #e5e5ea;
+    --surface-menu: #ffffff;
+    --surface-menu-border: #e5e5ea;
+    --surface-chrome: #fafafb;
+    --surface-chrome-border: #e5e5ea;
+    --surface-scrim: rgba(20, 20, 26, 0.28);
+
+    --shadow-card: 0 1px 2px rgba(16, 24, 40, 0.05);
+    --shadow-menu:
+        0 4px 12px rgba(16, 24, 40, 0.08), 0 1px 3px rgba(16, 24, 40, 0.04);
+    --shadow-dialog:
+        0 16px 48px rgba(16, 24, 40, 0.12), 0 2px 8px rgba(16, 24, 40, 0.06);
+    --shadow-toast: 0 8px 24px rgba(16, 24, 40, 0.1);
+    --shadow-drag: 0 8px 20px rgba(16, 24, 40, 0.14);
+
+    --gradient-border-rgb: 229 229 234;
+    --glow-alpha-scale: 0.28;
+    --grain-opacity: 0;
+
+    /* GitHub's light diff values — the reference every developer already reads. */
+    --diff-add-line: #e6ffec;
+    --diff-remove-line: #ffebe9;
+    --diff-add-word: #abf2bc;
+    --diff-remove-word: #ffc9c9;
+    --diff-add-gutter: #ccffd8;
+    --diff-remove-gutter: #ffd7d5;
+    --diff-add-gutter-text: #1a7f37;
+    --diff-remove-gutter-text: #cf222e;
+    --diff-add-bar: #2da44e;
+    --diff-remove-bar: #cf222e;
+    --diff-seam: #e5e5ea;
+    --diff-lineno: #797b86;
+    --diff-selection: rgba(124, 92, 230, 0.18);
+    --diff-plain: #24292f;
+
+    --color-mention-member: #4338ca;
+    --color-mention-team: #14603f;
+
+    color-scheme: light;
 }
