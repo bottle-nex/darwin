@@ -310,7 +310,7 @@
 
     .tiptap .image-node {
         display: inline-block;
-        width: calc(25% - 8px);
+        width: calc(50% - 8px);
         margin: 4px;
         vertical-align: top;
     }

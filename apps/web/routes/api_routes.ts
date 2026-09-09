@@ -9,6 +9,8 @@ export const VERIFY_OTP_URL = AUTH_URL + "/otp/verify";
 export const LIST_ORG = API_URL + "/org";
 export const CREATE_ORG = API_URL + "/org/create";
 
+export const SIGNED_UPLOAD_URL = API_URL + "/uploads/signed-url";
+
 export const LAST_VISITED_URL = API_URL + "/user/last-visited";
 export const SIDEBAR_THEME_URL = API_URL + "/user/sidebar-theme";
 export const USER_CONFIG_URL = API_URL + "/user/config";

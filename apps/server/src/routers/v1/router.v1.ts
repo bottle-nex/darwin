@@ -20,6 +20,7 @@ import project_chats_router from "../projectChats/router.project-chats";
 import questions_router from "../questions/router.questions";
 import search_router from "../search/router.search";
 import teams_router from "../teams/router.teams";
+import uploads_router from "../uploads/router.uploads";
 import user_router from "../user/router.user";
 import worker_router from "../worker/router.worker";
 
@@ -51,5 +52,6 @@ v1_router.use("/worker", worker_router);
 v1_router.use("/admin", admin_router);
 v1_router.use("/content", content_router);
 v1_router.use("/darwin", darwin_router);
+v1_router.use("/uploads", uploads_router);
 
 export default v1_router;

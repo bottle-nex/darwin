@@ -32,10 +32,10 @@ export default class SignedUploadController {
         }
 
         try {
-            const signed = await StorageService.signed_upload_url(contentType, "posts");
+            const signed = await StorageService.signed_upload_url(contentType, "uploads");
             return ResponseWriter.success(res, signed, "Upload URL created");
         } catch (err) {
-            console.error("[admin:signed-upload]", err);
+            console.error("[uploads:signed-upload]", err);
             return ResponseWriter.system_error(res);
         }
     }

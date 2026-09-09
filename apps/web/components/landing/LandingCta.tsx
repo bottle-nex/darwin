@@ -4,7 +4,7 @@ import { landingContainer } from "./LandingSection";
 
 export default function LandingCta() {
     return (
-        <section className="w-full bg-ink pb-20">
+        <section className="w-full bg-ink py-20">
             <div className={landingContainer}>
                 <div className="flex flex-col gap-y-8 rounded-md border border-edge bg-snow px-10 py-10 shadow-[0_18px_40px_-24px_rgba(24,24,27,0.1)] md:flex-row md:items-end md:justify-between md:gap-x-10">
                     <div>

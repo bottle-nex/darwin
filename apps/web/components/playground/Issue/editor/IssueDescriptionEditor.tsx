@@ -6,6 +6,7 @@ import { useMemo } from "react";
 
 import { createReferenceMention } from "@/components/playground/Home/chat/referenceMention";
 import { useActiveProject } from "@/hooks/useActiveProject";
+import { uploadImage } from "@/lib/uploads";
 
 export type { RichTextEditorState as IssueDescriptionState } from "@trydarwin/editor";
 
@@ -16,6 +17,7 @@ interface IssueDescriptionEditorProps extends Omit<RichTextEditorProps, "extraEx
 
 export default function IssueDescriptionEditor({
     mentionProjectId,
+    onImageUpload = uploadImage,
     ...props
 }: IssueDescriptionEditorProps) {
     const queryClient = useQueryClient();
@@ -35,5 +37,11 @@ export default function IssueDescriptionEditor({
         [mentionProjectId, projectName, queryClient],
     );
 
-    return <RichTextEditor {...props} extraExtensions={extraExtensions} />;
+    return (
+        <RichTextEditor
+            {...props}
+            onImageUpload={onImageUpload}
+            extraExtensions={extraExtensions}
+        />
+    );
 }

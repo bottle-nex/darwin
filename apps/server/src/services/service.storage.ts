@@ -84,13 +84,13 @@ export default class StorageService {
         return this.minioClient;
     }
 
-    static async signed_upload_url(contentType: string) {
+    static async signed_upload_url(contentType: string, prefix: string) {
         const extension = EXTENSIONS[contentType];
         if (!extension) {
             throw new Error(`unsupported content type: ${contentType}`);
         }
 
-        const key = `posts/${randomUUID()}.${extension}`;
+        const key = `${prefix}/${randomUUID()}.${extension}`;
         const [uploadUrl] = await this.storage()
             .bucket(ENV.SERVER_GCS_BUCKET!)
             .file(key)
