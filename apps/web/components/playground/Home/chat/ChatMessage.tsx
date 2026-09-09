@@ -72,7 +72,7 @@ function QuotedMessage({
             type="button"
             onClick={() => readable && onQuoteClick(quote.id)}
             className={cn(
-                "mb-1.5 flex w-full max-w-full items-stretch gap-x-2 overflow-hidden rounded-[4px] py-1.5 pr-2 text-left transition-colors",
+                "mb-1.5 flex w-full max-w-full items-stretch gap-x-2 overflow-hidden rounded-[4px] pr-2 text-left transition-colors",
                 isMine
                     ? "bg-primary-foreground/15 hover:bg-primary-foreground/25"
                     : "surface-sunken hover:bg-overlay/6",
@@ -91,7 +91,7 @@ function QuotedMessage({
                 aria-hidden
             />
             {readable ? (
-                <span className="flex min-w-0 flex-1 flex-col">
+                <span className="flex min-w-0 flex-1 flex-col py-1.5">
                     <cite
                         className={cn(
                             "truncate text-[11px] leading-4 font-medium not-italic",
@@ -117,7 +117,7 @@ function QuotedMessage({
             ) : (
                 <span
                     className={cn(
-                        "min-w-0 flex-1 truncate text-[12px] leading-4",
+                        "min-w-0 flex-1 truncate py-1.5 text-[12px] leading-4",
                         isMine ? "text-primary-foreground/60" : "text-neutral-500",
                     )}
                 >
