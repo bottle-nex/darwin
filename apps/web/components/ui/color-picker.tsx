@@ -61,7 +61,7 @@ export function ColorPicker({ value, onChange, className }: ColorPickerProps) {
                 className="!w-full [&_.react-colorful__hue]:mt-2 [&_.react-colorful__hue]:h-3 [&_.react-colorful__hue]:rounded-full [&_.react-colorful__saturation]:rounded-md"
             />
             <div className="relative">
-                <span className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-sm text-[#737373]">
+                <span className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-sm text-muted-foreground">
                     #
                 </span>
                 <Input

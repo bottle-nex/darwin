@@ -52,8 +52,8 @@ export function TooltipComponent({
             >
                 {foot ? (
                     <>
-                        <div className="px-2.5 py-2 text-snow/90">{content}</div>
-                        <div className="flex items-center justify-between gap-4 border-t border-white/6 px-2.5 py-1.5 text-[11px] text-snow/50">
+                        <div className="px-2.5 py-2 text-overlay/90">{content}</div>
+                        <div className="flex items-center justify-between gap-4 border-t border-overlay/6 px-2.5 py-1.5 text-[11px] text-overlay/50">
                             {foot}
                             {chips}
                         </div>

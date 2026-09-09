@@ -8,8 +8,9 @@ import { type ChevronProps, DayPicker, type Matcher } from "react-day-picker";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-const RANGE_TRACK = "bg-snow/5";
-const RANGE_EDGE = "[&>button]:bg-snow/90 [&>button]:text-neutral-900 [&>button]:hover:bg-snow/90";
+const RANGE_TRACK = "bg-overlay/5";
+const RANGE_EDGE =
+    "[&>button]:bg-primary [&>button]:text-primary-foreground [&>button]:hover:bg-primary";
 
 export interface CalendarRange {
     from?: Date;
@@ -70,13 +71,13 @@ function Calendar({
                 day: "size-8 p-0 text-center text-sm relative first:rounded-l-full last:rounded-r-full",
                 day_button: cn(
                     "size-8 rounded-full p-0 font-normal text-neutral-200 transition-colors cursor-pointer",
-                    "hover:bg-snow/10 aria-selected:opacity-100",
+                    "hover:bg-overlay/10 aria-selected:opacity-100",
                 ),
                 range_middle: RANGE_TRACK,
                 range_start: cn(RANGE_TRACK, "rounded-l-full", RANGE_EDGE),
                 range_end: cn(RANGE_TRACK, "rounded-r-full", RANGE_EDGE),
                 selected: RANGE_EDGE,
-                today: "[&>button]:ring [&>button]:ring-snow/20",
+                today: "[&>button]:ring [&>button]:ring-overlay/20",
                 outside: "text-neutral-600",
                 disabled: "text-neutral-700 opacity-50",
                 hidden: "invisible",

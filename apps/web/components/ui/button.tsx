@@ -6,26 +6,27 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-    "group/button inline-flex shrink-0 items-center justify-center rounded-sm border-transparent bg-clip-padding text-[12px] font-500 whitespace-nowrap transition-all outline-none select-none focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-70 aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+    "group/button inline-flex shrink-0 items-center justify-center rounded-sm border-transparent bg-clip-padding text-[12px] font-500 whitespace-nowrap transition-all outline-none select-none focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-70 aria-invalid:ring-3 aria-invalid:ring-destructive/20 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
     {
         variants: {
             variant: {
                 default:
-                    "bg-primary text-[#3B315C] shadow-[0_1px_2px_0_rgba(15,23,42,0.12),0_1px_3px_0_rgba(15,23,42,0.10)] hover:from-[#C4BAFF] hover:to-[#B0A2FF] focus-visible:border-ring",
+                    "bg-primary text-ink shadow-[0_1px_2px_0_rgba(15,23,42,0.12),0_1px_3px_0_rgba(15,23,42,0.10)] focus-visible:border-ring",
                 secondary:
-                    "bg-linear-to-b from-[#404040] to-neutral-900 text-white shadow-[0_1px_2px_0_rgba(15,23,42,0.12),0_1px_3px_0_rgba(15,23,42,0.14)] hover:from-neutral-600 hover:to-neutral-800 focus-visible:border-ring dark:from-neutral-200 dark:to-neutral-200 dark:text-neutral-950 dark:shadow-[0_1px_2px_0_rgba(0,0,0,0.25)] dark:hover:from-neutral-200 dark:hover:to-neutral-300",
+                    "bg-linear-to-b from-[#404040] to-neutral-900 text-white shadow-[0_1px_2px_0_rgba(15,23,42,0.12),0_1px_3px_0_rgba(15,23,42,0.14)] hover:from-neutral-600 hover:to-neutral-800 focus-visible:border-ring",
                 tertiary:
-                    "bg-linear-to-b from-[#E3E3E3] to-neutral-200 text-ink shadow-[0_1px_2px_0_rgba(15,23,42,0.05)] hover:bg-neutral-50 focus-visible:border-ring [&_svg]:text-neutral-400 hover:[&_svg]:text-neutral-600 dark:from-neutral-700 dark:to-neutral-800 dark:text-neutral-100 dark:border-neutral-600 dark:shadow-[0_1px_2px_0_rgba(0,0,0,0.2)] dark:hover:from-neutral-600 dark:hover:to-neutral-700 dark:[&_svg]:text-neutral-400 px-2! rounded-full",
+                    "bg-linear-to-b from-overlay/89 to-overlay/81 text-ink shadow-[var(--shadow-card)] focus-visible:border-ring [&_svg]:text-ink/40 hover:[&_svg]:text-ink/60 px-2! rounded-full",
                 outline:
-                    "bg-linear-to-b from-white to-neutral-50 text-foreground border border-neutral-200 shadow-[0_1px_2px_0_rgba(15,23,42,0.04)] hover:bg-neutral-50 focus-visible:border-ring aria-expanded:bg-neutral-50 dark:from-neutral-800 dark:to-neutral-800 dark:border-neutral-600 dark:hover:from-neutral-700 dark:hover:to-neutral-700 dark:aria-expanded:from-neutral-700",
+                    "bg-transparent text-foreground border border-border shadow-[var(--shadow-card)] hover:bg-overlay/6 focus-visible:border-ring aria-expanded:bg-overlay/6",
                 destructive:
-                    "bg-linear-to-b from-[#E34948] to-[#E34948] text-white shadow-[0_1px_2px_0_rgba(185,28,28,0.15)] hover:brightness-110 focus-visible:ring-destructive/40 dark:from-[#e04646] dark:to-[#cf3636]",
-                ghost: "text-foreground bg-graphite rounded-sm!",
+                    "bg-linear-to-b from-[#E34948] to-[#E34948] text-white shadow-[0_1px_2px_0_rgba(185,28,28,0.15)] hover:brightness-110 focus-visible:ring-destructive/40",
+                ghost: "text-foreground hover:bg-overlay/8 rounded-sm!",
                 link: "text-primary underline-offset-4 hover:underline",
                 unstyled: "cursor-pointer",
-                flat: "bg-snow/8 text-snow hover:bg-snow/12 rounded-[8px]!",
+                flat: "bg-overlay/8 text-overlay hover:bg-overlay/12 rounded-[8px]!",
                 "flat-primary": "bg-primary text-ink hover:bg-primary/85 rounded-[8px]!",
-                "flat-destructive": "bg-red-600/12 text-red-500 hover:bg-red-500/20 rounded-[8px]!",
+                "flat-destructive":
+                    "bg-danger-surface text-danger hover:bg-danger/20 rounded-[8px]!",
             },
             size: {
                 default:

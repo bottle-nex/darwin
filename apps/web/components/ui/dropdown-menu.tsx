@@ -157,7 +157,7 @@ function DropdownMenuSubTrigger({
     return (
         <DropdownMenuPrimitive.SubTrigger
             data-slot="dropdown-menu-sub-trigger"
-            className={cn(MENU_ITEM, "data-[state=open]:bg-white/5", className)}
+            className={cn(MENU_ITEM, "data-[state=open]:bg-overlay/5", className)}
             {...props}
         />
     );

@@ -6,11 +6,11 @@ export type PillTone = "neutral" | "muted" | "brand" | "positive" | "faint";
 type PillSize = "sm" | "md";
 
 const TONE: Record<PillTone, string> = {
-    neutral: "text-neutral-200 ring-white/10",
-    muted: "text-snow/50 ring-white/10",
+    neutral: "text-neutral-200 ring-overlay/10",
+    muted: "text-overlay/50 ring-overlay/10",
     brand: "text-primary ring-primary/30",
-    positive: "text-green-500 ring-green-500/30",
-    faint: "text-snow/45 ring-white/12",
+    positive: "text-success ring-success-edge",
+    faint: "text-overlay/45 ring-overlay/12",
 };
 
 const SIZE: Record<PillSize, string> = {

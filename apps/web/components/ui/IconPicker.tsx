@@ -21,7 +21,7 @@ export function iconPickSurface(pick: IconPick | null | undefined) {
     const tinted = pick?.kind === "icon";
     return {
         style: tinted ? { backgroundColor: `${pick.color}33` } : undefined,
-        className: tinted ? "hover:brightness-125" : "bg-snow/6 hover:bg-snow/10",
+        className: tinted ? "hover:brightness-125" : "bg-overlay/6 hover:bg-overlay/10",
     };
 }
 
@@ -88,7 +88,7 @@ function Cell({
                 type="button"
                 aria-label={title}
                 onClick={onClick}
-                className="flex size-7 cursor-pointer items-center justify-center rounded transition-colors hover:bg-white/10"
+                className="flex size-7 cursor-pointer items-center justify-center rounded transition-colors hover:bg-overlay/10"
             >
                 {children}
             </button>
@@ -143,7 +143,7 @@ function IconsTab({
                     </button>
                 ))}
 
-                <div className="mx-0.5 h-5 w-px bg-white/10" />
+                <div className="mx-0.5 h-5 w-px bg-overlay/10" />
 
                 <Popover>
                     <PopoverTrigger asChild>
@@ -396,7 +396,7 @@ export function IconPickButton({
                 {pick ? (
                     <IconPickGlyph pick={pick} className={glyph} />
                 ) : (
-                    <FallbackIcon className={cn(glyph, "text-white/60")} aria-hidden />
+                    <FallbackIcon className={cn(glyph, "text-overlay/60")} aria-hidden />
                 )}
             </Button>
         </IconPicker>

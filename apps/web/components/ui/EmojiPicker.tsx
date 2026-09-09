@@ -23,7 +23,7 @@ function EmojiButton({
                 type="button"
                 aria-label={label}
                 onClick={onSelect}
-                className="flex size-7 cursor-pointer items-center justify-center rounded text-[19px] leading-none transition-colors hover:bg-white/10 focus-visible:bg-white/10 focus-visible:outline-none"
+                className="flex size-7 cursor-pointer items-center justify-center rounded text-[19px] leading-none transition-colors hover:bg-overlay/10 focus-visible:bg-overlay/10 focus-visible:outline-none"
             >
                 {emoji}
             </button>

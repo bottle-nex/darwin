@@ -44,30 +44,30 @@ const SURFACE: Record<
     solid: {
         shape: "rounded-sm",
         glyph: { small: "size-3.25", big: "size-3.75" },
-        rest: "bg-graphite/70 ring-[0.5px] ring-white/8",
-        hover: "hover:bg-white/8",
-        active: "bg-white/8 ring-[0.5px] ring-white/12",
+        rest: "bg-active/70 ring-[0.5px] ring-overlay/8",
+        hover: "hover:bg-overlay/8",
+        active: "bg-overlay/8 ring-[0.5px] ring-overlay/12",
     },
     ghost: {
         shape: "rounded-full",
         glyph: { small: "size-3.75", big: "size-4.25" },
         rest: "bg-transparent",
-        hover: "hover:bg-white/8",
-        active: "bg-white/8",
+        hover: "hover:bg-overlay/8",
+        active: "bg-overlay/8",
     },
     outline: {
-        shape: "rounded-full ring-[0.5px] ring-white/10",
+        shape: "rounded-full ring-[0.5px] ring-overlay/10",
         glyph: { small: "size-3.5", big: "size-4" },
         rest: "bg-transparent",
-        hover: "hover:border-white/20 hover:bg-white/5",
-        active: "border-white/20 bg-white/8",
+        hover: "hover:border-overlay/20 hover:bg-overlay/5",
+        active: "border-overlay/20 bg-overlay/8",
     },
     ring: {
-        shape: "rounded-full ring-[0.5px] ring-snow/10",
+        shape: "rounded-full ring-[0.5px] ring-overlay/10",
         glyph: { small: "size-3.75", big: "size-4.25" },
         rest: "bg-transparent",
-        hover: "hover:bg-white/8",
-        active: "bg-white/8 ring-snow/20",
+        hover: "hover:bg-overlay/8",
+        active: "bg-overlay/8 ring-overlay/20",
     },
 };
 
@@ -79,16 +79,16 @@ const SIZE: Record<IconWrapperSize, { box: string; label: string; dot: string }>
 /** Spelled out per group name because Tailwind only generates classes it can read literally. */
 const GROUP_HOVER: Record<HoverGroup, Record<IconWrapperVariant, string>> = {
     ancestor: {
-        solid: "group-hover:bg-white/8 group-hover:text-neutral-200",
-        ghost: "group-hover:bg-white/8 group-hover:text-neutral-200",
+        solid: "group-hover:bg-overlay/8 group-hover:text-neutral-200",
+        ghost: "group-hover:bg-overlay/8 group-hover:text-neutral-200",
         outline: "group-hover:text-neutral-200",
-        ring: "group-hover:bg-white/8 group-hover:text-neutral-200",
+        ring: "group-hover:bg-overlay/8 group-hover:text-neutral-200",
     },
     card: {
-        solid: "group-hover/card:bg-white/8 group-hover/card:text-neutral-200",
-        ghost: "group-hover/card:bg-white/8 group-hover/card:text-neutral-200",
+        solid: "group-hover/card:bg-overlay/8 group-hover/card:text-neutral-200",
+        ghost: "group-hover/card:bg-overlay/8 group-hover/card:text-neutral-200",
         outline: "group-hover/card:text-neutral-200",
-        ring: "group-hover/card:bg-white/8 group-hover/card:text-neutral-200",
+        ring: "group-hover/card:bg-overlay/8 group-hover/card:text-neutral-200",
     },
 };
 

@@ -45,7 +45,7 @@ export default function ExpandableSearchBar({
                     onClose();
                 }}
                 placeholder={placeholder}
-                className="h-8 rounded-md bg-cement pr-9 pl-8 text-[12.5px] hover:bg-cement"
+                className="h-8 rounded-md pr-9 pl-8 text-[12.5px]"
             />
             <Button
                 variant="unstyled"

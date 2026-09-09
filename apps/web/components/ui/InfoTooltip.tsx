@@ -38,13 +38,13 @@ export default function InfoTooltip({
                 align={align}
                 sideOffset={sideOffset}
                 className={cn(
-                    "min-w-0 max-w-64 rounded-xl border border-white/8 shadow-[0_4px_16px_rgba(0,0,0,0.35)]",
+                    "min-w-0 max-w-64 rounded-xl",
                     typeof content === "string" ? "px-4 py-3" : "px-3 py-2",
                     className,
                 )}
             >
                 {typeof content === "string" ? (
-                    <p className="text-[13px] leading-relaxed text-snow/90">{content}</p>
+                    <p className="text-[13px] leading-relaxed text-overlay/90">{content}</p>
                 ) : (
                     content
                 )}

@@ -31,7 +31,7 @@ const COMPACT_CALENDAR = {
     // The cell sets the grid rhythm; the button is the smaller circle inside it.
     day: "relative h-10 flex-1 p-0 text-center text-[12.5px] first:rounded-l-full last:rounded-r-full",
     day_button:
-        "mx-auto flex size-8 cursor-pointer items-center justify-center rounded-full font-normal text-neutral-200 transition-colors hover:bg-snow/10",
+        "mx-auto flex size-8 cursor-pointer items-center justify-center rounded-full font-normal text-neutral-200 transition-colors hover:bg-overlay/10",
 };
 
 export type DatePopoverProps = {
@@ -89,7 +89,7 @@ function DatePickerPanel({
                         value={display}
                         onChange={(event) => handleTyping(event.target.value)}
                         onBlur={() => setDraft(null)}
-                        className="h-9! ring ring-snow/10"
+                        className="h-9!"
                         placeholder={INPUT_FORMAT.toUpperCase()}
                         aria-label={title ?? "Date"}
                     />
@@ -127,7 +127,7 @@ function DatePickerPanel({
                 </div>
             </div>
 
-            <div className="border-t border-white/6 px-2.5 py-2">
+            <div className="border-t border-overlay/6 px-2.5 py-2">
                 <Calendar
                     mode="single"
                     weekStartsOn={1}

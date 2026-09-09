@@ -42,7 +42,7 @@ export default function PreviewImage({
                 priority={priority}
                 sizes={sizes}
                 style={{ top: inset, left: inset }}
-                className="absolute w-full max-w-none rounded-tl-xl shadow-xl shadow-black ring-1 ring-ink/10 select-none"
+                className="absolute w-full max-w-none rounded-tl-xl shadow-xl shadow-[var(--shadow-dialog)] ring-1 ring-edge select-none"
             />
         </div>
     );

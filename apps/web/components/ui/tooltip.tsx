@@ -44,7 +44,7 @@ function TooltipContent({
                     if (node) setIsMultiLine(node.scrollHeight > SINGLE_LINE_MAX_HEIGHT_PX);
                 }}
                 className={cn(
-                    "z-50 w-fit max-w-56 origin-(--radix-tooltip-content-transform-origin) animate-in border border-white/6 bg-cement text-balance text-snow/90 shadow-[0_2px_8px_rgba(0,0,0,0.25)] fade-in-0 zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95",
+                    "surface-menu z-50 w-fit max-w-56 origin-(--radix-tooltip-content-transform-origin) animate-in text-balance text-overlay/90 fade-in-0 zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95",
                     isMultiLine
                         ? "rounded-lg px-2.5 py-2 text-xs leading-relaxed"
                         : "rounded-[4px] px-1.5 py-0.5 text-xs leading-tight",

@@ -25,7 +25,7 @@ export default function HelpHint({
                 tabIndex={0}
                 aria-label={label}
                 className={cn(
-                    "flex shrink-0 cursor-help items-center justify-center rounded-md text-snow/25 outline-none transition-colors hover:text-snow/60 focus-visible:text-snow/60",
+                    "flex shrink-0 cursor-help items-center justify-center rounded-md text-overlay/25 outline-none transition-colors hover:text-overlay/60 focus-visible:text-overlay/60",
                     className,
                 )}
             >

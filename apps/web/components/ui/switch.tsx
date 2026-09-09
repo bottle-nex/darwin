@@ -62,7 +62,7 @@ function Switch({
             onPointerUp={handlePointerUp}
             onPointerLeave={handlePointerUp}
             className={cn(
-                "relative inline-flex shrink-0 cursor-pointer items-center rounded-full bg-white/15 outline-none transition-colors data-[state=checked]:bg-primary focus-visible:ring-2 focus-visible:ring-primary/40 disabled:cursor-not-allowed disabled:opacity-50",
+                "relative inline-flex shrink-0 cursor-pointer items-center rounded-full bg-overlay/15 outline-none transition-colors data-[state=checked]:bg-primary focus-visible:ring-2 focus-visible:ring-primary/40 disabled:cursor-not-allowed disabled:opacity-50",
                 className,
             )}
             style={{ width: TRACK_WIDTH, height: TRACK_HEIGHT }}
