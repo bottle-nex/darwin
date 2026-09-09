@@ -80,7 +80,7 @@ export default function TagsCapsule({
                 <CapsuleTrigger disabled={disabled} className={className}>
                     {selectedTags.length === 0 ? (
                         <>
-                            <TagIcon className="size-3.5 text-white/60" />
+                            <TagIcon className="size-3.5 text-overlay/60" />
                             {placeholder}
                         </>
                     ) : (
@@ -89,7 +89,7 @@ export default function TagsCapsule({
                                 {selectedTags.slice(0, 3).map((tag) => (
                                     <span
                                         key={tag.id}
-                                        className="size-2.5 rounded-full ring-2 ring-charcoal"
+                                        className="size-2.5 rounded-full ring-2 ring-card"
                                         style={{ backgroundColor: tag.color }}
                                     />
                                 ))}

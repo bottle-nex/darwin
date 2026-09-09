@@ -8,11 +8,11 @@ const SIZES = {
 } as const;
 
 const ROLE_STYLES: Record<ProjectRole, { label: string; box: string }> = {
-    Admin: { label: "Admin", box: "bg-amber-400/10 text-amber-300" },
-    Maintain: { label: "Maintain", box: "bg-emerald-400/10 text-emerald-300" },
-    Write: { label: "Write", box: "bg-sky-400/10 text-sky-300" },
-    Triage: { label: "Triage", box: "bg-violet-400/10 text-violet-300" },
-    Read: { label: "Read", box: "bg-white/5 text-neutral-300" },
+    Admin: { label: "Admin", box: "bg-amber-500/15 text-amber-600" },
+    Maintain: { label: "Maintain", box: "bg-emerald-500/15 text-emerald-600" },
+    Write: { label: "Write", box: "bg-sky-500/15 text-sky-600" },
+    Triage: { label: "Triage", box: "bg-violet-500/15 text-violet-500" },
+    Read: { label: "Read", box: "bg-overlay/5 text-neutral-300" },
 };
 
 interface ProjectRoleTickerProps {

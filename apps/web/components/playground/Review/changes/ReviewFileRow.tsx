@@ -29,8 +29,8 @@ export default function ReviewFileRow({
             onClick={onSelect}
             aria-current={selected}
             className={cn(
-                "flex w-full cursor-pointer items-center gap-2 rounded-md px-3 py-1.5 text-left transition-colors bg-white/3 ring-[0.5px] ring-snow/5",
-                selected ? "bg-white/8" : "hover:bg-white/4",
+                "surface-card flex w-full cursor-pointer items-center gap-2 rounded-md px-3 py-1.5 text-left transition-colors",
+                selected ? "bg-overlay/8!" : "surface-card-interactive",
             )}
         >
             <DiffFileRowIcon className="size-3.5 shrink-0 text-neutral-500" />
@@ -46,8 +46,8 @@ export default function ReviewFileRow({
                 {directory}
             </span>
             <span className="shrink-0 text-[12.5px] tabular-nums">
-                {file.additions > 0 && <span className="text-green-500">+{file.additions}</span>}
-                {file.deletions > 0 && <span className="text-rose-500"> −{file.deletions}</span>}
+                {file.additions > 0 && <span className="text-success">+{file.additions}</span>}
+                {file.deletions > 0 && <span className="text-danger"> −{file.deletions}</span>}
             </span>
         </Button>
     );

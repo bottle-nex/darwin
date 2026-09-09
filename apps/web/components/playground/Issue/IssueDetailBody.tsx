@@ -36,7 +36,7 @@ export default function IssueDetailBody({
                 <div onContextMenu={(event) => event.stopPropagation()}>
                     <IssueBody form={form} />
                 </div>
-                <div className="h-px w-full bg-snow/7" />
+                <div className="h-px w-full bg-border" />
                 <ActivityFeed issueId={issueId} scrollElement={scrollElement} />
                 <PendingQuestions issueId={issueId} />
             </div>

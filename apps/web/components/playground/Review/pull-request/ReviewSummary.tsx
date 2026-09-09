@@ -59,7 +59,7 @@ export default function ReviewSummary({ review }: { review: ReviewHeader }) {
                 <span
                     className={cn(
                         MONO,
-                        "flex min-w-0 items-center gap-0.5 rounded-full px-2 py-1.5 ring-[0.5px] ring-snow/5",
+                        "flex min-w-0 items-center gap-0.5 rounded-full border border-border px-2 py-1.5",
                     )}
                 >
                     <span className="truncate">{review.baseBranch}</span>
@@ -78,8 +78,8 @@ export default function ReviewSummary({ review }: { review: ReviewHeader }) {
                     <span className="tabular-nums">{review.changedFiles}</span>
                     <span className={QUIET}>{review.changedFiles === 1 ? "file" : "files"}</span>
                     <span className="tabular-nums">
-                        <span className="text-green-500">+{review.additions}</span>{" "}
-                        <span className="text-rose-500">−{review.deletions}</span>
+                        <span className="text-success">+{review.additions}</span>{" "}
+                        <span className="text-danger">−{review.deletions}</span>
                     </span>
                 </Stat>
                 <Stat icon={CommitsIcon}>
@@ -142,5 +142,5 @@ function Stat({ icon: Icon, children }: { icon: IconType; children: ReactNode })
 }
 
 function Dot() {
-    return <span className="text-neutral-700">·</span>;
+    return <span className="text-overlay/30">·</span>;
 }

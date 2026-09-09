@@ -104,7 +104,7 @@ export default function PlaygroundTeamMemberRow({
                     {isMember ? (
                         <TeamRoleTicker role={teamMember.role} />
                     ) : (
-                        <span className="inline-flex max-w-full items-center gap-x-1.25 truncate rounded-[4px] bg-pink-400/10 px-2 py-0.5 text-[11px] font-medium text-pink-300">
+                        <span className="inline-flex max-w-full items-center gap-x-1.25 truncate rounded-[4px] bg-pink-500/15 px-2 py-0.5 text-[11px] font-medium text-pink-600">
                             {pendingMember.status}
                             <InvitationPendingIcon size={14} />
                         </span>
@@ -115,7 +115,7 @@ export default function PlaygroundTeamMemberRow({
                     {isMember && teamMember.projectRole ? (
                         <ProjectRoleTicker role={teamMember.projectRole} />
                     ) : (
-                        <span className="inline-flex items-center rounded-full bg-white/5 px-2 py-0.5 text-[11px] font-medium text-neutral-500">
+                        <span className="inline-flex items-center rounded-full bg-overlay/5 px-2 py-0.5 text-[11px] font-medium text-neutral-500">
                             —
                         </span>
                     )}
@@ -154,7 +154,7 @@ function RevokeInviteMenu({ invitationId, teamId }: { invitationId: string; team
             <DropdownMenuContent align="end" className="w-44">
                 <DropdownMenuItem className={"group"} onClick={() => revoke(invitationId)}>
                     <RevokeInviteIcon
-                        className="size-4 text-neutral-400 group-hover:text-red-300"
+                        className="size-4 text-neutral-400 group-hover:text-danger"
                         aria-hidden
                     />
                     Revoke invite

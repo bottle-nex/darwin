@@ -41,12 +41,12 @@ const REVIEW_VERDICT: Record<
     approved: {
         icon: ReviewVerdictApprovedIcon,
         label: "approved these changes",
-        tone: "text-green-400",
+        tone: "text-success",
     },
     changes_requested: {
         icon: ReviewVerdictRejectedIcon,
         label: "requested changes",
-        tone: "text-rose-400",
+        tone: "text-danger",
     },
     commented: { icon: ReviewVerdictCommentIcon, label: "reviewed", tone: "text-neutral-500" },
 };
@@ -104,7 +104,7 @@ export default function ReviewCommentCard({
                         href={comment.htmlUrl}
                         target="_blank"
                         rel="noreferrer"
-                        className="font-medium text-neutral-200 transition-colors hover:text-neutral-50"
+                        className="font-medium text-neutral-200 transition-colors hover:text-overlay"
                     >
                         <GithubActorName login={comment.author?.login} />
                     </a>
@@ -121,7 +121,7 @@ export default function ReviewCommentCard({
 
                 {comment.path && (
                     <div className="mt-1.5 overflow-hidden rounded-md border border-border">
-                        <p className="flex items-center gap-1.5 bg-white/[0.02] px-2 py-1 font-mono text-[13.5px] text-neutral-500">
+                        <p className="flex items-center gap-1.5 bg-overlay/[0.02] px-2 py-1 font-mono text-[13.5px] text-neutral-500">
                             <ReviewCommentFileIcon className="size-3 shrink-0" />
                             <span className="truncate">
                                 {comment.path}
@@ -145,7 +145,7 @@ export default function ReviewCommentCard({
                             className="min-h-24 text-[15px]"
                         />
                         {update.isError && (
-                            <p className="text-[13px] text-rose-400">
+                            <p className="text-[13px] text-danger">
                                 That comment didn&apos;t save. Try again.
                             </p>
                         )}
@@ -153,7 +153,7 @@ export default function ReviewCommentCard({
                             <Button
                                 size="xs"
                                 variant="ghost"
-                                className="rounded-sm font-medium text-snow"
+                                className="rounded-sm font-medium text-overlay"
                                 disabled={update.isPending}
                                 onClick={cancelEdit}
                             >
@@ -162,7 +162,7 @@ export default function ReviewCommentCard({
                             <Button
                                 size="xs"
                                 variant="default"
-                                className="gap-x-1.5 rounded-sm bg-green-700 font-medium text-snow"
+                                className="gap-x-1.5 rounded-sm bg-green-700 font-medium text-white"
                                 loading={update.isPending}
                                 disabled={!draft.trim()}
                                 onClick={saveEdit}
@@ -184,7 +184,7 @@ export default function ReviewCommentCard({
                             variant="unstyled"
                             type="button"
                             aria-label="Comment options"
-                            className="absolute top-0 right-0 flex size-6 cursor-pointer items-center justify-center rounded-md text-neutral-400 opacity-0 transition-opacity hover:bg-white/10 hover:text-neutral-100 focus-visible:opacity-100 group-hover/comment:opacity-100 data-[state=open]:opacity-100"
+                            className="absolute top-0 right-0 flex size-6 cursor-pointer items-center justify-center rounded-md text-neutral-400 opacity-0 transition-opacity hover:bg-overlay/10 hover:text-neutral-100 focus-visible:opacity-100 group-hover/comment:opacity-100 data-[state=open]:opacity-100"
                         >
                             <OverflowMenuIcon className="size-4" aria-hidden />
                         </Button>

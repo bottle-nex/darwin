@@ -44,7 +44,10 @@ export default function TemplatePicker({ projectId, onPick }: TemplatePickerProp
                 {template.icon ? (
                     <IconPickGlyph pick={template.icon} className="size-3.5 shrink-0" />
                 ) : (
-                    <TemplateFallbackIcon className="size-3.5 shrink-0 text-white/30" aria-hidden />
+                    <TemplateFallbackIcon
+                        className="size-3.5 shrink-0 text-overlay/30"
+                        aria-hidden
+                    />
                 )}
                 <span className="min-w-0 flex-1 truncate">{template.name}</span>
                 {template.id === defaultId && (
@@ -63,9 +66,9 @@ export default function TemplatePicker({ projectId, onPick }: TemplatePickerProp
                 <PopoverTrigger asChild>
                     <CapsuleTrigger
                         aria-label="Start from a template"
-                        className="size-7 shrink-0 justify-center rounded-full p-0 hover:text-white/80"
+                        className="size-7 shrink-0 justify-center rounded-full p-0 hover:text-overlay/80"
                     >
-                        <TemplateTriggerIcon className="size-3.5 text-white/60" />
+                        <TemplateTriggerIcon className="size-3.5 text-overlay/60" />
                     </CapsuleTrigger>
                 </PopoverTrigger>
             </TooltipComponent>

@@ -8,8 +8,8 @@ const SIZES = {
 } as const;
 
 const ROLE_STYLES: Record<TeamRole, { label: string; box: string }> = {
-    Maintainer: { label: "Maintainer", box: "bg-teal-400/10 text-teal-300" },
-    Member: { label: "Member", box: "bg-white/5 text-neutral-300" },
+    Maintainer: { label: "Maintainer", box: "bg-teal-500/15 text-teal-600" },
+    Member: { label: "Member", box: "bg-overlay/5 text-neutral-300" },
 };
 
 interface TeamRoleTickerProps {

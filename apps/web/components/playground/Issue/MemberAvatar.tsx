@@ -3,12 +3,12 @@ import type { ProjectMember } from "@/hooks/project/useProjectMembers";
 import { cn } from "@/lib/utils";
 
 const MEMBER_TONES = [
-    "bg-indigo-500/30 text-indigo-100",
-    "bg-emerald-500/30 text-emerald-100",
-    "bg-sky-500/30 text-sky-100",
-    "bg-rose-500/30 text-rose-100",
-    "bg-amber-500/30 text-amber-100",
-    "bg-violet-500/30 text-violet-100",
+    "bg-indigo-600 text-white",
+    "bg-emerald-600 text-white",
+    "bg-sky-600 text-white",
+    "bg-rose-600 text-white",
+    "bg-amber-600 text-white",
+    "bg-violet-600 text-white",
 ];
 
 function memberTone(id: string): string {
@@ -33,7 +33,7 @@ export default function MemberAvatar({
                 src={member.image}
                 alt=""
                 className={cn(
-                    "size-6 shrink-0 rounded-full object-cover ring-1 ring-white/10",
+                    "size-6 shrink-0 rounded-full object-cover ring-1 ring-card",
                     className,
                 )}
             />

@@ -62,7 +62,7 @@ export default function DiffReviewDisplay({
         );
     }
 
-    if (!detail) return <LogoLoader className="h-full w-full text-snow" />;
+    if (!detail) return <LogoLoader className="h-full w-full text-overlay" />;
 
     if (detail.status === "Pending" || detail.status === "Generating") {
         return (

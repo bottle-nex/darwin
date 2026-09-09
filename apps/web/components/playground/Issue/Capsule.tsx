@@ -29,7 +29,7 @@ export const CapsuleTrigger = forwardRef<
             type="button"
             ref={ref}
             className={cn(
-                "flex w-fit! items-center gap-1.5 px-2! py-1! bg-white/5 ring ring-white/10 text-[13px]! font-medium text-white/55 rounded-full! cursor-pointer hover:bg-white/10 transition-colors",
+                "flex w-fit! items-center gap-1.5 px-2! py-1! bg-overlay/5 text-[13px]! font-medium text-neutral-400 rounded-full! cursor-pointer hover:bg-overlay/10 transition-colors",
                 className,
             )}
             {...props}
@@ -58,7 +58,7 @@ function CapsuleOptionList({ options, value, onSelect }: CapsuleOptionListProps)
                         onClick={() => onSelect(option.value)}
                         className={cn(
                             "flex items-center justify-between gap-2 rounded-md px-2 py-1.5 text-left text-[13px] text-neutral-200 transition-colors cursor-pointer",
-                            isSelected ? "bg-white/8" : "hover:bg-white/5",
+                            isSelected ? "bg-overlay/8" : "hover:bg-overlay/5",
                         )}
                     >
                         <span className="flex items-center gap-2">
@@ -155,7 +155,7 @@ function CapsuleCalendar({
     disabled,
     className,
     icon: Icon = CalendarIcon,
-    iconClassName = "text-white/60",
+    iconClassName = "text-overlay/60",
     range,
     earliest,
     latest,

@@ -58,14 +58,14 @@ function diff_words(before: string, after: string): DiffPart[] {
 
 const TONE = {
     removed: {
-        row: "bg-rose-500/6",
-        marker: "text-rose-400/70",
-        word: "bg-rose-500/20 text-rose-200",
+        row: "bg-danger-surface",
+        marker: "text-danger/70",
+        word: "bg-danger-surface text-danger",
     },
     added: {
-        row: "bg-emerald-500/6",
-        marker: "text-emerald-400/70",
-        word: "bg-emerald-500/20 text-emerald-200",
+        row: "bg-success-surface",
+        marker: "text-success/70",
+        word: "bg-success-surface text-success",
     },
 };
 

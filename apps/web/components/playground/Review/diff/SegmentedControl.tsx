@@ -79,14 +79,14 @@ function Segment<T extends string>({
             className={cn(
                 "relative flex cursor-pointer items-center gap-1.5 rounded-md text-[13.5px] font-medium transition-colors",
                 showLabel ? "px-2.5 py-1" : "p-1.5",
-                selected ? "text-snow" : "text-neutral-500 hover:text-neutral-300",
+                selected ? "text-overlay" : "text-neutral-500 hover:text-neutral-300",
                 disabled && "cursor-not-allowed text-neutral-600 hover:text-neutral-600",
             )}
         >
             {selected && (
                 <motion.span
                     layoutId={`${name}-segment`}
-                    className="absolute inset-0 rounded-md border border-snow/5 bg-snow/4 shadow-sm shadow-black/7"
+                    className="surface-card absolute inset-0 rounded-md"
                     transition={{ type: "spring", duration: 0.35, bounce: 0.2 }}
                 />
             )}

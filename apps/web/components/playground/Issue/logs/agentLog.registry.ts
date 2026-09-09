@@ -38,8 +38,8 @@ export const ICON: Record<RunLogEventKind, IconType> = {
 
 /** Info reads at the row's own weight; a warn or error tints the title it belongs to. */
 export const LEVEL_MESSAGE: Partial<Record<RunLogLevel, string>> = {
-    [RunLogLevel.Warn]: "text-amber-200/75 hover:text-amber-200/90",
-    [RunLogLevel.Error]: "text-rose-300/85 hover:text-rose-300/90",
+    [RunLogLevel.Warn]: "text-warning/85 hover:text-warning",
+    [RunLogLevel.Error]: "text-danger/85 hover:text-danger",
 };
 
 export type LogDetail = {

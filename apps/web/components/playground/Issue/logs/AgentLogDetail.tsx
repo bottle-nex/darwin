@@ -45,9 +45,9 @@ function highlight(code: string): ReactNode[] {
 
 function Card({ label, children }: { label: string; children: ReactNode }) {
     return (
-        <div className="rounded-lg bg-black/25 px-3.5 py-3">
-            <p className="text-[11.5px] text-snow/35">{label}</p>
-            <div className="mt-2 font-mono text-[12px] leading-[21px] whitespace-pre-wrap text-snow/70">
+        <div className="rounded-lg bg-[#141414] px-3.5 py-3">
+            <p className="text-[11.5px] text-[#8a8f98]">{label}</p>
+            <div className="mt-2 font-mono text-[12px] leading-[21px] whitespace-pre-wrap text-[#e6e6e6]">
                 {children}
             </div>
         </div>
@@ -59,7 +59,7 @@ export default function AgentLogDetail({ detail }: { detail: LogDetail }) {
 
     return (
         <div
-            className="agent-log mt-1.5 flex flex-col gap-2 rounded-xl border border-snow/5 p-2"
+            className="agent-log mt-1.5 flex flex-col gap-2 rounded-xl border border-white/8 bg-[#0c0c0c] p-2"
             style={codeThemeVars(codeTheme)}
         >
             {detail.input && (

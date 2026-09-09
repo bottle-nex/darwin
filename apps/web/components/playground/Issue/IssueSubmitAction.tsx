@@ -30,7 +30,7 @@ export default function IssueSubmitAction({
         <section className={cn("h-fit flex items-center justify-end", className)}>
             <div className="flex items-center justify-end gap-x-2">
                 {!isCustom && body.prompts > 0 && (
-                    <span className="shrink-0 text-xs text-white/45">
+                    <span className="shrink-0 text-xs text-overlay/45">
                         {body.prompts} field{body.prompts === 1 ? "" : "s"} left
                     </span>
                 )}

@@ -18,19 +18,19 @@ export const PULL_REQUEST_STATE: Record<
     open: {
         icon: PullRequestOpenIcon,
         label: "Open",
-        text: "text-green-400",
-        surface: "bg-green-500/12",
+        text: "text-success",
+        surface: "bg-success-surface",
     },
     merged: {
         icon: MergeIcon,
         label: "Merged",
-        text: "text-violet-400",
-        surface: "bg-violet-500/12",
+        text: "text-primary",
+        surface: "bg-primary/12",
     },
     closed: {
         icon: PullRequestClosedIcon,
         label: "Closed",
-        text: "text-rose-400",
-        surface: "bg-rose-500/12",
+        text: "text-danger",
+        surface: "bg-danger-surface",
     },
 };

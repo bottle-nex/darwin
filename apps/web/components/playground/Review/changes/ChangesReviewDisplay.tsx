@@ -34,7 +34,7 @@ export default function ChangesReviewDisplay({
     const { diffView } = useUserConfig();
     const [selectedFilename, setSelectedFilename] = useState<string | null>(null);
 
-    if (isPending) return <LogoLoader className="h-full w-full text-snow" />;
+    if (isPending) return <LogoLoader className="h-full w-full text-overlay" />;
     if (!files?.length) {
         return (
             <p className="flex flex-1 items-center justify-center font-headline text-[13.5px] text-neutral-500">
@@ -60,8 +60,8 @@ export default function ChangesReviewDisplay({
                 <p className="px-3 font-headline text-[12.5px] text-neutral-500 tabular-nums">
                     {commit && <span className="font-mono">{shortSha(commit)} · </span>}
                     {files.length} {files.length === 1 ? "file" : "files"} changed{" "}
-                    <span className="text-green-500">+{additions}</span>{" "}
-                    <span className="text-rose-500">−{deletions}</span>
+                    <span className="text-success">+{additions}</span>{" "}
+                    <span className="text-danger">−{deletions}</span>
                 </p>
                 {files.map((file) => (
                     <ReviewFileRow

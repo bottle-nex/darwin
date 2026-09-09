@@ -6,7 +6,7 @@ import HeroBuddy from "@/components/landing/v2/HeroBuddy";
 import { IconPickGlyph } from "@/components/ui/IconPicker";
 import type { BoardDestinations } from "@/hooks/issues/useBoardDestinations";
 
-const ICON = "size-3.5 shrink-0 text-snow/50";
+const ICON = "size-3.5 shrink-0 text-overlay/50";
 
 export const MOVE_EMPTY_LABEL = "No other boards";
 
@@ -80,7 +80,10 @@ export function boardDestinationRows({
                             onSelect={() => onPick(column.id)}
                             className={CHILD_ROW}
                         >
-                            <span className="size-1 shrink-0 rounded-full bg-snow/25" aria-hidden />
+                            <span
+                                className="size-1 shrink-0 rounded-full bg-overlay/25"
+                                aria-hidden
+                            />
                             <span className="flex-1 truncate">{column.label}</span>
                         </Item>
                     ))}

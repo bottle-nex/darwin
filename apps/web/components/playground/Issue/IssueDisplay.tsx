@@ -33,7 +33,7 @@ export default function IssueDisplay({ issueId }: { issueId: string }) {
                 <PlaygroundBreadcrumb />
             </PaneLeadSlot>
             {isPending ? (
-                <LogoLoader className="h-full w-full text-snow" />
+                <LogoLoader className="h-full w-full text-overlay" />
             ) : isError && !(isAxiosError(error) && error.response?.status === 404) ? (
                 <div className="flex flex-1 flex-col items-center justify-center gap-y-3">
                     <p className="text-[13px] text-neutral-500">This issue could not be loaded.</p>

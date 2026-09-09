@@ -60,7 +60,7 @@ function CommentActions({
     onReaction: (comment: Chat, emoji: string) => void;
 }) {
     return (
-        <div className="absolute top-1.5 right-1.5 z-20 flex items-center gap-px rounded-lg border border-graphite/50 bg-charcoal p-0.5 opacity-0 shadow-lg transition-opacity group-hover/comment:opacity-100 focus-within:opacity-100 has-data-[state=open]:opacity-100">
+        <div className="surface-menu absolute top-1.5 right-1.5 z-20 flex items-center gap-px rounded-lg p-0.5 opacity-0 transition-opacity group-hover/comment:opacity-100 focus-within:opacity-100 has-data-[state=open]:opacity-100">
             <EmojiPicker align="end" onSelect={(emoji) => onReaction(comment, emoji)}>
                 <ActionButton aria-label="Add reaction" disabled={reactionDisabled}>
                     <EmojiReactionIcon className="size-3.5" />
@@ -129,7 +129,7 @@ function CommentContent({
                 <TooltipComponent content={at.toLocaleString()}>
                     <time
                         dateTime={at.toISOString()}
-                        className="text-[11px] whitespace-nowrap text-snow/50"
+                        className="text-[11px] whitespace-nowrap text-overlay/50"
                     >
                         {formatRelativeTime(at)}
                     </time>
@@ -178,7 +178,7 @@ export default function CommentCard({
     }
 
     return (
-        <div className="my-3 overflow-hidden rounded-[8px] border border-snow/3 bg-graphite/40">
+        <div className="surface-card my-3 overflow-hidden rounded-[8px]">
             <CommentContent
                 comment={root}
                 avatarSize="lg"
@@ -188,9 +188,9 @@ export default function CommentCard({
                 canDelete={canDelete}
             />
             {replies.length > 0 && (
-                <ul className="border-t border-snow/3">
+                <ul className="border-t border-border-subtle">
                     {replies.map((reply) => (
-                        <li key={reply.id} className="not-first:border-t border-snow/3">
+                        <li key={reply.id} className="not-first:border-t border-border-subtle">
                             <CommentContent
                                 comment={reply}
                                 avatarSize="md"
@@ -203,7 +203,7 @@ export default function CommentCard({
                     ))}
                 </ul>
             )}
-            <div className="border-t border-snow/3">
+            <div className="border-t border-border-subtle">
                 <ChatComposer
                     ref={composerRef}
                     projectId={projectId}

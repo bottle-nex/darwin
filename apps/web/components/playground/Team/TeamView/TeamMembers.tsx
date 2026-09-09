@@ -32,7 +32,7 @@ export default function PlaygroundTeamMembers({ teamId }: { teamId: string }) {
                 {isLoading ? (
                     <LogoLoader size={32} className="py-16" />
                 ) : isError ? (
-                    <p className="px-2.5 py-3 text-[12px] text-red-400">
+                    <p className="px-2.5 py-3 text-[12px] text-danger">
                         Couldn&apos;t load members.
                     </p>
                 ) : !members?.length ? (

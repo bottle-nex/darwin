@@ -92,14 +92,14 @@ export default function AgentLogList({
     if (isLoading) {
         return (
             <div className="flex h-24 items-center justify-center">
-                <LoadingSpinnerIcon className="size-4 animate-spin text-snow/40" />
+                <LoadingSpinnerIcon className="size-4 animate-spin text-overlay/40" />
             </div>
         );
     }
 
     if (!rows.length) {
         return (
-            <p className="px-3 py-6 text-[12px] text-snow/35">
+            <p className="px-3 py-6 text-[12px] text-overlay/35">
                 {data?.state === RunLogState.Live
                     ? "Waiting for the agent to report..."
                     : "No logs were captured for this run."}
@@ -110,13 +110,13 @@ export default function AgentLogList({
     return (
         <div className="flex flex-col">
             {(data?.droppedEvents ?? 0) > 0 && (
-                <div className="flex items-center justify-between gap-2 px-3 py-2 text-[11px] text-snow/40">
+                <div className="flex items-center justify-between gap-2 px-3 py-2 text-[11px] text-overlay/40">
                     <span>{data!.droppedEvents.toLocaleString()} earlier events dropped</span>
                     {canDownload && (
                         <button
                             type="button"
                             onClick={() => void openArchive(runId)}
-                            className="inline-flex cursor-pointer items-center gap-1 text-snow/55 transition-colors hover:text-snow"
+                            className="inline-flex cursor-pointer items-center gap-1 text-overlay/55 transition-colors hover:text-overlay"
                         >
                             <DownloadIcon className="size-3" />
                             full log
@@ -185,21 +185,21 @@ function LogRow({
     const Icon = ICON[event.kind];
     const title = titleOf(event);
     const detail = detailOf(event);
-    const tone = LEVEL_MESSAGE[run_log_level(event)] ?? "text-snow/60";
+    const tone = LEVEL_MESSAGE[run_log_level(event)] ?? "text-overlay/60";
 
     return (
         <div className="group/row relative flex items-start gap-x-2.5 pb-2">
             {railed && (
                 <span
                     aria-hidden
-                    className="absolute top-[22px] bottom-0 left-[11px] w-px bg-snow/10"
+                    className="absolute top-[22px] bottom-0 left-[11px] w-px bg-overlay/10"
                 />
             )}
             <span
                 aria-hidden
                 className="relative z-10 flex size-[22px] shrink-0 items-center justify-center"
             >
-                <Icon className="size-3.5 text-snow/45" />
+                <Icon className="size-3.5 text-overlay/45" />
             </span>
 
             <div className="min-w-0 flex-1">
@@ -213,7 +213,7 @@ function LogRow({
                         >
                             <span
                                 className={cn(
-                                    "truncate text-[13px] leading-[22px] hover:text-snow/80 transition-colors duration-200",
+                                    "truncate text-[13px] leading-[22px] hover:text-overlay/80 transition-colors duration-200",
                                     tone,
                                 )}
                             >
@@ -221,7 +221,7 @@ function LogRow({
                             </span>
                             <DropdownCaretIcon
                                 className={cn(
-                                    "size-3.5 shrink-0 text-snow/30 transition-transform",
+                                    "size-3.5 shrink-0 text-overlay/30 transition-transform",
                                     !open && "-rotate-90",
                                 )}
                                 aria-hidden
@@ -286,7 +286,7 @@ function QuestionReply({
     const [text, setText] = useState("");
 
     return (
-        <div className="mt-1.5 mb-1 flex flex-col gap-2 rounded-lg border border-amber-500/20 bg-amber-500/5 p-2.5">
+        <div className="mt-1.5 mb-1 flex flex-col gap-2 rounded-lg border border-warning-edge bg-warning-surface p-2.5">
             {options.length > 0 ? (
                 <div className="flex flex-wrap gap-1.5">
                     {options.map((option) => (

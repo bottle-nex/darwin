@@ -28,7 +28,7 @@ export default function CreateIssueForm({
             <main className="z-10 flex min-h-0 min-w-0 flex-1 flex-col justify-between overflow-hidden *:px-6">
                 <section className="flex flex-col items-start gap-y-3 pt-4 pb-2">
                     <div className="flex w-full items-center justify-between">
-                        <div className="flex items-center justify-start gap-x-1 text-snow text-xs">
+                        <div className="flex items-center justify-start gap-x-1 text-overlay text-xs">
                             <PlaygroundAvatar
                                 letter={project?.name.slice(0, 2) ?? ""}
                                 tone={project ? toneFor(project.id) : "emerald"}

@@ -91,7 +91,7 @@ export default function ReopenIssueDialog({
                     onKeyDown={(event) => handleDialogSubmitKey(event, submit)}
                 >
                     <section className="flex flex-col items-start gap-y-3 pt-4 pb-2">
-                        <div className="flex items-center justify-start gap-x-1 text-xs text-snow">
+                        <div className="flex items-center justify-start gap-x-1 text-xs text-overlay">
                             <PlaygroundAvatar
                                 letter={project?.name.slice(0, 2) ?? ""}
                                 tone={project ? toneFor(project.id) : "emerald"}

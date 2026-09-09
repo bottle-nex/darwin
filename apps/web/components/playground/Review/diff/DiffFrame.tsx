@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 const APPROXIMATION_HINT =
     "A rendered approximation, not the exact visual change. The component runs on its own in a sandbox, so fonts, data and surrounding layout can differ from the real app.";
 
-export const FRAME_SHELL = "overflow-hidden rounded-lg border border-snow/10 bg-white/2";
+export const FRAME_SHELL = "surface-raised overflow-hidden rounded-lg";
 
 export const FRAME_BORDER_X = 2;
 export const FRAME_CHROME_X = FRAME_BORDER_X + 24;
@@ -41,7 +41,7 @@ export default function DiffFrame({
                     label={APPROXIMATION_HINT}
                     side="top"
                     contentClassName="max-w-56"
-                    className="ml-auto size-5 hover:bg-white/5"
+                    className="ml-auto size-5 hover:bg-overlay/5"
                 />
             </header>
             <div className="overflow-hidden rounded-md" style={{ width, height }}>

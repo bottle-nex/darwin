@@ -75,14 +75,14 @@ export default function SolveReportDisplay({ route }: { route: SolveReportRoute 
                         reported.map((entry) => (
                             <section
                                 key={entry.id}
-                                className="border-t border-white/5 pt-8 first:border-t-0 first:pt-0 [&+section]:mt-10"
+                                className="border-t border-border pt-8 first:border-t-0 first:pt-0 [&+section]:mt-10"
                             >
                                 <p className="mb-4 text-[11px] tracking-wide text-neutral-500 uppercase">
                                     Attempt {entry.attemptNumber} · {shortDate(entry.startedAt)}
                                     {entry.model ? ` · ${entry.model}` : ""}
                                 </p>
                                 {entry.reopenedBy && (
-                                    <p className="mb-4 border-l border-white/10 pl-3 text-[13px] text-neutral-400">
+                                    <p className="mb-4 border-l border-border pl-3 text-[13px] text-neutral-400">
                                         Reopened by {entry.reopenedBy.actorName ?? "someone"} —{" "}
                                         {entry.reopenedBy.note}
                                     </p>

@@ -47,7 +47,7 @@ export default function PriorityCapsule({
                         {CurrentIcon && (
                             <CurrentIcon
                                 className={cn(
-                                    "size-3.5! ml-0.5 text-white/60",
+                                    "size-3.5! ml-0.5 text-overlay/60",
                                     current?.iconClassName,
                                 )}
                             />

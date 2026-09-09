@@ -160,7 +160,7 @@ type ActivityEntry<K extends ActivityType> = {
     summary?: string;
 };
 
-const MUTED_ICON_COLOR = "text-snow/70";
+const MUTED_ICON_COLOR = "text-overlay/70";
 
 const REGISTRY: { [K in ActivityType]?: ActivityEntry<K> } = {
     [ActivityType.IssueCreated]: {
@@ -182,7 +182,7 @@ const REGISTRY: { [K in ActivityType]?: ActivityEntry<K> } = {
     },
     [ActivityType.StatusChanged]: {
         icon: StatusChangedActivityIcon,
-        iconClassName: "text-[#F1BF00]",
+        iconClassName: "text-warning",
         glyph: (payload) => location_glyph(payload.to),
         render: (payload) => (
             <>
@@ -270,19 +270,19 @@ const REGISTRY: { [K in ActivityType]?: ActivityEntry<K> } = {
     },
     [ActivityType.RunStarted]: {
         icon: RunStartedActivityIcon,
-        iconClassName: "text-snow/60",
+        iconClassName: "text-overlay/60",
         render: (payload) => `started attempt ${payload.attemptNumber}`,
         summary: "started an attempt",
     },
     [ActivityType.RunCompleted]: {
         icon: RunCompletedActivityIcon,
-        iconClassName: "text-snow/60",
+        iconClassName: "text-overlay/60",
         render: (payload) => `finished attempt ${payload.attemptNumber}`,
         summary: "finished an attempt",
     },
     [ActivityType.AttemptFailed]: {
         icon: ErrorCircleIcon,
-        iconClassName: "text-red-300",
+        iconClassName: "text-danger",
         render: (payload) => (
             <>
                 failed attempt {payload.attemptNumber} — {payload.reason}
@@ -329,7 +329,7 @@ const REGISTRY: { [K in ActivityType]?: ActivityEntry<K> } = {
                     href={payload.url}
                     target="_blank"
                     rel="noreferrer"
-                    className="font-medium text-neutral-300 underline decoration-edge underline-offset-2 hover:text-mist"
+                    className="font-medium text-neutral-300 underline decoration-edge underline-offset-2 hover:text-foreground"
                 >
                     a pull request
                 </a>
@@ -347,7 +347,7 @@ const REGISTRY: { [K in ActivityType]?: ActivityEntry<K> } = {
                     href={payload.url}
                     target="_blank"
                     rel="noreferrer"
-                    className="font-medium text-neutral-300 underline decoration-edge underline-offset-2 hover:text-mist"
+                    className="font-medium text-neutral-300 underline decoration-edge underline-offset-2 hover:text-foreground"
                 >
                     a pull request
                 </a>
@@ -365,7 +365,7 @@ const REGISTRY: { [K in ActivityType]?: ActivityEntry<K> } = {
                     href={payload.url}
                     target="_blank"
                     rel="noreferrer"
-                    className="font-medium text-neutral-300 underline decoration-edge underline-offset-2 hover:text-mist"
+                    className="font-medium text-neutral-300 underline decoration-edge underline-offset-2 hover:text-foreground"
                 >
                     a pull request
                 </a>

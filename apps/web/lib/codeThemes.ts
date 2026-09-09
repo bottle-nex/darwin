@@ -189,6 +189,26 @@ export const CODE_THEME_PRESETS: Record<CodeTheme, CodeThemePreset> = {
 
 export const CODE_THEMES = Object.keys(CODE_THEME_PRESETS) as CodeTheme[];
 
+// Every selectable preset is a dark theme, so a diff rendered on a white page needs
+// its own palette rather than a dimmed version of one of them. Agent logs and the
+// settings preview deliberately stay dark and keep using the user's chosen preset.
+export const LIGHT_CODE_THEME: CodeThemePreset = {
+    label: "Darwin Light",
+    colors: {
+        plain: "#24292f",
+        comment: "#6e7781",
+        punctuation: "#57606a",
+        operator: "#0550ae",
+        keyword: "#cf222e",
+        string: "#0a3069",
+        number: "#0550ae",
+        function: "#8250df",
+        className: "#953800",
+        property: "#116329",
+        variable: "#953800",
+    },
+};
+
 // Falls back instead of indexing straight in: an older browser tab still holding a
 // dashboard response from before this column existed would otherwise read `colors`
 // off undefined and crash the whole Changes tab.
@@ -198,8 +218,11 @@ export function codeThemePreset(theme: CodeTheme | undefined): CodeThemePreset {
 
 // Builds the `style` object the diff puts on its root element. Setting the variables
 // there lets every token span inherit them without re-rendering the diff itself.
-export function codeThemeVars(theme: CodeTheme | undefined): React.CSSProperties {
-    const { colors } = codeThemePreset(theme);
+export function codeThemeVars(
+    theme: CodeTheme | undefined,
+    surface: "dark" | "light" = "dark",
+): React.CSSProperties {
+    const { colors } = surface === "light" ? LIGHT_CODE_THEME : codeThemePreset(theme);
     const entries = (Object.keys(CODE_TOKEN_VARS) as CodeTokenRole[]).map((role) => [
         CODE_TOKEN_VARS[role],
         colors[role],

@@ -97,10 +97,10 @@ export default function CapsuleSlider({
                 style={{ left: `${position}%` }}
                 className="group absolute inset-y-0 z-10 -ml-3 w-6 cursor-col-resize touch-none outline-none"
             >
-                <span className="pointer-events-none absolute inset-y-0 left-1/2 w-px -translate-x-1/2 bg-snow/40 transition-colors group-hover:bg-snow/70 group-focus-visible:bg-primary" />
-                <span className="pointer-events-none absolute top-1/2 left-1/2 flex size-6 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-white/10 bg-graphite shadow-[0_2px_8px_rgba(0,0,0,0.45)]">
-                    <span className="h-2.5 w-px bg-snow/60" />
-                    <span className="ml-0.5 h-2.5 w-px bg-snow/60" />
+                <span className="pointer-events-none absolute inset-y-0 left-1/2 w-px -translate-x-1/2 bg-overlay/40 transition-colors group-hover:bg-overlay/70 group-focus-visible:bg-primary" />
+                <span className="surface-menu pointer-events-none absolute top-1/2 left-1/2 flex size-6 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full">
+                    <span className="h-2.5 w-px bg-overlay/60" />
+                    <span className="ml-0.5 h-2.5 w-px bg-overlay/60" />
                 </span>
             </div>
         </div>
@@ -111,7 +111,7 @@ function Edge({ label, className, hidden }: { label: string; className: string; 
     return (
         <span
             className={cn(
-                "pointer-events-none absolute top-3 z-10 rounded-full bg-black/50 px-2 py-0.5 backdrop-blur-sm transition-opacity",
+                "surface-menu pointer-events-none absolute top-3 z-10 rounded-full px-2 py-0.5 transition-opacity",
                 MICRO_LABEL,
                 "text-neutral-200",
                 className,

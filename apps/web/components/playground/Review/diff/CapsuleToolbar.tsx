@@ -58,7 +58,7 @@ export default function CapsuleToolbar({
     return (
         <div
             className={cn(
-                "pointer-events-auto flex items-center gap-1 rounded-lg border border-white/5 p-1 shadow-[0_4px_12px_rgba(0,0,0,0.35)]",
+                "pointer-events-auto flex items-center gap-1 rounded-lg border border-border p-1 shadow-[var(--shadow-menu)]",
                 BLURRED_BG_TWO(glass),
             )}
         >
@@ -70,7 +70,7 @@ export default function CapsuleToolbar({
                 onChange={onViewportChange}
                 showLabels={false}
             />
-            <span className="h-5 w-px bg-white/5" aria-hidden />
+            <span className="h-5 w-px bg-border" aria-hidden />
             <SegmentedControl
                 name="capsule-mode"
                 label="Comparison"
@@ -80,7 +80,7 @@ export default function CapsuleToolbar({
             />
             {controls.length > 0 && (
                 <>
-                    <span className="h-5 w-px bg-white/5" aria-hidden />
+                    <span className="h-5 w-px bg-border" aria-hidden />
                     <PropsMenu
                         controls={controls}
                         values={controlValues}
@@ -112,7 +112,7 @@ function PropsMenu({
                     className={cn(
                         "relative flex cursor-pointer items-center gap-1.5 rounded-md border px-2.5 py-1 text-[13.5px] font-medium transition-colors",
                         open
-                            ? "border-snow/5 bg-snow/4 text-snow shadow-sm shadow-black/7"
+                            ? "surface-card text-overlay"
                             : "border-transparent text-neutral-500 hover:text-neutral-300",
                     )}
                 >

@@ -43,7 +43,7 @@ export default function PullRequestReviewDisplay({
 
                 <section className="flex flex-col gap-6 border-t border-border pt-6">
                     {isPending ? (
-                        <LogoLoader className="h-24 w-full text-snow" />
+                        <LogoLoader className="h-24 w-full text-overlay" />
                     ) : comments?.length ? (
                         comments.map((comment) => (
                             <ReviewCommentCard

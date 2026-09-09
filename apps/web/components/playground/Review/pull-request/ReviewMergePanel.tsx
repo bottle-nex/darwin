@@ -28,12 +28,12 @@ type MergeTone = "clean" | "dirty" | "attention" | "checking";
 type ConfirmingAction = "merge" | "close" | null;
 
 const TONE_STYLE: Record<MergeTone, { icon: IconType; badge: string; border: string }> = {
-    clean: { icon: MergeIcon, badge: "bg-green-600", border: "border-green-500/25" },
-    dirty: { icon: ErrorCircleIcon, badge: "bg-rose-500", border: "border-rose-500/25" },
+    clean: { icon: MergeIcon, badge: "bg-green-600", border: "border-success-edge" },
+    dirty: { icon: ErrorCircleIcon, badge: "bg-rose-500", border: "border-danger-edge" },
     attention: {
         icon: MergeToneWarningIcon,
         badge: "bg-amber-500",
-        border: "border-amber-500/25",
+        border: "border-warning-edge",
     },
     checking: { icon: StatusInfoIcon, badge: "bg-sky-500", border: "border-sky-500/25" },
 };
@@ -151,7 +151,7 @@ export default function ReviewMergePanel({
                     <p
                         className={cn(
                             "text-[13.5px] font-medium",
-                            tone === "clean" ? "text-green-400/80" : "text-neutral-100",
+                            tone === "clean" ? "text-success" : "text-neutral-100",
                         )}
                     >
                         {heading}
@@ -159,14 +159,14 @@ export default function ReviewMergePanel({
                     <p className="mt-0.5 text-[12.5px] text-neutral-500">{subtext}</p>
                 </div>
 
-                <div className="flex items-center gap-3 bg-green-500/3 px-4 py-3">
+                <div className="flex items-center gap-3 bg-success-surface px-4 py-3">
                     {isLoading ? null : !githubLinked ? (
                         <Button
                             size="xs"
                             variant="default"
                             loading={startLink.isPending}
                             onClick={() => startLink.mutate()}
-                            className="gap-x-1.5 rounded-sm bg-green-700 font-medium text-snow"
+                            className="gap-x-1.5 rounded-sm bg-green-700 font-medium text-white"
                         >
                             <GithubLogoIcon />
                             Connect GitHub
@@ -177,7 +177,7 @@ export default function ReviewMergePanel({
                                 <Button
                                     size="xs"
                                     variant="default"
-                                    className="gap-x-1.5 rounded-sm bg-green-700 font-medium text-snow"
+                                    className="gap-x-1.5 rounded-sm bg-green-700 font-medium text-white"
                                     disabled={!canManageReview}
                                     onClick={() => openConfirm("merge")}
                                 >
@@ -188,11 +188,11 @@ export default function ReviewMergePanel({
                             <Button
                                 size="xs"
                                 variant="ghost"
-                                className="rounded-sm font-medium text-snow gap-x-2"
+                                className="rounded-sm font-medium text-overlay gap-x-2"
                                 disabled={!canManageReview}
                                 onClick={() => openConfirm("close")}
                             >
-                                <PullRequestClosedIcon className="text-rose-500" />
+                                <PullRequestClosedIcon className="text-danger" />
                                 Close pull request
                             </Button>
                             {canAttemptMerge && (

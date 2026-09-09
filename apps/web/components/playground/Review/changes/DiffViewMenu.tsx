@@ -40,14 +40,14 @@ export default function DiffViewMenu() {
                             className={cn(
                                 "relative flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-xs px-1 py-1 text-[13.5px] font-medium transition-colors",
                                 diffView === view.value
-                                    ? "text-snow"
+                                    ? "text-overlay"
                                     : "text-neutral-500 hover:text-neutral-300",
                             )}
                         >
                             {diffView === view.value && (
                                 <motion.div
                                     layoutId="diff-view-tab-bg"
-                                    className="absolute inset-0 rounded-full border border-snow/5 bg-snow/4 shadow-sm shadow-black/7"
+                                    className="surface-card absolute inset-0 rounded-full"
                                     transition={{ type: "spring", duration: 0.35, bounce: 0.2 }}
                                 />
                             )}

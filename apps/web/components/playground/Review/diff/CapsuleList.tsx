@@ -49,8 +49,8 @@ function CapsuleRow({
             onClick={onSelect}
             aria-current={selected}
             className={cn(
-                "flex w-full cursor-pointer items-center gap-2 rounded-md bg-white/3 px-3 py-1.5 text-left ring-[0.5px] ring-snow/5 transition-colors",
-                selected ? "bg-white/8" : "hover:bg-white/4",
+                "surface-card flex w-full cursor-pointer items-center gap-2 rounded-md px-3 py-1.5 text-left transition-colors",
+                selected ? "bg-overlay/8!" : "surface-card-interactive",
             )}
         >
             <DiffFileRowIcon className="size-3.5 shrink-0 text-neutral-500" />

@@ -20,7 +20,7 @@ function PropertyChip({
     return (
         <span
             className={cn(
-                "inline-flex h-6.5 items-center gap-1.5 rounded-md px-2 text-[12.5px] ring-[0.5px] ring-white/8",
+                "inline-flex h-6.5 items-center gap-1.5 rounded-md border border-border px-2 text-[12.5px]",
                 muted ? "text-neutral-500" : "text-neutral-300",
             )}
         >
@@ -51,13 +51,13 @@ export default function SpaceOverviewMain({
     return (
         <div className="flex flex-col gap-6">
             {space.icon && (
-                <div className="flex size-11 items-center justify-center rounded-lg bg-white/6 ring-[0.5px] ring-white/8">
+                <div className="surface-card flex size-11 items-center justify-center rounded-lg">
                     <IconPickGlyph pick={space.icon} className="size-5.5 text-[22px]" />
                 </div>
             )}
 
             <div className="flex flex-col gap-2.5">
-                <h2 className="text-[26px] leading-8 font-semibold tracking-[-0.01em] text-neutral-50">
+                <h2 className="text-[26px] leading-8 font-semibold tracking-[-0.01em] text-overlay">
                     {space.name}
                 </h2>
                 <button

@@ -101,7 +101,7 @@ export default function ReviewComposer({
     }
 
     return (
-        <div className="flex flex-col rounded-xl border border-border bg-snow/2 focus-within:border-white/20 ml-8.5">
+        <div className="surface-card ml-8.5 flex flex-col rounded-xl focus-within:border-ring">
             <div className="max-h-32 overflow-y-auto px-3 pt-1.5" data-lenis-prevent>
                 <IssueDescriptionEditor
                     key={editorKey}
@@ -117,13 +117,13 @@ export default function ReviewComposer({
 
             <div className="flex items-center justify-end gap-2 px-3 pb-1.5">
                 {post.isError && (
-                    <p className="mr-auto text-[13.5px] text-rose-400">
+                    <p className="mr-auto text-[13.5px] text-danger">
                         That comment didn&apos;t post. Try again.
                     </p>
                 )}
                 <Button
                     size="icon-xs"
-                    className="bg-snow rounded-full"
+                    className="bg-overlay rounded-full"
                     disabled={isEmpty}
                     loading={post.isPending}
                     onClick={submit}

@@ -63,7 +63,7 @@ export default function PlaygroundTeamViewMain({ team }: PlaygroundTeamViewProps
                             type="button"
                             onClick={() => requestDelete(team)}
                             aria-label="Delete team"
-                            className="flex size-7 cursor-pointer items-center justify-center rounded-md text-neutral-400 hover:bg-white/5 hover:text-rose-300"
+                            className="flex size-7 cursor-pointer items-center justify-center rounded-md text-neutral-400 hover:bg-overlay/5 hover:text-danger"
                         >
                             <DeleteIcon className="size-4" aria-hidden />
                         </Button>

@@ -58,12 +58,12 @@ function QuestionCard({
     const isSecret = question.type === "NeedSecret";
 
     return (
-        <div className="flex flex-col gap-3 rounded-xl border border-amber-500/20 bg-amber-500/5 p-3">
+        <div className="flex flex-col gap-3 rounded-xl border border-warning-edge bg-warning-surface p-3">
             <div className="flex flex-col gap-1">
-                <span className="text-[11px] tracking-wide text-amber-300/80 uppercase">
+                <span className="text-[11px] tracking-wide text-warning uppercase">
                     {question.type === "ApprovePullRequest" ? "Approval needed" : "Agent question"}
                 </span>
-                <p className="text-[13px] text-snow">{question.prompt}</p>
+                <p className="text-[13px] text-overlay">{question.prompt}</p>
             </div>
 
             {isSecret ? (

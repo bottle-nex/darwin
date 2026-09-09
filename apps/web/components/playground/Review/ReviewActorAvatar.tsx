@@ -31,7 +31,7 @@ export default function ReviewActorAvatar({
         <span
             className={cn(
                 shape,
-                "flex items-center justify-center bg-white/10 text-[11.5px] font-medium text-neutral-300",
+                "flex items-center justify-center bg-overlay/10 text-[11.5px] font-medium text-neutral-300",
             )}
         >
             {(actor?.login[0] ?? "?").toUpperCase()}

@@ -21,6 +21,7 @@ import { useReviewFileSource } from "@/hooks/review/useReviewFileSource";
 import { useUserConfig } from "@/hooks/user/useUserConfig";
 import { codeThemeVars } from "@/lib/codeThemes";
 import { cn } from "@/lib/utils";
+import { usePlaygroundTheme } from "@/store/playground/usePlaygroundThemeStore";
 
 import { languageFor, refractor } from "./diffLanguage";
 import { splitPath } from "./ReviewFileRow";
@@ -46,6 +47,7 @@ export default function ReviewFileDiff({
 }) {
     const { name, directory } = splitPath(file.filename);
     const { codeTheme } = useUserConfig();
+    const surface = usePlaygroundTheme();
     const [wholeFile, setWholeFile] = useState(false);
     const [ranges, setRanges] = useState<Array<[number, number]>>([]);
     const wantsSource = wholeFile || ranges.length > 0;
@@ -96,15 +98,15 @@ export default function ReviewFileDiff({
         // The theme variables go here rather than on <Diff> because react-diff-view
         // only reads a fixed list of props and drops a style prop entirely.
         <section
-            style={codeThemeVars(codeTheme)}
-            className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-lg border border-border bg-white/2"
+            style={codeThemeVars(codeTheme, surface)}
+            className="surface-card flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-lg"
         >
             <header className="flex shrink-0 items-center gap-2 px-3 py-2.5">
                 <DiffFileRowIcon className="size-3.5 shrink-0 text-neutral-500" />
                 <span className="shrink-0 font-headline text-[14px] font-medium text-neutral-100">
                     {name}
                 </span>
-                <span className="min-w-0 flex-1 truncate font-headline text-[14px] text-snow/60 pb-[1.5px]">
+                <span className="min-w-0 flex-1 truncate font-headline text-[14px] text-overlay/60 pb-[1.5px]">
                     {file.previousFilename ? `renamed from ${file.previousFilename}` : directory}
                 </span>
 
@@ -116,7 +118,7 @@ export default function ReviewFileDiff({
                             setWholeFile(!wholeFile);
                         }}
                         loading={wantsSource && sourcePending}
-                        className="flex shrink-0 cursor-pointer items-center gap-1 rounded-md px-2 py-1 font-headline text-[12px] text-neutral-500 transition-colors hover:bg-white/5 hover:text-neutral-200"
+                        className="flex shrink-0 cursor-pointer items-center gap-1 rounded-md px-2 py-1 font-headline text-[12px] text-neutral-500 transition-colors hover:bg-overlay/5 hover:text-neutral-200"
                     >
                         {tooLarge
                             ? "Too large to expand"
@@ -127,12 +129,8 @@ export default function ReviewFileDiff({
                 )}
 
                 <span className="shrink-0 font-headline text-[12.5px] tabular-nums">
-                    {file.additions > 0 && (
-                        <span className="text-emerald-400">+{file.additions}</span>
-                    )}
-                    {file.deletions > 0 && (
-                        <span className="text-rose-400"> −{file.deletions}</span>
-                    )}
+                    {file.additions > 0 && <span className="text-success">+{file.additions}</span>}
+                    {file.deletions > 0 && <span className="text-danger"> −{file.deletions}</span>}
                 </span>
                 {file.htmlUrl && (
                     <a
@@ -236,7 +234,7 @@ function HunkGap({ skipped, onExpand }: { skipped: number; onExpand?: () => void
                 onClick={onExpand}
                 className={cn(
                     "flex w-full items-center justify-center gap-1.5 py-1 font-headline text-[12.5px] text-neutral-500 transition-colors",
-                    onExpand && "cursor-pointer hover:bg-white/4 hover:text-neutral-300",
+                    onExpand && "cursor-pointer hover:bg-overlay/4 hover:text-neutral-300",
                 )}
             >
                 <DiffExpandIcon className="size-3" />
