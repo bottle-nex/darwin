@@ -208,7 +208,7 @@ export default function CommentCard({
                     ref={composerRef}
                     projectId={projectId}
                     placeholder="Leave a reply..."
-                    className="rounded-none bg-transparent shadow-none"
+                    className="rounded-none border-0 bg-transparent"
                     onSend={handleSend}
                 />
             </div>

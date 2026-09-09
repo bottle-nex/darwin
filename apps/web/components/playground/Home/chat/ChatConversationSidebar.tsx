@@ -32,7 +32,7 @@ type ChatConversationSidebarProps = {
 };
 
 function latest_message_text(message: ChatPreviewMessage | null | undefined) {
-    if (!message) return "Say Hi!";
+    if (!message) return "No messages yet";
     if (message.isDeleted) return "Message deleted";
     return to_plain_text(message.message, message.references);
 }
@@ -54,7 +54,7 @@ function ConversationRow({
             aria-current={selected ? "page" : undefined}
             onClick={onClick}
             className={cn(
-                "flex w-full cursor-pointer items-center gap-2.5 rounded-lg px-2.5 py-2.5 text-left transition-colors",
+                "flex w-full cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 text-left transition-colors",
                 selected ? "bg-active text-neutral-100" : "text-neutral-300 hover:bg-hover",
             )}
         >
@@ -63,15 +63,14 @@ function ConversationRow({
                 tone={toneFor(conversation.id)}
                 icon={conversation.icon}
                 size="lg"
-                className="rounded-md"
             />
-            <span className="min-w-0 flex-1">
-                <span className="block truncate text-[12px] leading-4 font-medium">
+            <span className="flex min-w-0 flex-1 flex-col">
+                <span className="block truncate text-[12px] leading-[15px] font-medium">
                     {conversation.name}
                 </span>
                 <span
                     className={cn(
-                        "mt-0.5 block truncate text-[11px] leading-4",
+                        "block truncate text-[10.5px] leading-[13px]",
                         selected ? "text-neutral-400" : "text-neutral-500",
                     )}
                 >
@@ -126,7 +125,7 @@ export default function ChatConversationSidebar({
                             onClick={() => onSelect(null)}
                         />
                     ) : (
-                        <div className="h-13 animate-pulse rounded-lg bg-graphite" />
+                        <div className="h-10 animate-pulse rounded-md bg-graphite" />
                     )}
                 </section>
                 <section className="mt-3">
@@ -142,7 +141,7 @@ export default function ChatConversationSidebar({
                         ) : (
                             <div
                                 key="team-header"
-                                className="flex items-center justify-between px-2 py-1"
+                                className="flex items-center justify-between px-2 py-1.5"
                             >
                                 <h3 className="text-[12px] font-medium text-neutral-500 capitalize">
                                     Teams
@@ -172,7 +171,7 @@ export default function ChatConversationSidebar({
                             </div>
                         )}
                     </AnimatePresence>
-                    <div className="flex flex-col gap-px">
+                    <div className="flex flex-col gap-0.5">
                         {filtered_teams.map((team) => (
                             <ConversationRow
                                 key={team.id}
@@ -183,7 +182,7 @@ export default function ChatConversationSidebar({
                             />
                         ))}
                         {!filtered_teams.length && (
-                            <p className="px-2.5 py-2 text-[11px] text-neutral-600">
+                            <p className="px-2 py-2 text-[11px] text-neutral-600">
                                 {searchQuery ? "No team chats found" : "No team chats available"}
                             </p>
                         )}

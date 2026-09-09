@@ -139,7 +139,7 @@ const ChatComposer = forwardRef<ChatComposerHandle, ChatComposerProps>(function 
             extensions,
             editorProps: {
                 attributes: {
-                    class: "chat-composer min-h-9.5 py-1.75 pl-3 pr-11 text-neutral-100",
+                    class: "chat-composer min-h-9.5 py-2.25 pl-3 pr-11 text-neutral-100",
                     spellcheck: "false",
                 },
             },
@@ -156,12 +156,7 @@ const ChatComposer = forwardRef<ChatComposerHandle, ChatComposerProps>(function 
     }));
 
     return (
-        <div
-            className={cn(
-                "rounded-lg bg-graphite/40 shadow-[inset_0_1px_0_0_var(--color-edge)]",
-                className,
-            )}
-        >
+        <div className={cn("rounded-[8px] border border-snow/3 bg-graphite/40", className)}>
             {children}
             <div className="relative">
                 <div
@@ -178,7 +173,7 @@ const ChatComposer = forwardRef<ChatComposerHandle, ChatComposerProps>(function 
                     onClick={() => submit(editor)}
                     disabled={disabled || !editor || editor.isEmpty}
                     aria-label="Send message"
-                    className="group absolute bottom-2 right-1.5 rounded-full"
+                    className="group absolute bottom-1.5 right-1.5 rounded-full"
                 >
                     <IconWrapper icon={SendIcon} variant="ghost" />
                 </Button>
@@ -189,7 +184,7 @@ const ChatComposer = forwardRef<ChatComposerHandle, ChatComposerProps>(function 
                         variant="unstyled"
                         disabled={disabled || !editor}
                         aria-label="Add emoji"
-                        className="group absolute bottom-2 right-9 rounded-full"
+                        className="group absolute bottom-1.5 right-9 rounded-full"
                     >
                         <IconWrapper icon={EmojiReactionIcon} variant="ghost" />
                     </Button>

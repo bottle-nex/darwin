@@ -274,8 +274,8 @@ export default function ChatMessage({
                             letter={name.charAt(0).toUpperCase()}
                             src={chat.sender?.image ?? undefined}
                             tone={toneFor(chat.senderId ?? name)}
-                            size="lg"
-                            className={cn("rounded-full", !endsGroup && "invisible")}
+                            size="md"
+                            className={cn(!endsGroup && "invisible")}
                         />
                     )}
                     <article
