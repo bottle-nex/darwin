@@ -7,7 +7,12 @@ import PlaygroundAvatar, {
 } from "@/components/playground/Core/components/PlaygroundAvatar";
 import Capsule from "@/components/playground/Issue/Capsule";
 import { DATE_ICON_COLOR } from "@/components/playground/Issue/issueHelpers";
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import {
+    Dialog,
+    DIALOG_COMPOSER_SURFACE,
+    DialogContent,
+    DialogTitle,
+} from "@/components/ui/dialog";
 import DialogSubmitButton, { handleDialogSubmitKey } from "@/components/ui/DialogSubmitButton";
 import { DIALOG_TITLE_FIELD, GHOST_FIELD } from "@/components/ui/fieldStyles";
 import { type IconPick, IconPickButton } from "@/components/ui/IconPicker";
@@ -173,7 +178,7 @@ export default function SpaceFormDialog({ projectSlug }: { projectSlug: string }
                 }}
                 className={cn(
                     "flex max-h-[80vh] min-h-[40vh] w-187.5 max-w-none flex-col gap-0 overflow-hidden p-0 sm:max-w-none",
-                    "rounded-3xl bg-graphite",
+                    DIALOG_COMPOSER_SURFACE,
                 )}
             >
                 <DialogTitle className="sr-only">

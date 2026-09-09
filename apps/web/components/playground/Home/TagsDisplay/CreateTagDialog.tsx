@@ -8,7 +8,12 @@ import PlaygroundAvatar, {
 } from "@/components/playground/Core/components/PlaygroundAvatar";
 import { Button } from "@/components/ui/button";
 import { ColorPicker } from "@/components/ui/color-picker";
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import {
+    Dialog,
+    DIALOG_COMPOSER_SURFACE,
+    DialogContent,
+    DialogTitle,
+} from "@/components/ui/dialog";
 import DialogSubmitButton, { handleDialogSubmitKey } from "@/components/ui/DialogSubmitButton";
 import { DIALOG_TITLE_FIELD, GHOST_FIELD } from "@/components/ui/fieldStyles";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -58,7 +63,7 @@ export default function CreateTagDialog({
                 }}
                 className={cn(
                     "flex flex-col max-h-[80vh] min-h-[40vh] w-130 max-w-none sm:max-w-none p-0 gap-0 overflow-hidden",
-                    "rounded-3xl",
+                    DIALOG_COMPOSER_SURFACE,
                 )}
             >
                 <DialogTitle className="sr-only">{tag ? "Edit tag" : "New tag"}</DialogTitle>

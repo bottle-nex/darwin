@@ -8,7 +8,12 @@ import PlaygroundAvatar, {
     toneFor,
 } from "@/components/playground/Core/components/PlaygroundAvatar";
 import { toReferenceText } from "@/components/playground/Home/chat/referenceMention";
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import {
+    Dialog,
+    DIALOG_COMPOSER_SURFACE,
+    DialogContent,
+    DialogTitle,
+} from "@/components/ui/dialog";
 import DialogSubmitButton, { handleDialogSubmitKey } from "@/components/ui/DialogSubmitButton";
 import { DIALOG_TITLE_FIELD, GHOST_FIELD } from "@/components/ui/fieldStyles";
 import { Textarea } from "@/components/ui/textarea";
@@ -74,12 +79,15 @@ export default function ReopenIssueDialog({
             <DialogContent
                 showCloseButton={false}
                 onOpenAutoFocus={(event) => event.preventDefault()}
-                className="flex max-h-[80vh] min-h-[40vh] w-187.5 max-w-none flex-col gap-0 rounded-3xl bg-transparent p-0 sm:max-w-none"
+                className={cn(
+                    "flex max-h-[80vh] min-h-[40vh] w-187.5 max-w-none flex-col gap-0 overflow-hidden p-0 sm:max-w-none",
+                    DIALOG_COMPOSER_SURFACE,
+                )}
             >
                 <DialogTitle className="sr-only">Reopen issue</DialogTitle>
 
                 <main
-                    className="z-10 flex min-h-0 min-w-0 flex-1 flex-col justify-between overflow-hidden rounded-3xl bg-graphite *:px-6"
+                    className="z-10 flex min-h-0 min-w-0 flex-1 flex-col justify-between overflow-hidden *:px-6"
                     onKeyDown={(event) => handleDialogSubmitKey(event, submit)}
                 >
                     <section className="flex flex-col items-start gap-y-3 pt-4 pb-2">

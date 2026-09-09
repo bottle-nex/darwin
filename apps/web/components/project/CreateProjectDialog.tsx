@@ -8,7 +8,12 @@ import PlaygroundAvatar from "@/components/playground/Core/components/Playground
 import CreateProjectDialogDetailsStep from "@/components/project/CreateProjectDialogDetailsStep";
 import ProjectEnvStep, { type EnvRow } from "@/components/project/ProjectEnvStep";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import {
+    Dialog,
+    DIALOG_COMPOSER_SURFACE,
+    DialogContent,
+    DialogTitle,
+} from "@/components/ui/dialog";
 import { type IconPick, IconPickButton } from "@/components/ui/IconPicker";
 import { useGetDashboard } from "@/hooks/dashboard/useGetDashboard";
 import { useFetchOrganizations } from "@/hooks/playground/useFetchOrganizations";
@@ -84,7 +89,7 @@ export default function CreateProjectDialog() {
                 showCloseButton={false}
                 className={cn(
                     "flex flex-col max-h-[80vh] min-h-[40vh] w-187.5 max-w-none sm:max-w-none p-0 gap-0 overflow-hidden",
-                    "rounded-3xl",
+                    DIALOG_COMPOSER_SURFACE,
                 )}
             >
                 <DialogTitle className="sr-only">

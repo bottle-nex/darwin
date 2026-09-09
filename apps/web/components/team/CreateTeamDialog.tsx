@@ -7,7 +7,12 @@ import PlaygroundAvatar, {
     toneFor,
 } from "@/components/playground/Core/components/PlaygroundAvatar";
 import { CapsuleTrigger } from "@/components/playground/Issue/Capsule";
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import {
+    Dialog,
+    DIALOG_COMPOSER_SURFACE,
+    DialogContent,
+    DialogTitle,
+} from "@/components/ui/dialog";
 import DialogSubmitButton, { handleDialogSubmitKey } from "@/components/ui/DialogSubmitButton";
 import { DIALOG_TITLE_FIELD, GHOST_FIELD } from "@/components/ui/fieldStyles";
 import { type IconPick, IconPickButton, randomIconPick } from "@/components/ui/IconPicker";
@@ -36,7 +41,7 @@ export default function CreateTeamDialog() {
                 }}
                 className={cn(
                     "flex flex-col max-h-[80vh] min-h-[40vh] w-187.5 max-w-none sm:max-w-none p-0 gap-0 overflow-hidden",
-                    "rounded-3xl",
+                    DIALOG_COMPOSER_SURFACE,
                 )}
             >
                 <DialogTitle className="sr-only">Create team</DialogTitle>

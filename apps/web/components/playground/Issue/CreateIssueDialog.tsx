@@ -1,5 +1,6 @@
 "use client";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DIALOG_COMPOSER_SURFACE, DialogContent } from "@/components/ui/dialog";
+import { cn } from "@/lib/utils";
 import { useCreateIssueStore } from "@/store/issues/useCreateIssueStore";
 
 import CreateIssueForm from "./CreateIssueForm";
@@ -17,7 +18,10 @@ export default function CreateIssueDialog() {
                     event.preventDefault();
                     (event.currentTarget as HTMLElement).focus();
                 }}
-                className="flex flex-col max-h-[80vh] min-h-[40vh] w-187.5 max-w-none sm:max-w-none p-0 gap-0 rounded-3xl bg-transparent"
+                className={cn(
+                    "flex max-h-[80vh] min-h-[40vh] w-187.5 max-w-none flex-col gap-0 overflow-hidden p-0 sm:max-w-none",
+                    DIALOG_COMPOSER_SURFACE,
+                )}
             >
                 <CreateIssueForm target={target} onCreated={close} />
             </DialogContent>

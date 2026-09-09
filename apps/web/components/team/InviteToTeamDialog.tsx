@@ -7,7 +7,12 @@ import * as React from "react";
 import PlaygroundAvatar from "@/components/playground/Core/components/PlaygroundAvatar";
 import { CapsuleTrigger } from "@/components/playground/Issue/Capsule";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import {
+    Dialog,
+    DIALOG_COMPOSER_SURFACE,
+    DialogContent,
+    DialogTitle,
+} from "@/components/ui/dialog";
 import DialogSubmitButton, { handleDialogSubmitKey } from "@/components/ui/DialogSubmitButton";
 import { GHOST_FIELD } from "@/components/ui/fieldStyles";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -79,7 +84,10 @@ export default function InviteToTeamDialog({
                     event.preventDefault();
                     (event.currentTarget as HTMLElement).focus();
                 }}
-                className="flex flex-col max-h-[80vh] min-h-[40vh] w-150 max-w-none sm:max-w-none p-0 gap-0 overflow-hidden rounded-3xl"
+                className={cn(
+                    "flex max-h-[80vh] min-h-[40vh] w-150 max-w-none flex-col gap-0 overflow-hidden p-0 sm:max-w-none",
+                    DIALOG_COMPOSER_SURFACE,
+                )}
             >
                 <DialogTitle className="sr-only">Invite members</DialogTitle>
                 <InviteForm

@@ -40,6 +40,8 @@ function DialogOverlay({
     );
 }
 
+export const DIALOG_COMPOSER_SURFACE = "rounded-3xl border border-snow/5 bg-graphite";
+
 function DialogContent({
     className,
     children,

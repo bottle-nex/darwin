@@ -5,7 +5,12 @@ import { useState } from "react";
 import PlaygroundAvatar, {
     toneFor,
 } from "@/components/playground/Core/components/PlaygroundAvatar";
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import {
+    Dialog,
+    DIALOG_COMPOSER_SURFACE,
+    DialogContent,
+    DialogTitle,
+} from "@/components/ui/dialog";
 import DialogSubmitButton, { handleDialogSubmitKey } from "@/components/ui/DialogSubmitButton";
 import { DIALOG_TITLE_FIELD, GHOST_FIELD } from "@/components/ui/fieldStyles";
 import { Textarea } from "@/components/ui/textarea";
@@ -43,7 +48,7 @@ export default function AddCustomColumnDialog() {
                 }}
                 className={cn(
                     "flex w-110 max-w-none flex-col gap-0 overflow-hidden p-0 sm:max-w-none",
-                    "rounded-3xl",
+                    DIALOG_COMPOSER_SURFACE,
                 )}
             >
                 <DialogTitle className="sr-only">Add custom column</DialogTitle>
