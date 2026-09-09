@@ -1,4 +1,4 @@
-import { PLAYGROUND_THEME_STORAGE_KEY } from "@/store/playground/usePlaygroundThemeStore";
+import { PLAYGROUND_THEME_STORAGE_KEY } from "@/lib/playgroundTheme";
 
 const script = `try{var s=JSON.parse(localStorage.getItem("${PLAYGROUND_THEME_STORAGE_KEY}")).state.scheme;var d=s==="system"?window.matchMedia("(prefers-color-scheme: dark)").matches:s!=="light";if(!d){document.currentScript.parentElement.classList.add("light");if(document.body)document.body.classList.add("light")}}catch(e){}`;
 

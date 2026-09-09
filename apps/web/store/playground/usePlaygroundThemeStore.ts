@@ -4,14 +4,12 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 import { apiClient } from "@/lib/axios";
+import type { ColorScheme, ResolvedTheme } from "@/lib/playgroundTheme";
+import { isScheme, PLAYGROUND_THEME_STORAGE_KEY, resolveTheme } from "@/lib/playgroundTheme";
 import { USER_CONFIG_URL } from "@/routes/api_routes";
 
-export type ColorScheme = "dark" | "light" | "system";
-export type ResolvedTheme = "dark" | "light";
-
-export const PLAYGROUND_THEME_STORAGE_KEY = "playground-theme";
-
-const SCHEMES: ColorScheme[] = ["dark", "light", "system"];
+export type { ColorScheme, ResolvedTheme };
+export { PLAYGROUND_THEME_STORAGE_KEY, resolveTheme };
 
 export const STORED_SCHEME: Record<ColorScheme, StoredColorScheme> = {
     dark: StoredColorScheme.Dark,
@@ -24,10 +22,6 @@ export const SCHEME_FROM_STORED: Record<StoredColorScheme, ColorScheme> = {
     [StoredColorScheme.Light]: "light",
     [StoredColorScheme.System]: "system",
 };
-
-function isScheme(value: unknown): value is ColorScheme {
-    return typeof value === "string" && (SCHEMES as string[]).includes(value);
-}
 
 interface PlaygroundThemeState {
     scheme: ColorScheme;
@@ -63,11 +57,6 @@ export const usePlaygroundThemeStore = create<PlaygroundThemeState>()(
         },
     ),
 );
-
-export function resolveTheme(scheme: ColorScheme, systemPrefersDark: boolean): ResolvedTheme {
-    if (scheme === "system") return systemPrefersDark ? "dark" : "light";
-    return scheme;
-}
 
 export function usePlaygroundTheme(): ResolvedTheme {
     const fromStore = usePlaygroundThemeStore((state) =>
