@@ -53,7 +53,7 @@ export function HighPriorityIcon({ className }: IconBaseProps) {
             fill="currentColor"
             aria-hidden
             focusable="false"
-            className={clsx("size-4 text-snow", className)}
+            className={clsx("size-4", className)}
         >
             <rect x="1.5" y="8" width="3" height="6" rx="1" />
             <rect x="6.5" y="5" width="3" height="9" rx="1" />
@@ -69,7 +69,7 @@ export function MediumPriorityIcon({ className }: IconBaseProps) {
             fill="currentColor"
             aria-hidden
             focusable="false"
-            className={clsx("size-4 text-snow", className)}
+            className={clsx("size-4", className)}
         >
             <rect x="1.5" y="8" width="3" height="6" rx="1" />
             <rect x="6.5" y="5" width="3" height="9" rx="1" />
@@ -85,7 +85,7 @@ export function LowPriorityIcon({ className }: IconBaseProps) {
             fill="currentColor"
             aria-hidden
             focusable="false"
-            className={clsx("size-4 text-snow", className)}
+            className={clsx("size-4", className)}
         >
             <rect x="1.5" y="8" width="3" height="6" rx="1" />
             <rect x="6.5" y="5" width="3" height="9" rx="1" fillOpacity="0.4" />

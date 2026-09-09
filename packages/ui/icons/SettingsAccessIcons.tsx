@@ -7,14 +7,17 @@ import {
     HiOutlineCheckBadge,
     HiOutlineCog6Tooth,
     HiOutlineCommandLine,
+    HiOutlineComputerDesktop,
     HiDocumentText,
     HiOutlineFolder,
     HiOutlineHashtag,
     HiOutlineKey,
     HiLockClosed,
+    HiOutlineMoon,
     HiOutlineNoSymbol,
     HiOutlineRectangleGroup,
     HiOutlineRectangleStack,
+    HiOutlineSun,
     HiSquare3Stack3D,
     HiPuzzlePiece,
     HiRectangleStack,
@@ -91,3 +94,9 @@ export const SettingsOverviewIcon = createIcon(HiSquares2X2);
 export const SettingsTemplatesIcon = createIcon(HiDocumentText);
 
 export const SidebarToggleIcon = createIcon(TbLayoutSidebarFilled);
+
+export const ThemeDarkIcon = createIcon(HiOutlineMoon);
+
+export const ThemeLightIcon = createIcon(HiOutlineSun);
+
+export const ThemeSystemIcon = createIcon(HiOutlineComputerDesktop);
