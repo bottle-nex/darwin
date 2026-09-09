@@ -28,7 +28,7 @@ export default function SettingsOverviewDisplay() {
     return (
         <div className="flex flex-col gap-8 pb-16">
             <header className="flex flex-wrap items-center justify-between gap-x-8 gap-y-4">
-                <h1 className="text-xl leading-tight font-semibold tracking-tight text-snow">
+                <h1 className="text-xl leading-tight font-semibold tracking-tight text-overlay">
                     Settings
                 </h1>
                 <OverviewSearchField
@@ -39,7 +39,7 @@ export default function SettingsOverviewDisplay() {
             </header>
 
             {nothingMatches ? (
-                <p className="text-[13px] text-snow/40">
+                <p className="text-[13px] text-overlay/40">
                     No settings match &ldquo;{query.trim()}&rdquo;.
                 </p>
             ) : (
@@ -61,7 +61,7 @@ export default function SettingsOverviewDisplay() {
                         />
                     )}
                     {!hasProject && !searching && (
-                        <p className="text-[12px] text-snow/40">
+                        <p className="text-[12px] text-overlay/40">
                             Open a project to manage its settings.
                         </p>
                     )}

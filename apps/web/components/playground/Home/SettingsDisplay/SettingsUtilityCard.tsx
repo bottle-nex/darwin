@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 
-export const SETTINGS_CARD_SHELL = "rounded-xl border border-border bg-snow/3";
+export const SETTINGS_CARD_SHELL = "surface-card rounded-xl";
 
 export default function SettingsUtilityCard({
     title,
@@ -20,7 +20,7 @@ export default function SettingsUtilityCard({
     return (
         <div className={cn("flex flex-col gap-3", className)}>
             <div className="mx-2 flex items-center justify-between gap-3">
-                <span className="text-[15px] leading-tight font-medium text-snow">{title}</span>
+                <span className="text-[15px] leading-tight font-medium text-overlay">{title}</span>
                 {headerAction && (
                     <div className="flex shrink-0 items-center gap-2">{headerAction}</div>
                 )}

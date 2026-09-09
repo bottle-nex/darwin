@@ -16,7 +16,7 @@ export default function OverviewGroup({
 }) {
     return (
         <section className="flex flex-col gap-2 mt-2">
-            <h2 className="text-[11px] font-medium tracking-wider text-snow/35 uppercase">
+            <h2 className="text-[11px] font-medium tracking-wider text-overlay/35 uppercase">
                 {title}
             </h2>
             <div className="-mx-3 grid gap-x-3 gap-y-1 sm:grid-cols-2 lg:grid-cols-3">

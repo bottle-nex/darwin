@@ -39,7 +39,7 @@ export default function InboxDisplay() {
                 <PlaygroundBreadcrumb />
             </PaneLeadSlot>
 
-            <aside className="flex min-h-0 w-90 max-w-[42%] shrink-0 flex-col border-r border-graphite">
+            <aside className="flex min-h-0 w-90 max-w-[42%] shrink-0 flex-col border-r border-border">
                 <div className="flex shrink-0 items-center gap-1 px-2 pt-2">
                     {FILTERS.map((option) => (
                         <button
@@ -57,7 +57,7 @@ export default function InboxDisplay() {
                         <button
                             type="button"
                             onClick={() => mark_read({ scope: "project", projectId })}
-                            className="ml-auto cursor-pointer rounded-md px-1.5 py-1 text-[11px] text-neutral-500 transition-colors hover:bg-white/5 hover:text-neutral-200"
+                            className="ml-auto cursor-pointer rounded-md px-1.5 py-1 text-[11px] text-neutral-500 transition-colors hover:bg-overlay/5 hover:text-neutral-200"
                         >
                             Mark all read
                         </button>

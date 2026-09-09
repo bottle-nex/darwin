@@ -50,10 +50,10 @@ function SpaceDateButton({
             <IconWrapper
                 variant="ghost"
                 icon={CalendarIcon}
-                iconClassName={"size-4.25 group-hover:text-snow"}
+                iconClassName={"size-4.25 group-hover:text-overlay"}
                 className="text-[12px] flex items-center h-6.5"
             >
-                <span className="text-snow/90 font-medium">{shortDate(date)}</span>
+                <span className="text-overlay/90 font-medium">{shortDate(date)}</span>
             </IconWrapper>
         </Button>
     ) : (
@@ -67,7 +67,7 @@ function SpaceDateButton({
             <IconWrapper
                 variant="ghost"
                 icon={CalendarIcon}
-                iconClassName={"size-4.25 hover:text-snow"}
+                iconClassName={"size-4.25 hover:text-overlay"}
             />
         </Button>
     );

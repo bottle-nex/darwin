@@ -25,7 +25,7 @@ export default function ProjectSettingsMemberSection({
             {members.isLoading ? (
                 <p className="px-1 py-3 text-[12px] text-neutral-500">Loading…</p>
             ) : list.length === 0 ? (
-                <p className="rounded-lg bg-white/5 px-3 py-6 text-center text-[12px] text-neutral-500 shadow-[inset_0_1px_0_0_var(--color-edge)]">
+                <p className="surface-sunken rounded-lg px-3 py-6 text-center text-[12px] text-neutral-500">
                     No members yet.
                 </p>
             ) : (
@@ -33,7 +33,7 @@ export default function ProjectSettingsMemberSection({
                     {list.map((m) => (
                         <div
                             key={m.id}
-                            className="flex items-center gap-3 rounded-lg bg-cement px-3 py-2 shadow-[inset_0_1px_0_0_var(--color-edge)]"
+                            className="surface-card flex items-center gap-3 rounded-lg px-3 py-2"
                         >
                             <PlaygroundAvatar
                                 letter={initialOf(m.name, m.email)}
@@ -50,7 +50,7 @@ export default function ProjectSettingsMemberSection({
                                     </div>
                                 )}
                             </div>
-                            <span className="shrink-0 rounded bg-white/5 px-1.5 py-0.5 text-[10px] text-neutral-400">
+                            <span className="shrink-0 rounded bg-overlay/5 px-1.5 py-0.5 text-[10px] text-neutral-400">
                                 {m.role}
                             </span>
                         </div>

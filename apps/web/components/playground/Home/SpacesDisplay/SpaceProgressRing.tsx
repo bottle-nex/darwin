@@ -29,7 +29,7 @@ export default function SpaceProgressRing({
                 r={RADIUS}
                 fill="none"
                 strokeWidth={STROKE}
-                className="stroke-white/15"
+                className="stroke-overlay/15"
             />
             <circle
                 cx={SIZE / 2}

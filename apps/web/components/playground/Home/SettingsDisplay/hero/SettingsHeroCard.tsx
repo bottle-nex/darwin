@@ -6,7 +6,7 @@ export default function SettingsHeroCard({ children }: { children: React.ReactNo
     return (
         <div
             aria-hidden
-            className="pointer-events-none relative h-48 w-full shrink-0 overflow-hidden rounded-2xl border border-snow/5 bg-snow/1 select-none"
+            className="surface-sunken pointer-events-none relative h-48 w-full shrink-0 overflow-hidden rounded-2xl select-none"
         >
             {children}
         </div>
@@ -25,8 +25,8 @@ export function HeroPanel({
     return (
         <div
             className={cn(
-                "absolute rounded-2xl border bg-graphite p-4 shadow-[0_24px_60px_rgba(0,0,0,0.6)]",
-                accent ? "border-primary/45" : "border-snow/10",
+                "absolute rounded-2xl border bg-graphite p-4 shadow-[var(--shadow-dialog)]",
+                accent ? "border-primary/45" : "border-overlay/10",
                 className,
             )}
         >
@@ -39,7 +39,7 @@ export function HeroTile({ icon: Icon, className }: { icon: IconType; className?
     return (
         <span
             className={cn(
-                "flex size-8 shrink-0 items-center justify-center rounded-lg bg-snow/8 text-snow/80",
+                "flex size-8 shrink-0 items-center justify-center rounded-lg bg-overlay/8 text-overlay/80",
                 className,
             )}
         >
@@ -67,18 +67,18 @@ export function HeroRow({
             )}
         >
             <HeroTile icon={icon} className="size-7 rounded-md" />
-            <span className="flex-1 text-[13px] font-medium text-snow/85">{label}</span>
+            <span className="flex-1 text-[13px] font-medium text-overlay/85">{label}</span>
             {trailing}
         </div>
     );
 }
 
 export function HeroLabel({ children }: { children: React.ReactNode }) {
-    return <span className="text-[12px] font-medium text-snow/40">{children}</span>;
+    return <span className="text-[12px] font-medium text-overlay/40">{children}</span>;
 }
 
 export function HeroLine({ className }: { className?: string }) {
-    return <span className={cn("block h-2 rounded-full bg-snow/12", className)} />;
+    return <span className={cn("block h-2 rounded-full bg-overlay/12", className)} />;
 }
 
 export function HeroButton({
@@ -110,7 +110,7 @@ export function HeroChip({
     return (
         <span
             className={cn(
-                "inline-flex items-center gap-1.5 rounded-md bg-snow/7 px-2.5 py-1.5 text-[12px] text-snow/70",
+                "inline-flex items-center gap-1.5 rounded-md bg-overlay/7 px-2.5 py-1.5 text-[12px] text-overlay/70",
                 className,
             )}
         >
@@ -124,10 +124,10 @@ export function HeroSwitch({ on }: { on?: boolean }) {
         <span
             className={cn(
                 "flex h-5 w-9 shrink-0 items-center rounded-full px-0.5",
-                on ? "justify-end bg-primary" : "bg-snow/15",
+                on ? "justify-end bg-primary" : "bg-overlay/15",
             )}
         >
-            <span className="size-4 rounded-full bg-snow shadow" />
+            <span className="size-4 rounded-full bg-primary-foreground shadow" />
         </span>
     );
 }
@@ -142,7 +142,7 @@ export function HeroInput({
     return (
         <div
             className={cn(
-                "flex items-center rounded-lg border border-snow/8 bg-snow/5 px-3 py-2 text-[13px] text-snow/75",
+                "flex items-center rounded-lg border border-overlay/8 bg-overlay/5 px-3 py-2 text-[13px] text-overlay/75",
                 className,
             )}
         >

@@ -32,7 +32,7 @@ export default function CopyIconButton({
             onClick={handleCopy}
             aria-label={label}
             className={cn(
-                "relative flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-[8px] bg-snow/8 text-neutral-400 transition-colors hover:bg-snow/12 hover:text-neutral-200",
+                "relative flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-[8px] bg-overlay/8 text-neutral-400 transition-colors hover:bg-overlay/12 hover:text-neutral-200",
                 className,
             )}
         >

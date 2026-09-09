@@ -46,7 +46,7 @@ export default function GanttBoard() {
     }, [isToday, GanttTimeline.toDateKey(selectedDate)]);
 
     return (
-        <div className="dark flex h-full min-h-0 w-full flex-col text-foreground">
+        <div className="flex h-full min-h-0 w-full flex-col text-foreground">
             {/* <header className="flex shrink-0 items-center justify-end border-b border-border px-6 py-4">
                 <div className="flex items-center gap-2">
                     <Button variant="unstyled"
@@ -63,7 +63,7 @@ export default function GanttBoard() {
                             const [y, m, d] = e.target.value.split("-").map(Number);
                             if (y && m && d) setSelectedDate(new Date(y, m - 1, d));
                         }}
-                        className="rounded-md border border-border bg-card px-3 py-1.5 font-mono text-sm text-foreground outline-none focus:ring-2 focus:ring-ring [&::-webkit-calendar-picker-indicator]:invert"
+                        className="rounded-md border border-border bg-card px-3 py-1.5 font-mono text-sm text-foreground outline-none focus:ring-2 focus:ring-ring"
                     />
                     <Button variant="unstyled"
                         onClick={() => stepDay(1)}

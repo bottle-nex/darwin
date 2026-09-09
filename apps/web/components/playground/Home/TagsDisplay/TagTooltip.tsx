@@ -34,7 +34,7 @@ function TagTooltipFoot({ name }: { name: string }) {
                 <button
                     type="button"
                     onClick={showLabeledIssues}
-                    className="flex min-w-0 cursor-pointer items-center gap-1.5 text-snow/50 hover:text-snow/80"
+                    className="flex min-w-0 cursor-pointer items-center gap-1.5 text-overlay/50 hover:text-overlay/80"
                 >
                     <TagIcon className="size-3.5 shrink-0" aria-hidden />
                     <span className="truncate underline decoration-white/20 underline-offset-2">

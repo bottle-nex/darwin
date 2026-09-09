@@ -25,7 +25,7 @@ export default function SettingsTilePicker<T extends string>({
             {options.map((option) => (
                 <label
                     key={option.id}
-                    className="group cursor-pointer rounded-[12px] bg-snow/3 p-3 transition-colors hover:bg-snow/6 has-checked:bg-primary/10"
+                    className="surface-card surface-card-interactive group cursor-pointer rounded-[12px] p-3 transition-colors has-checked:bg-primary/10"
                 >
                     <input
                         type="radio"

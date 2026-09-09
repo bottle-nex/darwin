@@ -20,7 +20,7 @@ export type ProjectSettingsSection = "project" | "env" | "templates" | "harness"
 function RestrictedNotice() {
     return (
         <div className="flex flex-1 flex-col items-center justify-center px-6 pb-16 text-center">
-            <span className="flex size-12 items-center justify-center rounded-2xl bg-charcoal text-neutral-300 ring-1 ring-white/10">
+            <span className="flex size-12 items-center justify-center rounded-2xl bg-charcoal text-neutral-300 ring-1 ring-overlay/10">
                 <AccessRestrictedIcon className="size-5" aria-hidden />
             </span>
             <h2 className="mt-4 text-[13px] font-semibold text-neutral-100">

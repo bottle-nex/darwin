@@ -20,7 +20,7 @@ import CreateTemplateDisplay from "./CreateTemplateDisplay";
 type View = { kind: "list" } | { kind: "edit"; template?: IssueTemplate };
 
 const ROW_ICON_BUTTON =
-    "flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-[8px] bg-snow/8 text-neutral-400 transition-colors hover:bg-snow/12 hover:text-neutral-200 disabled:opacity-40 [&_svg]:size-3.5";
+    "flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-[8px] bg-overlay/8 text-neutral-400 transition-colors hover:bg-overlay/12 hover:text-neutral-200 disabled:opacity-40 [&_svg]:size-3.5";
 
 export default function IssueTemplatesDisplay({ projectId }: { projectId: string | undefined }) {
     const templates = useListTemplates(projectId);
@@ -113,7 +113,7 @@ export default function IssueTemplatesDisplay({ projectId }: { projectId: string
                                             />
                                         ) : (
                                             <TemplateDocumentIcon
-                                                className="size-3.5 shrink-0 text-white/35"
+                                                className="size-3.5 shrink-0 text-overlay/35"
                                                 aria-hidden
                                             />
                                         )}
@@ -157,7 +157,7 @@ export default function IssueTemplatesDisplay({ projectId }: { projectId: string
                                         onClick={() => setConfirmDelete(template)}
                                         className={cn(
                                             ROW_ICON_BUTTON,
-                                            "hover:bg-red-500/12 hover:text-red-300",
+                                            "hover:bg-danger-surface hover:text-danger",
                                         )}
                                     >
                                         <DeleteIcon className="size-3.5" aria-hidden />

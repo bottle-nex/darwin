@@ -21,20 +21,22 @@ export default function OverviewTile({
             )}
         >
             <span className="relative size-10 shrink-0">
-                <span className="absolute top-1/2 -left-1 h-8.5 w-8.5 -translate-y-1/2 -rotate-12 rounded-[9px] border border-snow/7 bg-graphite/60" />
-                <span className="absolute top-1/2 -right-1 h-8.5 w-8.5 -translate-y-1/2 rotate-12 rounded-[9px] border border-snow/7 bg-graphite/60" />
-                <span className="relative flex size-full items-center justify-center rounded-[10px] border border-snow/8 bg-graphite">
-                    <item.icon className="size-4.25 text-snow/80" aria-hidden />
+                <span className="absolute top-1/2 -left-1 h-8.5 w-8.5 -translate-y-1/2 -rotate-12 rounded-[9px] border border-overlay/7 bg-graphite/60" />
+                <span className="absolute top-1/2 -right-1 h-8.5 w-8.5 -translate-y-1/2 rotate-12 rounded-[9px] border border-overlay/7 bg-graphite/60" />
+                <span className="relative flex size-full items-center justify-center rounded-[10px] border border-overlay/8 bg-graphite">
+                    <item.icon className="size-4.25 text-overlay/80" aria-hidden />
                 </span>
             </span>
             <span className="flex min-w-0 flex-col gap-0.5">
-                <span className="text-[13px] leading-tight font-medium text-snow">
+                <span className="text-[13px] leading-tight font-medium text-overlay">
                     {item.label}
                 </span>
-                <span className="text-[12px] leading-tight text-snow/45">{item.description}</span>
+                <span className="text-[12px] leading-tight text-overlay/45">
+                    {item.description}
+                </span>
             </span>
             {isTopMatch && (
-                <kbd className="shrink-0 rounded-[5px] bg-snow/8 px-1.5 py-0.5 font-sans text-[11px] text-snow/60">
+                <kbd className="shrink-0 rounded-[5px] bg-overlay/8 px-1.5 py-0.5 font-sans text-[11px] text-overlay/60">
                     ↵
                 </kbd>
             )}

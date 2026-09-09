@@ -15,7 +15,7 @@ export default function OverviewSearchField({
     return (
         <div className="relative w-full sm:w-72">
             <SearchIcon
-                className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-snow/40"
+                className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-overlay/40"
                 aria-hidden
             />
             <Input
@@ -35,7 +35,7 @@ export default function OverviewSearchField({
                     }
                 }}
                 placeholder="Search settings..."
-                className="h-9 rounded-md bg-snow/4 pl-9 text-[13px] hover:bg-snow/6 focus-visible:bg-snow/6"
+                className="surface-inset h-9 rounded-md pl-9 text-[13px]"
             />
         </div>
     );

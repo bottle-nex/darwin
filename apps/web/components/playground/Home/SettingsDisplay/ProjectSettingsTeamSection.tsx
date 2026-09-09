@@ -24,7 +24,7 @@ function TeamRow({
     const updateTeam = useUpdateTeam();
 
     return (
-        <div className="group flex items-center gap-3 rounded-lg bg-white/5 px-3 py-2 shadow-[inset_0_1px_0_0_var(--color-edge)]">
+        <div className="surface-card group flex items-center gap-3 rounded-lg px-3 py-2">
             <IconPickButton
                 pick={team.icon}
                 onSelect={(icon) => updateTeam.mutate({ teamId: team.id, projectId, icon })}
@@ -43,7 +43,7 @@ function TeamRow({
                     type="button"
                     aria-label={`Delete ${team.name}`}
                     onClick={onDelete}
-                    className="flex size-6 shrink-0 cursor-pointer items-center justify-center rounded text-neutral-400 hover:bg-neutral-700/50 hover:text-red-500"
+                    className="flex size-6 shrink-0 cursor-pointer items-center justify-center rounded text-neutral-400 hover:bg-overlay/10 hover:text-danger"
                 >
                     <DeleteIcon className="size-3" aria-hidden />
                 </Button>
@@ -90,7 +90,7 @@ export default function ProjectSettingsTeamSection({
             </div>
 
             {project.teams.length === 0 ? (
-                <p className="rounded-lg bg-white/5 px-3 py-6 text-center text-[12px] text-neutral-500 shadow-[inset_0_1px_0_0_var(--color-edge)]">
+                <p className="surface-sunken rounded-lg px-3 py-6 text-center text-[12px] text-neutral-500">
                     No teams yet.
                 </p>
             ) : (

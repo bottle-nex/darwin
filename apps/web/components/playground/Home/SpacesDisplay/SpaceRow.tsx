@@ -115,7 +115,7 @@ export default function SpaceRow({
                                 variant="unstyled"
                                 type="button"
                                 aria-label={`${space.name} actions`}
-                                className="flex size-6 cursor-pointer items-center justify-center rounded text-neutral-400 opacity-0 ring-inset transition-opacity hover:bg-white/5 hover:text-neutral-200 focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-hidden group-hover/selectable:opacity-100 data-[state=open]:opacity-100"
+                                className="flex size-6 cursor-pointer items-center justify-center rounded text-neutral-400 opacity-0 ring-inset transition-opacity hover:bg-overlay/5 hover:text-neutral-200 focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-hidden group-hover/selectable:opacity-100 data-[state=open]:opacity-100"
                             >
                                 <OverflowMenuIcon className="size-4" aria-hidden />
                             </Button>

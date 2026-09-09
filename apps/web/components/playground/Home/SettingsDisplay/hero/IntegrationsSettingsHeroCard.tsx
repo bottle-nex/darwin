@@ -12,11 +12,11 @@ import { AppLogo } from "@/components/logo/AppLogo";
 import SettingsHeroCard from "./SettingsHeroCard";
 
 const INTEGRATION_APPS = [
-    { icon: GithubLogoIcon, color: "#e8e8e8" },
+    { icon: GithubLogoIcon, color: "var(--color-overlay)" },
     { icon: SlackLogoIcon, color: "#e01e5a" },
     { icon: LinearLogoIcon, color: "#8b93ff" },
     { icon: JiraLogoIcon, color: "#4d9fff" },
-    { icon: NotionLogoIcon, color: "#ffffff" },
+    { icon: NotionLogoIcon, color: "var(--color-overlay)" },
     { icon: DiscordLogoIcon, color: "#5865f2" },
 ];
 
@@ -118,7 +118,7 @@ export default function IntegrationsSettingsHeroCard() {
                 {BACKDROP_BLOCKS.map((block, index) => (
                     <span
                         key={index}
-                        className="absolute h-1 rounded-[2px] bg-snow/40"
+                        className="absolute h-1 rounded-[2px] bg-overlay/40"
                         style={{
                             top: block.top,
                             left: block.left,
@@ -130,7 +130,7 @@ export default function IntegrationsSettingsHeroCard() {
             </div>
             <div className="absolute inset-0 flex items-center justify-center [mask-image:linear-gradient(to_bottom,transparent_8%,black_42%,black_58%,transparent_92%)]">
                 <AppLogo
-                    className="h-44 w-auto text-snow/5"
+                    className="h-44 w-auto text-overlay/5"
                     fill="none"
                     stroke="currentColor"
                     strokeWidth={10}

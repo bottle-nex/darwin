@@ -35,8 +35,8 @@ const LABEL = "text-[12.5px] font-normal text-neutral-500";
 const SWATCH = "flex size-7 items-center justify-center rounded-full transition-all cursor-pointer";
 
 const SWATCH_STATE = {
-    on: "ring-2 ring-white/80 ring-offset-2 ring-offset-charcoal",
-    off: "ring-1 ring-white/10 hover:ring-white/30",
+    on: "ring-2 ring-overlay/80 ring-offset-2 ring-offset-charcoal",
+    off: "ring-1 ring-overlay/10 hover:ring-overlay/30",
 };
 
 type CreateTagDialogProps = {
@@ -133,7 +133,7 @@ function TagForm({ projectId, tag, onDone }: { projectId: string; tag?: Tag; onD
             onKeyDown={(event) => handleDialogSubmitKey(event, submit)}
         >
             <section className="flex flex-col items-start gap-y-3 pt-4 pb-2">
-                <div className="flex items-center justify-start gap-x-1 text-snow text-xs">
+                <div className="flex items-center justify-start gap-x-1 text-overlay text-xs">
                     <PlaygroundAvatar
                         letter={project?.name.slice(0, 2) ?? ""}
                         tone={project ? toneFor(project.id) : "emerald"}

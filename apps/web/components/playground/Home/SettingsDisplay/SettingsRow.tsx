@@ -24,9 +24,9 @@ export default function SettingsRow({
             )}
         >
             <div className="flex min-w-0 flex-col gap-0.5">
-                <span className="text-[13px] leading-tight text-snow">{label}</span>
+                <span className="text-[13px] leading-tight text-overlay">{label}</span>
                 {description && (
-                    <span className="text-[12px] leading-tight text-snow/50">{description}</span>
+                    <span className="text-[12px] leading-tight text-overlay/50">{description}</span>
                 )}
             </div>
             <div className={cn(stack ? "w-full" : "shrink-0")}>{children}</div>

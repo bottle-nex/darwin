@@ -109,7 +109,7 @@ export default function ProjectSettingsEnvSection({
                 label="Add variable"
                 description={
                     newKey.length > 0 && !keyValid ? (
-                        <span className="text-red-400">
+                        <span className="text-danger">
                             Keys must start with a letter or underscore and contain only letters,
                             numbers, and underscores.
                         </span>
@@ -218,7 +218,7 @@ export default function ProjectSettingsEnvSection({
                                             projectId &&
                                             deleteSecret.mutate({ projectId, key: s.key })
                                         }
-                                        className="flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-[8px] bg-snow/8 text-neutral-400 transition-colors hover:bg-red-500/12 hover:text-red-300 disabled:opacity-40 [&_svg]:size-3.5"
+                                        className="flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-[8px] bg-overlay/8 text-neutral-400 transition-colors hover:bg-danger-surface hover:text-danger disabled:opacity-40 [&_svg]:size-3.5"
                                     >
                                         <DeleteIcon className="size-3.5" aria-hidden />
                                     </Button>

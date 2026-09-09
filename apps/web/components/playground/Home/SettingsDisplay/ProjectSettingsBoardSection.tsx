@@ -11,11 +11,10 @@ import type { KanbanOptionView } from "@/types/project";
 
 import SettingsTilePicker, { type TileOption } from "./SettingsTilePicker";
 
-const PREVIEW_SHELL =
-    "flex h-11 items-center justify-end gap-1 rounded-[8px] border border-snow/5 bg-ink/40 px-2";
+const PREVIEW_SHELL = "surface-sunken flex h-11 items-center justify-end gap-1 rounded-[8px] px-2";
 
 const PREVIEW_CONTROL =
-    "flex items-center gap-1 rounded-[4px] bg-snow/8 px-1.5 py-1 text-[9px] text-neutral-300";
+    "flex items-center gap-1 rounded-[4px] bg-overlay/8 px-1.5 py-1 text-[9px] text-neutral-300";
 
 function PreviewControl({ icon: Icon, label }: { icon: typeof FilterIcon; label: string }) {
     return (

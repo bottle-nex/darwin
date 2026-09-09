@@ -16,7 +16,13 @@ export default function GanttIssueCard({ issue, now }: { issue: GanttIssue; now:
     const isDone = issue.status === "done";
     const isPaused = isSolving && issue.pausedAt != null;
 
-    const accent = isPaused ? "#fbbf24" : isDone ? "#4ade80" : isSolving ? "#60a5fa" : "#a78bfa";
+    const accent = isPaused
+        ? "var(--color-warning)"
+        : isDone
+          ? "var(--color-success)"
+          : isSolving
+            ? "#3b82f6"
+            : "var(--color-primary)";
     const statusLabel = isPaused
         ? "Paused"
         : isDone
@@ -36,7 +42,7 @@ export default function GanttIssueCard({ issue, now }: { issue: GanttIssue; now:
             <TooltipComponent content={`${identifier(issue.number)} · ${issue.title}`}>
                 <div
                     className={cn(
-                        "absolute inset-y-2 z-1 overflow-hidden rounded-md border border-zinc-800/80",
+                        "absolute inset-y-2 z-1 overflow-hidden rounded-md border border-border",
                         isQueued && "border-dashed",
                         BLURRED_BG_TWO(true),
                     )}
@@ -56,7 +62,7 @@ export default function GanttIssueCard({ issue, now }: { issue: GanttIssue; now:
                                     )}
                                 />
                                 {issue.label && (
-                                    <span className="truncate rounded-md bg-graphite px-1.5 py-0.5 text-[10px] font-medium text-neutral-300">
+                                    <span className="surface-inset truncate rounded-md px-1.5 py-0.5 text-[10px] font-medium text-neutral-300">
                                         {issue.label}
                                     </span>
                                 )}
@@ -82,7 +88,7 @@ export default function GanttIssueCard({ issue, now }: { issue: GanttIssue; now:
                         </div>
 
                         {isPaused && (
-                            <div className="mt-2 flex items-center gap-1 text-[11px] text-amber-400">
+                            <div className="text-warning mt-2 flex items-center gap-1 text-[11px]">
                                 <PausedStateIcon className="size-3 shrink-0" aria-hidden />
                                 <span className="truncate">
                                     Paused {pausedMinutes}m · {issue.pauseReason}
@@ -90,7 +96,7 @@ export default function GanttIssueCard({ issue, now }: { issue: GanttIssue; now:
                             </div>
                         )}
 
-                        <div className="mt-auto flex items-center justify-between border-t border-graphite pt-2">
+                        <div className="mt-auto flex items-center justify-between border-t border-border pt-2">
                             <span className="flex items-center gap-1 text-[11px] text-neutral-500">
                                 <CommentCountIcon className="size-3" aria-hidden />
                                 {issue.comments ? issue.comments : null}

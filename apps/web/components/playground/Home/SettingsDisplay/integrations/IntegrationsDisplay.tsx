@@ -30,7 +30,7 @@ export default function IntegrationsDisplay({ project }: { project: ProjectDetai
     return (
         <section className="flex flex-col gap-5">
             <header className="flex flex-col gap-1">
-                <h2 className="text-sm font-medium text-snow">Integrations</h2>
+                <h2 className="text-sm font-medium text-overlay">Integrations</h2>
             </header>
 
             <ul className="flex w-full max-w-90 list-none flex-col gap-3">

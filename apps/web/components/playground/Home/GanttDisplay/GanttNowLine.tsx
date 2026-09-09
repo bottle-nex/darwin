@@ -24,7 +24,7 @@ export default function GanttNowLine({ minute }: { minute: number }) {
             <div className="pointer-events-auto absolute inset-y-0 -left-1.5 w-3" />
             <div className="absolute inset-y-0 left-0 w-px bg-primary" />
             <div className="absolute -left-1 -top-1 size-2 rounded-full bg-primary" />
-            <span className="pointer-events-none absolute left-1.5 top-0.5 rounded bg-primary px-1.5 py-0.5 font-mono text-[10px] font-medium text-neutral-900 opacity-0 shadow-sm transition-opacity group-hover:opacity-100">
+            <span className="pointer-events-none absolute left-1.5 top-0.5 rounded bg-primary px-1.5 py-0.5 font-mono text-[10px] font-medium text-ink opacity-0 shadow-sm transition-opacity group-hover:opacity-100">
                 {fmtClockSeconds(minute)}
             </span>
         </div>

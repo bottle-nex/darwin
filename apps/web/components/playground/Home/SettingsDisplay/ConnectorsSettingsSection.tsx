@@ -90,7 +90,7 @@ function ConnectorRow({
         <SettingsRow
             label={
                 <span className="flex items-center gap-2">
-                    <Icon className="size-4 text-snow/70" />
+                    <Icon className="size-4 text-overlay/70" />
                     {meta.label}
                 </span>
             }

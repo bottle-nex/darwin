@@ -54,16 +54,16 @@ export default function IntegrationCard({
                 className,
             )}
         >
-            <Icon className="mt-0.5 size-8 shrink-0 text-snow" aria-hidden />
+            <Icon className="mt-0.5 size-8 shrink-0 text-overlay" aria-hidden />
 
             <div className="flex min-w-0 flex-1 flex-col gap-1">
                 <div className="flex items-center gap-2.5">
-                    <span className="shrink-0 text-[14px] font-semibold text-snow">{name}</span>
+                    <span className="shrink-0 text-[14px] font-semibold text-overlay">{name}</span>
                     <Pill size="sm" tone={STATUS_TONE[status]} dotColor={STATUS_DOT[status]}>
                         {STATUS_LABEL[status]}
                     </Pill>
                 </div>
-                <span className="text-[12.5px] leading-[1.5] text-snow/55">{description}</span>
+                <span className="text-[12.5px] leading-[1.5] text-overlay/55">{description}</span>
             </div>
 
             <Button

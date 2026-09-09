@@ -100,7 +100,7 @@ export default function TagsOptionsBar({
                                 icon={CloseIcon}
                                 onClick={onClearSelection}
                             />
-                            <div className="mx-1 h-4 w-px bg-white/8" />
+                            <div className="mx-1 h-4 w-px bg-overlay/8" />
                         </>
                     )}
 
@@ -138,7 +138,7 @@ export default function TagsOptionsBar({
                         </DropdownMenuContent>
                     </DropdownMenu>
 
-                    <div className="mx-1 h-4 w-px bg-white/8" />
+                    <div className="mx-1 h-4 w-px bg-overlay/8" />
 
                     <OptionButton label="New tag" icon={AddIcon} onClick={onCreate} />
                 </div>
@@ -181,14 +181,14 @@ function TagsSearchBar({ value, onChange, onClose }: TagsSearchBarProps) {
                     if (e.key === "Escape") onClose();
                 }}
                 placeholder="Search tags..."
-                className="h-7 w-full rounded-md border border-white/10 bg-white/5 pr-7 pl-8 text-[12px] text-neutral-100 placeholder:text-neutral-500 focus:border-white/25 focus:outline-none"
+                className="surface-inset h-7 w-full rounded-md pr-7 pl-8 text-[12px] text-neutral-100 placeholder:text-neutral-500 focus:border-overlay/25 focus:outline-none"
             />
             <Button
                 variant="unstyled"
                 type="button"
                 onClick={onClose}
                 aria-label="Close search"
-                className="absolute right-1.5 flex size-4 cursor-pointer items-center justify-center rounded-full bg-white/10 text-neutral-400 hover:bg-white/20 hover:text-neutral-100"
+                className="absolute right-1.5 flex size-4 cursor-pointer items-center justify-center rounded-full bg-overlay/10 text-neutral-400 hover:bg-overlay/20 hover:text-neutral-100"
             >
                 <CloseIcon className="size-2.5" aria-hidden />
             </Button>

@@ -24,7 +24,7 @@ function formatDate(value: string | null) {
 function CodeRow({ value, copyLabel }: { value: string; copyLabel: string }) {
     return (
         <div className="flex items-center gap-2">
-            <code className="h-8 min-w-0 flex-1 truncate rounded-[8px] border border-snow/5 bg-snow/6 px-2.5 text-[12px] leading-8 text-neutral-300">
+            <code className="surface-inset h-8 min-w-0 flex-1 truncate rounded-[8px] px-2.5 text-[12px] leading-8 text-neutral-300">
                 {value}
             </code>
             <CopyIconButton value={value} label={copyLabel} />
@@ -42,9 +42,9 @@ function CreatedKeyBanner({
     const connectorUrl = CLAUDE_MCP_CONNECTOR_URL(createdKey.key);
 
     return (
-        <div className="flex flex-col gap-y-3 rounded-lg border border-emerald-500/20 bg-emerald-500/5 p-3">
+        <div className="border-success-edge bg-success-surface flex flex-col gap-y-3 rounded-lg border p-3">
             <div className="flex flex-col gap-y-1.5">
-                <p className="text-xs text-emerald-300">
+                <p className="text-success text-xs">
                     Paste this as the &quot;Remote MCP server URL&quot; in Claude&apos;s Add custom
                     connector dialog — leave Name free-text and skip the OAuth fields.
                 </p>

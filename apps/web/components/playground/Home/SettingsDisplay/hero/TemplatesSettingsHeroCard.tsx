@@ -15,10 +15,10 @@ export default function TemplatesSettingsHeroCard() {
             <HeroPanel className="-bottom-6 -left-8 w-92 -rotate-6" accent>
                 <div className="flex items-center gap-3">
                     <HeroTile icon={SettingsTemplatesIcon} />
-                    <span className="text-[13.5px] font-medium text-snow/90">Bug report</span>
+                    <span className="text-[13.5px] font-medium text-overlay/90">Bug report</span>
                 </div>
                 <div className="mt-4 flex flex-col gap-2.5">
-                    <HeroLine className="w-56 bg-snow/20" />
+                    <HeroLine className="w-56 bg-overlay/20" />
                     <HeroLine className="w-44" />
                     <HeroLine className="w-48" />
                     <HeroLine className="w-32" />

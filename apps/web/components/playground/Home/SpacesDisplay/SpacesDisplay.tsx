@@ -65,7 +65,7 @@ export default function SpacesDisplay() {
                     {isLoading ? (
                         <LogoLoader size={32} className="py-16" />
                     ) : isError ? (
-                        <p className="px-2.5 py-3 text-[12px] text-red-400">
+                        <p className="px-2.5 py-3 text-[12px] text-danger">
                             Couldn&apos;t load spaces.
                         </p>
                     ) : !rows.length ? (

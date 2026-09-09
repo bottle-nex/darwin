@@ -107,7 +107,7 @@ export default function ProjectSettingsGeneralSection({
                     label="Slug"
                     description={
                         slugTaken ? (
-                            <span className="text-red-400">That slug is already taken.</span>
+                            <span className="text-danger">That slug is already taken.</span>
                         ) : (
                             "Used in this project's URLs."
                         )
@@ -185,7 +185,7 @@ export default function ProjectSettingsGeneralSection({
             )}
 
             <Dialog open={confirmOpen} onOpenChange={(o) => !del.isPending && setConfirmOpen(o)}>
-                <DialogContent className="border-white/10 sm:max-w-md">
+                <DialogContent className="border-overlay/10 sm:max-w-md">
                     <DialogHeader>
                         <DialogTitle className="text-[14px] text-neutral-100">
                             Delete project?

@@ -18,7 +18,7 @@ import { cn } from "@/lib/utils";
 import type { ApiResponse } from "@/types/api";
 import type { IssueTemplate } from "@/types/issueTemplate";
 
-const GHOST = "w-full bg-transparent outline-none placeholder:text-white/25";
+const GHOST = "w-full bg-transparent outline-none placeholder:text-overlay/25";
 
 const HINTS = [
     { keys: "/", does: "Headings, lists, code" },
@@ -152,10 +152,10 @@ export default function CreateTemplateDisplay({
             </header>
 
             <section className="flex flex-col gap-3">
-                <ul className="flex list-none flex-wrap items-center gap-x-5 gap-y-2 border-b border-white/6 pb-3 text-[11px] text-neutral-500">
+                <ul className="flex list-none flex-wrap items-center gap-x-5 gap-y-2 border-b border-overlay/6 pb-3 text-[11px] text-neutral-500">
                     {HINTS.map((hint) => (
                         <li key={hint.keys} className="flex items-center gap-1.5">
-                            <kbd className="rounded-[5px] bg-white/6 px-1.5 py-0.5 font-mono text-[10px] text-neutral-300 ring-1 ring-white/10">
+                            <kbd className="rounded-[5px] bg-overlay/6 px-1.5 py-0.5 font-mono text-[10px] text-neutral-300 ring-1 ring-overlay/10">
                                 {hint.keys}
                             </kbd>
                             {hint.does}
@@ -179,7 +179,7 @@ export default function CreateTemplateDisplay({
                 </article>
             </section>
 
-            <footer className="mt-auto flex items-center justify-between gap-4 border-t border-white/6 pt-4 pb-2">
+            <footer className="mt-auto flex items-center justify-between gap-4 border-t border-overlay/6 pt-4 pb-2">
                 <label className="flex cursor-pointer items-center gap-2">
                     <input
                         type="checkbox"
@@ -192,7 +192,7 @@ export default function CreateTemplateDisplay({
                             "flex size-4 items-center justify-center rounded-[5px] ring-1 transition-colors",
                             isDefault
                                 ? "bg-matcha ring-matcha"
-                                : "bg-white/5 ring-white/15 hover:ring-white/35",
+                                : "bg-overlay/5 ring-overlay/15 hover:ring-overlay/35",
                         )}
                     >
                         {isDefault && (

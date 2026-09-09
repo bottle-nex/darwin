@@ -56,8 +56,8 @@ function LabeledField({
 function DetailRow({ label, children }: { label: string; children: React.ReactNode }) {
     return (
         <div className="flex items-baseline justify-between gap-4">
-            <dt className="shrink-0 text-[11px] text-snow/40">{label}</dt>
-            <dd className="min-w-0 truncate text-[11px] text-snow/80">{children}</dd>
+            <dt className="shrink-0 text-[11px] text-overlay/40">{label}</dt>
+            <dd className="min-w-0 truncate text-[11px] text-overlay/80">{children}</dd>
         </div>
     );
 }
@@ -106,7 +106,7 @@ export default function GithubIssueImportDisplay({
                 type="button"
                 variant="unstyled"
                 onClick={onBack}
-                className="flex w-fit cursor-pointer items-center gap-2 text-[14px] text-snow/50 transition-colors hover:text-snow"
+                className="flex w-fit cursor-pointer items-center gap-2 text-[14px] text-overlay/50 transition-colors hover:text-overlay"
             >
                 <BackChevronIcon className="size-4" aria-hidden />
                 Integrations
@@ -120,13 +120,13 @@ export default function GithubIssueImportDisplay({
                         <IconWrapper
                             icon={GithubLogoIcon}
                             className="size-12 shrink-0 rounded-xl"
-                            iconClassName="size-6 text-snow"
+                            iconClassName="size-6 text-overlay"
                         />
                         <div className="flex min-w-0 flex-col gap-1">
-                            <h2 className="truncate text-[20px] leading-none font-medium text-snow">
+                            <h2 className="truncate text-[20px] leading-none font-medium text-overlay">
                                 GitHub
                             </h2>
-                            <span className="truncate text-[12px] text-snow/40">
+                            <span className="truncate text-[12px] text-overlay/40">
                                 Issue tracking · Built by darwin
                             </span>
                         </div>
@@ -157,7 +157,9 @@ export default function GithubIssueImportDisplay({
                             />
                             <div className="ml-auto flex items-center gap-2">
                                 {!enabled && missingSetup && (
-                                    <span className="text-[11px] text-snow/35">{missingSetup}</span>
+                                    <span className="text-[11px] text-overlay/35">
+                                        {missingSetup}
+                                    </span>
                                 )}
                                 <Button
                                     type="button"
@@ -184,7 +186,7 @@ export default function GithubIssueImportDisplay({
                         </div>
                     )}
 
-                    <p className="text-[13px] leading-[1.65] text-snow/55">
+                    <p className="text-[13px] leading-[1.65] text-overlay/55">
                         Your team files issues where it already works. When someone opens one on{" "}
                         {repo ?? "the connected repository"}, darwin copies it onto this
                         project&apos;s board — title, body and author — tagged so you can tell
@@ -192,7 +194,7 @@ export default function GithubIssueImportDisplay({
                     </p>
 
                     {!repo ? (
-                        <p className="border-t border-border pt-5 text-[13px] leading-[1.65] text-snow/55">
+                        <p className="border-t border-border pt-5 text-[13px] leading-[1.65] text-overlay/55">
                             This project has no repository connected, so there is nothing to import
                             from. Attach one when you create the project.
                         </p>

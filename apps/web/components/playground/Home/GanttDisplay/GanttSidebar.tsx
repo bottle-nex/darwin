@@ -28,7 +28,7 @@ export default function GanttSidebar({ pausedWorkerIds }: { pausedWorkerIds: Set
                         <span className="text-sm font-medium text-foreground">{lane.name}</span>
                     </div>
                     {pausedWorkerIds.has(lane.id) && (
-                        <span className="inline-flex w-fit items-center gap-1 rounded-full bg-amber-500/15 px-1.5 py-0.5 text-[10px] font-medium text-amber-400">
+                        <span className="bg-warning-surface text-warning inline-flex w-fit items-center gap-1 rounded-full px-1.5 py-0.5 text-[10px] font-medium">
                             <PausedStateIcon className="size-2.5" aria-hidden />
                             Paused
                         </span>
