@@ -66,7 +66,10 @@ export default function IssueBoardColumn({
     knownTotal,
     autoFill,
 }: IssueBoardColumnProps) {
-    const { setNodeRef } = useDroppable({ id: groupDropId(group.key), disabled: !droppable });
+    const { setNodeRef, isOver } = useDroppable({
+        id: groupDropId(group.key),
+        disabled: !droppable,
+    });
     const project = useActiveProject();
     const selectedIds = useIssueSelectionStore((s) => s.ids);
     const replaceSelection = useIssueSelectionStore((s) => s.replace);
@@ -84,8 +87,9 @@ export default function IssueBoardColumn({
         <div
             data-column-group={group.key}
             className={cn(
-                "group flex max-h-full min-h-0 flex-col rounded-lg bg-ink/20 p-2 ring-[0.5px] ring-snow/3 transition-colors",
+                "surface-sunken group flex max-h-full min-h-0 flex-col rounded-lg p-2 transition-colors",
                 fullWidth ? "min-w-0 flex-1" : "w-84 shrink-0",
+                isOver && "ring-2 ring-primary/40",
             )}
         >
             <div className="mb-2 flex items-center justify-between gap-2 px-0.5">
@@ -113,7 +117,7 @@ export default function IssueBoardColumn({
                                 setDraftTitle(null);
                             }
                         }}
-                        className="h-7 rounded-sm bg-charcoal text-[12px] shadow-none! hover:bg-charcoal"
+                        className="h-7 rounded-sm text-[12px] shadow-none!"
                     />
                 )}
                 <div className="flex items-center gap-1">
@@ -123,7 +127,7 @@ export default function IssueBoardColumn({
                             type="button"
                             onClick={onCreate}
                             aria-label={`Add an issue to ${title}`}
-                            className="flex size-6 cursor-pointer items-center justify-center rounded text-neutral-400 opacity-0 transition-opacity hover:bg-white/10 hover:text-neutral-200 focus-visible:opacity-100 group-hover:opacity-100"
+                            className="flex size-6 cursor-pointer items-center justify-center rounded text-neutral-400 opacity-0 transition-opacity hover:bg-overlay/10 hover:text-neutral-200 focus-visible:opacity-100 group-hover:opacity-100"
                         >
                             <AddIcon className="size-4" aria-hidden />
                         </Button>
@@ -134,7 +138,7 @@ export default function IssueBoardColumn({
                                 variant="unstyled"
                                 type="button"
                                 aria-label={`${title} options`}
-                                className="flex size-6 cursor-pointer items-center justify-center rounded text-neutral-400 opacity-0 transition-opacity hover:bg-white/10 hover:text-neutral-200 focus-visible:opacity-100 group-hover:opacity-100 data-[state=open]:opacity-100"
+                                className="flex size-6 cursor-pointer items-center justify-center rounded text-neutral-400 opacity-0 transition-opacity hover:bg-overlay/10 hover:text-neutral-200 focus-visible:opacity-100 group-hover:opacity-100 data-[state=open]:opacity-100"
                             >
                                 <OverflowMenuIcon className="size-4" aria-hidden />
                             </Button>
@@ -223,7 +227,7 @@ export default function IssueBoardColumn({
                             variant="unstyled"
                             type="button"
                             onClick={onCreate}
-                            className="mt-2 flex w-full shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-[9px] bg-white/5 px-2 py-1.5 text-center text-[13px] font-medium text-neutral-400 transition-colors hover:bg-white/8 hover:text-neutral-200"
+                            className="mt-2 flex w-full shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-[9px] bg-overlay/5 px-2 py-1.5 text-center text-[13px] font-medium text-neutral-400 transition-colors hover:bg-overlay/8 hover:text-neutral-200"
                         >
                             <AddIcon className="size-3.5" aria-hidden />
                             Add an Issue

@@ -44,7 +44,7 @@ export default function DarwinIssueRow({ issue }: { issue: DarwinIssueCard }) {
             type="button"
             onClick={() => openIssue(issue.id)}
             title={issue.title}
-            className="group flex w-full cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 text-left hover:bg-snow/5"
+            className="group flex w-full cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 text-left hover:bg-overlay/5"
         >
             <span className="flex size-4 shrink-0 items-center justify-center">
                 {PriorityIcon && (
@@ -55,13 +55,13 @@ export default function DarwinIssueRow({ issue }: { issue: DarwinIssueCard }) {
                 )}
             </span>
 
-            <span className="w-14 shrink-0 font-mono text-[11.5px] text-snow/45">
+            <span className="w-14 shrink-0 font-mono text-[11.5px] text-overlay/45">
                 {identifier(issue.number)}
             </span>
 
             <StatusIcon className={cn("size-3.5 shrink-0", glyph.titleBox)} aria-hidden />
 
-            <span className="min-w-0 flex-1 truncate text-[13px] text-snow group-hover:text-neutral-100">
+            <span className="min-w-0 flex-1 truncate text-[13px] text-overlay group-hover:text-neutral-100">
                 {issue.title}
             </span>
 
@@ -82,11 +82,11 @@ export default function DarwinIssueRow({ issue }: { issue: DarwinIssueCard }) {
                             src={person.image ?? undefined}
                             tone={toneFor(person.id)}
                             size="sm"
-                            className="rounded-full ring-1 ring-neutral-800"
+                            className="rounded-full ring-1 ring-card"
                         />
                     ))}
                     {overflow > 0 && (
-                        <span className="flex size-5 items-center justify-center rounded-full bg-white/10 text-[9px] font-medium text-neutral-300 ring-1 ring-inset ring-white/15">
+                        <span className="flex size-5 items-center justify-center rounded-full bg-overlay/10 text-[9px] font-medium text-neutral-300 ring-1 ring-inset ring-overlay/15">
                             +{overflow}
                         </span>
                     )}

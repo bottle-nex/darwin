@@ -84,7 +84,7 @@ export default function IssueListRow({
                     iconClassName={KanbanBoard.glyphFor(KanbanStatus.InReview).titleBox}
                     title="Open the review"
                 >
-                    <span className="text-snow">#{pullNumber}</span>
+                    <span className="text-overlay">#{pullNumber}</span>
                 </IconWrapper>
             </button>
         ) : null;
@@ -132,7 +132,7 @@ export default function IssueListRow({
                     }}
                     className="flex min-w-0 cursor-pointer items-center text-left focus-visible:outline-none"
                 >
-                    <span className="w-14 shrink-0 font-mono text-[12px] text-snow/70">
+                    <span className="w-14 shrink-0 font-mono text-[12px] text-overlay/70">
                         {identifier}
                     </span>
                     <IssueBoardChip
@@ -171,7 +171,7 @@ export default function IssueListRow({
                         src={assignee.image}
                         tone={assignee.tone}
                         size="sm"
-                        className="ring-1 ring-neutral-800"
+                        className="ring-1 ring-background"
                     />
                 ))}
             </IssueFieldChip>

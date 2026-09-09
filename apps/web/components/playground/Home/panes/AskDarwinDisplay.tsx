@@ -99,7 +99,7 @@ export default function AskDarwinDisplay() {
                                     <button
                                         type="button"
                                         onClick={() => void ask(base.prompt)}
-                                        className="top-lit-edge relative flex h-full w-full cursor-pointer flex-col gap-1.5 rounded-2xl bg-white/2 p-4 text-left transition-colors hover:bg-white/4"
+                                        className="surface-card surface-card-interactive top-lit-edge relative flex h-full w-full cursor-pointer flex-col gap-1.5 rounded-2xl p-4 text-left transition-colors"
                                     >
                                         <span className="text-sm font-medium text-neutral-100">
                                             {base.title}

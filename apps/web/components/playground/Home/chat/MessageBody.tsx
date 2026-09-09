@@ -39,7 +39,7 @@ function LinkedText({ text, isMine }: { text: string; isMine: boolean }) {
                         rel="noopener noreferrer"
                         className={cn(
                             "underline decoration-current/40 underline-offset-2 transition-colors hover:decoration-current",
-                            isMine ? "text-snow" : "text-primary",
+                            isMine ? "text-primary-foreground" : "text-primary",
                         )}
                     >
                         {part}
@@ -79,7 +79,7 @@ export default function MessageBody({
                             key={index}
                             className={cn(
                                 "mx-px rounded-[3px] px-1 italic",
-                                isMine ? "text-white/60" : "text-neutral-500",
+                                isMine ? "text-primary-foreground/70" : "text-neutral-500",
                             )}
                         >
                             {TOMBSTONE_LABEL[token.kind]}
@@ -89,7 +89,13 @@ export default function MessageBody({
 
                 if (token.kind === "member") {
                     return (
-                        <span key={index} className="mx-px px-1 font-semibold text-white">
+                        <span
+                            key={index}
+                            className={cn(
+                                "mx-px px-1 font-semibold",
+                                isMine ? "text-primary-foreground" : "text-overlay",
+                            )}
+                        >
                             {label}
                         </span>
                     );
@@ -100,7 +106,10 @@ export default function MessageBody({
                     return (
                         <span
                             key={index}
-                            className="mx-px inline-flex items-center gap-1 px-1 align-middle font-semibold text-white"
+                            className={cn(
+                                "mx-px inline-flex items-center gap-1 px-1 align-middle font-semibold",
+                                isMine ? "text-primary-foreground" : "text-overlay",
+                            )}
                         >
                             {icon ? (
                                 <IconPickGlyph pick={icon} className="size-3 text-[11px]" />
@@ -123,8 +132,8 @@ export default function MessageBody({
                         className={cn(
                             "mx-px inline-flex cursor-pointer items-center gap-1 rounded-[4px] px-1 align-middle font-mono text-[12px] font-medium transition-colors",
                             isMine
-                                ? "bg-black/20 text-white hover:bg-black/30"
-                                : "bg-white/10 text-neutral-100 hover:bg-white/15",
+                                ? "bg-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/30"
+                                : "bg-overlay/10 text-neutral-100 hover:bg-overlay/15",
                         )}
                     >
                         {StatusIcon && (

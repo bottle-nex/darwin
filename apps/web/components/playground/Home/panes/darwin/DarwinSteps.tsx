@@ -33,10 +33,10 @@ export default function DarwinSteps({ steps }: { steps: DarwinStepView[] }) {
                 <li
                     key={step.callId}
                     className={cn(
-                        "flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs",
+                        "flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs",
                         step.state === "error"
-                            ? "bg-red-500/10 text-red-300"
-                            : "bg-white/4 text-neutral-400",
+                            ? "border-danger-edge bg-danger-surface text-danger"
+                            : "border-transparent bg-overlay/4 text-neutral-400",
                     )}
                 >
                     {step.state === "running" ? (
@@ -54,7 +54,7 @@ export default function DarwinSteps({ steps }: { steps: DarwinStepView[] }) {
                         variant="unstyled"
                         type="button"
                         onClick={() => setExpanded((open) => !open)}
-                        className="cursor-pointer rounded-full bg-white/4 px-2.5 py-1 text-xs text-neutral-500 transition-colors hover:text-neutral-300"
+                        className="cursor-pointer rounded-full bg-overlay/4 px-2.5 py-1 text-xs text-neutral-500 transition-colors hover:text-neutral-300"
                     >
                         {expanded ? "Show less" : `+${hidden} more`}
                     </Button>

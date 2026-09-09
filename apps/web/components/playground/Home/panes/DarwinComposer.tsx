@@ -40,7 +40,7 @@ export default function DarwinComposer({
     return (
         <div
             className={cn(
-                "top-lit-edge relative flex flex-col rounded-2xl bg-white/2 p-3 backdrop-blur-md",
+                "surface-card top-lit-edge relative flex flex-col rounded-2xl p-3 backdrop-blur-md",
                 className,
             )}
         >

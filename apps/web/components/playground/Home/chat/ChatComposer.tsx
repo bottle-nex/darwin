@@ -156,7 +156,7 @@ const ChatComposer = forwardRef<ChatComposerHandle, ChatComposerProps>(function 
     }));
 
     return (
-        <div className={cn("rounded-[8px] border border-snow/3 bg-graphite/40", className)}>
+        <div className={cn("surface-inset rounded-[8px]", className)}>
             {children}
             <div className="relative">
                 <div

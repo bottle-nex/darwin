@@ -61,7 +61,7 @@ export function FilterDateItems({ facetKey }: { facetKey: DateFacetKey }) {
                     </Button>
                 )}
             </div>
-            <div className="h-px shrink-0 bg-white/5" />
+            <div className="h-px shrink-0 bg-overlay/5" />
             <Calendar mode="range" selected={selected} onSelect={select} />
         </>
     );

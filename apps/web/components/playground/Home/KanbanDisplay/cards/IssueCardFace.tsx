@@ -34,7 +34,7 @@ function AssigneeStack({ assignees }: { assignees: Assignee[] }) {
                 />
             ))}
             {overflow > 0 && (
-                <span className="flex size-5 shrink-0 items-center justify-center rounded-sm bg-white/10 text-[11px] font-medium text-neutral-300 ring-1 ring-inset ring-white/15">
+                <span className="flex size-5 shrink-0 items-center justify-center rounded-sm bg-overlay/10 text-[11px] font-medium text-neutral-300 ring-1 ring-inset ring-overlay/15">
                     +{overflow}
                 </span>
             )}
@@ -133,7 +133,7 @@ export default function IssueCardFace({
                         aria-label={column?.title ?? "No status"}
                     />
                 )}
-                <p className="line-clamp-2 text-[14px] leading-snug font-medium text-neutral-50">
+                <p className="line-clamp-2 text-[14px] leading-snug font-medium text-overlay">
                     {title}
                 </p>
             </div>

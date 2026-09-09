@@ -54,14 +54,14 @@ function LayoutTabs({
                     className={cn(
                         "relative flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-xs px-1 py-1 text-[13.5px] font-medium transition-colors",
                         layout === tab.value
-                            ? "text-snow"
+                            ? "text-overlay"
                             : "text-neutral-500 hover:text-neutral-300",
                     )}
                 >
                     {layout === tab.value && (
                         <motion.div
                             layoutId="issue-layout-tab-bg"
-                            className="absolute inset-0 rounded-full border border-snow/5 bg-snow/4 shadow-sm shadow-black/7"
+                            className="surface-card absolute inset-0 rounded-full"
                             transition={{ type: "spring", duration: 0.35, bounce: 0.2 }}
                         />
                     )}
@@ -123,7 +123,7 @@ export default function DisplayPanel(props: DisplayPanelProps) {
                         variant="unstyled"
                         type="button"
                         aria-label="Display"
-                        className="flex size-6.75 shrink-0 cursor-pointer items-center justify-center rounded-sm border-0 bg-transparent text-neutral-400 transition-colors hover:bg-white/8 hover:text-neutral-200"
+                        className="flex size-6.75 shrink-0 cursor-pointer items-center justify-center rounded-sm border-0 bg-transparent text-neutral-400 transition-colors hover:bg-overlay/8 hover:text-neutral-200"
                     >
                         <OptionsMenuIcon className="size-3.75" aria-hidden />
                     </Button>

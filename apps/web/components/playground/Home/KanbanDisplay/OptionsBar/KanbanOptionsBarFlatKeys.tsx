@@ -42,7 +42,7 @@ export default function KanbanOptionsBarFlatKeys({ scope }: { scope: BoardScope 
                         onLayoutChange={view.setLayout}
                         onGroupByChange={view.setGroupBy}
                     />
-                    <div className="mx-1 h-4 w-px bg-white/8" />
+                    <div className="mx-1 h-4 w-px bg-overlay/8" />
 
                     <AddTaskButton />
                 </div>

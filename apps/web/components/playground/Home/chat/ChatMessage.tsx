@@ -25,10 +25,10 @@ import MessageReactions from "./MessageReactions";
 type AnyChat = ThreadMessage;
 
 const NAME_TONE_TEXT: Record<AvatarTone, string> = {
-    indigo: "text-indigo-300",
-    purple: "text-violet-300",
-    blue: "text-sky-300",
-    emerald: "text-emerald-300",
+    indigo: "text-indigo-500",
+    purple: "text-violet-500",
+    blue: "text-sky-600",
+    emerald: "text-emerald-600",
     dark: "text-neutral-300",
 };
 
@@ -73,17 +73,19 @@ function QuotedMessage({
             onClick={() => readable && onQuoteClick(quote.id)}
             className={cn(
                 "mb-1.5 flex w-full max-w-full items-stretch gap-x-2 overflow-hidden rounded-[4px] py-1.5 pr-2 text-left transition-colors",
-                isMine ? "bg-black/15 hover:bg-black/25" : "bg-black/20 hover:bg-black/30",
+                isMine
+                    ? "bg-primary-foreground/15 hover:bg-primary-foreground/25"
+                    : "surface-sunken hover:bg-overlay/6",
                 readable ? "cursor-pointer" : "cursor-default",
             )}
         >
             <span
                 className={cn(
                     "w-0.5 shrink-0",
-                    !readable
-                        ? "bg-white/20"
-                        : isMine
-                          ? "bg-white/60"
+                    isMine
+                        ? "bg-primary-foreground/60"
+                        : !readable
+                          ? "bg-overlay/20"
                           : NAME_TONE_RULE[senderTone(quote)],
                 )}
                 aria-hidden
@@ -93,7 +95,7 @@ function QuotedMessage({
                     <cite
                         className={cn(
                             "truncate text-[11px] leading-4 font-medium not-italic",
-                            isMine ? "text-white" : senderToneText(quote),
+                            isMine ? "text-primary-foreground" : senderToneText(quote),
                         )}
                     >
                         {viewerId && quote.senderId === viewerId ? "You" : senderName(quote)}
@@ -101,7 +103,7 @@ function QuotedMessage({
                     <span
                         className={cn(
                             "line-clamp-2 wrap-anywhere text-[12px] leading-4",
-                            isMine ? "text-white/65" : "text-neutral-400",
+                            isMine ? "text-primary-foreground/70" : "text-neutral-400",
                         )}
                     >
                         {to_plain_text(quote.message, quote.references ?? [])}
@@ -116,7 +118,7 @@ function QuotedMessage({
                 <span
                     className={cn(
                         "min-w-0 flex-1 truncate text-[12px] leading-4",
-                        isMine ? "text-white/55" : "text-neutral-500",
+                        isMine ? "text-primary-foreground/60" : "text-neutral-500",
                     )}
                 >
                     {quote?.isDeleted ? "Message deleted" : "Message unavailable"}
@@ -157,7 +159,11 @@ function MessageTime({
     return (
         <time
             dateTime={sentAt.toISOString()}
-            className={cn(TIME_TEXT, isMine ? "text-white/50" : "text-neutral-500", className)}
+            className={cn(
+                TIME_TEXT,
+                isMine ? "text-primary-foreground/70" : "text-neutral-500",
+                className,
+            )}
         >
             {messageTimeLabel(sentAt)}
         </time>
@@ -256,7 +262,7 @@ export default function ChatMessage({
                 "group/message relative flex flex-col rounded-lg transition-colors duration-300",
                 isMine ? "items-end" : "items-start",
                 startsGroup && position > 1 && "pt-3",
-                identified && "bg-white/10 ring-1 ring-white/15",
+                identified && "bg-overlay/10 ring-1 ring-overlay/15",
             )}
         >
             <div
@@ -282,8 +288,8 @@ export default function ChatMessage({
                         className={cn(
                             "relative  min-w-20 flex-1 rounded-lg px-3 pb-2 pt-1.25 text-[13px] leading-5 tracking-[0.005em] wrap-anywhere transition-colors duration-200",
                             isMine
-                                ? "border border-graphite/50 bg-graphite text-neutral-200"
-                                : "border border-graphite/50 bg-graphite text-neutral-200",
+                                ? "border border-primary bg-primary text-primary-foreground"
+                                : "surface-card text-neutral-200",
                             endsGroup && (isMine ? "rounded-br-[1px]" : "rounded-bl-[1px]"),
                         )}
                     >
@@ -329,7 +335,7 @@ export default function ChatMessage({
                                 <span
                                     className={cn(
                                         "italic",
-                                        isMine ? "text-white/60" : "text-neutral-500",
+                                        isMine ? "text-primary-foreground/70" : "text-neutral-500",
                                     )}
                                 >
                                     Message deleted
@@ -362,7 +368,7 @@ export default function ChatMessage({
                                         className={cn(
                                             "flex cursor-pointer items-center gap-x-1 text-[11px] leading-none font-medium transition-colors",
                                             isMine
-                                                ? "text-white/70 hover:text-white"
+                                                ? "text-primary-foreground/70 hover:text-primary-foreground"
                                                 : "text-neutral-400 hover:text-neutral-200",
                                         )}
                                     >

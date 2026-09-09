@@ -40,13 +40,13 @@ export default function InReviewCard({ issue }: { issue: Issue }) {
                             iconClassName={titleBox}
                             title={pullNumber === null ? undefined : "Open the review"}
                         >
-                            <span className="text-[12px] text-snow">{issue.pr?.number}</span>
+                            <span className="text-[12px] text-overlay">{issue.pr?.number}</span>
                         </IconWrapper>
                     </button>
                     {issue.pr?.added !== undefined && issue.pr.removed !== undefined && (
                         <span className="inline-flex items-center gap-1.5 font-mono text-[10px]">
-                            <span className="text-emerald-400">+{issue.pr.added}</span>
-                            <span className="text-rose-400">-{issue.pr.removed}</span>
+                            <span className="text-success">+{issue.pr.added}</span>
+                            <span className="text-danger">-{issue.pr.removed}</span>
                         </span>
                     )}
                 </div>

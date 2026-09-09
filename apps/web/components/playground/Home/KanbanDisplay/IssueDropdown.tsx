@@ -36,9 +36,12 @@ import { KanbanBoard } from "@/lib/kanban/KanbanBoard";
 import { cn } from "@/lib/utils";
 import type { BoardIssue } from "@/types/board";
 
-const ICON = "size-3.5 text-snow/50!";
+const ICON = "size-3.5 text-overlay/50!";
 
 const CHEVRON = "ml-auto size-3.5 text-neutral-500";
+
+const SCROLLABLE_SUBMENU =
+    "max-h-[min(20rem,var(--radix-context-menu-content-available-height,20rem))] overflow-y-auto";
 
 /**
  * Radix arms a 100ms hover-intent timer before opening a submenu. On a menu this
@@ -48,11 +51,13 @@ function Submenu({
     trigger,
     className,
     disabled,
+    scrollable,
     children,
 }: {
     trigger: ReactNode;
     className?: string;
     disabled?: boolean;
+    scrollable?: boolean;
     children: ReactNode;
 }) {
     const [open, setOpen] = useState(false);
@@ -66,7 +71,12 @@ function Submenu({
                 {trigger}
                 <SubmenuDisclosureIcon className={CHEVRON} aria-hidden />
             </ContextMenuSubTrigger>
-            <ContextMenuSubContent className={className}>{children}</ContextMenuSubContent>
+            <ContextMenuSubContent
+                className={cn(scrollable && SCROLLABLE_SUBMENU, className)}
+                data-lenis-prevent={scrollable ? "" : undefined}
+            >
+                {children}
+            </ContextMenuSubContent>
         </ContextMenuSub>
     );
 }
@@ -167,6 +177,7 @@ export default function IssueDropdown({
 
                 <Submenu
                     disabled={!editable}
+                    scrollable
                     className="w-52"
                     trigger={
                         <>
@@ -198,6 +209,7 @@ export default function IssueDropdown({
 
                 <Submenu
                     disabled={!editable}
+                    scrollable
                     className="w-52"
                     trigger={
                         <>

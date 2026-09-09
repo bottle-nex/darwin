@@ -10,7 +10,7 @@ export default function FailedCard({ issue }: { issue: Issue }) {
     return (
         <BaseCard issue={issue}>
             <div className="mt-2.5 flex flex-col gap-1.5">
-                <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-rose-300/90">
+                <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-danger">
                     <RunFailedIcon className="size-3 shrink-0" aria-hidden />
                     {issue.error ?? "Run failed"}
                 </span>

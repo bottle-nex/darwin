@@ -69,7 +69,7 @@ export default function KanbanOptionsBarGroupedKeys({ scope }: { scope: BoardSco
                                 variant="unstyled"
                                 type="button"
                                 aria-label="Options"
-                                className="flex h-7 cursor-pointer items-center gap-1 rounded-md px-2 text-[12px] font-medium text-neutral-400 transition-colors hover:bg-white/5 hover:text-neutral-200"
+                                className="flex h-7 cursor-pointer items-center gap-1 rounded-md px-2 text-[12px] font-medium text-neutral-400 transition-colors hover:bg-overlay/5 hover:text-neutral-200"
                             >
                                 <OptionsMenuIcon className="size-4" aria-hidden />
                                 Options
@@ -138,7 +138,7 @@ export default function KanbanOptionsBarGroupedKeys({ scope }: { scope: BoardSco
                                 </EagerSubmenu>
                             </>
 
-                            <DropdownMenuSeparator className="my-1 h-px bg-white/5" />
+                            <DropdownMenuSeparator className="my-1 h-px bg-overlay/5" />
 
                             <DropdownMenuItem disabled>
                                 <ShareIcon className="size-3.5 text-neutral-400" aria-hidden />
@@ -151,7 +151,7 @@ export default function KanbanOptionsBarGroupedKeys({ scope }: { scope: BoardSco
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
-                    <div className="mx-1 h-4 w-px bg-white/8" />
+                    <div className="mx-1 h-4 w-px bg-overlay/8" />
 
                     <AddTaskButton />
                 </div>

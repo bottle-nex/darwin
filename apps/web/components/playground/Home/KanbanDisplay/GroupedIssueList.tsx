@@ -188,11 +188,13 @@ export default function GroupedIssueList({
             </IssueSelectionOrderProvider>
             <DragOverlay dropAnimation={null}>
                 {drag.activeIssue && (
-                    <CardRenderer
-                        issue={KanbanMappers.toIssue(drag.activeIssue, project?.name ?? "")}
-                        selectionScope={selectionScope}
-                        preview
-                    />
+                    <div className="cursor-grabbing rounded-md shadow-[var(--shadow-drag)]">
+                        <CardRenderer
+                            issue={KanbanMappers.toIssue(drag.activeIssue, project?.name ?? "")}
+                            selectionScope={selectionScope}
+                            preview
+                        />
+                    </div>
                 )}
             </DragOverlay>
         </DndContext>

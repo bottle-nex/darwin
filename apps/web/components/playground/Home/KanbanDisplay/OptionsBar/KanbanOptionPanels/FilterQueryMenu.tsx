@@ -26,7 +26,7 @@ export function FilterQueryItems() {
                 onChange={(e) => setFacet("query", e.target.value)}
                 onKeyDown={(e) => e.stopPropagation()}
                 placeholder="Search titles and #numbers..."
-                className="h-7 w-full rounded-md border border-white/10 bg-white/5 pr-2 pl-7 text-[12px] text-neutral-100 placeholder:text-neutral-500 focus:border-white/25 focus:outline-none"
+                className="surface-inset h-7 w-full rounded-md pr-2 pl-7 text-[12px] text-neutral-100 placeholder:text-neutral-500 focus:border-overlay/25 focus:outline-none"
             />
         </div>
     );

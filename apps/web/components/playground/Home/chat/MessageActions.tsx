@@ -16,7 +16,7 @@ export function ActionButton({ className, ...props }: ComponentProps<typeof Butt
             variant="unstyled"
             type="button"
             className={cn(
-                "flex size-6 cursor-pointer items-center justify-center rounded-md text-neutral-400 transition-colors hover:bg-white/10 hover:text-neutral-100 disabled:cursor-default disabled:opacity-40 data-[state=open]:bg-white/10 data-[state=open]:text-neutral-100",
+                "flex size-6 cursor-pointer items-center justify-center rounded-md text-neutral-400 transition-colors hover:bg-overlay/10 hover:text-neutral-100 disabled:cursor-default disabled:opacity-40 data-[state=open]:bg-overlay/10 data-[state=open]:text-neutral-100",
                 className,
             )}
             {...props}
@@ -44,7 +44,7 @@ export default function MessageActions({
     return (
         <div
             className={cn(
-                "absolute -top-6 z-20 flex items-center gap-px rounded-lg border border-graphite/50 bg-charcoal p-0.5 text-neutral-100 opacity-0 shadow-lg transition-opacity group-hover/message:opacity-100 focus-within:opacity-100 has-data-[state=open]:opacity-100",
+                "surface-menu absolute -top-6 z-20 flex items-center gap-px rounded-lg p-0.5 text-neutral-100 opacity-0 transition-opacity group-hover/message:opacity-100 focus-within:opacity-100 has-data-[state=open]:opacity-100",
                 isMine ? "right-1" : "left-1",
             )}
         >
@@ -71,7 +71,7 @@ export default function MessageActions({
                 <ActionButton
                     aria-label="Delete message"
                     onClick={() => onDelete(chat)}
-                    className="hover:bg-[#E34948] hover:text-[#E34948]"
+                    className="hover:bg-danger-surface hover:text-danger"
                 >
                     <DeleteIcon className="size-3.5" />
                 </ActionButton>

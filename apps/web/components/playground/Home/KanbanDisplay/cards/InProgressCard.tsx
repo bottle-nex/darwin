@@ -11,7 +11,7 @@ export default function InProgressCard({ issue }: { issue: Issue }) {
         <BaseCard issue={issue}>
             <div className="mt-2.5 flex flex-col gap-1.5">
                 {issue.step && (
-                    <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-amber-300/90">
+                    <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-warning">
                         <ProcessingSpinnerIcon className="size-3 animate-spin" aria-hidden />
                         {issue.step}
                     </span>

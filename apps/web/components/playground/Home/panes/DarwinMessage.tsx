@@ -46,7 +46,7 @@ export default function DarwinMessage({ message }: DarwinMessageProps) {
     if (message.role === "user") {
         return (
             <div className="flex justify-end">
-                <p className="max-w-[80%] rounded-2xl bg-white/6 px-4 py-2.5 text-[14px] leading-relaxed whitespace-pre-wrap text-neutral-100">
+                <p className="max-w-[80%] surface-card rounded-2xl px-4 py-2.5 text-[14px] leading-relaxed whitespace-pre-wrap text-neutral-100">
                     {message.content}
                 </p>
             </div>

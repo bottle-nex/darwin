@@ -27,10 +27,10 @@ import FilterQueryMenu from "./FilterQueryMenu";
  * solid surface, which models a single control rather than a row of them.
  */
 const CHIP_SURFACE =
-    "inline-flex h-5 shrink-0 items-center overflow-hidden rounded-sm bg-graphite/70 text-[11px] leading-none ring-[0.5px] ring-white/8";
+    "surface-card inline-flex h-5 shrink-0 items-center overflow-hidden rounded-sm text-[11px] leading-none";
 
 /** Matches the pill's own `ring-[0.5px]`, so the rules and the border read as one weight. */
-const CHIP_DIVIDER = "h-full w-[0.5px] shrink-0 bg-white/8";
+const CHIP_DIVIDER = "h-full w-[0.5px] shrink-0 bg-overlay/8";
 
 const CHIP_PART = "flex h-full items-center gap-1.5 px-2 text-neutral-400";
 
@@ -40,7 +40,7 @@ const CHIP_LABEL = cn(CHIP_PART, "shrink-0");
 /** The current value opens the menu, and highlights on its own hover. */
 const CHIP_SEGMENT = cn(
     CHIP_PART,
-    "min-w-0 cursor-pointer transition-colors hover:bg-white/8 hover:text-neutral-200",
+    "min-w-0 cursor-pointer transition-colors hover:bg-overlay/8 hover:text-neutral-200",
 );
 
 function isListFacet(key: FacetKey): key is ListFacetKey {

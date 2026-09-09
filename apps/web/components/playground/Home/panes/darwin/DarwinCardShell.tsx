@@ -26,12 +26,7 @@ export function DarwinCard({
     className?: string;
 }) {
     return (
-        <section
-            className={cn(
-                "overflow-hidden rounded-lg bg-snow/3 ring-[0.5px] ring-snow/8",
-                className,
-            )}
-        >
+        <section className={cn("surface-card overflow-hidden rounded-lg", className)}>
             {(title || trailing) && (
                 <header className="flex items-center justify-between gap-2 px-3 pt-2.5 pb-1.5">
                     {title && (

@@ -27,19 +27,23 @@ export class KanbanBoard {
      */
     static readonly BRIDGE_STATUSES: KanbanStatus[] = [KanbanStatus.Todo];
 
-    /** Column headers in board order. `titleBox`/`cardTint` are per-status coloured. */
+    /**
+     * Status glyph colours are literals, not tokens, so a lane reads the same
+     * whichever theme is active — the status is a property of the issue, not of
+     * the surface it sits on. Every value clears 3:1 against both grounds.
+     */
     static readonly COLUMNS: KanbanColumnDef[] = [
         {
             status: KanbanStatus.Todo,
             title: ISSUE_LANE_NAME[KanbanStatus.Todo],
             icon: TodoStatusIcon,
-            titleBox: "text-neutral-100",
+            titleBox: "text-[#8a8f98]",
         },
         {
             status: KanbanStatus.Queued,
             title: ISSUE_LANE_NAME[KanbanStatus.Queued],
             icon: QueuedStatusIcon,
-            titleBox: "text-snow/70",
+            titleBox: "text-[#7e838d]",
         },
         {
             status: KanbanStatus.InProgress,
@@ -63,23 +67,22 @@ export class KanbanBoard {
             status: KanbanStatus.Failed,
             title: ISSUE_LANE_NAME[KanbanStatus.Failed],
             icon: FailedStatusIcon,
-            titleBox: "text-rose-400",
+            titleBox: "text-[#e5484d]",
         },
         {
             status: KanbanStatus.Cancelled,
             title: ISSUE_LANE_NAME[KanbanStatus.Cancelled],
             icon: CancelledStatusIcon,
-            titleBox: "text-snow/60",
+            titleBox: "text-[#6f747e]",
         },
     ];
 
-    /** Dark-themed dot colour per priority. */
     static readonly PRIORITY_DOT: Record<Priority, string> = {
-        none: "bg-neutral-700",
-        urgent: "bg-rose-500",
-        high: "bg-amber-400",
-        medium: "bg-neutral-500",
-        low: "bg-neutral-600",
+        none: "bg-[#6f747e]",
+        urgent: "bg-[#e5484d]",
+        high: "bg-[#d69e1f]",
+        medium: "bg-[#8a8f98]",
+        low: "bg-[#7e838d]",
     };
 
     private static readonly COLUMN_BY_STATUS = new Map(
@@ -97,7 +100,7 @@ export class KanbanBoard {
      */
     private static readonly OFF_BOARD_GLYPH: StatusGlyph = {
         icon: OffBoardStatusIcon,
-        titleBox: "text-neutral-500",
+        titleBox: "text-[#6f747e]",
     };
 
     /** The status circle for any issue, on a board lane or parked off it. */

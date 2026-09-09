@@ -66,7 +66,7 @@ export default function DarwinThread({ view }: DarwinThreadProps) {
                 )}
 
                 {live?.error && (
-                    <p className="text-sm text-red-300" role="alert">
+                    <p className="text-sm text-danger" role="alert">
                         {live.error}
                     </p>
                 )}

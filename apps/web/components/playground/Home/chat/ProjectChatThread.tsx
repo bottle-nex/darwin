@@ -438,7 +438,7 @@ export default function ChatThread({
                                 ) : null}
                             </div>
                             {quoteNavigation && quoteStatus !== "found" ? (
-                                <div className="sticky top-0 z-20 mx-2 flex items-center justify-between gap-3 rounded-md border border-white/10 bg-charcoal px-3 py-2 text-[12px] text-neutral-300">
+                                <div className="surface-card sticky top-0 z-20 mx-2 flex items-center justify-between gap-3 rounded-md px-3 py-2 text-[12px] text-neutral-300">
                                     <span>
                                         {quoteStatus === "searching"
                                             ? `Searching older messages (${quoteNavigation.loadedPages}/5)...`
@@ -527,7 +527,7 @@ export default function ChatThread({
                     ) : (
                         <div className="flex h-full flex-col items-center justify-center gap-y-3 text-center">
                             <span
-                                className="flex size-11 items-center justify-center rounded-2xl bg-charcoal text-neutral-500 ring-1 ring-white/10"
+                                className="surface-card flex size-11 items-center justify-center rounded-2xl text-neutral-500"
                                 aria-hidden
                             >
                                 <CommentCountIcon className="size-5" />
@@ -557,7 +557,7 @@ export default function ChatThread({
                     onSend={handleSend}
                 >
                     {activeReplyTo ? (
-                        <div className="flex items-center gap-x-2.5 border-b border-white/6 px-2.5 py-2">
+                        <div className="flex items-center gap-x-2.5 border-b border-overlay/6 px-2.5 py-2">
                             <span
                                 className="w-px shrink-0 self-stretch rounded-full bg-neutral-600"
                                 aria-hidden
@@ -581,7 +581,7 @@ export default function ChatThread({
                                 type="button"
                                 onClick={() => setReplyTo(null)}
                                 aria-label="Cancel reply"
-                                className="flex size-6 shrink-0 cursor-pointer items-center justify-center rounded-md text-neutral-500 transition-colors hover:bg-white/6 hover:text-neutral-200"
+                                className="flex size-6 shrink-0 cursor-pointer items-center justify-center rounded-md text-neutral-500 transition-colors hover:bg-overlay/6 hover:text-neutral-200"
                             >
                                 <CloseIcon className="size-3.5" />
                             </Button>

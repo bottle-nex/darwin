@@ -20,7 +20,7 @@ const OptionButton = forwardRef<HTMLButtonElement, OptionButtonProps>(
             aria-label={label}
             aria-pressed={active}
             className={cn(
-                "flex size-6.75 shrink-0 cursor-pointer items-center justify-center rounded-sm border-0 bg-transparent text-neutral-400 transition-colors hover:bg-white/8 hover:text-neutral-200",
+                "flex size-6.75 shrink-0 cursor-pointer items-center justify-center rounded-sm border-0 bg-transparent text-neutral-400 transition-colors hover:bg-overlay/8 hover:text-neutral-200",
                 active && "text-neutral-100",
                 className,
             )}

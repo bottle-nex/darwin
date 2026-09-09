@@ -26,13 +26,13 @@ export class GanttTimeline {
     /** Width of the fixed left sidebar holding lane labels. */
     static readonly SIDEBAR_WIDTH = 120;
 
-    /** Tailwind dark-mode priority dot colours (mirrors the home-page kanban cards). */
+    /** Priority dot colours on the scope-aware neutral ramp (mirrors the kanban cards). */
     static readonly PRIORITY_DOT: Record<string, string> = {
-        none: "bg-neutral-800",
+        none: "bg-neutral-600/35",
         urgent: "bg-neutral-100",
         high: "bg-neutral-400",
         medium: "bg-neutral-600",
-        low: "bg-neutral-700",
+        low: "bg-neutral-600/60",
     };
 
     /** Current minute-of-day (fractional), e.g. 12:30 → 750.0. */

@@ -83,7 +83,7 @@ export function FilterFacetItems({ facetKey }: { facetKey: ListFacetKey }) {
                         )}
                     </div>
 
-                    <div className="h-px shrink-0 bg-white/5" />
+                    <div className="h-px shrink-0 bg-overlay/5" />
                 </>
             )}
 
@@ -101,7 +101,7 @@ export function FilterFacetItems({ facetKey }: { facetKey: ListFacetKey }) {
                                 checked={isOn}
                                 onCheckedChange={() => toggle(option.value)}
                                 onSelect={(e) => e.preventDefault()}
-                                className="flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 outline-none select-none data-highlighted:bg-white/5"
+                                className="flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 outline-none select-none data-highlighted:bg-overlay/5"
                             >
                                 {option.avatarSrc !== undefined ? (
                                     <MemberOptionRow
@@ -116,8 +116,8 @@ export function FilterFacetItems({ facetKey }: { facetKey: ListFacetKey }) {
                                             className={cn(
                                                 "flex size-3.5 shrink-0 items-center justify-center rounded border transition-colors",
                                                 isOn
-                                                    ? "border-neutral-200 bg-neutral-200 text-neutral-900"
-                                                    : "border-white/25",
+                                                    ? "border-primary bg-primary text-primary-foreground"
+                                                    : "border-overlay/25",
                                             )}
                                         >
                                             {isOn && <CheckIcon className="size-2.5" aria-hidden />}

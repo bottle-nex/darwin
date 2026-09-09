@@ -25,10 +25,10 @@ export default function IssueReferenceCard({ issue }: { issue: ReferencedIssueLa
             type="button"
             onClick={() => issue.id && openIssue(issue.id)}
             className={cn(
-                "flex w-full max-w-52 h-21 cursor-pointer items-stretch rounded-[7px] border border-graphite/50 p-1 text-left relative bg-linear-to-r from-white/8 to-white/2",
+                "surface-card relative flex h-21 w-full max-w-52 cursor-pointer items-stretch rounded-[7px] p-1 text-left",
             )}
         >
-            <div className="h-3.5 w-3.5 bg-charcoal rounded-full absolute top-1/2 -translate-y-1/2 -left-1.5 border-r border-graphite" />
+            <div className="h-3.5 w-3.5 bg-charcoal rounded-full absolute top-1/2 -translate-y-1/2 -left-1.5 border-r border-border" />
             <span className="flex w-9 shrink-0 items-start justify-center" aria-hidden>
                 <span className="flex size-6 items-center justify-center rounded-full">
                     <StatusIcon
@@ -36,7 +36,7 @@ export default function IssueReferenceCard({ issue }: { issue: ReferencedIssueLa
                     />
                 </span>
             </span>
-            <span className="flex min-w-0 flex-1 flex-col items-start justify-between gap-0.5 rounded-[5px] bg-charcoal/70 px-2 py-1.5 backdrop-blur-xs">
+            <span className="surface-sunken flex min-w-0 flex-1 flex-col items-start justify-between gap-0.5 rounded-[5px] px-2 py-1.5 backdrop-blur-xs">
                 <span className="shrink-0 text-[11.5px] leading-3.5 text-neutral-500">
                     {identifier(issue.number)}
                     {status && ` · ${status.title}`}

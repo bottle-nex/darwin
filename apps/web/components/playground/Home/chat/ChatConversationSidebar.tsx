@@ -111,7 +111,7 @@ export default function ChatConversationSidebar({
     }
 
     return (
-        <aside className="flex min-h-0 w-80 max-w-[42%] shrink-0 flex-col border-r border-graphite">
+        <aside className="flex min-h-0 w-80 max-w-[42%] shrink-0 flex-col border-r border-border">
             <nav data-lenis-prevent className="no-scrollbar min-h-0 flex-1 overflow-y-auto p-2">
                 <section>
                     <h3 className="px-2 py-1.5 text-[12px] font-medium text-neutral-500 capitalize">
@@ -125,7 +125,7 @@ export default function ChatConversationSidebar({
                             onClick={() => onSelect(null)}
                         />
                     ) : (
-                        <div className="h-10 animate-pulse rounded-md bg-graphite" />
+                        <div className="h-10 animate-pulse rounded-md bg-overlay/8" />
                     )}
                 </section>
                 <section className="mt-3">
@@ -153,7 +153,7 @@ export default function ChatConversationSidebar({
                                             type="button"
                                             onClick={openCreateTeam}
                                             aria-label="Create team"
-                                            className="flex size-6 cursor-pointer items-center justify-center rounded-md text-neutral-500 transition-colors hover:bg-white/5 hover:text-neutral-100"
+                                            className="flex size-6 cursor-pointer items-center justify-center rounded-md text-neutral-500 transition-colors hover:bg-overlay/5 hover:text-neutral-100"
                                         >
                                             <AddIcon className="size-3.5" aria-hidden />
                                         </Button>
@@ -163,7 +163,7 @@ export default function ChatConversationSidebar({
                                         type="button"
                                         onClick={() => setSearchOpen(true)}
                                         aria-label="Search teams"
-                                        className="flex size-6 cursor-pointer items-center justify-center rounded-md text-neutral-500 transition-colors hover:bg-white/5 hover:text-neutral-100"
+                                        className="flex size-6 cursor-pointer items-center justify-center rounded-md text-neutral-500 transition-colors hover:bg-overlay/5 hover:text-neutral-100"
                                     >
                                         <SearchToggleIcon className="size-3.5" aria-hidden />
                                     </Button>

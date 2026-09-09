@@ -77,7 +77,7 @@ function IssueDetail({ resource }: { resource: Extract<DarwinResource, { kind: "
             )}
 
             {comments.length > 0 && (
-                <div className="border-t border-snow/6 px-3 py-2">
+                <div className="border-t border-overlay/6 px-3 py-2">
                     <ul className="flex flex-col gap-2">
                         {comments.map((comment, index) => (
                             <li key={`${comment.at}-${index}`} className="flex gap-2">
@@ -164,7 +164,7 @@ function ProjectCard({ resource }: { resource: Extract<DarwinResource, { kind: "
                                     letter={member.name.charAt(0).toUpperCase()}
                                     tone={toneFor(member.id)}
                                     size="sm"
-                                    className="rounded-full ring-1 ring-neutral-800"
+                                    className="rounded-full ring-1 ring-background"
                                 />
                             ))}
                         </span>
@@ -204,7 +204,7 @@ function MemberList({ resource }: { resource: Extract<DarwinResource, { kind: "m
                                 className="rounded-full"
                             />
                             <span className="flex min-w-0 flex-1 flex-col">
-                                <span className="truncate text-[13px] text-snow">
+                                <span className="truncate text-[13px] text-overlay">
                                     {displayNameOf(member.name, member.email)}
                                     {member.isViewer && (
                                         <span className="text-neutral-500"> · you</span>

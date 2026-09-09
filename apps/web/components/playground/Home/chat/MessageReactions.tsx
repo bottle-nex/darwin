@@ -35,8 +35,8 @@ export default function MessageReactions({
                     className={cn(
                         "flex h-6 cursor-pointer items-center gap-1 rounded-full border px-1.5 text-[12px] leading-none transition-colors",
                         reaction.reactedByViewer
-                            ? "border-white/25 bg-white/12 text-white"
-                            : "border-white/8 bg-white/5 text-neutral-300 hover:border-white/15 hover:bg-white/10",
+                            ? "border-overlay/25 bg-overlay/12 text-overlay"
+                            : "border-overlay/8 bg-overlay/5 text-neutral-300 hover:border-overlay/15 hover:bg-overlay/10",
                     )}
                 >
                     <span>{reaction.emoji}</span>
