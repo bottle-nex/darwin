@@ -13,7 +13,6 @@ import {
     PaneActionsSlot,
     PaneLeadSlot,
 } from "@/components/playground/Core/components/PlaygroundPaneSlots";
-import SpaceEditAction from "@/components/playground/space/SpaceEditAction";
 import { Button } from "@/components/ui/button";
 import {
     DropdownMenu,
@@ -56,7 +55,7 @@ export default function KanbanOptionsBarGroupedKeys({ scope }: { scope: BoardSco
         <>
             <PaneLeadSlot>
                 <div className="flex min-w-0 items-center gap-1.5">
-                    <PlaygroundBreadcrumb action={<SpaceEditAction />} />
+                    <PlaygroundBreadcrumb />
 
                     <FilterChipsBar />
                 </div>

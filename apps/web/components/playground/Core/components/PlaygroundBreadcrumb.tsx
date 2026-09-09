@@ -1,19 +1,21 @@
 "use client";
 import type { IconType } from "@trydarwin/ui/icons";
 import { BreadcrumbSeparatorIcon, ICONS } from "@trydarwin/ui/icons";
-import { Fragment, type ReactNode } from "react";
+import { Fragment } from "react";
 
 import { PlaygroundTab } from "@/components/playground/playgroundTabs";
 import { Button } from "@/components/ui/button";
 import type { IconPick } from "@/components/ui/IconPicker";
 import IconWrapper from "@/components/ui/IconWrapper";
 import { useBoardColumns } from "@/hooks/issues/useBoardColumns";
+import { useGetProject } from "@/hooks/project/useGetProject";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { issueIdentifier } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { NO_FOCUS, useKanbanOptionsStore } from "@/store/kanban/useKanbanOptionsStore";
 import { usePaneRouteStore } from "@/store/playground/usePaneRouteStore";
 import { usePlaygroundNavStore } from "@/store/playground/usePlaygroundNavStore";
+import { useSpaceFormStore } from "@/store/space/useSpaceFormStore";
 import type { BoardIssue, BoardSpace } from "@/types/board";
 
 /** Renders any picked icon or emoji — a project's, a space's, a template's. */
@@ -121,14 +123,11 @@ export default function PlaygroundBreadcrumb({
     trail,
     trailing,
     trailingIcon,
-    action,
 }: {
     issue?: Pick<BoardIssue, "id" | "number" | "title" | "customColumnId">;
     trail?: PlaygroundBreadcrumbSegment[];
     trailing?: string;
     trailingIcon?: IconType;
-    /** Rendered after the last crumb — e.g. the edit button on an open space. */
-    action?: ReactNode;
 }) {
     const project = useActiveProject();
     const { data: metadata } = useBoardColumns(project?.id);
@@ -138,6 +137,10 @@ export default function PlaygroundBreadcrumb({
     const openSpace = usePlaygroundNavStore((state) => state.openSpace);
     const selectedSpace = usePlaygroundNavStore((state) => state.selectedSpace);
     const setFocus = useKanbanOptionsStore((state) => state.setFocus);
+    const openSpaceEditor = useSpaceFormStore((state) => state.openEdit);
+    const { data: currentProject } = useGetProject(project?.id);
+    const canManageSpace =
+        currentProject?.viewerRole === "Admin" || currentProject?.viewerRole === "Maintain";
     const inIssue = issue !== undefined;
     // An issue can be opened from Inbox or search, so its space is resolved
     // from the project-wide metadata rather than from whatever pane is showing.
@@ -168,7 +171,9 @@ export default function PlaygroundBreadcrumb({
         {
             label: selectedSpace?.name ?? "Space",
             icon: selectedSpace?.icon,
-            target: { tab: PlaygroundTab.Space, space: selectedSpace ?? undefined },
+            ...(canManageSpace && selectedSpace
+                ? { onClick: () => openSpaceEditor(selectedSpace.id) }
+                : { target: { tab: PlaygroundTab.Space, space: selectedSpace ?? undefined } }),
         },
     ];
     const segments = inIssue
@@ -220,12 +225,16 @@ export default function PlaygroundBreadcrumb({
                             className="size-3.5 shrink-0 text-neutral-600"
                             aria-hidden
                         />
-                        {onClick && !current ? (
+                        {onClick ? (
                             <Button
                                 variant="unstyled"
                                 type="button"
                                 onClick={onClick}
-                                className="flex shrink-0 cursor-pointer items-center gap-1.5 font-medium text-neutral-400 transition-colors hover:text-neutral-100"
+                                aria-current={current ? "page" : undefined}
+                                className={cn(
+                                    "flex shrink-0 cursor-pointer items-center gap-1.5 font-medium transition-colors hover:text-neutral-100",
+                                    current ? "text-neutral-100" : "text-neutral-400",
+                                )}
                             >
                                 {segmentIcon && (
                                     <PickedIcon pick={segmentIcon} className="size-5 shrink-0" />
@@ -257,7 +266,6 @@ export default function PlaygroundBreadcrumb({
                     </Fragment>
                 );
             })}
-            {action}
         </nav>
     );
 }
