@@ -44,7 +44,9 @@ export default function DarwinSteps({ steps }: { steps: DarwinStepView[] }) {
                     ) : (
                         <AgentStepIcon className="size-3" aria-hidden />
                     )}
-                    {darwinToolLabel(step.name)}
+                    <span className={cn(step.state === "running" && "shimmer-text")}>
+                        {darwinToolLabel(step.name)}
+                    </span>
                 </li>
             ))}
 

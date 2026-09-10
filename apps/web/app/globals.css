@@ -136,6 +136,43 @@
     }
 }
 
+@keyframes shimmer-text {
+    from {
+        background-position: 100% 0;
+    }
+    to {
+        background-position: 0 0;
+    }
+}
+
+.shimmer-text {
+    background-image: linear-gradient(
+        100deg,
+        #7a7a82 0%,
+        #7a7a82 40%,
+        #e7e7ea 50%,
+        #7a7a82 60%,
+        #7a7a82 100%
+    );
+    background-size: 200% 100%;
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    animation: shimmer-text 1.8s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .shimmer-text {
+        animation: none;
+        background-image: none;
+        color: #a3a3a3;
+    }
+
+    .animate-caret-blink {
+        animation: none;
+    }
+}
+
 @layer components {
     /*
      * Surface recipes. Dark lifts a surface with fill alpha; light needs a

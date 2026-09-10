@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
 const CARD_SPACING = 40;
 
 const PANEL_TILT =
-    "overflow-hidden rounded-md [transform:perspective(1000px)_rotateY(45deg)] [transform-origin:left_center] [backface-visibility:hidden]";
+    "overflow-hidden rounded-md [transform:perspective(1000px)_rotateY(45deg)] [transform-origin:left_center] [backface-visibility:hidden] shadow-[0_26px_60px_-32px_rgba(24,24,27,0.45)]";
 
 type HeroCard = {
     name: string;
@@ -37,7 +37,6 @@ const HERO_CARDS: HeroCard[] = [
     {
         name: "GitHub",
         logoSrc: "/images/integrations/github.svg",
-        logoClassName: "invert",
         left: "left-[80px]",
     },
     {
@@ -49,7 +48,6 @@ const HERO_CARDS: HeroCard[] = [
     {
         name: "Linear",
         logoSrc: "/images/integrations/linear.svg",
-        logoClassName: "invert",
         left: "left-[160px]",
     },
     {
@@ -153,18 +151,11 @@ export const IntegrationsHero = ({
                                     >
                                         <div className={cn("relative h-full w-full", PANEL_TILT)}>
                                             {card.logoSrc ? (
-                                                <div className="flex h-full w-full items-center justify-center bg-neutral-900">
-                                                    <Image
-                                                        src="https://assets.aceternity.com/labs/idle.webp"
-                                                        alt=""
-                                                        width={1000}
-                                                        height={1000}
-                                                        className="absolute inset-0 h-full w-full object-cover"
-                                                    />
+                                                <div className="flex h-full w-full items-center justify-center bg-neutral-100">
                                                     <div
                                                         style={swapStyle}
                                                         className={cn(
-                                                            "absolute inset-0 bg-[radial-gradient(70%_45%_at_50%_50%,rgba(255,255,255,0.14),transparent_75%)] opacity-0 transition-opacity group-hover:opacity-100",
+                                                            "absolute inset-0 bg-[radial-gradient(70%_45%_at_50%_50%,rgba(124,92,230,0.16),transparent_75%)] opacity-0 transition-opacity group-hover:opacity-100",
                                                             activeIndex === index && "opacity-100",
                                                         )}
                                                     />
@@ -181,15 +172,15 @@ export const IntegrationsHero = ({
                                                             card.logoClassName,
                                                         )}
                                                     />
+                                                    <div className="absolute inset-y-0 left-0 w-px bg-edge" />
                                                 </div>
                                             ) : (
                                                 <div className="relative h-full w-full">
-                                                    <div className="absolute inset-0 bg-neutral-950" />
-                                                    <div className="absolute inset-0 bg-[radial-gradient(90%_65%_at_50%_70%,rgba(171,159,242,0.75),rgba(171,159,242,0.25)_50%,transparent_80%)]" />
-                                                    <div className="absolute inset-0 bg-[radial-gradient(70%_40%_at_50%_-10%,rgba(171,159,242,0.3),transparent_70%)]" />
-                                                    <AppLogo className="absolute top-1/2 left-1/2 h-auto w-28 -translate-x-1/2 -translate-y-1/2 text-snow" />
-                                                    <div className="absolute inset-y-0 left-0 w-px bg-white/60" />
-                                                    <div className="absolute inset-y-0 left-px w-1 bg-white/15 blur-[1px]" />
+                                                    <div className="absolute inset-0 bg-neutral-100" />
+                                                    <div className="absolute inset-0 bg-[radial-gradient(90%_65%_at_50%_70%,rgba(124,92,230,0.42),rgba(124,92,230,0.14)_50%,transparent_80%)]" />
+                                                    <div className="absolute inset-0 bg-[radial-gradient(70%_40%_at_50%_-10%,rgba(124,92,230,0.16),transparent_70%)]" />
+                                                    <AppLogo className="absolute top-1/2 left-1/2 h-auto w-28 -translate-x-1/2 -translate-y-1/2 text-foreground" />
+                                                    <div className="absolute inset-y-0 left-0 w-px bg-edge" />
                                                 </div>
                                             )}
                                         </div>
@@ -204,39 +195,41 @@ export const IntegrationsHero = ({
                     variants={textContainer}
                     initial="hidden"
                     animate="visible"
-                    className="absolute bottom-20 left-0 max-w-2xl"
+                    className="absolute bottom-20 left-0 max-w-3xl"
                 >
-                    <motion.div variants={textItem} className="flex items-center gap-3">
+                    <motion.h1
+                        variants={textItem}
+                        className="font-headline mt-9 max-w-4xl text-[2.5rem] leading-tight tracking-tight"
+                    >
+                        <span className="font-headline font-medium text-foreground">
+                            The tools your team.{" "}
+                        </span>
+                        <span className="font-pixel text-muted-foreground/70">
+                            Already wired in.
+                        </span>
+                    </motion.h1>
+
+                    <motion.p
+                        variants={textItem}
+                        className="mt-3 max-w-2xl text-base leading-relaxed text-muted-foreground md:text-lg"
+                    >
+                        Issues flow in from GitHub, Slack, Linear, and Trello. Verified pull
+                        requests flow back out — without anyone picking up the ticket.
+                    </motion.p>
+                    <motion.div variants={textItem} className="flex items-center gap-3 mt-5">
                         <Link
                             href="/login"
-                            className="rounded-full bg-snow px-5 py-2.5 text-sm font-medium text-ink transition-opacity hover:opacity-90"
+                            className="inline-flex h-11 items-center rounded-lg bg-linear-to-b from-[#2b2b2b] via-[#2b2b2b] to-neutral-700 px-5 text-sm font-medium text-snow shadow-[0_3px_0_0_#151516,0_8px_16px_-6px_rgba(24,24,27,0.35)] transition-all duration-150 hover:bg-[#343435] active:translate-y-[2px] active:shadow-[0_1px_0_0_#151516,0_3px_6px_-4px_rgba(24,24,27,0.35)]"
                         >
                             Get started
                         </Link>
                         <Link
                             href="/login"
-                            className="rounded-full bg-snow/10 px-5 py-2.5 text-sm text-snow/80 transition-colors hover:bg-snow/15 hover:text-snow"
+                            className="inline-flex h-11 items-center rounded-lg border border-edge bg-snow px-5 text-sm font-medium text-foreground shadow-[0_1px_2px_rgba(24,24,27,0.05)] transition-colors hover:bg-mist"
                         >
                             Browse integrations
                         </Link>
                     </motion.div>
-
-                    <motion.h1
-                        variants={textItem}
-                        className="font-headline mt-9 text-5xl leading-[1.06] font-medium tracking-[-0.02em] text-snow md:text-7xl"
-                    >
-                        The tools your team.
-                        <br />
-                        Already wired in.
-                    </motion.h1>
-
-                    <motion.p
-                        variants={textItem}
-                        className="mt-7 max-w-lg text-lg leading-relaxed text-snow/60"
-                    >
-                        Issues flow in from GitHub, Slack, Linear, and Trello. Verified pull
-                        requests flow back out — without anyone picking up the ticket.
-                    </motion.p>
                 </motion.div>
             </div>
         </section>

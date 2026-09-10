@@ -1,3 +1,5 @@
+import type { DarwinLiveTurn } from "@/hooks/darwin/darwinCache";
+
 /**
  * What each tool is called on screen.
  *
@@ -23,4 +25,10 @@ const TOOL_LABELS: Record<string, string> = {
 
 export function darwinToolLabel(name: string): string {
     return TOOL_LABELS[name] ?? name.replace(/_/g, " ");
+}
+
+export function darwinActivityLabel(live: DarwinLiveTurn | null): string | null {
+    if (!live) return "Sending…";
+    if (live.tools.some((tool) => tool.state === "running")) return null;
+    return "Thinking…";
 }

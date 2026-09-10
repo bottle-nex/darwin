@@ -1,5 +1,6 @@
 "use client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { DarwinUiMessage } from "@trydarwin/types";
 
 import { apiClient } from "@/lib/axios";
 import { DARWIN_CANCEL_RUN_URL, DARWIN_MESSAGES_URL } from "@/routes/api_routes";
@@ -37,27 +38,25 @@ export function useSendDarwinMessage() {
             return res.data.data;
         },
         onSuccess: (data, variables) => {
+            const ask: DarwinUiMessage = {
+                id: `${data.runId}:ask`,
+                seq: Number.MAX_SAFE_INTEGER - 1,
+                role: "user",
+                content: variables.message,
+                tools: [],
+                createdAt: new Date().toISOString(),
+            };
+
             queryClient.setQueryData<DarwinThreadView>(
                 darwinThreadKey(data.threadId),
-                (previous) =>
-                    previous
-                        ? {
-                              ...previous,
-                              activeRunId: data.runId,
-                              live: emptyLiveTurn(data.runId),
-                              messages: [
-                                  ...previous.messages,
-                                  {
-                                      id: `${data.runId}:ask`,
-                                      seq: Number.MAX_SAFE_INTEGER - 1,
-                                      role: "user",
-                                      content: variables.message,
-                                      tools: [],
-                                      createdAt: new Date().toISOString(),
-                                  },
-                              ],
-                          }
-                        : previous,
+                (previous) => ({
+                    id: data.threadId,
+                    title: null,
+                    ...previous,
+                    activeRunId: data.runId,
+                    live: emptyLiveTurn(data.runId),
+                    messages: [...(previous?.messages ?? []), ask],
+                }),
             );
             void queryClient.invalidateQueries({
                 queryKey: darwinThreadsKey(variables.project_id),

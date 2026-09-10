@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 
+import LogoLoader from "@/components/app/LogoLoader";
 import PlaygroundBreadcrumb from "@/components/playground/Core/components/PlaygroundBreadcrumb";
 import { PaneLeadSlot } from "@/components/playground/Core/components/PlaygroundPaneSlots";
 import { useDarwinThread } from "@/hooks/darwin/useDarwinThread";
@@ -41,6 +42,8 @@ export default function AskDarwinDisplay() {
     const threadId = useDarwinThreadStore((state) => state.threadId);
     const openThread = useDarwinThreadStore((state) => state.open);
     const [greeting] = useState(timeOfDayGreeting);
+    const [pending, setPending] = useState<string | null>(null);
+    const [failed, setFailed] = useState<string | null>(null);
 
     const isConnected = useSocketConnection(project?.id);
     const thread = useDarwinThread(project?.id, threadId ?? undefined, isConnected);
@@ -48,19 +51,30 @@ export default function AskDarwinDisplay() {
     const stop = useStopDarwinRun();
 
     const name = user?.name?.trim() || user?.email?.split("@")[0] || "there";
-    const view = thread.data;
+    const view = thread.data ?? null;
     const runId = view?.activeRunId ?? null;
     const streaming = Boolean(runId);
-    const started = Boolean(threadId);
+    const sending = pending !== null;
+    const outgoing = sending && !runId ? pending : null;
+    const loadingThread = Boolean(threadId) && !view && thread.isLoading && !sending;
+    const started = Boolean(threadId) || sending || failed !== null;
 
     async function ask(text: string) {
-        if (!project?.id || streaming) return;
-        const result = await send.mutateAsync({
-            project_id: project.id,
-            thread_id: threadId ?? undefined,
-            message: text,
-        });
-        if (!threadId) openThread(result.threadId);
+        if (!project?.id || streaming || sending) return;
+        setFailed(null);
+        setPending(text);
+        try {
+            const result = await send.mutateAsync({
+                project_id: project.id,
+                thread_id: threadId ?? undefined,
+                message: text,
+            });
+            if (!threadId) openThread(result.threadId);
+        } catch {
+            setFailed(text);
+        } finally {
+            setPending(null);
+        }
     }
 
     function halt() {
@@ -75,8 +89,17 @@ export default function AskDarwinDisplay() {
             </PaneLeadSlot>
 
             <section className="relative flex min-h-0 flex-1 flex-col">
-                {started && view ? (
-                    <DarwinThread view={view} />
+                {loadingThread ? (
+                    <LogoLoader />
+                ) : started ? (
+                    <DarwinThread
+                        view={view}
+                        pending={outgoing}
+                        failed={failed}
+                        onRetry={() => {
+                            if (failed) void ask(failed);
+                        }}
+                    />
                 ) : (
                     <div className="relative z-10 flex min-h-0 flex-1 flex-col items-center justify-center px-6">
                         <h1 className="mb-6 text-2xl font-medium text-neutral-100">
@@ -90,6 +113,7 @@ export default function AskDarwinDisplay() {
                         onSend={ask}
                         onStop={halt}
                         streaming={streaming}
+                        sending={sending}
                         className="w-full max-w-180"
                     />
                     {!started && (

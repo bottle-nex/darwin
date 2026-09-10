@@ -78,12 +78,12 @@ export default function LoginForm({ callbackUrl = "/playground" }: LoginFormProp
     }
 
     const otpSlotClass = cn(
-        "h-12 flex-1 rounded-md border border-white/15 bg-white/5 text-base text-white shadow-none",
-        "data-[active=true]:border-[#8B77EC] data-[active=true]:ring-2 data-[active=true]:ring-[#8B77EC]/30",
+        "h-12 flex-1 rounded-md border border-edge bg-snow text-base text-foreground shadow-none",
+        "data-[active=true]:border-primary data-[active=true]:ring-2 data-[active=true]:ring-primary/30",
     );
 
     return (
-        <main className="flex min-h-dvh w-full flex-col items-center justify-center bg-ink px-4 text-white">
+        <main className="flex min-h-dvh w-full flex-col items-center justify-center bg-ink px-4 text-foreground">
             <div className="w-full max-w-80">
                 <div className="flex flex-col items-center">
                     <AppLogo iconOnly className="mb-6 scale-125" />
@@ -101,7 +101,7 @@ export default function LoginForm({ callbackUrl = "/playground" }: LoginFormProp
                                     onClick={() => handleOauth(option.type)}
                                     loading={oauthPending === option.type}
                                     disabled={oauthPending !== null}
-                                    className="flex h-12 items-center justify-center gap-x-2.5 rounded-full bg-white/6 text-sm font-medium transition-colors hover:bg-white/10 active:scale-[.99] cursor-pointer disabled:opacity-60"
+                                    className="flex h-12 items-center justify-center gap-x-2.5 rounded-full border border-edge bg-snow text-sm font-medium shadow-[0_1px_2px_rgba(24,24,27,0.05)] transition-colors hover:bg-mist active:scale-[.99] cursor-pointer disabled:opacity-60"
                                 >
                                     {oauthPending !== option.type && (
                                         <Image
@@ -109,10 +109,7 @@ export default function LoginForm({ callbackUrl = "/playground" }: LoginFormProp
                                             alt=""
                                             width={18}
                                             height={18}
-                                            className={cn(
-                                                "shrink-0",
-                                                option.type === "github" && "invert",
-                                            )}
+                                            className="shrink-0"
                                         />
                                     )}
                                     {option.label}
@@ -122,7 +119,7 @@ export default function LoginForm({ callbackUrl = "/playground" }: LoginFormProp
                                 variant="unstyled"
                                 type="button"
                                 onClick={() => setStep("email")}
-                                className="flex h-12 items-center justify-center rounded-full bg-white/6 text-sm font-medium transition-colors hover:bg-white/10 active:scale-[.99] cursor-pointer"
+                                className="flex h-12 items-center justify-center rounded-full border border-edge bg-snow text-sm font-medium shadow-[0_1px_2px_rgba(24,24,27,0.05)] transition-colors hover:bg-mist active:scale-[.99] cursor-pointer"
                             >
                                 Continue with email
                             </Button>
@@ -138,7 +135,7 @@ export default function LoginForm({ callbackUrl = "/playground" }: LoginFormProp
                                 autoFocus
                                 onChange={(e) => setEmail(e.target.value)}
                                 onKeyDown={(e) => e.key === "Enter" && handleSendOtp()}
-                                className="h-12 w-full rounded-full border border-white/15 bg-white/5 px-5 text-sm text-white placeholder:text-white/40 outline-none focus:border-[#8B77EC]"
+                                className="h-12 w-full rounded-full border border-edge bg-snow px-5 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-primary"
                             />
                             <Button
                                 variant="unstyled"
@@ -146,7 +143,7 @@ export default function LoginForm({ callbackUrl = "/playground" }: LoginFormProp
                                 onClick={handleSendOtp}
                                 loading={loading}
                                 disabled={!email}
-                                className="flex h-12 items-center justify-center gap-x-2 rounded-full bg-[#8B77EC] text-sm font-medium text-white transition-colors hover:bg-[#7c67e3] active:scale-[.99] disabled:opacity-60"
+                                className="flex h-12 items-center justify-center gap-x-2 rounded-full bg-primary text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 active:scale-[.99] disabled:opacity-60"
                             >
                                 Continue with email
                             </Button>
@@ -157,7 +154,7 @@ export default function LoginForm({ callbackUrl = "/playground" }: LoginFormProp
                                     setStep("options");
                                     setError("");
                                 }}
-                                className="text-sm text-white/50 transition-colors hover:text-white/80"
+                                className="text-sm text-muted-foreground transition-colors hover:text-foreground"
                             >
                                 Back to all options
                             </Button>
@@ -166,9 +163,9 @@ export default function LoginForm({ callbackUrl = "/playground" }: LoginFormProp
 
                     {step === "otp" && (
                         <div className="flex flex-col gap-y-4">
-                            <p className="text-center text-sm text-white/60">
+                            <p className="text-center text-sm text-muted-foreground">
                                 Enter the 6-digit code sent to{" "}
-                                <span className="font-medium text-white">{email}</span>
+                                <span className="font-medium text-foreground">{email}</span>
                             </p>
                             <InputOTP
                                 maxLength={6}
@@ -189,7 +186,7 @@ export default function LoginForm({ callbackUrl = "/playground" }: LoginFormProp
                                 onClick={handleVerifyOtp}
                                 loading={loading}
                                 disabled={otp.length !== 6}
-                                className="flex h-12 items-center justify-center gap-x-2 rounded-full bg-[#8B77EC] text-sm font-medium text-white transition-colors hover:bg-[#7c67e3] active:scale-[.99] disabled:opacity-60"
+                                className="flex h-12 items-center justify-center gap-x-2 rounded-full bg-primary text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 active:scale-[.99] disabled:opacity-60"
                             >
                                 Sign in
                             </Button>
@@ -201,17 +198,17 @@ export default function LoginForm({ callbackUrl = "/playground" }: LoginFormProp
                                     setOtp("");
                                     setError("");
                                 }}
-                                className="text-sm text-white/50 transition-colors hover:text-white/80"
+                                className="text-sm text-muted-foreground transition-colors hover:text-foreground"
                             >
                                 Change email
                             </Button>
                         </div>
                     )}
 
-                    {error && <p className="text-center text-xs text-red-400">{error}</p>}
+                    {error && <p className="text-center text-xs text-destructive">{error}</p>}
                 </div>
 
-                <p className="mt-8 text-center text-xs leading-relaxed text-white/40">
+                <p className="mt-8 text-center text-xs leading-relaxed text-muted-foreground">
                     Don&apos;t have an account? Just enter your email &amp; we&apos;ll create one.
                 </p>
             </div>
