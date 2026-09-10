@@ -8,7 +8,7 @@ import {
     MarketingPeopleIcon,
     NavCtaArrowIcon,
 } from "@trydarwin/ui/icons";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { AnimatePresence, motion, useReducedMotion, type Variants } from "motion/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -79,6 +79,16 @@ const NAV_ITEMS: NavItem[] = [
 const NAV_LINK_CLASS =
     "text-[13px] font-normal text-muted-foreground hover:text-foreground transition-colors duration-200";
 
+const REVEAL: Variants = {
+    hidden: { opacity: 0, y: -8, filter: "blur(8px)" },
+    show: {
+        opacity: 1,
+        y: 0,
+        filter: "blur(0px)",
+        transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1], delay: 0.1 },
+    },
+};
+
 export function LandingNavbar() {
     const router = useRouter();
     const session = useUserSessionStore((s) => s.session);
@@ -119,7 +129,12 @@ export function LandingNavbar() {
                     : "border-b border-transparent",
             )}
         >
-            <div className={cn(landingContainer, "flex h-full items-center justify-between")}>
+            <motion.div
+                initial={reduceMotion ? false : "hidden"}
+                animate="show"
+                variants={REVEAL}
+                className={cn(landingContainer, "flex h-full items-center justify-between")}
+            >
                 <div className="flex items-center gap-x-6 lg:gap-x-8">
                     <Link href="/" aria-label="try darwin home" className="text-foreground">
                         <AppLogo size={20} iconOnly />
@@ -259,7 +274,7 @@ export function LandingNavbar() {
                         Get Started
                     </button>
                 </div>
-            </div>
+            </motion.div>
         </header>
     );
 }
