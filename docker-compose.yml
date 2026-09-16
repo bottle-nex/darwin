@@ -1,5 +1,6 @@
 services:
   db:
+    restart: unless-stopped
     image: postgres:16
     container_name: nanbe-postgres
     environment:
@@ -12,6 +13,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
 
   redis:
+    restart: unless-stopped
     image: redis:7-alpine
     container_name: nanbe-redis
     ports:
@@ -21,6 +23,7 @@ services:
       - redis_data:/data
 
   minio:
+    restart: unless-stopped
     image: quay.io/minio/minio:latest
     container_name: nanbe-minio
     command: server /data --console-address ":9001"
