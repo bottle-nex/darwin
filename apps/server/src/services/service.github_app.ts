@@ -56,9 +56,23 @@ export default class GithubAppService {
         return this._appOctokit;
     }
 
+    /**
+     * `select_target` always shows GitHub's account chooser. `installations/new` only offers
+     * one while the app is uninstalled — afterwards it silently reuses the existing install,
+     * which is how every connection ended up on a personal account instead of an org.
+     *
+     * The explicit `redirect_uri` stops GitHub falling back to whichever callback URL happens
+     * to be listed first on the app, which used to land installs on the NextAuth login route.
+     */
     static buildInstallUrl(state: string): string {
         const slug = encodeURIComponent(ENV.SERVER_GITHUB_APP_SLUG);
-        return `https://github.com/apps/${slug}/installations/new?state=${encodeURIComponent(state)}`;
+        const redirectUri = encodeURIComponent(
+            `${ENV.SERVER_WEB_URL}/integrations/github/callback`,
+        );
+        return (
+            `https://github.com/apps/${slug}/installations/select_target` +
+            `?state=${encodeURIComponent(state)}&redirect_uri=${redirectUri}`
+        );
     }
 
     static async getInstallationToken(installationId: number): Promise<string> {
@@ -77,7 +91,7 @@ export default class GithubAppService {
         const account = data.account as { login?: string; type?: string; id?: number } | null;
         return {
             accountLogin: account?.login ?? "",
-            accountType: account?.type ?? "Organization",
+            accountType: account?.type ?? "Unknown",
             accountId: account?.id ?? 0,
         };
     }
