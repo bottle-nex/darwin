@@ -1,5 +1,5 @@
-import { Prisma, prisma, WorkerStatus } from "@trymatcha/database";
-import Logger from "@trymatcha/logger";
+import { Prisma, prisma, WorkerStatus } from "@trydarwin/database";
+import Logger from "@trydarwin/logger";
 import { Sandbox } from "e2b";
 
 import { ENV } from "../../conf/config.env";

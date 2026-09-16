@@ -1,4 +1,4 @@
-import { ExecutionMode } from "@trymatcha/database";
+import { ExecutionMode } from "@trydarwin/database";
 
 import type { ClaimedIssue } from "../dispatch/service.issue_solver";
 import { PR_BODY_PATH, REPO_DIR, SOLVE_REPORT_PATH } from "./service.e2b.constants";

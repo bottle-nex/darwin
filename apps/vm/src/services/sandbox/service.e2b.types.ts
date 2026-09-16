@@ -1,5 +1,5 @@
-import type Logger from "@trymatcha/logger";
-import type { RunLogEventKind, RunLogMilestoneBody } from "@trymatcha/types";
+import type Logger from "@trydarwin/logger";
+import type { RunLogEventKind, RunLogMilestoneBody } from "@trydarwin/types";
 import type { Sandbox } from "e2b";
 
 export interface SolveContext {

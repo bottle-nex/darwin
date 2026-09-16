@@ -1,5 +1,5 @@
 "use client";
-import { AutonomousModeIcon, ManualModeIcon } from "@trymatcha/ui/icons";
+import { AutonomousModeIcon, ManualModeIcon } from "@trydarwin/ui/icons";
 
 import { EXECUTION_MODE_OPTIONS, type ExecutionMode } from "@/types/project";
 

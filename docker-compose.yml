@@ -7,7 +7,7 @@ services:
       - POSTGRES_PASSWORD=password
       - POSTGRES_DB=nanbe
     ports:
-      - '4403:5432'
+      - '127.0.0.1:4403:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
@@ -15,21 +15,21 @@ services:
     image: redis:7-alpine
     container_name: nanbe-redis
     ports:
-      - '4404:6379'
+      - '127.0.0.1:4404:6379'
     command: redis-server --appendonly yes --notify-keyspace-events Ex
     volumes:
       - redis_data:/data
 
   minio:
-    image: minio/minio:latest
+    image: quay.io/minio/minio:latest
     container_name: nanbe-minio
     command: server /data --console-address ":9001"
     environment:
       MINIO_ROOT_USER: ${MINIO_ACCESS_KEY:-trydarwin-local}
       MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY:-trydarwin-local-dev-only}
     ports:
-      - "4405:9000"
-      - "4406:9001"
+      - "127.0.0.1:4405:9000"
+      - "127.0.0.1:4406:9001"
     volumes:
       - minio_data:/data
     healthcheck:
@@ -39,7 +39,7 @@ services:
       retries: 20
 
   minio-init:
-    image: minio/mc:latest
+    image: quay.io/minio/mc:latest
     depends_on:
       minio:
         condition: service_healthy

@@ -4,7 +4,7 @@ import {
     AgentQuestionType,
     IssueStatus,
     prisma,
-} from "@trymatcha/database";
+} from "@trydarwin/database";
 
 import { ENV } from "../../configs/env";
 import GithubAppService from "../service.github_app";

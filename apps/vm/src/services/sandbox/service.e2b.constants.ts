@@ -1,4 +1,4 @@
-import type { McpServerSpec } from "@trymatcha/harness";
+import type { McpServerSpec } from "@trydarwin/harness";
 
 import { ENV } from "../../conf/config.env";
 

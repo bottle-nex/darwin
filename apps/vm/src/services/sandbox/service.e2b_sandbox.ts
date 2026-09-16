@@ -1,4 +1,4 @@
-import type Logger from "@trymatcha/logger";
+import type Logger from "@trydarwin/logger";
 import type { CommandResult, SnapshotInfo } from "e2b";
 import { Sandbox } from "e2b";
 
