@@ -75,11 +75,7 @@ export default function DarwinComposer({
                     <IconWrapper
                         className={sending ? "cursor-default" : "cursor-pointer"}
                         icon={
-                            sending
-                                ? LoadingSpinnerIcon
-                                : streaming
-                                  ? StopGenerationIcon
-                                  : SendIcon
+                            sending ? LoadingSpinnerIcon : streaming ? StopGenerationIcon : SendIcon
                         }
                         iconClassName={sending ? "animate-spin" : undefined}
                         variant="ghost"
