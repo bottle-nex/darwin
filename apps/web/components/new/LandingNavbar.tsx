@@ -1,11 +1,13 @@
 "use client";
 import {
     type AnimatedIcon,
+    CloseIcon,
     DropdownCaretIcon,
     MarketingBriefcaseIcon,
     MarketingChecklistIcon,
     MarketingNoteIcon,
     MarketingPeopleIcon,
+    MobileNavIcon,
     NavCtaArrowIcon,
 } from "@trydarwin/ui/icons";
 import { AnimatePresence, motion, useReducedMotion, type Variants } from "motion/react";
@@ -76,6 +78,10 @@ const NAV_ITEMS: NavItem[] = [
     },
 ];
 
+const MOBILE_NAV_LINKS: NavLink[] = NAV_ITEMS.flatMap((item) =>
+    isNavMenu(item) ? item.links : [item],
+);
+
 const NAV_LINK_CLASS =
     "text-[13px] font-normal text-muted-foreground hover:text-foreground transition-colors duration-200";
 
@@ -94,6 +100,7 @@ export function LandingNavbar() {
     const session = useUserSessionStore((s) => s.session);
     const [scrolled, setScrolled] = useState(false);
     const [openMenu, setOpenMenu] = useState<string | null>(null);
+    const [mobileOpen, setMobileOpen] = useState(false);
     const headerRef = useRef<HTMLElement>(null);
     const reduceMotion = useReducedMotion();
 
@@ -119,7 +126,11 @@ export function LandingNavbar() {
         <header
             ref={headerRef}
             onMouseLeave={() => setOpenMenu(null)}
-            onKeyDown={(e) => e.key === "Escape" && setOpenMenu(null)}
+            onKeyDown={(e) => {
+                if (e.key !== "Escape") return;
+                setOpenMenu(null);
+                setMobileOpen(false);
+            }}
             className={cn(
                 "fixed top-0 left-0 right-0 z-50",
                 "transition-[height,border-color] duration-300 ease-out z-100",
@@ -255,10 +266,10 @@ export function LandingNavbar() {
                     </nav>
                 </div>
 
-                <div className="flex items-center gap-x-3">
+                <div className="flex items-center gap-x-2 sm:gap-x-3">
                     <Link
                         href="/blog?tab=changelog"
-                        className="spin-ring inline-flex h-9 items-center rounded-full p-px shadow-[0_1px_2px_rgba(24,24,27,0.07)]"
+                        className="spin-ring hidden h-9 items-center rounded-full p-px shadow-[0_1px_2px_rgba(24,24,27,0.07)] sm:inline-flex"
                     >
                         <span className="inline-flex h-full items-center gap-x-3 rounded-full bg-snow px-4 text-[13px] font-medium text-foreground transition-colors hover:bg-mist">
                             See what&apos;s new
@@ -273,8 +284,57 @@ export function LandingNavbar() {
                     >
                         Get Started
                     </button>
+
+                    <button
+                        type="button"
+                        aria-label={mobileOpen ? "Close menu" : "Open menu"}
+                        aria-expanded={mobileOpen}
+                        onClick={() => setMobileOpen((open) => !open)}
+                        className="-mr-2 inline-flex size-9 cursor-pointer items-center justify-center rounded-md text-foreground md:hidden"
+                    >
+                        {mobileOpen ? (
+                            <CloseIcon className="size-5" />
+                        ) : (
+                            <MobileNavIcon className="size-5" />
+                        )}
+                    </button>
                 </div>
             </motion.div>
+
+            <AnimatePresence initial={false}>
+                {mobileOpen && (
+                    <motion.nav
+                        initial={{ opacity: 0, y: -8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -8 }}
+                        transition={{
+                            duration: reduceMotion ? 0 : 0.22,
+                            ease: [0.22, 1, 0.36, 1],
+                        }}
+                        className="absolute inset-x-0 top-full flex flex-col gap-y-0.5 border-b border-edge bg-cement px-5 pt-2 pb-4 shadow-[0_12px_32px_-12px_rgba(24,24,27,0.18)] md:hidden"
+                    >
+                        {MOBILE_NAV_LINKS.map((link) => (
+                            <Link
+                                key={link.label}
+                                href={link.href}
+                                onClick={() => setMobileOpen(false)}
+                                className="rounded-md px-2 py-2.5 text-[14px] text-muted-foreground transition-colors hover:bg-hover hover:text-foreground"
+                            >
+                                {link.label}
+                            </Link>
+                        ))}
+
+                        <Link
+                            href="/blog?tab=changelog"
+                            onClick={() => setMobileOpen(false)}
+                            className="mt-2 flex items-center justify-between rounded-md border border-edge bg-snow px-3 py-2.5 text-[13px] font-medium text-foreground sm:hidden"
+                        >
+                            See what&apos;s new
+                            <NavCtaArrowIcon className="size-4 text-muted-foreground" />
+                        </Link>
+                    </motion.nav>
+                )}
+            </AnimatePresence>
         </header>
     );
 }

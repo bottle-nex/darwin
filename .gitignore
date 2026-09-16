@@ -55,3 +55,5 @@ AGENTS.md
 .darwin/
 
 *.tsbuildinfo
+.env.bak.*
+.env.*.bak

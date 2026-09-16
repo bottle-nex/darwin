@@ -21,10 +21,10 @@ import { useNewProjectStore } from "@/store/project/useNewProjectStore";
 export default function OrgRedirectPage() {
     const router = useRouter();
     const { orgSlug } = useParams<{ orgSlug: string }>();
-    const { data, isPending } = useGetDashboard(orgSlug);
+    const { data, isPending, isFetching } = useGetDashboard(orgSlug);
     const { forceCreate, setOpen, setTargetOrgSlug } = useNewProjectStore();
 
-    const hasNoProjects = !!data && data.projects.length === 0;
+    const hasNoProjects = !!data && data.projects.length === 0 && !isFetching;
 
     useEffect(() => {
         if (!data) return;

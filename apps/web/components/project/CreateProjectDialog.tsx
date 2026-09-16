@@ -6,8 +6,6 @@ import { useState } from "react";
 
 import PlaygroundAvatar from "@/components/playground/Core/components/PlaygroundAvatar";
 import CreateProjectDialogDetailsStep from "@/components/project/CreateProjectDialogDetailsStep";
-import ProjectEnvStep, { type EnvRow } from "@/components/project/ProjectEnvStep";
-import { Button } from "@/components/ui/button";
 import {
     Dialog,
     DIALOG_COMPOSER_SURFACE,
@@ -17,7 +15,6 @@ import {
 import { type IconPick, IconPickButton } from "@/components/ui/IconPicker";
 import { useGetDashboard } from "@/hooks/dashboard/useGetDashboard";
 import { useFetchOrganizations } from "@/hooks/playground/useFetchOrganizations";
-import { useSetProjectSecrets } from "@/hooks/project/useSetProjectSecrets";
 import { cn } from "@/lib/utils";
 import { useNewProjectStore } from "@/store/project/useNewProjectStore";
 
@@ -36,46 +33,19 @@ export default function CreateProjectDialog() {
     const org = (organizations ?? []).find((o) => o.slug === orgSlug);
     const { data: dashboard } = useGetDashboard(org?.slug);
 
-    const setSecrets = useSetProjectSecrets();
-
-    const [createdProjectId, setCreatedProjectId] = useState<string | null>(null);
     const [icon, setIcon] = useState<IconPick | null>(null);
     const [iconOpen, setIconOpen] = useState(false);
-    const [envRows, setEnvRows] = useState<EnvRow[]>([{ key: "", value: "" }]);
-    const [revealValues, setRevealValues] = useState(false);
 
-    const mustCreateProject =
-        open && !!org && forceCreate && dashboard?.projects.length === 0 && !createdProjectId;
+    const mustCreateProject = open && !!org && forceCreate && dashboard?.projects.length === 0;
 
     function handleOpenChange(next: boolean) {
         setOpen(next);
         if (!next) {
             setTargetOrgSlug(null);
             setForceCreate(false);
-            setCreatedProjectId(null);
             setIcon(null);
-            setEnvRows([{ key: "", value: "" }]);
-            setRevealValues(false);
-            setSecrets.reset();
         }
     }
-
-    function handleSaveSecrets() {
-        if (!createdProjectId) return;
-        const valid = envRows
-            .filter((row) => row.key.trim() && row.value)
-            .map((row) => ({ key: row.key.trim(), value: row.value }));
-        if (!valid.length) {
-            handleOpenChange(false);
-            return;
-        }
-        setSecrets.mutate(
-            { projectId: createdProjectId, secrets: valid },
-            { onSuccess: () => handleOpenChange(false) },
-        );
-    }
-
-    const hasValidSecrets = envRows.some((row) => row.key.trim() && row.value);
 
     return (
         <Dialog
@@ -92,9 +62,7 @@ export default function CreateProjectDialog() {
                     DIALOG_COMPOSER_SURFACE,
                 )}
             >
-                <DialogTitle className="sr-only">
-                    {createdProjectId ? "Environment variables" : "Create project"}
-                </DialogTitle>
+                <DialogTitle className="sr-only">Create project</DialogTitle>
 
                 <section className="flex items-center gap-x-1 px-6 pt-4 pb-2 text-xs text-overlay">
                     <PlaygroundAvatar
@@ -105,74 +73,29 @@ export default function CreateProjectDialog() {
                     <span>
                         <BreadcrumbSeparatorIcon />
                     </span>
-                    {!createdProjectId && (
-                        <IconPickButton
-                            pick={icon}
-                            onSelect={setIcon}
-                            open={iconOpen}
-                            onOpenChange={setIconOpen}
-                            label="Pick project icon"
-                            size="sm"
-                        />
-                    )}
+                    <IconPickButton
+                        pick={icon}
+                        onSelect={setIcon}
+                        open={iconOpen}
+                        onOpenChange={setIconOpen}
+                        label="Pick project icon"
+                        size="sm"
+                    />
                     <span>
                         <BreadcrumbSeparatorIcon />
                     </span>
-                    <span className="text-sm">
-                        {createdProjectId ? "Environment variables" : "New Project"}
-                    </span>
+                    <span className="text-sm">New Project</span>
                 </section>
 
-                {createdProjectId ? (
-                    <main className="flex min-h-0 min-w-0 flex-1 flex-col justify-between *:px-6">
-                        <section
-                            data-lenis-prevent
-                            className="no-scrollbar flex-1 min-h-0 overflow-y-auto"
-                        >
-                            <ProjectEnvStep
-                                rows={envRows}
-                                setRows={setEnvRows}
-                                reveal={revealValues}
-                                setReveal={setRevealValues}
-                            />
-                        </section>
-                        <section className="flex h-fit items-center justify-end gap-x-2 pb-4">
-                            <Button
-                                type="button"
-                                variant="unstyled"
-                                size="xs"
-                                disabled={setSecrets.isPending}
-                                onClick={() => handleOpenChange(false)}
-                                className="cursor-pointer px-2 text-xs text-overlay/50 hover:text-overlay/80"
-                            >
-                                Skip for now
-                            </Button>
-                            <Button
-                                type="button"
-                                variant="tertiary"
-                                size="xs"
-                                className="text-ink!"
-                                loading={setSecrets.isPending}
-                                disabled={!hasValidSecrets || setSecrets.isPending}
-                                onClick={handleSaveSecrets}
-                            >
-                                Save &amp; finish
-                            </Button>
-                        </section>
-                    </main>
-                ) : (
-                    <CreateProjectDialogDetailsStep
-                        org={org}
-                        icon={icon}
-                        mustCreateProject={mustCreateProject}
-                        onCancel={() =>
-                            mustCreateProject
-                                ? signOut({ callbackUrl: "/" })
-                                : handleOpenChange(false)
-                        }
-                        onCreated={setCreatedProjectId}
-                    />
-                )}
+                <CreateProjectDialogDetailsStep
+                    org={org}
+                    icon={icon}
+                    mustCreateProject={mustCreateProject}
+                    onCancel={() =>
+                        mustCreateProject ? signOut({ callbackUrl: "/" }) : handleOpenChange(false)
+                    }
+                    onCreated={() => handleOpenChange(false)}
+                />
             </DialogContent>
         </Dialog>
     );

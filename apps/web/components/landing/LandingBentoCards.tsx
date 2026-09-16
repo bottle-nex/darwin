@@ -76,7 +76,7 @@ export default function LandingBentoCards() {
                 titleContinued="The board hands it off, an agent picks it up."
                 description="Every issue walks the same path: board, agent, sandboxed runner, pull request. Nothing skips a stage."
             />
-            <div className="relative mt-16">
+            <div className="relative mt-10 md:mt-16">
                 <ProcessConnectors />
                 <div
                     ref={rowRef}

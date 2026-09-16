@@ -38,8 +38,9 @@ const COPY: Record<Flow, Record<Status, { title: string; hint: string }>> = {
 function StatusIcon({ status }: { status: Status }) {
     if (status === "success")
         return <SuccessCircleIcon className="size-5 text-matcha" aria-hidden />;
-    if (status === "error") return <ErrorCircleIcon className="size-5 text-red-400" aria-hidden />;
-    return <LoadingSpinnerIcon className="size-5 animate-spin text-neutral-400" aria-hidden />;
+    if (status === "error")
+        return <ErrorCircleIcon className="size-5 text-destructive" aria-hidden />;
+    return <LoadingSpinnerIcon className="size-5 animate-spin text-muted-foreground" aria-hidden />;
 }
 
 function GithubCallback() {
@@ -110,19 +111,19 @@ function GithubCallback() {
     const copy = COPY[flow][status];
 
     return (
-        <main className="flex h-dvh items-center justify-center bg-charcoal px-6 text-neutral-100">
+        <main className="flex h-dvh items-center justify-center bg-ink px-6 text-foreground">
             <div
                 role="status"
                 aria-live="polite"
                 className="flex flex-col items-center justify-center gap-4 text-center"
             >
-                <span className="flex size-12 items-center justify-center rounded-xl border border-white/10 bg-white/5">
+                <span className="flex size-12 items-center justify-center rounded-xl border border-edge bg-graphite">
                     <StatusIcon status={status} />
                 </span>
 
                 <div>
-                    <p className="text-sm font-medium text-neutral-200">{copy.title}</p>
-                    <p className="mt-1 text-xs text-neutral-500">{hint ?? copy.hint}</p>
+                    <p className="text-sm font-medium text-foreground">{copy.title}</p>
+                    <p className="mt-1 text-xs text-muted-foreground">{hint ?? copy.hint}</p>
                 </div>
 
                 {status === "error" && (

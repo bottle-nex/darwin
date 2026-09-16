@@ -37,7 +37,7 @@ export default function ShowcaseFrame({
     return (
         <div
             className={cn(
-                "relative h-110 w-full overflow-hidden rounded-lg border border-edge md:h-140",
+                "relative w-full overflow-hidden rounded-lg border border-edge",
                 className,
             )}
         >
@@ -65,7 +65,7 @@ export default function ShowcaseFrame({
                 {...glass}
             />
             <div className="absolute inset-0 bg-ink/40" />
-            <div className="absolute inset-0 flex items-center justify-center p-6">
+            <div className="relative flex min-h-110 items-center justify-center p-4 sm:p-6 md:min-h-140">
                 <div className={cn("w-full max-w-110", contentClassName)}>{children}</div>
             </div>
         </div>

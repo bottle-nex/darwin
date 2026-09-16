@@ -77,7 +77,7 @@ export default function LandingFeatureShowcase() {
                 titleContinued="darwin runs the rest of the loop."
                 description="One GitHub connection powers everything, issues on a board, agents in sandboxed runners, pull requests back to you."
             />
-            <div className="mt-16 grid gap-12 md:grid-cols-[300px_minmax(0,1fr)] md:gap-16">
+            <div className="mt-10 grid gap-12 md:mt-16 md:grid-cols-[300px_minmax(0,1fr)] md:gap-16">
                 <div className="hidden md:block">
                     <nav className="sticky top-28 flex flex-col gap-1">
                         {FEATURES.map((feature, i) => (
@@ -111,7 +111,7 @@ export default function LandingFeatureShowcase() {
                         ))}
                     </nav>
                 </div>
-                <div className="flex flex-col gap-20 md:gap-28">
+                <div className="flex flex-col gap-16 md:gap-28">
                     {FEATURES.map((feature, i) => (
                         <div
                             key={feature.index}

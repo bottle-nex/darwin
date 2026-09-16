@@ -4,7 +4,6 @@ import { useEffect, useLayoutEffect } from "react";
 
 import CommandDialogs from "@/components/command/CommandDialogs";
 import CommandMenu from "@/components/command/CommandMenu";
-import OnboardingDisplay from "@/components/onboarding/OnboardingDisplay";
 import IssueSelectionBar from "@/components/playground/Core/components/IssueSelectionBar";
 import PlaygroundPaneFrame from "@/components/playground/Core/components/PlaygroundPaneFrame";
 import FloatNotifications from "@/components/playground/Core/Notifications/FloatNotifications";
@@ -15,11 +14,7 @@ import SpacesSelectionBar from "@/components/playground/Home/SpacesDisplay/Space
 import CreateIssueDialog from "@/components/playground/Issue/CreateIssueDialog";
 import IssueDisplay from "@/components/playground/Issue/IssueDisplay";
 import SolveReportDisplay from "@/components/playground/Issue/SolveReportDisplay";
-import {
-    defaultHomeViewToTab,
-    isSettingsTab,
-    PlaygroundTab,
-} from "@/components/playground/playgroundTabs";
+import { defaultHomeViewToTab, PlaygroundTab } from "@/components/playground/playgroundTabs";
 import ReviewDisplay from "@/components/playground/Review/ReviewDisplay";
 import PlaygroundSheetSidebar from "@/components/playground/Sidebar/PlaygroundSheetSidebar";
 import PlaygroundShortcutSheet from "@/components/playground/Sidebar/PlaygroundShortcutSheet";
@@ -117,8 +112,6 @@ export default function PlaygroundShell() {
     }, []);
 
     const loading = isDashboardPending || (activeProject ? isProjectPending : false);
-    const inSettings = isSettingsTab(activeTab);
-    const showOnboarding = !loading && !!project && !project.tourCompleted && !inSettings;
 
     return (
         <main className="relative flex h-screen flex-col overflow-hidden bg-ink text-neutral-100 tracking-wide">
@@ -127,11 +120,7 @@ export default function PlaygroundShell() {
                 <PlaygroundSidebar />
                 <SidebarResizeHandle />
                 <PlaygroundPaneFrame lead={<PlaygroundCollapsedLead />}>
-                    {showOnboarding ? (
-                        <div className="flex min-h-0 flex-1 flex-col">
-                            <OnboardingDisplay project={project} orgId={dashboard!.org.id} />
-                        </div>
-                    ) : paneRoute.kind === "review" ? (
+                    {paneRoute.kind === "review" ? (
                         <ReviewDisplay route={paneRoute} />
                     ) : paneRoute.kind === "solve-report" ? (
                         <SolveReportDisplay route={paneRoute} />

@@ -100,7 +100,7 @@ export function selectionAlphaFor(rgb: string, enabled: boolean) {
 }
 
 export const DEFAULT_USER_CONFIG = {
-    backgroundLightingEnabled: true,
+    backgroundLightingEnabled: false,
     backgroundLightingColor: BackgroundLightingColor.Violet,
     defaultHomeView: DefaultHomeView.Kanban,
     codeTheme: CodeTheme.Darwin,

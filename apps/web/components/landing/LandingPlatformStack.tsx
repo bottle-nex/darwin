@@ -125,7 +125,7 @@ function GhostLayerBlock({
             onMouseEnter={() => onHoverChange(layer.id)}
             onMouseLeave={() => onHoverChange(null)}
             className={cn(
-                "group flex flex-1 flex-col p-8 transition-colors duration-300 hover:bg-hover md:p-10",
+                "group flex flex-1 flex-col p-6 transition-colors duration-300 hover:bg-hover md:p-10",
                 className,
             )}
         >
@@ -229,7 +229,7 @@ export default function LandingPlatformStack() {
                 />
             </Reveal>
 
-            <Reveal delay={0.15} className="mt-16">
+            <Reveal delay={0.15} className="mt-10 md:mt-16">
                 <div className="grid grid-cols-1 rounded-[10px] border border-edge md:grid-cols-[minmax(0,1fr)_minmax(0,1.45fr)_minmax(0,1fr)]">
                     <div className="flex flex-col max-md:border-b max-md:border-edge md:border-r md:border-edge">
                         <GhostLayerBlock
@@ -244,23 +244,20 @@ export default function LandingPlatformStack() {
                         />
                     </div>
 
-                    <figure className="order-first px-4 py-10 md:order-0 md:px-6 md:py-8">
+                    <figure className="order-first px-2 py-8 md:order-0 md:px-6 md:py-8">
                         <StackDiagram highlighted={highlighted} />
                     </figure>
 
-                    <aside className="relative flex items-center p-8 max-md:border-t max-md:border-edge md:p-10 md:pl-6">
-                        <span
-                            aria-hidden
-                            className="absolute inset-y-0 left-8 w-px bg-edge md:left-6"
-                        />
-                        <div className="relative flex-1 pl-10">
+                    <aside className="relative flex items-center p-6 max-md:border-t max-md:border-edge md:p-10 md:pl-6">
+                        <span aria-hidden className="absolute inset-y-0 left-6 w-px bg-edge" />
+                        <div className="relative flex-1 pl-7 md:pl-10">
                             <span
                                 aria-hidden
-                                className="absolute -top-4 -right-8 left-0 h-px bg-edge md:-right-10"
+                                className="absolute -top-4 -right-6 left-0 h-px bg-edge md:-right-10"
                             />
                             <span
                                 aria-hidden
-                                className="absolute -right-8 -bottom-4 left-0 h-px bg-edge md:-right-10"
+                                className="absolute -right-6 -bottom-4 left-0 h-px bg-edge md:-right-10"
                             />
                             <span
                                 aria-hidden

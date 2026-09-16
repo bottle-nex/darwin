@@ -585,8 +585,10 @@ export default function LandingIssueTracker() {
                 titleContinued="An agent branches your repo, fixes it, and proves it."
                 description="You open a finished pull request, not a half-built branch. The runner has already proven it works."
             />
-            <div className="mt-16">
-                <BranchingDiagram />
+            <div className="no-scrollbar -mx-5 mt-10 overflow-x-auto px-5 md:mx-0 md:mt-16 md:overflow-x-visible md:px-0">
+                <div className="min-w-[880px] md:min-w-0">
+                    <BranchingDiagram />
+                </div>
             </div>
         </LandingSection>
     );

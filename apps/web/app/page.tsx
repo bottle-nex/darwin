@@ -12,7 +12,7 @@ export default function Home() {
     return (
         <div
             data-lenis-prevent
-            className="theme-landing relative min-h-screen w-screen flex flex-col bg-background text-foreground pb-6"
+            className="theme-landing relative min-h-screen w-full overflow-x-hidden flex flex-col bg-background text-foreground pb-6"
         >
             <LandingNavbar />
             <LandingHero />

@@ -26,7 +26,7 @@ export default function LandingHero() {
     const initial = reduceMotion ? false : "hidden";
 
     return (
-        <section className="relative h-svh w-full overflow-hidden text-foreground">
+        <section className="relative min-h-svh w-full overflow-hidden text-foreground">
             <motion.div
                 initial={initial}
                 animate="show"
@@ -58,21 +58,23 @@ export default function LandingHero() {
                 initial={initial}
                 animate="show"
                 variants={HERO_COPY}
-                className="mx-auto max-w-7xl flex items-center justify-center h-full"
+                className="mx-auto flex min-h-svh max-w-7xl items-center justify-center px-5 py-24 md:px-8"
             >
-                <section className="max-w-3xl translate-y-[1vh]">
+                <section className="w-full max-w-3xl translate-y-[1vh]">
                     <motion.p
                         variants={HERO_BADGE}
-                        className="mx-auto flex w-fit items-center gap-x-2 rounded-lg bg-primary/20 hover:bg-primary/30 transition-all duration-150 ease-in cursor-pointer hover:-translate-y-0.5 px-4 py-2 text-[12px] text-[#6c4dd1]"
+                        className="mx-auto flex w-fit max-w-full flex-wrap items-center justify-center gap-x-2 gap-y-1 rounded-lg bg-primary/20 hover:bg-primary/30 transition-all duration-150 ease-in cursor-pointer hover:-translate-y-0.5 px-3 py-2 text-[12px] text-[#6c4dd1] sm:px-4"
                     >
                         <span className="font-mono text-[11px] tracking-[0.2em]">NEW</span>
                         <span className="font-medium">Runners now run your test suite</span>
-                        <span className="text-[#6c4dd1]/55">See the changelog</span>
+                        <span className="hidden text-[#6c4dd1]/55 sm:inline">
+                            See the changelog
+                        </span>
                         <NavCtaArrowIcon className="ml-1 size-4" />
                     </motion.p>
                     <motion.h1
                         variants={HERO_HEADLINE}
-                        className="font-headline text-[4.5rem]/none text-center font-[500] mt-10"
+                        className="font-headline text-[2.25rem]/[1.1] sm:text-[3.25rem]/[1.05] md:text-[4.5rem]/none text-center font-[500] mt-7 md:mt-10"
                     >
                         {HEADLINE_WORDS.map((word) => (
                             <Fragment key={word}>
@@ -93,7 +95,7 @@ export default function LandingHero() {
                     </motion.h1>
                     <motion.p
                         variants={HERO_BODY}
-                        className="mx-auto text-[15px] text-center mt-10 max-w-xl font-medium"
+                        className="mx-auto text-[14px] sm:text-[15px] text-center mt-6 md:mt-10 max-w-xl font-medium"
                     >
                         Your team drops issues on the board. A darwin agent claims one, runs your
                         codebase in a sandboxed runner, verifies the fix, and opens the pull request
@@ -101,7 +103,7 @@ export default function LandingHero() {
 
                     <motion.div
                         variants={HERO_ACTIONS}
-                        className="mt-9 flex items-center justify-center gap-x-7"
+                        className="mt-8 flex flex-wrap items-center justify-center gap-x-5 gap-y-4 sm:gap-x-7 md:mt-9"
                     >
                         <motion.button
                             variants={HERO_ACTION}

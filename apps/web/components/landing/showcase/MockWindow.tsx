@@ -50,7 +50,7 @@ export function PanelCard({
     children: React.ReactNode;
 }) {
     return (
-        <div className="relative flex w-full flex-col overflow-hidden rounded-lg border border-edge bg-cement/95 p-6 shadow-[0_24px_60px_-24px_rgba(24,24,27,0.35)] backdrop-blur-xl transition-transform duration-500 hover:-translate-y-1 md:h-110 md:p-7">
+        <div className="relative flex w-full flex-col overflow-hidden rounded-lg border border-edge bg-cement/95 p-4 shadow-[0_24px_60px_-24px_rgba(24,24,27,0.35)] backdrop-blur-xl transition-transform duration-500 hover:-translate-y-1 sm:p-6 md:h-110 md:p-7">
             <motion.h3
                 variants={appear(0.1)}
                 className="text-lg font-semibold tracking-tight text-foreground md:text-xl"
@@ -63,7 +63,7 @@ export function PanelCard({
             >
                 {description}
             </motion.p>
-            <div className="mt-6 flex min-h-0 flex-1 flex-col">{children}</div>
+            <div className="mt-5 flex min-h-0 flex-1 flex-col md:mt-6">{children}</div>
         </div>
     );
 }

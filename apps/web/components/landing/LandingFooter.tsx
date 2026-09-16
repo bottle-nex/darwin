@@ -18,14 +18,14 @@ const LIGHT_DELAY_MS = 200;
 
 function PromptCard() {
     return (
-        <div className="relative flex h-64 w-full flex-col justify-between overflow-hidden rounded-md border border-primary/25 bg-linear-to-b from-[#F1EDFE] via-[#E3DBFB] to-[#CBBFF6] p-5 shadow-[0_8px_24px_-12px_rgba(24,24,27,0.18)] md:h-full">
-            <AppLogo className="pointer-events-none absolute -right-8 -bottom-8 h-60 w-auto text-[#E5DDFC]" />
+        <div className="relative flex min-h-64 w-full flex-col justify-between gap-y-8 overflow-hidden rounded-md border border-primary/25 bg-linear-to-b from-[#F1EDFE] via-[#E3DBFB] to-[#CBBFF6] p-5 shadow-[0_8px_24px_-12px_rgba(24,24,27,0.18)] md:h-full md:gap-y-0">
+            <AppLogo className="pointer-events-none absolute -right-8 -bottom-8 h-44 w-auto text-[#E5DDFC] sm:h-60" />
 
             <div className="relative">
-                <h3 className="text-[1.80rem] font-medium text-foreground">
+                <h3 className="text-[1.375rem] font-medium text-foreground sm:text-[1.80rem]">
                     Nobody can get past the login screen
                 </h3>
-                <p className="mt-1 pr-24 text-lg leading-5.5 text-foreground/70">
+                <p className="mt-2 pr-12 text-[0.9375rem] leading-snug text-foreground/70 sm:pr-24 sm:text-lg sm:leading-5.5">
                     The OTP expires before the email arrives, so the first attempt always fails.
                     Raise the TTL, add a resend path, and open a PR.
                 </p>
@@ -57,8 +57,8 @@ const SOCIALS = [
 
 function FooterContent() {
     return (
-        <div className="relative z-10 flex flex-1 flex-col justify-between gap-10 px-6 py-8 md:px-10 md:pt-10 md:pb-6">
-            <nav className="flex flex-wrap gap-x-16 gap-y-8 md:justify-center">
+        <div className="relative z-10 flex flex-1 flex-col justify-between gap-10 px-5 py-8 sm:px-6 md:px-10 md:pt-10 md:pb-6">
+            <nav className="flex flex-wrap gap-x-10 gap-y-8 sm:gap-x-16 md:justify-center">
                 {FOOTER_COLUMNS.map((column) => (
                     <div key={column.heading}>
                         <h3 className="text-[11px] font-medium tracking-[0.18em] text-muted-foreground uppercase">
@@ -81,7 +81,7 @@ function FooterContent() {
                 ))}
             </nav>
 
-            <div className="flex items-center justify-between border-t border-edge pt-5">
+            <div className="flex flex-wrap items-center justify-between gap-4 border-t border-edge pt-5">
                 <div className="flex items-center gap-3">
                     <AppLogo className="h-4 w-auto text-foreground" />
                     <span className="text-xs text-muted-foreground/70">
@@ -122,7 +122,7 @@ export default function LandingFooter() {
             }
             className={cn(
                 landingContainer,
-                "relative mt-20 flex flex-col gap-4 md:h-90 md:flex-row",
+                "relative mt-14 flex flex-col gap-4 md:mt-20 md:h-90 md:flex-row",
             )}
         >
             <div aria-hidden className="relative z-10 md:w-[60%]">
